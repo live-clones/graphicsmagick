@@ -3732,25 +3732,30 @@ MagickExport void DrawPathStart(DrawContext context)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  DrawPeekGraphicContext() returns a pointer to the DrawInfo structure at
-%  the head of the drawing context stack. The returned DrawInfo structure is
-%  invalidated by DrawPopGraphicsContext so it should be used immediately.
+%  DrawPeekGraphicContext() returns a copy of the the DrawInfo structure at
+%  the head of the drawing context stack. The user is responsible for
+%  deallocating the returned object using DestroyDrawInfo.
 %
 %  The format of the DrawPeekGraphicContext method is:
 %
-%      const DrawInfo *DrawPeekGraphicContext(const DrawContext context)
+%      DrawInfo *DrawPeekGraphicContext(const DrawContext context)
 %
 %  A description of each parameter follows:
 %
 %    o context: drawing context
 %
 */
-MagickExport const DrawInfo *DrawPeekGraphicContext(const DrawContext context)
+MagickExport DrawInfo *DrawPeekGraphicContext(const DrawContext context)
 {
+  DrawInfo
+    *draw_info;
+
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
+  draw_info=CloneDrawInfo((ImageInfo *) NULL,CurrentContext);
+  CloneString(&draw_info->primitive,context->mvg);
   CurrentContext->primitive=context->mvg;
-  return(CurrentContext);
+  return(draw_info);
 }
 
 /*
