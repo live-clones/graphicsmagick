@@ -1,26 +1,26 @@
 Welcome to GraphicsMagick.
 
 GraphicsMagick provides a comprehensive collection of utilities,
-programming interfaces, and GUIs, to support image processing and 2D
-vector rendering.
+programming interfaces, and GUIs, to support image processing and 2D vector
+rendering.
 
-GraphicsMagick is originally based on ImageMagick from ImageMagick
-Studio (which was originally written at Dupont). The goal of Open
-ImageMagick is to provide the highest quality product possible while
-encouraging open and active participation from all interested
-developers. The GraphicsMagick usage license is designed to allow it
-to be used for any application, including proprietary or GPLed
-applications.
+GraphicsMagick is originally based on ImageMagick from ImageMagick Studio
+(which was originally written at Dupont). The goal of GraphicsMagick is to
+provide the highest quality product possible while encouraging open and
+active participation from all interested developers. The GraphicsMagick
+usage license is designed to allow it to be used for any application,
+including proprietary or GPLed applications. Please see the file
+Copyright.txt for the GraphicsMagick licence.
 
 AVAILABILITY
 
   GraphicsMagick is currently under development.  It may be retrieved
   via CVS using the procedure
 
-  cvs -d ":pserver:anonymous@cvs.simplesystems.org:/GraphicsMagick" login
+  cvs -d ":pserver:anonymous@cvs.graphicsmagick.org:/GraphicsMagick" login
   [ enter "anonymous" ]
 
-  cvs -d ":pserver:anonymous@cvs.simplesystems.org:/GraphicsMagick" \
+  cvs -d ":pserver:anonymous@cvs.graphicsmagick.org:/GraphicsMagick" \
    co ImageMagick
 
 DOCUMENTATION
@@ -28,9 +28,9 @@ DOCUMENTATION
   Open the file index.html in a web browser, or refer to
   the manual pages for the display(1), animate(1), montage(1),
   import(1), mogrify(1), identify(1), composite(1), and convert(1)
-  utilities. The ImageMagick(1) manual page provides details for utility
+  commands. The GraphicsMagick(1) manual page provides details for command
   options and will also aid with understanding library interfaces. Also
-  read the ImageMagick frequently asked questions in the file
+  read the GraphicsMagick frequently asked questions in the file
   www/Magick.html.
 
 INSTALLATION
@@ -38,7 +38,7 @@ INSTALLATION
   GraphicsMagick may be compiled from source code for virtually any
   modern Unix system (including Linux and MacOS X), Microsoft Windows,
   MacOS9, and VMS. Installation instructions may be found in the
-  following files:
+  following files (or their HTML equivalents):
 
   Unix:
     INSTALL-unix.txt
@@ -56,7 +56,9 @@ INSTALLATION
 MAGICK DELEGATES
 
   To further enhance the capabilities of GraphicsMagick, you may want to
-  get these programs or libraries:
+  get these programs or libraries. Note that the Windows source package
+  (equivalent to CVS module "GraphicsMagick-NT") includes (and builds) all
+  of the library-based packages listed here.
 
     o GraphicsMagick requires the BZLIB library from
 
@@ -68,8 +70,8 @@ MAGICK DELEGATES
 
         http://www.agocg.ac.uk/train/cgm/ralcgm.htm
 
-      to read the Computer Graphics Metafile image format (may not
-      compile under linux).  You also need Ghostscript (see below).
+      to read the Computer Graphics Metafile (CGM) image format. You also
+      need Ghostscript (see below).
 
     o GraphicsMagick requires fig2dev from
 
@@ -88,24 +90,24 @@ MAGICK DELEGATES
 
         http://www.cs.wisc.edu/~ghost/
 
-      to read the Postscript or the Portable Document format. It is used
-      to annotate an image when the FreeType library is not used, or an
-      X server is not available. See the FreeType library above for
-      another means to annotate an image. Note, Ghostscript must support
-      the ppmraw device (type gs -h to verify). If Ghostscript is
-      unavailable, the Display Postscript extension is used to rasterize
-      a Postscript document (assuming you define HasDPS). The DPS
+      to read the Postscript or the Portable Document format. It is used to
+      annotate an image when the FreeType library is not used, or an X
+      server is not available. See the FreeType library above for another
+      means to annotate an image. Note, Ghostscript must support the ppmraw
+      device (type gs -h to verify). If Ghostscript is unavailable, the
+      Display Postscript X11 extension is used to rasterize a Postscript
+      document (assuming you define HasDPS and DPS is available). The DPS
       extension is less robust than Ghostscript in that it will only
       rasterize one page of a multi-page document.
 
-      Ghostscript (released 7.0 and later) may optionally install a
-      library (libgs). If this library is installed, GraphicsMagick will
-      attempt to use it unless the option --without-gslib is passed to
-      configure. Note that Ghostscript provides its own modified version
-      of libjpeg and that symbols from this libjpeg may be confused with
-      symbols with the stand-alone libjpeg. If conflicts cause JPEG to
-      fail, it may be necessary to use Ghostscript's copy of libjpeg for
-      GraphicsMagick, and all delegate libraries which depend on libjpeg.
+      Ghostscript (release 7.0 and later) may optionally install a library
+      (libgs). If this library is installed, GraphicsMagick will attempt to
+      use it unless the option --without-gslib is passed to configure. Note
+      that Ghostscript provides its own modified version of libjpeg and
+      that symbols from this libjpeg may be confused with symbols with the
+      stand-alone libjpeg. If conflicts cause JPEG to fail, it may be
+      necessary to use Ghostscript's copy of libjpeg for GraphicsMagick,
+      and all delegate libraries which depend on libjpeg.
 
     o GraphicsMagick requires hp2xx available from
 
@@ -119,7 +121,7 @@ MAGICK DELEGATES
 
          http://www.littlecms.com/
 
-      to perform color management.
+      to perform ICC CMS color management.
 
     o GraphicsMagick requires gnuplot available via anonymous FTP as
 
@@ -131,7 +133,7 @@ MAGICK DELEGATES
 
          http://www.tdb.uu.se/~jan/html2ps.html
 
-      to read the HTML image format.
+      to rasterize HTML files.
 
     o GraphicsMagick requires the JBIG-Kit software available via
       HTTP from
@@ -160,12 +162,12 @@ MAGICK DELEGATES
       Use of lossless JPEG is not encouraged. Unless you have a requirement
       to read lossless jpeg-encoded DICOM images, please disregard the patch.
 
-    o GraphicsMagick requires the JasPer Project's Jasper library available
-      via http from
+    o GraphicsMagick requires the JasPer Project's Jasper library version
+      1.700.1 available via http from
 
          http://www.ece.uvic.ca/~mdadams/jasper/
 
-      to read and write the JPEG v2 format.
+      to read and write the JPEG-2000 format.
 
     o GraphicsMagick requires the MPEG utilities from the MPEG Software
       Simulation Group, which are available via anonymous FTP as
@@ -192,7 +194,7 @@ MAGICK DELEGATES
 
          ftp://ftp.cs.utah.edu/pub/dept/OLD/pub/urt-3.1b.tar.Z
 
-      to write the RLE image format (may not compile under linux).
+      to write the RLE image format.
 
     o GraphicsMagick requires scanimage from
 
@@ -216,7 +218,7 @@ MAGICK DELEGATES
       issues. If you need to use LZW compression, support is available via
       a seperate LZW compression kit (a patch) at the sites listed above.
 
-    o GraphicsMagick requires libwmf 0.2.5 (or 0.2.2) available from
+    o GraphicsMagick requires libwmf 0.2.5 (or later) from
 
          http://sourceforge.net/projects/wvware/
 
@@ -249,13 +251,13 @@ MAGICK DELEGATES
       the Digital Imaging Group in order to support the FlashPIX
       format. The FlashPIX library may be obtained from GraphicsMagick
       anonymous CVS by checking out the 'fpx' module, or retrieving the
-      file libfpx-1.2.0.4.tar.gz from the ftp directory
+      file libfpx-1.2.0.5.tar.gz from the ftp directory.
 
          ftp://ftp.imagemagick.org/pub/GraphicsMagick/delegates/.
 
-    o GraphicsMagick requires an X server for display and animate to work
-      properly. Unix systems usually provide an X server as part of
-      their standard installation.
+    o GraphicsMagick requires an X server for the 'display', 'animate',
+      and 'import' commands to work properly. Unix systems usually provide
+      an X server as part of their standard installation.
 
       A free X server for Microsoft Windows is available from
 
