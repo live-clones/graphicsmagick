@@ -805,7 +805,7 @@ Export void RegisterMIFFImage(void)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method WriteMIFFImage writes an image to a file.
+%  Method WriteMIFFImage writes a MIFF image to a file.
 %
 %  The format of the WriteMIFFImage method is:
 %
