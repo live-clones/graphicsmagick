@@ -200,7 +200,7 @@ ModuleExport void UnregisterMPRImage(void)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method ReadMPRImage writes an image into the Magick Persistent Registry
+%  WriteMPRImage() writes an image into the Magick Persistent Registry
 %  image as a blob from memory.  It allocates the memory necessary for the
 %  new Image structure and returns a pointer to the new image.
 %
