@@ -196,7 +196,7 @@ ModuleExport void RegisterLABELImage(void)
   entry=SetMagickInfo("LABEL");
   entry->decoder=ReadLABELImage;
   entry->adjoin=False;
-  entry->description=AllocateString("Text image format");
+  entry->description=AllocateString("Image label");
   entry->module=AllocateString("LABEL");
   (void) RegisterMagickInfo(entry);
 }
