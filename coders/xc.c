@@ -176,7 +176,7 @@ ModuleExport void RegisterXCImage(void)
   entry->decoder=ReadXCImage;
   entry->adjoin=False;
   entry->raw=True;
-  entry->description=AllocateString("Constant image of X server color");
+  entry->description=AllocateString("Constant image uniform color");
   entry->module=AllocateString("XC");
   RegisterMagickInfo(entry);
 }
