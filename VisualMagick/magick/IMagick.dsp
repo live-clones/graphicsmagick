@@ -3,6 +3,7 @@
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
+# TARGTYPE "Win32 (x86) Static Library" 0x0104
 
 CFG=IMagick - Win32 Debug static
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
@@ -27,9 +28,6 @@ CFG=IMagick - Win32 Debug static
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
 
 !IF  "$(CFG)" == "IMagick - Win32 Release"
 
@@ -44,10 +42,14 @@ RSC=rc.exe
 # PROP Intermediate_Dir ".\dRelease"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+LIB32=link.exe -lib
+CPP=cl.exe
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MD /W3 /GX /O2 /I "..\..\xlib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_VISUALC_" /D "NeedFunctionPrototypes" /YX /FD /c
+MTL=midl.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /fo".\Release\version.res" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -71,10 +73,14 @@ LINK32=link.exe
 # PROP Intermediate_Dir ".\dDebug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+LIB32=link.exe -lib
+CPP=cl.exe
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
 # ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\xlib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_VISUALC_" /D "NeedFunctionPrototypes" /YX /FD /c
+MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /fo".\Debug\version.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -97,8 +103,11 @@ LINK32=link.exe
 # PROP Output_Dir "..\lib"
 # PROP Intermediate_Dir ".\sRelease"
 # PROP Target_Dir ""
+MTL=midl.exe
+CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
 # ADD CPP /nologo /W3 /GX /O2 /I "..\..\xlib" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_VISUALC_" /D "NeedFunctionPrototypes" /D "_LIB" /YX /FD /c
+RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /fo".\sRelease\version.res" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -106,7 +115,6 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo
 # ADD LIB32 /nologo /out:"..\lib\IMagickstatic.lib"
 
 !ELSEIF  "$(CFG)" == "IMagick - Win32 Debug static"
@@ -121,8 +129,11 @@ LIB32=link.exe -lib
 # PROP Output_Dir "..\lib"
 # PROP Intermediate_Dir ".\sDebug"
 # PROP Target_Dir ""
+MTL=midl.exe
+CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
 # ADD CPP /nologo /W3 /Gm /GX /Zi /Od /I "..\..\xlib" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_VISUALC_" /D "NeedFunctionPrototypes" /D "_LIB" /YX /FD /GZ /c
+RSC=rc.exe
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /fo".\sDebug\version.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -239,7 +250,7 @@ SOURCE=..\..\magick\fits.c
 # Begin Source File
 
 SOURCE=..\..\magick\fpx.c
-# ADD CPP /I "..\..\fpx\"
+# ADD CPP /I "..\..\fpx\\"
 # End Source File
 # Begin Source File
 
@@ -538,10 +549,6 @@ SOURCE=..\..\magick\X.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\X11_stubs.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\magick\xbm.c
 # End Source File
 # Begin Source File
@@ -713,6 +720,10 @@ SOURCE=..\..\magick\xwindows.h
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 # End Group
+# Begin Source File
+
+SOURCE=..\..\README.txt
+# End Source File
 # Begin Source File
 
 SOURCE=.\Xmd.nth
