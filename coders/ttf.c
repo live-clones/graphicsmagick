@@ -138,7 +138,7 @@ static Image *ReadTTFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     (void) fprintf(file,"text +10+%d '%d'\n",y,i);
     (void) fprintf(file,"font-size %d",i);
     (void) fprintf(file,
-      "text +50+%d 'That which does not destroy me, only makes me stronger'\n",
+      "text +50+%d 'That which does not destroy me, only makes me stronger.'\n",
       y);
     if (i >= 24)
       i+=6;
