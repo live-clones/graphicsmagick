@@ -7,4 +7,3 @@ EXCLUDE = testURI.c
 EXCLUDE = testXPath.c
 EXCLUDE = slashrdf.c
 EXCLUDE = xmllint.c
-EXCLUDE = debugXML.c
