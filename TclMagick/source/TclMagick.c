@@ -2884,15 +2884,15 @@ static int wandObjCmd(
     {
         long num;
 
-	if( ((enum subIterations)index == TM_ITERATIONS) && (objc > 3) ) {
+	if( (index == TM_ITERATIONS) && (objc > 3) ) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "?num?");
 	    return TCL_ERROR;
 	}
-	if( ((enum subIterations)index == TM_GET_ITERATIONS) && (objc != 2) ) {
+	if( (index == TM_GET_ITERATIONS) && (objc != 2) ) {
 	    Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	    return TCL_ERROR;
 	}
-	if( ((enum subIterations)index == TM_SET_ITERATIONS) && (objc != 3) ) {
+	if( (index == TM_SET_ITERATIONS) && (objc != 3) ) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "num");
 	    return TCL_ERROR;
 	}
@@ -3190,15 +3190,15 @@ static int wandObjCmd(
     {
         long num;
 
-	if( ((enum subIterations)index == TM_SCENE) && (objc > 3) ) {
+	if( (index == TM_SCENE) && (objc > 3) ) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "?num?");
 	    return TCL_ERROR;
 	}
-	if( ((enum subIterations)index == TM_GET_SCENE) && (objc != 2) ) {
+	if( (index == TM_GET_SCENE) && (objc != 2) ) {
 	    Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	    return TCL_ERROR;
 	}
-	if( ((enum subIterations)index == TM_SET_SCENE) && (objc != 3) ) {
+	if( (index == TM_SET_SCENE) && (objc != 3) ) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "num");
 	    return TCL_ERROR;
 	}
