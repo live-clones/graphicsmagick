@@ -63,7 +63,7 @@
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method ReadMVGImage creates a gradation image and initializes it to
+%  Method ReadMVGImage creates a gradient image and initializes it to
 %  the X server color range as specified by the filename.  It allocates the
 %  memory necessary for the new Image structure and returns a pointer to the
 %  new image.
