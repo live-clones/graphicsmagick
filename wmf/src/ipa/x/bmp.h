@@ -17,11 +17,68 @@
    Boston, MA 02111-1307, USA.  */
 
 
-void wmf_x_rop_draw (wmfAPI* API,wmfROP_Draw_t* ropdraw)
-{	/* wmf_x_t* ddata = WMF_X_GetData (API); */
+void wmf_x_rop_draw (wmfAPI* API,wmfROP_Draw_t* rop_draw)
+{	wmf_x_t* ddata = WMF_X_GetData (API);
+
+	XPoint TL;
+	XPoint BR;
 
 	WMF_DEBUG (API,"wmf_[x_]rop_draw");
 
+	if (!TO_FILL (rop_draw)) return;
+
+	setbrushstyle (API,rop_draw->dc);
+
+	switch (rop_draw->ROP) /* Ternary raster operations */
+	{
+	case SRCCOPY: /* dest = source */
+	break;
+	case SRCPAINT: /* dest = source OR dest */
+	break;
+	case SRCAND: /* dest = source AND dest */
+	break;
+	case SRCINVERT: /* dest = source XOR dest */
+	break;
+	case SRCERASE: /* dest = source AND (NOT dest) */
+	break;
+	case NOTSRCCOPY: /* dest = (NOT source) */
+	break;
+	case NOTSRCERASE: /* dest = (NOT src) AND (NOT dest) */
+	break;
+	case MERGECOPY: /* dest = (source AND pattern) */
+	break;
+	case MERGEPAINT: /* dest = (NOT source) OR dest */
+	break;
+	case PATCOPY: /* dest = pattern */
+	break;
+	case PATPAINT: /* dest = DPSnoo */
+	break;
+	case PATINVERT: /* dest = pattern XOR dest */
+	break;
+	case DSTINVERT: /* dest = (NOT dest) */
+	break;
+	case BLACKNESS: /* dest = BLACK */
+		XSetForeground (ddata->display,ddata->gc,ddata->black);
+	break;
+	case WHITENESS: /* dest = WHITE */
+		XSetForeground (ddata->display,ddata->gc,ddata->white);
+	break;
+	default:
+	break;
+	}
+
+	TL = x_translate (API,rop_draw->TL);
+	BR = x_translate (API,rop_draw->BR);
+
+	BR.x -= TL.x;
+	BR.y -= TL.y;
+
+	if (ddata->window != None)
+	{	XFillRectangle (ddata->display,ddata->window,ddata->gc,TL.x,TL.y,BR.x,BR.y);
+	}
+	if (ddata->pixmap != None)
+	{	XFillRectangle (ddata->display,ddata->pixmap,ddata->gc,TL.x,TL.y,BR.x,BR.y);
+	}
 }
 
 void wmf_x_bmp_draw (wmfAPI* API,wmfBMP_Draw_t* bmp_draw)

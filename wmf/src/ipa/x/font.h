@@ -24,6 +24,11 @@ void wmf_x_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 
 	wmfRGB* bg = 0;
 
+	wmfD_Coord TL;
+	wmfD_Coord BR;
+	wmfD_Coord TR;
+	wmfD_Coord BL;
+
 	XPoint pt;
 	XPoint pts[5];
 
@@ -46,15 +51,31 @@ void wmf_x_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 
 	setdefaultstyle (API);
 
-	if ((WMF_DC_OPAQUE (draw_text->dc)) && (draw_text->bbox.BR.x > draw_text->bbox.TL.x))
-	{	bg = WMF_DC_BACKGROUND (draw_text->dc);
+	if (WMF_DC_OPAQUE (draw_text->dc))
+	{	if ((draw_text->BR.x > draw_text->TL.x) && (draw_text->BR.y > draw_text->TL.y))
+		{	TL = draw_text->TL;
+			BR = draw_text->BR;
+
+			TR.x = draw_text->BR.x;
+			TR.y = draw_text->TL.y;
+			BL.x = draw_text->TL.x;
+			BL.y = draw_text->BR.y;
+		}
+		else
+		{	TL = draw_text->bbox.TL;
+			BR = draw_text->bbox.BR;
+			TR = draw_text->bbox.TR;
+			BL = draw_text->bbox.BL;
+		}
+
+		bg = WMF_DC_BACKGROUND (draw_text->dc);
 
 		XSetForeground (ddata->display,ddata->gc,get_color (API,bg));
 
-		pts[0] = x_translate (API,draw_text->bbox.TL);
-		pts[1] = x_translate (API,draw_text->bbox.TR);
-		pts[2] = x_translate (API,draw_text->bbox.BR);
-		pts[3] = x_translate (API,draw_text->bbox.BL);
+		pts[0] = x_translate (API,TL);
+		pts[1] = x_translate (API,TR);
+		pts[2] = x_translate (API,BR);
+		pts[3] = x_translate (API,BL);
 		pts[4] = pts[0];
 
 		if (ddata->window != None)
@@ -90,8 +111,7 @@ void wmf_x_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 
 	phi = atan2 (sin (theta),font_ratio * cos (theta));
 
-	pen.x = 0;
-	pen.y = 0;
+	pt = x_translate_ft64 (API,draw_text->pt,&pen);
 
 	matrix.xx = (FT_Fixed) (  cos (phi) * 0x10000L);
 	matrix.xy = (FT_Fixed) (  sin (phi) * 0x10000L);
@@ -101,8 +121,6 @@ void wmf_x_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 	FT_Set_Transform (face,&matrix,&pen);
 
 	FT_Load_Char (face,draw_text->str[0],FT_LOAD_RENDER);
-
-	pt = x_translate (API,draw_text->pt);
 
 	pt.x += face->glyph->bitmap_left;
 	pt.y -= face->glyph->bitmap_top;
