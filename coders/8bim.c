@@ -237,10 +237,10 @@ ModuleExport void Register8BIMImage(void)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method UnregisterBIMImage removes format registrations made by the
+%  Method Unregister8BIMImage removes format registrations made by the
 %  BIM module from the list of supported formats.
 %
-%  The format of the UnregisterBIMImage method is:
+%  The format of the Unregister8BIMImage method is:
 %
 %      Unregister8BIMImage(void)
 %
