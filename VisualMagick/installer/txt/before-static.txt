@@ -7,7 +7,7 @@ Welcome to GraphicsMagick!
   GraphicsMagick. None of these licenses prohibit you from using this package
   for commercial or private use, but they may impose requirements on
   re-distribution of the package. Please see the 'licenses' subdirectory in
-  the package installation directory after you the package is installed to
+  the package installation directory after the package is installed to
   view the license restrictions of additional package components.
 
 Before You Start
