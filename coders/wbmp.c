@@ -79,7 +79,8 @@ static unsigned int
 %
 %  The format of the ReadWBMPImage method is:
 %
-%      Image *ReadWBMPImage(const ImageInfo *image_info,ExceptionInfo *exception)
+%      Image *ReadWBMPImage(const ImageInfo *image_info,
+%        ExceptionInfo *exception)
 %
 %  A description of each parameter follows:
 %
@@ -161,7 +162,7 @@ static Image *ReadWBMPImage(const ImageInfo *image_info,
     ThrowReaderException(CorruptImageWarning,
       "Only WBMP level 0 files supported",image);
   /*
-    Determine width and height
+    Initialize image structure.
   */
   if (WBMPReadInteger(image,&image->columns) == False) 
     ThrowReaderException(CorruptImageWarning,"Corrupt WBMP image",image);
@@ -169,9 +170,6 @@ static Image *ReadWBMPImage(const ImageInfo *image_info,
     ThrowReaderException(CorruptImageWarning,"Corrupt WBMP image",image);
   for (i=0; i < image->offset; i++)
     (void) ReadBlobByte(image);
-  /*
-    Initialize image structure.
-  */
   if (!AllocateImageColormap(image,2))
     ThrowReaderException(ResourceLimitWarning,"Memory allocation failed",image);
   if (image_info->ping)
