@@ -87,7 +87,7 @@ static void IdentifyUsage(void)
     {
       "-authenticate value  decrypt image with this password",
       "-cache threshold     megabytes of memory available to the pixel cache",
-      "-debug               display copious debugging information",
+      "-debug events        display copious debugging information",
       "-density geometry    horizontal and vertical density of the image",
       "-depth value         image depth",
       "-format \"string\"   output formatted image characteristics",
@@ -100,11 +100,8 @@ static void IdentifyUsage(void)
       (char *) NULL
     };
 
-  unsigned int
-    version;
-
-  (void) printf("Version: %.1024s\n",GetMagickVersion(&version));
-  (void) printf("Copyright: %.1024s\n\n",MagickCopyright);
+  (void) printf("Version: %.1024s\n",GetMagickVersion((unsigned long *) NULL));
+  (void) printf("Copyright: %.1024s\n\n",GetMagickCopyright());
   (void) printf("Usage: %.1024s [options ...] file [ [options ...] "
     "file ... ]\n",SetClientName((char *) NULL));
   (void) printf("\nWhere options include:\n");
