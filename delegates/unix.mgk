@@ -1,9 +1,10 @@
 # ImageMagick delegates for Unix.  The format is as follows.  Each
-# delegate begins with a tag and/or format separated by a colon (=>).
-# This line must be followed by one or more commands preceded with a tab
-# (\t) character.  If a command exceeds the length of a line, use the
-# backslash continuation character.  End the command with an ampersand
-# (&) to execute the command in the background.
+# delegate begins with a tag and/or format separated by a operation
+# tag (see below).  This line must be followed by one or more commands
+# preceded with a tab (\t) character.  If a command exceeds the length
+# of a line, use the backslash continuation character.  End the
+# command with an ampersand (&) to execute the command in the
+# background.
 #
 # Optionally you can include the image filename, type, width, height, or
 # other image attributes by embedding special format characters=>
@@ -34,7 +35,7 @@
 # An encode delegate begins with an image format, a less-equal sign (<=),
 # and a tag.  The delegate is invoked whenever ImageMagick attempts to write
 # an image whose format specifier or filename extension matches the tag
-# (e.g. image.mpg for tag=>mpg).  ImageMagick writes to a temporary file
+# (e.g. image.mpg for tag <=mpg).  ImageMagick writes to a temporary file
 # in the format you specify.  The delegate can then read this file and
 # convert it to a format it supports and pesumably ImageMagick does not.
 # 
@@ -50,8 +51,11 @@
 # ImageMagick looks for the delegate configurarion file in this order:
 #
 #     /usr/local/share/ImageMagick/delegates.mgk
-#     ~/magick/delegates.mgk
+#     DELEGATE_PATH/delegates.mgk
+#     HOME/.magick/delegates.mgk
 #     ./delegates.mgk
+#
+# Where DELEGATE_PATH and HOME are environment variables.
 #
 # Like entries in the later two directory overrides the specification
 # in the system-wide delegates file.
@@ -63,8 +67,17 @@
 <=compress
 	|/usr/bin/compress -c > %o
 
-<=gs
-	/usr/local/bin/gs -sDEVICE=%s -q -dNOPAUSE -dSAFER -sOutputFile="%s" -- "%s" -c quit
+<=gs-eps
+	/usr/local/bin/gs -sDEVICE=epswrite -q -dNOPAUSE -dSAFER \
+	  -sOutputFile="%s" -- "%s" -c quit
+
+<=gs-pdf
+	/usr/local/bin/gs -sDEVICE=pdfwrite -q -dNOPAUSE -dSAFER \
+	  -sOutputFile="%s" -- "%s" -c quit
+
+<=gs-ps
+	/usr/local/bin/gs -sDEVICE=pswrite -q -dNOPAUSE -dSAFER \
+	  -sOutputFile="%s" -- "%s" -c quit
 
 <=zip
 	|/usr/local/bin/gzip -cf > %o
@@ -83,6 +96,9 @@ cgm=>
 compress=>
 	|/usr/bin/uncompress -c %i
 
+dvi=>
+	/usr/local/bin/dvips -q -o %o %i
+
 edit=>
 	/usr/X11R6.4/bin/xterm -title "Edit Image Comment" -e vi %i
 
@@ -95,10 +111,15 @@ fig=>
 ftp=>
 	/usr/local/bin/GET %m:%i > %o 2>&1
 
-gs=>
-	/usr/local/bin/gs -sDEVICE=%s -q -dNOPAUSE -dSAFER -dTextAlphaBits=%u \
-	  -dGraphicsAlphaBits=%u -g%s -r%s %s -sOutputFile="%s" -- \
-	  "%s" -c quit
+gs-color=>
+	/usr/local/bin/gs -sDEVICE=pnmraw -q -dNOPAUSE -dSAFER \
+	  -dTextAlphaBits=%u -dGraphicsAlphaBits=%u -g%s -r%s %s \
+	  -sOutputFile="%s" -- "%s" -c quit
+
+gs-mono=>
+	/usr/local/bin/gs -sDEVICE=pbmraw -q -dNOPAUSE -dSAFER \
+	  -dTextAlphaBits=%u -dGraphicsAlphaBits=%u -g%s -r%s %s \
+	  -sOutputFile="%s" -- "%s" -c quit
 
 hpgl=>
 	/usr/local/bin/hp2xx -q -m eps -f %i %o
@@ -117,19 +138,19 @@ launch=>pnm
 
 mpg=>
 	/usr/local/bin/mpeg2decode -q -b %i -f -r -o3 %o%%d
-	/usr/bin/convert %o*.ppm %o
+	/usr/local/bin/convert %o*.ppm %o
 	/usr/bin/rm -f %o*.ppm
 
 m2v=>
 	/usr/local/bin/mpeg2decode -q -b %i -f -r -o3 %o%%d
-	/usr/bin/convert %o*.ppm %o
+	/usr/local/bin/convert %o*.ppm %o
 	/usr/bin/rm -f %o*.ppm
 
 pgp=>
 	/usr/local/bin/pgpv -fq %i
 
 pnm<=win
-	/usr/local/bin/display %i
+	/usr/local/bin/display -immutable %i
 
 print=>ps
 	/usr/bin/lp -c -s %i
