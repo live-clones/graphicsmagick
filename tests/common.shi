@@ -1,4 +1,5 @@
 SRCDIR=`dirname $0`
 SRCDIR=`cd $SRCDIR && pwd`
 TOPSRCDIR=`cd $srcdir && pwd`
+. $TOPSRCDIR/scripts/tap-functions.shi
 cd tests || exit 1
