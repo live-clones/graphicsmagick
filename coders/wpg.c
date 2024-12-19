@@ -1704,28 +1704,23 @@ UnpackRaster1bpp:
                 ThrowReaderException(CorruptImageError,InvalidColormapIndex,image);
               }
 
-              if(pPalette!=NULL &&
-                 PaletteAllocBytes < 4*(WPG_Palette.StartIndex+WPG_Palette.NumOfEntries))
-              {
-                MagickFreeResourceLimitedMemory(pPalette);
-                PaletteAllocBytes = 0;
-              }
+              /* Assure that buffer is allocated and the current size */
+              if (PaletteAllocBytes != Max(4*(WPG_Palette.StartIndex+WPG_Palette.NumOfEntries),4*256))
+                {
+                  PaletteAllocBytes = Max(4*(WPG_Palette.StartIndex+WPG_Palette.NumOfEntries),4*256);
+                  MagickReallocateResourceLimitedMemory(unsigned char *,pPalette,PaletteAllocBytes);
+                }
               if(pPalette==NULL)
-              {
-                PaletteItems = WPG_Palette.NumOfEntries;
-                PaletteAllocBytes = 4*(WPG_Palette.StartIndex+WPG_Palette.NumOfEntries);
-                if(PaletteAllocBytes < 4*256) PaletteAllocBytes = 4*256;
-                pPalette = MagickAllocateResourceLimitedMemory(unsigned char *,(size_t)PaletteAllocBytes);
-                if(pPalette==NULL)
-                    ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                for(i=0; i<=255; i++)
+                ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+
+              PaletteItems = WPG_Palette.NumOfEntries;
+              for(i=0; i<=255; i++)
                 {
                   pPalette[4*i] = WPG1_Palette[i].Red;
                   pPalette[4*i+1] = WPG1_Palette[i].Green;
                   pPalette[4*i+2] = WPG1_Palette[i].Blue;
                   pPalette[4*i+3] = OpaqueOpacity;
                 }
-              }
               if(ReadBlob(image,(size_t) PaletteItems*4,pPalette+((size_t)4*WPG_Palette.StartIndex)) != (size_t) PaletteItems*4)
               {
                 MagickFreeResourceLimitedMemory(pPalette);

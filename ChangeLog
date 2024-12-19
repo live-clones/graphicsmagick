@@ -1,3 +1,9 @@
+2024-12-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/wpg.c (ReadWPGImage): Assure that palette buffer is
+	allocated and the current size. Addresses SourceForge bug #750
+	"heap-buffer-overflow in ReadBlob".
+
 2024-12-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* config/delegates.mgk.in: Use XML predefined entities
