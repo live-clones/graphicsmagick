@@ -3,6 +3,8 @@
 	* coders/wpg.c (ReadWPGImage): Assure that palette buffer is
 	allocated and the current size. Addresses SourceForge bug #750
 	"heap-buffer-overflow in ReadBlob".
+	Reformat white-space to be more similar to conventions used in
+	the rest of the software.
 
 2024-12-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
