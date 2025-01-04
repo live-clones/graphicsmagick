@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to November 24, 2024.
+This file was last updated to reflect changes up to January 4, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -19,22 +19,25 @@ release and not attempt to patch older releases.
 .. contents::
   :local:
 
-1.3.46 (???? ??, 2024)
+1.3.46 (???? ??, 2025)
 ===========================
 
 Special Issues:
 
 * GraphicsMagick needs some additional productive volunteers.  For
   several years now, the burden has entirely been on me (Bob
-  Friesenhahn).  I have been sheparding the project for 22 years
+  Friesenhahn).  I have been sheparding the project for 23 years
   already (and contributed to ImageMagick and GraphicsMagick combined
-  for 28 years already).  Volunteers are needed to add/improve
+  for 29 years already).  Volunteers are needed to add/improve
   new/existing file format support, and to assure correct operation on
   all targets.
 
 Security Fixes:
 
 * JXL: Apply image dimension resource limits.
+
+* WPG: Assure that the palette buffer is allocated and the current
+  size (SourceForge bug #750).
 
 Bug fixes:
 
@@ -65,6 +68,9 @@ New Features:
   transition",
   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1019717.
 
+* Support XML predefined entities when reading delegates.mgk so that
+  it may be expressed in valid XML.
+
 API Updates:
 
 * Magick++: Added InitializeMagickSentinel helper class, which
@@ -84,6 +90,15 @@ Build Changes:
 
 * Test and demo programs are added to Coverity analysis.  This
   necessitated fixing test/demo code to use "secure" buffer handling.
+
+* Build the software differently for the oss-fuzz build so that
+  features not useful, or harmful to, oss-fuzz testing are
+  removed. This is indicated when
+  FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is defined.
+
+* The oss-fuzz build script (fuzzing/oss-fuzz-build.sh) is
+  subtantially updated to build a fully-featured libheif, with a set
+  of common libraries it depends on.
 
 1.3.45 (August 27, 2024)
 ===========================
