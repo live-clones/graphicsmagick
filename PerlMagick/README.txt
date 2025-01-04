@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2017 GraphicsMagick Group
+# Copyright (C) 2003-2025 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1998,1999 E. I. du Pont de Nemours and Company
 #
@@ -37,7 +37,7 @@ Installation
 
     Get the GraphicsMagick distribution and type the following:
 
-        gunzip -c GraphicsMagick-1.2.tar.gz | tar -xvf -
+        gunzip -c GraphicsMagick-1.3.tar.gz | tar -xvf -
         cd GraphicsMagick
         ./configure --enable-shared
         make
