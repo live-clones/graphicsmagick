@@ -41,6 +41,12 @@
 <p>2025-01-06  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>www/wand/Makefile.am ($(WWWWANDAPIDIR)/%.apirst): Use
+$(abs_top_srcdir) rather than $(top_srcdir) for the --include-rst
+argument when invoking format_c_api_doc.py to assure correct
+function if the build tree was configured using a relative path to
+the source directory, and the current working directory is
+changed.</p></li>
 <li><p>magick/magick_endian.c (MagickReverseBits): Function has never
 been used for anything.  Mark it as deprecated.
 MagickGetBitRevTable(): Function has never been used for anything.

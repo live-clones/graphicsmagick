@@ -11350,7 +11350,7 @@ uninstall-data-html:
 
 @HasRST2HTML_TRUE@@MAINTAINER_MODE_TRUE@$(WWWWANDAPIDIR)/%.apirst : $(top_srcdir)/wand/%.c
 @HasRST2HTML_TRUE@@MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
-@HasRST2HTML_TRUE@@MAINTAINER_MODE_TRUE@	$(FORMATCAPI) --whatis-file $(APIWHATIS) --include-rst $(top_srcdir)/www/api/api_hyperlinks.rst $< $@
+@HasRST2HTML_TRUE@@MAINTAINER_MODE_TRUE@	$(FORMATCAPI) --whatis-file $(APIWHATIS) --include-rst $(abs_top_srcdir)/www/api/api_hyperlinks.rst $< $@
 
 @HasRST2HTML_TRUE@@MAINTAINER_MODE_TRUE@$(WWWWANDAPIDIR)/%.html : $(WWWWANDAPIDIR)/%.apirst
 @HasRST2HTML_TRUE@@MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
