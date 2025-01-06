@@ -107,6 +107,11 @@ MagickSwabArrayOfDouble(double* dp, register size_t n)
 }
 
 /*
+  FIXME: Nothing in GraphicsMagick is using MagickReverseBits() or
+  MagickGetBitRevTable() so they should be removed.
+*/
+
+/*
  * Bit reversal tables.  MagickBitRevTable[<byte>] gives
  * the bit reversed value of <byte>.  Used in various
  * places in the library when the FillOrder requires

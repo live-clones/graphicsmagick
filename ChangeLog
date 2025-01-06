@@ -1,3 +1,10 @@
+2025-01-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/magick_endian.c (MagickReverseBits): Function has never
+	been used for anything.  Mark it as deprecated.
+	MagickGetBitRevTable(): Function has never been used for anything.
+	Mark it as deprecated.
+
 2025-01-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.
