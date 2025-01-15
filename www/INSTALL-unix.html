@@ -261,8 +261,10 @@ to reject such files.</p>
 </dd>
 <dt><kbd><span class="option">--enable-maintainer-mode</span></kbd></dt>
 <dd><p>enable additional Makefile rules which update generated files
-included in the distribution. Requires GNU make as well as a
-number of utilities and tools.</p>
+included in the distribution. Requires GNU make, Python 3, as well
+as a number of common development utilities and tools.  Python 3
+Docutils (0.17.1 or later) are required to format &quot;.rst&quot;
+reStructuredText files to HTML format.</p>
 </dd>
 <dt><kbd><span class="option">--enable-quantum-library-names</span></kbd></dt>
 <dd><p>shared library name includes quantum depth to allow shared
@@ -920,8 +922,10 @@ GraphicsMagick):</p>
 <pre class="literal-block">dcraw, fonts-urw-base35, ghostscript, hp2xx,
 ttf-mscorefonts-installer</pre>
 <p>These additional packages are useful in order to maintain
-GraphicsMagick itself:</p>
-<pre class="literal-block">autoconf, automake, graphviz, libtool, docutils-common, python, m4</pre>
+GraphicsMagick itself (see the <span class="docutils literal"><span class="pre">--enable-maintainer-mode</span></span> configure
+option):</p>
+<pre class="literal-block">autoconf, automake, graphviz, libtool, python3-docutils,
+docutils-common, python3, m4</pre>
 </section>
 </section>
 <section id="building-under-cygwin">

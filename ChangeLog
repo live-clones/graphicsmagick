@@ -1,3 +1,17 @@
+2025-01-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* NEWS.txt: Update the news.
+
+	* coders/jpeg.c (WriteJPEGImage): Properly invert CMYK components
+	when writing.  Addresses SourceForge bug #751 "all CMYK colorspace
+	image become black-white inverted".  This bug was introduced in
+	GraphicsMagick 1.3.43. Existing files which appear "corrupt" due
+	to this issue may be salvaged by using the -negate command like
+	"gm convert bad-cmyk.jpg -negate good-cmyk.jpg".
+
+	* www/INSTALL-unix.rst: Document the Docutils version necessary to
+	format reStructuredText files to HTML format.
+
 2025-01-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* www/wand/Makefile.am ($(WWWWANDAPIDIR)/%.apirst): Pass an

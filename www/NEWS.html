@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to January 4, 2025.</p>
+<p>This file was last updated to reflect changes up to January 15, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -125,6 +125,8 @@ size (SourceForge bug #750).</p></li>
 <li><p>BMP: Assure that the opacity channel is initialized, even if the
 image is indicated to be opaque. This avoids issues with code which
 assumes that the opacity channel is always initialized.</p></li>
+<li><p>JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
+inverted. This bug is now fixed.</p></li>
 <li><p>TclMagick: The TclMagick build uses the latest TEA tcl.m4 macros,
 while modernizing the Automake and Autoconf files. Many defects in
 the C code are corrected.  The libttkcommon &quot;shim&quot; library,

@@ -245,8 +245,10 @@ Optional Features
 --enable-maintainer-mode
 
     enable additional Makefile rules which update generated files
-    included in the distribution. Requires GNU make as well as a
-    number of utilities and tools.
+    included in the distribution. Requires GNU make, Python 3, as well
+    as a number of common development utilities and tools.  Python 3
+    Docutils (0.17.1 or later) are required to format ".rst"
+    reStructuredText files to HTML format.
 
 --enable-quantum-library-names
 
@@ -898,9 +900,11 @@ GraphicsMagick)::
   ttf-mscorefonts-installer
 
 These additional packages are useful in order to maintain
-GraphicsMagick itself::
+GraphicsMagick itself (see the ``--enable-maintainer-mode`` configure
+option)::
 
-  autoconf, automake, graphviz, libtool, docutils-common, python, m4
+  autoconf, automake, graphviz, libtool, python3-docutils,
+  docutils-common, python3, m4
 
 
 Building under Cygwin

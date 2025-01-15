@@ -38,15 +38,25 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-01-15  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>NEWS.txt: Update the news.</p></li>
+<li><p>coders/jpeg.c (WriteJPEGImage): Properly invert CMYK components
+when writing.  Addresses SourceForge bug #751 &quot;all CMYK colorspace
+image become black-white inverted&quot;.  This bug was introduced in
+GraphicsMagick 1.3.43. Existing files which appear &quot;corrupt&quot; due
+to this issue may be salvaged by using the -negate command like
+&quot;gm convert bad-cmyk.jpg -negate good-cmyk.jpg&quot;.</p></li>
+<li><p>www/INSTALL-unix.rst: Document the Docutils version necessary to
+format reStructuredText files to HTML format.</p></li>
+</ul>
+</blockquote>
 <p>2025-01-06  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
-<li><p>www/wand/Makefile.am ($(WWWWANDAPIDIR)/%.apirst): Use
-$(abs_top_srcdir) rather than $(top_srcdir) for the --include-rst
-argument when invoking format_c_api_doc.py to assure correct
-function if the build tree was configured using a relative path to
-the source directory, and the current working directory is
-changed.</p></li>
+<li><p>www/wand/Makefile.am ($(WWWWANDAPIDIR)/%.apirst): Pass an
+absolute path to format_c_api_doc.py --include-rst argument.</p></li>
 <li><p>magick/magick_endian.c (MagickReverseBits): Function has never
 been used for anything.  Mark it as deprecated.
 MagickGetBitRevTable(): Function has never been used for anything.
