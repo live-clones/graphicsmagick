@@ -329,11 +329,13 @@ int main ( int argc, char **argv )
         Prepend magic specifier if extension will be ignored.
       */
       (void) snprintf(filespec, sizeof(filespec), "%.*s:%.*s%s", 32, format,
-                      (int) sizeof(filespec)-37 , basefilespec, ".%s");
+                      (int) sizeof(filespec)-37, basefilespec, ".%s");
     }
   else
     {
-      (void) snprintf(filespec, sizeof(filespec), "%s%s", basefilespec, ".%s");
+      (void) snprintf(filespec, sizeof(filespec), "%.*s%s",
+                      (int) (sizeof(filespec)-sizeof(".%s")), basefilespec,
+                      ".%s");
     }
 
   (void) snprintf( filename, sizeof(filename), filespec, 1, format );
