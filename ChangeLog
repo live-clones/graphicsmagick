@@ -1,3 +1,11 @@
+2025-01-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* wand/magick_wand.c (MagickSetImagePixels): If update image has
+	matte, then promote canvas image to have matte.  Support composing
+	individual channels 'R', 'G', 'B', 'A', 'O', 'T', 'C', 'M', 'Y',
+	'K'. Intended to address SourceForge issue #752
+	"MagickResizeImage() discarding alpha values".
+
 2025-01-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* tests/rwfile.c: Fix another GCC warning.

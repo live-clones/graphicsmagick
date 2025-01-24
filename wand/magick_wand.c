@@ -9185,14 +9185,23 @@ WandExport unsigned int MagickSetImagePage(MagickWand *wand,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  MagickSetImagePixels() accepts pixel data and stores it in the image at the
-%  location you specify.  The method returns False on success otherwise True
+%  location you specify.  The method returns False on success, otherwise True
 %  if an error is encountered.  The pixel data can be either char, short int,
 %  int, long, float, or double in the order specified by map.
 %
-%  Suppose your want want to upload the first scanline of a 640x480 image from
+%  Suppose you want to upload the first scanline of a 640x480 image from
 %  character data in red-green-blue order:
 %
 %      MagickSetImagePixels(wand,0,0,0,640,1,"RGB",CharPixel,pixels);
+%
+%  The API user is responsible for assuring that pixels in the entire
+%  image are initialized properly.  If non-opaque pixels are to be
+%  supported (e.g. "RGBA") but the image does not already have an
+%  opacity channel (e.g. MagickGetImageMatte() returns False), please use
+%  MagickSetImageMatte() to set Matte true, and then assure that the
+%  opacity channel is initialized for all of the pixels.  This is necessary
+%  even if the region specified to MagickSetImagePixels() includes the
+%  entire image.
 %
 %  The format of the MagickSetImagePixels method is:
 %
@@ -9251,7 +9260,60 @@ WandExport unsigned int MagickSetImagePixels(MagickWand *wand,
     ConstituteImage(columns,rows,map,storage,pixels,&image->exception);
   if (constitute_image)
     {
-      (void) CompositeImage(image,CopyCompositeOp,constitute_image,x_offset,
+      CompositeOperator
+        compose = CopyCompositeOp;
+
+      /*
+        Support the ability to update an individual image channel
+        (e.g. 'A').  This is not efficient given that it requires
+        creating a whole image.
+
+        FIXME: It would be nice to support updating arbitrary
+        combinations of channels (e.g. "BG", "R", "A") via multiple
+        calls.  This requires a special purpose implementation rather
+        than using CompositeImage().
+      */
+      if (strlen(map) == 1)
+        {
+          switch (map[0])
+            {
+            case 'R':
+              compose = CopyRedCompositeOp;
+              break;
+            case 'G':
+              compose = CopyGreenCompositeOp;
+              break;
+            case 'B':
+              compose = CopyBlueCompositeOp;
+              break;
+            case 'A':
+            case 'O':
+            case 'T':
+              compose = CopyOpacityCompositeOp;
+              break;
+            case 'C':
+              compose = CopyCyanCompositeOp;
+              break;
+            case 'M':
+              compose = CopyMagentaCompositeOp;
+              break;
+            case 'Y':
+              compose = CopyYellowCompositeOp;
+              break;
+            case 'K':
+              compose = CopyBlackCompositeOp;
+              break;
+            default:
+              {
+              }
+            }
+        }
+
+      if (constitute_image->matte && !image->matte)
+        {
+          image->matte = constitute_image->matte;
+        }
+      (void) CompositeImage(image,compose,constitute_image,x_offset,
                             y_offset);
       DestroyImage(constitute_image);
       status = (image->exception.severity == UndefinedException);

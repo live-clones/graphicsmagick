@@ -5234,12 +5234,20 @@ which to composite image data.</p>
 <section id="id388">
 <h2>Description</h2>
 <p>MagickSetImagePixels() accepts pixel data and stores it in the image at the
-location you specify.  The method returns False on success otherwise True
+location you specify.  The method returns False on success, otherwise True
 if an error is encountered.  The pixel data can be either char, short int,
 int, long, float, or double in the order specified by map.</p>
-<p>Suppose your want want to upload the first scanline of a 640x480 image from
+<p>Suppose you want to upload the first scanline of a 640x480 image from
 character data in red-green-blue order:</p>
 <p>MagickSetImagePixels(wand,0,0,0,640,1,&quot;RGB&quot;,CharPixel,pixels);</p>
+<p>The API user is responsible for assuring that pixels in the entire
+image are initialized properly.  If non-opaque pixels are to be
+supported (e.g. &quot;RGBA&quot;) but the image does not already have an
+opacity channel (e.g. MagickGetImageMatte() returns False), please use
+MagickSetImageMatte() to set Matte true, and then assure that the
+opacity channel is initialized for all of the pixels.  This is necessary
+even if the region specified to MagickSetImagePixels() includes the
+entire image.</p>
 <p>The format of the MagickSetImagePixels method is:</p>
 <pre class="literal-block">unsigned int MagickSetImagePixels( MagickWand *wand, const long x_offset, const long y_offset,
                                    const unsigned long columns, const unsigned long rows,
