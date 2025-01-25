@@ -1,3 +1,11 @@
+2025-01-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (ReadMetadata): Only apply Exif orientation if
+	ignore-transformations is true since HEIF native transformations
+	will handle orientation otherwise.  Patch by Kevin Clauson via
+	GraphicsMagick SourceForge patch #83 "Patch: Fix HEIC Orientation
+	Issue".
+
 2025-01-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* wand/magick_wand.c (MagickSetImagePixels): If update image has
