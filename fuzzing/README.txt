@@ -143,6 +143,13 @@ With sources under /home/bfriesen/src/openjpeg::
   make -j 8
   make install
 
+jpeg
+++++
+
+With sources under libjpeg-turbo::
+
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DWITH_JPEG8=1 /home/bfriesen/src/libjpeg-turbo
+
 libheif
 +++++++
 

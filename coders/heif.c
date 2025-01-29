@@ -591,29 +591,30 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
 
-  /* FIXME: no support for reading multiple images but should be added */
+  /* FIXME: no support for reading multiple images but should be
+     added, if multiple images will use primary image */
   {
     int number_of_top_level_images;
     number_of_top_level_images=heif_context_get_number_of_top_level_images(heif);
     if (image->logging)
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "heif_context_get_number_of_top_level_images() reports %d images",
+                            "Number of top level images: %d (reading primary image only)",
                             number_of_top_level_images);
-    if (number_of_top_level_images != 1)
-      ThrowHEIFReaderException(CoderError, NumberOfImagesIsNotSupported, image);
-  }
-
-  heif_status=heif_context_get_primary_image_handle(heif, &heif_image_handle);
-  if (heif_status.code == heif_error_Memory_allocation_error)
-    ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-  if (heif_status.code != heif_error_Ok)
-    {
-      if (image->logging)
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_context_get_primary_image_handle() reports error \"%s\"",
-                              heif_status.message);
+    if (number_of_top_level_images == 0)
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
-    }
+
+    heif_status=heif_context_get_primary_image_handle(heif, &heif_image_handle);
+    if (heif_status.code == heif_error_Memory_allocation_error)
+      ThrowHEIFReaderException(ResourceLimitError, MemoryAllocationFailed, image);
+    if (heif_status.code != heif_error_Ok)
+      {
+        if (image->logging)
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "heif_context_get_primary_image_handle() reports error \"%s\"",
+                                heif_status.message);
+        ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+      }
+  }
 
   /*
     Note: Those values are preliminary but likely the upper bound
