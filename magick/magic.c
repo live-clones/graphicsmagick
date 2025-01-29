@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -60,7 +60,8 @@ StaticMagic[] =
 {
 #define MAGIC(name,offset,magic) {name,(const unsigned char * const)magic,sizeof(magic)-1,offset}
   MAGIC("WEBP", 8, "WEBP"),
-  MAGIC("AVIF", 4, "ftypavif"),
+  MAGIC("AVIF", 4, "ftypavif"), /* HEIF: AV1 image */
+  MAGIC("AVIF", 4, "ftypavis"), /* HEIF: AV1 image sequence */
   /* MAGIC("AVI", 0, "RIFF"), */
   MAGIC("8BIMWTEXT", 0, "8\000B\000I\000M\000#"),
   MAGIC("8BIMTEXT", 0, "8BIM#"),
@@ -91,9 +92,15 @@ StaticMagic[] =
   MAGIC("FITS", 0, "SIMPLE"),
   MAGIC("FPX", 0, "\320\317\021\340"),
   MAGIC("GIF", 0, "GIF8"),
-  MAGIC("HEIC", 4, "ftypheic"),
-  MAGIC("HEIC", 4, "ftypheix"),
-  MAGIC("HEIC", 4, "ftypmif1"),
+  MAGIC("HEIC", 4, "ftypheic"), /* HEIF: A regular heif image */
+  MAGIC("HEIC", 4, "ftypheix"), /* HEIF: Extended range (>8 bit) image */
+  MAGIC("HEIF", 4, "ftyphevc"), /* HEIF: Image sequence */
+  MAGIC("HEIF", 4, "ftypheim"), /* HEIF: Image sequence */
+  MAGIC("HEIF", 4, "ftypheis"), /* HEIF: Scalable image */
+  MAGIC("HEIF", 4, "ftyphevm"), /* HEIF: Multiview sequence */
+  MAGIC("HEIF", 4, "ftyphevs"), /* HEIF: Scalable sequence*/
+  MAGIC("HEIC", 4, "ftypmif1"), /* HEIF: Nokia alpha_ image */
+  MAGIC("HEIC", 4, "ftypmsf1"), /* HEIF: Nokia animation image */
   MAGIC("HDF", 1, "HDF"),
   MAGIC("HPGL", 0, "IN;"),
   MAGIC("HTML", 1, "HTML"),
