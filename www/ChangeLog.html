@@ -41,6 +41,10 @@
 <p>2025-01-29  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/png.c (WriteOnePNGImage): Ignore exessively short ICM
+profiles.  Should address oss-fuzz 392927700
+&quot;graphicsmagick:coder_PNG64_fuzzer: Heap-buffer-overflow in
+png_write_iCCP&quot;.</p></li>
 <li><p>magick/magic.c (StaticMagic): Identify some more HEIF
 sub-formats.</p></li>
 <li><p>coders/heif.c (ReadHEIFImage): Request the primary image handle

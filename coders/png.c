@@ -8297,35 +8297,50 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
             LocaleLower(profile_name);
             if (LocaleCompare(profile_name,"ICM") == 0)
               {
+                if (profile_length < 132)
+                  {
+                    if (logging)
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "  Ignoring %s profile (%u byte%s)"
+                                            " because it is too short!",
+                                            profile_name,
+                                            (unsigned int) profile_length,
+                                            profile_length > 1 ? "s" : "");
+                  }
+                else
+                  {
 #if defined(PNG_WRITE_iCCP_SUPPORTED)
-                {
-                  if (logging)
-                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                          "  Setting up iCCP chunk");
+                    {
+                      if (logging)
+                        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                              "  Setting up iCCP chunk (%u byte%s)",
+                                              (unsigned int) profile_length,
+                                              profile_length > 1 ? "s" : "");
 
-                  png_set_iCCP(ping,ping_info,(png_charp) "icm",
-                               (int) 0,
+                      png_set_iCCP(ping,ping_info,(png_charp) "icm",
+                                   (int) 0,
 #if (PNG_LIBPNG_VER < 10500)
-                               (png_charp) profile_info,
+                                   (png_charp) profile_info,
 #else
-                               (png_const_bytep) profile_info,
+                                   (png_const_bytep) profile_info,
 #endif
 
-                               (png_uint_32) profile_length);
-                }
+                                   (png_uint_32) profile_length);
+                    }
 #else
-                {
-                  if (logging)
-                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                          "  Setting up text chunk with"
-                                          " iCCP Profile");
-                  png_write_raw_profile(image_info,ping,ping_info,
-                                        "icm",
-                                        "ICC Profile",
-                                        profile_info,
-                                        (png_uint_32) profile_length);
-                }
+                    {
+                      if (logging)
+                        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                              "  Setting up text chunk with"
+                                              " iCCP Profile");
+                      png_write_raw_profile(image_info,ping,ping_info,
+                                            "icm",
+                                            "ICC Profile",
+                                            profile_info,
+                                            (png_uint_32) profile_length);
+                    }
 #endif
+                  }
               }
             else if (LocaleCompare(profile_name,"IPTC") == 0)
               {

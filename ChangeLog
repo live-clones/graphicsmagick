@@ -1,5 +1,10 @@
 2025-01-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/png.c (WriteOnePNGImage): Ignore exessively short ICM
+	profiles.  Should address oss-fuzz 392927700
+	"graphicsmagick:coder_PNG64_fuzzer: Heap-buffer-overflow in
+	png_write_iCCP".
+
 	* magick/magic.c (StaticMagic): Identify some more HEIF
 	sub-formats.
 
