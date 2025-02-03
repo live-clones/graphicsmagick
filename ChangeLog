@@ -1,3 +1,10 @@
+2025-02-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/magic.c: Add a Magic description field in order to help
+	identify and document format variants based on header magic.
+	(GetMagickFileFormat): Trace the format description at Coder
+	level.
+
 2025-01-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/png.c (WriteOnePNGImage): Ignore exessively short ICM
