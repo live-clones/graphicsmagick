@@ -56,12 +56,14 @@ static const struct
     * description;
 
   unsigned short
+    name_size,
+    description_size,
     length,
     offset;
 }
 StaticMagic[] =
 {
-#define MAGIC(name,description,offset,magic) {name,(const unsigned char * const)magic,description, sizeof(magic)-1,offset}
+#define MAGIC(name,description,offset,magic) {name,(const unsigned char * const)magic,description,sizeof(name)-1,sizeof(description)-1,sizeof(magic)-1,offset}
   MAGIC("WEBP", "WebP Image Format", 8, "WEBP"),
   MAGIC("AVIF", "HEIF AV1 image", 4, "ftypavif"),
   MAGIC("AVIF", "HEIF AV1 image sequence", 4, "ftypavis"),
@@ -75,10 +77,10 @@ StaticMagic[] =
   MAGIC("BMP", "BMP CP", 0, "CP"),
   MAGIC("BMP", "BMP IC", 0, "IC"),
   MAGIC("BMP", "BMP PI", 0, "PI"),
-  MAGIC("CALS", "Continuous Acquisition and Life-cycle Support Type 1 image", 21, "version: MIL-STD-1840"),
-  MAGIC("CALS", "Continuous Acquisition and Life-cycle Support Type 1 image", 0, "srcdocid:"),
-  MAGIC("CALS", "Continuous Acquisition and Life-cycle Support Type 1 image", 9, "srcdocid:"),
-  MAGIC("CALS", "Continuous Acquisition and Life-cycle Support Type 1 image", 8, "rorient:"),
+  MAGIC("CALS", "CALS (MIL-STD-1840) Type 1 image", 21, "version: MIL-STD-1840"),
+  MAGIC("CALS", "CALS (MIL-STD-1840) Type 1 image", 0, "srcdocid:"),
+  MAGIC("CALS", "CALS (MIL-STD-1840) Type 1 image", 9, "srcdocid:"),
+  MAGIC("CALS", "CALS (MIL-STD-1840) Type 1 image", 8, "rorient:"),
   MAGIC("CGM", "Computer Graphics Metaformat", 0, "BEGMF"),
   MAGIC("CIN", "Cineon Image File", 0, "\200\052\137\327"),
   MAGIC("DCM", "DICOM", 128, "DICM"),
@@ -88,7 +90,7 @@ StaticMagic[] =
   MAGIC("DPX", "SMPTE 268M-2003 (DPX 2.0)", 0, "SDPX"),
   MAGIC("DPX", "SMPTE 268M-2003 (DPX 2.0)", 0, "XPDS"),
   MAGIC("EMF", "Microsoft EMF", 40, "\040\105\115\106\000\000\001\000"),
-  MAGIC("EPT", "Adobe Encapsulated PostScript with MS-DOS TIFF preview", 0, "\305\320\323\306"),
+  MAGIC("EPT", "Adobe Encapsulated PostScript (with preview)", 0, "\305\320\323\306"),
   MAGIC("FAX", "Group 3 FAX", 0, "DFAX"),
   MAGIC("FIG", "Xfig", 0, "#FIG"),
   MAGIC("FITS", "Flexible Image Transport System", 0, "IT0"),
@@ -113,7 +115,7 @@ StaticMagic[] =
   MAGIC("IPTCTEXT", "IPTC Newsphoto text format", 0, "2#0=\042&#0;&#2;\042"),
   MAGIC("IPTC", "IPTC Newsphoto", 0, "\034\002"),
   MAGIC("JNG", "JPEG Network Graphics", 0, "\213JNG\r\n\032\n"),
-  MAGIC("JPEG", "Joint Photographic Experts Group JFIF format", 0, "\377\330\377"),
+  MAGIC("JPEG", "Joint Photographic Experts Group JFIF", 0, "\377\330\377"),
   MAGIC("JPC", "JPEG-2000 Code Stream Syntax", 0, "\377\117"),
   MAGIC("JP2", "JPEG-2000 JP2 File Format", 4, "\152\120\040\040\015"),
   MAGIC("JXL", "JPEG XL Image Format", 0, "\xff\x0a"),
@@ -122,7 +124,7 @@ StaticMagic[] =
   MAGIC("MIFF", "Magick Image File Format", 0, "Id=ImageMagick"),
   MAGIC("MIFF", "Magick Image File Format", 0, "id=ImageMagick"),
   MAGIC("MNG", "Multiple-image Network Graphics", 0, "\212MNG\r\n\032\n"),
-  MAGIC("MPC", "Magick Persistent Cache image format", 0, "id=MagickCache"),
+  MAGIC("MPC", "Magick Persistent Cache image", 0, "id=MagickCache"),
   MAGIC("MPEG", "MPEG Video Stream", 0, "\000\000\001\263"),
   MAGIC("PCD", "Adobe Photo CD", 2048, "PCD_"),
   MAGIC("PCL", "HP Page Control Language", 0, "\033E\033"),
@@ -343,25 +345,75 @@ InitializeMagicInfo(void)
 MagickExport MagickPassFail
 ListMagicInfo(FILE *file,ExceptionInfo *exception)
 {
+#define NAME_HEADER "Name"
+#define DESCRIPTION_HEADER "Description"
+#define OFFSET_HEADER "Offset"
+#define TARGET_HEADER "Target"
+#define OFFSET_TARGET_HEADER "Offset Target"
+
+  const size_t
+    description_size=sizeof(DESCRIPTION_HEADER)-1,
+    name_size=sizeof(NAME_HEADER)-1,
+    offset_size=sizeof(OFFSET_HEADER)-1,
+    target_size=sizeof(TARGET_HEADER)-1;
+
+  size_t
+    description_size_max=description_size,
+    name_size_max=name_size,
+    offset_size_max=offset_size,
+    target_size_max=Max(target_size,16);
+
   register unsigned int
     i,
     j;
+
+  for (i=0; i < ArraySize(StaticMagic); i++)
+    {
+      if (description_size_max < StaticMagic[i].description_size)
+        description_size_max = StaticMagic[i].description_size;
+      if (name_size_max < StaticMagic[i].name_size)
+        name_size_max = StaticMagic[i].name_size;
+      /* The following does not account for control code expansion */
+      if (target_size_max < StaticMagic[i].length)
+        target_size_max = StaticMagic[i].length;
+    }
 
   ARG_NOT_USED(exception);
 
   if (file == (const FILE *) NULL)
     file=stdout;
 
-  (void) fprintf(file,"Name      Offset Target\n");
-  (void) fprintf(file,"-------------------------------------------------"
-                 "------------------------------\n");
+  (void) fprintf(file,"%s",NAME_HEADER);
+  for (j=name_size; j <= name_size_max; j++)
+    (void) fprintf(file," ");
+
+  (void) fprintf(file,"%s",DESCRIPTION_HEADER);
+  for (j=description_size; j <= description_size_max; j++)
+    (void) fprintf(file," ");
+
+  (void) fprintf(file,"%s",OFFSET_HEADER);
+  for (j=offset_size; j <= offset_size_max; j++)
+    (void) fprintf(file," ");
+
+  (void) fprintf(file,"%s",TARGET_HEADER);
+  for (j=target_size; j <= target_size_max; j++)
+    (void) fprintf(file," ");
+  (void) fprintf(file,"\n");
+
+  for (j=0; j <= (name_size_max+1+description_size_max+1+offset_size_max+1+target_size_max+1); j++)
+    (void) fprintf(file,"-");
+  (void) fprintf(file,"\n");
+
   for (i=0; i < ArraySize(StaticMagic); i++)
     {
       register const unsigned char
         *c;
 
-      (void) fprintf(file,"%.1024s",StaticMagic[i].name);
-      for (j= (unsigned int) strlen(StaticMagic[i].name); j <= 9; j++)
+      (void) fprintf(file,"%.*s",(int) name_size_max,StaticMagic[i].name);
+      for (j= (unsigned int) strlen(StaticMagic[i].name); j <= name_size_max; j++)
+        (void) fprintf(file," ");
+      (void) fprintf(file,"%.*s",(int) description_size_max,StaticMagic[i].description);
+      for (j= (unsigned int) strlen(StaticMagic[i].description); j <= description_size_max; j++)
         (void) fprintf(file," ");
       (void) fprintf(file,"%6u ",StaticMagic[i].offset);
 
@@ -369,20 +421,20 @@ ListMagicInfo(FILE *file,ExceptionInfo *exception)
       c=StaticMagic[i].magic;
       for (j=0; j < StaticMagic[i].length; j++)
         {
-/*          else if ('\b' == c[j]) */
-/*            (void) fprintf(file,"\\b"); */
-/*          else if ('\f' == c[j]) */
-/*            (void) fprintf(file,"\\f"); */
+          /*          else if ('\b' == c[j]) */
+          /*            (void) fprintf(file,"\\b"); */
+          /*          else if ('\f' == c[j]) */
+          /*            (void) fprintf(file,"\\f"); */
           if ('\n' == c[j])
             (void) fprintf(file,"\\n");
           else if ('\r' == c[j])
             (void) fprintf(file,"\\r");
           else if ('\t' == c[j])
-              (void) fprintf(file,"\\t");
-/*          else if ('\v' == c[j]) */
-/*            (void) fprintf(file,"\\v"); */
-/*          else if ('\a' == c[j]) */
-/*            (void) fprintf(file,"\\a"); */
+            (void) fprintf(file,"\\t");
+          /*          else if ('\v' == c[j]) */
+          /*            (void) fprintf(file,"\\v"); */
+          /*          else if ('\a' == c[j]) */
+          /*            (void) fprintf(file,"\\a"); */
           else if ('\\' == c[j])
             (void) fprintf(file,"\\");
           else if ('\?' == c[j])

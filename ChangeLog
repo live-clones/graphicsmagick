@@ -1,3 +1,8 @@
+2025-02-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/magic.c (ListMagicInfo): Include a format description in
+	the output of 'gm convert -list magic'.
+
 2025-02-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/magic.c: Add a Magic description field in order to help
