@@ -1,3 +1,8 @@
+2025-02-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/magic.c: Make the magic-based format descriptions more
+	detailed and helpful.
+
 2025-02-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/magic.c (ListMagicInfo): Include a format description in
