@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2024 GraphicsMagick Group
+ * Copyright (C) 2003-2025 GraphicsMagick Group
  *
  * Test DispatchImage/ConstituteImage operations via
  * write/read/write/read sequence to detect any data corruption
@@ -12,6 +12,9 @@
  *
  */
 
+#if defined(_VISUALC_) && (_MSC_VER < 1900)
+#include <magick/studio.h>
+#endif
 #include <magick/api.h>
 #include <magick/enum_strings.h>
 

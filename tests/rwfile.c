@@ -18,6 +18,9 @@
  * enough) in order for the test to pass.
  * */
 
+#if defined(_VISUALC_) && (_MSC_VER < 1900)
+#include <magick/studio.h>
+#endif
 #include <magick/api.h>
 #include <magick/enum_strings.h>
 

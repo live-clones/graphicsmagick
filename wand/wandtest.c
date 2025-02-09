@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2024 GraphicsMagick Group */
+/* Copyright (C) 2003-2025 GraphicsMagick Group */
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -71,6 +71,9 @@
 /*
   Include declarations.
 */
+#if defined(_VISUALC_) && (_MSC_VER < 1900)
+#include <magick/studio.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
