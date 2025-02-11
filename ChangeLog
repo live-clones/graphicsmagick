@@ -1,3 +1,12 @@
+2025-02-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/nt_base.h: Update notes regarding `_MSC_VER` values and
+	Visual C++ versions.
+
+	* www/index.rst: Promote the Mercurial repository at
+	https://foss.heptapod.net/graphicsmagick/graphicsmagick since it
+	seems to work better.
+
 2025-02-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/magic.c: Make the magic-based format descriptions more
