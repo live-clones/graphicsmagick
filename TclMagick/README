@@ -12,8 +12,4 @@ Subsequent work has been done by Massimo Manghi
 <massimo.manghi@unipr.it>, and Bob Friesenhahn
 <bfriesen@simple.dallas.tx.us>.
 
-The Unix/Linux build is currently done using Automake+libtool. The
-quality of the integration as pertains to Tcl would be improved if the
-TclMagick build is changed to a pure Tcl Extension Architecture (TEA)
-build and test framework similar to SampleExtension
-(https://wiki.tcl-lang.org/page/SampleExtension).
+The Unix/Linux build is currently done using Automake+libtool.
