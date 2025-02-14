@@ -3756,28 +3756,28 @@ WandExport double MagickGetImageGamma(MagickWand *wand)
   return(wand->image->gamma);
 }
 /*
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %   M a g i c k G e t I m a g e G e o m e t r y                               %
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- %  MagickGetImageGeometry() gets the image geometry string.  NULL is
- %  returned if the image does not contain a geometry string.
- %
- %  The format of the MagickGetImageGeometry method is:
- %
- %      const char *MagickGetImageGeometry(MagickWand *wand)
- %
- %  A description of each parameter follows:
- %
- %    o wand: The magick wand.
- %
- */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   M a g i c k G e t I m a g e G e o m e t r y                               %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickGetImageGeometry() gets the image geometry string.  NULL is
+%  returned if the image does not contain a geometry string.
+%
+%  The format of the MagickGetImageGeometry method is:
+%
+%      const char *MagickGetImageGeometry(MagickWand *wand)
+%
+%  A description of each parameter follows:
+%
+%    o wand: The magick wand.
+%
+*/
 WandExport const char *MagickGetImageGeometry(MagickWand *wand)
 {
   assert(wand != (MagickWand *) NULL);
@@ -4042,28 +4042,28 @@ WandExport unsigned long MagickGetImageIterations(MagickWand *wand)
   return(wand->image->iterations);
 }
 /*
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %   M a g i c k G e t I m a g e M a t t e                                     %
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- %  MagickGetImageMatte() gets the image matte flag.  The flag is MagickTrue
- %  if the image supports an opacity (inverse of transparency) channel.
- %
- %  The format of the MagickGetImageMatte method is:
- %
- %      MagickBool MagickGetImageMatte(MagickWand *wand)
- %
- %  A description of each parameter follows:
- %
- %    o wand: The magick wand.
- %
- */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   M a g i c k G e t I m a g e M a t t e                                     %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickGetImageMatte() gets the image matte flag.  The flag is MagickTrue
+%  if the image supports an opacity (inverse of transparency) channel.
+%
+%  The format of the MagickGetImageMatte method is:
+%
+%      MagickBool MagickGetImageMatte(MagickWand *wand)
+%
+%  A description of each parameter follows:
+%
+%    o wand: The magick wand.
+%
+*/
 WandExport MagickBool MagickGetImageMatte(MagickWand *wand)
 {
   assert(wand != (MagickWand *) NULL);
@@ -6386,56 +6386,56 @@ WandExport unsigned int MagickOpaqueImage(MagickWand *wand,
 }
 
 /*
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %   M a g i c k O p e r a t o r I m a g e C h a n n e l                       %
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- %  MagickOperatorImageChannel() performs the requested arithmetic,
- %  bitwise-logical, or value operation on the selected channels of
- %  the entire image.  The AllChannels channel option operates on all
- %  color channels whereas the GrayChannel channel option treats the
- %  color channels as a grayscale intensity.
- %
- %  These operations are on the DirectClass pixels of the image and do not
- %  update pixel indexes or colormap.
- %
- %  The format of the MagickOperatorImageChannel method is:
- %
- %      MagickPassFail MagickOperatorImageChannel(MagickWand *wand,
- %        const ChannelType channel,const QuantumOperator quantum_operator,
- %        const double rvalue)
- %
- %  A description of each parameter follows:
- %
- %    o wand: The magick wand.
- %
- %    o channel: Channel to operate on (RedChannel, CyanChannel,
- %        GreenChannel, MagentaChannel, BlueChannel, YellowChannel,
- %        OpacityChannel, BlackChannel, MatteChannel, AllChannels,
- %        GrayChannel).  The AllChannels type only updates color
- %        channels.  The GrayChannel type treats the color channels
- %        as if they represent an intensity.
- %
- %    o quantum_operator: Operator to use (AddQuantumOp,AndQuantumOp,
- %        AssignQuantumOp, DepthQuantumOp, DivideQuantumOp, GammaQuantumOp,
- %        LShiftQuantumOp, MultiplyQuantumOp,  NegateQuantumOp,
- %        NoiseGaussianQuantumOp, NoiseImpulseQuantumOp,
- %        NoiseLaplacianQuantumOp, NoiseMultiplicativeQuantumOp,
- %        NoisePoissonQuantumOp, NoiseRandomQuantumOp, NoiseUniformQuantumOp,
- %        OrQuantumOp, RShiftQuantumOp, SubtractQuantumOp,
- %        ThresholdBlackQuantumOp, ThresholdQuantumOp, ThresholdWhiteQuantumOp,
- %        ThresholdBlackNegateQuantumOp, ThresholdWhiteNegateQuantumOp,
- %        XorQuantumOp).
- %
- %    o rvalue: Operator argument.
- %
- */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   M a g i c k O p e r a t o r I m a g e C h a n n e l                       %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickOperatorImageChannel() performs the requested arithmetic,
+%  bitwise-logical, or value operation on the selected channels of
+%  the entire image.  The AllChannels channel option operates on all
+%  color channels whereas the GrayChannel channel option treats the
+%  color channels as a grayscale intensity.
+%
+%  These operations are on the DirectClass pixels of the image and do not
+%  update pixel indexes or colormap.
+%
+%  The format of the MagickOperatorImageChannel method is:
+%
+%      MagickPassFail MagickOperatorImageChannel(MagickWand *wand,
+%        const ChannelType channel,const QuantumOperator quantum_operator,
+%        const double rvalue)
+%
+%  A description of each parameter follows:
+%
+%    o wand: The magick wand.
+%
+%    o channel: Channel to operate on (RedChannel, CyanChannel,
+%        GreenChannel, MagentaChannel, BlueChannel, YellowChannel,
+%        OpacityChannel, BlackChannel, MatteChannel, AllChannels,
+%        GrayChannel).  The AllChannels type only updates color
+%        channels.  The GrayChannel type treats the color channels
+%        as if they represent an intensity.
+%
+%    o quantum_operator: Operator to use (AddQuantumOp,AndQuantumOp,
+%        AssignQuantumOp, DepthQuantumOp, DivideQuantumOp, GammaQuantumOp,
+%        LShiftQuantumOp, MultiplyQuantumOp,  NegateQuantumOp,
+%        NoiseGaussianQuantumOp, NoiseImpulseQuantumOp,
+%        NoiseLaplacianQuantumOp, NoiseMultiplicativeQuantumOp,
+%        NoisePoissonQuantumOp, NoiseRandomQuantumOp, NoiseUniformQuantumOp,
+%        OrQuantumOp, RShiftQuantumOp, SubtractQuantumOp,
+%        ThresholdBlackQuantumOp, ThresholdQuantumOp, ThresholdWhiteQuantumOp,
+%        ThresholdBlackNegateQuantumOp, ThresholdWhiteNegateQuantumOp,
+%        XorQuantumOp).
+%
+%    o rvalue: Operator argument.
+%
+*/
 WandExport unsigned int
 MagickOperatorImageChannel(MagickWand *wand,
                            const ChannelType channel,
@@ -8705,30 +8705,30 @@ WandExport unsigned int MagickSetImageGamma(MagickWand *wand,const double gamma)
 }
 
 /*
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %   M a g i c k S e t I m a g e G e o m e t r y                               %
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- %  MagickSetImageGeometry() sets the image geometry string.
- %
- %  The format of the MagickSetImageGeometry method is:
- %
- %      unsigned int MagickSetImageGeometry(MagickWand *wand,
- %        const char *geometry)
- %
- %  A description of each parameter follows:
- %
- %    o wand: The magick wand.
- %
- %    o geometry: The image geometry.
- %
- */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   M a g i c k S e t I m a g e G e o m e t r y                               %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickSetImageGeometry() sets the image geometry string.
+%
+%  The format of the MagickSetImageGeometry method is:
+%
+%      unsigned int MagickSetImageGeometry(MagickWand *wand,
+%        const char *geometry)
+%
+%  A description of each parameter follows:
+%
+%    o wand: The magick wand.
+%
+%    o geometry: The image geometry.
+%
+*/
 WandExport unsigned int MagickSetImageGeometry(MagickWand *wand,
                                                const char *geometry)
 {
@@ -8945,32 +8945,32 @@ WandExport unsigned int MagickSetImageIterations(MagickWand *wand,
 }
 
 /*
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %   M a g i c k S e t I m a g e M a t t e                                     %
- %                                                                             %
- %                                                                             %
- %                                                                             %
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %
- %  MagickSetImageMatte() sets the image matte flag.  The image opacity
- %  (inverse of transparency) channel is enabled if the matte flag is
- %  True.
- %
- %  The format of the MagickSetImageMatte method is:
- %
- %      unsigned int MagickSetImageMatte(MagickWand *wand,
- %        const unsigned int matte)
- %
- %  A description of each parameter follows:
- %
- %    o wand: The magick wand.
- %
- %    o matte: The image matte.
- %
- */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   M a g i c k S e t I m a g e M a t t e                                     %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickSetImageMatte() sets the image matte flag.  The image opacity
+%  (inverse of transparency) channel is enabled if the matte flag is
+%  True.
+%
+%  The format of the MagickSetImageMatte method is:
+%
+%      unsigned int MagickSetImageMatte(MagickWand *wand,
+%       const unsigned int matte)
+%
+%  A description of each parameter follows:
+%
+%    o wand: The magick wand.
+%
+%    o matte: The image matte.
+%
+*/
 WandExport unsigned int MagickSetImageMatte(MagickWand *wand,
                                             const unsigned int matte)
 {

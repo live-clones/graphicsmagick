@@ -1,3 +1,10 @@
+2025-02-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* wand/magick_wand.c: Fix comment indentation issue which was
+	causing some functions to not appear in the formatted
+	documentation.  Thanks to Robert C. <robgcs@users.sourceforge.net>
+	for reporting that documentation for some functions were missing.
+
 2025-02-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/nt_base.h: Update notes regarding `_MSC_VER` values and
