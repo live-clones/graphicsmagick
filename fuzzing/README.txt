@@ -37,7 +37,7 @@ Clean up dangling (stale) Docker images::
 
 Pull the latest Docker images::
 
-  $ python infra/helper.py pull_images
+  $ python3 infra/helper.py pull_images
 
 Optionally remove the existing build directory (in git checkout):
 
@@ -49,39 +49,39 @@ Optionally remove the existing project image::
 
 Build the project image::
 
-  python infra/helper.py build_image graphicsmagick
+  python3 infra/helper.py build_image graphicsmagick
 
 Build project fuzzer target::
 
-  python infra/helper.py build_fuzzers --sanitizer <address/memory/undefined> \
+  python3 infra/helper.py build_fuzzers --sanitizer <address/memory/undefined> \
     --architecture <x86_64/i386> graphicsmagick
 
-  python infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick
 
 Reproduce using local source checkout (mount local sources into the running container)::
 
-  python infra/helper.py build_fuzzers \
+  python3 infra/helper.py build_fuzzers \
     --sanitizer <address/memory/undefined> graphicsmagick <source_path>
 
-  python infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick <source_path>
-  python infra/helper.py reproduce graphicsmagick <fuzz_target_name> <testcase_path>
+  python3 infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick <source_path>
+  python3 infra/helper.py reproduce graphicsmagick <fuzz_target_name> <testcase_path>
 
 Reproducing bugs::
 
-  $ python infra/helper.py reproduce graphicsmagick <fuzz_target_name> <testcase_path>
+  $ python3 infra/helper.py reproduce graphicsmagick <fuzz_target_name> <testcase_path>
 
 Check the build (this can take very long!)::
 
-  python infra/helper.py build_fuzzers --sanitizer <address/memory/undefined> \
+  python3 infra/helper.py build_fuzzers --sanitizer <address/memory/undefined> \
     --engine <libfuzzer/afl/honggfuzz/centipede> --architecture <x86_64/i386> graphicsmagick
 
-  python infra/helper.py check_build  --sanitizer <address/memory/undefined> \
+  python3 infra/helper.py check_build  --sanitizer <address/memory/undefined> \
     --engine <libfuzzer/afl/honggfuzz/centipede> --architecture <x86_64/i386> graphicsmagick \
     <fuzz_target_name>
 
 Get a shell into the container and compile::
 
-  python infra/helper.py shell --sanitizer address --architecture x86_64 graphicsmagick
+  python3 infra/helper.py shell --sanitizer address --architecture x86_64 graphicsmagick
   compile 2>&1 | tee build.log
 
 Copy fuzzing build script into running container (given simultaneous shell session)::

@@ -98,12 +98,13 @@ set -x
 # build zlib
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static zlib --libs
 #    -L/work/lib -lz
+# Need to override 'ZINC' Makefile definition to fix local inclusion.
 printf "=== Building zlib...\n"
 pushd "$SRC/zlib"
 ./configure \
     --static \
     --prefix="$WORK"
-make -j$(nproc) CFLAGS="$CFLAGS -fPIC"
+make ZINC=-I. -j$(nproc) CFLAGS="$CFLAGS -fPIC"
 make install
 popd
 
