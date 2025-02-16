@@ -65,6 +65,7 @@ enable_webp=true
 enable_x265=true
 enable_xml=false
 enable_xz=true
+enable_zlib=true
 enable_zstd=true
 
 export PKG_CONFIG_PATH="$WORK/lib/pkgconfig"
@@ -98,15 +99,21 @@ set -x
 # build zlib
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static zlib --libs
 #    -L/work/lib -lz
-# Need to override 'ZINC' Makefile definition to fix local inclusion.
-printf "=== Building zlib...\n"
-pushd "$SRC/zlib"
-./configure \
-    --static \
-    --prefix="$WORK"
-make ZINC=-I. -j$(nproc) CFLAGS="$CFLAGS -fPIC"
-make install
-popd
+if $enable_zlib
+then
+    printf "=== Building zlib...\n"
+    ZLIB_SRC="${SRC}/zlib"
+    ZLIB_BUILD="${SRC}/zlib_build"
+    rm -rf "${ZLIB_BUILD}"
+    mkdir -p "${ZLIB_BUILD}"
+    pushd "${ZLIB_BUILD}"
+    ${ZLIB_SRC}/configure \
+                --static \
+                --prefix="$WORK"
+    make -j$(nproc) CFLAGS="$CFLAGS -fPIC"
+    make install
+    popd
+fi
 
 # build xz
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static liblzma --libs
@@ -681,10 +688,7 @@ then
         pushd ${LIBZIP_BUILD}
         cmake \
             -DBUILD_SHARED_LIBS=off \
-            -DBUILD_TESTING=off \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER=$CXX \
-            -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
             -DCMAKE_C_COMPILER=$CC \
             -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
             -DCMAKE_INSTALL_PREFIX=$WORK \
@@ -693,8 +697,7 @@ then
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_OSSFUZZ=OFF \
             -DBUILD_REGRESS=OFF \
-            -DBUILD_TOOLS=OFF \
-            -DBUILD_TOOLS=OFF \
+            -DBUILD_TOOLS=ON \
             -DENABLE_GNUTLS=OFF \
             -DENABLE_MBEDTLS=OFF \
             -DENABLE_OPENSSL=OFF \
