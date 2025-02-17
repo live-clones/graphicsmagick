@@ -697,7 +697,7 @@ then
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_OSSFUZZ=OFF \
             -DBUILD_REGRESS=OFF \
-            -DBUILD_TOOLS=OFF \
+            -DBUILD_TOOLS=ON \
             -DENABLE_GNUTLS=OFF \
             -DENABLE_MBEDTLS=OFF \
             -DENABLE_OPENSSL=OFF \
