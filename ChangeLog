@@ -1,3 +1,7 @@
+2025-03-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* README.txt: Refresh README text.
+
 2025-02-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* wand/magick_wand.c: Fix comment indentation issue which was

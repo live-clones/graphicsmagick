@@ -9,20 +9,23 @@ Installing GraphicsMagick
 .. contents::
   :local:
 
-Executive Summary
------------------
+Introduction
+------------
 
 GraphicsMagick provides a comprehensive collection of utilities,
 programming interfaces, and GUIs, to support file format conversion,
 image processing, and 2D vector rendering.
 
-GraphicsMagick is originally based on ImageMagick from ImageMagick Studio
-(which was originally written by John Cristy at Dupont). The goal of
-GraphicsMagick is to provide the highest quality product possible while
-encouraging open and active participation from all interested developers.
-The GraphicsMagick usage license is designed to allow it to be used for
-any application, including proprietary or GPLed applications. Please see
-the file `Copyright.txt <Copyright.html>`_ for the GraphicsMagick licence.
+GraphicsMagick is originally based on ImageMagick from ImageMagick
+Studio (which was originally written by John Cristy at Dupont), but
+forking from it in late 2002, and becoming independent from it, while
+retaining the MIT-style license. The goal of GraphicsMagick is to
+provide the highest quality product possible while encouraging open
+and active participation from all interested developers.  The
+GraphicsMagick usage license is designed to allow it to be used for
+any application, including proprietary or GPLed applications. Please
+see the file `Copyright.txt <Copyright.html>`_ for the GraphicsMagick
+licence.
 
 Availability
 ------------
@@ -33,7 +36,7 @@ at http://sourceforge.net/projects/graphicsmagick/files/.
 GraphicsMagick is a continual work in progress. The very latest code
 is available via the Mercurial distributed source control management
 tool (https://www.mercurial-scm.org/). GraphicsMagick may be retrieved
-from foss.heptapod.net or SourceForge via the following commands:
+from foss.heptapod.net or SourceForge via one of the following commands:
 
   hg clone https://foss.heptapod.net/graphicsmagick/graphicsmagick GM
 
@@ -43,7 +46,7 @@ Mercurial provides a complete stand-alone repository which contains
 the full history of the GraphicsMagick project.  You may use the
 cloned repository for your own purposes related to GraphicsMagick
 (e.g. manage local GraphicsMagick changes), and can easily pull
-GraphicsMagick updates from the main repository whenever you like.
+updates from the main repository whenever you like.
 
 Documentation
 -------------
@@ -123,15 +126,14 @@ building under Microsoft Windows:
 
     https://sourceforge.net/projects/gs-fonts/
 
-  Ghostscript (at the time this text is written in October, 2018) has
-  been observed to have severe security issues when reading untrusted
-  Postscript files (does not apply to PDF).  Examples of these severe
-  security issues are being tricked into reading or writing arbitrary
-  files when executing in "-dSAFER" mode, which which is supposed to
-  prevent such access.  Users of Ghostscript who may encounter
-  untrusted Postscript files are recommended to assure that all
-  security patches have been applied and it might be necessary to use
-  the latest upstream release.
+  Ghostscript has historically been observed to have severe security
+  issues when reading untrusted Postscript files (does not apply to
+  PDF).  Examples of these severe security issues are being tricked
+  into reading or writing arbitrary files when executing in "-dSAFER"
+  mode, which which is supposed to prevent such access.  Users of
+  Ghostscript who may encounter untrusted Postscript files are
+  recommended to assure that all security patches have been applied
+  and it might be necessary to use the latest upstream release.
 
   Ghostscript is available for use under both free (GPL) and
   commercial licenses.  We are not lawyers so we can not provide
@@ -140,26 +142,9 @@ building under Microsoft Windows:
   usage terms if you plan to use it in some sort of commercial
   situation.
 
-  Ghostscript (release 7.0 and later) may optionally install a library
-  (libgs) under Linux. If this library is installed, GraphicsMagick may
-  be configured to use it. We do **NOT** recommend using this library
-  under Unix type systems. The Ghostscript library does not support
-  concurrency since only one instance of the interpreter is available.
-  Unix systems will obtain better performance from executing Ghostscript as
-  an external process since then multiple interpreters may execute at
-  once on multiple CPU cores.
-
-  If the Ghostscript library is used, then please be aware that
-  Ghostscript provides its own modified version of libjpeg and
-  libJasper while GraphicsMagick will be using these libraries as
-  provided with the system. If Ghostscript is not using the same
-  libraries, then identically named symbols may be used from the wrong
-  code, causing confusion or a program crash. If conflicts cause JPEG
-  to fail (JPEG returns an error regarding expected structure sizes),
-  it may be necessary to use Ghostscript's copy of libjpeg for
-  GraphicsMagick, and all delegate libraries which depend on libjpeg,
-  or convince Ghostscript to build against an unmodified installed
-  JPEG library (and lose compatibility with some Postscript files).
+  Ghostscript is used as an external program under Unix-like systems,
+  but is used via its DLL in the Microsoft Windows Visual Studio
+  build.
 
 * GraphicsMagick requires hp2xx available from
 
@@ -219,13 +204,14 @@ building under Microsoft Windows:
   lossless coding mode JPEG extension introduced in IJG JPEG v9 (which
   is not compatible with standard lossless JPEG!).
 
-  GraphicsMagick supports both 8-bit and 12-bit JPEG, but
-  unfortunately it does not yet support both at once.
+  GraphicsMagick supports 8-bit, 12-bit, and 16-bit JPEG, provided a
+  JPEG library (e.g. libjpeg-turbo) which supports those depths.
 
 * GraphicsMagick requires the JasPer Project's JasPer library from
   https://jasper-software.github.io/jasper/ to read and write the
   JPEG-2000 format.  Due to security concerns, using the latest
-  version of JasPer (3.0.0 or later) is recommended.
+  version of JasPer is always recommended.  Note that modern JasPer
+  requires C'11 (2011) language support.
 
 * On Unix-type systems, Windows/MinGW, and Windows/Cygwin,
   GraphicsMagick requires libltdl from libtool in order to support
@@ -251,14 +237,17 @@ building under Microsoft Windows:
      https://libtiff.gitlab.io/libtiff/
 
   to read the TIFF image format. It in turn optionally requires the
-  JPEG and ZLIB libraries.  Libtiff 3.8.2 or later is recommended.
+  JBIG, JPEG, LERC, Deflate, LZMA, ZSTD, WebP, and ZLIB libraries.
+  Libtiff 3.9.7 or later is required, but a recent release is always
+  recommended.
 
 * GraphicsMagick requires libzip available via HTTPS at
 
      https://libzip.org/
 
   in in order to read the ORA format.  It in turn optionally requires
-  libbzip2 and OpenSSL libraries.
+  ZLIB, BZip2, LZMA (xz), ZSTD, and a crypto library (Common Crypto,
+  GnuTLS, mbed TLS, OpenSSL, or Windows Cryptography).
 
 * GraphicsMagick may optionally use the TRIO library from
 
@@ -286,15 +275,12 @@ building under Microsoft Windows:
 
 * GraphicsMagick may optionally use the umem memory allocation library
   which is included in Sun's Solaris operating system, and
-  OpenSolaris/Illumos derivatives, or available from
-
-     https://github.com/omniti-labs/portableumem
-
-  to provide enhanced versions of the standard memory allocation
-  facilities. Use of umem may improve performance for multi-threaded
-  programs and provides access to debugging features that detect memory
-  leaks, buffer overruns, multiple frees, use of uninitialized data, use
-  of freed data, and many other common programming errors.
+  OpenSolaris/Illumos derivatives, to provide enhanced versions of the
+  standard memory allocation facilities. Use of umem may improve
+  performance for multi-threaded programs and provides access to
+  debugging features that detect memory leaks, buffer overruns,
+  multiple frees, use of uninitialized data, use of freed data, and
+  many other common programming errors.
 
 * GraphicsMagick requires libwmflite from libwmf 0.2.5 (or later) from
 
