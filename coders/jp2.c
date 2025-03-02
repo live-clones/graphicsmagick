@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -987,16 +987,16 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
                                 "    depth                         = %u\n"  /* depth */
                                 "    signed sample data            = %d",   /* signedness of the sample data (true == signed) */
                                 component,
-                                jas_image_cmptwidth(jp2_image,components[component]),
-                                jas_image_cmptheight(jp2_image,components[component]),
-                                jas_image_cmpttlx(jp2_image, components[component]),
-                                jas_image_cmpttly(jp2_image, components[component]),
-                                jas_image_cmptbrx(jp2_image, components[component]),
-                                jas_image_cmptbry(jp2_image, components[component]),
-                                jas_image_cmpthstep(jp2_image, components[component]),
-                                jas_image_cmptvstep(jp2_image, components[component]),
-                                jas_image_cmptprec(jp2_image,components[component]),
-                                jas_image_cmptsgnd(jp2_image, components[component]));
+                                (long) jas_image_cmptwidth(jp2_image,components[component]),
+                                (long) jas_image_cmptheight(jp2_image,components[component]),
+                                (long) jas_image_cmpttlx(jp2_image, components[component]),
+                                (long) jas_image_cmpttly(jp2_image, components[component]),
+                                (long) jas_image_cmptbrx(jp2_image, components[component]),
+                                (long) jas_image_cmptbry(jp2_image, components[component]),
+                                (long) jas_image_cmpthstep(jp2_image, components[component]),
+                                (long) jas_image_cmptvstep(jp2_image, components[component]),
+                                (unsigned int) jas_image_cmptprec(jp2_image,components[component]),
+                                (int) jas_image_cmptsgnd(jp2_image, components[component]));
         }
     }
   for (component=0; component < number_components; component++)
