@@ -1,3 +1,15 @@
+2025-03-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* NEWS.txt: Updated the news.
+
+	* fuzzing/oss-fuzz-build.sh (CPPFLAGS): Continue to enable
+	EXPERIMENTAL_EXIF_TAGS in oss-fuzz build in order to continue
+	testing writing EXIF in TIFF format.
+
+	* coders/tiff.c (EXPERIMENTAL_EXIF_TAGS): Disable
+	EXPERIMENTAL_EXIF_TAGS by default until libtiff API weaknesses are
+	resolved.
+
 2025-03-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/jp2.c (ReadJP2Image): Add casts in order to avoid

@@ -739,7 +739,7 @@ esac
 
 # Configure GraphicsMagick
 PATH=$WORK/bin:$PATH PKG_CONFIG_PATH="$WORK/lib/pkgconfig" PKG_CONFIG='pkg-config --static' ./configure \
-    CPPFLAGS="-I$WORK/include/libpng16 -I$WORK/include/freetype2 -I$WORK/include/libxml2 -I$WORK/include" \
+    CPPFLAGS="-DEXPERIMENTAL_EXIF_TAGS=1 -I$WORK/include/libpng16 -I$WORK/include/freetype2 -I$WORK/include/libxml2 -I$WORK/include" \
     CFLAGS="${CFLAGS}" \
     LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
     LIBS="${EXTRA_LIBS}" \

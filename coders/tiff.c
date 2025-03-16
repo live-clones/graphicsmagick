@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003 - 2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -73,7 +73,7 @@
 #  endif /* if defined(COMPRESSION_ZSTD) && defined(HasZSTD) */
 
 #if !defined(EXPERIMENTAL_EXIF_TAGS)
-#  define EXPERIMENTAL_EXIF_TAGS 1
+#  define EXPERIMENTAL_EXIF_TAGS 0
 #endif /* if !defined(EXPERIMENTAL_EXIF_TAGS) */
 
 /*
