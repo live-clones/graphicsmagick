@@ -1,3 +1,10 @@
+2025-03-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (AddIFDExifFields): Check for overflow of computed
+	unsigned value. Code is only active if EXPERIMENTAL_EXIF_TAGS is
+	true.  Addresses oss-fuzz 403696329
+	"graphicsmagick:coder_TIFF_any_fuzzer: Crash in LD_UINT16_HI".
+
 2025-03-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Updated the news.

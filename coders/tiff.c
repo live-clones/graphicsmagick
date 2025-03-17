@@ -4547,8 +4547,8 @@ int FieldCount = 0;
 
       fip = TIFFFindField(tiff, Tag, TIFF_ANY);
       if(logging && (Flags & FLAG_BASE)!=0)
-        (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Extracted tag from EXIF %xh, Field %d, Long2 %d, val %d %s",
-                           Tag, Field, Long2, Value, FipFieldName(fip));
+        (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Extracted tag from EXIF %xh, Field %u, Long2 %u, val %u %s",
+                             (unsigned) Tag, (unsigned) Field, (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
 
       if(Tag==TIFFTAG_COMPRESSION ||
          Tag==TIFFTAG_IMAGELENGTH || Tag==TIFFTAG_IMAGEWIDTH ||
@@ -4591,7 +4591,7 @@ int FieldCount = 0;
                          }
                          else
                          {
-                           if(Value+Long2>=profile_length-1) break;             /* String outside EXIF boundary. */
+                           if((Value > (Value+Long2)) || (Value+Long2>=profile_length-1)) break;             /* String outside EXIF boundary. */
                            if(CheckAndStoreStr(tiff, Tag, (const char *) profile_data+Value, Long2))
                              FieldCount++;
                          }
@@ -4605,7 +4605,7 @@ int FieldCount = 0;
                            if(FDT!=Field) break;                        /* Incompatible array type, might be converted in future. */
                            if(WriteCount!=TIFF_VARIABLE && WriteCount!=TIFF_VARIABLE2)
                                break;                                   /* Fixed size arrays not handled. */
-                           if(Value+2*Long2>=profile_length-1) break;
+                           if((Value > (Value+2U*Long2)) || (Value+2U*Long2>=profile_length-1)) break; // Value=4294967156, Value+2=4294967158, Long2=128, profile_length=515
                            if(Long2==0) break;
                            Array = MagickAllocateResourceLimitedMemory(magick_uint16_t *, 2*Long2);
                            if(Array==NULL) break;
@@ -4633,7 +4633,7 @@ int FieldCount = 0;
                            if(FDT!=Field) break;                        /* Incompatible array type, might be converted in future. */
                            if(WriteCount!=TIFF_VARIABLE && WriteCount!=TIFF_VARIABLE2)
                                break;                                   /* Fixed size arrays not handled. */
-                           if(Value+4*Long2>=profile_length-1) break;
+                           if((Value > (Value+4U*Long2)) || (Value+4U*Long2>=profile_length-1)) break;
                            if(Long2==0) break;
                            Array = MagickAllocateResourceLimitedMemory(magick_uint32_t *, 4*Long2);
                            if(Array==NULL) break;
@@ -4668,13 +4668,13 @@ int FieldCount = 0;
                              }
                              else
                              {
-                               if(Value+Long2>=profile_length-1) break;
+                               if((Value > (Value+Long2)) || (Value+Long2>=profile_length-1)) break;
                                if(TIFFSetField(tiff, Tag, profile_data+Value))  /* Argument 3 uint8_t[4]. */
                                  FieldCount++;
                              }
                              break;                                     /* Fixed size arrays not handled. */
                            }
-                           if(Value+Long2>=profile_length-1) break;
+                           if((Value > (Value+Long2)) || (Value+Long2>=profile_length-1)) break;
                                /* No need to convert endianity for BYTES. */
                            if(WriteCount==TIFF_VARIABLE)
                            {
@@ -4710,7 +4710,7 @@ Scalar:                  if(FDT==TIFF_SHORT)
                            if(WriteCount>1)
                            {
                              if(Long2<(magick_uint32_t)WriteCount) break;       /* Too small amount of mandatory items. */
-                             if(Value+8*WriteCount>=profile_length-1) break;    /* Array falls over blob boundary. */
+                             if((Value > (Value+8*WriteCount)) || (Value+8*WriteCount>=profile_length-1)) break;    /* Array falls over blob boundary. */
 #if TIFFLIB_VERSION >= 20230609
                              {
                                int i;
@@ -4763,7 +4763,7 @@ Scalar:                  if(FDT==TIFF_SHORT)
                          else           /* Process as scalar. */
                          {
                            double d;
-                           if(Value+8>=profile_length) break;
+                           if((Value > (Value+8U)) || (Value+8U>=profile_length)) break;
                            d = LD_UINT32(profile_data+Value+4);
                            if(d==0) break;              /* Prevent division by 0. */
                            d = LD_UINT32(profile_data+Value) / d;
