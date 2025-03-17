@@ -5,6 +5,9 @@
 	true.  Addresses oss-fuzz 403696329
 	"graphicsmagick:coder_TIFF_any_fuzzer: Crash in LD_UINT16_HI".
 
+	Reflow code to match the conventions used by the rest of the
+	project.
+
 2025-03-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Updated the news.
