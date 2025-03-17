@@ -4622,7 +4622,7 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
                       Array = MagickAllocateResourceLimitedMemory(magick_uint16_t *, 2*Long2);
                       if (Array == NULL)
                         break;
-                      for(i=0; i < Long2; i++)
+                      for (i=0; i < Long2; i++)
                         Array[i] = LD_UINT16(profile_data+Value+2*i);
                       if (WriteCount == TIFF_VARIABLE)
                         {
@@ -4654,7 +4654,7 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
                       Array = MagickAllocateResourceLimitedMemory(magick_uint32_t *, 4*Long2);
                       if (Array == NULL)
                         break;
-                      for(i=0; i < Long2; i++)
+                      for (i=0; i < Long2; i++)
                         Array[i] = LD_UINT32(profile_data+Value+4*i);
                       if (WriteCount == TIFF_VARIABLE)
                         {
@@ -4748,7 +4748,7 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
                                   ArrayD = MagickAllocateResourceLimitedMemory(double *, sizeof(double)*WriteCount);
                                   if (ArrayD == NULL)
                                     break;
-                                  for(i=0; i < WriteCount; i++)
+                                  for (i=0; i < WriteCount; i++)
                                     {
                                       const magick_uint32_t val = LD_UINT32(profile_data+Value+4+8*i);
                                       ArrayD[i] = (val==0) ? 0.0 : (LD_UINT32(profile_data+Value+8*i) / (double)val);
@@ -4764,7 +4764,7 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
                                   ArrayF = MagickAllocateResourceLimitedMemory(float *, sizeof(float)*WriteCount);
                                   if (ArrayF==NULL)
                                     break;
-                                  for(i=0; i < WriteCount; i++)
+                                  for (i=0; i < WriteCount; i++)
                                     {
                                       const magick_uint32_t val = LD_UINT32(profile_data+Value+4+8*i);
                                       ArrayF[i] = (val==0) ? 0.0f : (LD_UINT32(profile_data+Value+8*i) / (float)val);
