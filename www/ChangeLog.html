@@ -38,6 +38,15 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-03-26  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/jxl.c (ReadJXLImage): pixel_format.num_channels needs to
+be 2 for grayscale matte.  Addresses oss-fuzz 406320404
+&quot;graphicsmagick:coder_JXL_fuzzer: Heap-buffer-overflow in
+ImportViewPixelArea&quot;.</p></li>
+</ul>
+</blockquote>
 <p>2025-03-17  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul>

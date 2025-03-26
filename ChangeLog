@@ -1,3 +1,10 @@
+2025-03-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/jxl.c (ReadJXLImage): pixel_format.num_channels needs to
+	be 2 for grayscale matte.  Addresses oss-fuzz 406320404
+	"graphicsmagick:coder_JXL_fuzzer: Heap-buffer-overflow in
+	ImportViewPixelArea".
+
 2025-03-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/tiff.c (AddIFDExifFields): Check for overflow of computed
