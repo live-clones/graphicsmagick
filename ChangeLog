@@ -1,3 +1,7 @@
+2025-03-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* NEWS.txt: Update the news.
+
 2025-03-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/jxl.c (ReadJXLImage): pixel_format.num_channels needs to

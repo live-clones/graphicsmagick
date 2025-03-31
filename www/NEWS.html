@@ -116,12 +116,14 @@ all targets.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
-<li><p>JXL: Apply image dimension resource limits.</p></li>
+<li><p>JXL: Apply image dimension resource limits. Fix heap buffer write
+overflow while reading image.</p></li>
 <li><p>TIFF: Disable EXPERIMENTAL_EXIF_TAGS by default until libtiff API
 weaknesses (as discovered in OSS-Fuzz issue 402570327) are resolved.
 This can be accomplished in earlier versions supporting this feature
 by passing CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 as an argument to the
-configure script.</p></li>
+configure script. Continue to address issues in the EXIF tag code as
+discovered by oss-fuzz.</p></li>
 <li><p>WPG: Assure that the palette buffer is allocated and the current
 size (SourceForge bug #750).</p></li>
 </ul>
