@@ -377,6 +377,9 @@ fi
 # Build freetype
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static freetype2 --libs
 #    -L/work/lib -lfreetype -lpng16 -lm -lz
+#
+# Disable 'harfbuzz' to avoid compilation error of autofit module due
+# to "use of undeclared identifier 'RTLD_DEFAULT'".
 if $enable_freetype
 then
     printf "=== Building ${SRC}/freetype...\n"
@@ -389,6 +392,7 @@ then
         --disable-shared \
         --enable-freetype-config \
         --enable-static \
+        --without-harfbuzz \
         --prefix="$WORK"
     make -j$(nproc)
     make install
