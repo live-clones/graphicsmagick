@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2023 GraphicsMagick Group
+% Copyright (C) 2023-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -1042,6 +1042,12 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                             exif_profile=profile;
                             exif_size=profile_size;
                           }
+                        else
+                          {
+                            MagickFreeResourceLimitedMemory(profile);
+                            exif_profile=NULL;
+                            exif_size=0;
+                          }
                       }
                   }
                 if (LocaleNCompare(type,"xml ",sizeof(type)) == 0)
@@ -1056,6 +1062,12 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                           {
                             xmp_profile=profile;
                             xmp_size=profile_size;
+                          }
+                        else
+                          {
+                            MagickFreeResourceLimitedMemory(profile);
+                            xmp_profile=NULL;
+                            xmp_size=0;
                           }
                       }
                   }

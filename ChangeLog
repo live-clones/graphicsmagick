@@ -1,5 +1,10 @@
 2025-05-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/jxl.c (ReadJXLImage): Free profile memory if
+	JxlDecoderSetBoxBuffer() fails. Addresses oss-fuzz issue
+	"graphicsmagick:coder_TIFF_any_fuzzer: Direct-leak in
+	_MagickReallocateResourceLimitedMemory".
+
 	* fuzzing/oss-fuzz-build.sh: Disable 'harfbuzz' in freetype build
 	in order to avoid compilation error due to use of RTLD_DEFAULT.
 
