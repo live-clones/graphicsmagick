@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999, 2000, 2001, 2002, 2004
+// Copyright Bob Friesenhahn, 1999-2025
 //
 // Implementation of Blob
 //

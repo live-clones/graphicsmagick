@@ -1784,7 +1784,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                                 "geometry=%lux%lu,"
                                 " magick_geometry=%lux%lu,"
                                 " components=%d, "
-                                "blob size=%" MAGICK_OFF_F "d bytes, "
+                                "blob size=%" MAGICK_OFF_F " bytes, "
                                 "compression ratio %g",
                                 image->columns, image->rows,
                                 image->magick_columns, image->magick_rows,

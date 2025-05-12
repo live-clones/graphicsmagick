@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -861,7 +861,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
 
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "ExtractPostscript(): PS_Offset=%"MAGICK_OFF_F"d, PS_Size=%"MAGICK_SIZE_T_F"u",
+                          "ExtractPostscript(): PS_Offset=%"MAGICK_OFF_F", PS_Size=%"MAGICK_SIZE_T_F"",
                           (magick_off_t) PS_Offset, (MAGICK_SIZE_T) PS_Size);
 
   /*
@@ -872,7 +872,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"",
                               (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
@@ -885,7 +885,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"",
                               (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
@@ -925,7 +925,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"",
                               (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
@@ -941,7 +941,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "ExtractPostscript(): Failed to allocate "
-                                  "%"MAGICK_SIZE_T_F"u bytes of memory",
+                                  "%"MAGICK_SIZE_T_F" bytes of memory",
                                   (MAGICK_SIZE_T) PS_Size);
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);
           return image;
@@ -956,8 +956,8 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       MagickFreeResourceLimitedMemory(ps_data_alloc);
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to read %"MAGICK_SIZE_T_F"u bytes of data at"
-                              " offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to read %"MAGICK_SIZE_T_F" bytes of data at"
+                              " offset=%"MAGICK_OFF_F"",
                               (MAGICK_SIZE_T) PS_Size, (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image; /* return (Image *) NULL; */

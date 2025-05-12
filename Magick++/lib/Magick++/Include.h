@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999 - 2020
+// Copyright Bob Friesenhahn, 1999-2025
 //
 // Inclusion of GraphicsMagick headers (with namespace magic)
 

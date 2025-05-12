@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1752,7 +1752,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                           length=(int) (1.01*pixels_size+12);
                           if (image->logging)
                             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                                  "length = %"MAGICK_SIZE_T_F"u",
+                                                  "length = %"MAGICK_SIZE_T_F"",
                                                   (MAGICK_SIZE_T) length);
                           zip_info.avail_in=(uInt) ReadBlob(image,length,zip_info.next_in);
                         }
@@ -1871,7 +1871,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                           length=ReadBlobMSBLong(image);
                           if (image->logging)
                             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                                  "length = %"MAGICK_SIZE_T_F"u",
+                                                  "length = %"MAGICK_SIZE_T_F"",
                                                   (MAGICK_SIZE_T) length);
                           if ((length == 0) || (length > compressed_length))
                             {

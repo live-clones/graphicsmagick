@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -6486,7 +6486,7 @@ static MagickPassFail DCM_SetupRescaleMap(Image *image,DicomStream *dcm,Exceptio
 
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Allocating %"MAGICK_SIZE_T_F"u entries for rescale map...", (MAGICK_SIZE_T) num_entries);
+                              "Allocating %"MAGICK_SIZE_T_F" entries for rescale map...", (MAGICK_SIZE_T) num_entries);
       dcm->rescale_map=MagickAllocateResourceLimitedClearedArray(Quantum *,num_entries,sizeof(Quantum));
       if (dcm->rescale_map == NULL)
         {

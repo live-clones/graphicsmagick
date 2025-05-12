@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -409,7 +409,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "HDU read finished at offset %" MAGICK_OFF_F "Xh, "
-                            "number of pixels is: %" MAGICK_UINT64_F "u (%d*%d*%d)",
+                            "number of pixels is: %" MAGICK_UINT64_F " (%d*%d*%d)",
                             TellBlob(image),
                             number_pixels,
                             fits_info.columns,
@@ -472,7 +472,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
         ratio = (((double) number_pixels*packet_size)/remaining);
 
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Remaining: %" MAGICK_OFF_F "d, Ratio: %g",
+                            "Remaining: %" MAGICK_OFF_F ", Ratio: %g",
                             remaining, ratio);
 
       if (ratio > 1.5)
@@ -496,7 +496,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
       number_pixels = ((number_pixels+FITS_BLOCK_SIZE-1) /
                        FITS_BLOCK_SIZE) * FITS_BLOCK_SIZE; /* raw data block size */
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Seek CUR: %" MAGICK_OFF_F "u",(magick_off_t) number_pixels);
+                            "Seek CUR: %" MAGICK_OFF_F "",(magick_off_t) number_pixels);
       SeekBlob(image,(magick_off_t) number_pixels,SEEK_CUR);
     }
   else
@@ -573,7 +573,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
                 ratio = (((double) image->columns*image->rows*packet_size)/remaining);
 
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Remaining: %" MAGICK_OFF_F "d, Ratio: %g",
+                                    "Remaining: %" MAGICK_OFF_F ", Ratio: %g",
                                     remaining, ratio);
 
               if (ratio > 1.5)

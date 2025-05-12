@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2025 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -89,27 +89,27 @@ extern "C" {
 
 #  if defined(MAGICK_IMPLEMENTATION)
 
-#  define MAGICK_INT32_F ""
-#  define MAGICK_UINT32_F ""
-#  define MAGICK_INT64_F "I64"
-#  define MAGICK_UINT64_F "I64"
+#  define MAGICK_INT32_F "d"
+#  define MAGICK_UINT32_F "u"
+#  define MAGICK_INT64_F "I64d"
+#  define MAGICK_UINT64_F "I64u"
 
   typedef magick_uint64_t magick_uintmax_t;
 
 #  if defined(WIN64)
   /* WIN64 uses the LLP64 model */
   typedef unsigned long long magick_uintptr_t;
-#  define MAGICK_SIZE_T_F "I64"
+#  define MAGICK_SIZE_T_F "I64u"
 #  define MAGICK_SIZE_T unsigned __int64
-#  define MAGICK_SSIZE_T_F "I64"
+#  define MAGICK_SSIZE_T_F "I64d"
 #  define MAGICK_SSIZE_T signed __int64
   typedef size_t uintptr_t;
   typedef signed __int64 ptrdiff_t;
 #  else
   typedef unsigned long magick_uintptr_t;
-#  define MAGICK_SIZE_T_F "l"
+#  define MAGICK_SIZE_T_F "lu"
 #  define MAGICK_SIZE_T unsigned long
-#  define MAGICK_SSIZE_T_F ""
+#  define MAGICK_SSIZE_T_F "d"
 #  define MAGICK_SSIZE_T int
   typedef long magick_ptrdiff_t
   typedef unsigned long magick_uintptr_t;
@@ -119,7 +119,7 @@ extern "C" {
 
 #else
 
-  /* The following typedefs are substituted when using Unixish configure */
+  /* The following is used with Unixish configure */
   typedef int8_t   magick_int8_t;     /* int8_t */
   typedef uint8_t  magick_uint8_t;    /* uint8_t */
 
@@ -159,10 +159,27 @@ extern "C" {
   typedef ptrdiff_t magick_ptrdiff_t; /* ptrdiff_t */
 #  define MAGICK_PTRDIFF_F "td"  /* %td */
 
+/* MinGW GCC warns about 'z', even if it is supported */
+#if (defined(WIN32) || defined(WIN64))
+#  if defined(WIN64)
+#    define MAGICK_SIZE_T_F "I64u"
+#  else
+#    define MAGICK_SIZE_T_F "lu"
+#  endif
+#else
 #  define MAGICK_SIZE_T_F "zu" /* %zu */
+#endif
 #  define MAGICK_SIZE_T size_t     /* size_t */
 
+#if (defined(WIN32) || defined(WIN64))
+#  if defined(WIN64)
+#    define MAGICK_SSIZE_T_F "I64d"
+#  else
+#    define MAGICK_SSIZE_T_F "d"
+#  endif
+#else
 #  define MAGICK_SSIZE_T_F "zd" /* %zd */
+#endif
 #  define MAGICK_SSIZE_T ssize_t     /* ssize_t */
 
 #endif /* defined(MAGICK_IMPLEMENTATION) */

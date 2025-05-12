@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -153,7 +153,7 @@ MagickExport MagickPassFail GradientImage(Image *restrict image,
     }
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "Gradient span %"MAGICK_SIZE_T_F"u", (MAGICK_SIZE_T) span);
+                        "Gradient span %"MAGICK_SIZE_T_F"", (MAGICK_SIZE_T) span);
 
   /*
     Determine origin pixel for diagonal gradients

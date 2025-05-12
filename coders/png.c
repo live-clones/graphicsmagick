@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1249,7 +1249,7 @@ png_read_raw_profile(Image *image, const ImageInfo *image_info,
   if ((length == 0) || ((magick_uintptr_t) (ep-sp) <= length*2))
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "invalid profile length %"MAGICK_SIZE_T_F"u", (MAGICK_SIZE_T) length);
+                            "invalid profile length %"MAGICK_SIZE_T_F"", (MAGICK_SIZE_T) length);
       ThrowException(exception,CorruptImageWarning,UnableToParseEmbeddedProfile,image->filename);
       return (MagickFail);
     }
@@ -3379,7 +3379,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "chunk length (%" MAGICK_SIZE_T_F "u)"
                                   " is greater than input size"
-                                  " (%" MAGICK_OFF_F "d)",
+                                  " (%" MAGICK_OFF_F ")",
                                   (MAGICK_SIZE_T) length,
                                   blob_size);
           ThrowException(exception,CorruptImageError,
@@ -3491,7 +3491,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "    Unreasonable dimensions: "
                                     "geometry = %lux%lu, "
-                                    "blob size = %" MAGICK_OFF_F "d",
+                                    "blob size = %" MAGICK_OFF_F "",
                                     jng_width, jng_height, blob_size);
 
               ThrowException(exception,CorruptImageError,
@@ -4502,7 +4502,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "chunk length (%" MAGICK_SIZE_T_F "u)"
                                       " is greater than input size"
-                                      " (%" MAGICK_OFF_F "d)",
+                                      " (%" MAGICK_OFF_F ")",
                                       (MAGICK_SIZE_T) length,
                                       blob_size);
               MngInfoFreeStruct(mng_info,&have_mng_structure);

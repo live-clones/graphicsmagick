@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2025 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -996,7 +996,7 @@ TIFFMapBlob(thandle_t image_handle,tdata_t *base,toff_t *size)
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "TIFF mapped blob: base=0x%p size=%" MAGICK_OFF_F
-                              "d",*base, (magick_off_t) *size);
+                              "",*base, (magick_off_t) *size);
 #endif
       return 1;
     }
@@ -1043,7 +1043,7 @@ TIFFSeekBlob(thandle_t image_handle,toff_t offset,int whence)
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "TIFF seek blob: offset=%" MAGICK_OFF_F
-                          "u whence=%d (%s), returns %" MAGICK_OFF_F "d",
+                          " whence=%d (%s), returns %" MAGICK_OFF_F "",
                           (magick_off_t) offset,
                           whence,
                           (whence == SEEK_SET ? "SET" :
@@ -1069,7 +1069,7 @@ TIFFGetBlobSize(thandle_t image_handle)
 #if LOG_TIFF_BLOB_IO
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "TIFF get blob size returns %" MAGICK_OFF_F "d",
+                          "TIFF get blob size returns %" MAGICK_OFF_F "",
                           (magick_off_t) result);
 #endif /* LOG_TIFF_BLOB_IO */
 
@@ -1088,7 +1088,7 @@ TIFFUnmapBlob(thandle_t image_handle,
 
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "TIFF unmap blob: base=0x%p size=%" MAGICK_OFF_F "d",
+                          "TIFF unmap blob: base=0x%p size=%" MAGICK_OFF_F "",
                           base,(magick_off_t) size);
 #else
   ARG_NOT_USED(image_handle);
@@ -4915,7 +4915,7 @@ WriteNewsProfile(TIFF *tiff,
       /* Tag is type TIFF_LONG so byte length is divided by four */
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "TIFFSetField(tiff=0x%p,tag=%d,"
-                            "length=%"MAGICK_SIZE_T_F"u,data=0x%p)",
+                            "length=%"MAGICK_SIZE_T_F",data=0x%p)",
                             tiff,profile_tag,(MAGICK_SIZE_T) length/4,profile);
       (void) TIFFSetField(tiff,profile_tag,(uint32) length/4,(void *) profile);
     }
@@ -4944,7 +4944,7 @@ WriteNewsProfile(TIFF *tiff,
 #endif
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "TIFFSetField(tiff=0x%p,tag=%d,"
-                            "length=%"MAGICK_SIZE_T_F"u,data=0x%p)",
+                            "length=%"MAGICK_SIZE_T_F",data=0x%p)",
                             tiff,profile_tag,(MAGICK_SIZE_T) length,profile);
       (void) TIFFSetField(tiff,profile_tag,(uint32) length,(void *) profile);
     }

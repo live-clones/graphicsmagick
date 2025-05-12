@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2005-2022 GraphicsMagick Group
+% Copyright (C) 2005-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -2974,7 +2974,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   magick_off_t reported_file_offset = TellBlob(image);
                   if (EOFBlob(image))
                     {
-                      (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "d\n",
+                      (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "\n",
                                      dpx_file_info.file_size,
                                      (magick_off_t) reported_file_offset);
                       break;

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -2285,7 +2285,7 @@ static int format8BIM(Image *ifile, Image *ofile)
       if ((Size <= 0) || (Size > (file_size - TellBlob(ifile))))
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Invalid chunk size: %" MAGICK_OFF_F "d", Size);
+                                "Invalid chunk size: %" MAGICK_OFF_F "", Size);
           ThrowException(&ofile->exception,CorruptImageError,ImproperImageHeader,
                          ofile->filename);
           goto format8BIMError;

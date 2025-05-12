@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -3225,7 +3225,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
       limit=GetMagickResourceLimit(WidthResource);
       if (limit > LONG_MAX)
         limit = LONG_MAX;
-      FormatString(message,"%lu > %" MAGICK_INT64_F "u \"%.1024s\"",
+      FormatString(message,"%lu > %" MAGICK_INT64_F " \"%.1024s\"",
                    image->columns,limit,image->filename);
       ThrowException(exception,ResourceLimitError,ImagePixelWidthLimitExceeded,
                      message);

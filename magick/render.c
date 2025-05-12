@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -551,7 +551,7 @@ LogPolygonInfo(const PolygonInfo *polygon_info)
   p=polygon_info->edges;
   for (i=0; i < polygon_info->number_edges; i++)
   {
-    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      edge %"MAGICK_SIZE_T_F"u:",(MAGICK_SIZE_T) i);
+    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      edge %"MAGICK_SIZE_T_F":",(MAGICK_SIZE_T) i);
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      direction: %s",
       p->direction ? "down" : "up");
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      ghostline: %s",
@@ -2547,7 +2547,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   size_t NeedAllocCount;
 
 #if 0
-  fprintf(stderr,"Needed = %"MAGICK_SIZE_T_F"u\n",(MAGICK_SIZE_T) Needed);
+  fprintf(stderr,"Needed = %"MAGICK_SIZE_T_F"\n",(MAGICK_SIZE_T) Needed);
 #endif
   /* NeedAllocCount = p_PIMgr->StoreStartingAt + Needed + ((size_t)100 */
   status &= MagickAddSizeT(p_PIMgr->StoreStartingAt, Needed, &NeedAllocCount); /* + Needed */
@@ -2571,9 +2571,9 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
 
 #if 0
       fprintf(stderr,
-              "have_memory=%"MAGICK_SIZE_T_F"u (%"MAGICK_SIZE_T_F"u elem),"
-              " needed_memory=%"MAGICK_SIZE_T_F"u (%"MAGICK_SIZE_T_F"u elem),"
-              " added_memory=%"MAGICK_SIZE_T_F"u\n",
+              "have_memory=%"MAGICK_SIZE_T_F" (%"MAGICK_SIZE_T_F" elem),"
+              " needed_memory=%"MAGICK_SIZE_T_F" (%"MAGICK_SIZE_T_F" elem),"
+              " added_memory=%"MAGICK_SIZE_T_F"\n",
               (MAGICK_SIZE_T) have_memory, (MAGICK_SIZE_T) *p_PIMgr->p_AllocCount,
               (MAGICK_SIZE_T) needed_memory, (MAGICK_SIZE_T) NeedAllocCount,
               (MAGICK_SIZE_T) added_memory);

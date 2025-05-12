@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -654,8 +654,8 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
         file_size=GetBlobSize(image);
 
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "File size %" MAGICK_OFF_F "d,"
-                              "Pixels allocation size %" MAGICK_SIZE_T_F "u",
+                              "File size %" MAGICK_OFF_F ","
+                              "Pixels allocation size %" MAGICK_SIZE_T_F "",
                               file_size, (MAGICK_SIZE_T) length);
 
         if ((file_size != 0) && ((size_t) file_size < length))

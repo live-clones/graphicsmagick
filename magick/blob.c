@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -2532,7 +2532,7 @@ MagickExport MagickPassFail ImageToFile(Image *image,const char *filename,
   (void) close(file);
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                          "Copied %"MAGICK_SIZE_T_F"u bytes from Blob stream to \"%s\"",
+                          "Copied %"MAGICK_SIZE_T_F" bytes from Blob stream to \"%s\"",
                           (MAGICK_SIZE_T) total,filename);
   MagickFreeMemory(buffer);
   return (i < length ? MagickFail : MagickPass);
@@ -4806,7 +4806,7 @@ MagickExport magick_off_t SeekBlob(Image *image,const magick_off_t offset,
 #if 0
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                          "Seek %" MAGICK_OFF_F "d, whence = %s",
+                          "Seek %" MAGICK_OFF_F ", whence = %s",
                           offset,
                           (whence == SEEK_SET ? "SEEK_SET" :
                            (whence == SEEK_CUR ? "SEEK_CUR" :
