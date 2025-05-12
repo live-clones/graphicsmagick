@@ -102,11 +102,15 @@ de265
 With sources under /home/bfriesen/src/libde265::
 
   /home/bfriesen/src/libde265/configure --prefix=/usr/local CC=gcc CXX=g++ CFLAGS='-O -g' CXXFLAGS='-O -g'
+  make
+  make install
 
 x265
 ++++
 
 With sources under /home/bfriesen/src/x265-stable::
+
+  [ May need to do 'mv .git .git-mv' ]
 
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DENABLE_ASSEMBLY:BOOL=ON -DX265_LATEST_TAG=TRUE /home/bfriesen/src/x265-stable/source
   make -j 8
