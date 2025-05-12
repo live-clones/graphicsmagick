@@ -555,7 +555,7 @@ MagickExport MagickPassFail BlobReserveSize(Image *image, magick_off_t size)
   }
   if (blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                          "Request to reserve %" MAGICK_OFF_F "u output bytes %s",
+                          "Request to reserve %"MAGICK_UINT64_F" output bytes %s",
                           size,
                           (status == MagickFail ? "failed" : "succeeded"));
 
@@ -960,8 +960,8 @@ MagickExport MagickPassFail CloseBlob(Image *image)
                             image,blob,blob->reference_count);
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Blob "
-                            "wrote %" MAGICK_UINT64_F "u bytes, "
-                            "read %" MAGICK_UINT64_F "u bytes",
+                            "wrote %" MAGICK_UINT64_F " bytes, "
+                            "read %" MAGICK_UINT64_F " bytes",
                             blob->write_total, blob->read_total);
       UnlockSemaphoreInfo(image->blob->semaphore);
     }
@@ -2626,14 +2626,14 @@ MagickExport void *MapBlob(int file,const MapMode mode,magick_off_t offset,
     {
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Failed to mmap fd %d using %s mode at offset %"
-                            MAGICK_OFF_F "u and length %" MAGICK_OFF_F
-                            "u (%d=\"%s\").",file,MapModeToString(mode),offset,
+                            MAGICK_OFF_F " and length %" MAGICK_OFF_F
+                            " (%d=\"%s\").",file,MapModeToString(mode),offset,
                             (magick_off_t) length,errno,strerror(errno));
       return((void *) NULL);
     }
   (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                         "Mmapped fd %d using %s mode at offset %" MAGICK_OFF_F
-                        "u and length %" MAGICK_OFF_F "u to address %p",
+                        " and length %" MAGICK_OFF_F " to address %p",
                         file,MapModeToString(mode),offset,(magick_off_t) length,
                         map);
   return((void *) map);

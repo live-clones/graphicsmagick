@@ -311,8 +311,8 @@ MagickExport void DestroyMagickResources(void)
             continue;
           LockSemaphoreInfo(info->semaphore);
           (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
-                                "Resource - %c%s Limit: %"MAGICK_INT64_F"d,"
-                                " Maximum Used: %"MAGICK_INT64_F"d",
+                                "Resource - %c%s Limit: %" MAGICK_INT64_F ","
+                                " Maximum Used: %" MAGICK_INT64_F "",
                                 toupper((int) info->name[0]),info->name+1,
                                 info->maximum, (magick_int64_t) info->highwater);
           UnlockSemaphoreInfo(info->semaphore);
@@ -1043,7 +1043,7 @@ MagickExport MagickPassFail SetMagickResourceLimit(const ResourceType type,
         {
           (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
                                 "Ignored bogus request to set %s resource limit"
-                                " to %"MAGICK_INT64_F"d%s",
+                                " to %" MAGICK_INT64_F "%s",
                                 info->name,limit,info->units);
         }
       UnlockSemaphoreInfo(info->semaphore);
@@ -1115,7 +1115,7 @@ extern MagickPassFail _UpdateMagickResourceHighwater(const ResourceType type,
         {
           (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
                                 "Ignored request to set %s highwater to"
-                                " %"MAGICK_INT64_F"d%s",
+                                " %" MAGICK_INT64_F "%s",
                                 info->name,highwater,info->units);
         }
       UnlockSemaphoreInfo(info->semaphore);

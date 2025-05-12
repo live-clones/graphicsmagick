@@ -2346,7 +2346,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Element offset (%u) is outside the bounds of"
-                                      " actual file size (%" MAGICK_OFF_F "d)",
+                                      " actual file size (%" MAGICK_OFF_F ")",
                                       dpx_image_info.element_info[element].data_offset,
                                       (magick_off_t) file_size);
               ThrowDPXReaderException(CorruptImageError,ImproperImageHeader,image);
@@ -2360,7 +2360,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "File size estimate %" MAGICK_OFF_F
-                              "u bytes (have %" MAGICK_OFF_F "u bytes)",
+                              " bytes (have %" MAGICK_OFF_F " bytes)",
                               file_size_estimate, (magick_off_t) file_size);
       if ((file_size_estimate <= 0) || (file_size < file_size_estimate))
         ThrowDPXReaderException(CorruptImageError,InsufficientImageDataInFile,image);
@@ -4446,7 +4446,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
             ((magick_off_t) dpx_image_info.element_info[element].data_offset !=
              reported_file_offset))
           {
-            (void) fprintf(stderr,"### Descriptor %u offset %u, TellBlob says %" MAGICK_OFF_F "d\n",
+            (void) fprintf(stderr,"### Descriptor %u offset %u, TellBlob says %" MAGICK_OFF_F "\n",
                            element+1, dpx_image_info.element_info[element].data_offset,
                            (magick_off_t) reported_file_offset);
           }
@@ -4771,7 +4771,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
     if ((reported_file_offset != -1) &&
         ((magick_off_t) dpx_file_info.file_size != reported_file_offset))
       {
-        (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "d\n",
+        (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "\n",
                        dpx_file_info.file_size,
                        (magick_off_t) reported_file_offset);
       }

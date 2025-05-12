@@ -1,3 +1,19 @@
+2025-05-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* www/INSTALL-windows.rst: Suggest that GraphicsMagick now
+	requires (or will soon require) at least a working C'99 compiler
+	and headers in order to compile under Microsoft Visual
+	Studio. Visual Studio support will re-start from Visual Studio
+	2019 rather than the 2008 edition.
+
+	* magick/magick_types.h.in: Use types and declarations from
+	inttypes.h and stddef.h rather than values from the configure
+	script.  It seems long enough since 1999 that we can rely on these
+	headers now. ;-)
+
+	* configure.ac: Remove code to compute sized types for current CPU
+	and compiler options.
+
 2025-05-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/jxl.c (ReadJXLImage): Free profile memory if

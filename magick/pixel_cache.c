@@ -709,7 +709,7 @@ SetNexus(const Image * restrict image,const long x,const long y,
     {
       errno=0;
       FormatString(message,
-                   "Total pixels %" MAGICK_SIZE_T_F "u > %" MAGICK_UINT64_F "u \"%.1024s\"",
+                   "Total pixels %" MAGICK_SIZE_T_F " > %" MAGICK_UINT64_F " \"%.1024s\"",
                    (MAGICK_SIZE_T) region_pixels,
                    cache_info->limit_pixels,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelLimitExceeded,
@@ -1394,8 +1394,8 @@ WriteCacheIndexes(Cache cache,const NexusInfo *nexus_info)
               {
                 (void) LogMagickEvent(CacheEvent,GetMagickModule(),
                                       "Failed to write row %ld at file offset %" MAGICK_OFF_F
-                                      "d.  Wrote %" MAGICK_SSIZE_T_F "d rather than %"
-                                      MAGICK_SIZE_T_F "u bytes (%s).",
+                                      ".  Wrote %" MAGICK_SSIZE_T_F " rather than %"
+                                      MAGICK_SIZE_T_F " bytes (%s).",
                                       y,
                                       row_offset,
                                       (MAGICK_SSIZE_T) bytes_written,
@@ -1557,9 +1557,9 @@ WriteCachePixels(Cache cache,const NexusInfo *nexus_info)
               {
                 (void) LogMagickEvent(CacheEvent,GetMagickModule(),
                                       "Failed to write row %ld at file offset %"
-                                      MAGICK_OFF_F "d.  Wrote %"
-                                      MAGICK_SSIZE_T_F "d rather than %"
-                                      MAGICK_SIZE_T_F "u bytes (%s).",
+                                      MAGICK_OFF_F ".  Wrote %"
+                                      MAGICK_SSIZE_T_F " rather than %"
+                                      MAGICK_SIZE_T_F " bytes (%s).",
                                       y,
                                       row_offset,
                                       (MAGICK_SSIZE_T) bytes_written,
@@ -2626,9 +2626,9 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     {
       (void) LogMagickEvent(CacheEvent,GetMagickModule(),
                             "Unable to extend pixel cache from %"
-                            MAGICK_UINT64_F "u bytes "
-                            "by %" MAGICK_UINT64_F "u bytes "
-                            "to %" MAGICK_UINT64_F "u bytes",
+                            MAGICK_UINT64_F " bytes "
+                            "by %" MAGICK_UINT64_F " bytes "
+                            "to %" MAGICK_UINT64_F " bytes",
                             cache_info->length,
                             cache_info->offset,
                             cache_info->offset+cache_info->length);
@@ -3247,7 +3247,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
       limit=GetMagickResourceLimit(HeightResource);
       if (limit > LONG_MAX)
         limit = LONG_MAX;
-      FormatString(message,"%lu > %" MAGICK_INT64_F "u \"%.1024s\"",
+      FormatString(message,"%lu > %" MAGICK_INT64_F " \"%.1024s\"",
                    image->rows,limit,image->filename);
       ThrowException(exception,ResourceLimitError,ImagePixelHeightLimitExceeded,
                      message);
@@ -3267,7 +3267,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
 
         errno=0;
         FormatString(message,
-                     "%" MAGICK_INT64_F "d > %" MAGICK_INT64_F "u \"%.1024s\"",
+                     "%" MAGICK_INT64_F " > %" MAGICK_INT64_F " \"%.1024s\"",
                      total_pixels,
                      GetMagickResourceLimit(PixelsResource),image->filename);
         ThrowException(exception,ResourceLimitError,ImagePixelLimitExceeded,

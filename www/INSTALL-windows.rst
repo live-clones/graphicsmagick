@@ -270,8 +270,14 @@ Important Notes
   optimization, and the problem is likely to go away (but with less
   performance).
 
-Windows XP, Vista, 7 Visual C++ 6.0 through 17.6.5 Compilation
+Visual C++ 16.X through 17.13.6 Compilation
 --------------------------------------------------------------
+
+  Note that GraphicsMagick now requires at least working C'99 (from
+  1999!) and possibly C'11 (2011) support (due to 3rd party libraries)
+  so Visual Studio 2019 (Visual C++ 2019 aka 16.X.X) or later are
+  required.  Non-commercial users are recommended to use the free
+  Visual Studio Community Edition.
 
   The Visual C++ distribution targeted at Windows 2000 through Windows
   10 does not provide any stock workspace (DSW) or project files (DSP)

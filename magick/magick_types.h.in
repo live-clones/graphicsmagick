@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2020 GraphicsMagick Group
+  Copyright (C) 2003 - 2025 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -7,13 +7,13 @@
 
   GraphicsMagick types typedefs.
 
-  GraphicsMagick is expected to compile with any C '89 ANSI C compiler
+  GraphicsMagick is expected to compile with any C '99 ANSI C compiler
   supporting at least 16-bit 'short', 32-bit 'int', and 32-bit 'long'.
   It is also expected to take advantage of 64-bit LP64 and Windows
   WIN64 LLP64.  We use C '99 style types but declare our own types so
-  as to not depend on C '99 header files, and take care to depend only
-  on C '89 library functions, POSIX, or well-known extensions.  Any C
-  '99 syntax used is removed if the compiler does not support it.
+  as to not directly depend on C '99 header files, and take care to
+  depend only on C standard library functions, POSIX, or well-known
+  extensions.
 */
 
 #ifndef _MAGICK_TYPES_H
@@ -22,6 +22,9 @@
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
+
+#include <inttypes.h> /* Format constants, integer types */
+#include <stddef.h> /* ptrdiff_t, size_t */
 
 /*
   Assign ANSI C'99 stdint.h-like typedefs based on the sizes of native types
@@ -117,24 +120,24 @@ extern "C" {
 #else
 
   /* The following typedefs are substituted when using Unixish configure */
-  typedef @INT8_T@   magick_int8_t;     /* int8_t */
-  typedef @UINT8_T@  magick_uint8_t;    /* uint8_t */
+  typedef int8_t   magick_int8_t;     /* int8_t */
+  typedef uint8_t  magick_uint8_t;    /* uint8_t */
 
-  typedef @INT16_T@  magick_int16_t;    /* int16_t */
-  typedef @UINT16_T@ magick_uint16_t;   /* uint16_t */
+  typedef int16_t  magick_int16_t;    /* int16_t */
+  typedef uint16_t magick_uint16_t;   /* uint16_t */
 
-  typedef @INT32_T@  magick_int32_t;    /* int32_t */
-  typedef @UINT32_T@ magick_uint32_t;   /* uint32_t */
+  typedef int32_t  magick_int32_t;    /* int32_t */
+  typedef uint32_t magick_uint32_t;   /* uint32_t */
 
-  typedef @INT64_T@  magick_int64_t;    /* int64_t */
-  typedef @UINT64_T@ magick_uint64_t;   /* uint64_t */
+  typedef int64_t  magick_int64_t;    /* int64_t */
+  typedef uint64_t magick_uint64_t;   /* uint64_t */
 
 #  if defined(MAGICK_IMPLEMENTATION)
 
-#  define MAGICK_INT32_F @INT32_F@      /* %PRId32 */
-#  define MAGICK_UINT32_F @UINT32_F@    /* %PRIu32 */
-#  define MAGICK_INT64_F @INT64_F@      /* %PRId64 */
-#  define MAGICK_UINT64_F @UINT64_F@    /* %PRIu64 */
+#  define MAGICK_INT32_F PRId32      /* %PRId32 */
+#  define MAGICK_UINT32_F PRIu32    /* %PRIu32 */
+#  define MAGICK_INT64_F PRId64      /* %PRId64 */
+#  define MAGICK_UINT64_F PRIu64    /* %PRIu64 */
 
   /*
     C99 special size specifiers:
@@ -147,20 +150,20 @@ extern "C" {
     t  - ptrdiff_t / unsigned ptrdiff_t
   */
 
-  typedef @UINTMAX_T@ magick_uintmax_t; /* uintmax_t */
-#  define MAGICK_UINTMAX_F @UINTMAX_F@  /* %ju */
+  typedef uintmax_t magick_uintmax_t; /* uintmax_t */
+#  define MAGICK_UINTMAX_F "ju"  /* %ju */
 
-  typedef @UINTPTR_T@ magick_uintptr_t; /* uintptr_t */
-#  define MAGICK_UINTPTR_F @UINTPTR_F@  /* %tu */
+  typedef uintptr_t magick_uintptr_t; /* uintptr_t */
+#  define MAGICK_UINTPTR_F "tu"  /* %tu */
 
-  typedef @PTRDIFF_T@ magick_ptrdiff_t; /* ptrdiff_t */
-#  define MAGICK_PTRDIFF_F @PTRDIFF_F@  /* %td */
+  typedef ptrdiff_t magick_ptrdiff_t; /* ptrdiff_t */
+#  define MAGICK_PTRDIFF_F "td"  /* %td */
 
-#  define MAGICK_SIZE_T_F @MAGICK_SIZE_T_F@ /* %zu */
-#  define MAGICK_SIZE_T @MAGICK_SIZE_T@     /* size_t */
+#  define MAGICK_SIZE_T_F "zu" /* %zu */
+#  define MAGICK_SIZE_T size_t     /* size_t */
 
-#  define MAGICK_SSIZE_T_F @MAGICK_SSIZE_T_F@ /* %zd */
-#  define MAGICK_SSIZE_T @MAGICK_SSIZE_T@     /* ssize_t */
+#  define MAGICK_SSIZE_T_F "zd" /* %zd */
+#  define MAGICK_SSIZE_T ssize_t     /* ssize_t */
 
 #endif /* defined(MAGICK_IMPLEMENTATION) */
 

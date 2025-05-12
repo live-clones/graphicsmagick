@@ -773,8 +773,8 @@ static Image *ReadBMPImage(const ImageInfo *image_info,ExceptionInfo *exception)
       bmp_info.file_size=ReadBlobLSBLong(image); /* File size in bytes */
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "  File size: Claimed=%" MAGICK_SIZE_T_F "u, Actual=%"
-                              MAGICK_OFF_F "d",
+                              "  File size: Claimed=%" MAGICK_SIZE_T_F ", Actual=%"
+                              MAGICK_OFF_F "",
                               (MAGICK_SIZE_T) bmp_info.file_size, file_size);
       (void) ReadBlobLSBLong(image); /* Reserved */
       bmp_info.offset_bits=ReadBlobLSBLong(image); /* Bit map offset from start of file */
@@ -1198,7 +1198,7 @@ CheckBitSize:
           offset = start_position + 14 + bmp_info.size;
           if(logging)
               (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Seek offset %" MAGICK_OFF_F "d",
+                                  "Seek offset %" MAGICK_OFF_F "",
                                   (magick_off_t) offset);
           if((offset < start_position) ||
               (SeekBlob(image,offset,SEEK_SET) != (magick_off_t) offset))
@@ -1217,7 +1217,7 @@ CheckBitSize:
           offset = start_position + 14 + bmp_info.size;
           if(logging)
               (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Seek offset %" MAGICK_OFF_F "d",
+                                  "Seek offset %" MAGICK_OFF_F "",
                                   (magick_off_t) offset);
           if((offset < start_position) ||
               (SeekBlob(image,offset,SEEK_SET) != (magick_off_t) offset))
@@ -1306,7 +1306,7 @@ CheckBitSize:
           offset=start_position+14+bmp_info.size;
           if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Seek offset %" MAGICK_OFF_F "d",
+                                  "Seek offset %" MAGICK_OFF_F "",
                                   (magick_off_t) offset);
           if ((offset < start_position) ||
               (SeekBlob(image,offset,SEEK_SET) != (magick_off_t) offset))
@@ -1338,16 +1338,16 @@ CheckBitSize:
       */
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "start_position %" MAGICK_OFF_F "d,"
-                              " bmp_info.offset_bits %" MAGICK_OFF_F "d,"
-                              " bmp_info.ba_offset %" MAGICK_OFF_F "d" ,
+                              "start_position %" MAGICK_OFF_F ","
+                              " bmp_info.offset_bits %" MAGICK_OFF_F ","
+                              " bmp_info.ba_offset %" MAGICK_OFF_F "" ,
                               (magick_off_t) start_position,
                               (magick_off_t) bmp_info.offset_bits,
                               (magick_off_t) bmp_info.ba_offset);
       offset=start_position+bmp_info.offset_bits;
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Seek offset %" MAGICK_OFF_F "d",
+                              "Seek offset %" MAGICK_OFF_F "",
                               (magick_off_t) offset);
       if ((offset < start_position) ||
           (SeekBlob(image,offset,SEEK_SET) != (magick_off_t) offset))
@@ -1903,7 +1903,7 @@ CheckBitSize:
       offset=bmp_info.ba_offset;
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Seek offset %" MAGICK_OFF_F "d",
+                              "Seek offset %" MAGICK_OFF_F "",
                               (magick_off_t) offset);
       if (offset > 0)
         if ((offset < TellBlob(image)) ||

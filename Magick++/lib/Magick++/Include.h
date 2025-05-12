@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <inttypes.h> /* Format constants, integer types */
+#include <stddef.h> /* max_align_t added by 'C11 and needs global scope */
 #include <time.h>
 #include <sys/types.h> /* POSIX 1990 header and declares size_t and ssize_t */
 

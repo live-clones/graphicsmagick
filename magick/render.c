@@ -3574,7 +3574,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t width_resource_limit = GetMagickResourceLimit(WidthResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", width_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INT64_F "", width_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelWidthLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3584,7 +3584,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t hight_resource_limit = GetMagickResourceLimit(HeightResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", hight_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INT64_F "", hight_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelHeightLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3595,7 +3595,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t pixels_resource_limit = GetMagickResourceLimit(PixelsResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", pixels_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INT64_F "", pixels_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelLimitExceeded,resource_str);
                     status=MagickFail;
