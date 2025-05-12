@@ -1530,7 +1530,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
               else
                 {
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                        "Profile size %" MAGICK_SIZE_T_F "u is excessively large",
+                                        "Profile size %" MAGICK_SIZE_T_F " is excessively large",
                                         (MAGICK_SIZE_T ) profiles[i].length);
                   ThrowMIFFReaderException(CorruptImageError,ImproperImageHeader,
                                            image);

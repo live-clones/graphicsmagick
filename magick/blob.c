@@ -344,7 +344,7 @@ static void *ExtendBlobWriteStream(Image *image,const size_t length)
       if (blob->logging)
         (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                               "MagickReallocMemory blob->data=%p,"
-                              " blob->extent=%" MAGICK_SIZE_T_F "u",
+                              " blob->extent=%" MAGICK_SIZE_T_F "",
                               blob->data, (MAGICK_SIZE_T) blob->extent);
 #endif
       MagickReallocMemory(unsigned char *,blob->data,blob->extent+1);
@@ -734,7 +734,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
   image=(Image *) NULL;
   (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                         "Entering BlobToImage: blob=%p,"
-                        " length=%" MAGICK_SIZE_T_F "u",
+                        " length=%" MAGICK_SIZE_T_F "",
                         blob, (MAGICK_SIZE_T) length);
   if ((blob == (const void *) NULL) || (length == 0))
     {
@@ -2836,7 +2836,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
       if (image->blob->logging)
         (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                               "  attached data blob (addr %p, len %"
-                              MAGICK_SIZE_T_F "u) to image %p, blob %p",
+                              MAGICK_SIZE_T_F ") to image %p, blob %p",
                               image_info->blob,
                               (MAGICK_SIZE_T) image_info->length,
                               image,image->blob);
@@ -2994,7 +2994,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                           if (image->blob->logging)
                             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                                                   "  setvbuf of %" MAGICK_SIZE_T_F
-                                                  "u bytes returns failure!",
+                                                  " bytes returns failure!",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
                       else
@@ -3002,7 +3002,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                           if (image->blob->logging)
                             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                                                   "  I/O buffer set to %"
-                                                  MAGICK_SIZE_T_F "u bytes",
+                                                  MAGICK_SIZE_T_F " bytes",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
                     }
@@ -3038,7 +3038,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                       if (image->blob->logging)
                         (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                                               "  read %" MAGICK_SIZE_T_F
-                                              "u magic header bytes",
+                                              " magic header bytes",
                                               (MAGICK_SIZE_T) count);
 #if defined(POSIX)
                       /*
@@ -5136,7 +5136,7 @@ MagickExport MagickPassFail UnmapBlob(void *map,const size_t length)
 
   (void) LogMagickEvent(BlobEvent,GetMagickModule(),
     "Munmap file mapping at address %p and length %"
-                        MAGICK_SIZE_T_F "u",
+                        MAGICK_SIZE_T_F "",
     map,(MAGICK_SIZE_T) length);
   status=MagickMunmap(map,length);
   return(status == 0);

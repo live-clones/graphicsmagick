@@ -1,6 +1,6 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
-% Copyright (C) 2002 - 2022 ImageMagick Studio
+% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2002-2022 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
 % This program is covered by multiple licenses, which are described in
@@ -1074,7 +1074,7 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),"enter");
   if(image->logging)
     (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "%" MAGICK_SIZE_T_F "u image frames in list",
+                          "%" MAGICK_SIZE_T_F " image frames in list",
                           (MAGICK_SIZE_T) image_list_length);
 
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);

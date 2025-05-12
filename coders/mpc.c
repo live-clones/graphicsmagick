@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -892,7 +892,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
               else
                 {
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                        "Profile size %" MAGICK_SIZE_T_F "u is excessively large",
+                                        "Profile size %" MAGICK_SIZE_T_F " is excessively large",
                                         (MAGICK_SIZE_T ) profiles[i].length);
                   ThrowMPCReaderException(CorruptImageError,ImproperImageHeader,
                                            image);

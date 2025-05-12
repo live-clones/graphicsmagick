@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -141,8 +141,7 @@ static Image *ReadXTRNImage(const ImageInfo *image_info, ExceptionInfo *exceptio
       ImageInfo
         **image_info_ptr;
 #endif
-
-      (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x",(MAGICK_SIZE_T *) &param1, (MAGICK_SIZE_T *) &param2);
+      (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x",(MAGICK_SIZE_T *) &param1, (MAGICK_SIZE_T *) &param2); /* FIXME! */
       image_ptr=(Image **) param2;
       if(image_ptr!=NULL && *image_ptr!=(Image *)NULL)
         image=CloneImage(*image_ptr,0,0,False,&(*image_ptr)->exception);
@@ -163,7 +162,7 @@ static Image *ReadXTRNImage(const ImageInfo *image_info, ExceptionInfo *exceptio
       char
         filename[MaxTextExtent];
 
-      (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x,%s", (MAGICK_SIZE_T *)&param1, (MAGICK_SIZE_T *)&param2,&filename);
+      (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x,%s", (MAGICK_SIZE_T *)&param1, (MAGICK_SIZE_T *)&param2,&filename);  /* FIXME! */
       blob_data=(char **) param1;
       blob_length=(size_t *) param2;
       image=BlobToImage(clone_info,*blob_data,*blob_length,exception);
@@ -193,7 +192,7 @@ static Image *ReadXTRNImage(const ImageInfo *image_info, ExceptionInfo *exceptio
 
       filename[0] = '\0';
 
-      (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%s", (MAGICK_SIZE_T *)&param1,&filename);
+      (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%s", (MAGICK_SIZE_T *)&param1,&filename);  /* FIXME! */
       hr = S_OK;
       pSafeArray = (SAFEARRAY *) param1;
       if (pSafeArray)
@@ -438,7 +437,7 @@ static unsigned int WriteXTRNImage(const ImageInfo *image_info,Image *image)
       clone_info=CloneImageInfo(image_info);
       if (clone_info->filename[0])
         {
-          (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x", (MAGICK_SIZE_T *)&param1, (MAGICK_SIZE_T *)&param2);
+          (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x", (MAGICK_SIZE_T *)&param1, (MAGICK_SIZE_T *)&param2);  /* FIXME! */
           image_info_ptr=(ImageInfo **) param1;
           image_ptr=(Image **) param2;
           if ((image_info_ptr != (ImageInfo **) NULL) &&
@@ -467,7 +466,7 @@ static unsigned int WriteXTRNImage(const ImageInfo *image_info,Image *image)
       if (clone_info->filename[0])
         {
           (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%" MAGICK_SIZE_T_F "x,%s",
-              (MAGICK_SIZE_T *)&param1, (MAGICK_SIZE_T *)&param2,&filename);
+              (MAGICK_SIZE_T *)&param1, (MAGICK_SIZE_T *)&param2,&filename);  /* FIXME! */
 
           blob_data=(char **) param1;
           blob_length=(size_t *) param2;
@@ -510,7 +509,7 @@ static unsigned int WriteXTRNImage(const ImageInfo *image_info,Image *image)
       if (clone_info->filename[0])
         {
           (void) sscanf(clone_info->filename,"%" MAGICK_SIZE_T_F "x,%s",
-              (MAGICK_SIZE_T *)&param1,&filename);
+              (MAGICK_SIZE_T *)&param1,&filename);  /* FIXME! */
 
           image->client_data=param1;
 

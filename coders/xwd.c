@@ -507,8 +507,8 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
     if (header.bytes_per_line < bytes_per_line)
       {
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Header bytes_per_line = %" MAGICK_SIZE_T_F "u,"
-                              " expected %" MAGICK_SIZE_T_F "u",
+                              "Header bytes_per_line = %" MAGICK_SIZE_T_F ","
+                              " expected %" MAGICK_SIZE_T_F "",
                               (MAGICK_SIZE_T) header.bytes_per_line,
                               (MAGICK_SIZE_T) bytes_per_line);
         ThrowXWDReaderException(CorruptImageError,ImproperImageHeader,image);
@@ -1011,7 +1011,7 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           " image->columns=%lu,"
                           " bits_per_pixel=%u,"
-                          " bytes_per_line=%" MAGICK_SIZE_T_F "u,"
+                          " bytes_per_line=%" MAGICK_SIZE_T_F ","
                           " bitmap_pad=%u",
                           image->columns,
                           bits_per_pixel,

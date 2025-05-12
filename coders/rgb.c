@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -716,7 +716,7 @@ static unsigned int WriteRGBImage(const ImageInfo *image_info,Image *image)
                           "Depth %u bits, "
                           "Endian %s, "
                           "Packet Size %u, "
-                          "Row bytes %" MAGICK_SIZE_T_F "u",
+                          "Row bytes %" MAGICK_SIZE_T_F "",
                           image->scene,
                           image->columns,image->rows,
                           quantum_size,

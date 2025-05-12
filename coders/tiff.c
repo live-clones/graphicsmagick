@@ -838,7 +838,7 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u remaining"
+                                " bytes, %" MAGICK_SSIZE_T_F "u remaining"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
                                 (MAGICK_SSIZE_T) NEWSP_REMAINING(text,p,length));
@@ -850,7 +850,7 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u remaining"
+                                " bytes, %" MAGICK_SSIZE_T_F "u remaining"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
                                 (MAGICK_SSIZE_T) NEWSP_REMAINING(text,p,length));
@@ -865,7 +865,7 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u "
+                                " bytes, %" MAGICK_SSIZE_T_F "u "
                                 "remaining (need %u more bytes)"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
@@ -1019,8 +1019,8 @@ TIFFReadBlob(thandle_t image_handle,tdata_t data,tsize_t size)
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "TIFF read blob: data=0x%p size=%"
-                          MAGICK_SIZE_T_F "u, returns %"
-                          MAGICK_SIZE_T_F "u",
+                          MAGICK_SIZE_T_F ", returns %"
+                          MAGICK_SIZE_T_F "",
                           data, (MAGICK_SIZE_T) size,
                           (MAGICK_SIZE_T) result);
 #endif /* LOG_TIFF_BLOB_IO */
@@ -1159,7 +1159,7 @@ TIFFWriteBlob(thandle_t image_handle,tdata_t data,tsize_t size)
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "TIFF write blob: data=0x%p size=%" MAGICK_SIZE_T_F
-                          "u, returns %" MAGICK_SIZE_T_F "u",
+                          ", returns %" MAGICK_SIZE_T_F "",
                           data, (MAGICK_SIZE_T) size,
                           (MAGICK_SIZE_T) result);
 #endif  /* LOG_TIFF_BLOB_IO */
@@ -2765,7 +2765,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
             if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Request to allocate scanline buffer of %"
-                                    MAGICK_SIZE_T_F "u bytes",
+                                    MAGICK_SIZE_T_F " bytes",
                                     (MAGICK_SIZE_T) scanline_size);
 
             /*
@@ -2951,8 +2951,8 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
             strip_size_max=RoundUpToAlignment(strip_size_max,sizeof(magick_int32_t));
             if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Maximum strip size %" MAGICK_SIZE_T_F "u",
-                                    (MAGICK_SSIZE_T) strip_size_max);
+                                    "Maximum strip size %" MAGICK_SIZE_T_F "",
+                                    (MAGICK_SIZE_T) strip_size_max);
             if (strip_size_max <= 0)
               {
                 status=MagickFail;
@@ -3176,8 +3176,8 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
               {
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "TIFF tile geometry %ux%u, "
-                                      "%" MAGICK_SIZE_T_F "u pixels"
-                                      " (%" MAGICK_SIZE_T_F  "u bytes max)",
+                                      "%" MAGICK_SIZE_T_F " pixels"
+                                      " (%" MAGICK_SIZE_T_F  " bytes max)",
                                       (unsigned int)tile_columns,
                                       (unsigned int)tile_rows,
                                       (MAGICK_SIZE_T) tile_total_pixels,
@@ -3414,7 +3414,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
             if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Allocated %" MAGICK_SIZE_T_F "u bytes for RGBA strip",
+                                    "Allocated %" MAGICK_SIZE_T_F " bytes for RGBA strip",
                                     (MAGICK_SIZE_T) number_pixels*sizeof(uint32));
             /*
               Convert image to DirectClass pixel packets.
@@ -3521,8 +3521,8 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
               {
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Reading TIFF tiles ...");
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "TIFF tile geometry %ux%u, %" MAGICK_SIZE_T_F "u pixels/tile"
-                                      ", %" MAGICK_SIZE_T_F "u tiles",
+                                      "TIFF tile geometry %ux%u, %" MAGICK_SIZE_T_F " pixels/tile"
+                                      ", %" MAGICK_SIZE_T_F " tiles",
                                       (unsigned int)tile_columns,
                                       (unsigned int)tile_rows,
                                       (MAGICK_SIZE_T) tile_total_pixels,
@@ -3558,7 +3558,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
             if (AcquireMagickResource(PixelsResource,tile_total_pixels) != MagickPass)
               {
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "TIFF tile pixels %" MAGICK_SIZE_T_F "u exceeds limit!",
+                                      "TIFF tile pixels %" MAGICK_SIZE_T_F " exceeds limit!",
                                       (MAGICK_SIZE_T) tile_total_pixels);
                 ThrowTIFFReaderException(ResourceLimitError,ImagePixelLimitExceeded,
                                          image);

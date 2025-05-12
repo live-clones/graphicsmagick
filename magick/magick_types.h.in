@@ -134,10 +134,10 @@ extern "C" {
 
 #  if defined(MAGICK_IMPLEMENTATION)
 
-#  define MAGICK_INT32_F PRId32      /* %PRId32 */
-#  define MAGICK_UINT32_F PRIu32    /* %PRIu32 */
-#  define MAGICK_INT64_F PRId64      /* %PRId64 */
-#  define MAGICK_UINT64_F PRIu64    /* %PRIu64 */
+#  define MAGICK_INT32_F  PRId32      /* %PRId32 */
+#  define MAGICK_UINT32_F PRIu32      /* %PRIu32 */
+#  define MAGICK_INT64_F  PRId64      /* %PRId64 */
+#  define MAGICK_UINT64_F PRIu64      /* %PRIu64 */
 
   /*
     C99 special size specifiers:

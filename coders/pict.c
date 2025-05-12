@@ -863,7 +863,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
   if (IsEventLogged(CoderEvent))
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "DecodeImage: Using %lu bytes per line, %"
-                          MAGICK_SIZE_T_F "u bytes per row",
+                          MAGICK_SIZE_T_F " bytes per row",
                           bytes_per_line,
                           (MAGICK_SIZE_T) row_bytes);
   /*
@@ -2255,8 +2255,8 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
     bytes_per_line = MagickArraySize(bytes_per_line, image->matte ? 4 : 3);
   if (IsEventLogged(CoderEvent))
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Bytes per line: %" MAGICK_SIZE_T_F "u bytes,"
-                          " Row bytes: %" MAGICK_SIZE_T_F "u bytes", bytes_per_line, row_bytes);
+                          "Bytes per line: %" MAGICK_SIZE_T_F " bytes,"
+                          " Row bytes: %" MAGICK_SIZE_T_F " bytes", bytes_per_line, row_bytes);
   if ((row_bytes >= (size_t) SIZE_MAX/2) || (bytes_per_line == 0) ||
       (bytes_per_line > 0x7FFFU) || ((row_bytes+MaxCount*2U) >= 0x7FFFU))
     ThrowPICTWriterException(CoderError,UnsupportedNumberOfColumns,image);

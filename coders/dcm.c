@@ -5982,7 +5982,7 @@ static MagickPassFail funcDCM_Palette(Image *image,DicomStream *dcm,ExceptionInf
 
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Palette with %" MAGICK_SIZE_T_F "u entries...",
+                          "Palette with %" MAGICK_SIZE_T_F " entries...",
                           (MAGICK_SIZE_T) dcm->length);
   /*
     Initialize colormap (entries are always 16 bit)

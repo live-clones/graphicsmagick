@@ -736,8 +736,8 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
                             length-header_length);
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "Profile: %s, header %" MAGICK_SIZE_T_F "u bytes, "
-                        "data %" MAGICK_SIZE_T_F "u bytes",
+                        "Profile: %s, header %" MAGICK_SIZE_T_F " bytes, "
+                        "data %" MAGICK_SIZE_T_F " bytes",
                         profile_name, (MAGICK_SIZE_T) header_length,
                         (MAGICK_SIZE_T) length-header_length);
 
@@ -2575,7 +2575,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image)
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Skipped Profile: %s, %"
-                                  MAGICK_SIZE_T_F "u bytes",
+                                  MAGICK_SIZE_T_F " bytes",
                                   profile_name,
                                   (MAGICK_SIZE_T) profile_length);
           continue;
@@ -2584,7 +2584,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image)
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Wrote Profile: %s, %"
-                              MAGICK_SIZE_T_F "u bytes",profile_name,
+                              MAGICK_SIZE_T_F " bytes",profile_name,
                               (MAGICK_SIZE_T) profile_length);
     }
   DeallocateImageProfileIterator(profile_iterator);

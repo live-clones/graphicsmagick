@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -290,7 +290,7 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Excessive length %" MAGICK_SIZE_T_F "u!",
+                                  "Excessive length %" MAGICK_SIZE_T_F "!",
                                   (MAGICK_SIZE_T) length);
           ThrowException(&image->exception,CorruptImageError,
                          UnableToUncompressImage,image->filename);

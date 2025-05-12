@@ -816,8 +816,8 @@ SetNexus(const Image * restrict image,const long x,const long y,
     {
       (void) LogMagickEvent(CacheEvent,GetMagickModule(),
                             "Failed to allocate %" MAGICK_SIZE_T_F
-                            "u bytes for nexus staging "
-                            "(region pixels=%" MAGICK_SIZE_T_F "u, "
+                            " bytes for nexus staging "
+                            "(region pixels=%" MAGICK_SIZE_T_F ", "
                             "region width=%lu, "
                             "region height=%lu, "
                             "cache columns=%lu)!",

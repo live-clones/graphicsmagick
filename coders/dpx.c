@@ -2438,7 +2438,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
           pixels_offset=dpx_image_info.element_info[element].data_offset & 0xFFFFFFFF;
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Seek from %" MAGICK_SIZE_T_F "u to %lu...",
+                                  "Seek from %" MAGICK_SIZE_T_F " to %lu...",
                                   (MAGICK_SIZE_T) offset, pixels_offset);
           if (pixels_offset >= offset)
             {
@@ -2462,7 +2462,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Failed to seek to data offset %lu"
-                                      " (have %" MAGICK_SIZE_T_F "u)",
+                                      " (have %" MAGICK_SIZE_T_F ")",
                                       pixels_offset, (MAGICK_SIZE_T) offset);
               ThrowDPXReaderException(BlobError,UnableToSeekToOffset,image);
             }

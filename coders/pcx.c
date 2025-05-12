@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -421,7 +421,7 @@ static Image *ReadPCXImage(const ImageInfo *image_info,ExceptionInfo *exception)
         bytes_per_line /= 8U;
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Bytes per line: reqire >= %" MAGICK_SIZE_T_F "u, have %u",
+                              "Bytes per line: reqire >= %" MAGICK_SIZE_T_F ", have %u",
                               (MAGICK_SIZE_T) bytes_per_line, pcx_info.bytes_per_line);
       if ((bytes_per_line == 0) || (pcx_info.bytes_per_line < bytes_per_line))
         ThrowPCXReaderException(CorruptImageError,ImproperImageHeader,image);

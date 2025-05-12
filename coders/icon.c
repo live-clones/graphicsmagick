@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -295,8 +295,8 @@ static Image *ReadIconImage(const ImageInfo *image_info,
       {
         if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Read %" MAGICK_SIZE_T_F  "u bytes from blob"
-                                  " (expected %" MAGICK_SIZE_T_F  "u bytes)",
+                                  "Read %" MAGICK_SIZE_T_F  " bytes from blob"
+                                  " (expected %" MAGICK_SIZE_T_F  " bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) icon_file.directory[i].size);
         MagickFreeResourceLimitedMemory(data);
