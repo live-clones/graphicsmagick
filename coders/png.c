@@ -821,7 +821,7 @@ static void png_get_data(png_structp png_ptr,png_bytep data,png_size_t length)
           char
             msg[MaxTextExtent];
 
-          (void) snprintf(msg,sizeof(msg),"Expected %" MAGICK_SIZE_T_F "u bytes;"
+          (void) snprintf(msg,sizeof(msg),"Expected %" MAGICK_SIZE_T_F " bytes;"
                          " found %" MAGICK_SIZE_T_F "u bytes",
                          (MAGICK_SIZE_T) length,(MAGICK_SIZE_T) check);
           png_warning(png_ptr,msg);

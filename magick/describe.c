@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2017 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -506,7 +506,7 @@ MagickExport MagickPassFail DescribeImage(Image *image,FILE *file,
             tuple[MaxTextExtent];
 
           GetColorTuple(p,image->depth,image->matte,False,tuple);
-          (void) fprintf(file,"    %" MAGICK_SIZE_T_F "u: %.1024s",
+          (void) fprintf(file,"    %" MAGICK_SIZE_T_F ": %.1024s",
                          (MAGICK_SIZE_T) i,tuple);
           (void) fprintf(file,"\t");
           (void) QueryColorname(image,p,SVGCompliance,name,&image->exception);
