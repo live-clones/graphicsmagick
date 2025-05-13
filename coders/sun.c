@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2024 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -559,7 +559,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
       bytes_per_line = SUNBytesPerLine(sun_info.width,sun_info.depth);
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Bytes per line: %" MAGICK_SIZE_T_F "",
+                              "Bytes per line: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) bytes_per_line);
       if (bytes_per_line == 0)
         ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
@@ -568,7 +568,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Bytes per image: %" MAGICK_SIZE_T_F "",
+                              "Bytes per image: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) bytes_per_image);
 
       if (bytes_per_image == 0)
@@ -581,7 +581,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Sun data length: %" MAGICK_SIZE_T_F "",
+                              "Sun data length: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) sun_data_length);
 
       /*
@@ -1061,14 +1061,14 @@ static unsigned int WriteSUNImage(const ImageInfo *image_info,Image *image)
       bytes_per_line=SUNBytesPerLine(sun_info.width,sun_info.depth);
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Bytes per line: %" MAGICK_SIZE_T_F "",
+                              "Bytes per line: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) bytes_per_line);
       if (0 == bytes_per_line)
         ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
       bytes_per_image=MagickArraySize(sun_info.height,bytes_per_line);
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Bytes per image: %" MAGICK_SIZE_T_F "",
+                              "Bytes per image: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) bytes_per_image);
       if ((size_t) ((magick_uint32_t) bytes_per_image) != bytes_per_image)
         ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2023 GraphicsMagick Group
 % Copyright (c) 2000 Markus Friedl.  All rights reserved.
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
@@ -5647,7 +5647,7 @@ MagickExport char **StringToList(const char *text)
         if (textlist[i] == (char *) NULL)
           MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
             UnableToConvertText);
-        FormatString(textlist[i],"0x%08" MAGICK_SIZE_T_F "x: ", /* FIXME */
+        FormatString(textlist[i],"0x%08" MAGICK_SIZE_T_F "x: ",
                      (MAGICK_SIZE_T) chars_per_line*i);
         q=textlist[i]+strlen(textlist[i]);
         for (j=1; j <= Min(strlen(p),chars_per_line); j++)

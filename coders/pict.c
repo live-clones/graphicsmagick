@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2022 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -863,7 +863,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
   if (IsEventLogged(CoderEvent))
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "DecodeImage: Using %lu bytes per line, %"
-                          MAGICK_SIZE_T_F " bytes per row",
+                          MAGICK_SIZE_T_F "u bytes per row",
                           bytes_per_line,
                           (MAGICK_SIZE_T) row_bytes);
   /*
@@ -891,7 +891,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
 
           if (IsEventLogged(CoderEvent))
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Remaining: %" MAGICK_OFF_F ", Ratio: %g",
+                                  "Remaining: %" MAGICK_OFF_F "d, Ratio: %g",
                                   remaining, ratio);
 
           if (ratio > (bytes_per_line < 8 ? 1.0 : 255.0))
@@ -970,7 +970,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
       if (IsEventLogged(CoderEvent))
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "scanline_length = %u, "
-                              "scanline_alloc = %"MAGICK_SIZE_T_F"",
+                              "scanline_alloc = %"MAGICK_SIZE_T_F"u",
                               scanline_length, (MAGICK_SIZE_T)scanline_alloc);
 #endif
       if (scanline_length < 2)
@@ -986,7 +986,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
         {
           if (IsEventLogged(CoderEvent))
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Scanline length %u exceeds allocation %"MAGICK_SIZE_T_F"",
+                                  "Scanline length %u exceeds allocation %"MAGICK_SIZE_T_F"u",
                                   scanline_length, (MAGICK_SIZE_T)scanline_alloc);
           ThrowException(&image->exception,CorruptImageError,UnableToUncompressImage,
                          image->filename);
@@ -2255,8 +2255,8 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
     bytes_per_line = MagickArraySize(bytes_per_line, image->matte ? 4 : 3);
   if (IsEventLogged(CoderEvent))
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Bytes per line: %" MAGICK_SIZE_T_F " bytes,"
-                          " Row bytes: %" MAGICK_SIZE_T_F " bytes", bytes_per_line, row_bytes);
+                          "Bytes per line: %" MAGICK_SIZE_T_F "u bytes,"
+                          " Row bytes: %" MAGICK_SIZE_T_F "u bytes", bytes_per_line, row_bytes);
   if ((row_bytes >= (size_t) SIZE_MAX/2) || (bytes_per_line == 0) ||
       (bytes_per_line > 0x7FFFU) || ((row_bytes+MaxCount*2U) >= 0x7FFFU))
     ThrowPICTWriterException(CoderError,UnsupportedNumberOfColumns,image);

@@ -845,7 +845,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
         const magick_uint64_t memory_limit = (magick_uint64_t) GetMagickResourceLimit(MemoryResource);
         const magick_uint64_t max_samples = memory_limit/4U * sizeof(magick_uint32_t);
 
-        FormatString(option_keyval,"max_samples=%" MAGICK_UINT64_F " ", max_samples);
+        FormatString(option_keyval,"max_samples=%" MAGICK_UINT64_F "u ", max_samples);
         ConcatenateString(&options,option_keyval);
       }
 

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2023 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -765,7 +765,7 @@ static MagickPassFail load_level (Image* image,
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Tile offset %" MAGICK_OFF_F " is outside file bounds",
+                                  "Tile offset %" MAGICK_OFF_F "d is outside file bounds",
                                   (magick_off_t) offset);
           ThrowBinaryException(CorruptImageError,InsufficientImageDataInFile,image->filename);
         }
@@ -1003,7 +1003,7 @@ static MagickPassFail load_hierarchy (Image *image, XCFDocInfo* inDocInfo, XCFLa
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "load_hierarchy: dimensions %lux%lu, bpp=%lu,"
-                          " offset=%" MAGICK_OFF_F "",
+                          " offset=%" MAGICK_OFF_F "d",
                           width,height,(unsigned long) inDocInfo->bpp,
                           (magick_off_t) offset);
 
@@ -1012,7 +1012,7 @@ static MagickPassFail load_hierarchy (Image *image, XCFDocInfo* inDocInfo, XCFLa
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Hierarchy offset %" MAGICK_OFF_F " is outside file bounds",
+                              "Hierarchy offset %" MAGICK_OFF_F "d is outside file bounds",
                               (magick_off_t) offset);
       ThrowBinaryException(CorruptImageError,InsufficientImageDataInFile,image->filename);
     }
@@ -1040,7 +1040,7 @@ static MagickPassFail load_hierarchy (Image *image, XCFDocInfo* inDocInfo, XCFLa
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Level offset %" MAGICK_OFF_F " is outside file bounds",
+                              "Level offset %" MAGICK_OFF_F "d is outside file bounds",
                               (magick_off_t) offset);
       ThrowBinaryException(CorruptImageError,InsufficientImageDataInFile,image->filename);
     }
@@ -1227,7 +1227,7 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Hierarchy offset %" MAGICK_OFF_F " is outside file bounds",
+                              "Hierarchy offset %" MAGICK_OFF_F "d is outside file bounds",
                               (magick_off_t) hierarchy_offset);
       ThrowBinaryException(CorruptImageError,InsufficientImageDataInFile,image->filename);
     }
@@ -1239,7 +1239,7 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Hierarchy offset %" MAGICK_OFF_F " is unreasonable",
+                              "Hierarchy offset %" MAGICK_OFF_F "d is unreasonable",
                               (magick_off_t) hierarchy_offset);
       ThrowBinaryException(CorruptImageError,ImproperImageHeader,image->filename);
     }
@@ -1249,7 +1249,7 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
     ThrowBinaryException(CorruptImageError,InsufficientImageDataInFile,image->filename);
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Hierarchy offset %" MAGICK_OFF_F "",
+                          "Hierarchy offset %" MAGICK_OFF_F "d",
                           (magick_off_t) hierarchy_offset);
   if (load_hierarchy (image, inDocInfo, outLayer) == MagickFail)
     return MagickFail;
@@ -1262,7 +1262,7 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Layer mask offset %" MAGICK_OFF_F " is outside file bounds",
+                                  "Layer mask offset %" MAGICK_OFF_F "d is outside file bounds",
                                   (magick_off_t) layer_mask_offset);
           ThrowBinaryException(CorruptImageError,InsufficientImageDataInFile,image->filename);
         }
@@ -1274,7 +1274,7 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Layer mask offset %" MAGICK_OFF_F " is unreasonable",
+                                  "Layer mask offset %" MAGICK_OFF_F "d is unreasonable",
                                   (magick_off_t) hierarchy_offset);
           ThrowBinaryException(CorruptImageError,ImproperImageHeader,image->filename);
         }
@@ -1809,7 +1809,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 {
                   if (image->logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                          "Layer offset %" MAGICK_OFF_F " is outside file bounds",
+                                          "Layer offset %" MAGICK_OFF_F "d is outside file bounds",
                                           (magick_off_t) offset);
                   DestroyLayerInfo(number_layers,layer_info);
                   ThrowReaderException(CorruptImageError,InsufficientImageDataInFile,image);

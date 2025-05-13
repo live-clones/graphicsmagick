@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2024 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -191,7 +191,7 @@ static MagickPassFail DecodeImage(Image *image,const unsigned long compression,
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "  Decoding RLE compressed pixels to"
-                          " %" MAGICK_SIZE_T_F " bytes",
+                          " %" MAGICK_SIZE_T_F "u bytes",
                           (MAGICK_SIZE_T) image->rows*image->columns);
 
   byte=0;
@@ -213,7 +213,7 @@ static MagickPassFail DecodeImage(Image *image,const unsigned long compression,
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "  Decode buffer full (y=%lu, "
-                                  "pixels_size=%" MAGICK_SIZE_T_F ", "
+                                  "pixels_size=%" MAGICK_SIZE_T_F "u, "
                                   "pixels=%p, q=%p, end=%p)",
                                   y, (MAGICK_SIZE_T) pixels_size,
                                   pixels, q, end);
@@ -348,7 +348,7 @@ static MagickPassFail DecodeImage(Image *image,const unsigned long compression,
  rle_decode_done:
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "  Decoded %" MAGICK_SIZE_T_F " bytes",
+                          "  Decoded %" MAGICK_SIZE_T_F "u bytes",
                           (MAGICK_SIZE_T) (q-pixels));
   if ((MAGICK_SIZE_T) (q-pixels) < pixels_size)
     {
@@ -705,8 +705,8 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Read %" MAGICK_SIZE_T_F  " bytes from blob"
-                                  " (expected %" MAGICK_SIZE_T_F  " bytes)",
+                                  "Read %" MAGICK_SIZE_T_F  "u bytes from blob"
+                                  " (expected %" MAGICK_SIZE_T_F  "u bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) packet_size*image->colors);
           MagickFreeResourceLimitedMemory(dib_colormap);
@@ -740,7 +740,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (bytes_per_line == 0)
     ThrowReaderException(CoderError,ArithmeticOverflow,image);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "%" MAGICK_SIZE_T_F " bytes per line",
+                        "%" MAGICK_SIZE_T_F "u bytes per line",
                         (MAGICK_SIZE_T) bytes_per_line);
   /*
     Validate that file data size is suitable for claimed dimensions.
@@ -779,8 +779,8 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Read %" MAGICK_SIZE_T_F  " bytes from blob"
-                                  " (expected %" MAGICK_SIZE_T_F  " bytes)",
+                                  "Read %" MAGICK_SIZE_T_F  "u bytes from blob"
+                                  " (expected %" MAGICK_SIZE_T_F  "u bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) length);
           MagickFreeResourceLimitedMemory(pixels);

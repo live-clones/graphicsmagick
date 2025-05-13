@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2005-2025 GraphicsMagick Group
+% Copyright (C) 2005-2022 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -2346,7 +2346,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Element offset (%u) is outside the bounds of"
-                                      " actual file size (%" MAGICK_OFF_F ")",
+                                      " actual file size (%" MAGICK_OFF_F "d)",
                                       dpx_image_info.element_info[element].data_offset,
                                       (magick_off_t) file_size);
               ThrowDPXReaderException(CorruptImageError,ImproperImageHeader,image);
@@ -2360,7 +2360,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "File size estimate %" MAGICK_OFF_F
-                              " bytes (have %" MAGICK_OFF_F " bytes)",
+                              "u bytes (have %" MAGICK_OFF_F "u bytes)",
                               file_size_estimate, (magick_off_t) file_size);
       if ((file_size_estimate <= 0) || (file_size < file_size_estimate))
         ThrowDPXReaderException(CorruptImageError,InsufficientImageDataInFile,image);
@@ -2438,7 +2438,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
           pixels_offset=dpx_image_info.element_info[element].data_offset & 0xFFFFFFFF;
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Seek from %" MAGICK_SIZE_T_F " to %lu...",
+                                  "Seek from %" MAGICK_SIZE_T_F "u to %lu...",
                                   (MAGICK_SIZE_T) offset, pixels_offset);
           if (pixels_offset >= offset)
             {
@@ -2462,7 +2462,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Failed to seek to data offset %lu"
-                                      " (have %" MAGICK_SIZE_T_F ")",
+                                      " (have %" MAGICK_SIZE_T_F "u)",
                                       pixels_offset, (MAGICK_SIZE_T) offset);
               ThrowDPXReaderException(BlobError,UnableToSeekToOffset,image);
             }
@@ -2974,7 +2974,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   magick_off_t reported_file_offset = TellBlob(image);
                   if (EOFBlob(image))
                     {
-                      (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "\n",
+                      (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "d\n",
                                      dpx_file_info.file_size,
                                      (magick_off_t) reported_file_offset);
                       break;
@@ -4446,7 +4446,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
             ((magick_off_t) dpx_image_info.element_info[element].data_offset !=
              reported_file_offset))
           {
-            (void) fprintf(stderr,"### Descriptor %u offset %u, TellBlob says %" MAGICK_OFF_F "\n",
+            (void) fprintf(stderr,"### Descriptor %u offset %u, TellBlob says %" MAGICK_OFF_F "d\n",
                            element+1, dpx_image_info.element_info[element].data_offset,
                            (magick_off_t) reported_file_offset);
           }
@@ -4771,7 +4771,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
     if ((reported_file_offset != -1) &&
         ((magick_off_t) dpx_file_info.file_size != reported_file_offset))
       {
-        (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "\n",
+        (void) fprintf(stderr,"### File length %u, TellBlob says %" MAGICK_OFF_F "d\n",
                        dpx_file_info.file_size,
                        (magick_off_t) reported_file_offset);
       }

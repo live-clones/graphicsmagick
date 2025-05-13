@@ -195,7 +195,7 @@ static Image *ReadMetadata(const ImageInfo *image_info,
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Profile \"%s\" with content type \"%s\""
-                              " and size %" MAGICK_SIZE_T_F " bytes",
+                              " and size %" MAGICK_SIZE_T_F "u bytes",
                               profile_name ? profile_name : "(null)",
                               content_type ? content_type : "(null)",
                               (MAGICK_SIZE_T) profile_size);
@@ -367,7 +367,7 @@ static Image *ReadColorProfile(struct heif_image_handle *heif_image_handle,
 
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Reading ICC profile with size %" MAGICK_SIZE_T_F " bytes",
+                              "Reading ICC profile with size %" MAGICK_SIZE_T_F "u bytes",
                               (MAGICK_SIZE_T) profile_size);
 
       if (profile_size > 0)

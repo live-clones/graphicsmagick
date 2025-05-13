@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2024 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -2412,7 +2412,7 @@ MagickExport void DrawComposite(DrawContext context,
       char
         buffer[MaxTextExtent];
 
-      FormatString(buffer,"%" MAGICK_SIZE_T_F " bytes", (4L*blob_length/3L+4L));
+      FormatString(buffer,"%" MAGICK_SIZE_T_F "d bytes", (4L*blob_length/3L+4L));
       ThrowDrawException(ResourceLimitWarning,MemoryAllocationFailed,buffer)
     }
 

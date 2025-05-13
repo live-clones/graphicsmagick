@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2023 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -670,7 +670,7 @@ static void LogPNGChunk(int logging, png_byte const * type, size_t length)
 {
   if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-        "  Writing %c%c%c%c chunk, length: %" MAGICK_SIZE_T_F "",
+        "  Writing %c%c%c%c chunk, length: %" MAGICK_SIZE_T_F "u",
         type[0],type[1],type[2],type[3],(MAGICK_SIZE_T) length);
 }
 #endif /* PNG_LIBPNG_VER > 10011 */
@@ -821,8 +821,8 @@ static void png_get_data(png_structp png_ptr,png_bytep data,png_size_t length)
           char
             msg[MaxTextExtent];
 
-          (void) snprintf(msg,sizeof(msg),"Expected %" MAGICK_SIZE_T_F " bytes;"
-                         " found %" MAGICK_SIZE_T_F " bytes",
+          (void) snprintf(msg,sizeof(msg),"Expected %" MAGICK_SIZE_T_F "u bytes;"
+                         " found %" MAGICK_SIZE_T_F "u bytes",
                          (MAGICK_SIZE_T) length,(MAGICK_SIZE_T) check);
           png_warning(png_ptr,msg);
           png_error(png_ptr,"Read Exception");
@@ -1249,7 +1249,7 @@ png_read_raw_profile(Image *image, const ImageInfo *image_info,
   if ((length == 0) || ((magick_uintptr_t) (ep-sp) <= length*2))
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "invalid profile length %"MAGICK_SIZE_T_F"", (MAGICK_SIZE_T) length);
+                            "invalid profile length %"MAGICK_SIZE_T_F"u", (MAGICK_SIZE_T) length);
       ThrowException(exception,CorruptImageWarning,UnableToParseEmbeddedProfile,image->filename);
       return (MagickFail);
     }
@@ -1343,7 +1343,7 @@ static int read_user_chunk_callback(png_struct *ping, png_unknown_chunkp chunk)
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
      "    read_user_chunk: found %c%c%c%c chunk with size"
-                        " %" MAGICK_SIZE_T_F "",
+                        " %" MAGICK_SIZE_T_F "u",
                         chunk->name[0],chunk->name[1],
                         chunk->name[2],chunk->name[3],
                         (MAGICK_SIZE_T) chunk->size);
@@ -3351,7 +3351,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 " Reading JNG chunk type %c%c%c%c, "
-                                "length: %" MAGICK_SIZE_T_F "",
+                                "length: %" MAGICK_SIZE_T_F "u",
                                 type[0],type[1],type[2],type[3],
                                 (MAGICK_SIZE_T) length);
 
@@ -3364,7 +3364,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
           DestroyJNG(NULL,&color_image,&color_image_info,
             &alpha_image,&alpha_image_info);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "chunk length (%" MAGICK_SIZE_T_F ") > PNG_MAX_UINT",
+                                "chunk length (%" MAGICK_SIZE_T_F "u) > PNG_MAX_UINT",
                                 (MAGICK_SIZE_T) length);
           ThrowException(exception,CorruptImageError,
                          ImproperImageHeader,image->filename);
@@ -3377,9 +3377,9 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
             &alpha_image,&alpha_image_info);
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "chunk length (%" MAGICK_SIZE_T_F ")"
+                                  "chunk length (%" MAGICK_SIZE_T_F "u)"
                                   " is greater than input size"
-                                  " (%" MAGICK_OFF_F ")",
+                                  " (%" MAGICK_OFF_F "d)",
                                   (MAGICK_SIZE_T) length,
                                   blob_size);
           ThrowException(exception,CorruptImageError,
@@ -3491,7 +3491,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "    Unreasonable dimensions: "
                                     "geometry = %lux%lu, "
-                                    "blob size = %" MAGICK_OFF_F "",
+                                    "blob size = %" MAGICK_OFF_F "d",
                                     jng_width, jng_height, blob_size);
 
               ThrowException(exception,CorruptImageError,
@@ -3660,7 +3660,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "    Copying %" MAGICK_SIZE_T_F
-                                      " bytes of JDAT chunk data"
+                                      "u bytes of JDAT chunk data"
                                       " to color_blob.",
                                       (MAGICK_SIZE_T) length);
               (void) WriteBlob(color_image,length,(char *) chunk);
@@ -3670,7 +3670,7 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "    Skipping copy of %" MAGICK_SIZE_T_F
-                                      " bytes of JDAT chunk data"
+                                      "u bytes of JDAT chunk data"
                                       " to color_blob (color_image=%p).",
                                       (MAGICK_SIZE_T) length, color_image);
             }
@@ -4479,7 +4479,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  Reading MNG chunk, count: %"
-                                      MAGICK_SIZE_T_F  "",
+                                      MAGICK_SIZE_T_F  "u",
                                       (MAGICK_SIZE_T) count);
               MngInfoFreeStruct(mng_info,&have_mng_structure);
               ThrowReaderException(CorruptImageError,CorruptImage,image);
@@ -4500,9 +4500,9 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
             {
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "chunk length (%" MAGICK_SIZE_T_F ")"
+                                      "chunk length (%" MAGICK_SIZE_T_F "u)"
                                       " is greater than input size"
-                                      " (%" MAGICK_OFF_F ")",
+                                      " (%" MAGICK_OFF_F "d)",
                                       (MAGICK_SIZE_T) length,
                                       blob_size);
               MngInfoFreeStruct(mng_info,&have_mng_structure);

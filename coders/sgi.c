@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2020 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -371,7 +371,7 @@ static Image *ReadSGIImage(const ImageInfo *image_info,ExceptionInfo *exception)
                             iris_info.image_name,
                             iris_info.color_map);
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "File size %" MAGICK_OFF_F " bytes", file_size);
+                            "File size %" MAGICK_OFF_F "d bytes", file_size);
 
       /*
         Validate image header and set image attributes.

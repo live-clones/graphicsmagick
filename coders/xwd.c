@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2020 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -507,8 +507,8 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
     if (header.bytes_per_line < bytes_per_line)
       {
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Header bytes_per_line = %" MAGICK_SIZE_T_F ","
-                              " expected %" MAGICK_SIZE_T_F "",
+                              "Header bytes_per_line = %" MAGICK_SIZE_T_F "u,"
+                              " expected %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) header.bytes_per_line,
                               (MAGICK_SIZE_T) bytes_per_line);
         ThrowXWDReaderException(CorruptImageError,ImproperImageHeader,image);
@@ -654,8 +654,8 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
         file_size=GetBlobSize(image);
 
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "File size %" MAGICK_OFF_F ","
-                              "Pixels allocation size %" MAGICK_SIZE_T_F "",
+                              "File size %" MAGICK_OFF_F "d,"
+                              "Pixels allocation size %" MAGICK_SIZE_T_F "u",
                               file_size, (MAGICK_SIZE_T) length);
 
         if ((file_size != 0) && ((size_t) file_size < length))
@@ -1011,7 +1011,7 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           " image->columns=%lu,"
                           " bits_per_pixel=%u,"
-                          " bytes_per_line=%" MAGICK_SIZE_T_F ","
+                          " bytes_per_line=%" MAGICK_SIZE_T_F "u,"
                           " bitmap_pad=%u",
                           image->columns,
                           bits_per_pixel,

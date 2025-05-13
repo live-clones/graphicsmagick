@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2025 GraphicsMagick Group
+# Copyright (C) 2003-2024 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1998, 1999 E. I. du Pont de Nemours and Company
 #
@@ -1101,6 +1101,211 @@ if test "$ac_cv_have_C__func__" = 'yes' ; then
  AC_DEFINE([HAS_C__func__],[1],[Define if C compiler supports __func__])
 fi
 fi
+
+#
+# Compute sized types for current CPU and compiler options.
+#
+# The reason why we don't use autoconf's recent built-in support for
+# stdint.h types is because doing it ourself seems easier for dealing
+# with Windows builds which don't use configure.
+#
+
+# int8_t
+AC_MSG_CHECKING([for signed 8-bit type])
+INT8_T='signed char'
+AC_MSG_RESULT([$INT8_T])
+AC_SUBST([INT8_T])
+
+# uint8_t
+AC_MSG_CHECKING([for unsigned 8-bit type])
+UINT8_T='unsigned char'
+AC_MSG_RESULT([$UINT8_T])
+AC_SUBST([UINT8_T])
+
+# int16_t
+AC_MSG_CHECKING([for signed 16-bit type])
+INT16_T='signed short'
+AC_MSG_RESULT([$INT16_T])
+AC_SUBST([INT16_T])
+
+# uint16_t
+AC_MSG_CHECKING([for unsigned 16-bit type])
+UINT16_T='unsigned short'
+AC_MSG_RESULT([$UINT16_T])
+AC_SUBST([UINT16_T])
+
+# int32_t
+AC_MSG_CHECKING([for signed 32-bit type])
+INT32_T='none'
+INT32_F='none'
+if test $ac_cv_sizeof_signed_int -eq 4
+then
+  INT32_T='signed int'
+  INT32_F='""'
+elif test $ac_cv_sizeof_signed_long -eq 4
+then
+  INT32_T='signed long'
+  INT32_F='"l"'
+fi
+AC_MSG_RESULT([$INT32_T])
+AC_SUBST([INT32_T])
+AC_SUBST([INT32_F])
+
+# uint32_t
+AC_MSG_CHECKING([for unsigned 32-bit type])
+UINT32_T='none'
+UINT32_F='none'
+if test $ac_cv_sizeof_unsigned_int -eq 4
+then
+  UINT32_T='unsigned int'
+  UINT32_F='""'
+elif test $ac_cv_sizeof_unsigned_long -eq 4
+then
+  UINT32_T='unsigned long'
+  UINT32_F='"l"'
+fi
+AC_MSG_RESULT([$UINT32_T])
+AC_SUBST([UINT32_T])
+AC_SUBST([UINT32_F])
+
+# int64_t
+AC_MSG_CHECKING([for signed 64-bit type])
+INT64_T='none'
+INT64_F='none'
+if test $ac_cv_sizeof_signed_long -eq 8
+then
+  INT64_T='signed long'
+  INT64_F='"l"'
+elif test $ac_cv_sizeof_signed_long_long -eq 8
+then
+  INT64_T='signed long long'
+  INT64_F='"ll"'
+fi
+case "${host_os}" in
+  mingw* )
+    # Note that config.guess sets vendor to 'pc' but mingw-w64
+    # config.site overrides it and sets host_vendor to 'w64'.
+    case "${host_vendor}" in
+      'pc' ) # Original MinGW, use Microsoft syntax
+        INT64_F='"I64"'
+        ;;
+    esac
+esac
+AC_MSG_RESULT([$INT64_T])
+AC_SUBST([INT64_T])
+AC_SUBST([INT64_F])
+
+# uint64_t
+AC_MSG_CHECKING([for unsigned 64-bit type])
+UINT64_T='none'
+UINT64_F='none'
+if test $ac_cv_sizeof_unsigned_long -eq 8
+then
+  UINT64_T='unsigned long'
+  UINT64_F='"l"'
+elif test $ac_cv_sizeof_unsigned_long_long -eq 8
+then
+  UINT64_T='unsigned long long'
+  UINT64_F='"ll"'
+fi
+case "${host_os}" in
+  mingw* )
+    case "${host_vendor}" in
+      'pc' ) # Original MinGW, use Microsoft syntax
+        UINT64_F='"I64"'
+        ;;
+    esac
+esac
+AC_MSG_RESULT([$UINT64_T])
+AC_SUBST([UINT64_T])
+AC_SUBST([UINT64_F])
+
+# uintmax_t
+AC_MSG_CHECKING([for unsigned maximum type])
+UINTMAX_T='none'
+UINTMAX_F='none'
+if test "$UINT64_T" != 'none'
+then
+  UINTMAX_T=$UINT64_T
+  UINTMAX_F=$UINT64_F
+elif test "$UINT32_T" != 'none'
+then
+  UINTMAX_T=$UINT32_T
+  UINTMAX_F=$UINT32_F
+fi
+AC_MSG_RESULT([$UINTMAX_T])
+AC_SUBST([UINTMAX_T])
+AC_SUBST([UINTMAX_F])
+
+# uintptr_t
+AC_MSG_CHECKING([for unsigned pointer storage type])
+UINTPTR_T='none'
+UINTPTR_F='none'
+if test $ac_cv_sizeof_unsigned_long -eq $ac_cv_sizeof_unsigned_intp
+then
+  UINTPTR_T='unsigned long'
+  UINTPTR_F='"l"'
+elif test $ac_cv_sizeof_unsigned_long_long -eq $ac_cv_sizeof_unsigned_intp
+then
+  UINTPTR_T='unsigned long long'
+  UINTPTR_F='"ll"'
+fi
+AC_MSG_RESULT([$UINTPTR_T])
+AC_SUBST([UINTPTR_T])
+AC_SUBST([UINTPTR_F])
+
+# ptrdiff_t
+AC_MSG_CHECKING([for signed pointer difference type])
+PTRDIFF_T='none'
+PTRDDIFF_F='none'
+if test $ac_cv_sizeof_unsigned_long -eq $ac_cv_sizeof_unsigned_intp
+then
+  PTRDIFF_T='signed long'
+  PTRDIFF_F='"l"'
+elif test $ac_cv_sizeof_unsigned_long_long -eq $ac_cv_sizeof_unsigned_intp
+then
+  PTRDIFF_T='long long'
+  PTRDIFF_F='"ll"'
+fi
+AC_MSG_RESULT([$PTRDIFF_T])
+AC_SUBST([PTRDIFF_T])
+AC_SUBST([PTRDIFF_F])
+
+MAGICK_SIZE_T='none'
+MAGICK_SIZE_T_F='none'
+MAGICK_SSIZE_T='none'
+MAGICK_SSIZE_T_F='none'
+AC_MSG_CHECKING([for size_t format specification])
+if test $ac_cv_sizeof_size_t -eq $ac_cv_sizeof_unsigned_long
+then
+  # Normal case for LP32 and LP64
+  MAGICK_SIZE_T='unsigned long'
+  MAGICK_SIZE_T_F='"l"'
+  MAGICK_SSIZE_T='signed long'
+  MAGICK_SSIZE_T_F='"l"'
+elif test $ac_cv_sizeof_size_t -eq $ac_cv_sizeof_unsigned_long_long
+then
+  # Maybe a LLP64 architecture like WIN64
+  MAGICK_SIZE_T='unsigned long long'
+  MAGICK_SIZE_T_F='"ll"'
+  MAGICK_SSIZE_T='signed long long'
+  MAGICK_SSIZE_T_F='"ll"'
+  case "${host_os}" in
+    mingw* )
+      case "${host_vendor}" in
+        'pc' ) # Original MinGW, use Microsoft syntax
+          MAGICK_SIZE_T_F='"I64"'
+          MAGICK_SSIZE_T_F='"I64"'
+          ;;
+      esac
+      ;;
+  esac
+fi
+AC_MSG_RESULT([$MAGICK_SIZE_T_F])
+AC_SUBST([MAGICK_SIZE_T])
+AC_SUBST([MAGICK_SIZE_T_F])
+AC_SUBST([MAGICK_SSIZE_T])
+AC_SUBST([MAGICK_SSIZE_T_F])
 
 
 ########

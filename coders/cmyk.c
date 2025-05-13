@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003 - 2020 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -194,7 +194,7 @@ static Image *ReadCMYKImage(const ImageInfo *image_info,
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "image->tile_info.x=%lu, packet_size=%u, "
-                          "x=%" MAGICK_SIZE_T_F "",
+                          "x=%" MAGICK_SIZE_T_F "u",
                           image->tile_info.x, packet_size,
                           (MAGICK_SIZE_T) x);
   /*
@@ -758,7 +758,7 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
                           "Geometry %lux%lu, "
                           "Depth %u bits, "
                           "Endian %s, Packet Size %u, "
-                          "Row bytes %" MAGICK_SIZE_T_F "",
+                          "Row bytes %" MAGICK_SIZE_T_F "u",
                           image->scene,
                           image->columns,image->rows,
                           quantum_size,

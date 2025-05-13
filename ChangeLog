@@ -1,3 +1,10 @@
+2025-05-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/magick_types.h.in: Retreat from use of C'99 printf
+	macros.  The approach used was not working out, and especially
+	under Microsoft Windows.  This means that most changes made
+	yesterday are reverted.
+
 2025-05-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* www/INSTALL-windows.rst: Suggest that GraphicsMagick now

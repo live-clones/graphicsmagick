@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2020 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1028,7 +1028,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
 
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "%s %u bit palette with %" MAGICK_SIZE_T_F " colors",
+                              "%s %u bit palette with %" MAGICK_SIZE_T_F "u colors",
                               fixed_palette ? "Default" : "Custom",
                               palm_header.bits_per_pixel,
                               (MAGICK_SIZE_T) palette_entries);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2023 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1082,7 +1082,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
             if (image->logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Bytes/Row: %" MAGICK_SIZE_T_F "",
+                                    "Bytes/Row: %" MAGICK_SIZE_T_F "u",
                                     (MAGICK_SIZE_T) bytes_per_row);
 
             if (1 == samples_per_pixel)
@@ -2070,7 +2070,7 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
 
             if (image->logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Bytes/Row: %" MAGICK_SIZE_T_F "",
+                                    "Bytes/Row: %" MAGICK_SIZE_T_F "u",
                                     (MAGICK_SIZE_T) bytes_per_row);
 
             ExportPixelAreaOptionsInit(&export_options);

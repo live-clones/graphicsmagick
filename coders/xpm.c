@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2024 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -550,7 +550,7 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
           GetColorTuple(p,image->depth,image->matte,False,tuple);
           (void) QueryColorname(image,p,X11Compliance,name,&image->exception);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "    %" MAGICK_SIZE_T_F ": %.1024s\t  %.1024s",
+                                "    %" MAGICK_SIZE_T_F "u: %.1024s\t  %.1024s",
                                 (MAGICK_SIZE_T) ii,tuple,name);
           p++;
         }

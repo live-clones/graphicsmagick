@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2023 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -607,10 +607,10 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
       {
         max_packets=MagickArraySize(((image->columns+7) >> 3),image->rows);
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Alloc Bytes: %" MAGICK_SIZE_T_F ", "
-                              "Max Packets: %" MAGICK_SIZE_T_F ", "
-                              "Columns: %" MAGICK_SIZE_T_F " ,"
-                              "Rows: %" MAGICK_SIZE_T_F "",
+                              "Alloc Bytes: %" MAGICK_SIZE_T_F "u, "
+                              "Max Packets: %" MAGICK_SIZE_T_F "u, "
+                              "Columns: %" MAGICK_SIZE_T_F "u ,"
+                              "Rows: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) MagickArraySize(((image->columns+7) >> 3),
                                                               image->rows),
                               (MAGICK_SIZE_T) max_packets,
@@ -621,12 +621,12 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
       {
         max_packets=MagickArraySize(number_pixels,viff_info.number_data_bands);
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Alloc Bytes: %" MAGICK_SIZE_T_F ", "
-                              "Max Packets: %" MAGICK_SIZE_T_F ", "
-                              "Number Pixels: %" MAGICK_SIZE_T_F ", "
-                              "Columns: %" MAGICK_SIZE_T_F ", "
-                              "Rows: %" MAGICK_SIZE_T_F ", "
-                              "Number Data Bands: %" MAGICK_SIZE_T_F "",
+                              "Alloc Bytes: %" MAGICK_SIZE_T_F "u, "
+                              "Max Packets: %" MAGICK_SIZE_T_F "u, "
+                              "Number Pixels: %" MAGICK_SIZE_T_F "u, "
+                              "Columns: %" MAGICK_SIZE_T_F "u, "
+                              "Rows: %" MAGICK_SIZE_T_F "u, "
+                              "Number Data Bands: %" MAGICK_SIZE_T_F "u",
                               (MAGICK_SIZE_T) MagickArraySize(number_pixels,
                                                               viff_info.number_data_bands),
                               (MAGICK_SIZE_T) max_packets,

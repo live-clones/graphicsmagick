@@ -736,8 +736,8 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
                             length-header_length);
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "Profile: %s, header %" MAGICK_SIZE_T_F " bytes, "
-                        "data %" MAGICK_SIZE_T_F " bytes",
+                        "Profile: %s, header %" MAGICK_SIZE_T_F "u bytes, "
+                        "data %" MAGICK_SIZE_T_F "u bytes",
                         profile_name, (MAGICK_SIZE_T) header_length,
                         (MAGICK_SIZE_T) length-header_length);
 
@@ -1784,7 +1784,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                                 "geometry=%lux%lu,"
                                 " magick_geometry=%lux%lu,"
                                 " components=%d, "
-                                "blob size=%" MAGICK_OFF_F " bytes, "
+                                "blob size=%" MAGICK_OFF_F "d bytes, "
                                 "compression ratio %g",
                                 image->columns, image->rows,
                                 image->magick_columns, image->magick_rows,
@@ -2575,7 +2575,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image)
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Skipped Profile: %s, %"
-                                  MAGICK_SIZE_T_F " bytes",
+                                  MAGICK_SIZE_T_F "u bytes",
                                   profile_name,
                                   (MAGICK_SIZE_T) profile_length);
           continue;
@@ -2584,7 +2584,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image)
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Wrote Profile: %s, %"
-                              MAGICK_SIZE_T_F " bytes",profile_name,
+                              MAGICK_SIZE_T_F "u bytes",profile_name,
                               (MAGICK_SIZE_T) profile_length);
     }
   DeallocateImageProfileIterator(profile_iterator);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2024 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1106,12 +1106,12 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       WriteBlobStringWithEOL(image,"static const unsigned short message_dat_offsets[] =");
       WriteBlobStringWithEOL(image,"  {");
       offset=0;
-      FormatString(text, "    %" MAGICK_SIZE_T_F ",",(MAGICK_SIZE_T) offset);
+      FormatString(text, "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
       WriteBlobStringWithEOL(image,text);
       /* message 0 is reserved as the generic windows event message */
       /* WriteBlobStringWithEOL(image,"    \"%1\","); */
       offset += strlen("%1")+1;
-      FormatString(text, "    %" MAGICK_SIZE_T_F ",",(MAGICK_SIZE_T) offset);
+      FormatString(text, "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
       WriteBlobStringWithEOL(image,text);
       for (i=0; i < count; i++)
       {
@@ -1134,7 +1134,7 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
             }
             /* FormatString(text, "    \"%s\",",fields[4]); */
             offset += strlen(fields[4])+1;
-            FormatString(text, "    %" MAGICK_SIZE_T_F ",",(MAGICK_SIZE_T) offset);
+            FormatString(text, "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
             WriteBlobStringWithEOL(image,text);
           }
       }
