@@ -1,3 +1,10 @@
+2025-05-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/jxl.c (ReadJXLImage): More effort to free profile memory
+	if JxlDecoderSetBoxBuffer() fails. Addresses oss-fuzz issue
+	"graphicsmagick:coder_TIFF_any_fuzzer: Direct-leak in
+	_MagickReallocateResourceLimitedMemory".  Maybe this will fix it.
+
 2025-05-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/magick_types.h.in: Retreat from use of C'99 printf

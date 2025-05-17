@@ -1030,6 +1030,11 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                 if (LocaleNCompare(type,"Exif",sizeof(type)) == 0)
                   {
                     /*
+                      Assure that there is no leak if there are duplicate requests
+                    */
+                    MagickFreeResourceLimitedMemory(exif_profile);
+                    exif_size=0;
+                    /*
                       Allocate EXIF profile box buffer (plus a bit more)
                     */
                     if ((profile=MagickAllocateResourceLimitedClearedMemory(unsigned char *,
@@ -1052,6 +1057,11 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                   }
                 if (LocaleNCompare(type,"xml ",sizeof(type)) == 0)
                   {
+                    /*
+                      Assure that there is no leak if there are duplicate requests
+                    */
+                    MagickFreeResourceLimitedMemory(xmp_profile);
+                    xmp_size=0;
                     /*
                       Allocate XMP profile box buffer
                     */
@@ -1155,13 +1165,15 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
       (void) SetImageProfile(image,"EXIF",exif_profile,exif_size+exif_pad+4);
 
       MagickFreeResourceLimitedMemory(exif_profile);
+      exif_size=0;
     }
   if (xmp_profile != NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "XMP Box: Size %lu", (unsigned long) exif_size);
+                            "XMP Box: Size %lu", (unsigned long) xmp_size);
       (void) SetImageProfile(image,"XMP",xmp_profile,xmp_size);
       MagickFreeResourceLimitedMemory(xmp_profile);
+      xmp_size=0;
     }
   /* every break outside of success is some kind of error */
   if (status != JXL_DEC_SUCCESS) {
