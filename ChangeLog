@@ -1,5 +1,17 @@
 2025-05-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/xpm.c (ParseColor): Avoid truncation of nul character
+	from "g4 ".
+
+	* coders/logo.c (EmbeddedImageList): Avoid truncation of nul
+	character from "VERTICALRIGHTSHINGLE".
+
+	* magick/utility.c (GetPageGeometry): Avoid truncation of nul
+	character from "LETTERSMALL".
+
+	* magick/attribute.c: Avoid truncation of nul character from
+	"ThumbnailPrimaryChromaticities".
+
 	* fuzzing/README.txt: Add notes regarding how to build libjxl for
 	testing.
 

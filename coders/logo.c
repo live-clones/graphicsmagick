@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
 % Parts Copyright (c) 1989-2000 by Brian V. Smith
 % Parts Copyright (c) 1991 by Paul King

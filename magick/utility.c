@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (c) 2000 Markus Friedl.  All rights reserved.
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
@@ -2332,7 +2332,7 @@ MagickExport char *GetPageGeometry(const char *page_geometry)
   static const struct
   {
     char
-      name[11];
+      name[12];
 
     unsigned char
        name_length;
