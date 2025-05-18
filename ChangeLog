@@ -1,3 +1,8 @@
+2025-05-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/README.txt: Add notes regarding how to build libjxl for
+	testing.
+
 2025-05-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/jxl.c (ReadJXLImage): More effort to free profile memory

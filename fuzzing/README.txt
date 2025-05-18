@@ -99,7 +99,7 @@ Building libheif (and dependencies) for development
 de265
 +++++
 
-With sources under /home/bfriesen/src/libde265::
+With sources under /home/bfriesen/src/libde265 (from https://github.com/strukturag/libde265)::
 
   /home/bfriesen/src/libde265/configure --prefix=/usr/local CC=gcc CXX=g++ CFLAGS='-O -g' CXXFLAGS='-O -g'
   make
@@ -156,8 +156,26 @@ With sources under libjpeg-turbo::
   make -j 8
   make install
 
+libjxl
++++++++
+
+The initial git checkout looks like::
+
+  git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules
+
+Then see procedure in libjxl/BUILDING.md.  Based on that, do this::
+
+  cd libjxl
+  mkdir build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE ..
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
 libheif
 +++++++
+
+Sources come from https://github.com/strukturag/libheif.git
 
 With sources under /home/bfriesen/src/libheif::
 
