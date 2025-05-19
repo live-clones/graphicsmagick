@@ -49,7 +49,7 @@ GraphicsMagick Change Logs
 
 The following are the ``GraphicsMagick`` change logs since 2001:
 
-  * 2025_ (Nothing yet!)
+  * 2025_ (No releases yet!)
 
   * 2024_ (1.3.43, 1.3.44, 1.3.45 released)
 

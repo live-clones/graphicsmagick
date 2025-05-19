@@ -41,30 +41,30 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<div class="contents local topic" id="contents">
+<nav class="contents local" id="contents" role="doc-toc">
 <ul class="simple">
-<li><p><a class="reference internal" href="#introduction" id="id1">Introduction</a></p></li>
-<li><p><a class="reference internal" href="#installation" id="id2">Installation</a></p>
+<li><p><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#installation" id="toc-entry-2">Installation</a></p>
 <ul>
-<li><p><a class="reference internal" href="#unix" id="id3">UNIX</a></p></li>
-<li><p><a class="reference internal" href="#windows-xp-windows-12" id="id4">Windows XP - Windows 12</a></p></li>
-<li><p><a class="reference internal" href="#running-the-regression-tests" id="id5">Running the Regression Tests</a></p></li>
+<li><p><a class="reference internal" href="#unix" id="toc-entry-3">UNIX</a></p></li>
+<li><p><a class="reference internal" href="#windows-xp-windows-12" id="toc-entry-4">Windows XP - Windows 12</a></p></li>
+<li><p><a class="reference internal" href="#running-the-regression-tests" id="toc-entry-5">Running the Regression Tests</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#overview" id="id6">Overview</a></p></li>
-<li><p><a class="reference internal" href="#example-script" id="id7">Example Script</a></p></li>
-<li><p><a class="reference internal" href="#read-or-write-an-image" id="id8">Read or Write an Image</a></p></li>
-<li><p><a class="reference internal" href="#manipulate-an-image" id="id9">Manipulate an Image</a></p></li>
-<li><p><a class="reference internal" href="#set-an-image-attribute" id="id10">Set an Image Attribute</a></p></li>
-<li><p><a class="reference internal" href="#get-an-image-attribute" id="id11">Get an Image Attribute</a></p></li>
-<li><p><a class="reference internal" href="#create-an-image-montage" id="id12">Create an Image Montage</a></p></li>
-<li><p><a class="reference internal" href="#working-with-blobs" id="id13">Working with Blobs</a></p></li>
-<li><p><a class="reference internal" href="#miscellaneous-methods" id="id14">Miscellaneous Methods</a></p></li>
-<li><p><a class="reference internal" href="#handling-errors" id="id15">Handling Errors</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="toc-entry-6">Overview</a></p></li>
+<li><p><a class="reference internal" href="#example-script" id="toc-entry-7">Example Script</a></p></li>
+<li><p><a class="reference internal" href="#read-or-write-an-image" id="toc-entry-8">Read or Write an Image</a></p></li>
+<li><p><a class="reference internal" href="#manipulate-an-image" id="toc-entry-9">Manipulate an Image</a></p></li>
+<li><p><a class="reference internal" href="#set-an-image-attribute" id="toc-entry-10">Set an Image Attribute</a></p></li>
+<li><p><a class="reference internal" href="#get-an-image-attribute" id="toc-entry-11">Get an Image Attribute</a></p></li>
+<li><p><a class="reference internal" href="#create-an-image-montage" id="toc-entry-12">Create an Image Montage</a></p></li>
+<li><p><a class="reference internal" href="#working-with-blobs" id="toc-entry-13">Working with Blobs</a></p></li>
+<li><p><a class="reference internal" href="#miscellaneous-methods" id="toc-entry-14">Miscellaneous Methods</a></p></li>
+<li><p><a class="reference internal" href="#handling-errors" id="toc-entry-15">Handling Errors</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="introduction">
-<h1><a class="toc-backref" href="#id1">Introduction</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">Introduction</a></h1>
 <p>PerlMagick is an objected-oriented Perl interface to GraphicsMagick. Use
 the module to read, manipulate, or write an image or image sequence from
 within a Perl script. This makes it very suitable for Web CGI scripts.
@@ -75,9 +75,9 @@ PerlMagick. The PerlMagick demo directory provides a number of sample
 demos.</p>
 </section>
 <section id="installation">
-<h1><a class="toc-backref" href="#id2">Installation</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">Installation</a></h1>
 <section id="unix">
-<h2><a class="toc-backref" href="#id3">UNIX</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">UNIX</a></h2>
 <p>PerlMagick is installed by default by installing GraphicsMagick.
 Installing PerlMagick as a subordinate package of GraphicsMagick is the
 best way to avoid problems.</p>
@@ -85,7 +85,7 @@ best way to avoid problems.</p>
 are ways around this. Consult the Perl manual pages for more information.</p>
 </section>
 <section id="windows-xp-windows-12">
-<h2><a class="toc-backref" href="#id4">Windows XP - Windows 12</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">Windows XP - Windows 12</a></h2>
 <p>[ These procedures have not been exercised for some time ]</p>
 <p>After GraphicsMagick has been compiled from the GraphicsMagick Windows
 source distribution using Microsoft Visual C++, PerlMagick may be
@@ -100,7 +100,7 @@ nmake install</pre>
 instructions.</p>
 </section>
 <section id="running-the-regression-tests">
-<h2><a class="toc-backref" href="#id5">Running the Regression Tests</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">Running the Regression Tests</a></h2>
 <p>To verify a correct installation, type:</p>
 <pre class="literal-block">make test</pre>
 <p>Use nmake test under Windows. There are a few demonstration scripts
@@ -112,7 +112,7 @@ scripts.</p>
 </section>
 </section>
 <section id="overview">
-<h1><a class="toc-backref" href="#id6">Overview</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">Overview</a></h1>
 <p>Any script that wants to use PerlMagick methods must first define the
 methods within its namespace and instantiate an image object. Do this
 with</p>
@@ -154,7 +154,7 @@ variable to work properly. For example,</p>
 <pre class="literal-block">$ENV{PATH}='/bin:/usr/bin:/usr/local/bin';</pre>
 </section>
 <section id="example-script">
-<h1><a class="toc-backref" href="#id7">Example Script</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">Example Script</a></h1>
 <p>Here is an example script to get you started:</p>
 <pre class="literal-block">#!/usr/local/bin/perl
 use Graphics::Magick;
@@ -205,17 +205,11 @@ push(&#64;$q, &#64;$p); # push the images from object p onto object q
 $p-&gt;Convolve([1, 2, 1, 2, 4, 2, 1, 2, 1]); # 3x3 Gaussian kernel</pre>
 </section>
 <section id="read-or-write-an-image">
-<h1><a class="toc-backref" href="#id8">Read or Write an Image</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">Read or Write an Image</a></h1>
 <p>Use the methods listed below to either read, write, or display an image
 or image sequence.</p>
 <table>
 <caption>Read or Write Methods</caption>
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 19%" />
-<col style="width: 27%" />
-<col style="width: 44%" />
-</colgroup>
 <tbody>
 <tr><td><p>Method</p></td>
 <td><p>Parameters</p></td>
@@ -305,7 +299,7 @@ $image-&gt;Write(filename=&amp;gt;'webp:output.webp');</p>
 </blockquote>
 </section>
 <section id="manipulate-an-image">
-<h1><a class="toc-backref" href="#id9">Manipulate an Image</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">Manipulate an Image</a></h1>
 <p>Once you create an image with, for example, method ReadImage() you may want
 to operate on it. Below is a list of all the image manipulations methods
 available to you with PerlMagick. There are examples of select PerlMagick
@@ -318,11 +312,6 @@ width, height, x, and y, parameters.</p>
 <p>The following image manipulation methods are available:</p>
 <table>
 <caption>Image Manipulation Methods</caption>
-<colgroup>
-<col style="width: 24%" />
-<col style="width: 46%" />
-<col style="width: 30%" />
-</colgroup>
 <tbody>
 <tr><td><p>Method</p></td>
 <td><p>Parameters</p></td>
@@ -955,18 +944,13 @@ is an alias for method Trim().</p>
 documentation for a more detailed description of these attributes.</p>
 </section>
 <section id="set-an-image-attribute">
-<h1><a class="toc-backref" href="#id10">Set an Image Attribute</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-10" role="doc-backlink">Set an Image Attribute</a></h1>
 <p>Use method Set() to set an image attribute. For example,</p>
 <pre class="literal-block">$image-&gt;Set(dither=&gt;'True');
 $image-&gt;[$x]-&gt;Set(delay=&gt;3);</pre>
 <p>And here is a list of all the image attributes you can set:</p>
 <table>
 <caption>Image Attributes</caption>
-<colgroup>
-<col style="width: 23%" />
-<col style="width: 51%" />
-<col style="width: 27%" />
-</colgroup>
 <tbody>
 <tr><td><p>Attribute</p></td>
 <td><p>Values</p></td>
@@ -1336,7 +1320,7 @@ parameters (e.g. geometry=&gt;'106x80' is equivalent to width=&gt;106, height=&g
 gm documentation for a more detailed description of these attributes.</p>
 </section>
 <section id="get-an-image-attribute">
-<h1><a class="toc-backref" href="#id11">Get an Image Attribute</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-11" role="doc-backlink">Get an Image Attribute</a></h1>
 <p>Use method Get() to get an image attribute. For example,</p>
 <pre class="literal-block">($a, $b, $c) = $image-&gt;Get('colorspace', 'magick', 'adjoin');
 $width = $image-&gt;[3]-&gt;Get('columns');</pre>
@@ -1344,11 +1328,6 @@ $width = $image-&gt;[3]-&gt;Get('columns');</pre>
 can get these additional attributes:</p>
 <table>
 <caption>Image Attributes</caption>
-<colgroup>
-<col style="width: 18%" />
-<col style="width: 14%" />
-<col style="width: 68%" />
-</colgroup>
 <tbody>
 <tr><td><p>Attribute</p></td>
 <td><p>Values</p></td>
@@ -1467,7 +1446,7 @@ False}</p></td>
 documentation for a more detailed description of these attributes.</p>
 </section>
 <section id="create-an-image-montage">
-<h1><a class="toc-backref" href="#id12">Create an Image Montage</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-12" role="doc-backlink">Create an Image Montage</a></h1>
 <p>Use method Montage() to create a composite image by combining several
 separate images. The images are tiled on the composite image with the
 name of the image optionally appearing just below the individual tile.
@@ -1476,11 +1455,6 @@ For example,</p>
 <p>And here is a list of Montage() parameters you can set:</p>
 <table>
 <caption>Montage Parameters</caption>
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 52%" />
-<col style="width: 32%" />
-</colgroup>
 <tbody>
 <tr><td><p>Parameter</p></td>
 <td><p>Values</p></td>
@@ -1602,19 +1576,13 @@ parameters (e.g. geometry=&gt;'106x80' is equivalent to width=&gt;106, height=&g
 documentation for a more detailed description of these attributes.</p>
 </section>
 <section id="working-with-blobs">
-<h1><a class="toc-backref" href="#id13">Working with Blobs</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-13" role="doc-backlink">Working with Blobs</a></h1>
 <p>A blob contains data that directly represent a particular image format in
 memory instead of on disk. PerlMagick supports blobs in any of these
 image formats and provides methods to convert a blob to or from a
 particular image format.</p>
 <table>
 <caption>Blob Methods</caption>
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 14%" />
-<col style="width: 34%" />
-<col style="width: 36%" />
-</colgroup>
 <tbody>
 <tr><td><p>Method</p></td>
 <td><p>Parameters</p></td>
@@ -1656,7 +1624,7 @@ $image=Graphics::Magick-&gt;new(magick=&gt;'jpg');
 $image-&gt;BlobToImage(&#64;blob);</pre>
 </section>
 <section id="miscellaneous-methods">
-<h1><a class="toc-backref" href="#id14">Miscellaneous Methods</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-14" role="doc-backlink">Miscellaneous Methods</a></h1>
 <p>The Append() method append a set of images. For example,</p>
 <pre class="literal-block">$p = $image-&gt;Append(stack=&gt;{true,false});</pre>
 <p>appends all the images associated with object $image. By default, images
@@ -1741,7 +1709,7 @@ specification for cropping or resizing one or more images. For example,</p>
 PingImage() is an alias for method Ping().</p>
 </section>
 <section id="handling-errors">
-<h1><a class="toc-backref" href="#id15">Handling Errors</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-15" role="doc-backlink">Handling Errors</a></h1>
 <p>All PerlMagick methods return an undefined string context upon success. If
 any problems occur, the error is returned as a string with an embedded
 numeric status code. A status code less than 400 is a warning. This means
@@ -1778,11 +1746,6 @@ print $1; # print the error number</pre>
 <p>Below is a list of error and warning codes:</p>
 <table>
 <caption>Error and Warning Codes</caption>
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 31%" />
-<col style="width: 63%" />
-</colgroup>
 <tbody>
 <tr><td><p>Code</p></td>
 <td><p>Mnemonic</p></td>

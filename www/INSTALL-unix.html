@@ -41,35 +41,35 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<div class="contents local topic" id="contents">
+<nav class="contents local" id="contents" role="doc-toc">
 <ul class="simple">
-<li><p><a class="reference internal" href="#archive-formats" id="id1">Archive Formats</a></p></li>
-<li><p><a class="reference internal" href="#build-configuration" id="id2">Build Configuration</a></p>
+<li><p><a class="reference internal" href="#archive-formats" id="toc-entry-1">Archive Formats</a></p></li>
+<li><p><a class="reference internal" href="#build-configuration" id="toc-entry-2">Build Configuration</a></p>
 <ul>
-<li><p><a class="reference internal" href="#optional-features" id="id3">Optional Features</a></p></li>
-<li><p><a class="reference internal" href="#optional-packages-options" id="id4">Optional Packages/Options</a></p></li>
+<li><p><a class="reference internal" href="#optional-features" id="toc-entry-3">Optional Features</a></p></li>
+<li><p><a class="reference internal" href="#optional-packages-options" id="toc-entry-4">Optional Packages/Options</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#jpeg-xl" id="id5">JPEG XL</a></p></li>
-<li><p><a class="reference internal" href="#popular-distribution-packages" id="id6">Popular Distribution Packages</a></p>
+<li><p><a class="reference internal" href="#jpeg-xl" id="toc-entry-5">JPEG XL</a></p></li>
+<li><p><a class="reference internal" href="#popular-distribution-packages" id="toc-entry-6">Popular Distribution Packages</a></p>
 <ul>
-<li><p><a class="reference internal" href="#debian-packages" id="id7">Debian Packages</a></p></li>
+<li><p><a class="reference internal" href="#debian-packages" id="toc-entry-7">Debian Packages</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#building-under-cygwin" id="id8">Building under Cygwin</a></p></li>
-<li><p><a class="reference internal" href="#building-under-mingw-w64-msys2" id="id9">Building under MinGW-W64 &amp; MSYS2</a></p>
+<li><p><a class="reference internal" href="#building-under-cygwin" id="toc-entry-8">Building under Cygwin</a></p></li>
+<li><p><a class="reference internal" href="#building-under-mingw-w64-msys2" id="toc-entry-9">Building under MinGW-W64 &amp; MSYS2</a></p>
 <ul>
-<li><p><a class="reference internal" href="#cross-compilation-on-unix-linux-host" id="id10">Cross-compilation On Unix/Linux Host</a></p></li>
+<li><p><a class="reference internal" href="#cross-compilation-on-unix-linux-host" id="toc-entry-10">Cross-compilation On Unix/Linux Host</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#dealing-with-configuration-failures" id="id11">Dealing with configuration failures</a></p></li>
-<li><p><a class="reference internal" href="#makefile-build-targets" id="id12">Makefile Build Targets</a></p></li>
-<li><p><a class="reference internal" href="#build-install" id="id13">Build &amp; Install</a></p></li>
-<li><p><a class="reference internal" href="#verifying-the-build" id="id14">Verifying The Build</a></p></li>
+<li><p><a class="reference internal" href="#dealing-with-configuration-failures" id="toc-entry-11">Dealing with configuration failures</a></p></li>
+<li><p><a class="reference internal" href="#makefile-build-targets" id="toc-entry-12">Makefile Build Targets</a></p></li>
+<li><p><a class="reference internal" href="#build-install" id="toc-entry-13">Build &amp; Install</a></p></li>
+<li><p><a class="reference internal" href="#verifying-the-build" id="toc-entry-14">Verifying The Build</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="archive-formats">
-<h1><a class="toc-backref" href="#id1">Archive Formats</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">Archive Formats</a></h1>
 <p>GraphicsMagick is distributed in a number of different archive formats.
 The source code must be extracted prior to compilation as follows:</p>
 <p>7z</p>
@@ -120,7 +120,7 @@ a command similar to:</p>
 <pre class="literal-block">cd GraphicsMagick-1.3</pre>
 </section>
 <section id="build-configuration">
-<h1><a class="toc-backref" href="#id2">Build Configuration</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">Build Configuration</a></h1>
 <p>Use 'configure' to automatically configure, build, and install
 GraphicsMagick. The configure script may be executed from the
 GraphicsMagick source directory (e.g ./configure) or from a separate
@@ -216,7 +216,7 @@ to specifying --enable-something=no and --without-something is
 equivalent to --with-something=no.  The configure options are as
 follows (execute 'configure --help' to see all options).</p>
 <section id="optional-features">
-<h2><a class="toc-backref" href="#id3">Optional Features</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">Optional Features</a></h2>
 <dl class="option-list">
 <dt><kbd><span class="option">--disable-compressed-files</span></kbd></dt>
 <dd><p>disable reading and writing of gzip/bzip stream files</p>
@@ -274,7 +274,7 @@ directory (only one can be used for development)</p>
 </dl>
 </section>
 <section id="optional-packages-options">
-<h2><a class="toc-backref" href="#id4">Optional Packages/Options</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">Optional Packages/Options</a></h2>
 <dl class="option-list">
 <dt><kbd><span class="option">--with-quantum-depth</span></kbd></dt>
 <dd><p>number of bits in a pixel quantum (default 8).  Also see
@@ -540,11 +540,6 @@ the previous level. The following table shows the range available
 for various quantum sizes.</p>
 <blockquote>
 <table>
-<colgroup>
-<col style="width: 24%" />
-<col style="width: 42%" />
-<col style="width: 34%" />
-</colgroup>
 <thead>
 <tr><th class="head"><p>QuantumDepth</p></th>
 <th class="head"><p>Valid Range (Decimal)</p></th>
@@ -582,10 +577,6 @@ memory at one time. The following table shows memory consumption
 values for a 1024x768 image:</p>
 <blockquote>
 <table>
-<colgroup>
-<col style="width: 46%" />
-<col style="width: 54%" />
-</colgroup>
 <thead>
 <tr><th class="head"><p>QuantumDepth</p></th>
 <th class="head"><p>Virtual Memory</p></th>
@@ -756,11 +747,6 @@ package manager and installing from a package manager is easier than
 installing from source:</p>
 <table>
 <caption>URW Font Packages</caption>
-<colgroup>
-<col style="width: 22%" />
-<col style="width: 32%" />
-<col style="width: 46%" />
-</colgroup>
 <thead>
 <tr><th class="head"><p>Distribution</p></th>
 <th class="head"><p>Package Name</p></th>
@@ -818,11 +804,6 @@ than the legacy 'psfonts'/'urw-base35-fonts' package described above
 (i.e. --with-gs-font-dir).</p>
 <table>
 <caption>URW Font Packages</caption>
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 30%" />
-<col style="width: 51%" />
-</colgroup>
 <thead>
 <tr><th class="head"><p>Distribution</p></th>
 <th class="head"><p>Package Name</p></th>
@@ -881,7 +862,7 @@ multi-threaded programs than umem, but is less memory efficient.</p>
 </section>
 </section>
 <section id="jpeg-xl">
-<h1><a class="toc-backref" href="#id5">JPEG XL</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">JPEG XL</a></h1>
 <p>JPEG XL seems to be a work in progress, with previous APIs being
 deprecated, and replacement APIs introduced.  We have taken an
 approach to use the latest recommended APIs.  For development testing
@@ -901,12 +882,12 @@ make install</pre>
 work without known issues when compiled using GCC 9.4.0.</p>
 </section>
 <section id="popular-distribution-packages">
-<h1><a class="toc-backref" href="#id6">Popular Distribution Packages</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">Popular Distribution Packages</a></h1>
 <p>We will attempt to document the package names useful for
 GraphicsMagick on various primordial operating system distributions
 here.</p>
 <section id="debian-packages">
-<h2><a class="toc-backref" href="#id7">Debian Packages</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">Debian Packages</a></h2>
 <p>These packages may be installed on a Debian Linux system (or one that
 derives from Debian such as Ubuntu or Mint) in order to quickly build
 a full GraphicsMagick.  Most of these are optional depending on the
@@ -929,7 +910,7 @@ docutils-common, python3, m4</pre>
 </section>
 </section>
 <section id="building-under-cygwin">
-<h1><a class="toc-backref" href="#id8">Building under Cygwin</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">Building under Cygwin</a></h1>
 <p>GraphicsMagick may be built under the Windows Cygwin Unix-emulation
 environment available for free from</p>
 <blockquote>
@@ -953,7 +934,7 @@ The test suite <span class="docutils literal">make check</span> includes several
 C++ exceptions are working properly.</p>
 </section>
 <section id="building-under-mingw-w64-msys2">
-<h1><a class="toc-backref" href="#id9">Building under MinGW-W64 &amp; MSYS2</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">Building under MinGW-W64 &amp; MSYS2</a></h1>
 <p>GraphicsMagick may easily be built using the free <a class="reference external" href="https://www.msys2.org/">MSYS2</a> distribution which provides GCC compilers,
 libraries, and headers, targeting native Windows along with a
 Unix-like command shell and a package manager ('pacman') to install
@@ -992,7 +973,7 @@ installation layout (e.g. <span class="docutils literal"><span class="pre">C:\Gr
 which may be embedded in libraries and configuration files are
 transformed into Windows paths so they don't depend on MSYS.</p>
 <section id="cross-compilation-on-unix-linux-host">
-<h2><a class="toc-backref" href="#id10">Cross-compilation On Unix/Linux Host</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-10" role="doc-backlink">Cross-compilation On Unix/Linux Host</a></h2>
 <p>Given a modern and working MinGW32 or mingw-w64 installation, it is
 easy to cross-compile GraphicsMagick from a Unix-type host to produce
 Microsoft Windows executables.</p>
@@ -1025,7 +1006,7 @@ system (e.g. by packaging via an installer).</p>
 </section>
 </section>
 <section id="dealing-with-configuration-failures">
-<h1><a class="toc-backref" href="#id11">Dealing with configuration failures</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-11" role="doc-backlink">Dealing with configuration failures</a></h1>
 <p>While configure is designed to ease installation of GraphicsMagick, it
 often discovers problems that would otherwise be encountered later
 when compiling GraphicsMagick. The configure script tests for headers
@@ -1061,7 +1042,7 @@ configure output and a description of what you expected to see (and
 why) so the failure you are observing can be identified and resolved.</p>
 </section>
 <section id="makefile-build-targets">
-<h1><a class="toc-backref" href="#id12">Makefile Build Targets</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-12" role="doc-backlink">Makefile Build Targets</a></h1>
 <p>Once GraphicsMagick is configured, these standard build targets are
 available from the generated Makefiles:</p>
 <blockquote>
@@ -1101,7 +1082,7 @@ an 'uninstall' target.</p>
 </blockquote>
 </section>
 <section id="build-install">
-<h1><a class="toc-backref" href="#id13">Build &amp; Install</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-13" role="doc-backlink">Build &amp; Install</a></h1>
 <p>Now that GraphicsMagick is configured, type</p>
 <pre class="literal-block">make</pre>
 <p>to build the package and</p>
@@ -1113,7 +1094,7 @@ software), specify DESTDIR like</p>
 <pre class="literal-block">make DESTDIR=/my/dest/dir install</pre>
 </section>
 <section id="verifying-the-build">
-<h1><a class="toc-backref" href="#id14">Verifying The Build</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-14" role="doc-backlink">Verifying The Build</a></h1>
 <p>To confirm your installation of the GraphicsMagick distribution was
 successful, ensure that the installation directory is in your executable
 search path and type</p>

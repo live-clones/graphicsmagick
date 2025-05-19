@@ -1,3 +1,8 @@
+2025-05-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* scripts/format_c_api_doc.py (proto_pretty): Fix regular
+	expression encoding.
+
 2025-05-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/xpm.c (ParseColor): Avoid truncation of nul character

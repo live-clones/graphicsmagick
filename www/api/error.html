@@ -39,27 +39,27 @@
 <main id="error">
 <h1 class="title">error</h1>
 <p class="subtitle" id="error-reporting-methods">Error reporting methods</p>
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents" role="doc-toc">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#catchexception" id="id27">CatchException</a></p></li>
-<li><p><a class="reference internal" href="#copyexception" id="id28">CopyException</a></p></li>
-<li><p><a class="reference internal" href="#destroyexceptioninfo" id="id29">DestroyExceptionInfo</a></p></li>
-<li><p><a class="reference internal" href="#getexceptioninfo" id="id30">GetExceptionInfo</a></p></li>
-<li><p><a class="reference internal" href="#getlocaleexceptionmessage" id="id31">GetLocaleExceptionMessage</a></p></li>
-<li><p><a class="reference internal" href="#magickerror" id="id32">MagickError</a></p></li>
-<li><p><a class="reference internal" href="#magickfatalerror" id="id33">MagickFatalError</a></p></li>
-<li><p><a class="reference internal" href="#magickwarning" id="id34">MagickWarning</a></p></li>
-<li><p><a class="reference internal" href="#seterrorhandler" id="id35">SetErrorHandler</a></p></li>
-<li><p><a class="reference internal" href="#setexceptioninfo" id="id36">SetExceptionInfo</a></p></li>
-<li><p><a class="reference internal" href="#setfatalerrorhandler" id="id37">SetFatalErrorHandler</a></p></li>
-<li><p><a class="reference internal" href="#setwarninghandler" id="id38">SetWarningHandler</a></p></li>
-<li><p><a class="reference internal" href="#throwexception" id="id39">ThrowException</a></p></li>
-<li><p><a class="reference internal" href="#throwloggedexception" id="id40">ThrowLoggedException</a></p></li>
+<li><p><a class="reference internal" href="#catchexception" id="toc-entry-1">CatchException</a></p></li>
+<li><p><a class="reference internal" href="#copyexception" id="toc-entry-2">CopyException</a></p></li>
+<li><p><a class="reference internal" href="#destroyexceptioninfo" id="toc-entry-3">DestroyExceptionInfo</a></p></li>
+<li><p><a class="reference internal" href="#getexceptioninfo" id="toc-entry-4">GetExceptionInfo</a></p></li>
+<li><p><a class="reference internal" href="#getlocaleexceptionmessage" id="toc-entry-5">GetLocaleExceptionMessage</a></p></li>
+<li><p><a class="reference internal" href="#magickerror" id="toc-entry-6">MagickError</a></p></li>
+<li><p><a class="reference internal" href="#magickfatalerror" id="toc-entry-7">MagickFatalError</a></p></li>
+<li><p><a class="reference internal" href="#magickwarning" id="toc-entry-8">MagickWarning</a></p></li>
+<li><p><a class="reference internal" href="#seterrorhandler" id="toc-entry-9">SetErrorHandler</a></p></li>
+<li><p><a class="reference internal" href="#setexceptioninfo" id="toc-entry-10">SetExceptionInfo</a></p></li>
+<li><p><a class="reference internal" href="#setfatalerrorhandler" id="toc-entry-11">SetFatalErrorHandler</a></p></li>
+<li><p><a class="reference internal" href="#setwarninghandler" id="toc-entry-12">SetWarningHandler</a></p></li>
+<li><p><a class="reference internal" href="#throwexception" id="toc-entry-13">ThrowException</a></p></li>
+<li><p><a class="reference internal" href="#throwloggedexception" id="toc-entry-14">ThrowLoggedException</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="catchexception">
-<h1><a class="toc-backref" href="#id27">CatchException</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">CatchException</a></h1>
 <section id="synopsis">
 <h2>Synopsis</h2>
 <pre class="literal-block">CatchException( const <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
@@ -79,12 +79,12 @@ the exception as a warning, error, or fatal depending on the severity.</p>
 </section>
 </section>
 <section id="copyexception">
-<h1><a class="toc-backref" href="#id28">CopyException</a></h1>
-<section id="id1">
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">CopyException</a></h1>
+<section id="synopsis-1">
 <h2>Synopsis</h2>
 <pre class="literal-block">void CopyException( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *copy, const <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *original );</pre>
 </section>
-<section id="id2">
+<section id="description-1">
 <h2>Description</h2>
 <p>CopyException() copies exception data from one ExceptionInfo structure
 to another.</p>
@@ -102,12 +102,12 @@ to another.</p>
 </section>
 </section>
 <section id="destroyexceptioninfo">
-<h1><a class="toc-backref" href="#id29">DestroyExceptionInfo</a></h1>
-<section id="id3">
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">DestroyExceptionInfo</a></h1>
+<section id="synopsis-2">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DestroyExceptionInfo( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id4">
+<section id="description-2">
 <h2>Description</h2>
 <p>DestroyExceptionInfo() deallocates memory associated with exception.</p>
 <p>The format of the DestroyExceptionInfo method is:</p>
@@ -121,12 +121,12 @@ to another.</p>
 </section>
 </section>
 <section id="getexceptioninfo">
-<h1><a class="toc-backref" href="#id30">GetExceptionInfo</a></h1>
-<section id="id5">
+<h1><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">GetExceptionInfo</a></h1>
+<section id="synopsis-3">
 <h2>Synopsis</h2>
 <pre class="literal-block">GetExceptionInfo( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id6">
+<section id="description-3">
 <h2>Description</h2>
 <p>GetExceptionInfo() initializes an exception to default values.</p>
 <p>The format of the GetExceptionInfo method is:</p>
@@ -140,12 +140,12 @@ to another.</p>
 </section>
 </section>
 <section id="getlocaleexceptionmessage">
-<h1><a class="toc-backref" href="#id31">GetLocaleExceptionMessage</a></h1>
-<section id="id7">
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">GetLocaleExceptionMessage</a></h1>
+<section id="synopsis-4">
 <h2>Synopsis</h2>
 <pre class="literal-block">const char *GetLocaleExceptionMessage( const <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> severity, const char *tag );</pre>
 </section>
-<section id="id8">
+<section id="description-4">
 <h2>Description</h2>
 <p>GetLocaleExceptionMessage() converts a enumerated exception severity and tag
 to a message in the current locale.</p>
@@ -162,12 +162,12 @@ to a message in the current locale.</p>
 </section>
 </section>
 <section id="magickerror">
-<h1><a class="toc-backref" href="#id32">MagickError</a></h1>
-<section id="id9">
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">MagickError</a></h1>
+<section id="synopsis-5">
 <h2>Synopsis</h2>
 <pre class="literal-block">void MagickError( const <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> error, const char *reason, const char *description );</pre>
 </section>
-<section id="id10">
+<section id="description-5">
 <h2>Description</h2>
 <p>Method MagickError calls the error handler methods with an error reason.</p>
 <p>The format of the MagickError method is:</p>
@@ -187,13 +187,13 @@ program.</p>
 </section>
 </section>
 <section id="magickfatalerror">
-<h1><a class="toc-backref" href="#id33">MagickFatalError</a></h1>
-<section id="id11">
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">MagickFatalError</a></h1>
+<section id="synopsis-6">
 <h2>Synopsis</h2>
 <pre class="literal-block">void MagickFatalError( const <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> error, const char *reason,
                        const char *description );</pre>
 </section>
-<section id="id12">
+<section id="description-6">
 <h2>Description</h2>
 <p>MagickFatalError() calls the fatal error handler methods with an error
 reason.  The fatal error handler is not expected to return!</p>
@@ -215,13 +215,13 @@ program.</p>
 </section>
 </section>
 <section id="magickwarning">
-<h1><a class="toc-backref" href="#id34">MagickWarning</a></h1>
-<section id="id13">
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">MagickWarning</a></h1>
+<section id="synopsis-7">
 <h2>Synopsis</h2>
 <pre class="literal-block">void MagickWarning( const <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> warning, const char *reason,
                     const char *description );</pre>
 </section>
-<section id="id14">
+<section id="description-7">
 <h2>Description</h2>
 <p>Method MagickWarning calls the warning handler methods with a warning
 reason.</p>
@@ -242,12 +242,12 @@ reason.</p>
 </section>
 </section>
 <section id="seterrorhandler">
-<h1><a class="toc-backref" href="#id35">SetErrorHandler</a></h1>
-<section id="id15">
+<h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">SetErrorHandler</a></h1>
+<section id="synopsis-8">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#errorhandler">ErrorHandler</a> SetErrorHandler( <a class="reference external" href="../api/types.html#errorhandler">ErrorHandler</a> handler );</pre>
 </section>
-<section id="id16">
+<section id="description-8">
 <h2>Description</h2>
 <p>SetErrorHandler() sets the error handler to the specified method
 and returns the previous error handler.</p>
@@ -262,12 +262,12 @@ and returns the previous error handler.</p>
 </section>
 </section>
 <section id="setexceptioninfo">
-<h1><a class="toc-backref" href="#id36">SetExceptionInfo</a></h1>
-<section id="id17">
+<h1><a class="toc-backref" href="#toc-entry-10" role="doc-backlink">SetExceptionInfo</a></h1>
+<section id="synopsis-9">
 <h2>Synopsis</h2>
 <pre class="literal-block">SetExceptionInfo( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception, <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> severity );</pre>
 </section>
-<section id="id18">
+<section id="description-9">
 <h2>Description</h2>
 <p>SetExceptionInfo() set the exception severity.</p>
 <p>The format of the SetExceptionInfo method is:</p>
@@ -284,12 +284,12 @@ and returns the previous error handler.</p>
 </section>
 </section>
 <section id="setfatalerrorhandler">
-<h1><a class="toc-backref" href="#id37">SetFatalErrorHandler</a></h1>
-<section id="id19">
+<h1><a class="toc-backref" href="#toc-entry-11" role="doc-backlink">SetFatalErrorHandler</a></h1>
+<section id="synopsis-10">
 <h2>Synopsis</h2>
 <pre class="literal-block">FatalErrorHandler SetFatalErrorHandler( FatalErrorHandler handler );</pre>
 </section>
-<section id="id20">
+<section id="description-10">
 <h2>Description</h2>
 <p>SetFatalErrorHandler() sets the fatal error handler to the specified method
 and returns the previous fatal error handler.</p>
@@ -304,12 +304,12 @@ and returns the previous fatal error handler.</p>
 </section>
 </section>
 <section id="setwarninghandler">
-<h1><a class="toc-backref" href="#id38">SetWarningHandler</a></h1>
-<section id="id21">
+<h1><a class="toc-backref" href="#toc-entry-12" role="doc-backlink">SetWarningHandler</a></h1>
+<section id="synopsis-11">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#errorhandler">ErrorHandler</a> SetWarningHandler( <a class="reference external" href="../api/types.html#errorhandler">ErrorHandler</a> handler );</pre>
 </section>
-<section id="id22">
+<section id="description-11">
 <h2>Description</h2>
 <p>SetWarningHandler() sets the warning handler to the specified method
 and returns the previous warning handler.</p>
@@ -324,13 +324,13 @@ and returns the previous warning handler.</p>
 </section>
 </section>
 <section id="throwexception">
-<h1><a class="toc-backref" href="#id39">ThrowException</a></h1>
-<section id="id23">
+<h1><a class="toc-backref" href="#toc-entry-13" role="doc-backlink">ThrowException</a></h1>
+<section id="synopsis-12">
 <h2>Synopsis</h2>
 <pre class="literal-block">void ThrowException( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception, const <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> severity,
                      const char *reason, const char *description );</pre>
 </section>
-<section id="id24">
+<section id="description-12">
 <h2>Description</h2>
 <p>ThrowException() throws an exception with the specified severity code,
 reason, and optional description.</p>
@@ -354,14 +354,14 @@ reason, and optional description.</p>
 </section>
 </section>
 <section id="throwloggedexception">
-<h1><a class="toc-backref" href="#id40">ThrowLoggedException</a></h1>
-<section id="id25">
+<h1><a class="toc-backref" href="#toc-entry-14" role="doc-backlink">ThrowLoggedException</a></h1>
+<section id="synopsis-13">
 <h2>Synopsis</h2>
 <pre class="literal-block">void ThrowLoggedException( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception, const <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> severity,
                            const char *reason, const char *description, const char *module,
                            const char *function, const unsigned long line ;</pre>
 </section>
-<section id="id26">
+<section id="description-13">
 <h2>Description</h2>
 <p>ThrowLoggedException() throws an exception with the specified severity code,
 reason, optional description, source filename, function name, and line
