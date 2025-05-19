@@ -176,7 +176,7 @@ def proto_pretty(line):
     line = re.sub(r'\) ',     ')',  line)
     line = re.sub(r' \* ',    ' *', line)
 
-    line = re.sub('^\s*',     '',   line)
+    line = re.sub(r'^\s*',     '',   line)
     return line
 
 
