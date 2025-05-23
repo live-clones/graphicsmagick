@@ -388,6 +388,9 @@
 /* Define to 1 if you have the <tiffconf.h> header file. */
 #undef HAVE_TIFFCONF_H
 
+/* Define to 1 if you have the `TIFFErrorExtR' function. */
+#undef HAVE_TIFFERROREXTR
+
 /* Define to 1 if you have the `TIFFIsCODECConfigured' function. */
 #undef HAVE_TIFFISCODECCONFIGURED
 
@@ -405,6 +408,9 @@
 
 /* Define to 1 if you have the `TIFFSwabArrayOfTriples' function. */
 #undef HAVE_TIFFSWABARRAYOFTRIPLES
+
+/* Define to 1 if you have the `TIFFWarningExtR' function. */
+#undef HAVE_TIFFWARNINGEXTR
 
 /* Define to 1 if you have the `times' function. */
 #undef HAVE_TIMES

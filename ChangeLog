@@ -1,3 +1,12 @@
+2025-05-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c: Add support for libtiff 4.5 TIFFWarningExtR() and
+	TIFFErrorExtR() in order to provide an error handling context per
+	TIFF handle.  This improves concurrency and thread safety when
+	multiple libraries are using libtiff within the same process.
+	Resolves SourceForge issue #753 "Support TIFFErrorExtR() in TIFF
+	coder".
+
 2025-05-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* scripts/format_c_api_doc.py (proto_pretty): Fix regular

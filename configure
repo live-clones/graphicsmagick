@@ -31603,7 +31603,19 @@ then :
 
 fi
 
-            ac_fn_c_check_func "$LINENO" "TIFFIsCODECConfigured" "ac_cv_func_TIFFIsCODECConfigured"
+            ac_fn_c_check_func "$LINENO" "TIFFErrorExtR" "ac_cv_func_TIFFErrorExtR"
+if test "x$ac_cv_func_TIFFErrorExtR" = xyes
+then :
+  printf "%s\n" "#define HAVE_TIFFERROREXTR 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "TIFFWarningExtR" "ac_cv_func_TIFFWarningExtR"
+if test "x$ac_cv_func_TIFFWarningExtR" = xyes
+then :
+  printf "%s\n" "#define HAVE_TIFFWARNINGEXTR 1" >>confdefs.h
+
+fi
+ac_fn_c_check_func "$LINENO" "TIFFIsCODECConfigured" "ac_cv_func_TIFFIsCODECConfigured"
 if test "x$ac_cv_func_TIFFIsCODECConfigured" = xyes
 then :
   printf "%s\n" "#define HAVE_TIFFISCODECCONFIGURED 1" >>confdefs.h

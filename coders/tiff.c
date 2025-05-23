@@ -935,13 +935,25 @@ TIFFCloseBlob(thandle_t image_handle)
 
 /* Report errors. */
 static void
-TIFFReadErrors(const char *module,const char *format,
+TIFFReadErrorsHandler(const char *module,const char *format,
                va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFReadErrorsHandlerExtR(TIFF *tif, void *user_data,
+                          const char *module, const char *format, va_list warning)
+  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 static void
-TIFFWriteErrors(const char *module,const char *format,
+TIFFWriteErrorsHandler(const char *module,const char *format,
                 va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFWriteErrorsHandlerExtR(TIFF *tif, void *user_data,
+                           const char *module, const char *format, va_list warning)
+  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 static void
-TIFFReadErrors(const char *module,const char *format,
+TIFFReadErrorsHandler(const char *module,const char *format,
   va_list warning)
 {
   ExceptionInfo
@@ -961,8 +973,37 @@ TIFFReadErrors(const char *module,const char *format,
   ThrowException2(tiff_exception,CorruptImageError,message,module);
 }
 
+#if defined(HAVE_TIFFERROREXTR)
+static int TIFFReadErrorsHandlerExtR(TIFF *tif, void *user_data,
+                                     const char *module, const char *format,
+                                     va_list warning)
+{
+  ExceptionInfo
+    *tiff_exception;
+
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+#define UNKNOWN_TAG_ERROR "Internal error, unknown tag"
+  if (LocaleNCompare(message,UNKNOWN_TAG_ERROR,sizeof(UNKNOWN_TAG_ERROR)-1) == 0)
+    return 0;
+  (void) strlcat(message,".",MaxTextExtent);
+  tiff_exception=(ExceptionInfo *) user_data;
+  ThrowException2(tiff_exception,CorruptImageError,message,module);
+  /*
+    0: both functions TIFFErrorHandler() and TIFFErrorHandlerExt() are called.
+    non-zero: no further error message function is called.
+  */
+  return 1;
+}
+#endif /* if defined(HAVE_TIFFERROREXTR) */
+
 static void
-TIFFWriteErrors(const char *module,const char *format,
+TIFFWriteErrorsHandler(const char *module,const char *format,
   va_list warning)
 {
   ExceptionInfo
@@ -978,6 +1019,33 @@ TIFFWriteErrors(const char *module,const char *format,
   tiff_exception=(ExceptionInfo *) MagickTsdGetSpecific(tsd_key);
   ThrowException2(tiff_exception,CoderError,message,module);
 }
+
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFWriteErrorsHandlerExtR(TIFF *tif, void *user_data,
+                           const char *module, const char *format, va_list warning)
+{
+  ExceptionInfo
+    *tiff_exception;
+
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+  (void) strlcat(message,".",MaxTextExtent);
+  tiff_exception=(ExceptionInfo *) user_data;
+  ThrowException2(tiff_exception,CoderError,message,module);
+
+  /*
+    0: both functions TIFFWarningHandler() and TIFFWarningHandlerExt() are called.
+    non-zero: no further warning message function is called.
+   */
+  return 1;
+}
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 
 /* Memory map entire input file in read-only mode. */
 static int
@@ -1096,6 +1164,68 @@ TIFFUnmapBlob(thandle_t image_handle,
   ARG_NOT_USED(size);
 #endif  /* LOG_TIFF_BLOB_IO */
 }
+
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
+                                  const char *module, const char *format, va_list warning)
+  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+static int TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
+                                             const char *module, const char *format,
+                                             va_list warning)
+{
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  (void) user_data;
+  (void) module;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+  (void) strlcat(message,".",MaxTextExtent);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "TIFF Warning: %s",message);
+  /*
+    0: both functions TIFFErrorHandler() and TIFFErrorHandlerExt() are called.
+    non-zero: no further error message function is called.
+  */
+  return 1;
+}
+
+static int
+TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
+                                         const char *module, const char *format, va_list warning)
+  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+static int TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
+                                                    const char *module, const char *format,
+                                                    va_list warning)
+{
+  ExceptionInfo
+    *tiff_exception;
+
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+#define UNKNOWN_TAG_ERROR "Internal error, unknown tag"
+  if (LocaleNCompare(message,UNKNOWN_TAG_ERROR,sizeof(UNKNOWN_TAG_ERROR)-1) == 0)
+    return 0;
+  (void) strlcat(message,".",MaxTextExtent);
+  tiff_exception=(ExceptionInfo *) user_data;
+  ThrowException2(tiff_exception,CoderWarning,message,module);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "TIFF Warning: %s",message);
+  /*
+    0: both functions TIFFWarningHandler() and then TIFFWarningHandlerExt() are called.
+    non-zero: no further error message function is called.
+  */
+  return 1;
+}
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 
 /* Report warnings as a coder log message. */
 static void
@@ -1933,20 +2063,41 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   file_size = GetBlobSize(image);
   (void) MagickTsdSetSpecific(tsd_key,(void *) exception);
-  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFReadErrors);
+
+  /*
+    Set global thread-specific reader errors and warnings handlers.
+  */
+  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFReadErrorsHandler);
   (void) TIFFSetWarningHandler((TIFFErrorHandler) (CheckThrowWarnings(image_info) ?
                                                    TIFFWarningsThrowException :
                                                    TIFFWarningsLogOnly));
   client_data.image=image;
   client_data.image_info=image_info;
-  tiff=TIFFClientOpen(image->filename,"rb",(thandle_t) &client_data,TIFFReadBlob,
+#if defined(HAVE_TIFFERROREXTR)
+  {
+    TIFFOpenOptions *open_options = TIFFOpenOptionsAlloc();
+    TIFFOpenOptionsSetErrorHandlerExtR(open_options, TIFFReadErrorsHandlerExtR, (void *) exception);
+    TIFFOpenOptionsSetWarningHandlerExtR(open_options,
+                                         (CheckThrowWarnings(image_info) ?
+                                          TIFFReadWarningHandlerExtRThrowException : TIFFReadWarningHandlerExtRLogOnly),
+                                         (void *) exception); /* FIXME */
+    tiff=TIFFClientOpenExt(image->filename,"rb",(thandle_t) &client_data,
+                           TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,TIFFCloseBlob,
+                           TIFFGetBlobSize,TIFFMapBlob,TIFFUnmapBlob,
+                           open_options);
+    TIFFOpenOptionsFree(open_options);
+  }
+#else
+  tiff=TIFFClientOpen(image->filename,"rb",(thandle_t) &client_data,
+                      TIFFReadBlob,
                       TIFFWriteBlob,TIFFSeekBlob,TIFFCloseBlob,
                       TIFFGetBlobSize,TIFFMapBlob,TIFFUnmapBlob);
+#endif /* if defined(HAVE_TIFFERROREXTR) */
   if (tiff == (TIFF *) NULL)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
 
   /*
-    Report error if error was reported via TIFFReadErrors() while in
+    Report error if error was reported via TIFFReadErrorsHandler() while in
     TIFFClientOpen().
   */
   if (exception->severity > ErrorException)
@@ -2411,9 +2562,16 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
              { TIFFTAG_MODEL, "model" },
              { TIFFTAG_PAGENAME, "label" },
              { TIFFTAG_SOFTWARE, "software" },
-             { TIFFTAG_OPIIMAGEID, "imageid" }, /* Causes TIFFFieldWithTag() to return NULL */
+#if 1
+             /*
+               These three cause TIFFFieldWithTag() to return NULL and
+               therefore produce "TIFF Warning: Warning, unknown tag" exceptions
+               while reading!
+              */
+             { TIFFTAG_OPIIMAGEID, "imageid" },
              { 33423, "kodak-33423" },
              { 36867, "kodak-36867" }
+#endif
             };
 
         for (i = 0; i < ArraySize(text_tags); i++)
@@ -4213,7 +4371,7 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
     }
 
   (void) MagickTsdSetSpecific(tsd_key,(void *) (&image->exception));
-  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrors);
+  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrorsHandler);
   (void) TIFFSetWarningHandler((TIFFErrorHandler) (CheckThrowWarnings(image_info) ?
                                                    TIFFWarningsThrowException :
                                                    TIFFWarningsLogOnly));
@@ -5044,7 +5202,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
   if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   (void) MagickTsdSetSpecific(tsd_key,(void *) (&image->exception));
-  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrors);
+  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrorsHandler);
   (void) TIFFSetWarningHandler((TIFFErrorHandler) (CheckThrowWarnings(image_info) ?
                                                    TIFFWarningsThrowException :
                                                    TIFFWarningsLogOnly));
@@ -5100,10 +5258,26 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                           filename,open_flags);
   client_data.image=image;
   client_data.image_info=image_info;
-  tiff=TIFFClientOpen(filename,open_flags,(thandle_t) &client_data,
-                      TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,
-                      TIFFCloseBlob,TIFFGetBlobSize,TIFFMapBlob,
-                      TIFFUnmapBlob);
+#if defined(HAVE_TIFFERROREXTR)
+  {
+    TIFFOpenOptions *open_options = TIFFOpenOptionsAlloc();
+    TIFFOpenOptionsSetErrorHandlerExtR(open_options, TIFFWriteErrorsHandlerExtR, (void *) &image->exception);
+    TIFFOpenOptionsSetWarningHandlerExtR(open_options, TIFFWriteErrorsHandlerExtR, (void *) &image->exception); /* FIXME */
+    tiff=TIFFClientOpenExt(filename,open_flags,(thandle_t) &client_data,
+                           TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,
+                           TIFFCloseBlob,TIFFGetBlobSize,TIFFMapBlob,
+                           TIFFUnmapBlob,
+                           open_options);
+    TIFFOpenOptionsFree(open_options);
+  }
+#else
+  {
+    tiff=TIFFClientOpen(filename,open_flags,(thandle_t) &client_data,
+                        TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,
+                        TIFFCloseBlob,TIFFGetBlobSize,TIFFMapBlob,
+                        TIFFUnmapBlob);
+  }
+#endif /* if defined(HAVE_TIFFERROREXTR) */
   if (tiff == (TIFF *) NULL)
     {
       if (GetBlobIsOpen(image))
