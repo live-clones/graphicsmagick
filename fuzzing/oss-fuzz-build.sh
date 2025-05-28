@@ -177,7 +177,7 @@ printf "=== Building ${SRC}/libpng...\n"
 if $enable_png
 then
     pushd "$SRC/libpng"
-    #autoreconf -fiv
+    autoreconf -fiv
     ./configure \
         --prefix="$WORK" \
         --disable-shared \

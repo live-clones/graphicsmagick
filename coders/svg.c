@@ -166,13 +166,6 @@ typedef struct _SVGInfo
     idLevelInsideDefs,  /* when an "id" is seen, remember svg->n (SVG element level) */
     svgPushCount;       /* for tracking nested <svg> elements */
 
-#if defined(HasXML)
-  xmlParserCtxtPtr
-    parser;
-
-  xmlDocPtr
-    document;
-#endif
 } SVGInfo;
 
 /*
@@ -486,57 +479,6 @@ static char **GetTransformTokens(void *context,const char *text,
 extern "C" {
 #endif
 
-  static int SVGIsStandalone(void *context);
-
-  static int SVGIsStandalone(void *context);
-
-#if defined(ENABLE_XML_INTERNAL_SUBSET)
-  static int SVGHasInternalSubset(void *context);
-#endif /* ENABLE_XML_INTERNAL_SUBSET */
-
-  static int SVGHasExternalSubset(void *context);
-
-#if defined(ENABLE_XML_INTERNAL_SUBSET)
-  static void SVGInternalSubset(void *context,const xmlChar *name,
-                                const xmlChar *external_id,
-                                const xmlChar *system_id);
-#endif /* ENABLE_XML_INTERNAL_SUBSET */
-
-  static xmlParserInputPtr SVGResolveEntity(void *context,
-                                            const xmlChar *public_id,
-                                            const xmlChar *system_id);
-
-  static xmlEntityPtr SVGGetEntity(void *context,const xmlChar *name);
-
-  static xmlEntityPtr SVGGetParameterEntity(void *context,const xmlChar *name);
-
-  static void SVGEntityDeclaration(void *context,const xmlChar *name,int type,
-                                   const xmlChar *public_id,
-                                   const xmlChar *system_id,xmlChar *content);
-
-  static void SVGAttributeDeclaration(void *context,const xmlChar *element,
-                                      const xmlChar *name,int type,int value,
-                                      const xmlChar *default_value,
-                                      xmlEnumerationPtr tree);
-
-  static void SVGElementDeclaration(void *context,const xmlChar *name,int type,
-                                    xmlElementContentPtr content);
-
-  static void SVGNotationDeclaration(void *context,const xmlChar *name,
-                                     const xmlChar *public_id,
-                                     const xmlChar *system_id);
-
-  static void SVGUnparsedEntityDeclaration(void *context,const xmlChar *name,
-                                           const xmlChar *public_id,
-                                           const xmlChar *system_id,
-                                           const xmlChar *notation);
-
-  static void SVGSetDocumentLocator(void *context,
-                                    xmlSAXLocatorPtr location);
-
-  static void SVGStartDocument(void *context);
-
-  static void SVGEndDocument(void *context);
 
   static void SVGStartElement(void *context,const xmlChar *name,
                               const xmlChar **attributes);
@@ -545,24 +487,7 @@ extern "C" {
 
   static void SVGCharacters(void *context,const xmlChar *c,int length);
 
-  static void SVGReference(void *context,const xmlChar *name);
-
-  static void SVGIgnorableWhitespace(void *context,const xmlChar *c,int length);
-
-  static void SVGProcessingInstructions(void *context,const xmlChar *target,
-                                        const xmlChar *data);
-
-  static void SVGComment(void *context,const xmlChar *value);
-
   static void SVGWarning(void *context,const char *format,...);
-
-  static void SVGError(void *context,const char *format,...);
-
-  static void SVGCDataBlock(void *context,const xmlChar *value,int length);
-
-  static void SVGExternalSubset(void *context,const xmlChar *name,
-                                const xmlChar *external_id,
-                                const xmlChar *system_id);
 
   ModuleExport void RegisterSVGImage(void);
 
@@ -573,349 +498,7 @@ extern "C" {
 #endif
 
 
-static int
-SVGIsStandalone(void *context)
-{
-  SVGInfo
-    *svg_info;
 
-  /*
-    Is this document tagged standalone?
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.SVGIsStandalone()");
-  svg_info=(SVGInfo *) context;
-  return(svg_info->document->standalone == 1);
-}
-
-#if defined(ENABLE_XML_INTERNAL_SUBSET) && ENABLE_XML_INTERNAL_SUBSET
-static int
-SVGHasInternalSubset(void *context)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    Does this document has an internal subset?
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.SVGHasInternalSubset()");
-  svg_info=(SVGInfo *) context;
-  return(svg_info->document->intSubset != NULL);
-}
-#endif /* ENABLE_XML_INTERNAL_SUBSET */
-
-static int
-SVGHasExternalSubset(void *context)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    Does this document has an external subset?
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.SVGHasExternalSubset()");
-  svg_info=(SVGInfo *) context;
-  return(svg_info->document->extSubset != NULL);
-}
-
-#if defined(ENABLE_XML_INTERNAL_SUBSET) && ENABLE_XML_INTERNAL_SUBSET
-/* FIXME: Parser context allocation/handling is apparently wrong for internal subset */
-static void
-SVGInternalSubset(void *context,const xmlChar *name,
-                  const xmlChar *external_id,const xmlChar *system_id)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    Create an internal subset (svg_info->document->intSubset)
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.internalSubset(%.1024s, %.1024s, %.1024s)",(char *) name,
-                        (external_id != (const xmlChar *) NULL ? (char *) external_id : "none"),
-                        (system_id != (const xmlChar *) NULL ? (char *) system_id : "none"));
-  svg_info=(SVGInfo *) context;
-  (void) xmlCreateIntSubset(svg_info->document,name,external_id,system_id);
-}
-#endif /* ENABLE_XML_INTERNAL_SUBSET */
-
-static xmlParserInputPtr
-SVGResolveEntity(void *context,
-                 const xmlChar *public_id,const xmlChar *system_id)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlParserInputPtr
-    stream;
-
-  /*
-    Special entity resolver, better left to the parser, it has more
-    context than the application layer.  The default behaviour is to
-    not resolve the entities, in that case the ENTITY_REF nodes are
-    built in the structure (and the parameter values).
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.resolveEntity(%.1024s, %.1024s)",
-                        (public_id != (const xmlChar *) NULL ? (char *) public_id : "none"),
-                        (system_id != (const xmlChar *) NULL ? (char *) system_id : "none"));
-  svg_info=(SVGInfo *) context;
-  stream=xmlLoadExternalEntity((const char *) system_id,(const char *)
-                               public_id,svg_info->parser);
-  return(stream);
-}
-
-static xmlEntityPtr
-SVGGetEntity(void *context,const xmlChar *name)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    Get an entity by name.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.SVGGetEntity(%.1024s)",name);
-  svg_info=(SVGInfo *) context;
-  return(xmlGetDocEntity(svg_info->document,name));
-}
-
-static xmlEntityPtr
-SVGGetParameterEntity(void *context,const xmlChar *name)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    Get a parameter entity by name.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.getParameterEntity(%.1024s)",name);
-  svg_info=(SVGInfo *) context;
-  return(xmlGetParameterEntity(svg_info->document,name));
-}
-
-static void
-SVGEntityDeclaration(void *context,const xmlChar *name,int type,
-                     const xmlChar *public_id,const xmlChar *system_id,xmlChar *content)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    An entity definition has been parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.entityDecl(%.1024s, %d, %.1024s, %.1024s, %.1024s)",name,type,
-                        public_id != (xmlChar *) NULL ? (char *) public_id : "none",
-                        system_id != (xmlChar *) NULL ? (char *) system_id : "none",content);
-  svg_info=(SVGInfo *) context;
-  if (svg_info->parser->inSubset == 1)
-    {
-      if (xmlAddDocEntity(svg_info->document,name,type,public_id,system_id,
-                          content) == (xmlEntityPtr) NULL)
-        SVGError(context, "SAX.entityDecl: xmlAddDocEntity() returned NULL!");
-    }
-  else
-    {
-      if (svg_info->parser->inSubset == 2)
-        {
-          if (xmlAddDtdEntity(svg_info->document,name,type,public_id,system_id,
-                              content) == (xmlEntityPtr) NULL)
-            SVGError(context, "SAX.entityDecl: xmlAddDtdEntity() returned NULL!");
-        }
-    }
-}
-
-static void
-SVGAttributeDeclaration(void *context,const xmlChar *element,
-                        const xmlChar *name,int type,int value,const xmlChar *default_value,
-                        xmlEnumerationPtr tree)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlChar
-    *fullname,
-    *prefix;
-
-  xmlParserCtxtPtr
-    parser;
-
-  /*
-    An attribute definition has been parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.attributeDecl(%.1024s, %.1024s, %d, %d, %.1024s, ...)",element,
-                        name,type,value,default_value);
-  svg_info=(SVGInfo *) context;
-  fullname=(xmlChar *) NULL;
-  prefix=(xmlChar *) NULL;
-  parser=svg_info->parser;
-  fullname=(xmlChar *) xmlSplitQName(parser,name,&prefix);
-  if (parser->inSubset == 1)
-    (void) xmlAddAttributeDecl(&parser->vctxt,svg_info->document->intSubset,
-                               element,fullname,prefix,(xmlAttributeType) type,
-                               (xmlAttributeDefault) value,default_value,tree);
-  else
-    if (parser->inSubset == 2)
-      (void) xmlAddAttributeDecl(&parser->vctxt,svg_info->document->extSubset,
-                                 element,fullname,prefix,(xmlAttributeType) type,
-                                 (xmlAttributeDefault) value,default_value,tree);
-  if (prefix != (xmlChar *) NULL)
-    xmlFree(prefix);
-  if (fullname != (xmlChar *) NULL)
-    xmlFree(fullname);
-}
-
-static void
-SVGElementDeclaration(void *context,const xmlChar *name,int type,
-                      xmlElementContentPtr content)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlParserCtxtPtr
-    parser;
-
-  /*
-    An element definition has been parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.elementDecl(%.1024s, %d, ...)",name,type);
-  svg_info=(SVGInfo *) context;
-  parser=svg_info->parser;
-  if (parser->inSubset == 1)
-    (void) xmlAddElementDecl(&parser->vctxt,svg_info->document->intSubset,
-                             name,(xmlElementTypeVal) type,content);
-  else
-    if (parser->inSubset == 2)
-      (void) xmlAddElementDecl(&parser->vctxt,svg_info->document->extSubset,
-                               name,(xmlElementTypeVal) type,content);
-}
-
-static void
-SVGNotationDeclaration(void *context,const xmlChar *name,
-                       const xmlChar *public_id,const xmlChar *system_id)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlParserCtxtPtr
-    parser;
-
-  /*
-    What to do when a notation declaration has been parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.notationDecl(%.1024s, %.1024s, %.1024s)",name,
-                        public_id != (const xmlChar *) NULL ? (char *) public_id : "none",
-                        system_id != (const xmlChar *) NULL ? (char *) system_id : "none");
-  svg_info=(SVGInfo *) context;
-  parser=svg_info->parser;
-  if (parser->inSubset == 1)
-    (void) xmlAddNotationDecl(&parser->vctxt,svg_info->document->intSubset,
-                              name,public_id,system_id);
-  else
-    if (parser->inSubset == 2)
-      (void) xmlAddNotationDecl(&parser->vctxt,svg_info->document->intSubset,
-                                name,public_id,system_id);
-}
-
-static void
-SVGUnparsedEntityDeclaration(void *context,const xmlChar *name,
-                             const xmlChar *public_id,const xmlChar *system_id,
-                             const xmlChar *notation)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    What to do when an unparsed entity declaration is parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.unparsedEntityDecl(%.1024s, %.1024s, %.1024s, %.1024s)",name,
-                        public_id != (xmlChar *) NULL ? (char *) public_id : "none",
-                        system_id != (xmlChar *) NULL ? (char *) system_id : "none",notation);
-  svg_info=(SVGInfo *) context;
-  (void) xmlAddDocEntity(svg_info->document,name,
-                         XML_EXTERNAL_GENERAL_UNPARSED_ENTITY,public_id,system_id,notation);
-
-}
-
-static void
-SVGSetDocumentLocator(void *context,
-                      xmlSAXLocatorPtr location)
-{
-  /*   SVGInfo */
-  /*     *svg_info; */
-
-  ARG_NOT_USED(context);
-  ARG_NOT_USED(location);
-  /*
-    Receive the document locator at startup, actually xmlDefaultSAXLocator.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.setDocumentLocator()");
-  /*   svg_info=(SVGInfo *) context; */
-}
-
-static void
-SVGStartDocument(void *context)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlParserCtxtPtr
-    parser;
-
-  /*
-    Called when the document start being processed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.startDocument()");
-  svg_info=(SVGInfo *) context;
-  DestroyExceptionInfo(svg_info->exception);
-  GetExceptionInfo(svg_info->exception);
-  parser=svg_info->parser;
-  svg_info->document=xmlNewDoc(parser->version);
-  if (svg_info->document == (xmlDocPtr) NULL)
-    return;
-  if (parser->encoding == NULL)
-    svg_info->document->encoding=(const xmlChar *) NULL;
-  else
-    svg_info->document->encoding=xmlStrdup(parser->encoding);
-  svg_info->document->standalone=parser->standalone;
-}
-
-static void
-SVGEndDocument(void *context)
-{
-  SVGInfo
-    *svg_info;
-
-  /*
-    Called when the document end has been detected.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.endDocument()");
-  svg_info=(SVGInfo *) context;
-  MagickFreeMemory(svg_info->size);
-  MagickFreeMemory(svg_info->title);
-  MagickFreeResourceLimitedMemory(svg_info->comment);
-  MagickFreeMemory(svg_info->scale);
-  MagickFreeMemory(svg_info->stop_color);
-  MagickFreeMemory(svg_info->offset);
-  MagickFreeResourceLimitedMemory(svg_info->text);
-  MagickFreeMemory(svg_info->vertices);
-  MagickFreeMemory(svg_info->url);
-
-  /* Don't free xmlParserCtxtPtr parser which is used later */
-
-  if (svg_info->document != (xmlDocPtr) NULL)
-    {
-      xmlFreeDoc(svg_info->document);
-      svg_info->document=(xmlDocPtr) NULL;
-    }
-}
 
 
 /*
@@ -1130,6 +713,9 @@ SVGStartElement(void *context,const xmlChar *name,
   SVGInfo
     *svg_info;
 
+  xmlParserCtxtPtr
+    parser;
+
   size_t
     i,
     j;
@@ -1148,7 +734,8 @@ SVGStartElement(void *context,const xmlChar *name,
                         "  SAX.startElement(%.1024s",name);
   id[0]='\0';
   token[0]='\0';
-  svg_info=(SVGInfo *) context;
+  parser=(xmlParserCtxtPtr) context;
+  svg_info=(SVGInfo *) parser->_private;
   svg_info->n++;
   MagickReallocMemory(double *,svg_info->scale,MagickArraySize((size_t)svg_info->n+1,sizeof(double)));
   if (svg_info->scale == (double *) NULL)
@@ -2637,9 +2224,9 @@ SVGStartElement(void *context,const xmlChar *name,
 #ifdef BROKEN_SIZE_OPTION
   if (LocaleCompare((char *) name,"svg") == 0)
     {
-      if (svg_info->document->encoding != (const xmlChar *) NULL)
+      if (parser->encoding != (const xmlChar *) NULL)
         MVGPrintf(svg_info->file,"encoding %.1024s\n",
-                  (char *) svg_info->document->encoding);
+                  (const char *) parser->encoding);
       if (attributes != (const xmlChar **) NULL)
         {
           double
@@ -2678,9 +2265,9 @@ SVGStartElement(void *context,const xmlChar *name,
 #else
   if (LocaleCompare((char *) name,"svg") == 0)
     {
-      if (svg_info->document->encoding != (const xmlChar *) NULL)
-        (void) fprintf(svg_info->file,"encoding %.1024s\n",
-                       (char *) svg_info->document->encoding);
+      /* if (svg_info->document->encoding != (const xmlChar *) NULL) */
+      /*   (void) fprintf(svg_info->file,"encoding %.1024s\n", */
+      /*                  (char *) svg_info->document->encoding); */
       if (attributes != (const xmlChar **) NULL)
         {
           char
@@ -3248,12 +2835,16 @@ SVGEndElement(void *context,const xmlChar *name)
   SVGInfo
     *svg_info;
 
+  xmlParserCtxtPtr
+    parser;
+
   /*
     Called when the end of an element has been detected.
   */
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "  SAX.endElement(%.1024s)",name);
-  svg_info=(SVGInfo *) context;
+  parser=(xmlParserCtxtPtr) context;
+  svg_info=(SVGInfo *) parser->_private;
   if (strchr((char *) name,':') != (char *) NULL)
     {
       /*
@@ -3632,6 +3223,9 @@ SVGCharacters(void *context,const xmlChar *c,int length)
   SVGInfo
     *svg_info;
 
+  xmlParserCtxtPtr
+    parser;
+
   char
     *p;
 
@@ -3650,7 +3244,8 @@ SVGCharacters(void *context,const xmlChar *c,int length)
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "  SAX.characters(%.1024s,%d)",c,length);
 
-  svg_info=(SVGInfo *) context;
+  parser=(xmlParserCtxtPtr) context;
+  svg_info=(SVGInfo *) parser->_private;
 
   new_text_len = svg_info->text_len+length;
   new_text = MagickReallocateResourceLimitedMemory(char *,svg_info->text,new_text_len+1);
@@ -3674,68 +3269,13 @@ SVGCharacters(void *context,const xmlChar *c,int length)
 }
 
 static void
-SVGReference(void *context,const xmlChar *name)
+SVGComment(void *context,const xmlChar *value)
 {
   SVGInfo
     *svg_info;
 
   xmlParserCtxtPtr
     parser;
-
-  /*
-    Called when an entity reference is detected.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.reference(%.1024s)",name);
-  svg_info=(SVGInfo *) context;
-  parser=svg_info->parser;
-  if (parser == (xmlParserCtxtPtr) NULL)
-    return;
-  if (parser->node == (xmlNodePtr) NULL)
-    return;
-  if (*name == '#')
-    (void) xmlAddChild(parser->node,xmlNewCharRef(svg_info->document,name));
-  else
-    (void) xmlAddChild(parser->node,xmlNewReference(svg_info->document,name));
-}
-
-static void
-SVGIgnorableWhitespace(void *context,const xmlChar *c,int length)
-{
-  /*   SVGInfo */
-  /*     *svg_info; */
-
-  ARG_NOT_USED(context);
-  /*
-    Receiving some ignorable whitespaces from the parser.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.ignorableWhitespace(%.30s, %d)",c,length);
-  /*   svg_info=(SVGInfo *) context; */
-}
-
-static void
-SVGProcessingInstructions(void *context,const xmlChar *target,
-                                      const xmlChar *data)
-{
-  /*   SVGInfo */
-  /*     *svg_info; */
-
-  ARG_NOT_USED(context);
-  /*
-    A processing instruction has been parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.processingInstruction(%.1024s, %.1024s)",
-                        target,data);
-  /*   svg_info=(SVGInfo *) context; */
-}
-
-static void
-SVGComment(void *context,const xmlChar *value)
-{
-  SVGInfo
-    *svg_info;
 
   char
     *p;
@@ -3755,7 +3295,8 @@ SVGComment(void *context,const xmlChar *value)
   */
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "  SAX.comment(%.1024s)",value);
-  svg_info=(SVGInfo *) context;
+  parser=(xmlParserCtxtPtr) context;
+  svg_info=(SVGInfo *) parser->_private;
   /*
     Old way concatenated all comments like this:
   if (svg_info->comment != (char *) NULL)
@@ -3809,6 +3350,9 @@ SVGWarning(void *context,const char *format,...)
   SVGInfo
     *svg_info;
 
+  xmlParserCtxtPtr
+    parser;
+
   va_list
     operands;
 
@@ -3817,7 +3361,8 @@ SVGWarning(void *context,const char *format,...)
      extra parameters.
   */
   va_start(operands,format);
-  svg_info=(SVGInfo *) context;
+  parser=(xmlParserCtxtPtr) context;
+  svg_info=(SVGInfo *) parser->_private;
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.warning: ");
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
 #if !defined(HAVE_VSNPRINTF)
@@ -3841,6 +3386,9 @@ SVGError(void *context,const char *format,...)
   SVGInfo
     *svg_info;
 
+  xmlParserCtxtPtr
+    parser;
+
   va_list
     operands;
 
@@ -3849,7 +3397,8 @@ SVGError(void *context,const char *format,...)
     extra parameters.
   */
   va_start(operands,format);
-  svg_info=(SVGInfo *) context;
+  parser=(xmlParserCtxtPtr) context;
+  svg_info=(SVGInfo *) parser->_private;
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.error: ");
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
 #if !defined(HAVE_VSNPRINTF)
@@ -3859,113 +3408,12 @@ SVGError(void *context,const char *format,...)
 #endif
   ThrowException2(svg_info->exception,CoderError,reason,(char *) NULL);
   va_end(operands);
-  xmlStopParser(svg_info->parser);
-}
-
-static void
-SVGCDataBlock(void *context,const xmlChar *value,int length)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlNodePtr
-    child;
-
-  xmlParserCtxtPtr
-    parser;
-
-  /*
-    Called when a pcdata block has been parsed.
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.pcdata(%.1024s, %d)",value,length);
-  svg_info=(SVGInfo *) context;
-  parser=svg_info->parser;
-  child=xmlGetLastChild(parser->node);
-  if ((child != (xmlNodePtr) NULL) && (child->type == XML_CDATA_SECTION_NODE))
-    {
-      (void) xmlTextConcat(child,value,length);
-      return;
-    }
-  /* Create a new node containing a CDATA block. */
-  /* FIXME: parser->myDoc is null so add fails.  What do do? */
-  child=xmlNewCDataBlock(parser->myDoc,value,length);
-  if (xmlAddChild(parser->node,child) == (xmlNodePtr) NULL)
-    xmlFreeNode(child);
-}
-
-static void
-SVGExternalSubset(void *context,const xmlChar *name,
-                  const xmlChar *external_id,const xmlChar *system_id)
-{
-  SVGInfo
-    *svg_info;
-
-  xmlParserCtxt
-    parser_context;
-
-  xmlParserCtxtPtr
-    parser;
-
-  xmlParserInputPtr
-    input;
-
-  /*
-    Does this document has an external subset?
-  */
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "  SAX.externalSubset(%.1024s, %.1024s, %.1024s)",name,
-                        (external_id != (const xmlChar *) NULL ? (char *) external_id : "none"),
-                        (system_id != (const xmlChar *) NULL ? (char *) system_id : "none"));
-  svg_info=(SVGInfo *) context;
-  parser=svg_info->parser;
-  if (((external_id == NULL) && (system_id == NULL)) ||
-      (!parser->validate || !parser->wellFormed || !svg_info->document))
-    return;
-  input=SVGResolveEntity(context,external_id,system_id);
-  if (input == NULL)
-    return;
-  (void) xmlNewDtd(svg_info->document,name,external_id,system_id);
-  parser_context=(*parser);
-  parser->inputTab=(xmlParserInputPtr *) xmlMalloc(5*sizeof(*parser->inputTab));
-  if (parser->inputTab == (xmlParserInputPtr *) NULL)
-    {
-      parser->errNo=XML_ERR_NO_MEMORY;
-      parser->input=parser_context.input;
-      parser->inputNr=parser_context.inputNr;
-      parser->inputMax=parser_context.inputMax;
-      parser->inputTab=parser_context.inputTab;
-      return;
-    }
-  parser->inputNr=0;
-  parser->inputMax=5;
-  parser->input=NULL;
-  xmlPushInput(parser,input);
-  (void) xmlSwitchEncoding(parser,xmlDetectCharEncoding(parser->input->cur,4));
-  if (input->filename == (char *) NULL)
-    input->filename=(char *) xmlStrdup(system_id);
-  input->line=1;
-  input->col=1;
-  input->base=parser->input->cur;
-  input->cur=parser->input->cur;
-  input->free=NULL;
-  xmlParseExternalSubset(parser,external_id,system_id);
-  while (parser->inputNr > 1)
-    (void) xmlPopInput(parser);
-  xmlFreeInputStream(parser->input);
-  xmlFree(parser->inputTab);
-  parser->input=parser_context.input;
-  parser->inputNr=parser_context.inputNr;
-  parser->inputMax=parser_context.inputMax;
-  parser->inputTab=parser_context.inputTab;
+  xmlStopParser(parser);
 }
 
 static Image *
 ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
-  xmlSAXHandler
-    SAXModules;
-
   char
     filename[MaxTextExtent],
     geometry[MaxTextExtent],
@@ -3978,7 +3426,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
     *image;
 
   size_t
-    n;
+    n = 0;
 
   SVGInfo
     svg_info;
@@ -3986,13 +3434,23 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   unsigned int
     status;
 
+  xmlSAXHandler
+    SAXModules;
+
   xmlSAXHandlerPtr
     SAXHandler;
+
+  xmlParserCtxtPtr
+    parser;
 
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
   assert(exception != (ExceptionInfo *) NULL);
   assert(exception->signature == MagickSignature);
+
+  filename[0] = '\0';
+  geometry[0] = '\0';
+  message[0] = '\0';
 
   /*
     Libxml initialization.  We call it here since initialization can
@@ -4071,64 +3529,42 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (image_info->size != (char *) NULL)
     (void) CloneString(&svg_info.size,image_info->size);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"begin SAX");
+
   /*
-    xmlSubstituteEntitiesDefault(1) enables external ENTITY support
-    (e.g. SVGResolveEntity() which allows XML to be loaded from an
-    external source (url or local file).  This may be a security
-    hazard if the input is not trustworthy or if connecting to the
-    correct source is not assured. If the XML is parsed on the
-    backside of a firewall then it may be able to access unintended
-    resources.
-
-    See "https://www.w3.org/TR/SVG11/svgdtd.html#DTD.1.16".
-
-    FIXME: Do we need a way for the user to enable this?  Does
-    retrieval of external entities work at all?
+    TODO: Upgrade to SAX version 2 (startElementNs/endElementNs)
   */
-  (void) xmlSubstituteEntitiesDefault(0); /* deprecated */
-
-  (void) memset(&SAXModules,0,sizeof(SAXModules));
-#if defined(ENABLE_XML_INTERNAL_SUBSET) && ENABLE_XML_INTERNAL_SUBSET
-  SAXModules.internalSubset=SVGInternalSubset;
-#endif /* ENABLE_XML_INTERNAL_SUBSET */
-  SAXModules.isStandalone=SVGIsStandalone;
-#if defined(ENABLE_XML_INTERNAL_SUBSET) && ENABLE_XML_INTERNAL_SUBSET
-  SAXModules.hasInternalSubset=SVGHasInternalSubset;
-#endif /* ENABLE_XML_INTERNAL_SUBSET */
-  SAXModules.hasExternalSubset=SVGHasExternalSubset;
-  SAXModules.resolveEntity=SVGResolveEntity;
-  SAXModules.getEntity=SVGGetEntity;
-  SAXModules.entityDecl=SVGEntityDeclaration;
-  SAXModules.notationDecl=SVGNotationDeclaration;
-  SAXModules.attributeDecl=SVGAttributeDeclaration;
-  SAXModules.elementDecl=SVGElementDeclaration;
-  SAXModules.unparsedEntityDecl=SVGUnparsedEntityDeclaration;
-  SAXModules.setDocumentLocator=SVGSetDocumentLocator;
-  SAXModules.startDocument=SVGStartDocument;
-  SAXModules.endDocument=SVGEndDocument;
+  xmlSAXVersion(&SAXModules,1);
   SAXModules.startElement=SVGStartElement;
   SAXModules.endElement=SVGEndElement;
-  SAXModules.reference=SVGReference;
+  SAXModules.reference=(referenceSAXFunc) NULL;
   SAXModules.characters=SVGCharacters;
-  SAXModules.ignorableWhitespace=SVGIgnorableWhitespace;
-  SAXModules.processingInstruction=SVGProcessingInstructions;
+  SAXModules.ignorableWhitespace=(ignorableWhitespaceSAXFunc) NULL;
+  SAXModules.processingInstruction=(processingInstructionSAXFunc) NULL;
   SAXModules.comment=SVGComment;
   SAXModules.warning=SVGWarning;
   SAXModules.error=SVGError;
   SAXModules.fatalError=SVGError;
-  SAXModules.getParameterEntity=SVGGetParameterEntity;
-  SAXModules.cdataBlock=SVGCDataBlock;
-  SAXModules.externalSubset=SVGExternalSubset;
+  SAXModules.cdataBlock=SVGCharacters;
 
   SAXHandler=(&SAXModules);
-  svg_info.parser=xmlCreatePushParserCtxt(SAXHandler,&svg_info,(char *) NULL,0,
-                                          image->filename);
-  if (svg_info.parser == (xmlParserCtxtPtr) NULL)
+  parser=(xmlParserCtxtPtr) NULL;
+
+  /*
+    https://gnome.pages.gitlab.gnome.org/libxml2/html/parser_8h.html#xmlCreatePushParserCtxt
+  */
+  parser=xmlCreatePushParserCtxt(SAXHandler, /* a SAX handler (optional) */
+                                 (void *) NULL, /* user data for SAX callbacks (optional)  */
+                                 (void *) NULL, /* initial chunk (optional, deprecated)  */
+                                 0, /* size of initial chunk in bytes  */
+                                 image->filename /* file name or URI (optional)  */
+                                 );
+
+  if (parser == (xmlParserCtxtPtr) NULL)
     {
       ThrowException(exception,DrawError,UnableToDrawOnImage,
                      "Failed to push XML parser context");
     }
-  if (svg_info.parser != (xmlParserCtxtPtr) NULL)
+  if (parser != (xmlParserCtxtPtr) NULL)
     {
       /*
         Enable substituting entity values in the output.
@@ -4141,41 +3577,43 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
         backside of a firewall then it may be able to access unintended
         resources.
 
-         See "https://www.w3.org/TR/SVG11/svgdtd.html#DTD.1.16".
+        See "https://www.w3.org/TR/SVG11/svgdtd.html#DTD.1.16".
 
-         https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html#xmlParserOption
-         https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html#XML_PARSE_NOENT
+        https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html#xmlParserOption
+        https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html#XML_PARSE_NOENT
 
-         (void) xmlCtxtUseOptions(svg_info.parser,XML_PARSE_NOENT);
+        (void) xmlCtxtUseOptions(svg_info.parser,XML_PARSE_NOENT);
       */
       /*
         Disable network access via XML_PARSE_NONET
         (void) xmlCtxtUseOptions(svg_info.parser,XML_PARSE_NONET);
       */
 
+      parser->_private=(SVGInfo *) &svg_info;
       while ((n=ReadBlob(image,MaxTextExtent-1,message)) != 0)
         {
           message[n]='\0';
-          status=xmlParseChunk(svg_info.parser,message,(int) n,False);
+          status=xmlParseChunk(parser,message,(int) n,False);
           if (status != 0)
             break;
         }
-      (void) xmlParseChunk(svg_info.parser,message,0,True);
+      (void) xmlParseChunk(parser,message,0,True);
       /*
         Assure that our private context is freed, even if we abort before
         seeing the document end.
       */
-      SVGEndDocument(&svg_info);
-      if (svg_info.parser->myDoc != (xmlDocPtr) NULL)
+      /* SVGEndDocument(&svg_info); FIXME */
+      if (parser->myDoc != (xmlDocPtr) NULL)
         {
-          xmlFreeDoc(svg_info.parser->myDoc);
-          svg_info.parser->myDoc = (xmlDocPtr) NULL;
+          xmlFreeDoc(parser->myDoc);
+          parser->myDoc = (xmlDocPtr) NULL;
         }
       /*
         Free all the memory used by a parser context. However the parsed
         document in ctxt->myDoc is not freed (so we just did that).
       */
-      xmlFreeParserCtxt(svg_info.parser);
+      xmlFreeParserCtxt(parser);
+      parser=(xmlParserCtxtPtr) NULL;
     }
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"end SAX");
   (void) fclose(file);

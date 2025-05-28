@@ -1,3 +1,19 @@
+2025-05-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/svg.c (ReadSVGImage): Use libxml2's SAX handlers for the
+	SVG renderer.  These changes are informed by Nick Wellnhofer's
+	changes to ImageMagick's SVG renderer as provided in ImageMagick
+	pull request 7784 at
+	"https://github.com/ImageMagick/ImageMagick/pull/7784/commits/c0405a520b6e0e445dd8f70c1883125d2015c298".
+	This should resolve the SVG portion of SourceForge issue #749 "Use
+	libxml2's SAX handlers".
+
+2025-05-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Now that libpng configure.ac has been
+	fixed upstream, restore 'autoreconf -fiv' step when building
+	libpng.
+
 2025-05-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/tiff.c: Add support for libtiff 4.5 TIFFWarningExtR() and
