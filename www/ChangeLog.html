@@ -41,6 +41,10 @@
 <p>2025-06-01  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/svg.c: GetStyleTokens, GetTransformTokens, and
+SVGProcessTransformString should have a 'const SVGInfo *svg_info'
+argument rather than a wrong and misleading 'void *context'
+argument. Fixes a crash which was recently introduced.</p></li>
 <li><p>coders/msl.c (ReadMSLImage): Use libxml2's SAX handlers for the
 MVG XML-based scripting implementation.  These changes are
 informed by Nick Wellnhofer's changes to ImageMagick's SVG

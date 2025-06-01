@@ -1,5 +1,10 @@
 2025-06-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/svg.c: GetStyleTokens, GetTransformTokens, and
+	SVGProcessTransformString should have a 'const SVGInfo *svg_info'
+	argument rather than a wrong and misleading 'void *context'
+	argument. Fixes a crash which was recently introduced.
+
 	* coders/msl.c (ReadMSLImage): Use libxml2's SAX handlers for the
 	MVG XML-based scripting implementation.  These changes are
 	informed by Nick Wellnhofer's changes to ImageMagick's SVG

@@ -275,7 +275,7 @@ GetUserSpaceCoordinateValue(const SVGInfo *svg_info,
     dst[(size)]='\0';                             \
   } while (0);
 
-static char **GetStyleTokens(void *context,const char *text,size_t *number_tokens)
+static char **GetStyleTokens(const SVGInfo *svg_info,const char *text,size_t *number_tokens)
 {
 #define MaxStyleTokens 256
 
@@ -291,13 +291,9 @@ static char **GetStyleTokens(void *context,const char *text,size_t *number_token
     i,
     iListFront;
 
-  SVGInfo
-    *svg_info;
-
   MagickBool
     IsFontSize = MagickFalse;
 
-  svg_info=(SVGInfo *) context;
   assert(svg_info->signature == MagickSignature);
   *number_tokens=0;
   alloc_tokens=0;
@@ -402,7 +398,7 @@ static char **GetStyleTokens(void *context,const char *text,size_t *number_token
                     MemoryAllocationFailed,UnableToConvertStringToTokens); \
   } while (0)
 
-static char **GetTransformTokens(void *context,const char *text,
+static char **GetTransformTokens(const SVGInfo *svg_info,const char *text,
                                  size_t *number_tokens)
 {
 #define MaxTransformTokens 256
@@ -417,13 +413,9 @@ static char **GetTransformTokens(void *context,const char *text,
   register size_t
     i;
 
-  SVGInfo
-    *svg_info;
-
   size_t
     alloc_tokens;
 
-  svg_info=(SVGInfo *) context;
   assert(svg_info->signature == MagickSignature);
   *number_tokens=0;
   if (text == (const char *) NULL)
@@ -511,10 +503,7 @@ extern "C" {
   into new function SVGProcessTransformString().
 */
 static void
-SVGProcessTransformString  (
-        void *context,
-        char const *TransformString
-        )
+SVGProcessTransformString(const SVGInfo *svg_info,char const *TransformString)
 {/*SVGProcessTransformString*/
 
   char
@@ -529,18 +518,14 @@ SVGProcessTransformString  (
     *p = NULL,
     token[MaxTextExtent];
 
-  SVGInfo
-    *svg_info;
-
   size_t
     j,
     number_tokens = 0;
 
-  svg_info=(SVGInfo *) context;
   assert(svg_info->signature == MagickSignature);
   IdentityAffine(&transform);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  ");
-  tokens=GetTransformTokens(context,TransformString,&number_tokens);
+  tokens=GetTransformTokens(svg_info,TransformString,&number_tokens);
   if ((tokens != (char **) NULL) && (number_tokens > 0))
     {/*if ((tokens != (char **) NULL) && (number_tokens > 0))*/
 
@@ -1446,7 +1431,7 @@ SVGStartElement(void *context,const xmlChar *name,
 
                   IdentityAffine(&transform);
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  ");
-                  tokens=GetTransformTokens(context,value,&number_tokens);
+                  tokens=GetTransformTokens(svg_info,value,&number_tokens);
                   if ((tokens != (char **) NULL) && (number_tokens > 0))
                     {
                       for (j=0; j < (number_tokens-1); j+=2)
@@ -1813,7 +1798,7 @@ SVGStartElement(void *context,const xmlChar *name,
                     **tokens;
 
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  ");
-                  tokens=GetStyleTokens(context,value,&number_tokens);
+                  tokens=GetStyleTokens(svg_info,value,&number_tokens);
                   if ((tokens != (char **) NULL) && (number_tokens > 0))
                     {
                       for (j=0; j < (number_tokens-1); j+=2)
@@ -2045,7 +2030,7 @@ SVGStartElement(void *context,const xmlChar *name,
                                 if (LocaleCompare(keyword,"transform") == 0)
                                   {
                                     /* implement style="transform: translate(..." */
-                                    SVGProcessTransformString(context,value);
+                                    SVGProcessTransformString(svg_info,value);
                                     break;
                                   }
                                 break;
@@ -2100,7 +2085,7 @@ SVGStartElement(void *context,const xmlChar *name,
                     The code that was here has been refactored into
                     function SVGProcessTransformString()
                   */
-                  SVGProcessTransformString(context,value);
+                  SVGProcessTransformString(svg_info,value);
                   break;
                 }
               break;
@@ -2797,7 +2782,7 @@ void    ProcessStyleClassDefs (
                   }
                 if (LocaleCompare(keyword,"transform") == 0)
                   {/*style="transform: ...*/
-                    SVGProcessTransformString((void *)svg_info,value);
+                    SVGProcessTransformString(svg_info,value);
                     break;
                   }/*style="transform: ...*/
                 break;
