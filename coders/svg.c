@@ -1602,7 +1602,9 @@ SVGStartElement(void *context,const xmlChar *name,
                       strlcat(svg_info->url,")",NewSize);
                     }
                   else
-                    (void) CloneString(&svg_info->url,value);
+                    {
+                      (void) CloneString(&svg_info->url,value);
+                    }
                   break;
                 }
               break;
@@ -3656,13 +3658,17 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
         (void) SetImageAttribute(image,"comment",svg_info.comment);
     }
   /*
-    Free resources allocated above (also freed by SVGEndDocument()).
+    Free allocated resources from struct SVGInfo
   */
-  MagickFreeMemory(svg_info.size);
-  MagickFreeMemory(svg_info.title);
-  MagickFreeResourceLimitedMemory(svg_info.comment);
-  MagickFreeMemory(svg_info.scale);
-  MagickFreeResourceLimitedMemory(svg_info.text);
+  MagickFreeMemory(svg_info.size); /* char ptr */
+  MagickFreeMemory(svg_info.title); /* char ptr */
+  MagickFreeResourceLimitedMemory(svg_info.comment); /* char ptr */
+  MagickFreeMemory(svg_info.scale); /* double ptr */
+  MagickFreeMemory(svg_info.stop_color);  /* char ptr */
+  MagickFreeMemory(svg_info.offset); /* char ptr */
+  MagickFreeResourceLimitedMemory(svg_info.text); /* char ptr */
+  MagickFreeMemory(svg_info.vertices); /* char ptr */
+  MagickFreeMemory(svg_info.url); /* char ptr */
 
   (void) memset(&svg_info,0xbf,sizeof(SVGInfo));
   (void) LiberateTemporaryFile(filename);
