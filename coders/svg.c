@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -166,6 +166,9 @@ typedef struct _SVGInfo
     idLevelInsideDefs,  /* when an "id" is seen, remember svg->n (SVG element level) */
     svgPushCount;       /* for tracking nested <svg> elements */
 
+  unsigned long
+    signature;
+
 } SVGInfo;
 
 /*
@@ -295,6 +298,7 @@ static char **GetStyleTokens(void *context,const char *text,size_t *number_token
     IsFontSize = MagickFalse;
 
   svg_info=(SVGInfo *) context;
+  assert(svg_info->signature == MagickSignature);
   *number_tokens=0;
   alloc_tokens=0;
   if (text == (const char *) NULL)
@@ -420,6 +424,7 @@ static char **GetTransformTokens(void *context,const char *text,
     alloc_tokens;
 
   svg_info=(SVGInfo *) context;
+  assert(svg_info->signature == MagickSignature);
   *number_tokens=0;
   if (text == (const char *) NULL)
     return((char **) NULL);
@@ -525,12 +530,14 @@ SVGProcessTransformString  (
     token[MaxTextExtent];
 
   SVGInfo
-    *svg_info=(SVGInfo *) context;
+    *svg_info;
 
   size_t
     j,
     number_tokens = 0;
 
+  svg_info=(SVGInfo *) context;
+  assert(svg_info->signature == MagickSignature);
   IdentityAffine(&transform);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  ");
   tokens=GetTransformTokens(context,TransformString,&number_tokens);
@@ -736,6 +743,7 @@ SVGStartElement(void *context,const xmlChar *name,
   token[0]='\0';
   parser=(xmlParserCtxtPtr) context;
   svg_info=(SVGInfo *) parser->_private;
+  assert(svg_info->signature == MagickSignature);
   svg_info->n++;
   MagickReallocMemory(double *,svg_info->scale,MagickArraySize((size_t)svg_info->n+1,sizeof(double)));
   if (svg_info->scale == (double *) NULL)
@@ -2845,6 +2853,7 @@ SVGEndElement(void *context,const xmlChar *name)
                         "  SAX.endElement(%.1024s)",name);
   parser=(xmlParserCtxtPtr) context;
   svg_info=(SVGInfo *) parser->_private;
+  assert(svg_info->signature == MagickSignature);
   if (strchr((char *) name,':') != (char *) NULL)
     {
       /*
@@ -3246,6 +3255,7 @@ SVGCharacters(void *context,const xmlChar *c,int length)
 
   parser=(xmlParserCtxtPtr) context;
   svg_info=(SVGInfo *) parser->_private;
+  assert(svg_info->signature == MagickSignature);
 
   new_text_len = svg_info->text_len+length;
   new_text = MagickReallocateResourceLimitedMemory(char *,svg_info->text,new_text_len+1);
@@ -3297,6 +3307,7 @@ SVGComment(void *context,const xmlChar *value)
                         "  SAX.comment(%.1024s)",value);
   parser=(xmlParserCtxtPtr) context;
   svg_info=(SVGInfo *) parser->_private;
+  assert(svg_info->signature == MagickSignature);
   /*
     Old way concatenated all comments like this:
   if (svg_info->comment != (char *) NULL)
@@ -3363,6 +3374,7 @@ SVGWarning(void *context,const char *format,...)
   va_start(operands,format);
   parser=(xmlParserCtxtPtr) context;
   svg_info=(SVGInfo *) parser->_private;
+  assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.warning: ");
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
 #if !defined(HAVE_VSNPRINTF)
@@ -3399,6 +3411,7 @@ SVGError(void *context,const char *format,...)
   va_start(operands,format);
   parser=(xmlParserCtxtPtr) context;
   svg_info=(SVGInfo *) parser->_private;
+  assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.error: ");
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
 #if !defined(HAVE_VSNPRINTF)
@@ -3528,6 +3541,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   svg_info.svgPushCount = 0;
   if (image_info->size != (char *) NULL)
     (void) CloneString(&svg_info.size,image_info->size);
+  svg_info.signature=MagickSignature;
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"begin SAX");
 
   /*

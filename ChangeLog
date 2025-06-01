@@ -1,3 +1,16 @@
+2025-06-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/msl.c (ReadMSLImage): Use libxml2's SAX handlers for the
+	MVG XML-based scripting implementation.  These changes are
+	informed by Nick Wellnhofer's changes to ImageMagick's SVG
+	renderer as provided in ImageMagick pull request 7784 at
+	"https://github.com/ImageMagick/ImageMagick/pull/7784/commits/c0405a520b6e0e445dd8f70c1883125d2015c298".
+	This should resolve the MVG portion of SourceForge issue #749 "Use
+	libxml2's SAX handlers".
+	(MSLInfo): Add signature to MSLInfo.
+
+	* coders/svg.c (SVGInfo): Add signature to SVGInfo.
+
 2025-05-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/svg.c (ReadSVGImage): Use libxml2's SAX handlers for the

@@ -38,6 +38,20 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-06-01  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/msl.c (ReadMSLImage): Use libxml2's SAX handlers for the
+MVG XML-based scripting implementation.  These changes are
+informed by Nick Wellnhofer's changes to ImageMagick's SVG
+renderer as provided in ImageMagick pull request 7784 at
+&quot;<a class="reference external" href="https://github.com/ImageMagick/ImageMagick/pull/7784/commits/c0405a520b6e0e445dd8f70c1883125d2015c298">https://github.com/ImageMagick/ImageMagick/pull/7784/commits/c0405a520b6e0e445dd8f70c1883125d2015c298</a>&quot;.
+This should resolve the MVG portion of SourceForge issue #749 &quot;Use
+libxml2's SAX handlers&quot;.
+(MSLInfo): Add signature to MSLInfo.</p></li>
+<li><p>coders/svg.c (SVGInfo): Add signature to SVGInfo.</p></li>
+</ul>
+</blockquote>
 <p>2025-05-28  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
