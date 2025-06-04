@@ -63,7 +63,7 @@ enable_png=true
 enable_tiff=true
 enable_webp=true
 enable_x265=true
-enable_xml=false
+enable_xml=true
 enable_xz=true
 enable_zlib=true
 enable_zstd=true
@@ -95,6 +95,9 @@ ls -l "${OUT}"
 rm -f ${OUT}/*_fuzzer
 
 set -x
+
+# For some reason, libxml2 requires automake 1.16.3 or later, and this
+# is handled by Dockerfile rules!
 
 # build zlib
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static zlib --libs
@@ -195,13 +198,21 @@ if $enable_xml
 then
     printf "=== Building ${SRC}/libxml2...\n"
     pushd "$SRC/libxml2"
+    #
+    # Build is patterned after libxml2/fuzz/oss-fuzz-build.sh
+    #
+    # Don't enable zlib and liblzma with MSan
+    if [ "$SANITIZER" = memory ]; then
+        LIBXML2_EXTRA_CONFIG=''
+    else
+        LIBXML2_EXTRA_CONFIG='--with-zlib --with-lzma'
+    fi
     ./autogen.sh \
         --disable-shared \
         --without-debug \
-        --without-legacy \
+        --without-http \
         --without-python \
-        --without-schemas \
-        --without-schematron \
+        $LIBXML2_EXTRA_CONFIG \
         --prefix="${WORK}"
     make -j$(nproc)
     make install

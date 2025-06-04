@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1760,8 +1760,12 @@ static Image *ReadWPGImage(const ImageInfo *image_info,
               /* Assure that buffer is allocated and the current size */
               if (PaletteAllocBytes != Max(4*(WPG_Palette.StartIndex+WPG_Palette.NumOfEntries),4*256))
                 {
+                  unsigned char *new_pPalette;
                   PaletteAllocBytes = Max(4*(WPG_Palette.StartIndex+WPG_Palette.NumOfEntries),4*256);
-                  MagickReallocateResourceLimitedMemory(unsigned char *,pPalette,PaletteAllocBytes);
+                  new_pPalette=MagickReallocateResourceLimitedMemory(unsigned char *,pPalette,PaletteAllocBytes);
+                  if (new_pPalette == (unsigned char *) NULL)
+                    MagickFreeResourceLimitedMemory(pPalette);
+                  pPalette=new_pPalette;
                 }
               if (pPalette==NULL)
                 ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -747,7 +747,9 @@ static void _MagickFreeResourceLimitedMemory_T(MagickMemoryResource_T *memory_re
 
   This works like MagickRealloc() except for supporting count and size
   arguments similar to calloc().  GNU libc has a reallocarray()
-  function using similar arguments.
+  function using similar arguments. A pointer to the (possibly) new
+  allocation is returned, so if NULL is returned, the previous pointer
+  remains valid, similar to realloc().
 
   Alignment concerns: 128-bit SSE registers have an alignment
   requirement of 16 bytes, the 256-bit Intel AVX registers have an

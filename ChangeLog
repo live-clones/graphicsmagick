@@ -1,3 +1,23 @@
+2025-06-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/wpg.c (ReadWPGImage): Fix improper usage of
+	MagickReallocateResourceLimitedMemory().  Addresses oss-fuzz
+	422512441 "graphicsmagick:coder_WPG_fuzzer: Direct-leak in
+	_MagickReallocateResourceLimitedMemory ()".
+
+	* magick/resource.c (DestroyMagickResources): If
+	DEBUG_MAGICK_RESOURCES is enabled, do not assert unless
+	DEBUG_MAGICK_RESOURCES_ASSERT is also enabled. An assertion
+	prevents valgrind from showing us where the leaks are.
+
+	* magick/memory.c: Document that
+	_MagickReallocateResourceLimitedMemory() returns a discrete
+	pointer, similar to realloc().  This means it does not work the
+	same as MagickReallocateMemory().
+
+	* magick/tsd.c (MagickTsdKeyCreate2): Fix GCC
+	-Wcalloc-transposed-args related warning.
+
 2025-06-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/svg.c: GetStyleTokens, GetTransformTokens, and

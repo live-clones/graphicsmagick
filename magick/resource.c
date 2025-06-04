@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003 - 2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -335,7 +335,9 @@ MagickExport void DestroyMagickResources(void)
             fprintf(stderr,"Resource[%s] %s! %"MAGICK_INT64_F"d remaining\n",
                     info->name, info->value < 0 ? "underflow" : "leak",
                     (magick_int64_t) info->value);
+#if defined(DEBUG_MAGICK_RESOURCES_ASSERT) && DEBUG_MAGICK_RESOURCES_ASSERT)
             assert(info->value == 0);
+#endif /* if defined(DEBUG_MAGICK_RESOURCES_ASSERT) && DEBUG_MAGICK_RESOURCES_ASSERT) */
           }
         UnlockSemaphoreInfo(info->semaphore);
       }
