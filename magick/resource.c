@@ -335,9 +335,9 @@ MagickExport void DestroyMagickResources(void)
             fprintf(stderr,"Resource[%s] %s! %"MAGICK_INT64_F"d remaining\n",
                     info->name, info->value < 0 ? "underflow" : "leak",
                     (magick_int64_t) info->value);
-#if defined(DEBUG_MAGICK_RESOURCES_ASSERT) && DEBUG_MAGICK_RESOURCES_ASSERT)
+#if defined(DEBUG_MAGICK_RESOURCES_ASSERT) && DEBUG_MAGICK_RESOURCES_ASSERT
             assert(info->value == 0);
-#endif /* if defined(DEBUG_MAGICK_RESOURCES_ASSERT) && DEBUG_MAGICK_RESOURCES_ASSERT) */
+#endif /* if defined(DEBUG_MAGICK_RESOURCES_ASSERT) && DEBUG_MAGICK_RESOURCES_ASSERT */
           }
         UnlockSemaphoreInfo(info->semaphore);
       }

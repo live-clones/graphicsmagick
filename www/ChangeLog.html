@@ -38,6 +38,25 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-06-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/wpg.c (ReadWPGImage): Fix improper usage of
+MagickReallocateResourceLimitedMemory().  Addresses oss-fuzz
+422512441 &quot;graphicsmagick:coder_WPG_fuzzer: Direct-leak in
+_MagickReallocateResourceLimitedMemory ()&quot;.</p></li>
+<li><p>magick/resource.c (DestroyMagickResources): If
+DEBUG_MAGICK_RESOURCES is enabled, do not assert unless
+DEBUG_MAGICK_RESOURCES_ASSERT is also enabled. An assertion
+prevents valgrind from showing us where the leaks are.</p></li>
+<li><p>magick/memory.c: Document that
+_MagickReallocateResourceLimitedMemory() returns a discrete
+pointer, similar to realloc().  This means it does not work the
+same as MagickReallocateMemory().</p></li>
+<li><p>magick/tsd.c (MagickTsdKeyCreate2): Fix GCC
+-Wcalloc-transposed-args related warning.</p></li>
+</ul>
+</blockquote>
 <p>2025-06-01  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
