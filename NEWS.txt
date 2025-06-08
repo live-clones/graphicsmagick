@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to January 15, 2025.
+This file was last updated to reflect changes up to June 8, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -34,15 +34,24 @@ Special Issues:
 
 Security Fixes:
 
+* MSL: Use libxml2's SAX handlers for the MVG XML-based scripting
+  implementation.  This removes a lot of archaic cruft which might
+  suffer from security issues.
+
 * JXL: Apply image dimension resource limits. Fix heap buffer write
   overflow while reading image.
+
+* SVG: Use libxml2's SAX handlers for the SVG renderer.  This removes
+  a lot of archaic cruft which might suffer from security issues.
 
 * TIFF: Disable EXPERIMENTAL_EXIF_TAGS by default until libtiff API
   weaknesses (as discovered in OSS-Fuzz issue 402570327) are resolved.
   This can be accomplished in earlier versions supporting this feature
   by passing CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 as an argument to the
   configure script. Continue to address issues in the EXIF tag code as
-  discovered by oss-fuzz.
+  discovered by oss-fuzz. The primary issue is that the libtiff API's
+  used are non-validating so arguments originating from EXIF will need
+  to be validated by this implementation.
 
 * WPG: Assure that the palette buffer is allocated and the current
   size (SourceForge bug #750).
@@ -56,6 +65,10 @@ Bug fixes:
 * JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
   inverted. This bug is now fixed.
 
+* PNG: Fix broken tRNS table when writing via "PNG8". Warn if pixel
+  transparencies are independent of color palette, since this results
+  in a loss of image quality. Remove output file if an error occurs.
+
 * TclMagick: The TclMagick build uses the latest TEA tcl.m4 macros,
   while modernizing the Automake and Autoconf files. Many defects in
   the C code are corrected.  The libttkcommon "shim" library,
@@ -65,8 +78,15 @@ Bug fixes:
   integrated into the build via 'make check' and 'make test'.  Even
   'make distcheck' works now.
 
+* HEIF: Only apply Exif orientation if ignore-transformations is true
+  since HEIF native transformations will handle orientation otherwise.
+
+* HEIF: Use primary image for HEIC even when it has multiple images.
+
 * Hull transform: Fix a arithemetic overflow regression added on
   October 21, 2023.
+
+* JXL: Free profile memory if JxlDecoderSetBoxBuffer() fails.
 
 * Magick++ 'analyze' demo: Request "Analyze" rather than "analyze". It
   is not clear how this was working before.
@@ -82,12 +102,26 @@ New Features:
 * Support XML predefined entities when reading delegates.mgk so that
   it may be expressed in valid XML.
 
+* Header Magic: When identifying files via their header, there is now
+  a magic description field to indicate the sub-format used.
+
+* Header Magic: Include a format description in the output of 'gm convert -list magic'.
+
+* TIFF: Add support for libtiff 4.5 TIFFWarningExtR() and
+  TIFFErrorExtR() in order to provide an error handling context per
+  TIFF handle.  This improves concurrency and thread safety when
+  multiple libraries are using libtiff within the same process.
+
 API Updates:
 
 * Magick++: Added InitializeMagickSentinel helper class, which
   performs the function of InitializeMagick() and invokes
   DestroyMagick() when an object created based on it goes out of
   scope.  The Magick++ demos and tests are updated to use this class.
+
+* Wand: MagickSetImagePixels(), If update image has matte, then
+  promote canvas image to have matte.  Support composing individual
+  channels 'R', 'G', 'B', 'A', 'O', 'T', 'C', 'M', 'Y', 'K'.
 
 Behavior Changes:
 
@@ -96,6 +130,10 @@ Behavior Changes:
   other libraries.
 
 Build Changes:
+
+* Use Autoconf 2.72.
+
+* Use Automake 1.17.
 
 * Update Libtool to version 2.5.4.
 

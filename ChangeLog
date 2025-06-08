@@ -1,5 +1,7 @@
 2025-06-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* NEWS.txt: Update the news.
+
 	* coders/png.c (WriteOnePNGImage): Fix broken tRNS table when
 	writing via "PNG8". Warn if pixel transparencies are independent
 	of color palette, since this results in a loss of image
