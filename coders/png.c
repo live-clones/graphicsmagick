@@ -7329,6 +7329,14 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                             "PNG write has failed!");
       png_destroy_write_struct(&ping,&ping_info);
       MagickFreeResourceLimitedMemory(mng_info->png_pixels);
+
+      /*
+        Handle write failure by removing the output file.
+      */
+      if (unlink(image->filename) != -1)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Removed broken output file \"%s\"",image->filename);
+
 #if defined(GMPNG_SETJMP_NOT_THREAD_SAFE)
       UnlockSemaphoreInfo(png_semaphore);
 #endif
@@ -7506,71 +7514,102 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         palette=MagickAllocateMemory(png_color *,
                                      number_colors*sizeof(png_color));
         if (palette == (png_color *) NULL)
-          png_error(ping, "Could not allocate palette");
-        else
-        {
-          for (i=0; i < (long) number_colors; i++)
-            {
-              palette[i].red=ScaleQuantumToChar(image->colormap[i].red);
-              palette[i].green=ScaleQuantumToChar(image->colormap[i].green);
-              palette[i].blue=ScaleQuantumToChar(image->colormap[i].blue);
-              if (logging)
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-#if QuantumDepth == 8
-                                      "    %3ld (%3d,%3d,%3d)",
-#else
-                                      "    %5ld (%5d,%5d,%5d)",
-#endif
-                                      i,palette[i].red,palette[i].green,
-                                      palette[i].blue);
-
-            }
-          png_set_PLTE(ping,ping_info,palette,(int) number_colors);
-          MagickFreeMemory(palette);
-        }
-        /*
-          Identify which colormap entry is transparent.
-        */
-        ping_trans_alpha=MagickAllocateMemory(unsigned char *, number_colors);
-        if (ping_trans_alpha == (unsigned char *) NULL)
-          png_error(ping, "Could not allocate ping_trans_alpha");
+          {
+            png_error(ping, "Could not allocate palette");
+          }
         else
           {
-            assert(number_colors <= 256);
             for (i=0; i < (long) number_colors; i++)
-              ping_trans_alpha[i]=255;
-            for (y=0; y < (long) image->rows; y++)
               {
-                register const PixelPacket
-                  *p=NULL;
+                palette[i].red=ScaleQuantumToChar(image->colormap[i].red);
+                palette[i].green=ScaleQuantumToChar(image->colormap[i].green);
+                palette[i].blue=ScaleQuantumToChar(image->colormap[i].blue);
+                if (logging)
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+#if QuantumDepth == 8
+                                        "    %3ld (%3d,%3d,%3d)",
+#else
+                                        "    %5ld (%5d,%5d,%5d)",
+#endif
+                                        i,palette[i].red,palette[i].green,
+                                        palette[i].blue);
 
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                                     &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                indexes=AccessImmutableIndexes(image);
-                for (x=0; x < (long) image->columns; x++)
+              }
+            png_set_PLTE(ping,ping_info,palette,(int) number_colors);
+            MagickFreeMemory(palette);
+          }
+        if (!characteristics.opaque) /* Previously image->matte or image_matte */
+          {
+            /* TO DO: reduce to binary (direct relationship between
+               colormap entry and alpha) transparency */
+
+            /*
+              Identify which colormap entries are transparent.
+
+              Warn if pixel opacities independent of colormap entries
+              (loss of image quality).
+            */
+            const unsigned png_q8_opaque = 255;
+            ping_trans_alpha=MagickAllocateMemory(unsigned char *, number_colors);
+            if (ping_trans_alpha == (unsigned char *) NULL)
+              png_error(ping, "Could not allocate ping_trans_alpha");
+            else
+              {
+                MagickBool
+                  complex_opacity = MagickFalse;
+                assert(number_colors <= 256);
+                for (i=0; i < (long) number_colors; i++)
+                  ping_trans_alpha[i]=png_q8_opaque;
+                for (y=0; y < (long) image->rows; y++)
                   {
-                    if (p->opacity != OpaqueOpacity)
-                      {
-                        IndexPacket
-                          index;
+                    register const PixelPacket
+                      *p=NULL;
 
-                        index=indexes[x];
-                        assert((unsigned long) index < number_colors);
-                        ping_trans_alpha[index]=(png_byte) (255-
-                                                ScaleQuantumToChar(p->opacity));
+                    p=AcquireImagePixels(image,0,y,image->columns,1,
+                                         &image->exception);
+                    if (p == (const PixelPacket *) NULL)
+                      break;
+                    indexes=AccessImmutableIndexes(image);
+                    for (x=0; x < (long) image->columns; x++)
+                      {
+                        if (p->opacity != OpaqueOpacity)
+                          {
+                            IndexPacket
+                              index;
+
+                            png_byte
+                              alpha;
+
+                            index=indexes[x];
+                            assert((unsigned long) index < number_colors);
+                            alpha=(png_byte) (png_q8_opaque-ScaleQuantumToChar(p->opacity));
+                            if ((ping_trans_alpha[i] != png_q8_opaque) &&
+                                ping_trans_alpha[index] != alpha)
+                              complex_opacity=MagickTrue;
+                            ping_trans_alpha[index]=alpha;
+                          }
+                        p++;
                       }
-                    p++;
+                  }
+                ping_num_trans=0;
+                for (i=0; i < (long) number_colors; i++)
+                  if (ping_trans_alpha[i] != png_q8_opaque)
+                    ping_num_trans=(unsigned short) (i+1);
+
+                if (ping_num_trans != 0)
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "    %u transparent colors, enable tRNS",
+                                          ping_num_trans);
+                    ping_valid_trns = 1;
+                  }
+                if (complex_opacity)
+                  {
+                    errno=0;
+                    png_warning(ping,
+                                "Complex opacity is not supported by PNG8!");
                   }
               }
-            ping_num_trans=0;
-            for (i=0; i < (long) number_colors; i++)
-              if (ping_trans_alpha[i] != 255)
-                ping_num_trans=(unsigned short) (i+1);
-            if (ping_num_trans != 0)
-              ping_valid_trns = 1;
-            MagickFreeMemory(ping_trans_alpha);
           }
         /*
           Identify which colormap entry is the background color.
@@ -7580,10 +7619,6 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
             break;
         ping_background.index=(png_uint_16) i;
       }
-      if (image_matte)
-        {
-          /* TO DO: reduce to binary transparency */
-        }
     }
   else if (mng_info->write_png24 || mng_info->write_png48)
     {

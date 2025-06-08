@@ -1,3 +1,12 @@
+2025-06-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/png.c (WriteOnePNGImage): Fix broken tRNS table when
+	writing via "PNG8". Warn if pixel transparencies are independent
+	of color palette, since this results in a loss of image
+	quality. Remove output file if an error occurs.  Addresses
+	SourceForge issue #755 "Converting to indexed PNG produces invalid
+	file".
+
 2025-06-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/wpg.c (ReadWPGImage): Fix improper usage of
