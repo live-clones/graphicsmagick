@@ -7333,7 +7333,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
       /*
         Handle write failure by removing the output file.
       */
-      if (unlink(image->filename) != -1)
+      if ((image != (Image *) NULL) &&
+          (unlink(image->filename) != -1))
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Removed broken output file \"%s\"",image->filename);
 

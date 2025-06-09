@@ -1,5 +1,11 @@
 2025-06-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/png.c (WriteOnePNGImage): In error handler, check if
+	image is null prior to attempting to dereference it.  This issue
+	is recently introduced.  Should resolve oss-fuzz 423668251
+	"graphicsmagick:coder_PNG24_fuzzer: Null-dereference in
+	WriteOnePNGImage".
+
 	* NEWS.txt: Update the news.
 
 	* magick/transform.c (TransformImage): If crop_geometry contains
