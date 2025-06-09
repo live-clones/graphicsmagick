@@ -5,6 +5,10 @@
 	is recently introduced.  Should resolve oss-fuzz 423668251
 	"graphicsmagick:coder_PNG24_fuzzer: Null-dereference in
 	WriteOnePNGImage".
+	(WriteOnePNGImage): Fix recently-introduced typo which causes heap
+	buffer overflow. Should resolve oss-fuzz 423417425
+	"graphicsmagick:coder_PNG8_fuzzer: Heap-buffer-overflow in
+	WriteOnePNGImage".
 
 	* NEWS.txt: Update the news.
 

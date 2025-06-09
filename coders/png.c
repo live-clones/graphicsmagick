@@ -1125,6 +1125,7 @@ static void PNGWarningHandler(png_struct *ping,png_const_charp message)
                         "  libpng-%.1024s warning: %.1024s",
                         PNG_LIBPNG_VER_STRING, message);
   image=(Image *) png_get_error_ptr(ping);
+  errno=0;
   (void) ThrowException2(&image->exception,CoderWarning,message,
                          image->filename);
 }
@@ -7584,8 +7585,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                             index=indexes[x];
                             assert((unsigned long) index < number_colors);
                             alpha=(png_byte) (png_q8_opaque-ScaleQuantumToChar(p->opacity));
-                            if ((ping_trans_alpha[i] != png_q8_opaque) &&
-                                ping_trans_alpha[index] != alpha)
+                            if ((ping_trans_alpha[index] != png_q8_opaque) &&
+                                (ping_trans_alpha[index] != alpha))
                               complex_opacity=MagickTrue;
                             ping_trans_alpha[index]=alpha;
                           }
