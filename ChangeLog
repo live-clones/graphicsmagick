@@ -1,3 +1,12 @@
+2025-06-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* NEWS.txt: Update the news.
+
+	* magick/transform.c (TransformImage): If crop_geometry contains
+	'%', that should not block a full list of image tiles from being
+	generated.  Resolves SourceForge issue #717 "-crop does not
+	generate tiles when used with a percentage".
+
 2025-06-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

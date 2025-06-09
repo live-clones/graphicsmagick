@@ -1655,13 +1655,21 @@ MagickExport Image *ShaveImage(const Image *image,
 %  A description of each parameter follows:
 %
 %    o image: The image to transform. The resulting transformed image is
-%      returned via this parameter.
+%      returned via this same parameter.
 %
-%    o crop_geometry: A crop geometry string.  This geometry defines a
-%      subregion of the image to crop.
+%    o crop_geometry: An optional crop geometry string in the form
+%      <width>x<height>{+-}<x>{+-}<y>{%}.  This geometry defines a subregion
+%      of the image to optionally crop.  If crop_geometry is non-NULL, then if
+%      the x and y offsets are present, a single image is generated, consisting
+%      of the pixels from the cropping region, otherwise a list of image tiles
+%      of the specified geometry, covering the entire input image is generated.
+%      In this case, the rightmost tiles and the bottom tiles are smaller if
+%      the specified geometry extends beyond the dimensions of the input image.
 %
-%    o image_geometry: An image geometry string.  This geometry defines the
-%      final size of the image.
+%    o image_geometry: An optional image geometry string in the form
+%      <width>x<height>.  This geometry defines the final size of the image,
+%      or image tiles.  If non-NULL, the resulting image (or image tiles)
+%      are resized similar to ZoomImage().
 %
 %
 */
@@ -1706,8 +1714,7 @@ MagickExport MagickPassFail TransformImage(Image **image,const char *crop_geomet
                               geometry.width, geometry.height,
                               geometry.x, geometry.y);
       if ((geometry.width == 0) || (geometry.height == 0) ||
-          ((flags & XValue) != 0) || ((flags & YValue) != 0) ||
-          (flags & PercentValue))
+          ((flags & XValue) != 0) || ((flags & YValue) != 0))
         {
           crop_image=CropImage(transform_image,&geometry,&(*image)->exception);
           if (crop_image == (Image *) NULL)

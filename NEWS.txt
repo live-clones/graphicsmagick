@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to June 8, 2025.
+This file was last updated to reflect changes up to June 9, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -90,6 +90,9 @@ Bug fixes:
 
 * Magick++ 'analyze' demo: Request "Analyze" rather than "analyze". It
   is not clear how this was working before.
+
+* TransformImage(), and -crop: Sove the problem "-crop does not
+  generate tiles when used with a percentage"
 
 New Features:
 

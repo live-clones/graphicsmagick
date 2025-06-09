@@ -1625,7 +1625,8 @@ MagickExport MagickPassFail GetExecutionPathUsingName(char *path)
 %      string.
 %
 %    o image_geometry:  Specifies a character string representing the geometry
-%      specification.
+%      specification in the form
+%      <width>x<height>{+-}<x>{+-}<y>{%}{@}{!}{^}{<}{>}.
 %
 %    o x,y:  The x and y offset as determined by the geometry specification is
 %      returned here.
