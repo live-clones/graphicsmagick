@@ -1,3 +1,7 @@
+2025-06-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* doc/options.imdoc (characters): Document that adding '!' to the geometry specification does change the image aspect ratio if necessary.  Addresses GraphicsMagick feature request #48 "-geometry !".
+
 2025-06-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/png.c (WriteOnePNGImage): In error handler, check if

@@ -2826,7 +2826,7 @@ height are treated as minimum values rather than maximum values.</pp>
 Append a ! (exclamation point) to the geometry to force the image size to
 exactly the size you specify. For example, if you specify
 <tt>640x480!</tt> the image width is set to 640 pixels and height to
-480.</pp>
+480, changing the image aspect ratio if necessary.</pp>
 
 <pp>
 If only the width is specified, without the trailing 'x', then height
