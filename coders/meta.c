@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -450,44 +450,56 @@ static long parse8BIM(Image *ifile, Image *ofile)
                     currentpos = TellBlob(ofile);
                     if (currentpos < 0)
                       goto parse8BIM_failure;
-                    (void) SeekBlob(ofile,savedpos,SEEK_SET);
-                    (void) WriteBlobMSBLong(ofile,diff);
-                    (void) SeekBlob(ofile,currentpos,SEEK_SET);
+                    if (SeekBlob(ofile,savedpos,SEEK_SET) != savedpos)
+                      goto parse8BIM_failure;
+                    if (WriteBlobMSBLong(ofile,diff) < 4)
+                      goto parse8BIM_failure;
+                    if (SeekBlob(ofile,currentpos,SEEK_SET) != currentpos)
+                      goto parse8BIM_failure;
                     savedolen = 0L;
                   }
                 if (outputlen & 1)
                   {
-                    (void) WriteBlobByte(ofile,0x00);
+                    if (WriteBlobByte(ofile,0x00) < 1)
+                      goto parse8BIM_failure;
                     outputlen++;
                   }
-                (void) WriteBlobString(ofile,"8BIM");
-                (void) WriteBlobMSBShort(ofile,recnum);
+                if (WriteBlobString(ofile,"8BIM") < 4)
+                  goto parse8BIM_failure;
+                if (WriteBlobMSBShort(ofile,recnum) < 2)
+                  goto parse8BIM_failure;
                 outputlen += 6;
                 if (name)
                   nlen = (unsigned char) strlen(name);
-                (void) WriteBlobByte(ofile,nlen);
+                if (WriteBlobByte(ofile,nlen) < 1)
+                  goto parse8BIM_failure;
                 outputlen++;
                 for (i=0; i<nlen; i++)
-                  (void) WriteBlobByte(ofile,name[i]);
+                  if (WriteBlobByte(ofile,name[i]) < 1)
+                    goto parse8BIM_failure;
                 outputlen += nlen;
                 if (!(nlen&1))
                   {
-                    (void) WriteBlobByte(ofile,0x00);
+                    if (WriteBlobByte(ofile,0x00) < 1)
+                      goto parse8BIM_failure;
                     outputlen++;
                   }
                 if (recnum != IPTC_ID)
                   {
-                    (void) WriteBlobMSBLong(ofile, (const magick_uint32_t) len);
+                    if (WriteBlobMSBLong(ofile, (const magick_uint32_t) len) < 4)
+                      goto parse8BIM_failure;
                     outputlen += 4;
 
                     next=0;
                     outputlen += len;
                     while (len--)
-                      (void) WriteBlobByte(ofile,token[next++]);
+                      if (WriteBlobByte(ofile,token[next++]) < 1)
+                        goto parse8BIM_failure;
 
                     if (outputlen & 1)
                       {
-                        (void) WriteBlobByte(ofile,0x00);
+                        if (WriteBlobByte(ofile,0x00) < 1)
+                          goto parse8BIM_failure;
                         outputlen++;
                       }
                   }
@@ -497,7 +509,8 @@ static long parse8BIM(Image *ifile, Image *ofile)
                     savedpos = TellBlob(ofile);
                     if (savedpos < 0)
                       goto parse8BIM_failure;
-                    (void) WriteBlobMSBLong(ofile,0xFFFFFFFFUL);
+                    if (WriteBlobMSBLong(ofile,0xFFFFFFFFUL) < 4)
+                      goto parse8BIM_failure;
                     outputlen += 4;
                     savedolen = outputlen;
                   }
@@ -506,15 +519,20 @@ static long parse8BIM(Image *ifile, Image *ofile)
               {
                 if (len <= 0x7FFF)
                   {
-                    (void) WriteBlobByte(ofile,0x1c);
-                    (void) WriteBlobByte(ofile,dataset);
-                    (void) WriteBlobByte(ofile,recnum & 255);
-                    (void) WriteBlobMSBShort(ofile,(const magick_uint16_t) len);
+                    if (WriteBlobByte(ofile,0x1c) < 1)
+                      goto parse8BIM_failure;
+                    if (WriteBlobByte(ofile,dataset) < 1)
+                      goto parse8BIM_failure;
+                    if (WriteBlobByte(ofile,recnum & 255) < 1)
+                      goto parse8BIM_failure;
+                    if (WriteBlobMSBShort(ofile,(const magick_uint16_t) len) < 2)
+                      goto parse8BIM_failure;
                     outputlen += 5;
                     next=0;
                     outputlen += len;
                     while (len--)
-                      (void) WriteBlobByte(ofile,token[next++]);
+                      if (WriteBlobByte(ofile,token[next++]) < 1)
+                        goto parse8BIM_failure;
                   }
               }
           }
@@ -533,9 +551,12 @@ static long parse8BIM(Image *ifile, Image *ofile)
       if (currentpos < 0)
         goto parse8BIM_failure;
 
-      (void) SeekBlob(ofile,savedpos,SEEK_SET);
-      (void) WriteBlobMSBLong(ofile,diff);
-      (void) SeekBlob(ofile,currentpos,SEEK_SET);
+      if (SeekBlob(ofile,savedpos,SEEK_SET) != savedpos)
+        goto parse8BIM_failure;
+      if (WriteBlobMSBLong(ofile,diff) < 4)
+        goto parse8BIM_failure;
+      if (SeekBlob(ofile,currentpos,SEEK_SET) != currentpos)
+        goto parse8BIM_failure;
       savedolen = 0L;
     }
   return outputlen;
@@ -754,44 +775,56 @@ static long parse8BIMW(Image *ifile, Image *ofile)
                     currentpos = TellBlob(ofile);
                     if (currentpos < 0)
                       goto parse8BIMW_failure;
-                    (void) SeekBlob(ofile,savedpos,SEEK_SET);
-                    (void) WriteBlobMSBLong(ofile,diff);
-                    (void) SeekBlob(ofile,currentpos,SEEK_SET);
+                    if (SeekBlob(ofile,savedpos,SEEK_SET) != savedpos)
+                      goto parse8BIMW_failure;
+                    if (WriteBlobMSBLong(ofile,diff) != 4)
+                      goto parse8BIMW_failure;
+                    if (SeekBlob(ofile,currentpos,SEEK_SET) != currentpos)
+                      goto parse8BIMW_failure;
                     savedolen = 0L;
                   }
                 if (outputlen & 1)
                   {
-                    (void) WriteBlobByte(ofile,0x00);
+                    if (WriteBlobByte(ofile,0x00) != 1)
+                      goto parse8BIMW_failure;
                     outputlen++;
                   }
-                (void) WriteBlobString(ofile,"8BIM");
-                (void) WriteBlobMSBShort(ofile,recnum);
+                if (WriteBlobString(ofile,"8BIM") < 4)
+                  goto parse8BIMW_failure;
+                if (WriteBlobMSBShort(ofile,recnum) < 2)
+                  goto parse8BIMW_failure;
                 outputlen += 6;
                 if (name)
                   nlen = (unsigned char) strlen(name);
-                (void) WriteBlobByte(ofile,nlen);
+                if (WriteBlobByte(ofile,nlen) != 1)
+                  goto parse8BIMW_failure;
                 outputlen++;
                 for (i=0; i<nlen; i++)
-                  (void) WriteBlobByte(ofile,name[i]);
+                  if (WriteBlobByte(ofile,name[i]) != 1)
+                    goto parse8BIMW_failure;
                 outputlen += nlen;
                 if (!(nlen&1))
                   {
-                    (void) WriteBlobByte(ofile,0x00);
+                    if (WriteBlobByte(ofile,0x00) != 1)
+                      goto parse8BIMW_failure;
                     outputlen++;
                   }
                 if (recnum != IPTC_ID)
                   {
-                    (void) WriteBlobMSBLong(ofile, (const magick_uint32_t) len);
+                    if (WriteBlobMSBLong(ofile, (const magick_uint32_t) len) != 4)
+                      goto parse8BIMW_failure;
                     outputlen += 4;
 
                     next=0;
                     outputlen += len;
                     while (len--)
-                      (void) WriteBlobByte(ofile,token[next++]);
+                      if (WriteBlobByte(ofile,token[next++]) != 1)
+                        goto parse8BIMW_failure;
 
                     if (outputlen & 1)
                       {
-                        (void) WriteBlobByte(ofile,0x00);
+                        if (WriteBlobByte(ofile,0x00) != 1)
+                          goto parse8BIMW_failure;
                         outputlen++;
                       }
                   }
@@ -801,7 +834,8 @@ static long parse8BIMW(Image *ifile, Image *ofile)
                     savedpos = TellBlob(ofile);
                     if (savedpos < 0)
                       goto parse8BIMW_failure;
-                    (void) WriteBlobMSBLong(ofile,0xFFFFFFFFUL);
+                    if (WriteBlobMSBLong(ofile,0xFFFFFFFFUL) != 4)
+                      goto parse8BIMW_failure;
                     outputlen += 4;
                     savedolen = outputlen;
                   }
@@ -810,15 +844,20 @@ static long parse8BIMW(Image *ifile, Image *ofile)
               {
                 if (len <= 0x7FFF)
                   {
-                    (void) WriteBlobByte(ofile,0x1c);
-                    (void) WriteBlobByte(ofile,dataset);
-                    (void) WriteBlobByte(ofile,recnum & 255);
-                    (void) WriteBlobMSBShort(ofile,(const magick_uint16_t) len);
+                    if (WriteBlobByte(ofile,0x1c) != 1)
+                      goto parse8BIMW_failure;
+                    if (WriteBlobByte(ofile,dataset) != 1)
+                      goto parse8BIMW_failure;
+                    if (WriteBlobByte(ofile,recnum & 255) != 1)
+                      goto parse8BIMW_failure;
+                    if (WriteBlobMSBShort(ofile,(const magick_uint16_t) len) != 2)
+                      goto parse8BIMW_failure;
                     outputlen += 5;
                     next=0;
                     outputlen += (long) len;
                     while (len--)
-                      (void) WriteBlobByte(ofile,token[next++]);
+                      if (WriteBlobByte(ofile,token[next++]) != 1)
+                        goto parse8BIMW_failure;
                   }
               }
           }
@@ -836,9 +875,12 @@ static long parse8BIMW(Image *ifile, Image *ofile)
       currentpos = TellBlob(ofile);
       if (currentpos < 0)
         goto parse8BIMW_failure;
-      (void) SeekBlob(ofile,savedpos,SEEK_SET);
-      (void) WriteBlobMSBLong(ofile,diff);
-      (void) SeekBlob(ofile,currentpos,SEEK_SET);
+      if (SeekBlob(ofile,savedpos,SEEK_SET) != savedpos)
+        goto parse8BIMW_failure;
+      if (WriteBlobMSBLong(ofile,diff) != 4)
+        goto parse8BIMW_failure;
+      if (SeekBlob(ofile,currentpos,SEEK_SET) != currentpos)
+        goto parse8BIMW_failure;
       savedolen = 0L;
     }
   return outputlen;
@@ -892,7 +934,8 @@ static int jpeg_transfer_1(Image *ifile, Image *ofile)
   c = ReadBlobByte(ifile);
   if (c == EOF)
     return EOF;
-  (void) WriteBlobByte(ofile,c);
+  if (WriteBlobByte(ofile,c) != 1)
+    return EOF;
   return c;
 }
 
@@ -966,7 +1009,8 @@ static int jpeg_nextmarker(Image *ifile, Image *ofile)
       return M_EOI; /* we hit EOF */
     else
       if (c != 0xff)
-        (void) WriteBlobByte(ofile,c);
+        if (WriteBlobByte(ofile,c) != 1)
+          return M_EOI; /* pretend we hit EOF */
   } while (c != 0xff);
 
   /* get marker byte, swallowing possible padding */
@@ -1297,7 +1341,8 @@ static Image *ReadMETAImage(const ImageInfo *image_info,
             c=ReadBlobByte(image);
             if (c == EOF)
               break;
-            WriteBlobByte(buff,c);
+            if (WriteBlobByte(buff,c) != 1)
+              break;
           }
 #else
 #define MaxBufferSize  65541
@@ -2035,7 +2080,11 @@ static int formatIPTC(Image *ifile, Image *ofile)
       FormatString(temp, "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
     else
       FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
-    (void) WriteBlobString(ofile,temp);
+    if (WriteBlobString(ofile,temp) == 0)
+      {
+        MagickFreeResourceLimitedMemory(str);
+        return -1;
+      }
     formatString( ofile, (char *)str, taglen );
     MagickFreeResourceLimitedMemory(str);
 
@@ -2454,7 +2503,7 @@ static MagickPassFail WriteMETAImage(const ImageInfo *image_info,Image *image)
           ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
         }
       AttachBlob(buff->blob,info,length);
-      (void) formatIPTC(buff,image);
+      (void) formatIPTC(buff,image); /* returns -1 on failure */
       DetachBlob(buff->blob);
       DestroyImage(buff);
       status &= CloseBlob(image);

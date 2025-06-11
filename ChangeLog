@@ -1,6 +1,16 @@
+2025-06-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/meta.c (formatIPTC): Return immediately upon blob I/O
+	error.
+	(parse8BIM): Return immediately upon blob I/O error.
+	(parse8BIMW): Return immediately upon blob I/O error.
+
 2025-06-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-	* doc/options.imdoc (characters): Document that adding '!' to the geometry specification does change the image aspect ratio if necessary.  Addresses GraphicsMagick feature request #48 "-geometry !".
+	* doc/options.imdoc (characters): Document that adding '!' to the
+	geometry specification does change the image aspect ratio if
+	necessary.  Addresses GraphicsMagick feature request #48
+	"-geometry !".
 
 2025-06-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
