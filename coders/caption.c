@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -171,6 +171,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
     q=draw_info->text;
     i++;
   }
+  q=(char *) NULL;
   if (image->rows == 0)
     image->rows=(unsigned long) ((i+1)*(metrics.ascent-metrics.descent));
   (void) SetImage(image,OpaqueOpacity);
@@ -182,6 +183,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
   draw_info->geometry=AllocateString(geometry);
   (void) AnnotateImage(image,draw_info);
   DestroyDrawInfo(draw_info);
+  draw_info=(DrawInfo *) NULL;
   MagickFreeMemory(caption);
   StopTimer(&image->timer);
   return(image);

@@ -1,5 +1,9 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/caption.c (ReadCAPTIONImage): NULL pointers which are no
+	longer needed. Coverity issue 470182 about a memory leak via 'q'
+	appears to be bogus.
+
 	* magick/montage.c (CloneMontageInfo): Assure that memory
 	allocated by GetMontageInfo() is freed, before overwriting the
 	pointer to it with a new allocation.  Coverity issues 470173,
