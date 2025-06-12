@@ -1,5 +1,10 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/montage.c (CloneMontageInfo): Assure that memory
+	allocated by GetMontageInfo() is freed, before overwriting the
+	pointer to it with a new allocation.  Coverity issues 470173,
+	470176, and 40179.
+
 	* Makefile.am (coverity-build): Add a 'coverity-build' target,
 	which only does the Coverity build, without submitting it for
 	Coverity analysis.
