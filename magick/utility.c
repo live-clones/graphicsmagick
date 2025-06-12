@@ -2147,10 +2147,10 @@ MagickExport int GetMagickGeometry(const char *geometry,long *x,long *y,
     return(flags);
 
 #if 0
-      fprintf(stderr,"WidthValue=%u, HeightValue=%u width=%lu, height=%lu\n",
-              flags & WidthValue ? 1 : 0,
-              flags & HeightValue ? 1 : 0,
-              *width,*height);
+  fprintf(stderr,"WidthValue=%u, HeightValue=%u width=%lu, height=%lu\n",
+          flags & WidthValue ? 1 : 0,
+          flags & HeightValue ? 1 : 0,
+          *width,*height);
 #endif
 
   if (flags & AreaValue) /* @  */
@@ -2171,36 +2171,40 @@ MagickExport int GetMagickGeometry(const char *geometry,long *x,long *y,
         target_area=(double) (*width);
       if (flags & HeightValue)
         target_area *= (double) (*height);
-      original_area=(double) former_width*former_height;
-      resize=MagickFalse;
-      if (flags & GreaterValue)
-        {
-          /* Resize if image area greater than target */
-          if (original_area > target_area)
-            resize=MagickTrue;
-        }
-      else if (flags & LessValue)
-        {
-          /* Resize if image area less than target */
-          if (original_area < target_area)
-            resize=MagickTrue;
-        }
-      else
-        {
-          /* Always resize */
-          resize=MagickTrue;
-        }
 
-      if (resize)
+      if (target_area > 0.25)
         {
-          scale_factor=1.0/sqrt(original_area/target_area);
-          *width=(unsigned long) floor(former_width*scale_factor+0.25);
-          *height=(unsigned long) floor(former_height*scale_factor+0.25);
-        }
-      else
-        {
-          *width=former_width;
-          *height=former_height;
+          original_area=(double) former_width*former_height;
+          resize=MagickFalse;
+          if (flags & GreaterValue)
+            {
+              /* Resize if image area greater than target */
+              if (original_area > target_area)
+                resize=MagickTrue;
+            }
+          else if (flags & LessValue)
+            {
+              /* Resize if image area less than target */
+              if (original_area < target_area)
+                resize=MagickTrue;
+            }
+          else
+            {
+              /* Always resize */
+              resize=MagickTrue;
+            }
+
+          if (resize)
+            {
+              scale_factor=1.0/sqrt(original_area/target_area);
+              *width=(unsigned long) floor(former_width*scale_factor+0.25);
+              *height=(unsigned long) floor(former_height*scale_factor+0.25);
+            }
+          else
+            {
+              *width=former_width;
+              *height=former_height;
+            }
         }
     }
   else
