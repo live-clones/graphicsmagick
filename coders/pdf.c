@@ -1770,7 +1770,10 @@ static unsigned int ZLIBEncodeImage(Image *image,const size_t length,
       compressed_packets=stream.total_out;
     }
   if (status)
-    ThrowBinaryException(CoderError,UnableToZipCompressImage,(char *) NULL)
+    {
+      (void) deflateEnd(&stream);
+      ThrowBinaryException(CoderError,UnableToZipCompressImage,(char *) NULL);
+    }
   else
     for (i=0; i < (long) compressed_packets; i++)
       (void) WriteBlobByte(image,compressed_pixels[i]);

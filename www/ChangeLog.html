@@ -41,6 +41,8 @@
 <p>2025-06-12  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/pdf.c (ZLIBEncodeImage): Assure that z_stream is ended in
+error case.  Coverity issue 470180 &quot;Resource leak&quot;.</p></li>
 <li><p>coders/caption.c (ReadCAPTIONImage): NULL pointers which are no
 longer needed. Coverity issue 470182 about a memory leak via 'q'
 appears to be bogus.</p></li>

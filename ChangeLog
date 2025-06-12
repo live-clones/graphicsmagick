@@ -1,5 +1,8 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/pdf.c (ZLIBEncodeImage): Assure that z_stream is ended in
+	error case.  Coverity issue 470180 "Resource leak".
+
 	* coders/caption.c (ReadCAPTIONImage): NULL pointers which are no
 	longer needed. Coverity issue 470182 about a memory leak via 'q'
 	appears to be bogus.
