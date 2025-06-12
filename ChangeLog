@@ -1,5 +1,9 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/rle.c (ReadRLEImage): Verify that integer returned by
+	ReadBlobByte() is not EOF, and is in range of unsigned char before
+	assigning value. Coverity issue 10235 "Negative loop bound".
+
 	* coders/ps3.c (ZLIBEncode2Image): Assure that z_stream is ended in
 	error case.  Coverity issue 470178 "Resource leak".
 
