@@ -1,5 +1,9 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/render.c (DrawPolygonPrimitive): Coverity 470185
+	"Logically dead code". There is no actual issue of any
+	consequence.
+
 	* magick/pixel_cache.c (CheckImagePixelLimits): Change limit range
 	check to avoid useless warning about "dead code". Coverity issue
 	470175 "Logically dead code" and 376900 "Operands don't affect

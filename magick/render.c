@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -5241,6 +5241,7 @@ GetPixelOpacity(PolygonInfo * restrict polygon_info,const double mid,
   return(subpath_opacity);
 }
 
+#if defined(HAVE_OPENMP)
 static PolygonInfo* ClonePolygonInfo(const PolygonInfo* orig_polygon_info, ExceptionInfo *exception)
 {
   PolygonInfo
@@ -5300,6 +5301,7 @@ static PolygonInfo* ClonePolygonInfo(const PolygonInfo* orig_polygon_info, Excep
 
   return polygon_info;
 }
+#endif /* if defined(HAVE_OPENMP) */
 
 static MagickPassFail
 DrawPolygonPrimitive(Image *image,const DrawInfo *draw_info,
@@ -5401,8 +5403,12 @@ DrawPolygonPrimitive(Image *image,const DrawInfo *draw_info,
             */
             polygon_info=ConvertPathToPolygon(path_info,&image->exception);
             for (index=0; index < allocated_views; index++)
+#if defined(HAVE_OPENMP)
             AssignThreadViewData(polygon_set,index,index == 0 ? (void *) polygon_info :
                                  ClonePolygonInfo(polygon_info,&image->exception));
+#else
+            AssignThreadViewData(polygon_set,index,(void *) polygon_info);
+#endif /* if defined(HAVE_OPENMP) */
 
             /*
               Verify worker thread allocations.
