@@ -442,10 +442,13 @@ snapshot: distcheck
 endif # HasGRAPHICSMAGICK_SNAPSHOT_COPY
 
 # Build under Coverity
-coverity:
+coverity-build:
 	$(MAKE) clean
 	$(RM) -rf $(COVERITY_COV_INT)
 	cov-build --dir $(COVERITY_COV_INT) $(MAKE) $(all) $(check_PROGRAMS)
+
+# Build under Coverity, and submit the results
+coverity: coverity-build
 	tar caf $(COVERITY_TARBALL) $(COVERITY_COV_INT)
 	curl \
 	--form token=`cat $$HOME/.coverity_key_gm` \

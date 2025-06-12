@@ -1,3 +1,12 @@
+2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* Makefile.am (coverity-build): Add a 'coverity-build' target,
+	which only does the Coverity build, without submitting it for
+	Coverity analysis.
+
+	* coders/meta.c (ReadMETAImage): WriteBlob() does not perform
+	partial writes so remove that apparent assumption.
+
 2025-06-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/meta.c (formatIPTC): Return immediately upon blob I/O
