@@ -1241,6 +1241,21 @@
       <Message name="TileNotBoundedByImageDimensions">
         Tile is not bounded by image dimensions
       </Message>
+      <Message name="UnableToCineonLogRGBTransformColorspace">
+        unable to Cineon Log transform colorspace
+      </Message>
+      <Message name="ReferenceWhiteIsOutOfRange">
+        Reference white is out of range
+      </Message>
+      <Message name="ReferenceBlackIsOutOfRange">
+        Reference black is out of range
+      </Message>
+      <Message name="DisplayGammaIsOutOfRange">
+        Display gamma is out of range
+      </Message>
+      <Message name="FilmGammaIsOutOfRange">
+        Film gamma is out of range
+      </Message>
     </Error>
     <FatalError>
       <Message name="InvalidInterlaceType">

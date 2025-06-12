@@ -1,5 +1,13 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/colorspace.c (RGBTransformImage): Validate that CineonLog
+	parameters are in legal ranges.  Addresses Coverity 470177,
+	470183, and 470184 "Division or modulo by float zero".
+
+	* magick/describe.c (DescribeImage): Fix Coverity 470181 "Division
+	or modulo by float zero".  This is not likely to happen, but
+	Coverity has no way to know that.
+
 	* magick/render.c (DrawPolygonPrimitive): Coverity 470185
 	"Logically dead code". There is no actual issue of any
 	consequence.

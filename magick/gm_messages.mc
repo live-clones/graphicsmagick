@@ -1769,6 +1769,18 @@ color separated image required
 .
 
 MessageId       = +1
+SymbolicName    = OptionErrorDisplayGammaIsOutOfRange
+Language        = English
+Display gamma is out of range
+.
+
+MessageId       = +1
+SymbolicName    = OptionErrorFilmGammaIsOutOfRange
+Language        = English
+Film gamma is out of range
+.
+
+MessageId       = +1
 SymbolicName    = OptionErrorFrameIsLessThanImageSize
 Language        = English
 frame is less than image size
@@ -1913,6 +1925,12 @@ Null blob argument
 .
 
 MessageId       = +1
+SymbolicName    = OptionErrorReferenceBlackIsOutOfRange
+Language        = English
+Reference black is out of range
+.
+
+MessageId       = +1
 SymbolicName    = OptionErrorReferenceImageRequired
 Language        = English
 Reference image required
@@ -1922,6 +1940,12 @@ MessageId       = +1
 SymbolicName    = OptionErrorReferenceIsNotMyType
 Language        = English
 Reference is not my type
+.
+
+MessageId       = +1
+SymbolicName    = OptionErrorReferenceWhiteIsOutOfRange
+Language        = English
+Reference white is out of range
 .
 
 MessageId       = +1
@@ -1982,6 +2006,12 @@ MessageId       = +1
 SymbolicName    = OptionErrorUnableToChopImage
 Language        = English
 unable to chop image
+.
+
+MessageId       = +1
+SymbolicName    = OptionErrorUnableToCineonLogRGBTransformColorspace
+Language        = English
+unable to Cineon Log transform colorspace
 .
 
 MessageId       = +1
