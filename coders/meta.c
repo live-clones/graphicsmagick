@@ -1349,31 +1349,31 @@ static Image *ReadMETAImage(const ImageInfo *image_info,
           char
             *buffer;
 
-          ExtendedSignedIntegralType
-            count;
-
           size_t
+            count,
             i,
             length;
 
           buffer=MagickAllocateResourceLimitedMemory(char *,MaxBufferSize);
-          if (buffer != (char *) NULL)
+          if (buffer == (char *) NULL)
             {
-              i=0;
-              while ((length=ReadBlob(image,MaxBufferSize,buffer)) != 0)
-              {
-                count=0;
-                for (i=0; i < length; i+=count)
+              DestroyImage(buff);
+              ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+            }
+          i=0;
+          while ((length=ReadBlob(image,MaxBufferSize,buffer)) != 0)
+            {
+              count=0;
+              for (i=0; i < length; i+=count)
                 {
                   count=WriteBlob(buff,length-i,buffer+i);
-                  if (count <= 0)
+                  if (count != (length-i))
                     break;
                 }
-                if (i < length)
-                  break;
-              }
-              MagickFreeResourceLimitedMemory(buffer);
+              if (i < length)
+                break;
             }
+          MagickFreeResourceLimitedMemory(buffer);
 #endif
         }
       blob=GetBlobStreamData(buff); /* blob may be realloced */
@@ -1449,7 +1449,8 @@ static Image *ReadMETAImage(const ImageInfo *image_info,
             c=ReadBlobByte(image);
             if (c == EOF)
               break;
-            (void) WriteBlobByte(buff,c);
+            if (WriteBlobByte(buff,c) != 1)
+              break;
           }
         }
 
