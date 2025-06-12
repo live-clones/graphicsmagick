@@ -1,5 +1,10 @@
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/pixel_cache.c (CheckImagePixelLimits): Change limit range
+	check to avoid useless warning about "dead code". Coverity issue
+	470175 "Logically dead code" and 376900 "Operands don't affect
+	result".
+
 	* coders/rle.c (ReadRLEImage): Verify that integer returned by
 	ReadBlobByte() is not EOF, and is in range of unsigned char before
 	assigning value. Coverity issue 10235 "Negative loop bound".
