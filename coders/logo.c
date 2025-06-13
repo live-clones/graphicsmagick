@@ -4878,7 +4878,7 @@ static const unsigned char
 
 static const struct
 {
-  char                  name[20];       /* image name */
+  char                  name[21];       /* image name */
   char                  magick[4];      /* blob format */
   const void           *blob;           /* blob data */
   unsigned short        extent;         /* blob size */

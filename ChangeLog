@@ -1,4 +1,13 @@
+2025-06-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/logo.c (EmbeddedImageList): Provide space for
+	"VERTICALRIGHTSHINGLE" string termination.
+
 2025-06-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/utility.c (GetMagickGeometry): Skip resize computions
+	given an area ('@') value of zero. Coverity 470174 "Division or
+	modulo by float zero ".
 
 	* magick/colorspace.c (RGBTransformImage): Validate that CineonLog
 	parameters are in legal ranges.  Addresses Coverity 470177,
