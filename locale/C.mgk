@@ -1256,6 +1256,9 @@
       <Message name="FilmGammaIsOutOfRange">
         Film gamma is out of range
       </Message>
+      <Message name="SoftClipOffsetIsOutOfRange">
+        Soft clip offset is out of range
+      </Message>
     </Error>
     <FatalError>
       <Message name="InvalidInterlaceType">

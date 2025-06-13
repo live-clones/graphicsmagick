@@ -1961,6 +1961,12 @@ Request did not return an image
 .
 
 MessageId       = +1
+SymbolicName    = OptionErrorSoftClipOffsetIsOutOfRange
+Language        = English
+Soft clip offset is out of range
+.
+
+MessageId       = +1
 SymbolicName    = OptionErrorSteganoImageRequired
 Language        = English
 Stegano image required

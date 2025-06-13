@@ -1,5 +1,9 @@
 2025-06-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/colorspace.c (TransformRGBImage): Validate that CineonLog
+	parameters are in legal ranges.  Addresses Coverity 470177
+	"Division or modulo by float zero".
+
 	* coders/logo.c (EmbeddedImageList): Provide space for
 	"VERTICALRIGHTSHINGLE" string termination.
 

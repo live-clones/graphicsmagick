@@ -1518,6 +1518,45 @@ MagickExport MagickPassFail TransformRGBImage(Image *image,
       (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                             "Log Transform: ReferenceWhite=%g ReferenceBlack=%g DisplayGamma=%g FilmGamma=%g SoftClip=%g",
                             ReferenceWhite,ReferenceBlack,DisplayGamma,NegativeFilmGamma,SoftClip);
+            if (ReferenceWhite <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal reference-white value %g!", ReferenceWhite);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                ReferenceWhiteIsOutOfRange);
+        }
+
+      if (ReferenceBlack < 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal reference-black value %g!", ReferenceBlack);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                ReferenceBlackIsOutOfRange);
+        }
+
+      if (DisplayGamma <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal display-gamma value %g!", DisplayGamma);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                DisplayGammaIsOutOfRange);
+        }
+
+      if (NegativeFilmGamma <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal film-gamma value %g!", NegativeFilmGamma);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                FilmGammaIsOutOfRange);
+        }
+
+      if (SoftClip < 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal soft-clip-offset value %g!", SoftClip);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                SoftClipOffsetIsOutOfRange);
+        }
 
       BreakPoint=ReferenceWhite-SoftClip;
       Gain=MaxLinearValue/(1.0 - pow(pow(10,((ReferenceBlack-ReferenceWhite)
