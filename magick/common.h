@@ -304,6 +304,9 @@ extern "C" {
 #if !defined(MAGICK_OPTIMIZE_FUNC)
 #  define MAGICK_OPTIMIZE_FUNC(opt) /*nothing*/
 #endif
+#if !defined(MAGICK_FUNC_PRINTF_FORMAT)
+#  define MAGICK_FUNC_PRINTF_FORMAT(string_index,first_to_check)) /*nothing*/
+#endif
 #if !defined(MAGICK_FALLTHROUGH)
 #  define MAGICK_FALLTHROUGH /*nothing*/
 #endif
