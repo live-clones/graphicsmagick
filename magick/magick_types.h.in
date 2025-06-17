@@ -23,8 +23,6 @@
 extern "C" {
 #endif
 
-#define _ISOC99_SOURCE 1
-
 #include <inttypes.h> /* Format constants, integer types */
 #include <stddef.h> /* ptrdiff_t, size_t */
 

@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-#define _ISOC99_SOURCE 1
-
 /*
   This define is not used by GraphicsMagick and it causes some headers
   from other installed packages (e.g. MinGW libpthread) to misbehave.
