@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2020 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
   Copyright 1991-1999 E. I. du Pont de Nemours and Company
 
@@ -38,7 +38,7 @@ extern "C" {
   MagickMonitorFormatted(const magick_int64_t quantum,
                          const magick_uint64_t span,
                          ExceptionInfo *exception,
-                         const char *format,...) MAGICK_ATTRIBUTE((__format__ (__printf__,4,5)));
+                         const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(4,5);
 
 #if defined(MAGICK_IMPLEMENTATION)
 #  include "magick/monitor-private.h"

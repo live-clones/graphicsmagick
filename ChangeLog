@@ -1,5 +1,11 @@
 2025-06-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/common.h: Use function attribute __gnu_printf__ rather
+	than __printf__ in function attribute declarations in order to
+	allow C'99 formatters with MINGW64 GCC.  New macro
+	MAGICK_FUNC_PRINTF_FORMAT is used for all printf format
+	declarations.
+
 	* configure.ac, magick/magick_types.h.in, etc.: First pass at
 	depending on a C'99 compliant build environment. Not yet tested
 	for Microsoft Windows builds.

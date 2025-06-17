@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -343,16 +343,8 @@ struct _DrawVTable
   Forward declarations.
 */
 static int
-  MvgPrintf(DrawContext context, const char *format, ...)
-#if defined(__GNUC__)
-MAGICK_ATTRIBUTE ((format (printf, 2, 3)))
-#endif
-,
-  MvgAutoWrapPrintf(DrawContext context, const char *format, ...)
-#if defined(__GNUC__)
-MAGICK_ATTRIBUTE ((format (printf, 2, 3)))
-#endif
-;
+  MvgPrintf(DrawContext context, const char *format, ...) MAGICK_FUNC_PRINTF_FORMAT(2, 3),
+  MvgAutoWrapPrintf(DrawContext context, const char *format, ...) MAGICK_FUNC_PRINTF_FORMAT(2, 3);
 static void
   MvgAppendColor(DrawContext context, const PixelPacket *color);
 

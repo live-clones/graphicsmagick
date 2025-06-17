@@ -121,7 +121,7 @@ static unsigned int
   WriteMSLImage(const ImageInfo *,Image *);
 
 static void
-MSLError(void *context,const char *format,...) MAGICK_ATTRIBUTE((__format__ (__printf__,2,3)));
+MSLError(void *context,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3);
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3912,7 +3912,7 @@ MSLCharacters(void *context,const xmlChar *c,int length)
 }
 
 static void
-MSLWarning(void *context,const char *format,...) MAGICK_ATTRIBUTE((__format__ (__printf__,2,3)));
+MSLWarning(void *context,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3);
 
 static void
 MSLWarning(void *context,const char *format,...)

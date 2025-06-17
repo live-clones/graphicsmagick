@@ -936,21 +936,22 @@ TIFFCloseBlob(thandle_t image_handle)
 /* Report errors. */
 static void
 TIFFReadErrorsHandler(const char *module,const char *format,
-               va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+                      va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(2,0);
 #if defined(HAVE_TIFFERROREXTR)
 static int
 TIFFReadErrorsHandlerExtR(TIFF *tif, void *user_data,
                           const char *module, const char *format, va_list warning)
-  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
 #endif /* if defined(HAVE_TIFFERROREXTR) */
 static void
 TIFFWriteErrorsHandler(const char *module,const char *format,
-                va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+                       va_list warning) MAGICK_FUNC_PRINTF_FORMAT(2,0);
 #if defined(HAVE_TIFFERROREXTR)
 static int
 TIFFWriteErrorsHandlerExtR(TIFF *tif, void *user_data,
                            const char *module, const char *format, va_list warning)
-  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
 #endif /* if defined(HAVE_TIFFERROREXTR) */
 static void
 TIFFReadErrorsHandler(const char *module,const char *format,
@@ -1169,7 +1170,7 @@ TIFFUnmapBlob(thandle_t image_handle,
 static int
 TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
                                   const char *module, const char *format, va_list warning)
-  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
 static int TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
                                              const char *module, const char *format,
                                              va_list warning)
@@ -1196,7 +1197,7 @@ static int TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
 static int
 TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
                                          const char *module, const char *format, va_list warning)
-  MAGICK_ATTRIBUTE((__format__ (__printf__,4,0)));
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
 static int TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
                                                     const char *module, const char *format,
                                                     va_list warning)
@@ -1229,7 +1230,8 @@ static int TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
 
 /* Report warnings as a coder log message. */
 static void
-TIFFWarningsLogOnly(const char *module,const char *format,va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+TIFFWarningsLogOnly(const char *module,const char *format,va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(2,0);
 static void
 TIFFWarningsLogOnly(const char *module,const char *format,va_list warning)
 {
@@ -1252,7 +1254,8 @@ TIFFWarningsLogOnly(const char *module,const char *format,va_list warning)
 
 /* Report warnings as exception in thread-specific ExceptionInfo */
 static void
-TIFFWarningsThrowException(const char *module,const char *format,va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+TIFFWarningsThrowException(const char *module,const char *format,va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(2,0);
 static void
 TIFFWarningsThrowException(const char *module,const char *format,va_list warning)
 {
