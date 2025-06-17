@@ -837,8 +837,8 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
       if (NEWSP_REMAINING(text,p,length) < 8)
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u remaining"
+                                "Truncated profile: %" MAGICK_SIZE_T_F "u"
+                                " bytes, %" MAGICK_SSIZE_T_F "u remaining"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
                                 (MAGICK_SSIZE_T) NEWSP_REMAINING(text,p,length));
@@ -849,8 +849,8 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
       if (NEWSP_REMAINING(text,p,length) < 8)
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u remaining"
+                                "Truncated profile: %" MAGICK_SIZE_T_F "u"
+                                " bytes, %" MAGICK_SSIZE_T_F "u remaining"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
                                 (MAGICK_SSIZE_T) NEWSP_REMAINING(text,p,length));
@@ -864,8 +864,8 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
           ((ssize_t) hdr_length > NEWSP_REMAINING(text,p,length)))
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u "
+                                "Truncated profile: %" MAGICK_SIZE_T_F "u"
+                                " bytes, %" MAGICK_SSIZE_T_F "u "
                                 "remaining (need %u more bytes)"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
@@ -1086,9 +1086,9 @@ TIFFReadBlob(thandle_t image_handle,tdata_t data,tsize_t size)
 #if LOG_TIFF_BLOB_IO
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "TIFF read blob: data=0x%p size=%"
-                          MAGICK_SIZE_T_F "u, returns %"
-                          MAGICK_SIZE_T_F "u",
+                          "TIFF read blob: data=0x%p size="
+                          "%" MAGICK_SIZE_T_F "u, returns "
+                          "%" MAGICK_SIZE_T_F "u",
                           data, (MAGICK_SIZE_T) size,
                           (MAGICK_SIZE_T) result);
 #endif /* LOG_TIFF_BLOB_IO */
@@ -1288,8 +1288,9 @@ TIFFWriteBlob(thandle_t image_handle,tdata_t data,tsize_t size)
 #if LOG_TIFF_BLOB_IO
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "TIFF write blob: data=0x%p size=%" MAGICK_SIZE_T_F
-                          "u, returns %" MAGICK_SIZE_T_F "u",
+                          "TIFF write blob: data=0x%p size="
+                          "%" MAGICK_SIZE_T_F "u, returns "
+                          "%" MAGICK_SIZE_T_F "u",
                           data, (MAGICK_SIZE_T) size,
                           (MAGICK_SIZE_T) result);
 #endif  /* LOG_TIFF_BLOB_IO */
@@ -2922,8 +2923,8 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
             if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Request to allocate scanline buffer of %"
-                                    MAGICK_SIZE_T_F "u bytes",
+                                    "Request to allocate scanline buffer of "
+                                    "%" MAGICK_SIZE_T_F "u bytes",
                                     (MAGICK_SIZE_T) scanline_size);
 
             /*
@@ -5073,7 +5074,7 @@ WriteNewsProfile(TIFF *tiff,
       /* Tag is type TIFF_LONG so byte length is divided by four */
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "TIFFSetField(tiff=0x%p,tag=%d,"
-                            "length=%"MAGICK_SIZE_T_F"u,data=0x%p)",
+                            "length=%" MAGICK_SIZE_T_F "u,data=0x%p)",
                             tiff,profile_tag,(MAGICK_SIZE_T) length/4,profile);
       (void) TIFFSetField(tiff,profile_tag,(uint32) length/4,(void *) profile);
     }
@@ -5102,7 +5103,7 @@ WriteNewsProfile(TIFF *tiff,
 #endif
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "TIFFSetField(tiff=0x%p,tag=%d,"
-                            "length=%"MAGICK_SIZE_T_F"u,data=0x%p)",
+                            "length=%" MAGICK_SIZE_T_F "u,data=0x%p)",
                             tiff,profile_tag,(MAGICK_SIZE_T) length,profile);
       (void) TIFFSetField(tiff,profile_tag,(uint32) length,(void *) profile);
     }

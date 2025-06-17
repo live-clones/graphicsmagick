@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -858,7 +858,7 @@ HorizontalFilter(const Image * restrict source,Image * restrict destination,
   if (IsEventLogged(TransformEvent))
     (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                           "Horizontal Filter: %lux%lu => %lux%lu "
-                          "(x_factor %g, blur %g, span %"MAGICK_SIZE_T_F"u) ...",
+                          "(x_factor %g, blur %g, span %" MAGICK_SIZE_T_F "u) ...",
                           source->columns, source->rows,
                           destination->columns, destination->rows,
                           x_factor, blur, (MAGICK_SIZE_T) span);
@@ -1135,7 +1135,7 @@ VerticalFilter(const Image * restrict source,Image * restrict destination,
   if (IsEventLogged(TransformEvent))
     (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                           "Vertical Filter: %lux%lu => %lux%lu "
-                          "(y_factor %g, blur %g, span %"MAGICK_SIZE_T_F"u) ...",
+                          "(y_factor %g, blur %g, span %" MAGICK_SIZE_T_F "u) ...",
                           source->columns, source->rows,
                           destination->columns, destination->rows,
                           y_factor, blur, (MAGICK_SIZE_T) span);

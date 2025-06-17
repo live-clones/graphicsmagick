@@ -1,3 +1,9 @@
+2025-06-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* configure.ac, magick/magick_types.h.in, etc.: First pass at
+	depending on a C'99 compliant build environment. Not yet tested
+	for Microsoft Windows builds.
+
 2025-06-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/colorspace.c (TransformRGBImage): Validate that CineonLog

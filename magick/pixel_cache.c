@@ -156,10 +156,10 @@ typedef struct _CacheInfo
   unsigned long rows;
 
   /* Offset to pixels in cache file (constrained to positive range of magick_off_t) */
-  magick_uint64_t offset;
+  magick_uintmax_t offset;
 
   /* Length of pixels region (constrained to positive range of magick_off_t) */
-  magick_uint64_t length;
+  magick_uintmax_t length;
 
   /* Image pixels if memory resident */
   PixelPacket *pixels;
@@ -174,7 +174,7 @@ typedef struct _CacheInfo
   MagickBool indexes_valid;
 
   /* Total pixels limit */
-  magick_uint64_t limit_pixels;
+  magick_uintmax_t limit_pixels;
 
   /* Maximum width (limited to LONG_MAX) */
   unsigned long limit_width;
@@ -709,7 +709,7 @@ SetNexus(const Image * restrict image,const long x,const long y,
     {
       errno=0;
       FormatString(message,
-                   "Total pixels %" MAGICK_SIZE_T_F "u > %" MAGICK_UINT64_F "u \"%.1024s\"",
+                   "Total pixels %" MAGICK_SIZE_T_F "u > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
                    (MAGICK_SIZE_T) region_pixels,
                    cache_info->limit_pixels,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelLimitExceeded,
@@ -2626,9 +2626,9 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     {
       (void) LogMagickEvent(CacheEvent,GetMagickModule(),
                             "Unable to extend pixel cache from %"
-                            MAGICK_UINT64_F "u bytes "
-                            "by %" MAGICK_UINT64_F "u bytes "
-                            "to %" MAGICK_UINT64_F "u bytes",
+                            MAGICK_UINTMAX_F "u bytes "
+                            "by %" MAGICK_UINTMAX_F "u bytes "
+                            "to %" MAGICK_UINTMAX_F "u bytes",
                             cache_info->length,
                             cache_info->offset,
                             cache_info->offset+cache_info->length);
@@ -3225,8 +3225,8 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
       limit=GetMagickResourceLimit(WidthResource);
       if (limit >= LONG_MAX)
         limit = LONG_MAX;
-      FormatString(message,"%lu > %" MAGICK_INT64_F "u \"%.1024s\"",
-                   image->columns,limit,image->filename);
+      FormatString(message,"%lu > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
+                   image->columns,(magick_uintmax_t) limit,image->filename);
       ThrowException(exception,ResourceLimitError,ImagePixelWidthLimitExceeded,
                      message);
       return MagickFail;
@@ -3247,8 +3247,8 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
       limit=GetMagickResourceLimit(HeightResource);
       if (limit >= LONG_MAX)
         limit = LONG_MAX;
-      FormatString(message,"%lu > %" MAGICK_INT64_F "u \"%.1024s\"",
-                   image->rows,limit,image->filename);
+      FormatString(message,"%lu > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
+                   image->rows,(magick_uintmax_t) limit,image->filename);
       ThrowException(exception,ResourceLimitError,ImagePixelHeightLimitExceeded,
                      message);
       return MagickFail;
@@ -3267,9 +3267,9 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
 
         errno=0;
         FormatString(message,
-                     "%" MAGICK_INT64_F "d > %" MAGICK_INT64_F "u \"%.1024s\"",
-                     total_pixels,
-                     GetMagickResourceLimit(PixelsResource),image->filename);
+                     "%" MAGICK_INTMAX_F "d > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
+                     (magick_intmax_t) total_pixels,
+                     (magick_uintmax_t) GetMagickResourceLimit(PixelsResource),image->filename);
         ThrowException(exception,ResourceLimitError,ImagePixelLimitExceeded,
                        message);
         return MagickFail;

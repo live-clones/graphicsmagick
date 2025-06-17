@@ -551,7 +551,7 @@ LogPolygonInfo(const PolygonInfo *polygon_info)
   p=polygon_info->edges;
   for (i=0; i < polygon_info->number_edges; i++)
   {
-    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      edge %"MAGICK_SIZE_T_F"u:",(MAGICK_SIZE_T) i);
+    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      edge %" MAGICK_SIZE_T_F "u:",(MAGICK_SIZE_T) i);
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      direction: %s",
       p->direction ? "down" : "up");
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      ghostline: %s",
@@ -2547,7 +2547,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   size_t NeedAllocCount;
 
 #if 0
-  fprintf(stderr,"Needed = %"MAGICK_SIZE_T_F"u\n",(MAGICK_SIZE_T) Needed);
+  fprintf(stderr,"Needed = %" MAGICK_SIZE_T_F "u\n",(MAGICK_SIZE_T) Needed);
 #endif
   /* NeedAllocCount = p_PIMgr->StoreStartingAt + Needed + ((size_t)100 */
   status &= MagickAddSizeT(p_PIMgr->StoreStartingAt, Needed, &NeedAllocCount); /* + Needed */
@@ -2571,9 +2571,9 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
 
 #if 0
       fprintf(stderr,
-              "have_memory=%"MAGICK_SIZE_T_F"u (%"MAGICK_SIZE_T_F"u elem),"
-              " needed_memory=%"MAGICK_SIZE_T_F"u (%"MAGICK_SIZE_T_F"u elem),"
-              " added_memory=%"MAGICK_SIZE_T_F"u\n",
+              "have_memory=%" MAGICK_SIZE_T_F "u (%" MAGICK_SIZE_T_F "u elem),"
+              " needed_memory=%" MAGICK_SIZE_T_F "u (%" MAGICK_SIZE_T_F "u elem),"
+              " added_memory=%" MAGICK_SIZE_T_F "u\n",
               (MAGICK_SIZE_T) have_memory, (MAGICK_SIZE_T) *p_PIMgr->p_AllocCount,
               (MAGICK_SIZE_T) needed_memory, (MAGICK_SIZE_T) NeedAllocCount,
               (MAGICK_SIZE_T) added_memory);
@@ -3574,7 +3574,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t width_resource_limit = GetMagickResourceLimit(WidthResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", width_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) width_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelWidthLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3584,7 +3584,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t hight_resource_limit = GetMagickResourceLimit(HeightResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", hight_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) hight_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelHeightLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3595,7 +3595,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t pixels_resource_limit = GetMagickResourceLimit(PixelsResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", pixels_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) pixels_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelLimitExceeded,resource_str);
                     status=MagickFail;

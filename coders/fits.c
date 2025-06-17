@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -201,7 +201,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
     status,
     value_expected;
 
-  magick_uint64_t
+  magick_uintmax_t
     number_pixels;
 
   ImportPixelAreaOptions import_options;
@@ -369,9 +369,9 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
               if (ax_number > 0)
                 {
                   if (number_pixels == 0)
-                    number_pixels = (magick_uint64_t) y;
+                    number_pixels = (magick_uintmax_t) y;
                   else
-                    number_pixels *= (y <= 0) ? 1U : (magick_uint64_t) y;
+                    number_pixels *= (y <= 0) ? 1U : (magick_uintmax_t) y;
                 }
             }
 
@@ -409,7 +409,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "HDU read finished at offset %" MAGICK_OFF_F "Xh, "
-                            "number of pixels is: %" MAGICK_UINT64_F "u (%d*%d*%d)",
+                            "number of pixels is: %" MAGICK_UINTMAX_F "u (%d*%d*%d)",
                             TellBlob(image),
                             number_pixels,
                             fits_info.columns,

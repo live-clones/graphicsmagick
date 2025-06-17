@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1071,8 +1071,8 @@ static Image *ReadPSDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                       if (logging)
                         {
                           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                                "      unsupported data: length=%"
-                                                MAGICK_SIZE_T_F "u",
+                                                "      unsupported data: "
+                                                "length=%" MAGICK_SIZE_T_F "u",
                                                 (MAGICK_SIZE_T) size-combinedlength);
                         }
                       for (j=0; j < (long) (size-combinedlength); j++)

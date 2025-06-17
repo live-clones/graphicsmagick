@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -970,7 +970,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
       if (IsEventLogged(CoderEvent))
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "scanline_length = %u, "
-                              "scanline_alloc = %"MAGICK_SIZE_T_F"u",
+                              "scanline_alloc = %" MAGICK_SIZE_T_F "u",
                               scanline_length, (MAGICK_SIZE_T)scanline_alloc);
 #endif
       if (scanline_length < 2)
@@ -986,7 +986,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
         {
           if (IsEventLogged(CoderEvent))
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Scanline length %u exceeds allocation %"MAGICK_SIZE_T_F"u",
+                                  "Scanline length %u exceeds allocation %" MAGICK_SIZE_T_F "u",
                                   scanline_length, (MAGICK_SIZE_T)scanline_alloc);
           ThrowException(&image->exception,CorruptImageError,UnableToUncompressImage,
                          image->filename);

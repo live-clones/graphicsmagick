@@ -1250,7 +1250,7 @@ png_read_raw_profile(Image *image, const ImageInfo *image_info,
   if ((length == 0) || ((magick_uintptr_t) (ep-sp) <= length*2))
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "invalid profile length %"MAGICK_SIZE_T_F"u", (MAGICK_SIZE_T) length);
+                            "invalid profile length %" MAGICK_SIZE_T_F "u", (MAGICK_SIZE_T) length);
       ThrowException(exception,CorruptImageWarning,UnableToParseEmbeddedProfile,image->filename);
       return (MagickFail);
     }
@@ -3660,8 +3660,8 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
             {
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "    Copying %" MAGICK_SIZE_T_F
-                                      "u bytes of JDAT chunk data"
+                                      "    Copying %" MAGICK_SIZE_T_F "u"
+                                      " bytes of JDAT chunk data"
                                       " to color_blob.",
                                       (MAGICK_SIZE_T) length);
               (void) WriteBlob(color_image,length,(char *) chunk);
@@ -3670,8 +3670,8 @@ static Image *ReadOneJNGImage(MngInfo *mng_info,
             {
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "    Skipping copy of %" MAGICK_SIZE_T_F
-                                      "u bytes of JDAT chunk data"
+                                      "    Skipping copy of %" MAGICK_SIZE_T_F "u"
+                                      " bytes of JDAT chunk data"
                                       " to color_blob (color_image=%p).",
                                       (MAGICK_SIZE_T) length, color_image);
             }
@@ -4479,8 +4479,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
             {
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "  Reading MNG chunk, count: %"
-                                      MAGICK_SIZE_T_F  "u",
+                                      "  Reading MNG chunk, count: "
+                                      "%" MAGICK_SIZE_T_F  "u",
                                       (MAGICK_SIZE_T) count);
               MngInfoFreeStruct(mng_info,&have_mng_structure);
               ThrowReaderException(CorruptImageError,CorruptImage,image);

@@ -861,7 +861,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
 
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "ExtractPostscript(): PS_Offset=%"MAGICK_OFF_F"d, PS_Size=%"MAGICK_SIZE_T_F"u",
+                          "ExtractPostscript(): PS_Offset=%" MAGICK_OFF_F "d, PS_Size=%" MAGICK_SIZE_T_F "u",
                           (magick_off_t) PS_Offset, (MAGICK_SIZE_T) PS_Size);
 
   /*
@@ -872,7 +872,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to seek to PS_Offset=%" MAGICK_OFF_F "d",
                               (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
@@ -885,7 +885,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to seek to PS_Offset=%" MAGICK_OFF_F "d",
                               (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
@@ -941,7 +941,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "ExtractPostscript(): Failed to allocate "
-                                  "%"MAGICK_SIZE_T_F"u bytes of memory",
+                                  "%" MAGICK_SIZE_T_F "u bytes of memory",
                                   (MAGICK_SIZE_T) PS_Size);
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);
           return image;
@@ -956,7 +956,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       MagickFreeResourceLimitedMemory(ps_data_alloc);
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to read %"MAGICK_SIZE_T_F"u bytes of data at"
+                              "ExtractPostscript(): Failed to read %" MAGICK_SIZE_T_F "u bytes of data at"
                               " offset=%"MAGICK_OFF_F"d",
                               (MAGICK_SIZE_T) PS_Size, (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);

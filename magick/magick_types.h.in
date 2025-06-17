@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+#define _ISOC99_SOURCE 1
+
 #include <inttypes.h> /* Format constants, integer types */
 #include <stddef.h> /* ptrdiff_t, size_t */
 
@@ -71,7 +73,8 @@ extern "C" {
 */
 
 #if (defined(WIN32) || defined(WIN64)) && \
-  !defined(__MINGW32__) && !defined(__MINGW64__)
+  !defined(__MINGW32__) && !defined(__MINGW64__) && \
+  (_MSC_VER < 1910)
 
   /* The following typedefs are used for WIN32 & WIN64 (without
      configure) */
@@ -89,71 +92,88 @@ extern "C" {
 
 #  if defined(MAGICK_IMPLEMENTATION)
 
-#  define MAGICK_INT32_F ""
-#  define MAGICK_UINT32_F ""
+#if 0
+#  define MAGICK_INT32_F ""           /* %d (or %PRId32) */
+#  define MAGICK_UINT32_F ""          /* %d (or %PRIu32) */
 #  define MAGICK_INT64_F "I64"
 #  define MAGICK_UINT64_F "I64"
+#endif
+#  define MAGICK_INTMAX_F "I64"       /* Formatter for intmax_t type */
+#  define MAGICK_UINTMAX_F "I64"      /* Formatter for uintmax_t type */
 
-  typedef magick_uint64_t magick_uintmax_t;
+  /* typedef magick_uint64_t magick_uintmax_t; */
+
+#  define MAGICK_INTMAX_F "j"  /* %jd */
+
+  /* typedef uintmax_t magick_uintmax_t; */ /* uintmax_t */
+#  define MAGICK_UINTMAX_F "j"  /* %ju */
+
+  /* typedef uintptr_t magick_uintptr_t; */ /* uintptr_t */
+#  define MAGICK_UINTPTR_F "t"  /* %tu */
+
+  /* typedef ptrdiff_t magick_ptrdiff_t; */ /* ptrdiff_t */
+#  define MAGICK_PTRDIFF_F "t"  /* %td */
+
 
 #  if defined(WIN64)
   /* WIN64 uses the LLP64 model */
-  typedef unsigned long long magick_uintptr_t;
 #  define MAGICK_SIZE_T_F "I64"
 #  define MAGICK_SIZE_T unsigned __int64
 #  define MAGICK_SSIZE_T_F "I64"
 #  define MAGICK_SSIZE_T signed __int64
-  typedef size_t uintptr_t;
+  typedef unsigned long long magick_uintptr_t;
   typedef signed __int64 ptrdiff_t;
+  typedef unsigned long long magick_uintptr_t; /* uintptr_t */
+  typedef signed __int64 magick_intmax_t; /* intmax_t */
+  typedef unsigned __int64 magick_uintmax_t; /* uintmax_t */
 #  else
-  typedef unsigned long magick_uintptr_t;
+  /* typedef unsigned long magick_uintptr_t; */
 #  define MAGICK_SIZE_T_F "l"
 #  define MAGICK_SIZE_T unsigned long
 #  define MAGICK_SSIZE_T_F ""
 #  define MAGICK_SSIZE_T int
-  typedef long magick_ptrdiff_t
-  typedef unsigned long magick_uintptr_t;
+  typedef long ptrdiff_t
+  typedef unsigned long magick_uintptr_t; /* uintptr_t */
+  typedef signed long magick_intmax_t; /* intmax_t */
+  typedef unsigned long magick_uintmax_t; /* uintmax_t */
 #  endif // defined(WIN64)
+
+#if !defined(ssize_t) && !defined(__MINGW32__) && !defined(__MINGW64__)
+#  if defined(WIN64)
+  typedef __int64 ssize_t;
+#  else
+  typedef int ssize_t;
+#  endif
+#endif /* !defined(ssize_t) && !defined(__MINGW32__) && !defined(__MINGW64__)*/
 
 #endif /* if defined(MAGICK_IMPLEMENTATION) */
 
 #else
 
   /* The following typedefs are substituted when using Unixish configure */
-  typedef @INT8_T@   magick_int8_t;     /* int8_t */
-  typedef @UINT8_T@  magick_uint8_t;    /* uint8_t */
+  typedef int8_t   magick_int8_t;     /* int8_t */
+  typedef uint8_t  magick_uint8_t;    /* uint8_t */
 
-  typedef @INT16_T@  magick_int16_t;    /* int16_t */
-  typedef @UINT16_T@ magick_uint16_t;   /* uint16_t */
+  typedef int16_t  magick_int16_t;    /* int16_t */
+  typedef uint16_t magick_uint16_t;   /* uint16_t */
 
-  typedef @INT32_T@  magick_int32_t;    /* int32_t */
-  typedef @UINT32_T@ magick_uint32_t;   /* uint32_t */
+  typedef int32_t  magick_int32_t;    /* int32_t */
+  typedef uint32_t magick_uint32_t;   /* uint32_t */
 
-  typedef @INT64_T@  magick_int64_t;    /* int64_t */
-  typedef @UINT64_T@ magick_uint64_t;   /* uint64_t */
+  typedef int64_t  magick_int64_t;    /* int64_t */
+  typedef uint64_t magick_uint64_t;   /* uint64_t */
 
 #  if defined(MAGICK_IMPLEMENTATION)
 
-  /*
-    As a stupid annoyance, the formatter (e.g. 'd', 'i', 'u', 'o',
-    'x', 'X') for PRI expressions is in the middle rather than
-    concatenated at the end! Existing code adds the formatter at the
-    end since that is how the printf formatters normally work.
+#if 0
+#  define MAGICK_INT32_F  ""          /* %d (or %PRId32) */
+#  define MAGICK_UINT32_F ""          /* %d (or %PRIu32) */
+#  define MAGICK_INT64_F  PRId64      /* %PRId64 */
+#  define MAGICK_UINT64_F PRIu64      /* %PRIu64 */
+#endif
 
-    As another annoyance, fscanf() uses SCN expressions.
-
-    As yet another annoyance, with the introduction of user-defined
-    literals in C++ (C++11), white space needs to be added prior to
-    use of the format macros.  This means (at least in C++) that using
-    code should have spaces before and after use of the macro.
-
-    If we use these formatting macros, then much code needs to be
-    updated.
-  */
-#  define MAGICK_INT32_F @INT32_F@      /* %PRId32 */
-#  define MAGICK_UINT32_F @UINT32_F@    /* %PRIu32 */
-#  define MAGICK_INT64_F @INT64_F@      /* %PRId64 */
-#  define MAGICK_UINT64_F @UINT64_F@    /* %PRIu64 */
+#  define MAGICK_INTMAX_F "j"         /* Formatter for intmax_t type */
+#  define MAGICK_UINTMAX_F "j"        /* Formatter for uintmax_t type */
 
   /*
     C99 special size specifiers:
@@ -164,25 +184,25 @@ extern "C" {
     j  - intmax_t / uintmax_t
     z  - signed size_t / size_t
     t  - ptrdiff_t / unsigned ptrdiff_t
-
-    Even in 2024, MinGW GCC 14.10 complains about any use of 'z',
-    regardless of if the Windows runtime supports it.
   */
 
-  typedef @UINTMAX_T@ magick_uintmax_t; /* uintmax_t */
-#  define MAGICK_UINTMAX_F @UINTMAX_F@  /* %ju */
+  typedef intmax_t magick_intmax_t; /* intmax_t */
+#  define MAGICK_INTMAX_F "j"  /* %jd */
 
-  typedef @UINTPTR_T@ magick_uintptr_t; /* uintptr_t */
-#  define MAGICK_UINTPTR_F @UINTPTR_F@  /* %tu */
+  typedef uintmax_t magick_uintmax_t; /* uintmax_t */
+#  define MAGICK_UINTMAX_F "j"  /* %ju */
 
-  typedef @PTRDIFF_T@ magick_ptrdiff_t; /* ptrdiff_t */
-#  define MAGICK_PTRDIFF_F @PTRDIFF_F@  /* %td */
+  typedef uintptr_t magick_uintptr_t; /* uintptr_t */
+#  define MAGICK_UINTPTR_F "t"  /* %tu */
 
-#  define MAGICK_SIZE_T_F @MAGICK_SIZE_T_F@ /* %zu */
-#  define MAGICK_SIZE_T @MAGICK_SIZE_T@     /* size_t */
+  typedef ptrdiff_t magick_ptrdiff_t; /* ptrdiff_t */
+#  define MAGICK_PTRDIFF_F "t"  /* %td */
 
-#  define MAGICK_SSIZE_T_F @MAGICK_SSIZE_T_F@ /* %zd */
-#  define MAGICK_SSIZE_T @MAGICK_SSIZE_T@     /* ssize_t */
+#  define MAGICK_SIZE_T_F "z" /* %zu */
+#  define MAGICK_SIZE_T size_t     /* size_t */
+
+#  define MAGICK_SSIZE_T_F "z" /* %zd */
+#  define MAGICK_SSIZE_T ssize_t     /* ssize_t */
 
 #endif /* defined(MAGICK_IMPLEMENTATION) */
 
@@ -192,7 +212,7 @@ extern "C" {
   typedef magick_int64_t magick_off_t;
 
 #if defined(MAGICK_IMPLEMENTATION)
-#  define MAGICK_OFF_F MAGICK_INT64_F
+#  define MAGICK_OFF_F MAGICK_INTMAX_F
 #endif /* defined(MAGICK_IMPLEMENTATION) */
 
 #if defined(__cplusplus) || defined(c_plusplus)

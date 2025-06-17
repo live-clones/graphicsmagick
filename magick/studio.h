@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2024 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -14,6 +14,8 @@
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
+
+#define _ISOC99_SOURCE 1
 
 /*
   This define is not used by GraphicsMagick and it causes some headers
