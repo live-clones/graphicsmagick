@@ -1,5 +1,12 @@
 2025-06-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* NEWS.txt: Update the news.
+
+	* magick/magick_types.h.in, VisualMagick/magick/magick_types.h.in:
+	Reduce to pure C'99 definitions from standard header files.  Note
+	that for Visual Studio, Visual Studio 2015 or later is needed in
+	order to support C'99.
+
 	* magick/common.h: Use function attribute __gnu_printf__ rather
 	than __printf__ in function attribute declarations in order to
 	allow C'99 formatters with MINGW64 GCC.  New macro

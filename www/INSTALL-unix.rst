@@ -921,9 +921,8 @@ sub-commands will work) and it includes the Freetype v2 DLL required
 to support TrueType and Postscript Type 1 fonts. Make sure that
 /usr/X11R6/bin is in your PATH prior to running configure.
 
-If you are using Cygwin version 1.3.9 or later, you may specify the
-configure option '--enable-shared' to build Cygwin DLLs, and
-additionally '--with-modules' to enable use of loadable
+You may specify the configure option '--enable-shared' to build Cygwin
+DLLs, and additionally '--with-modules' to enable use of loadable
 modules. Specifying '--enable-shared' is required if you want to build
 PerlMagick under Cygwin because Cygwin does not provide the libperl.a
 static library required to create a static PerlMagick.  Note that

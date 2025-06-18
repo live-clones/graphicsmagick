@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to June 9, 2025.</p>
+<p>This file was last updated to reflect changes up to June 17, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -174,7 +174,8 @@ transition&quot;,
 it may be expressed in valid XML.</p></li>
 <li><p>Header Magic: When identifying files via their header, there is now
 a magic description field to indicate the sub-format used.</p></li>
-<li><p>Header Magic: Include a format description in the output of 'gm convert -list magic'.</p></li>
+<li><p>Header Magic: Include a format description in the output of 'gm
+convert -list magic'.</p></li>
 <li><p>TIFF: Add support for libtiff 4.5 TIFFWarningExtR() and
 TIFFErrorExtR() in order to provide an error handling context per
 TIFF handle.  This improves concurrency and thread safety when
@@ -198,6 +199,16 @@ other libraries.</p></li>
 </ul>
 <p>Build Changes:</p>
 <ul class="simple">
+<li><p>The build now requires a C'99 compatible compiler (inttypes.h,
+stdint.h, and printf 'j', 'z', and 't' formatters).  This means that
+(absent additional porting efforts) Solaris 10 U8 (released in
+October 2009) may be the oldest system supported.  C'89 is obviously
+from 1989 and although I was glad to hear that systems from the
+mid'90s were still able to compile and use recent GraphicsMagick,
+adding the C'99 requirement is part of an effort to simplify
+GraphicsMagick configuration requirements.  Libraries that
+GraphicsMagick optionally uses had already adopted a C'99 or
+C'11 (2011) requirement.</p></li>
 <li><p>Use Autoconf 2.72.</p></li>
 <li><p>Use Automake 1.17.</p></li>
 <li><p>Update Libtool to version 2.5.4.</p></li>
@@ -209,7 +220,8 @@ removed. This is indicated when
 FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is defined.</p></li>
 <li><p>The oss-fuzz build script (fuzzing/oss-fuzz-build.sh) is
 subtantially updated to build a fully-featured libheif, with a set
-of common libraries it depends on.</p></li>
+of common libraries it depends on. In fact, all of the dependencies
+(except for some rarely-used libtiff dependencies) are now included.</p></li>
 </ul>
 </section>
 <section id="august-27-2024">

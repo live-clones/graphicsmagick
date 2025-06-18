@@ -279,11 +279,11 @@ Visual C++ 16.X through 17.13.6 Compilation
   required.  Non-commercial users are recommended to use the free
   Visual Studio Community Edition.
 
-  The Visual C++ distribution targeted at Windows 2000 through Windows
-  10 does not provide any stock workspace (DSW) or project files (DSP)
+  The Visual C++ distribution targeted at Windows 8 through Windows 11
+  does not provide any stock workspace (DSW) or project files (DSP)
   except for those included with third party libraries. Instead, there
-  is a "configure" program that must run to create build
-  environments to satisfy various requirements.
+  is a "configure" program that must run to create build environments
+  to satisfy various requirements.
 
   The configure program resides in ``VisualMagick\configure`` in the
   GraphicsMagick source tree.  A pre-compiled configure.exe is
@@ -426,12 +426,12 @@ Visual C++ 16.X through 17.13.6 Compilation
 
   Note #1:
 
-  If your Visual Studio is not a paid/professional version (prior than
-  perhaps Visual Studio 2019), then it might not include the
-  components required to build UTIL_IMDisplay.  A build failure will
-  therefore result if UTIL_IMDisplay is not removed from the project
-  file. If the Build step fails for UTIL_IMDisplay, then simply remove
-  it from the project file.
+  If your Visual Studio is not a paid/professional version (prior to
+  Visual Studio 2019), then it might not include the components
+  required to build UTIL_IMDisplay.  A build failure will therefore
+  result if UTIL_IMDisplay is not removed from the project file. If
+  the Build step fails for UTIL_IMDisplay, then simply remove it from
+  the project file.
 
   Note #2:
 
@@ -615,10 +615,9 @@ Windows Distribution Build Procedure
 ------------------------------------
 
   The following are the instructions for how to build a Q:8 (or Q:16)
-  DLL-based distribution installer package using Visual Studio 2008
-  Professional.  This is the same procedure used to produce the
-  release packages.  The PerlMagick steps are skipped as of
-  GraphicsMagick 1.3.26):
+  DLL-based distribution installer package using Visual Studio 2019.
+  This is the same procedure used to produce the release packages.
+  The PerlMagick steps are skipped as of GraphicsMagick 1.3.26):
 
   1. Install prerequisite software:
 
