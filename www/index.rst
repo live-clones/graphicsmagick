@@ -82,10 +82,10 @@ OpenMP_ 2.0 specification.
 
 GraphicsMagick is quite portable, and compiles under almost every
 modern general purpose operating system that runs on 32-bit or 64-bit
-CPUs and which provides a C'99 compatible compiler.  GraphicsMagick is
-available for Unix or Unix-like systems, including Linux. It also runs
-under `Windows <INSTALL-windows.html>`_ 8 and later (8.X, 10, 11), and
-MacOS-X.
+CPUs and which provides a C'99 compatible compiler (e.g. supports
+`stdint.h`).  GraphicsMagick is available for Unix or Unix-like
+systems, including Linux. It also runs under `Windows
+<INSTALL-windows.html>`_ 8 and later (8.X, 10, 11), and MacOS-X.
 
 GraphicsMagick supports huge images and has been tested with
 gigapixel-size images. GraphicsMagick can create new images on the

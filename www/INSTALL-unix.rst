@@ -73,6 +73,15 @@ a command similar to::
 Build Configuration
 -------------------
 
+As of June 17, 2025, GraphicsMagick requires a C'99 compiler, with
+standard inttypes.h and stdint.h header files, and working printf
+support (e.g. 'j', 'z', and 't' size specifiers) for types declared in
+stdint.h.  For releases prior to this date, GraphicsMagick built its
+own type definitions based on the data types/sizes available. Users of
+modern Unix/Linux systems should have no issues due to this change,
+but Unix-style builds under Microsoft Windows (e.g. MinGW) may be
+negatively impacted if the compiler is too old.
+
 Use 'configure' to automatically configure, build, and install
 GraphicsMagick. The configure script may be executed from the
 GraphicsMagick source directory (e.g ./configure) or from a separate

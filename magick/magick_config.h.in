@@ -415,17 +415,11 @@
 /* Define to 1 if you have the 'times' function. */
 #undef HAVE_TIMES
 
-/* Define to 1 if the system has the type 'uintmax_t'. */
-#undef HAVE_UINTMAX_T
-
 /* Define to 1 if you have the 'ulltostr' function. */
 #undef HAVE_ULLTOSTR
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define to 1 if the system has the type 'unsigned long long int'. */
-#undef HAVE_UNSIGNED_LONG_LONG_INT
 
 /* Define to 1 if you have the 'vsnprintf' function. */
 #undef HAVE_VSNPRINTF
@@ -768,15 +762,6 @@
 /* Define to 1 on platforms where this makes time_t a 64-bit type. */
 #undef __MINGW_USE_VC2005_COMPAT
 
-/* Define to empty if 'const' does not conform to ANSI C. */
-#undef const
-
-/* Define to '__inline__' or '__inline' if that's what the C compiler
-   calls it, or to nothing if 'inline' is not supported under any name.  */
-#ifndef __cplusplus
-#undef inline
-#endif
-
 /* Define to 'int' if <sys/types.h> does not define. */
 #undef mode_t
 
@@ -801,12 +786,5 @@
 # define __restrict__
 #endif
 
-/* Define as 'unsigned int' if <stddef.h> doesn't define. */
-#undef size_t
-
 /* Define as 'int' if <sys/types.h> doesn't define. */
 #undef ssize_t
-
-/* Define to the widest unsigned integer type if <stdint.h> and <inttypes.h>
-   do not define. */
-#undef uintmax_t

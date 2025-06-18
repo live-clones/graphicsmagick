@@ -11,7 +11,7 @@
 # Written by Bob Friesenhahn <bfriesen@GraphicsMagick.org>
 #
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.72])
 AC_INIT
 AC_CONFIG_SRCDIR([magick/magick.h])
 
@@ -231,6 +231,11 @@ AC_SUBST([top_srcdir_native])
 
 # Check for programs
 AC_PROG_CC
+AC_MSG_CHECKING([ANSI C compiler language standard version])
+AC_MSG_RESULT([$ac_prog_cc_stdc])
+#if test "$ac_prog_cc_stdc" = 'c89' ; then
+#   AC_MSG_ERROR([ANSI c99 (or later) is required!])
+#fi
 AC_PROG_CPP
 LT_PATH_LD
 AC_SUBST([LD])
@@ -942,9 +947,6 @@ AC_ARG_WITH([libstdc],
   fi])
 AC_SUBST([LIBSTDCLDFLAGS])
 
-# Does gcc required -traditional?
-AC_PROG_GCC_TRADITIONAL
-
 ########
 #
 # Set defines required to build DLLs and modules using MinGW
@@ -991,8 +993,14 @@ AC_SUBST([LIBRARY_EXTRA_CPPFLAGS])
 # Check standard headers
 AC_HEADER_DIRENT
 
+# Check for the existence of inttypes.h
+AC_CHECK_HEADER([inttypes.h], [AC_DEFINE([HAVE_INTTYPES_H], [1], [Define to 1 if you have the <inttypes.h> header file.])], [AC_MSG_ERROR([inttypes.h not found, cannot build])])
+
+# Check for the existence of stdint.h
+AC_CHECK_HEADER([stdint.h], [AC_DEFINE([HAVE_STDINT_H], [1], [Define to 1 if you have the <stdint.h> header file.])], [AC_MSG_ERROR([stdint.h not found, cannot build])])
+
 # Check additional headers
-AC_CHECK_HEADERS([inttypes.h machine/param.h mach-o/dyld.h process.h stdint.h sun_prefetch.h sys/mman.h sys/resource.h sys/times.h sys/types.h])
+AC_CHECK_HEADERS([machine/param.h mach-o/dyld.h process.h sun_prefetch.h sys/mman.h sys/resource.h sys/times.h sys/types.h])
 AC_CHECK_HEADERS([wincrypt.h],[],[],[#include <windows.h>])
 
 case "${host_os}" in
@@ -1012,7 +1020,7 @@ esac
 
 # If the C compiler does not fully support the ANSI C qualifier const,
 # define const to be empty.
-AC_C_CONST
+#AC_C_CONST
 
 # If the C compiler supports the keyword restrict, do
 # nothing. Otherwise define restrict to __restrict__ or __restrict if
@@ -1022,7 +1030,7 @@ AC_C_RESTRICT
 # If the C compiler supports the keyword inline, do nothing. Otherwise
 # define inline to __inline__ or __inline if it accepts one of those,
 # otherwise define inline to be empty.
-AC_C_INLINE
+#AC_C_INLINE
 
 # If words are stored with the most significant byte first (like
 # Motorola and SPARC CPUs), define `WORDS_BIGENDIAN'.
@@ -1038,17 +1046,22 @@ AC_TYPE_OFF_T
 AC_TYPE_PID_T
 
 # Define size_t to a suitable type, if standard headers do not define it.
-AC_TYPE_SIZE_T
+#AC_TYPE_SIZE_T
 
 # Define ssize_t to a suitable type, if standard headers do not define it.
 AC_TYPE_SSIZE_T
 
 # Define uintmax_t to a suitable type, if standard headers do not define it.
-AC_TYPE_UINTMAX_T
+#AC_TYPE_UINTMAX_T
 
 # If C compiler supports a working long double type with more range
 # or precision than the double type then define HAVE_LONG_DOUBLE_WIDER.
 # This is used by magick/quantize.c.
+#
+# GCC and clang's pre-processors define __SIZEOF_DOUBLE__ and__SIZEOF_LONG_DOUBLE__
+#   cpp -dM < /dev/null |fgrep SIZEOF
+#   gcc -dM -E - < /dev/null
+#   clang -dM -E - < /dev/null
 AC_TYPE_LONG_DOUBLE_WIDER
 
 # If the C type char is unsigned, define __CHAR_UNSIGNED__, unless the

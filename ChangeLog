@@ -1,3 +1,17 @@
+2025-06-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* m4/acx_pthread.m4: Update to modern syntax.
+
+	* configure.ac: Check and report the ANSI C compiler language
+	standard version and add specific checks for inttypes.h and
+	stdint.h.
+
+	* www/INSTALL-unix.rst: Add notes about a C'99 compiler now being
+	required.
+
+	* www/INSTALL-windows.rst: Add a note that a Microsoft Visual C++
+	Redistributable package is required.
+
 2025-06-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

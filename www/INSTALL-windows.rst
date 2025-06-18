@@ -22,6 +22,13 @@ Installing Using Installer Package
 Prerequisites
 -------------
 
+  Windows release packages after June 18, 2025 require the common
+  `Microsoft Visual C++ Redistributable version
+  <https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170>`
+  to be installed in order to be able to execute.  Most modern Windows
+  systems (Windows 8 and later) very likely already have this
+  installed.
+
   While multiple versions of GraphicsMagick may be installed at one
   time, if your intention is to replace a prior installation of
   GraphicsMagick with a newer version, then it is wise to uninstall
@@ -623,7 +630,7 @@ Windows Distribution Build Procedure
 
     a. Install Microsoft Visual Studio.
 
-    b. Download and install Inno Setup 6
+    b. Download and install Inno Setup
        <"http://www.jrsoftware.org/isinfo.php">.
 
     c. Download and install ActiveState ActivePerl (optional)
