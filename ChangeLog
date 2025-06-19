@@ -1,5 +1,8 @@
 2025-06-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/attribute.c (tag_table): Capture more EXIF tags, and try
+	to add tag type information for each tag.
+
 	* coders/png.c (WriteOnePNGImage): Cache the output filename
 	before invoking setjmp() and use it when setjmp() returns
 	failure. Hopefully will eliminate oss-fuzz 423668251
