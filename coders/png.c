@@ -7164,6 +7164,9 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
     lcms_vers[32];
 #endif
 
+  char
+    filename[MaxTextExtent];
+
   Image
     * volatile imagev = imagep,  /* Use only 'imagev' before setjmp() */
     *image;                      /* Use only 'image' after setjmp() */
@@ -7243,6 +7246,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
 
   if (imagev == (Image *) NULL)
     return(MagickFalse);
+
+  (void) MagickStrlCpy(filename, imagev->filename, sizeof(filename));
 
   /* Define these outside of the following "if logging()" block so they will
    * show in debuggers.
@@ -7334,10 +7339,9 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
       /*
         Handle write failure by removing the output file.
       */
-      if ((image != (Image *) NULL) &&
-          (unlink(image->filename) != -1))
+      if (unlink(filename) != -1)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Removed broken output file \"%s\"",image->filename);
+                              "Removed broken output file \"%s\"",filename);
 
 #if defined(GMPNG_SETJMP_NOT_THREAD_SAFE)
       UnlockSemaphoreInfo(png_semaphore);
