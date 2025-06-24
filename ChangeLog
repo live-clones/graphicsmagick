@@ -1,5 +1,8 @@
 2025-06-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* fuzzing/oss-fuzz-build.sh (enable_de265): Disable compilation of
+	libde265 since it is currently not successfully compiling.
+
 	* magick/attribute.c: Update EXIF tag definitions for Exif Version
 	3.0. Add more information about the tags. Explore use of bsearch()
 	for tag look-up.

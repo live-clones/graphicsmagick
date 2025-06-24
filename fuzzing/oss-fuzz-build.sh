@@ -48,7 +48,7 @@ apt install autoconf-archive
 
 enable_aom=true
 enable_bzip2=true
-enable_de265=true
+enable_de265=false
 enable_freetype=true
 enable_heif=true
 enable_jasper=true
