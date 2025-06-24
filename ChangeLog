@@ -1,3 +1,9 @@
+2025-06-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/attribute.c: Update EXIF tag definitions for Exif Version
+	3.0. Add more information about the tags. Explore use of bsearch()
+	for tag look-up.
+
 2025-06-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/attribute.c (tag_table): Capture more EXIF tags, and try

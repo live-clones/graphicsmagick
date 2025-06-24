@@ -1085,321 +1085,427 @@ Generate8BIMAttribute(Image *image,const char *key)
 #define EXIF_TAG_STOP  0xFFFF
 #define TAG_EXIF_OFFSET  0x8769
 #define TAG_INTEROP_OFFSET  0xa005
-#define GPS_TAG_START 0x01
-#define GPS_TAG_STOP  0x1D
+#define GPS_TAG_START 0x0001
+#define GPS_TAG_STOP  0x001D
 #define GPS_OFFSET 0x8825
 #define GPS_LATITUDE 0x0002
 #define GPS_LONGITUDE 0x0004
 #define GPS_TIMESTAMP 0x0007
 #define MAX_TAGS_PER_IFD 1024 /* Maximum tags allowed per IFD */
 #define EXIF_ORIENTATION 0x0112
+#define AnyCount -1
 
-static const struct
+typedef struct _IFDTagTableType
 {
   unsigned short
     tag;
 
-  unsigned short
+  short
     format;
 
+  short
+    count; /* -1 == Any, 0 == not set yet */
+
   const char
-    description[32];
+    description[36];
 
   /*
     Add tag format and component numbers
     https://www.media.mit.edu/pia/Research/deepview/exif.html
   */
+} IFDTagTableType;
 
-}
+#define TAG_INFO(tag,format,count,description) {tag,format,count,description}
+
+/* https://en.wikipedia.org/wiki/Exif */
+/* Microsoft Windows GDI+ tags are documented at https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-constant-property-tags-in-numerical-order */
+
+static IFDTagTableType
 tag_table[] =
   {
-#define TAG_INFO(tag,format,description) {tag,format,description}
     /*
-      GPS Attributes come from the GPS Info IFD and may be in separate
+      GPS Info IFD tags. These should be in a separate numeric space
+      from EXIF/TIFF tags!
+    */
+    TAG_INFO(0x0000, EXIF_FMT_BYTE, 4, "GPSVersionID"), /* GPS IFD */
+    TAG_INFO(0x0001, EXIF_FMT_ASCII, 2, "GPSLatitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0002, EXIF_FMT_URATIONAL, 3, "GPSLatitude"), /* GPS IFD */
+    TAG_INFO(0x0003, EXIF_FMT_ASCII, 2, "GPSLongitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0004, EXIF_FMT_URATIONAL, 3, "GPSLongitude"), /* GPS IFD */
+    TAG_INFO(0x0005, EXIF_FMT_BYTE, 1, "GPSAltitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0006, EXIF_FMT_URATIONAL, 1, "GPSAltitude"), /* GPS IFD */
+    TAG_INFO(0x0007, EXIF_FMT_URATIONAL, 3, "GPSTimeStamp"), /* GPS IFD */
+    TAG_INFO(0x0008, EXIF_FMT_ASCII, AnyCount, "GPSSatellites"), /* GPS IFD */
+    TAG_INFO(0x0009, EXIF_FMT_ASCII, 2, "GPSStatus"), /* GPS IFD */
+    TAG_INFO(0x000A, EXIF_FMT_ASCII, 2, "GPSMeasureMode"), /* GPS IFD */
+    TAG_INFO(0x000B, EXIF_FMT_URATIONAL, 1, "GPSDOP"), /* GPS IFD */
+    TAG_INFO(0x000C, EXIF_FMT_ASCII, 2, "GPSSpeedRef"), /* GPS IFD */
+    TAG_INFO(0x000D, EXIF_FMT_URATIONAL, 1, "GPSSpeed"), /* GPS IFD */
+    TAG_INFO(0x000E, EXIF_FMT_ASCII, 2, "GPSTrackRef"), /* GPS IFD */
+    TAG_INFO(0x000F, EXIF_FMT_URATIONAL, 1, "GPSTrack"), /* GPS IFD */
+    TAG_INFO(0x0010, EXIF_FMT_ASCII, 2, "GPSImgDirectionRef"), /* GPS IFD */
+    TAG_INFO(0x0011, EXIF_FMT_URATIONAL, 1, "GPSImgDirection"), /* GPS IFD */
+    TAG_INFO(0x0012, EXIF_FMT_ASCII, 0, "GPSMapDatum"), /* GPS IFD */
+    TAG_INFO(0x0013, EXIF_FMT_ASCII, 2, "GPSDestLatitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0014, EXIF_FMT_URATIONAL, 3, "GPSDestLatitude"), /* GPS IFD */
+    TAG_INFO(0x0015, EXIF_FMT_ASCII, 2, "GPSDestLongitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0016, EXIF_FMT_URATIONAL, 3, "GPSDestLongitude"), /* GPS IFD */
+    TAG_INFO(0x0017, EXIF_FMT_ASCII, 2, "GPSDestBearingRef"), /* GPS IFD */
+    TAG_INFO(0x0018, EXIF_FMT_URATIONAL, 1, "GPSDestBearing"), /* GPS IFD */
+    TAG_INFO(0x0019, EXIF_FMT_ASCII, 2, "GPSDestDistanceRef"), /* GPS IFD */
+    TAG_INFO(0x001A, EXIF_FMT_URATIONAL, 1, "GPSDestDistance"), /* GPS IFD */
+    TAG_INFO(0x001B, EXIF_FMT_UNDEFINED, AnyCount, "GPSProcessingMethod"), /* GPS IFD */
+    TAG_INFO(0x001C, EXIF_FMT_UNDEFINED, AnyCount, "GPSAreaInformation"), /* GPS IFD */
+    TAG_INFO(0x001D, EXIF_FMT_ASCII, 11, "GPSDateStamp"), /* GPS IFD */
+    TAG_INFO(0x001E, EXIF_FMT_USHORT, 1, "GPSDifferential"), /* GPS IFD */
+    TAG_INFO(0x001F, EXIF_FMT_URATIONAL, 1, "GPSHPositioningError"), /* GPS IFD */
+
+    TAG_INFO(0x0100, EXIF_FMT_USHORT  /* or EXIF_FMT_ULONG */, 1, "ImageWidth"),
+    TAG_INFO(0x0101, EXIF_FMT_USHORT  /* or EXIF_FMT_ULONG */, 1, "ImageLength"),
+    TAG_INFO(0x0102, EXIF_FMT_USHORT, 3, "BitsPerSample"),
+    TAG_INFO(0x0103, EXIF_FMT_USHORT, 1, "Compression"),
+    TAG_INFO(0x0106, EXIF_FMT_USHORT, 1, "PhotometricInterpretation"),
+    TAG_INFO(0x010A, EXIF_FMT_USHORT, 1, "FillOrder"),
+    TAG_INFO(0x010D, EXIF_FMT_ASCII, AnyCount, "DocumentName"),
+    TAG_INFO(0x010E, EXIF_FMT_ASCII, AnyCount, "ImageDescription"),
+    TAG_INFO(0x010F, EXIF_FMT_ASCII, AnyCount, "Make"),
+    TAG_INFO(0x0110, EXIF_FMT_ASCII, AnyCount, "Model"),
+    TAG_INFO(0x0111, EXIF_FMT_USHORT /* or EXIF_FMT_ULONG */, 0, "StripOffsets"),
+    TAG_INFO(0x0112, EXIF_FMT_USHORT, 1, "Orientation"),
+    TAG_INFO(0x0115, EXIF_FMT_USHORT, 1, "SamplesPerPixel"),
+    TAG_INFO(0x0116, EXIF_FMT_USHORT /* or EXIF_FMT_ULONG */, 1, "RowsPerStrip"),
+    TAG_INFO(0x0117, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, 0, "StripByteCounts"),
+    TAG_INFO(0x0118, EXIF_FMT_USHORT, 0, "MinSampleValue"),
+    TAG_INFO(0x0119, EXIF_FMT_USHORT, 0, "MaxSampleValue"),
+    TAG_INFO(0x011A, EXIF_FMT_URATIONAL, 1, "XResolution"),
+    TAG_INFO(0x011B, EXIF_FMT_URATIONAL, 1, "YResolution"),
+    TAG_INFO(0x011C, EXIF_FMT_USHORT, 1, "PlanarConfiguration"),
+    TAG_INFO(0x011D, EXIF_FMT_ASCII, 0, "PageName"),
+    TAG_INFO(0x011E, EXIF_FMT_URATIONAL, 1, "XPosition"),
+    TAG_INFO(0x011F, EXIF_FMT_URATIONAL, 1, "YPosition"),
+
+    TAG_INFO(0x0120, EXIF_FMT_ULONG, AnyCount, "FreeOffsets"), /* Defunct feature */
+    TAG_INFO(0x0121, EXIF_FMT_ULONG, AnyCount, "FreeByteCounts"), /* Defunct feature */
+    TAG_INFO(0x0122, EXIF_FMT_USHORT, 1, "GrayResponseUnit"),
+    TAG_INFO(0x0123, EXIF_FMT_USHORT, 0 /* 2**BitsPerSample */, "GrayResponseCurve"),
+    TAG_INFO(0x0124, EXIF_FMT_ULONG, 1, "T4Options"),
+    TAG_INFO(0x0125, EXIF_FMT_ULONG, 1, "T6Options"),
+    TAG_INFO(0x0128, EXIF_FMT_USHORT, 1, "ResolutionUnit"),
+    TAG_INFO(0x012D, EXIF_FMT_USHORT, 3*256, "TransferFunction"),
+    TAG_INFO(0x0131, EXIF_FMT_ASCII, 0, "Software"),
+    TAG_INFO(0x0132, EXIF_FMT_ASCII, 20, "DateTime"),
+    TAG_INFO(0x013B, EXIF_FMT_ASCII, 0, "Artist"),
+    TAG_INFO(0x013C, EXIF_FMT_ASCII, 0, "HostComputer"),
+    TAG_INFO(0x013D, EXIF_FMT_USHORT, 0, "Predictor"),
+    TAG_INFO(0x013E, EXIF_FMT_URATIONAL, 2, "WhitePoint"),
+    TAG_INFO(0x013F, EXIF_FMT_URATIONAL, 6, "PrimaryChromaticities"),
+    TAG_INFO(0x0140, EXIF_FMT_USHORT, 0, "ColorMap"),
+    TAG_INFO(0x0141, EXIF_FMT_USHORT, 0, "HalfToneHints"),
+    TAG_INFO(0x0142, EXIF_FMT_USHORT, 0, "TileWidth"),
+    TAG_INFO(0x0143, EXIF_FMT_USHORT, 0, "TileLength"),
+    TAG_INFO(0x0144, EXIF_FMT_ULONG, 0, "TileOffsets"),
+    TAG_INFO(0x0145, EXIF_FMT_USHORT, 0, "TileByteCounts"),
+    TAG_INFO(0x014A, EXIF_FMT_ULONG, 0, "SubIFD"),
+    TAG_INFO(0x014C, EXIF_FMT_USHORT, 0, "InkSet"),
+    TAG_INFO(0x014D, EXIF_FMT_ASCII, 0, "InkNames"),
+    TAG_INFO(0x014E, EXIF_FMT_USHORT, 0, "NumberOfInks"),
+    TAG_INFO(0x0150, EXIF_FMT_BYTE /* or EXIF_FMT_SHORT */, 0 /* 2, or 2*SamplesPerPixel */, "DotRange"),
+    TAG_INFO(0x0151, EXIF_FMT_ASCII, 0, "TargetPrinter"),
+    TAG_INFO(0x0152, EXIF_FMT_USHORT, 0, "ExtraSample"),
+    TAG_INFO(0x0153, EXIF_FMT_USHORT, 0, "SampleFormat"),
+    TAG_INFO(0x0154, EXIF_FMT_NOTYPE, 0, "SMinSampleValue"), /* BYTE or SHORT or LONG or RATIONAL or DOUBLE */
+    TAG_INFO(0x0155, EXIF_FMT_NOTYPE, 0, "SMaxSampleValue"), /* BYTE or SHORT or LONG or RATIONAL or DOUBLE */
+    TAG_INFO(0x0156, EXIF_FMT_USHORT, 0, "TransferRange"),
+    TAG_INFO(0x0157, EXIF_FMT_BYTE, AnyCount, "ClipPath"),
+    TAG_INFO(0x0158, EXIF_FMT_ULONG, 1, "XClipPathUnits"),
+    TAG_INFO(0x0159, EXIF_FMT_ULONG, 1, "YClipPathUnits"),
+    TAG_INFO(0x015A, EXIF_FMT_USHORT, 1, "Indexed"),
+    TAG_INFO(0x015B, EXIF_FMT_UNDEFINED, 0, "JPEGTables"),
+    TAG_INFO(0x015F, EXIF_FMT_USHORT, 0, "OPIProxy"),
+    TAG_INFO(0x0200, EXIF_FMT_USHORT, 0, "JPEGProc"),
+    TAG_INFO(0x0201, EXIF_FMT_ULONG, 1, "JPEGInterchangeFormat"),
+    TAG_INFO(0x0202, EXIF_FMT_ULONG, 1, "JPEGInterchangeFormatLength"),
+    TAG_INFO(0x0203, EXIF_FMT_USHORT, 0, "JPEGRestartInterval"),
+    TAG_INFO(0x0205, EXIF_FMT_USHORT, 0, "JPEGLosslessPredictors"),
+    TAG_INFO(0x0206, EXIF_FMT_USHORT, 0, "JPEGPointTransforms"),
+    TAG_INFO(0x0207, EXIF_FMT_ULONG, 0, "JPEGQTables"),
+    TAG_INFO(0x0208, EXIF_FMT_ULONG, 0, "JPEGDCTables"),
+    TAG_INFO(0x0209, EXIF_FMT_ULONG, 0, "JPEGACTables"),
+    TAG_INFO(0x0211, EXIF_FMT_URATIONAL, 3, "YCbCrCoefficients"),
+    TAG_INFO(0x0212, EXIF_FMT_USHORT, 2, "YCbCrSubSampling"),
+    TAG_INFO(0x0213, EXIF_FMT_USHORT, 1, "YCbCrPositioning"),
+    TAG_INFO(0x0214, EXIF_FMT_URATIONAL, 6, "ReferenceBlackWhite"),
+    TAG_INFO(0x02BC, EXIF_FMT_NOTYPE, 0, "ExtensibleMetadataPlatform"), /* XMP */
+    TAG_INFO(0x0301, EXIF_FMT_NOTYPE, 0, "Gamma"),
+    TAG_INFO(0x0302, EXIF_FMT_NOTYPE, 0, "ICCProfileDescriptor"),
+    TAG_INFO(0x0303, EXIF_FMT_NOTYPE, 0, "SRGBRenderingIntent"),
+    TAG_INFO(0x0320, EXIF_FMT_NOTYPE, 0, "ImageTitle"),
+
+    /*
+      Interoperability IFD tags.  These should be in a separate
       numeric space from EXIF/TIFF tags!
     */
-    TAG_INFO(0x001, EXIF_FMT_ASCII, "GPSLatitudeRef"),
-    TAG_INFO(0x002, EXIF_FMT_URATIONAL, "GPSLatitude"),
-    TAG_INFO(0x003, EXIF_FMT_ASCII, "GPSLongitudeRef"),
-    TAG_INFO(0x004, EXIF_FMT_URATIONAL, "GPSLongitude"),
-    TAG_INFO(0x005, EXIF_FMT_BYTE, "GPSAltitudeRef"),
-    TAG_INFO(0x006, EXIF_FMT_URATIONAL, "GPSAltitude"),
-    TAG_INFO(0x007, EXIF_FMT_URATIONAL, "GPSTimeStamp"),
-    TAG_INFO(0x008, EXIF_FMT_ASCII, "GPSSatellites"),
-    TAG_INFO(0x009, EXIF_FMT_ASCII, "GPSStatus"),
-    TAG_INFO(0x00A, EXIF_FMT_ASCII, "GPSMeasureMode"),
-    TAG_INFO(0x00B, EXIF_FMT_URATIONAL, "GPSDOP"),
-    TAG_INFO(0x00C, EXIF_FMT_ASCII, "GPSSpeedRef"),
-    TAG_INFO(0x00D, EXIF_FMT_URATIONAL, "GPSSpeed"),
-    TAG_INFO(0x00E, EXIF_FMT_ASCII, "GPSTrackRef"),
-    TAG_INFO(0x00F, EXIF_FMT_URATIONAL, "GPSTrack"),
-    TAG_INFO(0x010, EXIF_FMT_ASCII, "GPSImgDirectionRef"),
-    TAG_INFO(0x011, EXIF_FMT_URATIONAL, "GPSImgDirection"),
-    TAG_INFO(0x012, EXIF_FMT_ASCII, "GPSMapDatum"),
-    TAG_INFO(0x013, EXIF_FMT_ASCII, "GPSDestLatitudeRef"),
-    TAG_INFO(0x014, EXIF_FMT_URATIONAL, "GPSDestLatitude"),
-    TAG_INFO(0x015, EXIF_FMT_ASCII, "GPSDestLongitudeRef"),
-    TAG_INFO(0x016, EXIF_FMT_URATIONAL, "GPSDestLongitude"),
-    TAG_INFO(0x017, EXIF_FMT_ASCII, "GPSDestBearingRef"),
-    TAG_INFO(0x018, EXIF_FMT_URATIONAL, "GPSDestBearing"),
-    TAG_INFO(0x019, EXIF_FMT_ASCII, "GPSDestDistanceRef"),
-    TAG_INFO(0x01A, EXIF_FMT_URATIONAL, "GPSDestDistance"),
-    TAG_INFO(0x01B, EXIF_FMT_UNDEFINED, "GPSProcessingMethod"),
-    TAG_INFO(0x01C, EXIF_FMT_UNDEFINED, "GPSAreaInformation"),
-    TAG_INFO(0x01D, EXIF_FMT_ASCII, "GPSDateStamp"),
-    TAG_INFO(0x01E, EXIF_FMT_USHORT, "GPSDifferential"),
-    TAG_INFO(0x01F, EXIF_FMT_URATIONAL, "GPSHPositioningError"),
+    TAG_INFO(0x1000, EXIF_FMT_NOTYPE, 0, "RelatedImageFileFormat"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1001, EXIF_FMT_ULONG, 0, "RelatedImageWidth"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1002, EXIF_FMT_ULONG, 0, "RelatedImageLength"), /* Exif Interoperability IFD */
 
-    TAG_INFO(0x100, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, "ImageWidth"),
-    TAG_INFO(0x101, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, "ImageLength"),
-    TAG_INFO(0x102, EXIF_FMT_USHORT, "BitsPerSample"),
-    TAG_INFO(0x103, EXIF_FMT_USHORT, "Compression"),
-    TAG_INFO(0x106, EXIF_FMT_USHORT, "PhotometricInterpretation"),
-    TAG_INFO(0x10A, EXIF_FMT_USHORT, "FillOrder"),
-    TAG_INFO(0x10D, EXIF_FMT_ASCII,  "DocumentName"),
-    TAG_INFO(0x10E, EXIF_FMT_ASCII, "ImageDescription"),
-    TAG_INFO(0x10F, EXIF_FMT_ASCII, "Make"),
-    TAG_INFO(0x110, EXIF_FMT_ASCII, "Model"),
-    TAG_INFO(0x111, EXIF_FMT_USHORT /* or EXIF_FMT_ULONG */, "StripOffsets"),
-    TAG_INFO(0x112, EXIF_FMT_USHORT, "Orientation"),
-    TAG_INFO(0x115, EXIF_FMT_USHORT, "SamplesPerPixel"),
-    TAG_INFO(0x116, EXIF_FMT_USHORT /* or EXIF_FMT_ULONG */, "RowsPerStrip"),
-    TAG_INFO(0x117, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, "StripByteCounts"),
-    TAG_INFO(0x118, EXIF_FMT_USHORT, "MinSampleValue"),
-    TAG_INFO(0x119, EXIF_FMT_USHORT, "MaxSampleValue"),
-    TAG_INFO(0x11A, EXIF_FMT_URATIONAL, "XResolution"),
-    TAG_INFO(0x11B, EXIF_FMT_URATIONAL, "YResolution"),
-    TAG_INFO(0x11C, EXIF_FMT_USHORT, "PlanarConfiguration"),
-    TAG_INFO(0x11D, EXIF_FMT_ASCII, "PageName"),
-    TAG_INFO(0x11E, EXIF_FMT_URATIONAL, "XPosition"),
-    TAG_INFO(0x11F, EXIF_FMT_URATIONAL, "YPosition"),
-    TAG_INFO(0x120, EXIF_FMT_ULONG, "FreeOffsets"),
-    TAG_INFO(0x121, EXIF_FMT_ULONG, "FreeByteCounts"),
-    TAG_INFO(0x122, EXIF_FMT_USHORT, "GrayResponseUnit"),
-    TAG_INFO(0x123, EXIF_FMT_USHORT, "GrayResponseCurve"),
-    TAG_INFO(0x124, EXIF_FMT_ULONG, "T4Options"),
-    TAG_INFO(0x125, EXIF_FMT_ULONG, "T6Options"),
-    TAG_INFO(0x128, EXIF_FMT_USHORT, "ResolutionUnit"),
-    TAG_INFO(0x12D, EXIF_FMT_USHORT, "TransferFunction"),
-    TAG_INFO(0x131, EXIF_FMT_ASCII, "Software"),
-    TAG_INFO(0x132, EXIF_FMT_ASCII, "DateTime"),
-    TAG_INFO(0x13B, EXIF_FMT_ASCII, "Artist"),
-    TAG_INFO(0x13C, EXIF_FMT_ASCII, "HostComputer"),
-    TAG_INFO(0x13D, EXIF_FMT_USHORT, "Predictor"),
-    TAG_INFO(0x13E, EXIF_FMT_URATIONAL, "WhitePoint"),
-    TAG_INFO(0x13F, EXIF_FMT_URATIONAL, "PrimaryChromaticities"),
-    TAG_INFO(0x140, EXIF_FMT_USHORT, "ColorMap"),
-    TAG_INFO(0x141, EXIF_FMT_USHORT, "HalfToneHints"),
-    TAG_INFO(0x142, EXIF_FMT_USHORT, "TileWidth"),
-    TAG_INFO(0x143, EXIF_FMT_USHORT, "TileLength"),
-    TAG_INFO(0x144, EXIF_FMT_ULONG, "TileOffsets"),
-    TAG_INFO(0x145, EXIF_FMT_USHORT, "TileByteCounts"),
-    TAG_INFO(0x14A, EXIF_FMT_ULONG, "SubIFD"),
-    TAG_INFO(0x14C, EXIF_FMT_USHORT, "InkSet"),
-    TAG_INFO(0x14D, EXIF_FMT_ASCII, "InkNames"),
-    TAG_INFO(0x14E, EXIF_FMT_USHORT, "NumberOfInks"),
-    TAG_INFO(0x150, EXIF_FMT_BYTE /* or EXIF_FMT_SHORT */, "DotRange"),
-    TAG_INFO(0x151, EXIF_FMT_ASCII, "TargetPrinter"),
-    TAG_INFO(0x152, EXIF_FMT_USHORT, "ExtraSample"),
-    TAG_INFO(0x153, EXIF_FMT_USHORT, "SampleFormat"),
-    TAG_INFO(0x154, EXIF_FMT_NOTYPE, "SMinSampleValue"), /* Multiple types supported */
-    TAG_INFO(0x155, EXIF_FMT_NOTYPE, "SMaxSampleValue"), /* Multiple types supported */
-    TAG_INFO(0x156, EXIF_FMT_USHORT, "TransferRange"),
-    TAG_INFO(0x157, EXIF_FMT_NOTYPE, "ClipPath"),
-    TAG_INFO(0x158, EXIF_FMT_NOTYPE, "XClipPathUnits"),
-    TAG_INFO(0x159, EXIF_FMT_NOTYPE, "YClipPathUnits"),
-    TAG_INFO(0x15A, EXIF_FMT_NOTYPE, "Indexed"),
-    TAG_INFO(0x15B, EXIF_FMT_NOTYPE, "JPEGTables"),
-    TAG_INFO(0x15F, EXIF_FMT_NOTYPE, "OPIProxy"),
-    TAG_INFO(0x200, EXIF_FMT_USHORT, "JPEGProc"),
-    TAG_INFO(0x201, EXIF_FMT_ULONG, "JPEGInterchangeFormat"),
-    TAG_INFO(0x202, EXIF_FMT_ULONG, "JPEGInterchangeFormatLength"),
-    TAG_INFO(0x203, EXIF_FMT_USHORT, "JPEGRestartInterval"),
-    TAG_INFO(0x205, EXIF_FMT_USHORT, "JPEGLosslessPredictors"),
-    TAG_INFO(0x206, EXIF_FMT_USHORT, "JPEGPointTransforms"),
-    TAG_INFO(0x207, EXIF_FMT_ULONG, "JPEGQTables"),
-    TAG_INFO(0x208, EXIF_FMT_ULONG, "JPEGDCTables"),
-    TAG_INFO(0x209, EXIF_FMT_ULONG, "JPEGACTables"),
-    TAG_INFO(0x211, EXIF_FMT_URATIONAL, "YCbCrCoefficients"),
-    TAG_INFO(0x212, EXIF_FMT_USHORT, "YCbCrSubSampling"),
-    TAG_INFO(0x213, EXIF_FMT_USHORT, "YCbCrPositioning"),
-    TAG_INFO(0x214, EXIF_FMT_URATIONAL, "ReferenceBlackWhite"),
-    TAG_INFO(0x2BC, EXIF_FMT_NOTYPE, "ExtensibleMetadataPlatform"), /* XMP */
-    TAG_INFO(0x301, EXIF_FMT_NOTYPE, "Gamma"),
-    TAG_INFO(0x302, EXIF_FMT_NOTYPE, "ICCProfileDescriptor"),
-    TAG_INFO(0x303, EXIF_FMT_NOTYPE, "SRGBRenderingIntent"),
-    TAG_INFO(0x320, EXIF_FMT_NOTYPE, "ImageTitle"),
-    TAG_INFO(0x5001, EXIF_FMT_NOTYPE, "ResolutionXUnit"),
-    TAG_INFO(0x5002, EXIF_FMT_NOTYPE, "ResolutionYUnit"),
-    TAG_INFO(0x5003, EXIF_FMT_NOTYPE, "ResolutionXLengthUnit"),
-    TAG_INFO(0x5004, EXIF_FMT_NOTYPE, "ResolutionYLengthUnit"),
-    TAG_INFO(0x5005, EXIF_FMT_NOTYPE, "PrintFlags"),
-    TAG_INFO(0x5006, EXIF_FMT_NOTYPE, "PrintFlagsVersion"),
-    TAG_INFO(0x5007, EXIF_FMT_NOTYPE, "PrintFlagsCrop"),
-    TAG_INFO(0x5008, EXIF_FMT_NOTYPE, "PrintFlagsBleedWidth"),
-    TAG_INFO(0x5009, EXIF_FMT_NOTYPE, "PrintFlagsBleedWidthScale"),
-    TAG_INFO(0x500A, EXIF_FMT_NOTYPE, "HalftoneLPI"),
-    TAG_INFO(0x500B, EXIF_FMT_NOTYPE, "HalftoneLPIUnit"),
-    TAG_INFO(0x500C, EXIF_FMT_NOTYPE, "HalftoneDegree"),
-    TAG_INFO(0x500D, EXIF_FMT_NOTYPE, "HalftoneShape"),
-    TAG_INFO(0x500E, EXIF_FMT_NOTYPE, "HalftoneMisc"),
-    TAG_INFO(0x500F, EXIF_FMT_NOTYPE, "HalftoneScreen"),
-    TAG_INFO(0x5010, EXIF_FMT_NOTYPE, "JPEGQuality"),
-    TAG_INFO(0x5011, EXIF_FMT_NOTYPE, "GridSize"),
-    TAG_INFO(0x5012, EXIF_FMT_NOTYPE, "ThumbnailFormat"),
-    TAG_INFO(0x5013, EXIF_FMT_NOTYPE, "ThumbnailWidth"),
-    TAG_INFO(0x5014, EXIF_FMT_NOTYPE, "ThumbnailHeight"),
-    TAG_INFO(0x5015, EXIF_FMT_NOTYPE, "ThumbnailColorDepth"),
-    TAG_INFO(0x5016, EXIF_FMT_NOTYPE, "ThumbnailPlanes"),
-    TAG_INFO(0x5017, EXIF_FMT_NOTYPE, "ThumbnailRawBytes"),
-    TAG_INFO(0x5018, EXIF_FMT_NOTYPE, "ThumbnailSize"),
-    TAG_INFO(0x5019, EXIF_FMT_NOTYPE, "ThumbnailCompressedSize"),
-    TAG_INFO(0x501A, EXIF_FMT_NOTYPE, "ColorTransferFunction"),
-    TAG_INFO(0x501B, EXIF_FMT_NOTYPE, "ThumbnailData"),
-    TAG_INFO(0x5020, EXIF_FMT_NOTYPE, "ThumbnailImageWidth"),
-    TAG_INFO(0x5021, EXIF_FMT_NOTYPE, "ThumbnailImageHeight"),
-    TAG_INFO(0x5022, EXIF_FMT_NOTYPE, "ThumbnailBitsPerSample"),
-    TAG_INFO(0x5023, EXIF_FMT_NOTYPE, "ThumbnailCompression"),
-    TAG_INFO(0x5024, EXIF_FMT_NOTYPE, "ThumbnailPhotometricInterp"),
-    TAG_INFO(0x5025, EXIF_FMT_NOTYPE, "ThumbnailImageDescription"),
-    TAG_INFO(0x5026, EXIF_FMT_NOTYPE, "ThumbnailEquipMake"),
-    TAG_INFO(0x5027, EXIF_FMT_NOTYPE, "ThumbnailEquipModel"),
-    TAG_INFO(0x5028, EXIF_FMT_NOTYPE, "ThumbnailStripOffsets"),
-    TAG_INFO(0x5029, EXIF_FMT_NOTYPE, "ThumbnailOrientation"),
-    TAG_INFO(0x502A, EXIF_FMT_NOTYPE, "ThumbnailSamplesPerPixel"),
-    TAG_INFO(0x502B, EXIF_FMT_NOTYPE, "ThumbnailRowsPerStrip"),
-    TAG_INFO(0x502C, EXIF_FMT_NOTYPE, "ThumbnailStripBytesCount"),
-    TAG_INFO(0x502D, EXIF_FMT_NOTYPE, "ThumbnailResolutionX"),
-    TAG_INFO(0x502E, EXIF_FMT_NOTYPE, "ThumbnailResolutionY"),
-    TAG_INFO(0x502F, EXIF_FMT_NOTYPE, "ThumbnailPlanarConfig"),
-    TAG_INFO(0x5030, EXIF_FMT_NOTYPE, "ThumbnailResolutionUnit"),
-    TAG_INFO(0x5031, EXIF_FMT_NOTYPE, "ThumbnailTransferFunction"),
-    TAG_INFO(0x5032, EXIF_FMT_NOTYPE, "ThumbnailSoftwareUsed"),
-    TAG_INFO(0x5033, EXIF_FMT_NOTYPE, "ThumbnailDateTime"),
-    TAG_INFO(0x5034, EXIF_FMT_NOTYPE, "ThumbnailArtist"),
-    TAG_INFO(0x5035, EXIF_FMT_NOTYPE, "ThumbnailWhitePoint"),
-    TAG_INFO(0x5036, EXIF_FMT_NOTYPE, "ThumbnailPrimaryChromaticities"),
-    TAG_INFO(0x5037, EXIF_FMT_NOTYPE, "ThumbnailYCbCrCoefficients"),
-    TAG_INFO(0x5038, EXIF_FMT_NOTYPE, "ThumbnailYCbCrSubsampling"),
-    TAG_INFO(0x5039, EXIF_FMT_NOTYPE, "ThumbnailYCbCrPositioning"),
-    TAG_INFO(0x503A, EXIF_FMT_NOTYPE, "ThumbnailRefBlackWhite"),
-    TAG_INFO(0x503B, EXIF_FMT_NOTYPE, "ThumbnailCopyRight"),
-    TAG_INFO(0x5090, EXIF_FMT_NOTYPE, "LuminanceTable"),
-    TAG_INFO(0x5091, EXIF_FMT_NOTYPE, "ChrominanceTable"),
-    TAG_INFO(0x5100, EXIF_FMT_NOTYPE, "FrameDelay"),
-    TAG_INFO(0x5101, EXIF_FMT_NOTYPE, "LoopCount"),
-    TAG_INFO(0x5110, EXIF_FMT_NOTYPE, "PixelUnit"),
-    TAG_INFO(0x5111, EXIF_FMT_NOTYPE, "PixelPerUnitX"),
-    TAG_INFO(0x5112, EXIF_FMT_NOTYPE, "PixelPerUnitY"),
-    TAG_INFO(0x5113, EXIF_FMT_NOTYPE, "PaletteHistogram"),
-    TAG_INFO(0x1000, EXIF_FMT_NOTYPE, "RelatedImageFileFormat"),
-    TAG_INFO(0x800D, EXIF_FMT_NOTYPE, "ImageID"),
-    TAG_INFO(0x80E3, EXIF_FMT_NOTYPE, "Matteing"),
-    TAG_INFO(0x80E4, EXIF_FMT_NOTYPE, "DataType"),
-    TAG_INFO(0x80E5, EXIF_FMT_NOTYPE, "ImageDepth"),
-    TAG_INFO(0x80E6, EXIF_FMT_NOTYPE, "TileDepth"),
-    TAG_INFO(0x828D, EXIF_FMT_USHORT, "CFARepeatPatternDim"),
-    TAG_INFO(0x828E, EXIF_FMT_BYTE, "CFAPattern"),
-    TAG_INFO(0x828F, EXIF_FMT_URATIONAL, "BatteryLevel"),
-    TAG_INFO(0x8298, EXIF_FMT_ASCII, "Copyright"),
-    TAG_INFO(0x829A, EXIF_FMT_URATIONAL, "ExposureTime"),
-    TAG_INFO(0x829D, EXIF_FMT_URATIONAL, "FNumber"),
-    TAG_INFO(0x83BB, EXIF_FMT_ULONG, "IPTC/NAA"),
-    TAG_INFO(0x84E3, EXIF_FMT_NOTYPE, "IT8RasterPadding"),
-    TAG_INFO(0x84E5, EXIF_FMT_NOTYPE, "IT8ColorTable"),
-    TAG_INFO(0x8649, EXIF_FMT_NOTYPE, "ImageResourceInformation"),
-    TAG_INFO(0x8769, EXIF_FMT_ULONG, "ExifOffset"),
-    TAG_INFO(0x8773, EXIF_FMT_NOTYPE, "InterColorProfile"),
-    TAG_INFO(0x8822, EXIF_FMT_USHORT, "ExposureProgram"),
-    TAG_INFO(0x8824, EXIF_FMT_ASCII, "SpectralSensitivity"),
-    TAG_INFO(0x8825, EXIF_FMT_ULONG, "GPSInfo"),
-    TAG_INFO(0x8827, EXIF_FMT_USHORT, "PhotographicSensitivity"), /* Was "ISOSpeedRatings" */
-    TAG_INFO(0x8828, EXIF_FMT_UNDEFINED, "OECF"),
-    TAG_INFO(0x8830, EXIF_FMT_USHORT, "SensitivityType"),
-    TAG_INFO(0x8831, EXIF_FMT_ULONG, "StandardOutputSensitivity"),
-    TAG_INFO(0x8832, EXIF_FMT_ULONG, "RecommendedExposureIndex"),
-    TAG_INFO(0x8833, EXIF_FMT_ULONG, "ISOSpeed"),
-    TAG_INFO(0x8834, EXIF_FMT_ULONG, "ISOSpeedLatitudeyyy"),
-    TAG_INFO(0x8835, EXIF_FMT_ULONG, "ISOSpeedLatitudezzz"),
-
-    TAG_INFO(0x9000, EXIF_FMT_UNDEFINED, "ExifVersion"),
-    TAG_INFO(0x9003, EXIF_FMT_ASCII, "DateTimeOriginal"),
-    TAG_INFO(0x9004, EXIF_FMT_ASCII, "DateTimeDigitized"),
-    TAG_INFO(0x9010, EXIF_FMT_ASCII, "OffsetTime"),
-    TAG_INFO(0x9011, EXIF_FMT_ASCII, "OffsetTimeOriginal"),
-    TAG_INFO(0x9012, EXIF_FMT_ASCII, "OffsetTimeDigitized"),
-    TAG_INFO(0x9101, EXIF_FMT_UNDEFINED, "ComponentsConfiguration"),
-    TAG_INFO(0x9102, EXIF_FMT_URATIONAL, "CompressedBitsPerPixel"),
-    TAG_INFO(0x9201, EXIF_FMT_SRATIONAL, "ShutterSpeedValue"),
-    TAG_INFO(0x9202, EXIF_FMT_URATIONAL, "ApertureValue"),
-    TAG_INFO(0x9203, EXIF_FMT_SRATIONAL, "BrightnessValue"),
-    TAG_INFO(0x9204, EXIF_FMT_SRATIONAL, "ExposureBiasValue"),
-    TAG_INFO(0x9205, EXIF_FMT_URATIONAL, "MaxApertureValue"),
-    TAG_INFO(0x9206, EXIF_FMT_URATIONAL, "SubjectDistance"),
-    TAG_INFO(0x9207, EXIF_FMT_USHORT, "MeteringMode"),
-    TAG_INFO(0x9208, EXIF_FMT_USHORT, "LightSource"),
-    TAG_INFO(0x9209, EXIF_FMT_USHORT, "Flash"),
-    TAG_INFO(0x920A, EXIF_FMT_URATIONAL, "FocalLength"),
-    TAG_INFO(0x9214, EXIF_FMT_USHORT, "SubjectArea"),
-    TAG_INFO(0x927C, EXIF_FMT_UNDEFINED, "MakerNote"),
-    TAG_INFO(0x9286, EXIF_FMT_UNDEFINED, "UserComment"),
-    TAG_INFO(0x9290, EXIF_FMT_ASCII, "SubSecTime"),
-    TAG_INFO(0x9291, EXIF_FMT_ASCII, "SubSecTimeOriginal"),
-    TAG_INFO(0x9292, EXIF_FMT_ASCII, "SubSecTimeDigitized"),
-    TAG_INFO(0x9400, EXIF_FMT_SRATIONAL, "Temperature"),
-    TAG_INFO(0x9401, EXIF_FMT_URATIONAL, "Humidity"),
-    TAG_INFO(0x9402, EXIF_FMT_URATIONAL, "Pressure"),
-    TAG_INFO(0x9403, EXIF_FMT_SRATIONAL, "WaterDepth"),
-    TAG_INFO(0x9404, EXIF_FMT_URATIONAL, "Acceleration"),
-    TAG_INFO(0x9405, EXIF_FMT_SRATIONAL, "CameraElevationAngle "),
-    TAG_INFO(0x9C9B, EXIF_FMT_NOTYPE, "WinXP-Title"),     /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9C, EXIF_FMT_NOTYPE, "WinXP-Comments"),  /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9D, EXIF_FMT_NOTYPE, "WinXP-Author"),    /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9E, EXIF_FMT_NOTYPE, "WinXP-Keywords"),  /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9F, EXIF_FMT_NOTYPE, "WinXP-Subject"),   /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0xA000, EXIF_FMT_UNDEFINED, "FlashPixVersion"),
-    TAG_INFO(0xA001, EXIF_FMT_USHORT , "ColorSpace"),
-    TAG_INFO(0xA002, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, "ExifImageWidth"),
-    TAG_INFO(0xA003, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, "ExifImageLength"),
-    TAG_INFO(0xA004, EXIF_FMT_ASCII, "RelatedSoundFile"),
-    TAG_INFO(0xA005, EXIF_FMT_ULONG, "InteroperabilityOffset"),
-    TAG_INFO(0xA20B, EXIF_FMT_URATIONAL, "FlashEnergy"),
-    TAG_INFO(0xA20C, EXIF_FMT_UNDEFINED, "SpatialFrequencyResponse"),
-    TAG_INFO(0xA20D, EXIF_FMT_NOTYPE, "Noise"),
-    TAG_INFO(0xA20E, EXIF_FMT_URATIONAL, "FocalPlaneXResolution"),
-    TAG_INFO(0xA20F, EXIF_FMT_URATIONAL, "FocalPlaneYResolution"),
-    TAG_INFO(0xA210, EXIF_FMT_USHORT, "FocalPlaneResolutionUnit"),
-    TAG_INFO(0xA211, EXIF_FMT_NOTYPE, "ImageNumber"),
-    TAG_INFO(0xA212, EXIF_FMT_NOTYPE, "SecurityClassification"),
-    TAG_INFO(0xA213, EXIF_FMT_NOTYPE, "ImageHistory"),
-    TAG_INFO(0xA214, EXIF_FMT_USHORT, "SubjectLocation"),
-    TAG_INFO(0xA215, EXIF_FMT_URATIONAL, "ExposureIndex"),
-    TAG_INFO(0xA216, EXIF_FMT_NOTYPE, "TIFF_EPStandardID"),
-    TAG_INFO(0xA217, EXIF_FMT_USHORT, "SensingMethod"),
-    TAG_INFO(0xA300, EXIF_FMT_UNDEFINED, "FileSource"),
-    TAG_INFO(0xA301, EXIF_FMT_UNDEFINED, "SceneType"),
-    TAG_INFO(0xA302, EXIF_FMT_UNDEFINED, "CFAPattern"),
-    TAG_INFO(0xA401, EXIF_FMT_USHORT, "CustomRendered"),
-    TAG_INFO(0xA402, EXIF_FMT_USHORT, "ExposureMode"),
-    TAG_INFO(0xA403, EXIF_FMT_USHORT, "WhiteBalance"),
-    TAG_INFO(0xA404, EXIF_FMT_URATIONAL, "DigitalZoomRatio"),
-    TAG_INFO(0xA405, EXIF_FMT_USHORT, "FocalLengthIn35mmFilm"),
-    TAG_INFO(0xA406, EXIF_FMT_USHORT, "SceneCaptureType"),
-    TAG_INFO(0xA407, EXIF_FMT_URATIONAL, "GainControl"),
-    TAG_INFO(0xA408, EXIF_FMT_USHORT, "Contrast"),
-    TAG_INFO(0xA409, EXIF_FMT_USHORT, "Saturation"),
-    TAG_INFO(0xA40A, EXIF_FMT_USHORT, "Sharpness"),
-    TAG_INFO(0xA40B, EXIF_FMT_UNDEFINED, "DeviceSettingDescription"),
-    TAG_INFO(0xA40C, EXIF_FMT_USHORT, "SubjectDistanceRange"),
-    TAG_INFO(0xA420, EXIF_FMT_ASCII, "ImageUniqueID"),
-    TAG_INFO(0xA430, EXIF_FMT_ASCII, "CameraOwnerName"),
-    TAG_INFO(0xA431, EXIF_FMT_ASCII, "BodySerialNumber"),
-    TAG_INFO(0xA432, EXIF_FMT_URATIONAL, "LensSpecification"),
-    TAG_INFO(0xA435, EXIF_FMT_ASCII, "LensMake"),
-    TAG_INFO(0xA436, EXIF_FMT_ASCII, "LensModel"),
-    TAG_INFO(0xA437, EXIF_FMT_ASCII, "LensSerialNumber"),
-    TAG_INFO(0xA500, EXIF_FMT_URATIONAL, "Gamma")
+    TAG_INFO(0x5001, EXIF_FMT_USHORT, 1, "ResolutionXUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5002, EXIF_FMT_USHORT, 1, "ResolutionYUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5003, EXIF_FMT_USHORT, 1, "ResolutionXLengthUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5004, EXIF_FMT_USHORT, 1, "ResolutionYLengthUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5005, EXIF_FMT_ASCII, AnyCount /* Number of flags */, "PrintFlags"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5006, EXIF_FMT_USHORT, 1, "PrintFlagsVersion"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5007, EXIF_FMT_BYTE, 1, "PrintFlagsCrop"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5008, EXIF_FMT_ULONG, 1, "PrintFlagsBleedWidth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5009, EXIF_FMT_USHORT, 1, "PrintFlagsBleedWidthScale"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500A, EXIF_FMT_URATIONAL, 1, "HalftoneLPI"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500B, EXIF_FMT_USHORT, 1, "HalftoneLPIUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500C, EXIF_FMT_URATIONAL, 1, "HalftoneDegree"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500D, EXIF_FMT_USHORT, 1, "HalftoneShape"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500E, EXIF_FMT_ULONG, 1, "HalftoneMisc"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500F, EXIF_FMT_BYTE, 1, "HalftoneScreen"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5010, EXIF_FMT_USHORT, AnyCount, "JPEGQuality"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5011, EXIF_FMT_UNDEFINED, AnyCount, "GridSize"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5012, EXIF_FMT_ULONG, 1, "ThumbnailFormat"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5013, EXIF_FMT_ULONG, 1, "ThumbnailWidth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5014, EXIF_FMT_ULONG, 1, "ThumbnailHeight"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5015, EXIF_FMT_USHORT, 1, "ThumbnailColorDepth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5016, EXIF_FMT_USHORT, 1, "ThumbnailPlanes"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5017, EXIF_FMT_ULONG, 1, "ThumbnailRawBytes"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5018, EXIF_FMT_ULONG, 1, "ThumbnailSize"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5019, EXIF_FMT_ULONG, 1, "ThumbnailCompressedSize"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x501A, EXIF_FMT_UNDEFINED, 0, "ColorTransferFunction"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x501B, EXIF_FMT_BYTE, 0, "ThumbnailData"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5020, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, 1, "ThumbnailImageWidth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5021, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, 1, "ThumbnailImageHeight"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5022, EXIF_FMT_USHORT, 1, "ThumbnailBitsPerSample"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5023, EXIF_FMT_USHORT, 1, "ThumbnailCompression"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5024, EXIF_FMT_USHORT, 1, "ThumbnailPhotometricInterp"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5025, EXIF_FMT_ASCII, AnyCount, "ThumbnailImageDescription"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5026, EXIF_FMT_ASCII, AnyCount, "ThumbnailEquipMake"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5027, EXIF_FMT_ASCII, AnyCount, "ThumbnailEquipModel"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5028, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, 0, "ThumbnailStripOffsets"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5029, EXIF_FMT_USHORT, 1, "ThumbnailOrientation"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502A, EXIF_FMT_USHORT, 1, "ThumbnailSamplesPerPixel"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502B, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, 1, "ThumbnailRowsPerStrip"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502C, EXIF_FMT_ULONG /* or EXIF_FMT_USHORT */, 0, "ThumbnailStripBytesCount"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502D, EXIF_FMT_USHORT /* type provided by ThumbnailResolutionUnit */, 0, "ThumbnailResolutionX"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502E, EXIF_FMT_USHORT /* type provided by ThumbnailResolutionUnit */, 0, "ThumbnailResolutionY"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502F, EXIF_FMT_USHORT, 1, "ThumbnailPlanarConfig"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5030, EXIF_FMT_USHORT, 1, "ThumbnailResolutionUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5031, EXIF_FMT_USHORT, 0, "ThumbnailTransferFunction"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5032, EXIF_FMT_ASCII, AnyCount, "ThumbnailSoftwareUsed"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5033, EXIF_FMT_ASCII, AnyCount, "ThumbnailDateTime"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5034, EXIF_FMT_ASCII, AnyCount, "ThumbnailArtist"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5035, EXIF_FMT_URATIONAL, 2, "ThumbnailWhitePoint"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5036, EXIF_FMT_URATIONAL, 6, "ThumbnailPrimaryChromaticities"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5037, EXIF_FMT_URATIONAL, 3, "ThumbnailYCbCrCoefficients"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5038, EXIF_FMT_USHORT, 2, "ThumbnailYCbCrSubsampling"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5039, EXIF_FMT_USHORT, 1, "ThumbnailYCbCrPositioning"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x503A, EXIF_FMT_URATIONAL, 6, "ThumbnailRefBlackWhite"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x503B, EXIF_FMT_ASCII, AnyCount, "ThumbnailCopyRight"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5090, EXIF_FMT_USHORT, 64, "LuminanceTable"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5091, EXIF_FMT_USHORT, 64, "ChrominanceTable"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5100, EXIF_FMT_ULONG, 0, "FrameDelay"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5101, EXIF_FMT_USHORT, 1, "LoopCount"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5102, EXIF_FMT_BYTE, 0, "GlobalPalette"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5103, EXIF_FMT_BYTE, 1, "IndexBackground"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5104, EXIF_FMT_BYTE, 1, "IndexTransparent"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5110, EXIF_FMT_BYTE, 0, "PixelUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5111, EXIF_FMT_ULONG, 1, "PixelPerUnitX"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5112, EXIF_FMT_ULONG, 1, "PixelPerUnitY"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5113, EXIF_FMT_BYTE, AnyCount, "PaletteHistogram"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x800D, EXIF_FMT_ASCII, 0, "ImageID"), /* Adobe OPI */
+    TAG_INFO(0x80E3, EXIF_FMT_NOTYPE, 0, "Matteing"),
+    TAG_INFO(0x80E4, EXIF_FMT_NOTYPE, 0, "DataType"),
+    TAG_INFO(0x80E5, EXIF_FMT_NOTYPE, 0, "ImageDepth"),
+    TAG_INFO(0x80E6, EXIF_FMT_NOTYPE, 0, "TileDepth"),
+    TAG_INFO(0x828D, EXIF_FMT_USHORT, 0, "CFARepeatPatternDim"),
+    TAG_INFO(0x828E, EXIF_FMT_BYTE, 0, "CFAPattern"),
+    TAG_INFO(0x828F, EXIF_FMT_URATIONAL, 0, "BatteryLevel"),
+    TAG_INFO(0x8298, EXIF_FMT_ASCII, AnyCount, "Copyright"),
+    TAG_INFO(0x829A, EXIF_FMT_URATIONAL, 1, "ExposureTime"),
+    TAG_INFO(0x829D, EXIF_FMT_URATIONAL, 1, "FNumber"),
+    TAG_INFO(0x83BB, EXIF_FMT_ULONG, 0, "IPTC/NAA"),
+    TAG_INFO(0x84E3, EXIF_FMT_NOTYPE, 0, "IT8RasterPadding"),
+    TAG_INFO(0x84E5, EXIF_FMT_NOTYPE, 0, "IT8ColorTable"),
+    TAG_INFO(0x8649, EXIF_FMT_NOTYPE, 0, "ImageResourceInformation"),
+    TAG_INFO(0x8769, EXIF_FMT_ULONG, 1, "ExifOffset"), /* Exif IFD Pointer */
+    TAG_INFO(0x8773, EXIF_FMT_BYTE, AnyCount, "InterColorProfile"), /* ICCProfile */
+    TAG_INFO(0x8822, EXIF_FMT_USHORT, 1, "ExposureProgram"),
+    TAG_INFO(0x8824, EXIF_FMT_ASCII, AnyCount, "SpectralSensitivity"),
+    TAG_INFO(0x8825, EXIF_FMT_ULONG, 1, "GPSInfo"), /* Offset to GPS IFD */
+    TAG_INFO(0x8827, EXIF_FMT_USHORT, AnyCount, "PhotographicSensitivity"), /* Was "ISOSpeedRatings" */
+    TAG_INFO(0x8828, EXIF_FMT_UNDEFINED, AnyCount, "OECF"),
+    TAG_INFO(0x8830, EXIF_FMT_USHORT, 1, "SensitivityType"),
+    TAG_INFO(0x8831, EXIF_FMT_ULONG, 1, "StandardOutputSensitivity"),
+    TAG_INFO(0x8832, EXIF_FMT_ULONG, 1, "RecommendedExposureIndex"),
+    TAG_INFO(0x8833, EXIF_FMT_ULONG, 1, "ISOSpeed"),
+    TAG_INFO(0x8834, EXIF_FMT_ULONG, 1, "ISOSpeedLatitudeyyy"),
+    TAG_INFO(0x8835, EXIF_FMT_ULONG, 1, "ISOSpeedLatitudezzz"),
+    TAG_INFO(0x9000, EXIF_FMT_UNDEFINED, 4, "ExifVersion"), /* e.g. "0300" without NUL */
+    TAG_INFO(0x9003, EXIF_FMT_ASCII, 20, "DateTimeOriginal"),
+    TAG_INFO(0x9004, EXIF_FMT_ASCII, 20, "DateTimeDigitized"),
+    TAG_INFO(0x9010, EXIF_FMT_ASCII, 7, "OffsetTime"),
+    TAG_INFO(0x9011, EXIF_FMT_ASCII, 7, "OffsetTimeOriginal"),
+    TAG_INFO(0x9012, EXIF_FMT_ASCII, 7, "OffsetTimeDigitized"),
+    TAG_INFO(0x9101, EXIF_FMT_UNDEFINED, 4, "ComponentsConfiguration"),
+    TAG_INFO(0x9102, EXIF_FMT_URATIONAL, 1, "CompressedBitsPerPixel"),
+    TAG_INFO(0x9201, EXIF_FMT_SRATIONAL, 1, "ShutterSpeedValue"),
+    TAG_INFO(0x9202, EXIF_FMT_URATIONAL, 1, "ApertureValue"),
+    TAG_INFO(0x9203, EXIF_FMT_SRATIONAL, 1, "BrightnessValue"),
+    TAG_INFO(0x9204, EXIF_FMT_SRATIONAL, 1, "ExposureBiasValue"),
+    TAG_INFO(0x9205, EXIF_FMT_URATIONAL, 1, "MaxApertureValue"),
+    TAG_INFO(0x9206, EXIF_FMT_URATIONAL, 1, "SubjectDistance"),
+    TAG_INFO(0x9207, EXIF_FMT_USHORT, 1, "MeteringMode"),
+    TAG_INFO(0x9208, EXIF_FMT_USHORT, 1, "LightSource"),
+    TAG_INFO(0x9209, EXIF_FMT_USHORT, 1, "Flash"),
+    TAG_INFO(0x920A, EXIF_FMT_URATIONAL, 1, "FocalLength"),
+    TAG_INFO(0x9214, EXIF_FMT_USHORT, AnyCount /* 2 or 3 or 4 */, "SubjectArea"),
+    TAG_INFO(0x927C, EXIF_FMT_UNDEFINED, AnyCount, "MakerNote"),
+    TAG_INFO(0x9286, EXIF_FMT_UNDEFINED, AnyCount, "UserComment"),
+    TAG_INFO(0x9290, EXIF_FMT_ASCII, AnyCount, "SubSecTime"),
+    TAG_INFO(0x9291, EXIF_FMT_ASCII, AnyCount, "SubSecTimeOriginal"),
+    TAG_INFO(0x9292, EXIF_FMT_ASCII, AnyCount, "SubSecTimeDigitized"),
+    TAG_INFO(0x9400, EXIF_FMT_SRATIONAL, 1, "Temperature"),
+    TAG_INFO(0x9401, EXIF_FMT_URATIONAL, 1, "Humidity"),
+    TAG_INFO(0x9402, EXIF_FMT_URATIONAL, 1, "Pressure"),
+    TAG_INFO(0x9403, EXIF_FMT_SRATIONAL, 1, "WaterDepth"),
+    TAG_INFO(0x9404, EXIF_FMT_URATIONAL, 1, "Acceleration"),
+    TAG_INFO(0x9405, EXIF_FMT_SRATIONAL, 1, "CameraElevationAngle "),
+    TAG_INFO(0x9C9B, EXIF_FMT_NOTYPE, AnyCount, "WinXP-Title"),     /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9C, EXIF_FMT_NOTYPE, AnyCount, "WinXP-Comments"),  /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9D, EXIF_FMT_NOTYPE, AnyCount, "WinXP-Author"),    /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9E, EXIF_FMT_NOTYPE, AnyCount, "WinXP-Keywords"),  /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9F, EXIF_FMT_NOTYPE, AnyCount, "WinXP-Subject"),   /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0xA000, EXIF_FMT_UNDEFINED, 4, "FlashPixVersion"),
+    TAG_INFO(0xA001, EXIF_FMT_USHORT , 1, "ColorSpace"),
+    TAG_INFO(0xA002, EXIF_FMT_USHORT /* or EXIF_FMT_ULONG */, 1, "ExifImageWidth"),
+    TAG_INFO(0xA003, EXIF_FMT_USHORT /* or EXIF_FMT_ULONG */, 1, "ExifImageLength"),
+    TAG_INFO(0xA004, EXIF_FMT_ASCII, 13, "RelatedSoundFile"),
+    TAG_INFO(0xA005, EXIF_FMT_ULONG, 0, "InteroperabilityOffset"), /* Interoperability IFD Pointer */
+    TAG_INFO(0xA20B, EXIF_FMT_URATIONAL, 1, "FlashEnergy"),
+    TAG_INFO(0xA20C, EXIF_FMT_UNDEFINED, AnyCount, "SpatialFrequencyResponse"),
+    TAG_INFO(0xA20D, EXIF_FMT_NOTYPE, 0, "Noise"),
+    TAG_INFO(0xA20E, EXIF_FMT_URATIONAL, 1, "FocalPlaneXResolution"),
+    TAG_INFO(0xA20F, EXIF_FMT_URATIONAL, 1, "FocalPlaneYResolution"),
+    TAG_INFO(0xA210, EXIF_FMT_USHORT, 1, "FocalPlaneResolutionUnit"),
+    TAG_INFO(0xA211, EXIF_FMT_NOTYPE, 0, "ImageNumber"),
+    TAG_INFO(0xA212, EXIF_FMT_NOTYPE, 0, "SecurityClassification"),
+    TAG_INFO(0xA213, EXIF_FMT_NOTYPE, 0, "ImageHistory"),
+    TAG_INFO(0xA214, EXIF_FMT_USHORT, 2, "SubjectLocation"),
+    TAG_INFO(0xA215, EXIF_FMT_URATIONAL, 1, "ExposureIndex"),
+    TAG_INFO(0xA216, EXIF_FMT_NOTYPE, 0, "TIFF_EPStandardID"),
+    TAG_INFO(0xA217, EXIF_FMT_USHORT, 1, "SensingMethod"),
+    TAG_INFO(0xA300, EXIF_FMT_UNDEFINED, 1, "FileSource"),
+    TAG_INFO(0xA301, EXIF_FMT_UNDEFINED, 1, "SceneType"),
+    TAG_INFO(0xA302, EXIF_FMT_UNDEFINED, AnyCount, "CFAPattern"),
+    TAG_INFO(0xA401, EXIF_FMT_USHORT, 1, "CustomRendered"),
+    TAG_INFO(0xA402, EXIF_FMT_USHORT, 1, "ExposureMode"),
+    TAG_INFO(0xA403, EXIF_FMT_USHORT, 1, "WhiteBalance"),
+    TAG_INFO(0xA404, EXIF_FMT_URATIONAL, 1, "DigitalZoomRatio"),
+    TAG_INFO(0xA405, EXIF_FMT_USHORT, 1, "FocalLengthIn35mmFilm"),
+    TAG_INFO(0xA406, EXIF_FMT_USHORT, 1, "SceneCaptureType"),
+    TAG_INFO(0xA407, EXIF_FMT_URATIONAL, 1, "GainControl"),
+    TAG_INFO(0xA408, EXIF_FMT_USHORT, 1, "Contrast"),
+    TAG_INFO(0xA409, EXIF_FMT_USHORT, 1, "Saturation"),
+    TAG_INFO(0xA40A, EXIF_FMT_USHORT, 1, "Sharpness"),
+    TAG_INFO(0xA40B, EXIF_FMT_UNDEFINED, AnyCount, "DeviceSettingDescription"),
+    TAG_INFO(0xA40C, EXIF_FMT_USHORT, 1, "SubjectDistanceRange"),
+    TAG_INFO(0xA420, EXIF_FMT_ASCII, 33, "ImageUniqueID"),
+    TAG_INFO(0xA430, EXIF_FMT_ASCII, AnyCount, "CameraOwnerName"),
+    TAG_INFO(0xA431, EXIF_FMT_ASCII, AnyCount, "BodySerialNumber"),
+    TAG_INFO(0xA432, EXIF_FMT_URATIONAL, 4, "LensSpecification"),
+    TAG_INFO(0xA433, EXIF_FMT_ASCII, AnyCount, "LensMake"),
+    TAG_INFO(0xA434, EXIF_FMT_ASCII, AnyCount, "LensModel"),
+    TAG_INFO(0xA435, EXIF_FMT_ASCII, AnyCount, "LensSerialNumber"),
+    TAG_INFO(0xA436, EXIF_FMT_ASCII, AnyCount, "ImageTitle"),
+    TAG_INFO(0xA437, EXIF_FMT_ASCII, AnyCount, "Photographer"),
+    TAG_INFO(0xA438, EXIF_FMT_ASCII, AnyCount, "ImageEditor"),
+    TAG_INFO(0xA439, EXIF_FMT_ASCII, AnyCount, "CameraFirmware"),
+    TAG_INFO(0xA43A, EXIF_FMT_ASCII, AnyCount, "RAWDevelopingSoftware"),
+    TAG_INFO(0xA43B, EXIF_FMT_ASCII, AnyCount, "ImageEditingSoftware"),
+    TAG_INFO(0xA43C, EXIF_FMT_ASCII, AnyCount, "MetadataEditingSoftware"),
+    TAG_INFO(0xA460, EXIF_FMT_USHORT, 1, "CompositeImage"),
+    TAG_INFO(0xA461, EXIF_FMT_USHORT, 2, "SourceImageNumberOfCompositeImage"),
+    TAG_INFO(0xA462, EXIF_FMT_UNDEFINED, AnyCount, "SourceExposureTimesOfCompositeImage"),
+    TAG_INFO(0xA500, EXIF_FMT_URATIONAL, 1, "Gamma")
   };
+
+/* Set to non-zero in order to use bsearch rather than linear search. */
+#if !defined(EXIF_USE_BSEARCH)
+#define EXIF_USE_BSEARCH 0
+#endif /* !defined(EXIF_USE_BSEARCH) */
+
+#if EXIF_USE_BSEARCH
+/*
+  Compare two IFDTagTableType entries by tag
+*/
+static int IFDTagTableTypeCompare(const void *l, const void *r)
+{
+  const IFDTagTableType * restrict lp = l;
+  const IFDTagTableType * restrict rp = r;
+  int sense;
+  unsigned int lptag = lp->tag;
+  unsigned int rptag = rp->tag;
+
+  if (lptag > rptag)
+    sense = 1;
+  else if (lptag < rptag)
+    sense = -1;
+  else
+    sense = 0;
+
+  return sense;
+}
+#endif /* if EXIF_USE_BSEARCH */
+
+/*
+  Find EXIF table entry matching tag
+*/
+static const IFDTagTableType *
+FindEXIFTableEntryByTag(const unsigned int t,
+                        const IFDTagTableType *tag_table,
+                        const size_t tag_table_entries) MAGICK_FUNC_PURE;
+
+static const IFDTagTableType *
+FindEXIFTableEntryByTag(const unsigned int t,
+                        const IFDTagTableType *tag_table,
+                        const size_t tag_table_entries)
+{
+  const IFDTagTableType *key_p = (IFDTagTableType *) NULL;
+
+#if EXIF_USE_BSEARCH
+  IFDTagTableType key;
+
+  key.tag = t;
+
+  key_p=(void *) bsearch((const void *) &key,(void *) tag_table,tag_table_entries,
+                                        sizeof(tag_table[0]),IFDTagTableTypeCompare);
+#else
+  register unsigned int
+    ttt;
+
+  size_t
+    i;
+
+  for (i=0; i < tag_table_entries; i++)
+    {
+      ttt = tag_table[i].tag;
+      if (ttt == t)
+        {
+          key_p = &tag_table[i];
+          break;
+        }
+      else if (ttt > t)
+        {
+          break;
+        }
+    }
+#endif /* if EXIF_USE_BSEARCH */
+
+  return key_p;
+}
 
 /*
   Convert an EXIF tag ID to a tag description
@@ -1412,6 +1518,15 @@ tag_table[] =
 static const char *
 EXIFTagToDescription(unsigned int t, char *tag_description)
 {
+  const IFDTagTableType *key_p;
+
+  key_p = FindEXIFTableEntryByTag(t, tag_table, ArraySize(tag_table));
+  if (key_p != (IFDTagTableType *) NULL)
+    {
+      (void) strlcpy(tag_description,key_p->description,MaxTextExtent);
+      return tag_description;
+    }
+#if 0
   unsigned int
     i;
 
@@ -1419,11 +1534,15 @@ EXIFTagToDescription(unsigned int t, char *tag_description)
     {
       if (tag_table[i].tag == t)
         {
-          (void) strlcpy(tag_description,tag_table[i].description,
-                         MaxTextExtent);
+          (void) strlcpy(tag_description,tag_table[i].description,MaxTextExtent);
           return tag_description;
         }
+      else if (tag_table[i].tag > t)
+        {
+          break;
+        }
     }
+#endif
 
   FormatString(tag_description,"0x%04X",t);
   return tag_description;
@@ -1899,13 +2018,15 @@ GenerateEXIFAttribute(Image *image,const char *specification)
       nde=Read16u(morder,ifdp);
       if (logging && debug)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                  "EXIF: IFD at offset %" MAGICK_SSIZE_T_F "d has %u tags", (MAGICK_SSIZE_T) (ifdp-tiffp), nde);
+                                  "EXIF: IFD at offset %" MAGICK_SSIZE_T_F "d has %u tags",
+                                  (MAGICK_SSIZE_T) (ifdp-tiffp), nde);
       if (nde > MAX_TAGS_PER_IFD)
         {
           nde=MAX_TAGS_PER_IFD;
           if (logging && debug)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                  "EXIF: Limiting IFD at offset %" MAGICK_SSIZE_T_F "d to %u tags!", (MAGICK_SSIZE_T) (ifdp-tiffp), nde);
+                                  "EXIF: Limiting IFD at offset %" MAGICK_SSIZE_T_F "d to %u tags!",
+                                  (MAGICK_SSIZE_T) (ifdp-tiffp), nde);
         }
       for (; de < nde; de++)
         {
@@ -1985,10 +2106,15 @@ GenerateEXIFAttribute(Image *image,const char *specification)
 
           if (logging && debug)
             {
+              int expected_format=f;
+              const IFDTagTableType *key_p = FindEXIFTableEntryByTag(t,tag_table,ArraySize(tag_table));
+              if (key_p)
+                expected_format=key_p->format;
+
               (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                    "EXIF: TagVal=%d  TagDescr=\"%s\" Format=%d  "
+                                    "EXIF: TagVal=%d  TagDescr=\"%s\" Format=%d (expected %d)  "
                                     "FormatDescr=\"%s\"  Components=%u",t,
-                                    EXIFTagToDescription(t,tag_description),f,
+                                    EXIFTagToDescription(t,tag_description),f,expected_format,
                                     EXIFFormatToDescription(f),c);
             }
           if ((pval < tiffp) || (pval > tiffp_max))
