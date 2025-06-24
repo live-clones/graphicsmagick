@@ -48,7 +48,7 @@ apt install autoconf-archive
 
 enable_aom=true
 enable_bzip2=true
-enable_de265=false
+enable_de265=true
 enable_freetype=true
 enable_heif=true
 enable_jasper=true
@@ -513,6 +513,10 @@ then
     # Build libde265 (a C++ library)
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libde265 --libs
     #     -L/work/lib -lde265 -lc++
+    #
+    # FIXME: Compilation with the auto-tools is deprecated and will be
+    # removed in an upcoming release. Please switch to using the CMake
+    # build.
     libde265="$SRC/libde265"
     if $enable_de265
     then
