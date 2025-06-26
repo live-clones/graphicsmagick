@@ -1,3 +1,10 @@
+2025-06-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/png.c (ReadMNGImage): Validate that MNG width or height
+	is non-zero. Addresses oss-fuzz 426843901
+	"graphicsmagick:coder_MNG_fuzzer: Use-of-uninitialized-value in
+	SetImageEx".
+
 2025-06-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* fuzzing/oss-fuzz-build.sh (enable_de265): Re-enable compilation

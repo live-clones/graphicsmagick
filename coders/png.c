@@ -4585,13 +4585,24 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
 #if defined(GMPNG_SETJMP_NOT_THREAD_SAFE)
               UnlockSemaphoreInfo(png_semaphore);
 #endif
+              if ((mng_info->mng_width == 0) ||
+                  (mng_info->mng_height == 0))
+                {
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                      "   MNG width or height is zero: width %lu, height %lu",
+                      mng_info->mng_width,mng_info->mng_height);
+                  MagickFreeMemory(chunk);
+                  MngInfoFreeStruct(mng_info,&have_mng_structure);
+                  ThrowReaderException(CorruptImageError,ImproperImageHeader,
+                      image);
+                }
               if ((long) mng_info->mng_width >
                   GetMagickResourceLimit(WidthResource) ||
                   (long) mng_info->mng_height >
                   GetMagickResourceLimit(HeightResource))
                 {
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                      "   MNG width or height too large: %lu, %lu",
+                      "   MNG width or height too large: width %lu, height %lu",
                       mng_info->mng_width,mng_info->mng_height);
                   MagickFreeMemory(chunk);
                   MngInfoFreeStruct(mng_info,&have_mng_structure);
