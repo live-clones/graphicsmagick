@@ -4673,7 +4673,10 @@ static int CheckAndStoreStr(TIFF *tiff, const magick_uint16_t Tag, const char *S
 }
 
 
-static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data, const unsigned char *IFD_data, const size_t profile_length,
+static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
+                            const unsigned char * const profile_data,
+                            const unsigned char *IFD_data,
+                            const size_t profile_length,
                             MagickBool logging, magick_uint16_t Flags)
 {
   magick_uint32_t(*LD_UINT32)(const unsigned char *Mem);
@@ -4715,8 +4718,10 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
 
           fip = TIFFFindField(tiff, Tag, TIFF_ANY);
           if (logging && (Flags & FLAG_BASE) != 0)
-            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Extracted tag from EXIF %xh, Field %u, Long2 %u, val %u %s",
-                                 (unsigned) Tag, (unsigned) Field, (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
+            (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                 "Extracted tag from EXIF %xh, Field %u, Long2 %u, val %u %s",
+                                 (unsigned) Tag, (unsigned) Field, (unsigned) Long2,
+                                 (unsigned) Value, FipFieldName(fip));
 
           if (Tag == TIFFTAG_COMPRESSION ||
               Tag == TIFFTAG_IMAGELENGTH || Tag == TIFFTAG_IMAGEWIDTH ||
@@ -4725,23 +4730,53 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
               Tag == TIFFTAG_ORIENTATION ||            /* Orientation is handled different way. */
               Tag == TIFFTAG_XRESOLUTION || Tag == TIFFTAG_YRESOLUTION)
             {
-              goto NextItem;        /* Banned TIFF tags that cannot be copyed from EXIF. */
+              goto NextItem;        /* Banned TIFF tags that cannot be copied from EXIF. */
             }
 
           if (Tag == TIFFTAG_EXIFIFD)
             {
               if (Value >= profile_length)
-                goto NextItem;
-              if ((Flags & FLAG_EXIF) != 0)
-                FieldCount += AddIFDExifFields(tiff, profile_data, profile_data+Value, profile_length, logging, Flags|FLAG_BASE);
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                         "EXIF IFD data length (%u) exceeds profile length (%zu)!",
+                                         (unsigned) Value, profile_length);
+                  goto NextItem;
+                }
+              if (((Flags & FLAG_EXIF) != 0) && ((*ifds_handled & FLAG_EXIF) == 0))
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing into EXIF IFD...");
+                  *ifds_handled |= FLAG_EXIF;
+
+                  FieldCount += AddIFDExifFields(tiff, ifds_handled, profile_data, profile_data+Value,
+                                                 profile_length, logging, Flags|FLAG_BASE);
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing out of EXIF IFD...");
+                }
               goto NextItem;
             }
           if (Tag == TIFFTAG_GPSIFD)
             {
               if (Value >= profile_length)
-                goto NextItem;
-              if ((Flags & FLAG_GPS) != 0)
-                FieldCount += AddIFDExifFields(tiff, profile_data, profile_data+Value, profile_length, logging, Flags|FLAG_BASE);
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                         "GPS IFD data length (%u) exceeds profile length (%zu)!",
+                                         (unsigned) Value, profile_length);
+                  goto NextItem;
+                }
+              if (((Flags & FLAG_GPS) != 0) && ((*ifds_handled & FLAG_GPS) == 0))
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing into GPS IFD...");
+                  *ifds_handled |= FLAG_GPS;
+
+                  FieldCount += AddIFDExifFields(tiff, ifds_handled, profile_data, profile_data+Value,
+                                                 profile_length, logging, Flags|FLAG_BASE);
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing out of GPS IFD...");
+                }
               goto NextItem;
             }
 
@@ -4987,10 +5022,15 @@ static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data
 
 static int AddExifFields(TIFF *tiff, const unsigned char *profile_data, size_t profile_length, MagickBool logging, magick_uint16_t Flags)
 {
-  const char EXIF[6] = {'E','x','i','f',0,0};
+  const char EXIF[6]
+    = {'E','x','i','f',0,0};
+
+  unsigned int
+    ifds_handled = 0;
 
   if (profile_data==NULL || profile_length < 12+8)
     return 0;
+
   if (memcmp(EXIF,profile_data,6)==0)
     {
       profile_data += 6;
@@ -5002,7 +5042,7 @@ static int AddExifFields(TIFF *tiff, const unsigned char *profile_data, size_t p
   if (profile_data[0] != profile_data[1])
     return 0;
 
-  return AddIFDExifFields(tiff, profile_data,
+  return AddIFDExifFields(tiff, &ifds_handled, profile_data,
                           profile_data + ((profile_data[0]=='M')?LD_UINT32_HI(profile_data+4):LD_UINT32_LO(profile_data+4)),
                           profile_length-2, logging, Flags);
 }

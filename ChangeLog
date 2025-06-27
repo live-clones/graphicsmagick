@@ -1,3 +1,10 @@
+2025-06-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (AddExifFields): Only handle EXIF and GPS IFDs
+	once.  Avoid infinite recursion.  Addresses oss-fuzz 405456339
+	"graphicsmagick:coder_TIFF_any_fuzzer: Stack-overflow in
+	AddIFDExifFields".
+
 2025-06-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/png.c (ReadMNGImage): Validate that MNG width or height
