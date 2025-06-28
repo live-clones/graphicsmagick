@@ -513,32 +513,31 @@ then
     # Build libde265 (a C++ library)
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libde265 --libs
     #     -L/work/lib -lde265 -lc++
-    #
-    # FIXME: Compilation with the auto-tools is deprecated and will be
-    # removed in an upcoming release. Please switch to using the CMake
-    # build.
     libde265="$SRC/libde265"
     if $enable_de265
     then
        if [ -d "${libde265}" ]
        then
            printf "=== Building ${libde265}...\n"
-           pushd "${libde265}"
-           ./autogen.sh
-           ./configure \
-               CFLAGS="$CFLAGS -fPIC" \
-               --disable-acceleration_speed \
-               --disable-dec265 \
-               --disable-enc265 \
-               --disable-hdrcopy \
-               --disable-shared \
-               --disable-sherlock265 \
-               --enable-static \
-               --prefix="$WORK"
+           libde265_build="${libde265}_build"
+           mkdir -p "${libde265_build}"
+           pushd "${libde265_build}"
+           cmake -G "Unix Makefiles" \
+                 -DCMAKE_BUILD_TYPE=Debug \
+                 -DCMAKE_CXX_COMPILER=$CXX \
+                 -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+                 -DCMAKE_C_COMPILER=$CC \
+                 -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
+                 -DCMAKE_INSTALL_RPATH='/usr/local/lib' \
+                 -DCMAKE_INSTALL_PREFIX="$WORK" \
+                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+                 -DBUILD_SHARED_LIBS=OFF \
+                 -DENABLE_SDL=OFF \
+                 -DENABLE_DECODER=ON \
+                 -DENABLE_ENCODER=ON \
+                 "${libde265}"
            make clean
            make -j$(nproc)
-           # Fix broken libde265.pc
-           sed -i 's/@LIBS_PRIVATE@/-lc++/' libde265.pc
            make install
            popd
        else

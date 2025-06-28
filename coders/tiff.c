@@ -4823,7 +4823,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                         Array[i] = LD_UINT16(profile_data+Value+2*i);
                       if (WriteCount == TIFF_VARIABLE)
                         {
-                          if (TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
+                          if (TIFFSetField(tiff, Tag/*301 TIFFTAG_TRANSFERFUNCTION*/, (int)Long2/*29*/, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
                             FieldCount++;
                         } else if (WriteCount == TIFF_VARIABLE2)
                         {

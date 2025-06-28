@@ -101,9 +101,7 @@ de265
 
 With sources under /home/bfriesen/src/libde265 (from https://github.com/strukturag/libde265)::
 
-  /home/bfriesen/src/libde265/configure --prefix=/usr/local CC=gcc CXX=g++ CFLAGS='-O -g' CXXFLAGS='-O -g'
-  make
-  make install
+  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=ON /home/bfriesen/src/libde265
 
 x265
 ++++
