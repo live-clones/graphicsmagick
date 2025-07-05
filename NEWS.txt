@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to June 17, 2025.
+This file was last updated to reflect changes up to July 5, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -44,15 +44,6 @@ Security Fixes:
 * SVG: Use libxml2's SAX handlers for the SVG renderer.  This removes
   a lot of archaic cruft which might suffer from security issues.
 
-* TIFF: Disable EXPERIMENTAL_EXIF_TAGS by default until libtiff API
-  weaknesses (as discovered in OSS-Fuzz issue 402570327) are resolved.
-  This can be accomplished in earlier versions supporting this feature
-  by passing CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 as an argument to the
-  configure script. Continue to address issues in the EXIF tag code as
-  discovered by oss-fuzz. The primary issue is that the libtiff API's
-  used are non-validating so arguments originating from EXIF will need
-  to be validated by this implementation.
-
 * WPG: Assure that the palette buffer is allocated and the current
   size (SourceForge bug #750).
 
@@ -68,6 +59,8 @@ Bug fixes:
 * PNG: Fix broken tRNS table when writing via "PNG8". Warn if pixel
   transparencies are independent of color palette, since this results
   in a loss of image quality. Remove output file if an error occurs.
+
+* MNG: Validate that Validate that MNG width or height is non-zero.
 
 * TclMagick: The TclMagick build uses the latest TEA tcl.m4 macros,
   while modernizing the Automake and Autoconf files. Many defects in
@@ -90,6 +83,15 @@ Bug fixes:
 
 * Magick++ 'analyze' demo: Request "Analyze" rather than "analyze". It
   is not clear how this was working before.
+
+* TIFF: EXPERIMENTAL_EXIF_TAGS is enabled by default again since all
+  known security issues have been addressed.  Use
+  CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 to disable it.
+
+* TIFF: Only handle EXIF and GPS IFDs once in order to avoid infinite
+  recursion.
+
+* TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION tag.
 
 * TransformImage(), and -crop: Sove the problem "-crop does not
   generate tiles when used with a percentage"
@@ -115,6 +117,8 @@ New Features:
   TIFFErrorExtR() in order to provide an error handling context per
   TIFF handle.  This improves concurrency and thread safety when
   multiple libraries are using libtiff within the same process.
+
+* EXIF attribute decoding is now updated to support Exif Version 3.0.
 
 API Updates:
 

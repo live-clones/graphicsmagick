@@ -1,5 +1,7 @@
 2025-07-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* NEWS.txt: Update the news.
+
 	* coders/tiff.c (AddIFDExifFields): TIFFTAG_TRANSFERFUNCTION
 	depends on image specific tags TIFFTAG_BITSPERSAMPLE and
 	TIFFTAG_SAMPLESPERPIXEL, which are already banned.  So also ban

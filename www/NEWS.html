@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to June 17, 2025.</p>
+<p>This file was last updated to reflect changes up to July 5, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -123,14 +123,6 @@ suffer from security issues.</p></li>
 overflow while reading image.</p></li>
 <li><p>SVG: Use libxml2's SAX handlers for the SVG renderer.  This removes
 a lot of archaic cruft which might suffer from security issues.</p></li>
-<li><p>TIFF: Disable EXPERIMENTAL_EXIF_TAGS by default until libtiff API
-weaknesses (as discovered in OSS-Fuzz issue 402570327) are resolved.
-This can be accomplished in earlier versions supporting this feature
-by passing CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 as an argument to the
-configure script. Continue to address issues in the EXIF tag code as
-discovered by oss-fuzz. The primary issue is that the libtiff API's
-used are non-validating so arguments originating from EXIF will need
-to be validated by this implementation.</p></li>
 <li><p>WPG: Assure that the palette buffer is allocated and the current
 size (SourceForge bug #750).</p></li>
 </ul>
@@ -144,6 +136,7 @@ inverted. This bug is now fixed.</p></li>
 <li><p>PNG: Fix broken tRNS table when writing via &quot;PNG8&quot;. Warn if pixel
 transparencies are independent of color palette, since this results
 in a loss of image quality. Remove output file if an error occurs.</p></li>
+<li><p>MNG: Validate that Validate that MNG width or height is non-zero.</p></li>
 <li><p>TclMagick: The TclMagick build uses the latest TEA tcl.m4 macros,
 while modernizing the Automake and Autoconf files. Many defects in
 the C code are corrected.  The libttkcommon &quot;shim&quot; library,
@@ -160,6 +153,12 @@ October 21, 2023.</p></li>
 <li><p>JXL: Free profile memory if JxlDecoderSetBoxBuffer() fails.</p></li>
 <li><p>Magick++ 'analyze' demo: Request &quot;Analyze&quot; rather than &quot;analyze&quot;. It
 is not clear how this was working before.</p></li>
+<li><p>TIFF: EXPERIMENTAL_EXIF_TAGS is enabled by default again since all
+known security issues have been addressed.  Use
+CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 to disable it.</p></li>
+<li><p>TIFF: Only handle EXIF and GPS IFDs once in order to avoid infinite
+recursion.</p></li>
+<li><p>TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION tag.</p></li>
 <li><p>TransformImage(), and -crop: Sove the problem &quot;-crop does not
 generate tiles when used with a percentage&quot;</p></li>
 </ul>
@@ -180,6 +179,7 @@ convert -list magic'.</p></li>
 TIFFErrorExtR() in order to provide an error handling context per
 TIFF handle.  This improves concurrency and thread safety when
 multiple libraries are using libtiff within the same process.</p></li>
+<li><p>EXIF attribute decoding is now updated to support Exif Version 3.0.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
