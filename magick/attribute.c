@@ -1191,7 +1191,7 @@ tag_table[] =
     TAG_INFO(0x0124, EXIF_FMT_ULONG, 1, "T4Options"),
     TAG_INFO(0x0125, EXIF_FMT_ULONG, 1, "T6Options"),
     TAG_INFO(0x0128, EXIF_FMT_USHORT, 1, "ResolutionUnit"),
-    TAG_INFO(0x012D, EXIF_FMT_USHORT, 3*256, "TransferFunction"),
+    TAG_INFO(0x012D, EXIF_FMT_USHORT, 3*256  /* (1 or 3) * (1 << BitsPerSample) */, "TransferFunction"),
     TAG_INFO(0x0131, EXIF_FMT_ASCII, 0, "Software"),
     TAG_INFO(0x0132, EXIF_FMT_ASCII, 20, "DateTime"),
     TAG_INFO(0x013B, EXIF_FMT_ASCII, 0, "Artist"),

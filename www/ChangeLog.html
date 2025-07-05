@@ -38,6 +38,17 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-07-05  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/tiff.c (AddIFDExifFields): TIFFTAG_TRANSFERFUNCTION
+depends on image specific tags TIFFTAG_BITSPERSAMPLE and
+TIFFTAG_SAMPLESPERPIXEL, which are already banned.  So also ban
+TIFFTAG_TRANSFERFUNCTION. Addresses oss-fuzz 402570327
+&quot;graphicsmagick:coder_TIFF_any_fuzzer: Null-dereference READ in
+_TIFFmemcpy&quot;.</p></li>
+</ul>
+</blockquote>
 <p>2025-06-28  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

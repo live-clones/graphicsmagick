@@ -1,3 +1,12 @@
+2025-07-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (AddIFDExifFields): TIFFTAG_TRANSFERFUNCTION
+	depends on image specific tags TIFFTAG_BITSPERSAMPLE and
+	TIFFTAG_SAMPLESPERPIXEL, which are already banned.  So also ban
+	TIFFTAG_TRANSFERFUNCTION. Addresses oss-fuzz 402570327
+	"graphicsmagick:coder_TIFF_any_fuzzer: Null-dereference READ in
+	_TIFFmemcpy".
+
 2025-06-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* fuzzing/README.txt: Document how to build de265 using cmake.

@@ -4719,16 +4719,24 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
           fip = TIFFFindField(tiff, Tag, TIFF_ANY);
           if (logging && (Flags & FLAG_BASE) != 0)
             (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                                 "Extracted tag from EXIF %xh, Field %u, Long2 %u, val %u %s",
-                                 (unsigned) Tag, (unsigned) Field, (unsigned) Long2,
+                                 "Extracted tag from EXIF %xh.H (%u), Field %u, Long2 %u, val %u %s",
+                                 (unsigned) Tag, (unsigned) Tag, (unsigned) Field, (unsigned) Long2,
                                  (unsigned) Value, FipFieldName(fip));
 
           if (Tag == TIFFTAG_COMPRESSION ||
-              Tag == TIFFTAG_IMAGELENGTH || Tag == TIFFTAG_IMAGEWIDTH ||
-              Tag == TIFFTAG_SAMPLESPERPIXEL || Tag == TIFFTAG_BITSPERSAMPLE || Tag == TIFFTAG_SAMPLEFORMAT ||
-              Tag == TIFFTAG_STRIPOFFSETS || Tag == TIFFTAG_ROWSPERSTRIP || Tag == TIFFTAG_STRIPBYTECOUNTS ||
-              Tag == TIFFTAG_ORIENTATION ||            /* Orientation is handled different way. */
-              Tag == TIFFTAG_XRESOLUTION || Tag == TIFFTAG_YRESOLUTION)
+              Tag == TIFFTAG_IMAGELENGTH ||
+              Tag == TIFFTAG_IMAGEWIDTH ||
+              Tag == TIFFTAG_SAMPLESPERPIXEL ||
+              Tag == TIFFTAG_BITSPERSAMPLE ||
+              Tag == TIFFTAG_SAMPLEFORMAT ||
+              Tag == TIFFTAG_STRIPOFFSETS ||
+              Tag == TIFFTAG_ROWSPERSTRIP ||
+              Tag == TIFFTAG_STRIPBYTECOUNTS ||
+              Tag == TIFFTAG_ORIENTATION || /* Orientation is handled different way. */
+              Tag == TIFFTAG_XRESOLUTION ||
+              Tag == TIFFTAG_YRESOLUTION ||
+              Tag == TIFFTAG_TRANSFERFUNCTION /* Depends on TIFFTAG_BITSPERSAMPLE and TIFFTAG_SAMPLESPERPIXEL (above) */
+              )
             {
               goto NextItem;        /* Banned TIFF tags that cannot be copied from EXIF. */
             }
@@ -4811,7 +4819,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                       if (FDT != Field)
                         break;                        /* Incompatible array type, might be converted in future. */
                       if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
-                        break;                                   /* Fixed size arrays not handled. */
+                        break;                        /* Fixed size arrays not handled. */
                       if ((Value > (Value+2U*Long2)) || (Value+2U*Long2 >= profile_length-1))
                         break;
                       if (Long2 == 0)
@@ -4823,7 +4831,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                         Array[i] = LD_UINT16(profile_data+Value+2*i);
                       if (WriteCount == TIFF_VARIABLE)
                         {
-                          if (TIFFSetField(tiff, Tag/*301 TIFFTAG_TRANSFERFUNCTION*/, (int)Long2/*29*/, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
+                          if (TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
                             FieldCount++;
                         } else if (WriteCount == TIFF_VARIABLE2)
                         {
