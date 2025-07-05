@@ -6,6 +6,8 @@
 	TIFFTAG_TRANSFERFUNCTION. Addresses oss-fuzz 402570327
 	"graphicsmagick:coder_TIFF_any_fuzzer: Null-dereference READ in
 	_TIFFmemcpy".
+	(EXPERIMENTAL_EXIF_TAGS): Enable transfer of EXIF tags by default
+	again.
 
 2025-06-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
