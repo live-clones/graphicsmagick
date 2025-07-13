@@ -1,3 +1,10 @@
+2025-07-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/analyze.c (GetImageBoundingBox): If image rows or columns
+	is zero, then return default bounds.  Addresses oss-fuzz 431500052
+	"graphicsmagick:coder_SVG_fuzzer: Integer-overflow in
+	GetImageBoundingBox".
+
 2025-07-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.
