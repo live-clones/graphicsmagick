@@ -9523,6 +9523,10 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
             (void) SetImageAttribute(*image,"comment",(char *) NULL);
             if (*option == '-')
               {
+                /*
+                  Like TranslateText() except with added support for
+                  '@' to take input from local file.
+                */
                 char *translated_text =
                   AmpersandTranslateText(clone_info,*image,argv[++i]);
                 if (translated_text != (char *) NULL)
@@ -10151,22 +10155,16 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
             (void) SetImageAttribute(*image,"label",(char *) NULL);
             if (*option == '-')
               {
-                const char *label = argv[++i];
-                if ((*label == '@') && IsAccessible(label+1))
+                /*
+                  Like TranslateText() except with added support for
+                  '@' to take input from local file.
+                */
+                char *translated_text =
+                  AmpersandTranslateText(clone_info,*image,argv[++i]);
+                if (translated_text != (char *) NULL)
                   {
-                    char *text;
-                    size_t length;
-                    text = FileToBlob(label+1,&length,&(*image)->exception);
-                    if (text != (char *) NULL)
-                      {
-                        TrimStringNewLine(text,length);
-                        SetImageAttribute(*image,"label",text);
-                        MagickFreeMemory(text);
-                      }
-                  }
-                else
-                  {
-                    (void) SetImageAttribute(*image,"label",label);
+                    (void) SetImageAttribute(*image,"label",translated_text);
+                    MagickFreeMemory(translated_text);
                   }
               }
             continue;

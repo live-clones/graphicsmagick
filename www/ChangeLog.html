@@ -41,6 +41,17 @@
 <p>2025-07-13  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/command.c (MogrifyImage): Apply text translations for
+-comment and -label before calling SetImageAttribute().</p></li>
+<li><p>magick/attribute.c (SetImageAttribute): No longer translate
+format requests for special format characters (e.g. &quot;%m:%f %wx%h&quot;)
+in attribute text.  These translations were applied for the keys
+&quot;comment&quot; and &quot;label&quot;.  This is a change to existing API behavior
+so code depending on this should use TranslateText() to perform
+the translations prior to calling SetImageAttribute().  It is not
+entirely known what impact this may have, but including this
+functionality in SetImageAttribute() was evil given that it is
+also used for text attributes read from file metadata.</p></li>
 <li><p>magick/analyze.c (GetImageBoundingBox): If image rows or columns
 is zero, then return default bounds.  Addresses oss-fuzz 431500052
 &quot;graphicsmagick:coder_SVG_fuzzer: Integer-overflow in

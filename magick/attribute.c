@@ -3403,36 +3403,10 @@ SetImageAttribute(Image *image,const char *key,const char *value)
   if (attribute == (ImageAttribute *) NULL)
     return(MagickFail);
   attribute->key=AllocateString(key);
-  attribute->length=0;
-  if (!GetBlobIsOpen(image) &&
-      ((LocaleNCompare(key,"comment",7) == 0) ||
-       (LocaleNCompare(key,"label",5) == 0)))
-    {
-      /*
-        Translate format requests in attribute text when the blob is
-        not open.
-
-        This is really gross since it is assumed that the attribute is
-        supplied by the user and the user intends for translation to
-        occur.  However, 'comment' and 'label' attributes may also
-        come from an image file and may contain arbitrary text.  As a
-        crude-workaround, translations are only performed when the
-        blob is not open.
-      */
-      attribute->value=TranslateText((ImageInfo *) NULL,image,value);
-      if (attribute->value != (char *) NULL)
-        attribute->length=strlen(attribute->value);
-    }
-  else
-    {
-      /*
-        Use attribute text as is.
-      */
-      attribute->length=strlen(value);
-      attribute->value=MagickAllocateMemory(char *,attribute->length+1);
-      if (attribute->value != (char *) NULL)
-        (void) strlcpy(attribute->value,value,attribute->length+1);
-    }
+  attribute->length=strlen(value);
+  attribute->value=MagickAllocateMemory(char *,attribute->length+1);
+  if (attribute->value != (char *) NULL)
+    (void) strlcpy(attribute->value,value,attribute->length+1);
   if ((attribute->value == (char *) NULL) ||
       (attribute->key == (char *) NULL))
     {
