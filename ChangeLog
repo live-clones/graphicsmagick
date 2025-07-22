@@ -1,5 +1,8 @@
 2025-07-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/render.c (DrawImage): Primitive and token buffers are
+	based on resource-managed memory.
+
 	* coders/tiff.c (AddIFDExifFields): TIFFTAG_COLORMAP depends on
 	image specific tags, so do not transfer as an EXIF tag.  Addresses
 	oss-fuzz 433440617 "graphicsmagick:coder_TIFF_any_fuzzer:

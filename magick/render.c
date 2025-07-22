@@ -2439,10 +2439,6 @@ char *  ExtractTokensBetweenPushPop (
   Added to support new elements "use" and "class".
 
   FIXME: Need to add anti-recursion measures.
-
-  See if DrawImageGetCurrentRecurseLevel(),
-  DrawImageSetCurrentRecurseLevel(), DrawImageRecurseIn(),
-  DrawImageRecurseOut() can be used.
 */
 static
 char * InsertAttributeIntoInputStream (
@@ -2496,6 +2492,16 @@ char * InsertAttributeIntoInputStream (
   RemainingLength = *pprimitive_extent - (size_t)(q - *pprimitive);
   NeededLength = AttributeLength + RemainingLength;
 
+#if 0
+  if (image->logging)
+    (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                          "InsertAttributeIntoInputStream(): keyword \"%s\" "
+                          "AttributeName \"%s\", AttributeLength=%zu, "
+                          "RemainingLength=%zu, NeededLength=%zu",
+                          keyword, AttributeName, AttributeLength,
+                          RemainingLength, NeededLength);
+#endif
+
   if  ( NeededLength <= *pprimitive_extent )
     {/*combined strings fit in existing primitive buffer*/
 
@@ -2505,24 +2511,72 @@ char * InsertAttributeIntoInputStream (
     }/*combined strings fit in existing primitive buffer*/
   else
     {/*combined strings need bigger buffer*/
-
+#if 1
+      /*
+        Based on original free/new design
+      */
       char * primitiveNew;
+      char * tokenNew;
       *pprimitive_extent = NeededLength;
-      primitiveNew = MagickAllocateMemory(char *,NeededLength+1);
+      primitiveNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
       if (primitiveNew == (char *) NULL)
         {
           *pStatus = MagickFail;
           return(q);
         }
-      (void) memcpy(primitiveNew,attribute->value,AttributeLength);
-      (void) memcpy(primitiveNew+AttributeLength,q,RemainingLength);
+      (void) memcpy(primitiveNew,attribute->value,AttributeLength); /* Attribute value */
+      (void) memcpy(primitiveNew+AttributeLength,q,RemainingLength); /* Remaining */
       primitiveNew[NeededLength] = '\0';
 
-      MagickFreeMemory(*pprimitive);
+      MagickFreeResourceLimitedMemory(*pprimitive);
       q = *pprimitive = primitiveNew;
-      MagickFreeMemory(*ptoken);
-      *ptoken = MagickAllocateMemory(char *,NeededLength+1);
+      MagickFreeResourceLimitedMemory(*ptoken);
+      tokenNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
+      if (tokenNew == (char *) NULL)
+        {
+          *pStatus = MagickFail;
+          return(q);
+        }
+      *ptoken = tokenNew;
       *ptoken_max_length = NeededLength;
+#else
+      /*
+        Based on reallocation design
+      */
+      {
+        char * primitiveNew;
+        size_t Offset;
+        *pprimitive_extent = NeededLength;
+        Offset = q-*pprimitive;
+        primitiveNew = MagickReallocateResourceLimitedMemory(char *,*pprimitive,NeededLength+1);
+        if (primitiveNew == (char *) NULL)
+          {
+            *pStatus = MagickFail;
+            return(q);
+          }
+        /* FIXME: Need to verify this! */
+        (void) memmove(/* dest */primitiveNew+AttributeLength,/* source */primitiveNew+Offset,RemainingLength); /* Remaining */
+        (void) memcpy(primitiveNew,attribute->value,AttributeLength); /* Attribute value */
+        primitiveNew[NeededLength] = '\0';
+        q = *pprimitive = primitiveNew;
+      }
+      {
+        char * tokenNew;
+        tokenNew = MagickReallocateResourceLimitedMemory(char *,*ptoken,NeededLength+1);
+        if (tokenNew == (char *) NULL)
+          {
+            *pStatus = MagickFail;
+            return(q);
+          }
+        *ptoken = tokenNew;
+        *ptoken_max_length = NeededLength;
+      }
+#if 0
+     if (image->logging)
+        (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                              "InsertAttributeIntoInputStream(): \"%s\"", *pprimitive);
+#endif
+#endif
 
     }/*combined strings need bigger buffer*/
 
@@ -2631,6 +2685,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     geometry[MaxTextExtent],
     name[MaxTextExtent],
     pattern[MaxTextExtent],
+    *original_primitive,
     *primitive,
     *q,
     *token;
@@ -2741,19 +2796,37 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   */
   if ((*draw_info->primitive == '@') &&
       (DrawImageGetCurrentRecurseLevel(image) == 1))
-    primitive=(char *)
-      FileToBlob(draw_info->primitive+1,&length,&image->exception);
+    {
+      original_primitive=(char *)
+        FileToBlob(draw_info->primitive+1,&length,&image->exception);
+    }
   else
-    primitive=AllocateString(draw_info->primitive);
-  if (primitive == (char *) NULL)
+    {
+      original_primitive=draw_info->primitive;
+    }
+  if (original_primitive == (char *) NULL)
     return(MagickFail);
-  primitive_extent=strlen(primitive);
+
 
   if (getenv("MAGICK_SKIP_RENDERING") != NULL)
     {
-      MagickFreeMemory(primitive);
+      if (original_primitive != draw_info->primitive)
+        MagickFreeMemory(original_primitive);
       return MagickPass;
     }
+
+    primitive_extent=strlen(original_primitive);
+    primitive = MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
+    if (primitive == (char *) NULL)
+      {
+        if (original_primitive != draw_info->primitive)
+          MagickFreeMemory(original_primitive);
+        return(MagickFail);
+      }
+    (void) memcpy(primitive, original_primitive, primitive_extent+1);
+    if (original_primitive != draw_info->primitive)
+          MagickFreeMemory(original_primitive);
+
   n=0;
   /*
     Allocate primitive info memory.
@@ -2761,7 +2834,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   graphic_context=MagickAllocateMemory(DrawInfo **,sizeof(DrawInfo *));
   if (graphic_context == (DrawInfo **) NULL)
     {
-      MagickFreeMemory(primitive);
+      MagickFreeResourceLimitedMemory(primitive);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
         UnableToDrawOnImage)
     }
@@ -2774,19 +2847,19 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
   if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass)
     {
-      MagickFreeMemory(primitive);
+      MagickFreeResourceLimitedMemory(primitive);
       MagickFreeMemory(graphic_context);
       return MagickFail;
     }
   if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
     {
-      MagickFreeMemory(primitive);
+      MagickFreeResourceLimitedMemory(primitive);
       MagickFreeMemory(graphic_context);
       return MagickFail;
     }
   graphic_context[n]=CloneDrawInfo((ImageInfo *) NULL,draw_info);
   /* next two lines: don't need copy of primitive, just a buffer of the same size */
-  token=MagickAllocateMemory(char *,primitive_extent+1);
+  token=MagickAllocateResourceLimitedMemory(char *,primitive_extent+1);
   token_max_length=primitive_extent;
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
   xTextCurrent = yTextCurrent = 0.0;  /* initialize current text position */
@@ -2854,7 +2927,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           q++;
         continue;
       }
-    p=q-strlen(keyword);
+    p=q-strlen(keyword); /* FIXME: Make sure that this rule works! */
     primitive_type=UndefinedPrimitive;
     current=graphic_context[n]->affine;
     IdentityAffine(&affine);
@@ -4334,7 +4407,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     if (primitive_type == UndefinedPrimitive)
       {
         (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",
-          (int) (q-p),p);
+                              (int) (q-p),p);
         continue;
       }
     /*
@@ -4903,11 +4976,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     Free resources.
   */
   DrawImageRecurseOut(image);
-  MagickFreeMemory(token);
+  MagickFreeResourceLimitedMemory(token);
   if (primitive_info != (PrimitiveInfo *) NULL)
     LiberateMagickResource(MemoryResource,(*PIMgr.p_AllocCount)*sizeof(PrimitiveInfo));
   MagickFreeMemory(primitive_info);
-  MagickFreeMemory(primitive);
+  MagickFreeResourceLimitedMemory(primitive);
   for ( ; n >= 0; n--)
     DestroyDrawInfo(graphic_context[n]);
   MagickFreeMemory(graphic_context);
