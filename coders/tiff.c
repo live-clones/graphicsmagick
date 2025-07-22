@@ -4723,7 +4723,8 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                  (unsigned) Tag, (unsigned) Tag, (unsigned) Field, (unsigned) Long2,
                                  (unsigned) Value, FipFieldName(fip));
 
-          if (Tag == TIFFTAG_COMPRESSION ||
+          if (Tag == TIFFTAG_COLORMAP ||
+              Tag == TIFFTAG_COMPRESSION ||
               Tag == TIFFTAG_IMAGELENGTH ||
               Tag == TIFFTAG_IMAGEWIDTH ||
               Tag == TIFFTAG_SAMPLESPERPIXEL ||

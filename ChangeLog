@@ -1,3 +1,10 @@
+2025-07-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (AddIFDExifFields): TIFFTAG_COLORMAP depends on
+	image specific tags, so do not transfer as an EXIF tag.  Addresses
+	oss-fuzz 433440617 "graphicsmagick:coder_TIFF_any_fuzzer:
+	Null-dereference READ in _TIFFmemcpy".
+
 2025-07-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/command.c (MogrifyImage): Apply text translations for
