@@ -158,7 +158,9 @@ known security issues have been addressed.  Use
 CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 to disable it.</p></li>
 <li><p>TIFF: Only handle EXIF and GPS IFDs once in order to avoid infinite
 recursion.</p></li>
-<li><p>TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION tag.</p></li>
+<li><p>TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION and TIFFTAG_COLORMAP tags.</p></li>
+<li><p>GetImageBoundingBox(): If image rows or columns is zero, then return
+default bounds.</p></li>
 <li><p>TransformImage(), and -crop: Sove the problem &quot;-crop does not
 generate tiles when used with a percentage&quot;</p></li>
 </ul>
@@ -196,6 +198,10 @@ channels 'R', 'G', 'B', 'A', 'O', 'T', 'C', 'M', 'Y', 'K'.</p></li>
 <li><p>Magick++: Support for automatic cleanup via a 'MagickCleanUp' static
 object is removed due to race conditions with static destruction in
 other libraries.</p></li>
+<li><p>SetImageAttribute(): No longer translate format requests for special
+format characters (e.g. &quot;%m:%f %wx%h&quot;) in attribute text.  Any code
+which was relying on this should use TranslateText() to perform the
+translations prior to calling SetImageAttribute().</p></li>
 </ul>
 <p>Build Changes:</p>
 <ul class="simple">
