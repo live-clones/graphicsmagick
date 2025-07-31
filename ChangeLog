@@ -1,3 +1,18 @@
+2025-07-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* tests/rwfile.tap: Add tests for PNG24, PNG32, PNG48, and PNG8
+	PNG subformats.
+
+	* coders/png.c (WriteOnePNGImage): More work on writing PNG8
+	format. It is decided that PNG8 does indeed mean "Indexed-color
+	with 8-bit sample depth. Binary transparency is supported, but not
+	full-alpha tRNS-type.". As a value add for the user, if the image
+	background color is fully transparent, then its color index is
+	selected to be the transparent color, and transparency is removed
+	from any other non-opaque colors.  If no effective means is found
+	to reduce to just one transparent color, opacity is stripped from
+	the output.
+
 2025-07-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

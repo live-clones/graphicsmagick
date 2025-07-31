@@ -38,6 +38,22 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-07-31  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>tests/rwfile.tap: Add tests for PNG24, PNG32, PNG48, and PNG8
+PNG subformats.</p></li>
+<li><p>coders/png.c (WriteOnePNGImage): More work on writing PNG8
+format. It is decided that PNG8 does indeed mean &quot;Indexed-color
+with 8-bit sample depth. Binary transparency is supported, but not
+full-alpha tRNS-type.&quot;. As a value add for the user, if the image
+background color is fully transparent, then its color index is
+selected to be the transparent color, and transparency is removed
+from any other non-opaque colors.  If no effective means is found
+to reduce to just one transparent color, opacity is stripped from
+the output.</p></li>
+</ul>
+</blockquote>
 <p>2025-07-24  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
