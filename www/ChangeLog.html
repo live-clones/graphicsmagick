@@ -42,7 +42,15 @@
 <blockquote>
 <ul class="simple">
 <li><p>coders/png.c (WriteOnePNGImage): Pass colormap index for Palette
-image when writing bKGD chunk.</p></li>
+image when writing bKGD chunk.
+(WriteOnePNGImage): For Palette image, need to use colormap index
+rather than a computed grayscale value.  This addresses oss-fuzz
+435651831 &quot;graphicsmagick:coder_PNG8_fuzzer: Heap-buffer-overflow
+in WriteOnePNGImage&quot;, which became evident after the recent PNG8
+work.
+(WriteOnePNGImage): Replace semi-transparent colors which are very
+close to the transparent background color, with the transparent
+background color.</p></li>
 </ul>
 </blockquote>
 <p>2025-07-31  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>

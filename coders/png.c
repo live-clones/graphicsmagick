@@ -798,6 +798,28 @@ extern "C" {
 #endif
 
 /*
+  Compute a distance vector between two colors (0-3.0)
+*/
+static double DistanceVector(const PixelPacket *a, const PixelPacket *b)
+{
+  double
+    difference,
+    distance,
+    distance_squared;
+
+  difference=(a->red-(double) b->red)/MaxRGBDouble;
+  distance_squared=(difference*difference);
+
+  difference=(a->green-(double) b->green)/MaxRGBDouble;
+  distance_squared+=(difference*difference);
+
+  difference=(a->blue-(double) b->blue)/MaxRGBDouble;
+  distance_squared+=(difference*difference);
+  distance=sqrt(distance_squared);
+  return distance;
+}
+
+/*
   This is the function that does the actual reading of data.  It is
   the same as the one supplied in libpng, except that it receives the
   datastream from the ReadBlob() function instead of standard input.
@@ -7630,12 +7652,23 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                   for (x=0; x < (long) image->columns; x++)
                     {
                       /*
-                        FIXME: Implement a smarter algorithm which
-                        decides if pixel should be assigned to the
-                        background color, or be set to opaque
+                        Replace non-opaque pixels which are very close
+                        to the transparent background color with the
+                        transparent background color.
                       */
                       if ((indexes[x] != background_index) && (p->opacity != OpaqueOpacity))
-                        p->opacity=OpaqueOpacity;
+                        {
+                          double distance = DistanceVector(&image->colormap[background_index],p);
+                          if (distance < 0.3)
+                            {
+                              *p=image->colormap[background_index];
+                              p->opacity=TransparentOpacity;
+                            }
+                          else
+                            {
+                              p->opacity=OpaqueOpacity;
+                            }
+                        }
                       p++;
                     }
                   SyncImagePixelsEx(image,&image->exception);
@@ -7793,8 +7826,11 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                   &mask;
                 ping_trans_color.gray=
                   (png_uint_16) ScaleQuantumToShort(PixelIntensity(p))&mask;
-                ping_trans_color.index=(unsigned char)
-                  (ScaleQuantumToChar(MaxRGB-p->opacity));
+                if (ping_colortype == PNG_COLOR_TYPE_PALETTE)
+                  ping_trans_color.index = (png_byte) ping_background.index;
+                else
+                  ping_trans_color.index=(unsigned char)
+                    (ScaleQuantumToChar(MaxRGB-p->opacity));
                 ping_valid_trns=1;
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Single transparent color (%d,%d,%d index=%d)",
@@ -7982,7 +8018,10 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                     &mask;
                   ping_trans_color.gray=
                     (png_uint_16) ScaleQuantumToShort(PixelIntensity(p))&mask;
-                  ping_trans_color.index=(unsigned char)
+                  if (ping_colortype == PNG_COLOR_TYPE_PALETTE)
+                    ping_trans_color.index = (png_byte) ping_background.index;
+                  else
+                    ping_trans_color.index=(unsigned char)
                     (ScaleQuantumToChar(MaxRGB-p->opacity));
                   ping_valid_trns=1;
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
