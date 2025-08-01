@@ -1,3 +1,8 @@
+2025-08-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/png.c (WriteOnePNGImage): Pass colormap index for Palette
+	image when writing bKGD chunk.
+
 2025-07-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* tests/rwfile.tap: Add tests for PNG24, PNG32, PNG48, and PNG8

@@ -7629,6 +7629,11 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                   indexes=AccessMutableIndexes(image);
                   for (x=0; x < (long) image->columns; x++)
                     {
+                      /*
+                        FIXME: Implement a smarter algorithm which
+                        decides if pixel should be assigned to the
+                        background color, or be set to opaque
+                      */
                       if ((indexes[x] != background_index) && (p->opacity != OpaqueOpacity))
                         p->opacity=OpaqueOpacity;
                       p++;
@@ -8418,7 +8423,9 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
     {
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "  Setting up bKGD chunk");
+                              "  Setting up bKGD chunk for %s image",
+                              PngColorTypeToString(ping_colortype));
+
       if (ping_bit_depth < 8 && ping_colortype == PNG_COLOR_TYPE_GRAY)
         {
           png_uint_16
@@ -8432,6 +8439,9 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
 
           background.gray=(png_uint_16)
             (maxval*(PixelIntensity(&image->background_color))/MaxRGB);
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "      bKGD gray %u", background.gray);
 
           png_set_bKGD(ping,ping_info,&background);
         }
@@ -8455,6 +8465,11 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 (maxval*image->background_color.blue/MaxRGB);
               background.gray=(png_uint_16)
                 (maxval*PixelIntensity(&image->background_color)/MaxRGB);
+              if (logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "      background (red=%u, green=%u, blue=%u, gray=%u)",
+                                      background.red, background.green, background.blue,
+                                      background.gray);
             }
           else
             {
@@ -8463,8 +8478,20 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
               background.blue=image->background_color.blue;
               background.gray=
                 (png_uint_16) PixelIntensity(&image->background_color);
+              if (logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "      background (red=%u, green=%u, blue=%u, gray=%u)",
+                                      background.red, background.green, background.blue,
+                                      background.gray);
             }
-          background.index=(png_byte) background.gray;
+          if (ping_colortype == PNG_COLOR_TYPE_PALETTE)
+            background.index=(png_byte) ping_background.index;
+          else
+            background.index=(png_byte) background.gray;
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "      bKGD index %u",
+                                  background.index);
           png_set_bKGD(ping,ping_info,&background);
         }
     }
