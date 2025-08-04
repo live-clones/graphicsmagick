@@ -7250,8 +7250,10 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
   register const IndexPacket
     *indexes;
 
+  register unsigned long
+    i;
+
   register long
-    i,
     x;
 
   unsigned char
@@ -7557,7 +7559,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
           /*
             Refresh index for background color
           */
-          for (i=0; i < (long) Max(number_colors-1,1); i++)
+          for (i=0; i < Max(Max(1,number_colors)-1,1); i++)
             {
               if (RGBColorMatchExact(ping_background,image->colormap[i]))
                 {
@@ -7692,7 +7694,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
               /*
                 Refresh index for background color
               */
-              for (i=0; i < (long) Max(number_colors-1,1); i++)
+              for (i=0; i < Max(Max(1,number_colors)-1,1); i++)
                 {
                   if (RGBColorMatchExact(ping_background,image->colormap[i]))
                     {
@@ -7728,7 +7730,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         }
       else
         {
-          for (i=0; i < (long) number_colors; i++)
+          for (i=0; i < number_colors; i++)
             {
               palette[i].red=ScaleQuantumToChar(image->colormap[i].red);
               palette[i].green=ScaleQuantumToChar(image->colormap[i].green);
@@ -7849,7 +7851,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
               if (ping_trans_alpha == (unsigned char *) NULL)
                 png_error(ping, "Could not allocate trans_alpha");
 
-              for (i=0; i < (long) number_colors; i++)
+              for (i=0; i < number_colors; i++)
                 ping_trans_alpha[i]=255;
               ping_trans_alpha[ping_trans_color.index]=0;
             }
@@ -7858,7 +7860,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
       /*
         Identify which colormap entry is the background color.
       */
-      for (i=0; i < (long) Max(number_colors-1,1); i++)
+      for (i=0; i < Max(Max(1,number_colors)-1,1); i++)
         {
           if (RGBColorMatchExact(ping_background,image->colormap[i]))
             {
@@ -8154,7 +8156,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                                                 sizeof(png_color));
                     if (palette == (png_color *) NULL)
                       png_error(ping, "Could not allocate palette");
-                    for (i=0; i < (long) number_colors; i++)
+                    for (i=0; i < number_colors; i++)
                       {
                         palette[i].red=ScaleQuantumToChar
                           (image->colormap[i].red);
@@ -8189,7 +8191,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                                           "  Look for transparent colormap entry, number_colors=%d",
                                           (int) number_colors);
 
-                    for (i=0; i < (long) number_colors; i++)
+                    for (i=0; i < number_colors; i++)
                       trans_alpha[i]=256;
 
                     for (y=0; y < (long) image->rows; y++)
@@ -8258,7 +8260,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
 
                     if (ping_valid_trns != 0)
                       {
-                        for (i=0; i < (long) number_colors; i++)
+                        for (i=0; i < number_colors; i++)
                           {
                             if (trans_alpha[i] == 256)
                               trans_alpha[i]=255;
@@ -8282,7 +8284,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                         if (ping_trans_alpha == (unsigned char *) NULL)
                           png_error(ping, "Could not allocate trans_alpha");
 
-                        for (i=0; i<(int) number_colors; i++)
+                        for (i=0; i < number_colors; i++)
                           {
                             if (trans_alpha[i] == 256)
                               ping_trans_alpha[i]=255;
@@ -8298,7 +8300,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 /*
                   Identify which colormap entry is the background color.
                 */
-                for (i=0; i < (long) Max(number_colors-1,1); i++)
+                for (i=0; i < Max(Max(1,number_colors)-1,1); i++)
                   if (RGBColorMatchExact(ping_background,
                                          image->colormap[i]))
                     break;
@@ -8884,7 +8886,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
             else
               (void) ExportImagePixelArea(image,(QuantumType) RedQuantum,
                                           quantum_size,png_pixels,0,0);
-            for (i=0; i < (long) image->columns; i++)
+            for (i=0; i < image->columns; i++)
               *(png_pixels+i)=(*(png_pixels+i) > 128) ? 255 : 0;
             png_write_row(ping,png_pixels);
             if (image->previous == (Image *) NULL)
@@ -9864,7 +9866,7 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
           /* Copy IDAT chunks */
           len=0;
           p=(unsigned char *) (blob+8);
-          for (i=8; i<(long) length; i+=len+12)
+          for (i=8; i<(long)length; i+=len+12)
             {
               len=mng_get_long(p);
               p+=4;

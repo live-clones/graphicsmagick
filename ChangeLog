@@ -1,5 +1,7 @@
 2025-08-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/png.c (WriteOnePNGImage): Fix sign-compare warnings.
+
 	* coders/svg.c (ReadSVGImage): Defend against what appears to be a
 	failure of xmlStopParser() to cause a stop in development libxml2.
 	Should address oss-fuzz 436118547
