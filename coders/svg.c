@@ -3594,11 +3594,35 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
       while ((n=ReadBlob(image,MaxTextExtent-1,message)) != 0)
         {
           message[n]='\0';
+          /* fprintf(stderr,"SVG: %s\n", message); */
           status=xmlParseChunk(parser,message,(int) n,False);
           if (status != 0)
             break;
+          /*
+            The following should not be needed since SVGError invokes
+            xmlStopParser() which should stop the parser by causing
+            xmlParseChunk() to return non-zero!
+          */
+          /* Supported since libxml2 2.14.0 */
+#if LIBXML_VERSION >= 21400
+          if (xmlCtxtIsStopped(parser))
+            {
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "  xmlCtxtIsStopped");
+              status=1;
+              break;
+            }
+#endif
+          if (svg_info.exception->severity >= ErrorException)
+            {
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "  xmlStopParser failed to stop!");
+              status=1;
+              break;
+            }
         }
-      (void) xmlParseChunk(parser,message,0,True);
+      if ((n > 0) && (status != 0))
+        (void) xmlParseChunk(parser,message,0,True);
       /*
         Assure that our private context is freed, even if we abort before
         seeing the document end.
