@@ -38,6 +38,16 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-08-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/render.c (DrawImage): Do not dereference null memory
+memory allocation for 'token' fails. Do not ignore
+DrawPatternPath() failure. Addresses oss-fuzz 436131990
+&quot;graphicsmagick:coder_MVG_fuzzer: Null-dereference WRITE in
+DrawImage&quot;.</p></li>
+</ul>
+</blockquote>
 <p>2025-08-01  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

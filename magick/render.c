@@ -2861,6 +2861,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   /* next two lines: don't need copy of primitive, just a buffer of the same size */
   token=MagickAllocateResourceLimitedMemory(char *,primitive_extent+1);
   token_max_length=primitive_extent;
+  if (token == (char *) NULL)
+    {
+      DestroyDrawInfo(graphic_context[n]);
+      graphic_context[n]=(DrawInfo *) NULL;
+      MagickFreeResourceLimitedMemory(primitive);
+      MagickFreeMemory(graphic_context);
+      return MagickFail;
+    }
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
   xTextCurrent = yTextCurrent = 0.0;  /* initialize current text position */
   /*
@@ -3150,8 +3158,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               break;    /* if drawing clip path, ignore changes to fill color */
             FormatString(pattern,"[MVG:%.1024s]",token);
             if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
-              (void) DrawPatternPath(image,draw_info,token,
-                &graphic_context[n]->fill_pattern);
+              {
+                if (DrawPatternPath(image,draw_info,token,
+                                    &graphic_context[n]->fill_pattern) != MagickPass)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+              }
             else
               {/*fill color, not pattern*/
 
@@ -3875,16 +3889,25 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("graphic-context",token) == 0)
               {
                 n++;
+                /* FIXME: Change to managed memory. If this allocation
+                   fails (unlikely), then the existing DrawInfo
+                   allocations will be leaked! */
                 MagickReallocMemory(DrawInfo **,graphic_context,
                                     MagickArraySize(((size_t) n+1),sizeof(DrawInfo *)));
                 if (graphic_context == (DrawInfo **) NULL)
                   {
                     ThrowException3(&image->exception,ResourceLimitError,
-                      MemoryAllocationFailed,UnableToDrawOnImage);
+                                    MemoryAllocationFailed,UnableToDrawOnImage);
                     break;
                   }
                 graphic_context[n]=
                   CloneDrawInfo((ImageInfo *) NULL,graphic_context[n-1]);
+                if (graphic_context[n] == (DrawInfo *) NULL)
+                  {
+                    ThrowException3(&image->exception,ResourceLimitError,
+                                    MemoryAllocationFailed,UnableToDrawOnImage);
+                    break;
+                  }
                 FillOpacityPending = StrokeOpacityPending = MagickFalse;
                 break;
               }
