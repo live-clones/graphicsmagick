@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -223,7 +223,7 @@ static MagickPassFail DecodeImage(Image *image,const unsigned long compression,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "  Decoding RLE compressed pixels to"
                           " %" MAGICK_SIZE_T_F "u bytes",
-                          (MAGICK_SIZE_T ) image->rows*image->columns);
+                          (MAGICK_SIZE_T) image->rows*(size_t)image->columns);
 
   (void) memset(pixels,0,pixels_size);
   byte=0;

@@ -2404,7 +2404,7 @@ MagickExport void DrawComposite(DrawContext context,
       char
         buffer[MaxTextExtent];
 
-      FormatString(buffer,"%" MAGICK_SIZE_T_F "d bytes", (4L*blob_length/3L+4L));
+      FormatString(buffer,"%" MAGICK_SIZE_T_F "u bytes", (4*blob_length/3+4));
       ThrowDrawException(ResourceLimitWarning,MemoryAllocationFailed,buffer)
     }
 

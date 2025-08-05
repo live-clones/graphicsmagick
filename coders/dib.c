@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -192,7 +192,7 @@ static MagickPassFail DecodeImage(Image *image,const unsigned long compression,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "  Decoding RLE compressed pixels to"
                           " %" MAGICK_SIZE_T_F "u bytes",
-                          (MAGICK_SIZE_T) image->rows*image->columns);
+                          (MAGICK_SIZE_T) image->rows*(size_t)image->columns);
 
   byte=0;
   x=0;
