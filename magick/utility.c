@@ -4793,23 +4793,32 @@ MagickExport MagickPassFail MagickCreateDirectoryPath(const char *dir,
   unsigned int
     directory_mode;
 
-#if defined(S_IRWXU)
+#if !defined(MSWINDOWS)
+
+#  if defined(S_IRWXU)
   directory_mode = S_IRWXU;
-#else
+#  else
   directory_mode = 0777;
-#endif
-#if defined(S_IRGRP)
+#  endif /* if defined(S_IRWXU) */
+
+#  if defined(S_IRGRP)
   directory_mode |= S_IRGRP;
-#endif
-#if defined(S_IXGRP)
+#  endif /* if defined(S_IRGRP) */
+#  if defined(S_IXGRP)
   directory_mode |= S_IXGRP;
-#endif
-#if defined(S_IROTH)
+#  endif /*if defined(S_IXGRP) */
+#  if defined(S_IROTH)
   directory_mode |= S_IROTH;
-#endif
-#if defined(S_IXOTH)
+#  endif /* if defined(S_IROTH) */
+#  if defined(S_IXOTH)
   directory_mode |= S_IXOTH;
-#endif
+#  endif /* if defined(S_IXOTH) */
+
+#else
+
+  (void) directory_mode;
+
+#endif /* if !defined(MSWINDOWS) */
 
   dir_len = strlen(dir);
   end = dir + dir_len;
