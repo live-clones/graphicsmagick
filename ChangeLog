@@ -1,3 +1,10 @@
+2025-08-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* configure.ac: When libpng information is provided by pkgconf
+	(pkg-config), use only the library name that pkgconf
+	provides. Addresses SourceForge Patch #85 "Fix detection of png
+	debug".
+
 2025-08-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/utility.c (MagickCreateDirectoryPath): Microsoft Windows

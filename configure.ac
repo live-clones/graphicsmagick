@@ -1410,9 +1410,12 @@ pkg_config_to_flags() {
        esac
     done
 
-    #printf "CPPFLAGS=${CPPFLAGS}\n"
-    #printf "LDFLAGS=${LDFLAGS}\n"
-    #printf "LIBS=${LIBS}\n\n"
+    if test -n "$VERBOSE"
+    then
+        printf "CPPFLAGS=${CPPFLAGS}\n"
+        printf "LDFLAGS=${LDFLAGS}\n"
+        printf "LIBS=${LIBS}\n\n"
+    fi
 
     #set +x
     return $?
@@ -2209,22 +2212,33 @@ then
     AC_CHECK_HEADER([png.h],[passed=`expr $passed + 1`],
        [failed=`expr $failed + 1`],)
 
+    if test -n "$PNG_LIBS" ; then
+       # Use only pkgconf values
+       pnglibs=$PNG_LIBS
+    else
+       # Search library search path using common library names
+       pnglibs='-lpng17 -lpng16 -lpng15 -lpng14 -lpng12 -lpng'
+    fi
+    dnl printf "### pnglibs=${pnglibs}\n"
     if test $passed -gt 0; then
-      for var in 7 6 5 4 2 '' ; do
-        if test "x${var}" = 'x' ; then
-          pnglib='png'
-        else
-          pnglib="png1${var}"
-        fi
+      OIFS=$IFS
+      IFS=' '
+      for pnglib in $pnglibs ; do
         if test "$have_png" = 'no'
         then
+          # Must protect sed expression from M4 destruction by quoting with '[]'!
+          pnglibbase=`printf -- "${pnglib}" | sed -nE ['s/^-l(.*)/\1/p']`
+          libver=`printf -- $pnglib | sed -nE ['s/^[^0-9]*(([0-9]+\.)*[0-9]+).*/\1/p']`
+          dnl printf "### pnglib=%s, libver = %d, pnglibbase=%s\n" $pnglib $libver $pnglibbase
 
           # Test for compatible LIBPNG library
           failed=0
           passed=0
-          if test "$with_png" = 'yes' -o "$with_png" = "libpng1${var}" ; then
-            if test "${pnglib}" != 'png' ; then
-              AC_MSG_CHECKING([for LIBPNG1${var} support ])
+          if test "$with_png" = 'yes' -o "$with_png" = "libpng${libver}" ; then
+            if test "${pnglib}" != '-lpng' ; then
+              pnglibtest="png${libver}"
+              var=`expr ${libver} - 10`
+              AC_MSG_CHECKING([for ${pnglibtest} (libpng version minor number ${var}) support ])
               AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
 #include <stdlib.h>
 #include <png.h>
@@ -2250,28 +2264,28 @@ return 0;
 
           if test $passed -gt 0 -a $failed -le 0
           then
-            if test "1${var}" = '15' ; then
-              AC_CHECK_LIB([png15],[png_get_io_ptr],[passed=`expr $passed + 1`],
+            if test "${libver}" = '15' ; then
+              AC_CHECK_LIB([$pnglibbase],[png_get_io_ptr],[passed=`expr $passed + 1`],
                  [failed=`expr $failed + 1`],)
-              AC_CHECK_LIB([png15],[png_longjmp],[passed=`expr $passed + 1`],
-                 [failed=`expr $failed + 1`],)
-            fi
-            if test "1${var}" = '14' ; then
-              AC_CHECK_LIB([png14],[png_get_io_ptr],[passed=`expr $passed + 1`],
-                 [failed=`expr $failed + 1`],)
-              AC_CHECK_LIB([png14],[png_get_io_state],[passed=`expr $passed + 1`],
+              AC_CHECK_LIB([$pnglibbase],[png_longjmp],[passed=`expr $passed + 1`],
                  [failed=`expr $failed + 1`],)
             fi
-            if test "1${var}" = '12' ; then
-              AC_CHECK_LIB([png12],[png_get_io_ptr],[passed=`expr $passed + 1`],
+            if test "${libver}" = '14' ; then
+              AC_CHECK_LIB([$pnglibbase],[png_get_io_ptr],[passed=`expr $passed + 1`],
+                 [failed=`expr $failed + 1`],)
+              AC_CHECK_LIB([$pnglibbase],[png_get_io_state],[passed=`expr $passed + 1`],
                  [failed=`expr $failed + 1`],)
             fi
-            if test "1${var}" = '1' ; then
+            if test "${libver}" = '12' ; then
+              AC_CHECK_LIB([$pnglibbase],[png_get_io_ptr],[passed=`expr $passed + 1`],
+                 [failed=`expr $failed + 1`],)
+            fi
+            if test -z "${libver}" ; then
                 AC_CHECK_LIB([png],[png_get_io_ptr],[passed=`expr $passed + 1`],
                    [failed=`expr $failed + 1`],)
             fi
             if test $passed -gt 0 -a $failed -le 0 ; then
-              AC_MSG_CHECKING([if ${pnglib} package is complete])
+              AC_MSG_CHECKING([if ${pnglibbase} package is complete])
               if test $passed -gt 0 ; then
                 if test $failed -gt 0 ; then
                   AC_MSG_RESULT([no -- some components failed test])
@@ -2280,7 +2294,7 @@ return 0;
                   LDFLAGS=$OLD_LDFLAGS
                   LIBS=$OLD_LIBS
                 else
-                  LIB_PNG="-l${pnglib}"
+                  LIB_PNG="${pnglib}"
                   pkg_config_to_flags 'libpng' "${LIB_PNG}" ''
                   #LIBS="$LIB_PNG $LIBS"
                   AC_DEFINE([HasPNG],[1],[Define if you have PNG library])
@@ -2292,6 +2306,7 @@ return 0;
           fi
         fi
       done
+      IFS=$OIFS
     fi
   fi
 else
