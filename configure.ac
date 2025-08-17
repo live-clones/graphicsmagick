@@ -2212,14 +2212,22 @@ then
     AC_CHECK_HEADER([png.h],[passed=`expr $passed + 1`],
        [failed=`expr $failed + 1`],)
 
+    # Default is to search library search path using common library names
+    pnglibs='-lpng17 -lpng16 -lpng15 -lpng14 -lpng12 -lpng'
     if test -n "$PNG_LIBS" ; then
-       # Use only pkgconf values
-       pnglibs=$PNG_LIBS
-    else
-       # Search library search path using common library names
-       pnglibs='-lpng17 -lpng16 -lpng15 -lpng14 -lpng12 -lpng'
+       # Use only pkgconf-provided values
+       OIFS=$IFS
+       IFS=' '
+       for png_libs_arg in "$PNG_LIBS" ; do
+         case $png_libs_arg in
+           -lpng*)
+             pnglibs=$png_libs_arg
+             break
+             ;;
+         esac
+       done
+       IFS=$OIFS
     fi
-    dnl printf "### pnglibs=${pnglibs}\n"
     if test $passed -gt 0; then
       OIFS=$IFS
       IFS=' '
@@ -2231,7 +2239,7 @@ then
           libver=`printf -- $pnglib | sed -nE ['s/^[^0-9]*(([0-9]+\.)*[0-9]+).*/\1/p']`
           dnl printf "### pnglib=%s, libver = %d, pnglibbase=%s\n" $pnglib $libver $pnglibbase
 
-          # Test for compatible LIBPNG library
+          # Test for compatible LIBPNG library. Needs to be re-worked if a libpng 2.x appears.
           failed=0
           passed=0
           if test "$with_png" = 'yes' -o "$with_png" = "libpng${libver}" ; then
