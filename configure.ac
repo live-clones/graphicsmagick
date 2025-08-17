@@ -11,7 +11,7 @@
 # Written by Bob Friesenhahn <bfriesen@GraphicsMagick.org>
 #
 
-AC_PREREQ([2.72])
+AC_PREREQ([2.71])
 AC_INIT
 AC_CONFIG_SRCDIR([magick/magick.h])
 

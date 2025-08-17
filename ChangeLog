@@ -1,3 +1,8 @@
+2025-08-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* configure.ac: Require Autoconf 2.71 (or later) since this
+	version is well supported by modern OS build environments.
+
 2025-08-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* configure.ac: When libpng information is provided by pkgconf
