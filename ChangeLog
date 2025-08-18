@@ -1,3 +1,8 @@
+2025-08-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* configure.ac: Remove quoting of PNG_LIBS which prevented
+	white-space splitting it into arguments.
+
 2025-08-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* configure.ac: Require Autoconf 2.71 (or later) since this

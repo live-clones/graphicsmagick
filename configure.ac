@@ -2193,6 +2193,7 @@ then
       printf "PNG_LIBS=${PNG_LIBS}\n"
       printf "PNG_CFLAGS=${PNG_CFLAGS}\n"
     fi
+    # This adds libpng to LIBS before it is verified below.
     pkg_config_to_flags 'libpng' "${PNG_LIBS}" "${PNG_CFLAGS}"
   else
     if test -n "${PNG_PKG_ERRORS}"
@@ -2215,14 +2216,18 @@ then
     # Default is to search library search path using common library names
     pnglibs='-lpng17 -lpng16 -lpng15 -lpng14 -lpng12 -lpng'
     if test -n "$PNG_LIBS" ; then
+       # Verify pkg-config provided PNG_LIBS
+       dnl # printf "Verifying pkg-config PNG_LIBS ${PNG_LIBS}...\n"
        # Use only pkgconf-provided values
        OIFS=$IFS
        IFS=' '
-       for png_libs_arg in "$PNG_LIBS" ; do
+       for png_libs_arg in $PNG_LIBS ; do
+         dnl #printf "Testing png_libs_arg ${png_libs_arg}\n"
          case $png_libs_arg in
            -lpng*)
              pnglibs=$png_libs_arg
-             break
+             dnl #printf "Assigning pnglibs=${pnglibs}\n"
+             break 1
              ;;
          esac
        done
@@ -2236,7 +2241,7 @@ then
         then
           # Must protect sed expression from M4 destruction by quoting with '[]'!
           pnglibbase=`printf -- "${pnglib}" | sed -nE ['s/^-l(.*)/\1/p']`
-          libver=`printf -- $pnglib | sed -nE ['s/^[^0-9]*(([0-9]+\.)*[0-9]+).*/\1/p']`
+          libver=`printf -- "${pnglib}" | sed -nE ['s/^[^0-9]*(([0-9]+\.)*[0-9]+).*/\1/p']`
           dnl printf "### pnglib=%s, libver = %d, pnglibbase=%s\n" $pnglib $libver $pnglibbase
 
           # Test for compatible LIBPNG library. Needs to be re-worked if a libpng 2.x appears.
