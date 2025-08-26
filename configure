@@ -784,10 +784,12 @@ LIBZIP_CFLAGS
 LIB_WEBP
 HasWEBP_FALSE
 HasWEBP_TRUE
-WEBP_LIBS
-WEBP_CFLAGS
 WEBPMUX_LIBS
 WEBPMUX_CFLAGS
+WEBP_LIBS
+WEBP_CFLAGS
+SHARPYUV_LIBS
+SHARPYUV_CFLAGS
 LIB_TTF
 HasTTF_FALSE
 HasTTF_TRUE
@@ -1172,10 +1174,12 @@ JPEG_CFLAGS
 JPEG_LIBS
 FREETYPE_CFLAGS
 FREETYPE_LIBS
-WEBPMUX_CFLAGS
-WEBPMUX_LIBS
+SHARPYUV_CFLAGS
+SHARPYUV_LIBS
 WEBP_CFLAGS
 WEBP_LIBS
+WEBPMUX_CFLAGS
+WEBPMUX_LIBS
 LIBZIP_CFLAGS
 LIBZIP_LIBS
 TIFF_CFLAGS
@@ -1948,12 +1952,16 @@ Some influential environment variables:
               C compiler flags for FREETYPE, overriding pkg-config
   FREETYPE_LIBS
               linker flags for FREETYPE, overriding pkg-config
+  SHARPYUV_CFLAGS
+              C compiler flags for SHARPYUV, overriding pkg-config
+  SHARPYUV_LIBS
+              linker flags for SHARPYUV, overriding pkg-config
+  WEBP_CFLAGS C compiler flags for WEBP, overriding pkg-config
+  WEBP_LIBS   linker flags for WEBP, overriding pkg-config
   WEBPMUX_CFLAGS
               C compiler flags for WEBPMUX, overriding pkg-config
   WEBPMUX_LIBS
               linker flags for WEBPMUX, overriding pkg-config
-  WEBP_CFLAGS C compiler flags for WEBP, overriding pkg-config
-  WEBP_LIBS   linker flags for WEBP, overriding pkg-config
   LIBZIP_CFLAGS
               C compiler flags for LIBZIP, overriding pkg-config
   LIBZIP_LIBS linker flags for LIBZIP, overriding pkg-config
@@ -8561,22 +8569,19 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-  if test "$acx_pthread_ok" = yes
-  then
+  if test "$acx_pthread_ok" = yes ; then
     have_threads=yes
 
     DEF_THREAD="$PTHREAD_CFLAGS"
     CFLAGS="$CFLAGS $DEF_THREAD"
     CXXFLAGS="$CXXFLAGS $DEF_THREAD"
 
-    if test "$CC" != "$PTHREAD_CC"
-    then
+    if test "$CC" != "$PTHREAD_CC" ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads." >&5
 printf "%s\n" "$as_me: WARNING: Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads." >&2;}
       CC="$PTHREAD_CC"
     fi
-    if test "$CXX" != "$PTHREAD_CXX"
-    then
+    if test "$CXX" != "$PTHREAD_CXX" ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads." >&5
 printf "%s\n" "$as_me: WARNING: Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads." >&2;}
       CXX="$PTHREAD_CXX"
@@ -8916,8 +8921,7 @@ else case e in #(
 esac
 fi
 
-if test "$with_openmp_slow" = 'no'
-then
+if test "$with_openmp_slow" = 'no' ; then
 
 printf "%s\n" "#define DisableSlowOpenMP 1" >>confdefs.h
 
@@ -9225,8 +9229,7 @@ fi
 
 
 LFS_CPPFLAGS=''
-if test "$enable_largefile" != no
-then
+if test "$enable_largefile" != no ; then
   if test "$ac_cv_sys_file_offset_bits" != 'no' && test -n "$ac_cv_sys_file_offset_bits"
   then
     LFS_CPPFLAGS="$LFS_CPPFLAGS -D_FILE_OFFSET_BITS=$ac_cv_sys_file_offset_bits"
@@ -22313,15 +22316,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 # Check to see if building shared libraries
 libtool_build_shared_libs='no'
-if test "$enable_shared" = 'yes'
-then
+if test "$enable_shared" = 'yes' ; then
   libtool_build_shared_libs='yes'
 fi
 
 # Check to see if building static libraries
 libtool_build_static_libs='no'
-if test "$enable_static" = 'yes'
-then
+if test "$enable_static" = 'yes' ; then
   libtool_build_static_libs='yes'
 fi
 
@@ -22385,8 +22386,7 @@ else case e in #(
 esac
 fi
 
-if test "$with_installed" = 'yes'
-then
+if test "$with_installed" = 'yes' ; then
 
 printf "%s\n" "#define UseInstalledMagick 1" >>confdefs.h
 
@@ -22405,8 +22405,7 @@ else case e in #(
 esac
 fi
 
-if test "$with_broken_coders" = 'yes'
-then
+if test "$with_broken_coders" = 'yes' ; then
 
 printf "%s\n" "#define EnableBrokenCoders 1" >>confdefs.h
 
@@ -22486,12 +22485,10 @@ fi
 
 
 with_profiling='no'
-if test "$with_prof" = 'yes' || test "$with_gprof" = 'yes' || test "$with_gcov" = 'yes'
-then
+if test "$with_prof" = 'yes' || test "$with_gprof" = 'yes' || test "$with_gcov" = 'yes' ; then
   with_profiling='yes'
 
-  if test "$libtool_build_shared_libs" = 'yes'
-  then
+  if test "$libtool_build_shared_libs" = 'yes' ; then
     echo "Warning: Can not profile code using shared libraries"
   fi
 fi
@@ -22506,8 +22503,7 @@ else case e in #(
 esac
 fi
 
-if test "$with_symbol_prefix" != 'no'
-then
+if test "$with_symbol_prefix" != 'no' ; then
 
 printf "%s\n" "#define PREFIX_MAGICK_SYMBOLS 1" >>confdefs.h
 
@@ -22570,8 +22566,7 @@ esac
 fi
 
 MAGICK_LT_RELEASE_OPTS=
-if test "$with_quantum_library_names" != 'no'
-then
+if test "$with_quantum_library_names" != 'no' ; then
     MAGICK_LT_RELEASE_OPTS="-release Q${QuantumDepth}"
 fi
 
@@ -23100,17 +23095,14 @@ fi
 #  executable/Magick++: _DLL _MAGICKMOD_
 MODULE_EXTRA_CPPFLAGS=''
 LIBRARY_EXTRA_CPPFLAGS=''
-if test "${native_win32_build}" = 'yes'
-then
-  if test "${libtool_build_shared_libs}" = 'yes'
-  then
+if test "${native_win32_build}" = 'yes' ; then
+  if test "${libtool_build_shared_libs}" = 'yes' ; then
     CPPFLAGS="$CPPFLAGS -D_DLL"
     MAGICK_API_CPPFLAGS="$MAGICK_API_CPPFLAGS -D_DLL"
     MAGICK_API_PC_CPPFLAGS="$MAGICK_API_PC_CPPFLAGS -D_DLL"
     LIBRARY_EXTRA_CPPFLAGS="$LIBRARY_EXTRA_CPPFLAGS -D_MAGICKLIB_"
 
-    if test "$build_modules" = 'yes'
-    then
+    if test "$build_modules" = 'yes' ; then
       LIBRARY_EXTRA_CPPFLAGS="$LIBRARY_EXTRA_CPPFLAGS -D_MAGICKMOD_"
     else
       MODULE_EXTRA_CPPFLAGS="$MODULE_EXTRA_CPPFLAGS -D_MAGICKLIB_"
@@ -23122,8 +23114,7 @@ then
     MAGICK_API_PC_CPPFLAGS="$MAGICK_API_PC_CPPFLAGS -D_LIB"
 
   fi
-  if test "$with_threads" = 'yes'
-  then
+  if test "$with_threads" = 'yes' ; then
      CPPFLAGS="$CPPFLAGS -D_MT"
      MAGICK_API_CPPFLAGS="$MAGICK_API_CPPFLAGS -D_MT"
      MAGICK_API_PC_CPPFLAGS="$MAGICK_API_PC_CPPFLAGS -D_MT"
@@ -24075,16 +24066,14 @@ then :
   printf %s "(cached) " >&6
 else case e in #(
   e)  gm_cv_dev_urandom=no
-  if test -c /dev/urandom
-  then
+  if test -c /dev/urandom ; then
     gm_cv_dev_urandom=yes
   fi ;;
 esac
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $gm_cv_dev_urandom" >&5
 printf "%s\n" "$gm_cv_dev_urandom" >&6; }
-  if test "${gm_cv_dev_urandom}" = yes
-  then
+  if test "${gm_cv_dev_urandom}" = yes ; then
 
 printf "%s\n" "#define HAVE_DEV_URANDOM 1" >>confdefs.h
 
@@ -24144,16 +24133,14 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-    if test "${SysCtlDelegate}X" != 'X'
-    then
+    if test "${SysCtlDelegate}X" != 'X' ; then
        # "sysctl -n hw.physmem" became available in FreeBSD 2.0
        # Apple's Darwin is based on FreeBSD and supports sysctl
        MAGICK_PHYSICAL_MEMORY_COMMAND="${SysCtlDelegate} -n hw.physmem"
     fi
     ;;
 esac
-if test "${MAGICK_PHYSICAL_MEMORY_COMMAND}X" != 'X'
-then
+if test "${MAGICK_PHYSICAL_MEMORY_COMMAND}X" != 'X' ; then
 
 printf "%s\n" "#define MAGICK_PHYSICAL_MEMORY_COMMAND \"${MAGICK_PHYSICAL_MEMORY_COMMAND}\"" >>confdefs.h
 
@@ -24165,8 +24152,7 @@ fi
 #
 ########
 have_magick_plus_plus='no'
-if test "$with_magick_plus_plus" = 'yes'
-then
+if test "$with_magick_plus_plus" = 'yes' ; then
  OLIBS="$LIBS"
  LIBS=''
  ac_ext=cpp
@@ -25645,11 +25631,9 @@ pkg_config_to_flags() {
 # Find Posix threads library (no pkg-config support!)
 #
 LIB_THREAD=''
-if test "$with_threads" != 'no' && test "$have_threads" = 'yes'
-then
+if test "$with_threads" != 'no' && test "$have_threads" = 'yes' ; then
 
-  if test "x$PTHREAD_LIBS" = "x"
-  then
+  if test "x$PTHREAD_LIBS" = "x" ; then
     case "${host_cpu}-${host_os}" in
       *-freebsd*)
 
@@ -25715,8 +25699,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     esac
   fi
 
-  for lib in pthread pthreads
-  do
+  for lib in pthread pthreads ; do
     if test "x$PTHREAD_LIBS" = "x" ; then
 
 
@@ -25792,8 +25775,7 @@ fi
 have_tcmalloc='no'
 LIB_TCMALLOC=''
 OLIBS="$LIBS"
-if test "$have_threads" = 'yes' -a "$with_tcmalloc" != 'no'
-then
+if test "$have_threads" = 'yes' -a "$with_tcmalloc" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Google perftools tcmalloc (minimal) library support " >&5
 printf %s "checking Google perftools tcmalloc (minimal) library support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -25853,10 +25835,8 @@ esac
 fi
 
 
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             have_tcmalloc='no (some components failed test)'
         else
             LIB_TCMALLOC=-ltcmalloc_minimal
@@ -25888,8 +25868,7 @@ fi
 #
 have_umem='no'
 LIB_UMEM=''
-if test "$with_umem" != 'no'
-then
+if test "$with_umem" != 'no' ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Solaris umem library support " >&5
 printf %s "checking for Solaris umem library support ... " >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -26007,10 +25986,8 @@ else case e in #(
 esac
 fi
 
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       have_umem='no (some components failed test)'
     else
       LIB_UMEM='-lumem'
@@ -26045,8 +26022,7 @@ fi
 have_mtmalloc='no'
 LIB_MTMALLOC=''
 OLIBS="$LIBS"
-if test "$have_umem" = 'no' -a "$have_threads" = 'yes' -a "$with_mtmalloc" != 'no'
-then
+if test "$have_umem" = 'no' -a "$have_threads" = 'yes' -a "$with_mtmalloc" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Solaris mtmalloc library support " >&5
 printf %s "checking for Solaris mtmalloc library support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -26115,10 +26091,8 @@ esac
 fi
 
 
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             have_mtmalloc='no (some components failed test)'
         else
             LIB_MTMALLOC=-lmtmalloc
@@ -26148,10 +26122,8 @@ fi
 # Find OpenMP library (no pkg-config support!)
 #
 LIB_OMP=''
-if test "${OPENMP_ENABLED}" = 'yes'
-then
-  if test "${GCC}" = "yes"
-  then
+if test "${OPENMP_ENABLED}" = 'yes' ; then
+  if test "${GCC}" = "yes" ; then
     # Open64 (passes for GCC but uses different OpenMP implementation)
     if test "x$LIB_OMP" = x ; then
       if $CC --version 2>&1 | grep Open64 > /dev/null ; then
@@ -26538,8 +26510,7 @@ LIBS="$LIB_MATH $LIBS"
 #
 have_trio='no'
 LIB_TRIO=''
-if test "$ac_cv_have_decl_vsnprintf" != 'yes' && test "$with_trio" != 'no'
-then
+if test "$ac_cv_have_decl_vsnprintf" != 'yes' && test "$with_trio" != 'no' ; then
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TRIO vsnprintf replacement" >&5
 printf %s "checking for TRIO vsnprintf replacement... " >&6; }
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for trio_vsnprintf in -ltrio" >&5
@@ -26590,8 +26561,7 @@ then :
   have_trio='yes'
 fi
 
-   if test "$have_trio" = 'yes'
-   then
+   if test "$have_trio" = 'yes' ; then
      LIB_TRIO="-ltrio"
      LIBS="$LIB_TRIO $LIBS"
 
@@ -26612,12 +26582,11 @@ fi
 #
 # Only use/depend on libtdl if we are building modules.  This is a
 # change from previous releases (prior to 1.3.17) which supported
-# loaded modules via libtdl if shared libraries were built.  of
-# whether modules are built or not.
+# loaded modules via libtdl if shared libraries were built.
+# Regardless of whether modules are built or not.
 have_ltdl='no'
 LIB_LTDL=''
-if test "$build_modules" != 'no'
-then
+if test "$build_modules" != 'no' ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libltdl " >&5
 printf %s "checking for libltdl ... " >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -26686,10 +26655,8 @@ fi
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if libltdl package is complete" >&5
 printf %s "checking if libltdl package is complete... " >&6; }
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
       have_ltdl='no (failed tests)'
@@ -26707,8 +26674,7 @@ printf "%s\n" "yes" >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
   fi
-  if test "$have_ltdl" != 'yes'
-  then
+  if test "$have_ltdl" != 'yes' ; then
     { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
 printf "%s\n" "$as_me: error: in '$ac_pwd':" >&2;}
 as_fn_error 1 "libltdl is required by modules build
@@ -26728,8 +26694,7 @@ fi
 #
 have_zlib='no'
 LIB_ZLIB=''
-if test "$with_zlib" != 'no' || test "$with_png" != 'no'
-then
+if test "$with_zlib" != 'no' || test "$with_png" != 'no' ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for ZLIB support " >&5
 printf %s "checking for ZLIB support ... " >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -26812,18 +26777,27 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
   if test $failed -eq 0 ; then
-    if test -n "$VERBOSE"
-    then
+    if test -n "$VERBOSE" ; then
       printf "ZLIB_LIBS=${ZLIB_LIBS}\n"
       printf "ZLIB_CFLAGS=${ZLIB_CFLAGS}\n"
     fi
     pkg_config_to_flags 'zlib' "${ZLIB_LIBS}" "${ZLIB_CFLAGS}"
   else
-    if test -n "${ZLIB_PKG_ERRORS}"
-    then
+    if test -n "${ZLIB_PKG_ERRORS}" ; then
       printf "${ZLIB_PKG_ERRORS}\n"
     fi
     failed=0
+  fi
+  zlib=z
+  if test -n "$ZLIB_LIBS" ; then
+    for arg in $ZLIB_LIBS ; do
+      case $arg in
+        -l*)
+          zlib=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                    break 1
+        ;;
+      esac
+    done
   fi
   ac_fn_c_check_header_compile "$LINENO" "zconf.h" "ac_cv_header_zconf_h" "$ac_includes_default"
 if test "x$ac_cv_header_zconf_h" = xyes
@@ -26843,14 +26817,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for compress in -lz" >&5
-printf %s "checking for compress in -lz... " >&6; }
-if test ${ac_cv_lib_z_compress+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zlib""_compress" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for compress in -l$zlib" >&5
+printf %s "checking for compress in -l$zlib... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
+LIBS="-l$zlib  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -26874,9 +26849,9 @@ return compress ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_z_compress=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_z_compress=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -26884,9 +26859,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_compress" >&5
-printf "%s\n" "$ac_cv_lib_z_compress" >&6; }
-if test "x$ac_cv_lib_z_compress" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -26894,14 +26870,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for uncompress in -lz" >&5
-printf %s "checking for uncompress in -lz... " >&6; }
-if test ${ac_cv_lib_z_uncompress+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zlib""_uncompress" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for uncompress in -l$zlib" >&5
+printf %s "checking for uncompress in -l$zlib... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
+LIBS="-l$zlib  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -26925,9 +26902,9 @@ return uncompress ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_z_uncompress=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_z_uncompress=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -26935,9 +26912,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_uncompress" >&5
-printf "%s\n" "$ac_cv_lib_z_uncompress" >&6; }
-if test "x$ac_cv_lib_z_uncompress" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -26945,14 +26923,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for deflate in -lz" >&5
-printf %s "checking for deflate in -lz... " >&6; }
-if test ${ac_cv_lib_z_deflate+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zlib""_deflate" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for deflate in -l$zlib" >&5
+printf %s "checking for deflate in -l$zlib... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
+LIBS="-l$zlib  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -26976,9 +26955,9 @@ return deflate ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_z_deflate=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_z_deflate=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -26986,9 +26965,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_deflate" >&5
-printf "%s\n" "$ac_cv_lib_z_deflate" >&6; }
-if test "x$ac_cv_lib_z_deflate" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -26996,14 +26976,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for inflate in -lz" >&5
-printf %s "checking for inflate in -lz... " >&6; }
-if test ${ac_cv_lib_z_inflate+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zlib""_inflate" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for inflate in -l$zlib" >&5
+printf %s "checking for inflate in -l$zlib... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
+LIBS="-l$zlib  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27027,9 +27008,9 @@ return inflate ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_z_inflate=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_z_inflate=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -27037,9 +27018,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_inflate" >&5
-printf "%s\n" "$ac_cv_lib_z_inflate" >&6; }
-if test "x$ac_cv_lib_z_inflate" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -27047,14 +27029,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gzseek in -lz" >&5
-printf %s "checking for gzseek in -lz... " >&6; }
-if test ${ac_cv_lib_z_gzseek+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zlib""_gzseek" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gzseek in -l$zlib" >&5
+printf %s "checking for gzseek in -l$zlib... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
+LIBS="-l$zlib  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27078,9 +27061,9 @@ return gzseek ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_z_gzseek=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_z_gzseek=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -27088,9 +27071,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_gzseek" >&5
-printf "%s\n" "$ac_cv_lib_z_gzseek" >&6; }
-if test "x$ac_cv_lib_z_gzseek" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -27098,14 +27082,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gztell in -lz" >&5
-printf %s "checking for gztell in -lz... " >&6; }
-if test ${ac_cv_lib_z_gztell+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zlib""_gztell" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gztell in -l$zlib" >&5
+printf %s "checking for gztell in -l$zlib... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
+LIBS="-l$zlib  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27129,9 +27114,9 @@ return gztell ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_z_gztell=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_z_gztell=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -27139,9 +27124,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_gztell" >&5
-printf "%s\n" "$ac_cv_lib_z_gztell" >&6; }
-if test "x$ac_cv_lib_z_gztell" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -27151,10 +27137,8 @@ fi
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if ZLIB package is complete" >&5
 printf %s "checking if ZLIB package is complete... " >&6; }
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
       have_zlib='no (failed tests)'
@@ -27164,7 +27148,7 @@ printf "%s\n" "no -- some components failed test" >&6; }
       LDFLAGS=$OLD_LDFLAGS
       LIBS=$OLD_LIBS
     else
-      LIB_ZLIB='-lz'
+      LIB_ZLIB="-l${zlib}"
       pkg_config_to_flags 'zlib' "${LIB_ZLIB}" ''
 
 printf "%s\n" "#define HasZLIB 1" >>confdefs.h
@@ -27194,8 +27178,7 @@ fi
 #
 #
 have_bzlib='no'
-if test "$with_bzlib" != 'no'
-then
+if test "$with_bzlib" != 'no' ; then
   LIB_BZLIB=''
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for BZLIB support " >&5
 printf %s "checking for BZLIB support ... " >&6; }
@@ -27261,8 +27244,7 @@ then :
   found_libbz=`expr $found_libbz + 1`
 fi
 
-  if test "$native_win32_build" = 'yes'
-  then
+  if test "$native_win32_build" = 'yes' ; then
     # Under MinGW, libbz2 obfuscates its functions by declaring them
     # with DLL interfaces.  This would be all better if we could
     # somehow include bzlib.h during the test but Autoconf does not
@@ -27317,8 +27299,7 @@ then :
 fi
 
   fi
-  if test $found_libbz -gt 0
-  then
+  if test $found_libbz -gt 0 ; then
     passed=`expr $passed + 1`
   else
     failed=`expr $failed + 1`
@@ -27328,10 +27309,8 @@ fi
   #AC_CHECK_LIB([bz2],[_imp__BZ2_decompress],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],)
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if BZLIB package is complete" >&5
 printf %s "checking if BZLIB package is complete... " >&6; }
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
       have_bzlib='no (failed tests)'
@@ -27365,8 +27344,7 @@ fi
 #
 have_lzma='no'
 LIB_LZMA=''
-if test "$with_lzma" != 'no'
-then
+if test "$with_lzma" != 'no' ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for LZMA support " >&5
 printf %s "checking for LZMA support ... " >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -27448,18 +27426,27 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
   if test $failed -eq 0 ; then
-    if test -n "$VERBOSE"
-    then
+    if test -n "$VERBOSE" ; then
       printf "LZMA_LIBS=${LZMA_LIBS}\n"
       printf "LZMA_CFLAGS=${LZMA_CFLAGS}\n"
     fi
     pkg_config_to_flags 'liblzma' "${LZMA_LIBS}" "${LZMA_CFLAGS}"
   else
-    if test -n "${LZMA_PKG_ERRORS}"
-    then
+    if test -n "${LZMA_PKG_ERRORS}" ; then
       printf "${LZMA_PKG_ERRORS}\n"
     fi
     failed=0
+  fi
+  lzma=lzma
+  if test -n "$LZMA_LIBS" ; then
+    for arg in $LZMA_LIBS ; do
+      case $arg in
+        -l*)
+          lzma=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                    break 1
+        ;;
+      esac
+    done
   fi
   ac_fn_c_check_header_compile "$LINENO" "lzma.h" "ac_cv_header_lzma_h" "$ac_includes_default"
 if test "x$ac_cv_header_lzma_h" = xyes
@@ -27470,14 +27457,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for lzma_code in -llzma" >&5
-printf %s "checking for lzma_code in -llzma... " >&6; }
-if test ${ac_cv_lib_lzma_lzma_code+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$lzma""_lzma_code" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for lzma_code in -l$lzma" >&5
+printf %s "checking for lzma_code in -l$lzma... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-llzma  $LIBS"
+LIBS="-l$lzma  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27501,9 +27489,9 @@ return lzma_code ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_lzma_lzma_code=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_lzma_lzma_code=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -27511,9 +27499,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lzma_lzma_code" >&5
-printf "%s\n" "$ac_cv_lib_lzma_lzma_code" >&6; }
-if test "x$ac_cv_lib_lzma_lzma_code" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -27523,10 +27512,8 @@ fi
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if LZMA package is complete" >&5
 printf %s "checking if LZMA package is complete... " >&6; }
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
       have_lzma='no (failed tests)'
@@ -27535,11 +27522,14 @@ printf "%s\n" "no -- some components failed test" >&6; }
       LIBS=$OLD_LIBS
     else
       LIB_LZMA=''
-      for token in ${LZMA_LIBS}
-      do
+      for token in ${LZMA_LIBS} ; do
         case $token in
           -l*)
-            LIB_LZMA="$LIB_LZMA $token"
+            if test -n "$LIB_LZMA" ; then
+              LIB_LZMA="$LIB_LZMA $token"
+            else
+              LIB_LZMA=$token
+            fi
             ;;
         esac
       done
@@ -27571,8 +27561,7 @@ fi
 #
 have_zstd='no'
 LIB_ZSTD=''
-if test "$with_zstd" != 'no'
-then
+if test "$with_zstd" != 'no' ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Zstd support " >&5
 printf %s "checking for Zstd support ... " >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -27653,20 +27642,28 @@ else
 printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
-  if test $failed -eq 0
-  then
-    if test -n "$VERBOSE"
-    then
+  if test $failed -eq 0 ; then
+    if test -n "$VERBOSE" ; then
       printf "ZSTD_LIBS=${ZSTD_LIBS}\n"
       printf "ZSTD_CFLAGS=${ZSTD_CFLAGS}\n"
     fi
     pkg_config_to_flags 'libzstd' "${ZSTD_LIBS}" "${ZSTD_CFLAGS}"
   else
-    if test -n "${ZSTD_PKG_ERRORS}"
-    then
+    if test -n "${ZSTD_PKG_ERRORS}" ; then
       printf "${ZSTD_PKG_ERRORS}\n"
     fi
     failed=0
+  fi
+  zstd=zstd
+  if test -n "$ZSTD_LIBS" ; then
+    for arg in $ZSTD_LIBS ; do
+      case $arg in
+        -l*)
+          zstd=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                    break 1
+        ;;
+      esac
+    done
   fi
   ac_fn_c_check_header_compile "$LINENO" "zstd.h" "ac_cv_header_zstd_h" "$ac_includes_default"
 if test "x$ac_cv_header_zstd_h" = xyes
@@ -27677,14 +27674,15 @@ else case e in #(
 esac
 fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for ZSTD_createDStream in -lzstd" >&5
-printf %s "checking for ZSTD_createDStream in -lzstd... " >&6; }
-if test ${ac_cv_lib_zstd_ZSTD_createDStream+y}
+  as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zstd""_ZSTD_createDStream" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for ZSTD_createDStream in -l$zstd" >&5
+printf %s "checking for ZSTD_createDStream in -l$zstd... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lzstd  $LIBS"
+LIBS="-l$zstd  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27708,9 +27706,9 @@ return ZSTD_createDStream ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_zstd_ZSTD_createDStream=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_zstd_ZSTD_createDStream=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -27718,9 +27716,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_zstd_ZSTD_createDStream" >&5
-printf "%s\n" "$ac_cv_lib_zstd_ZSTD_createDStream" >&6; }
-if test "x$ac_cv_lib_zstd_ZSTD_createDStream" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -27730,10 +27729,8 @@ fi
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if Zstd package is complete" >&5
 printf %s "checking if Zstd package is complete... " >&6; }
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
       have_zstd='no (failed tests)'
@@ -27741,7 +27738,7 @@ printf "%s\n" "no -- some components failed test" >&6; }
       LDFLAGS=$OLD_LDFLAGS
       LIBS=$OLD_LIBS
     else
-      LIB_ZSTD='-lzstd'
+      LIB_ZSTD="-l${zstd}"
       pkg_config_to_flags 'libzstd' "${LIB_ZSTD}" ''
       #LIBS="$LIB_ZSTD $LIBS"
 
@@ -27773,8 +27770,7 @@ have_xml='no'
 LIB_XML=''
 LIB_XML_DEPS=''
 LIB_XML2_BASE=''
-if test "$with_xml" != 'no'
-then
+if test "$with_xml" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XML support " >&5
 printf %s "checking for XML support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -27855,8 +27851,7 @@ else
 printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
-    if test $failed -eq 0
-    then
+    if test $failed -eq 0 ; then
       if test -n "$VERBOSE"
       then
         printf "XML_LIBS=${XML_LIBS}\n"
@@ -27864,8 +27859,7 @@ fi
       fi
       pkg_config_to_flags 'libxml-2.0' "${XML_LIBS}" "${XML_CFLAGS}"
     else
-      if test -n "${XML_PKG_ERRORS}"
-      then
+      if test -n "${XML_PKG_ERRORS}" ; then
         printf "${XML_PKG_ERRORS}\n"
       fi
       failed=0
@@ -27873,6 +27867,17 @@ fi
     failed=0
     passed=0
 
+    xml2=xml2
+    if test -n "$XML_LIBS" ; then
+      for arg in $XML_LIBS ; do
+        case $arg in
+          -l*)
+            xml2=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
     # libxml2 normally requires pkg-config in order to produce the
     # necessary additional include path.  For example
     # "-I/usr/include/libxml2", but if pkg-config was not available,
@@ -27909,14 +27914,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for xmlSAXVersion in -lxml2" >&5
-printf %s "checking for xmlSAXVersion in -lxml2... " >&6; }
-if test ${ac_cv_lib_xml2_xmlSAXVersion+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$xml2""_xmlSAXVersion" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for xmlSAXVersion in -l$xml2" >&5
+printf %s "checking for xmlSAXVersion in -l$xml2... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lxml2 $LIB_XML_DEPS $LIBS"
+LIBS="-l$xml2 $LIB_XML_DEPS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27940,9 +27946,9 @@ return xmlSAXVersion ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_xml2_xmlSAXVersion=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_xml2_xmlSAXVersion=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -27950,9 +27956,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xml2_xmlSAXVersion" >&5
-printf "%s\n" "$ac_cv_lib_xml2_xmlSAXVersion" >&6; }
-if test "x$ac_cv_lib_xml2_xmlSAXVersion" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -27961,14 +27968,15 @@ esac
 fi
 
     # Next two require --with-push to be enabled
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for xmlParseChunk in -lxml2" >&5
-printf %s "checking for xmlParseChunk in -lxml2... " >&6; }
-if test ${ac_cv_lib_xml2_xmlParseChunk+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$xml2""_xmlParseChunk" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for xmlParseChunk in -l$xml2" >&5
+printf %s "checking for xmlParseChunk in -l$xml2... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lxml2 $LIB_XML_DEPS $LIBS"
+LIBS="-l$xml2 $LIB_XML_DEPS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -27992,9 +28000,9 @@ return xmlParseChunk ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_xml2_xmlParseChunk=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_xml2_xmlParseChunk=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -28002,9 +28010,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xml2_xmlParseChunk" >&5
-printf "%s\n" "$ac_cv_lib_xml2_xmlParseChunk" >&6; }
-if test "x$ac_cv_lib_xml2_xmlParseChunk" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -28012,14 +28021,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for xmlCreatePushParserCtxt in -lxml2" >&5
-printf %s "checking for xmlCreatePushParserCtxt in -lxml2... " >&6; }
-if test ${ac_cv_lib_xml2_xmlCreatePushParserCtxt+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$xml2""_xmlCreatePushParserCtxt" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for xmlCreatePushParserCtxt in -l$xml2" >&5
+printf %s "checking for xmlCreatePushParserCtxt in -l$xml2... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lxml2 $LIB_XML_DEPS $LIBS"
+LIBS="-l$xml2 $LIB_XML_DEPS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -28043,9 +28053,9 @@ return xmlCreatePushParserCtxt ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_xml2_xmlCreatePushParserCtxt=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_xml2_xmlCreatePushParserCtxt=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -28053,9 +28063,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xml2_xmlCreatePushParserCtxt" >&5
-printf "%s\n" "$ac_cv_lib_xml2_xmlCreatePushParserCtxt" >&6; }
-if test "x$ac_cv_lib_xml2_xmlCreatePushParserCtxt" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -28065,10 +28076,8 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if XML package is complete " >&5
 printf %s "checking if XML package is complete ... " >&6; }
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
             have_xml='no (failed tests)'
@@ -28076,7 +28085,22 @@ printf "%s\n" "no -- some components failed test" >&6; }
             LDFLAGS=$OLD_LDFLAGS
             LIBS=$OLD_LIBS
         else
-            LIB_XML="-lxml2"
+            if test -n "${XML_LIBS}" ; then
+              LIB_XML=''
+              for token in ${XML_LIBS} ; do
+                case $token in
+                  -l*)
+                    if test -n "$LIB_XML" ; then
+                      LIB_XML="$LIB_XML $token"
+                    else
+                      LIB_XML=$token
+                    fi
+                    ;;
+                esac
+              done
+            else
+              LIB_XML="-l${xml2}"
+            fi
             pkg_config_to_flags 'libxml-2.0' "${LIB_XML}" ''
 
 printf "%s\n" "#define HasXML 1" >>confdefs.h
@@ -28919,10 +28943,9 @@ fi
 
 fi
 
-if test "$no_x" != 'yes'
-then
+if test "$no_x" != 'yes' ; then
   LDFLAGS="$LDFLAGS $X_LIBS"
-  LIB_X11="$X_PRE_LIBS -lX11 $X_EXTRA_LIBS"
+  LIB_X11=`echo $X_PRE_LIBS -lX11 $X_EXTRA_LIBS | sed -e 's/  */ /g'`
   LIBS="$LIB_X11 $LIBS"
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
 
@@ -28940,8 +28963,7 @@ then :
   have_shmctl='yes'
 fi
 
-  if test "$have_shmctl" != 'yes'
-  then
+  if test "$have_shmctl" != 'yes' ; then
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing shmctl" >&5
 printf %s "checking for library containing shmctl... " >&6; }
 if test ${ac_cv_search_shmctl+y}
@@ -29011,8 +29033,7 @@ fi
 
   fi
 
-  if test "$have_shmctl" = 'yes'
-  then
+  if test "$have_shmctl" = 'yes' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XShmAttach in -lXext" >&5
 printf %s "checking for XShmAttach in -lXext... " >&6; }
 if test ${ac_cv_lib_Xext_XShmAttach+y}
@@ -29121,8 +29142,7 @@ fi
 
   LIBS="$LIB_XEXT $LIBS"
 fi
-if test "$no_x" != 'yes'
-then
+if test "$no_x" != 'yes' ; then
   have_x='yes'
 else
   have_x='no'
@@ -29142,8 +29162,7 @@ fi
 # If profiling, then check for -ldl and dlopen (required for Solaris & gcc)
 #
 LIB_DL=''
-if test "$with_profiling" = 'yes'
-then
+if test "$with_profiling" = 'yes' ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
 printf %s "checking for dlopen in -ldl... " >&6; }
 if test ${ac_cv_lib_dl_dlopen+y}
@@ -29201,8 +29220,7 @@ fi
 #
 have_fpx='no'
 LIB_FPX=''
-if test "$with_fpx" != 'no'
-then
+if test "$with_fpx" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for FlashPIX components " >&5
 printf %s "checking for FlashPIX components ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -29276,14 +29294,12 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if FlashPIX package is complete" >&5
 printf %s "checking if FlashPIX package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-    if test $failed -gt 0
-    then
+    if test $passed -gt 0 ; then
+      if test $failed -gt 0 ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
         have_fpx='no (failed tests)'
-    else
+      else
         LIB_FPX='-lfpx'
         LIBS="$LIB_FPX $LIBS"
 
@@ -29293,7 +29309,7 @@ printf "%s\n" "#define HasFPX 1" >>confdefs.h
 printf "%s\n" "yes" >&6; }
         have_fpx='yes'
         PERLMAINCC="$CXX"
-    fi
+      fi
     else
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
@@ -29314,8 +29330,7 @@ fi
 #
 have_lcms2='no'
 LIB_LCMS=''
-if test "$with_lcms2" != 'no'
-then
+if test "$with_lcms2" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for lcms v2 support" >&5
 printf %s "checking for lcms v2 support... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -29399,15 +29414,13 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
+      if test -n "$VERBOSE" ; then
         printf "LCMS2_LIBS=${LCMS2_LIBS}\n"
         printf "LCMS2_CFLAGS=${LCMS2_CFLAGS}\n"
       fi
       pkg_config_to_flags 'lcms2' "${LCMS2_LIBS}" "${LCMS2_CFLAGS}"
     else
-      if test -n "${LCMS2_PKG_ERRORS}"
-      then
+      if test -n "${LCMS2_PKG_ERRORS}" ; then
         printf "${LCMS2_PKG_ERRORS}\n"
       fi
       failed=0
@@ -29420,8 +29433,7 @@ then :
   have_lcms_header='yes'
 fi
 
-    if test "$have_lcms_header" = 'yes'
-    then
+    if test "$have_lcms_header" = 'yes' ; then
 
 printf "%s\n" "#define HAVE_LCMS2_H 1" >>confdefs.h
 
@@ -29429,8 +29441,7 @@ printf "%s\n" "#define HAVE_LCMS2_H 1" >>confdefs.h
     fi
 
     # Check for <lcms2/lcms2.h)
-    if test "$have_lcms_header" != 'yes'
-    then
+    if test "$have_lcms_header" != 'yes' ; then
       ac_fn_c_check_header_compile "$LINENO" "lcms2/lcms2.h" "ac_cv_header_lcms2_lcms2_h" "$ac_includes_default"
 if test "x$ac_cv_header_lcms2_lcms2_h" = xyes
 then :
@@ -29447,19 +29458,31 @@ printf "%s\n" "#define HAVE_LCMS2_LCMS2_H 1" >>confdefs.h
     fi
 
     # Failed to find lcms header?
-    if test "$have_lcms_header" != 'yes'
-    then
+    if test "$have_lcms_header" != 'yes' ; then
       failed=`expr $failed + 1`
     fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for cmsSetLogErrorHandler in -llcms2" >&5
-printf %s "checking for cmsSetLogErrorHandler in -llcms2... " >&6; }
-if test ${ac_cv_lib_lcms2_cmsSetLogErrorHandler+y}
+    lcms2=lcms2
+    if test -n "$LCMS2_LIBS" ; then
+      for arg in $LCMS2_LIBS ; do
+        case $arg in
+          -l*)
+            lcms2=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
+
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$lcms2""_cmsSetLogErrorHandler" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for cmsSetLogErrorHandler in -l$lcms2" >&5
+printf %s "checking for cmsSetLogErrorHandler in -l$lcms2... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-llcms2  $LIBS"
+LIBS="-l$lcms2  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -29483,9 +29506,9 @@ return cmsSetLogErrorHandler ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_lcms2_cmsSetLogErrorHandler=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_lcms2_cmsSetLogErrorHandler=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -29493,9 +29516,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lcms2_cmsSetLogErrorHandler" >&5
-printf "%s\n" "$ac_cv_lib_lcms2_cmsSetLogErrorHandler" >&6; }
-if test "x$ac_cv_lib_lcms2_cmsSetLogErrorHandler" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -29505,10 +29529,8 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if LCMS v2 package is complete" >&5
 printf %s "checking if LCMS v2 package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-      if test $failed -gt 0
-      then
+    if test $passed -gt 0 ; then
+      if test $failed -gt 0 ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
         have_lcms2='no (failed tests)'
@@ -29518,7 +29540,22 @@ printf "%s\n" "no -- some components failed test" >&6; }
         LDFLAGS=$OLD_LDFLAGS
         LIBS=$OLD_LIBS
       else
-        LIB_LCMS='-llcms2'
+        if test -n "$LCMS2_LIBS" ; then
+          LIB_LCMS=''
+          for token in ${LCMS2_LIBS} ; do
+            case $token in
+              -l*)
+                if test -n "$LIB_LCMS" ; then
+                  LIB_LCMS="$LIB_LCMS $token"
+                else
+                  LIB_LCMS=$token
+                fi
+              ;;
+            esac
+          done
+        else
+          LIB_LCMS="-l${lcms2}"
+        fi
         pkg_config_to_flags 'lcms2' "${LIB_LCMS}" ''
         #LIBS="$LIB_LCMS $LIBS"
         #AC_DEFINE(HasLCMS2,1,Define if you have LCMS v2 library)
@@ -29541,8 +29578,7 @@ else
   HasLCMS_FALSE=
 fi
 
-if test "$have_lcms2" = 'yes'
-then
+if test "$have_lcms2" = 'yes' ; then
 
 printf "%s\n" "#define HasLCMS 1" >>confdefs.h
 
@@ -29551,8 +29587,7 @@ fi
 
 have_png='no'
 LIB_PNG=''
-if test "$have_zlib" = 'yes' -a "$with_png" = 'yes'
-then
+if test "$have_zlib" = 'yes' -a "$with_png" = 'yes' ; then
   #
   # Check for PNG delegate library.
   #
@@ -29633,16 +29668,14 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
   if test $failed -eq 0 ; then
-    if test -n "$VERBOSE"
-    then
+    if test -n "$VERBOSE" ; then
       printf "PNG_LIBS=${PNG_LIBS}\n"
       printf "PNG_CFLAGS=${PNG_CFLAGS}\n"
     fi
     # This adds libpng to LIBS before it is verified below.
     pkg_config_to_flags 'libpng' "${PNG_LIBS}" "${PNG_CFLAGS}"
   else
-    if test -n "${PNG_PKG_ERRORS}"
-    then
+    if test -n "${PNG_PKG_ERRORS}" ; then
       printf "${PNG_PKG_ERRORS}\n"
     fi
     failed=0
@@ -29672,21 +29705,18 @@ fi
     if test -n "$PNG_LIBS" ; then
        # Verify pkg-config provided PNG_LIBS
               # Use only pkgconf-provided values
-       OIFS=$IFS
-       IFS=' '
        for png_libs_arg in $PNG_LIBS ; do
-                  case $png_libs_arg in
+         printf "Testing png_libs_arg ${png_libs_arg}\n"
+         case $png_libs_arg in
            -lpng*)
              pnglibs=$png_libs_arg
-                          break 1
+             printf "Assigning pnglibs=${pnglibs}\n"
+             break 1
              ;;
          esac
        done
-       IFS=$OIFS
     fi
     if test $passed -gt 0; then
-      OIFS=$IFS
-      IFS=' '
       for pnglib in $pnglibs ; do
         if test "$have_png" = 'no'
         then
@@ -29746,8 +29776,7 @@ printf "%s\n" "yes" >&6; }
             fi
           fi
 
-          if test $passed -gt 0 -a $failed -le 0
-          then
+          if test $passed -gt 0 -a $failed -le 0 ; then
             if test "${libver}" = '15' ; then
               as_ac_Lib=`printf "%s\n" "ac_cv_lib_$pnglibbase""_png_get_io_ptr" | sed "$as_sed_sh"`
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for png_get_io_ptr in -l$pnglibbase" >&5
@@ -30099,7 +30128,6 @@ printf "%s\n" "yes" >&6; }
           fi
         fi
       done
-      IFS=$OIFS
     fi
   fi
 else
@@ -30121,8 +30149,7 @@ fi
 #
 have_jpeg='no'
 LIB_JPEG=''
-if test "$with_jpeg" != 'no'
-then
+if test "$with_jpeg" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JPEG support " >&5
 printf %s "checking for JPEG support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -30133,66 +30160,9 @@ printf "%s\n" "" >&6; }
     failed=0
     passed=0
 
-    #PKG_CHECK_MODULES([JPEG], [libturbojpeg, libjpeg], [passed=`expr $passed + 1`], [failed=`expr $failed + 1`])
-
-pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libturbojpeg" >&5
-printf %s "checking for libturbojpeg... " >&6; }
-
-if test -n "$JPEG_CFLAGS"; then
-    pkg_cv_JPEG_CFLAGS="$JPEG_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libturbojpeg\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libturbojpeg") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_JPEG_CFLAGS=`$PKG_CONFIG --cflags "libturbojpeg" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$JPEG_LIBS"; then
-    pkg_cv_JPEG_LIBS="$JPEG_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libturbojpeg\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libturbojpeg") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_JPEG_LIBS=`$PKG_CONFIG --libs "libturbojpeg" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        JPEG_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libturbojpeg" 2>&1`
-        else
-	        JPEG_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libturbojpeg" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$JPEG_PKG_ERRORS" >&5
-
+    # The turbojpeg package installs libturbojpeg and libjpeg.  The
+    # turbojpeg library does not provide libjpeg symbols.  That is why
+    # we request libjpeg.
 
 pkg_failed=no
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libjpeg" >&5
@@ -30257,87 +30227,6 @@ elif test $pkg_failed = untried; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 	failed=`expr $failed + 1`
-else
-	JPEG_CFLAGS=$pkg_cv_JPEG_CFLAGS
-	JPEG_LIBS=$pkg_cv_JPEG_LIBS
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-	passed=`expr $passed + 1`
-fi
-elif test $pkg_failed = untried; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-
-pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libjpeg" >&5
-printf %s "checking for libjpeg... " >&6; }
-
-if test -n "$JPEG_CFLAGS"; then
-    pkg_cv_JPEG_CFLAGS="$JPEG_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libjpeg\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libjpeg") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_JPEG_CFLAGS=`$PKG_CONFIG --cflags "libjpeg" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$JPEG_LIBS"; then
-    pkg_cv_JPEG_LIBS="$JPEG_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libjpeg\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libjpeg") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_JPEG_LIBS=`$PKG_CONFIG --libs "libjpeg" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        JPEG_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libjpeg" 2>&1`
-        else
-	        JPEG_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libjpeg" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$JPEG_PKG_ERRORS" >&5
-
-	failed=`expr $failed + 1`
-elif test $pkg_failed = untried; then
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-	failed=`expr $failed + 1`
-else
-	JPEG_CFLAGS=$pkg_cv_JPEG_CFLAGS
-	JPEG_LIBS=$pkg_cv_JPEG_LIBS
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-	passed=`expr $passed + 1`
-fi
 else
 	JPEG_CFLAGS=$pkg_cv_JPEG_CFLAGS
 	JPEG_LIBS=$pkg_cv_JPEG_LIBS
@@ -30346,18 +30235,28 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
+      if test -n "$VERBOSE" ; then
         printf "JPEG_LIBS=${JPEG_LIBS}\n"
         printf "JPEG_CFLAGS=${JPEG_CFLAGS}\n"
       fi
       pkg_config_to_flags 'libjpeg' "${JPEG_LIBS}" "${JPEG_CFLAGS}"
     else
-      if test -n "${JPEG_PKG_ERRORS}"
-      then
+      if test -n "${JPEG_PKG_ERRORS}" ; then
         printf "${JPEG_PKG_ERRORS}\n"
       fi
       failed=0
+    fi
+
+    jpeg=jpeg
+    if test -n "$JPEG_LIBS" ; then
+      for arg in $JPEG_LIBS ; do
+        case $arg in
+          -l*)
+            jpeg=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
     fi
 
     ac_fn_c_check_header_compile "$LINENO" "jconfig.h" "ac_cv_header_jconfig_h" "$ac_includes_default"
@@ -30396,14 +30295,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jpeg_read_header in -ljpeg" >&5
-printf %s "checking for jpeg_read_header in -ljpeg... " >&6; }
-if test ${ac_cv_lib_jpeg_jpeg_read_header+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$jpeg""_jpeg_read_header" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jpeg_read_header in -l$jpeg" >&5
+printf %s "checking for jpeg_read_header in -l$jpeg... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljpeg  $LIBS"
+LIBS="-l$jpeg  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -30427,9 +30327,9 @@ return jpeg_read_header ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_jpeg_jpeg_read_header=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_jpeg_jpeg_read_header=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -30437,9 +30337,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jpeg_jpeg_read_header" >&5
-printf "%s\n" "$ac_cv_lib_jpeg_jpeg_read_header" >&6; }
-if test "x$ac_cv_lib_jpeg_jpeg_read_header" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -30449,18 +30350,31 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if JPEG package is complete" >&5
 printf %s "checking if JPEG package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-    if test $failed -gt 0
-    then
+    if test $passed -gt 0 ; then
+      if test $failed -gt 0 ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
         have_jpeg='no (failed tests)'
         CPPFLAGS=$OLD_CPPFLAGS
         LDFLAGS=$OLD_LDFLAGS
         LIBS=$OLD_LIBS
-    else
-        LIB_JPEG='-ljpeg'
+      else
+        if test -n "$JPEG_LIBS" ; then
+          LIB_JPEG=''
+          for token in ${JPEG_LIBS} ; do
+            case $token in
+              -l*)
+                if test -n "$LIB_JPEG" ; then
+                  LIB_JPEG="$LIB_JPEG $token"
+                else
+                  LIB_JPEG=$token
+                fi
+              ;;
+            esac
+          done
+        else
+          LIB_JPEG="-l${jpeg}"
+        fi
         pkg_config_to_flags 'libjpeg' "${LIB_JPEG}" ''
         #LIBS="$LIB_JPEG $LIBS"
 
@@ -30534,8 +30448,7 @@ fi
 # #
 # have_mpeg2='no'
 # LIB_MPEG2=''
-# if test "$with_mpeg2" != 'no'
-# then
+# if test "$with_mpeg2" != 'no' ; then
 #     AC_MSG_CHECKING([for MPEG version 2 support ])
 #     AC_MSG_RESULT()
 #     failed=0
@@ -30543,10 +30456,8 @@ fi
 #     AC_CHECK_HEADER([mpeg2dec/mpeg2.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`])
 #     AC_CHECK_LIB([mpeg2],[mpeg2_decode_data],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],)
 #     AC_MSG_CHECKING([if MPEG version 2 support package is complete])
-#     if test $passed -gt 0
-#     then
-#     if test $failed -gt 0
-#     then
+#     if test $passed -gt 0 ; then
+#     if test $failed -gt 0 ; then
 #       AC_MSG_RESULT([no -- some components failed test])
 #       have_mpeg2='no (failed tests)'
 #     else
@@ -30568,8 +30479,7 @@ fi
 #
 have_ttf='no'
 LIB_TTF=''
-if test "$with_ttf" != 'no'
-then
+if test "$with_ttf" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for FreeType 2.0 " >&5
 printf %s "checking for FreeType 2.0 ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -30665,28 +30575,39 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
+      if test -n "$VERBOSE" ; then
         printf "FREETYPE_LIBS=${FREETYPE_LIBS}\n"
         printf "FREETYPE_CFLAGS=${FREETYPE_CFLAGS}\n"
       fi
       pkg_config_to_flags 'freetype2' "${FREETYPE_LIBS}" "${FREETYPE_CFLAGS}"
     else
-      if test -n "${FREETYPE_PKG_ERRORS}"
-      then
+      if test -n "${FREETYPE_PKG_ERRORS}" ; then
         printf "${FREETYPE_PKG_ERRORS}\n"
       fi
       failed=0
     fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for FT_Init_FreeType in -lfreetype" >&5
-printf %s "checking for FT_Init_FreeType in -lfreetype... " >&6; }
-if test ${ac_cv_lib_freetype_FT_Init_FreeType+y}
+    freetype=freetype
+    if test -n "$FREETYPE_LIBS" ; then
+      for arg in $FREETYPE_LIBS ; do
+        case $arg in
+          -l*)
+            freetype=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
+
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$freetype""_FT_Init_FreeType" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for FT_Init_FreeType in -l$freetype" >&5
+printf %s "checking for FT_Init_FreeType in -l$freetype... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfreetype  $LIBS"
+LIBS="-l$freetype  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -30710,9 +30631,9 @@ return FT_Init_FreeType ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_freetype_FT_Init_FreeType=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_freetype_FT_Init_FreeType=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -30720,18 +30641,18 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_freetype_FT_Init_FreeType" >&5
-printf "%s\n" "$ac_cv_lib_freetype_FT_Init_FreeType" >&6; }
-if test "x$ac_cv_lib_freetype_FT_Init_FreeType" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
-  LIB_TTF="-lfreetype"
+  LIB_TTF="-l${freetype}"
 else case e in #(
   e) LIB_TTF='' ;;
 esac
 fi
 
-    if test "$LIB_TTF" != ''
-    then
+    if test "$LIB_TTF" != '' ; then
       passed=`expr $passed + 1`
     else
       failed=`expr $failed + 1`
@@ -30750,8 +30671,7 @@ else case e in #(
 esac
 fi
 
-    if test "${FT2BUILD_H}x" = 'x'
-    then
+    if test "${FT2BUILD_H}x" = 'x' ; then
        # Last ditch, test old include style where everything is rooted
        # under 'freetype'
        ac_fn_c_check_header_compile "$LINENO" "freetype/freetype.h" "ac_cv_header_freetype_freetype_h" "$ac_includes_default"
@@ -30764,8 +30684,7 @@ esac
 fi
 
     fi
-    if test "$have_freetype_h" = 'yes'
-    then
+    if test "$have_freetype_h" = 'yes' ; then
         passed=`expr $passed + 1`
     else
         failed=`expr $failed + 1`
@@ -30773,10 +30692,8 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if FreeType package is complete" >&5
 printf %s "checking if FreeType package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             LIB_TTF=''
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
@@ -30792,12 +30709,11 @@ printf "%s\n" "no -- some components failed test" >&6; }
 
 printf "%s\n" "#define HasTTF 1" >>confdefs.h
 
-            if test "$ac_cv_header_ft2build_h" = 'yes'
-            then
+            if test "$ac_cv_header_ft2build_h" = 'yes' ; then
 
 printf "%s\n" "#define HAVE_FT2BUILD_H 1" >>confdefs.h
 
-             fi
+            fi
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
             have_ttf='yes'
@@ -30823,8 +30739,7 @@ fi
 #
 have_webp='no'
 LIB_WEBP=''
-if test "$with_webp" != 'no'
-then
+if test "$with_webp" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for WEBP support " >&5
 printf %s "checking for WEBP support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -30845,24 +30760,25 @@ printf "%s\n" "" >&6; }
     # WEBPMUX_LIBS=-L/work/lib -lwebpmux -lm -lwebp -lm -lsharpyuv -lm
     # WEBP_LIBS=-L/work/lib -lwebp -lm -lsharpyuv -lm
 
-    # Need to add libsharp    libsharpyuv.pc
+    # Need to add libsharpyuv    libsharpyuv.pc
 
-    # libwebp, libwebpmux, libwebpdemux
+    # pkg-config libsharpyuv --static --libs
+    # -L/work/lib -lsharpyuv -lm
 
 pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libwebpmux" >&5
-printf %s "checking for libwebpmux... " >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libsharpyuv" >&5
+printf %s "checking for libsharpyuv... " >&6; }
 
-if test -n "$WEBPMUX_CFLAGS"; then
-    pkg_cv_WEBPMUX_CFLAGS="$WEBPMUX_CFLAGS"
+if test -n "$SHARPYUV_CFLAGS"; then
+    pkg_cv_SHARPYUV_CFLAGS="$SHARPYUV_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libwebpmux\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libwebpmux") 2>&5
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsharpyuv\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libsharpyuv") 2>&5
   ac_status=$?
   printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_WEBPMUX_CFLAGS=`$PKG_CONFIG --cflags "libwebpmux" 2>/dev/null`
+  pkg_cv_SHARPYUV_CFLAGS=`$PKG_CONFIG --cflags "libsharpyuv" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -30870,16 +30786,16 @@ fi
  else
     pkg_failed=untried
 fi
-if test -n "$WEBPMUX_LIBS"; then
-    pkg_cv_WEBPMUX_LIBS="$WEBPMUX_LIBS"
+if test -n "$SHARPYUV_LIBS"; then
+    pkg_cv_SHARPYUV_LIBS="$SHARPYUV_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libwebpmux\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libwebpmux") 2>&5
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libsharpyuv\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libsharpyuv") 2>&5
   ac_status=$?
   printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_WEBPMUX_LIBS=`$PKG_CONFIG --libs "libwebpmux" 2>/dev/null`
+  pkg_cv_SHARPYUV_LIBS=`$PKG_CONFIG --libs "libsharpyuv" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -30900,12 +30816,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        WEBPMUX_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libwebpmux" 2>&1`
+	        SHARPYUV_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libsharpyuv" 2>&1`
         else
-	        WEBPMUX_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libwebpmux" 2>&1`
+	        SHARPYUV_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libsharpyuv" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$WEBPMUX_PKG_ERRORS" >&5
+	echo "$SHARPYUV_PKG_ERRORS" >&5
 
 	failed=`expr $failed + 1`
 elif test $pkg_failed = untried; then
@@ -30913,42 +30829,39 @@ elif test $pkg_failed = untried; then
 printf "%s\n" "no" >&6; }
 	failed=`expr $failed + 1`
 else
-	WEBPMUX_CFLAGS=$pkg_cv_WEBPMUX_CFLAGS
-	WEBPMUX_LIBS=$pkg_cv_WEBPMUX_LIBS
+	SHARPYUV_CFLAGS=$pkg_cv_SHARPYUV_CFLAGS
+	SHARPYUV_LIBS=$pkg_cv_SHARPYUV_LIBS
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
-        printf "WEBPMUX_LIBS=${WEBPMUX_LIBS}\n"
-        printf "WEBPMUX_CFLAGS=${WEBPMUX_CFLAGS}\n"
+      if test -n "$VERBOSE" ; then
+        printf "SHARPYUV_LIBS=${SHARPYUV_LIBS}\n"
+        printf "SHARPYUV_CFLAGS=${SHARPYUV_CFLAGS}\n"
       fi
-      pkg_config_to_flags 'libwebpmux' "${WEBPMUX_LIBS}" "${WEBPMUX_CFLAGS}"
+      pkg_config_to_flags 'libwebpmux' "${SHARPYUV_LIBS}" "${SHARPYUV_CFLAGS}"
     else
-      if test -n "${WEBPMUX_PKG_ERRORS}"
-      then
-        printf "${WEBPMUX_PKG_ERRORS}\n"
+      if test -n "${SHARPYUV_PKG_ERRORS}" ; then
+        printf "${SHARPYUV_PKG_ERRORS}\n"
       fi
       failed=0
     fi
 
-    # We are not currently using libwebpdemux
-    #PKG_CHECK_MODULES([WEBPDEMUX], [libwebpdemux], [], [])
-    #if test $failed -eq 0 ; then
-    #  if test -n "$VERBOSE"
-    #  then
-    #    printf "WEBPDMUX_LIBS=${WEBPDMUX_LIBS}\n"
-    #    printf "WEBPDMUX_CFLAGS=${WEBPDMUX_CFLAGS}\n"
-    #  fi
-    #  pkg_config_to_flags 'libwebpdemux' "${WEBPDMUX_LIBS}" "${WEBPDMUX_CFLAGS}"
-    #else
-    #  failed=0
-    #fi
+    sharpyuv=sharpyuv
+    if test -n "$SHARPYUV_LIBS" ; then
+      for arg in $SHARPYUV_LIBS ; do
+        case $arg in
+          -l*)
+            sharpyuv=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
 
     # pkg-config libwebp --static --libs
-    #-L/work/lib -lwebp -lm -lsharpyuv -lm
+    # -L/work/lib -lwebp -lm -lsharpyuv -lm
 
 pkg_failed=no
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libwebp" >&5
@@ -31021,19 +30934,140 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
+      if test -n "$VERBOSE" ; then
         printf "WEBP_LIBS=${WEBP_LIBS}\n"
         printf "WEBP_CFLAGS=${WEBP_CFLAGS}\n"
       fi
       pkg_config_to_flags 'libwebp' "${WEBP_LIBS}" "${WEBP_CFLAGS}"
     else
-      if test -n "${WEBP_PKG_ERRORS}"
-      then
+      if test -n "${WEBP_PKG_ERRORS}" ; then
         printf "${WEBP_PKG_ERRORS}\n"
       fi
       failed=0
     fi
+
+    webp=webp
+    if test -n "$WEBP_LIBS" ; then
+      for arg in $WEBP_LIBS ; do
+        case $arg in
+          -l*)
+            webp=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
+
+    # pkg-config libwebpmux --static --libs
+    # -L/work/lib -lwebpmux -lm -lwebp -lm -lsharpyuv -lm
+
+pkg_failed=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libwebpmux" >&5
+printf %s "checking for libwebpmux... " >&6; }
+
+if test -n "$WEBPMUX_CFLAGS"; then
+    pkg_cv_WEBPMUX_CFLAGS="$WEBPMUX_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libwebpmux\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libwebpmux") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_WEBPMUX_CFLAGS=`$PKG_CONFIG --cflags "libwebpmux" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$WEBPMUX_LIBS"; then
+    pkg_cv_WEBPMUX_LIBS="$WEBPMUX_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libwebpmux\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libwebpmux") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_WEBPMUX_LIBS=`$PKG_CONFIG --libs "libwebpmux" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        WEBPMUX_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libwebpmux" 2>&1`
+        else
+	        WEBPMUX_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libwebpmux" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$WEBPMUX_PKG_ERRORS" >&5
+
+	failed=`expr $failed + 1`
+elif test $pkg_failed = untried; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+	failed=`expr $failed + 1`
+else
+	WEBPMUX_CFLAGS=$pkg_cv_WEBPMUX_CFLAGS
+	WEBPMUX_LIBS=$pkg_cv_WEBPMUX_LIBS
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+	passed=`expr $passed + 1`
+fi
+    if test $failed -eq 0 ; then
+      if test -n "$VERBOSE" ; then
+        printf "WEBPMUX_LIBS=${WEBPMUX_LIBS}\n"
+        printf "WEBPMUX_CFLAGS=${WEBPMUX_CFLAGS}\n"
+      fi
+      pkg_config_to_flags 'libwebpmux' "${WEBPMUX_LIBS}" "${WEBPMUX_CFLAGS}"
+    else
+      if test -n "${WEBPMUX_PKG_ERRORS}" ; then
+        printf "${WEBPMUX_PKG_ERRORS}\n"
+      fi
+      failed=0
+    fi
+
+    webpmux=webpmux
+    if test -n "$WEBPMUX_LIBS" ; then
+      for arg in $WEBPMUX_LIBS ; do
+        case $arg in
+          -l*)
+            webpmux=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
+
+    # We are not currently using libwebpdemux
+    #PKG_CHECK_MODULES([WEBPDEMUX], [libwebpdemux], [], [])
+    #if test $failed -eq 0 ; then
+    #  if test -n "$VERBOSE"
+    #  then
+    #    printf "WEBPDMUX_LIBS=${WEBPDMUX_LIBS}\n"
+    #    printf "WEBPDMUX_CFLAGS=${WEBPDMUX_CFLAGS}\n"
+    #  fi
+    #  pkg_config_to_flags 'libwebpdemux' "${WEBPDMUX_LIBS}" "${WEBPDMUX_CFLAGS}"
+    #else
+    #  failed=0
+    #fi
 
     ac_fn_c_check_header_compile "$LINENO" "webp/decode.h" "ac_cv_header_webp_decode_h" "$ac_includes_default"
 if test "x$ac_cv_header_webp_decode_h" = xyes
@@ -31053,14 +31087,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for WebPDecodeRGB in -lwebp" >&5
-printf %s "checking for WebPDecodeRGB in -lwebp... " >&6; }
-if test ${ac_cv_lib_webp_WebPDecodeRGB+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$webp""_WebPDecodeRGB" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for WebPDecodeRGB in -l$webp" >&5
+printf %s "checking for WebPDecodeRGB in -l$webp... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lwebp  $LIBS"
+LIBS="-l$webp  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31084,9 +31119,9 @@ return WebPDecodeRGB ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_webp_WebPDecodeRGB=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_webp_WebPDecodeRGB=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31094,9 +31129,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_webp_WebPDecodeRGB" >&5
-printf "%s\n" "$ac_cv_lib_webp_WebPDecodeRGB" >&6; }
-if test "x$ac_cv_lib_webp_WebPDecodeRGB" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`; LIB_WEBP='-lwebp'
 else case e in #(
@@ -31104,14 +31140,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for WebPMuxSetImage in -lwebpmux" >&5
-printf %s "checking for WebPMuxSetImage in -lwebpmux... " >&6; }
-if test ${ac_cv_lib_webpmux_WebPMuxSetImage+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$webpmux""_WebPMuxSetImage" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for WebPMuxSetImage in -l$webpmux" >&5
+printf %s "checking for WebPMuxSetImage in -l$webpmux... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lwebpmux -lwebp $LIBS"
+LIBS="-l$webpmux -lwebp $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31135,9 +31172,9 @@ return WebPMuxSetImage ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_webpmux_WebPMuxSetImage=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_webpmux_WebPMuxSetImage=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31145,21 +31182,23 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_webpmux_WebPMuxSetImage" >&5
-printf "%s\n" "$ac_cv_lib_webpmux_WebPMuxSetImage" >&6; }
-if test "x$ac_cv_lib_webpmux_WebPMuxSetImage" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   LIB_WEBP="$LIB_WEBP -lwebpmux"
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for SharpYuvConvert in -lsharpyuv" >&5
-printf %s "checking for SharpYuvConvert in -lsharpyuv... " >&6; }
-if test ${ac_cv_lib_sharpyuv_SharpYuvConvert+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$sharpyuv""_SharpYuvConvert" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for SharpYuvConvert in -l$sharpyuv" >&5
+printf %s "checking for SharpYuvConvert in -l$sharpyuv... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsharpyuv  $LIBS"
+LIBS="-l$sharpyuv  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31183,9 +31222,9 @@ return SharpYuvConvert ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_sharpyuv_SharpYuvConvert=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_sharpyuv_SharpYuvConvert=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31193,19 +31232,18 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_sharpyuv_SharpYuvConvert" >&5
-printf "%s\n" "$ac_cv_lib_sharpyuv_SharpYuvConvert" >&6; }
-if test "x$ac_cv_lib_sharpyuv_SharpYuvConvert" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   LIB_WEBP="$LIB_WEBP -lsharpyuv"
 fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if WEBP package is complete" >&5
 printf %s "checking if WEBP package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
             have_webp='no (failed tests)'
@@ -31243,8 +31281,7 @@ fi
 #
 have_libzip='no'
 LIB_ZIP=''
-if test "$with_libzip" != 'no'
-then
+if test "$with_libzip" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libzip support " >&5
 printf %s "checking for libzip support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -31326,8 +31363,7 @@ else
 printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
-    if test $failed -eq 0
-    then
+    if test $failed -eq 0 ; then
         if test -n "$VERBOSE"
         then
             printf "LIBZIP_LIBS=${LIBZIP_LIBS}\n"
@@ -31335,11 +31371,22 @@ fi
         fi
         pkg_config_to_flags 'libzip' "${LIBZIP_LIBS}" "${LIBZIP_CFLAGS}"
     else
-      if test -n "${LIBZIP_PKG_ERRORS}"
-      then
+      if test -n "${LIBZIP_PKG_ERRORS}" ; then
         printf "${LIBZIP_PKG_ERRORS}\n"
       fi
       failed=0
+    fi
+
+    zip=zip
+    if test -n "$LIBZIP_LIBS" ; then
+      for arg in $LIBZIP_LIBS ; do
+        case $arg in
+          -l*)
+            zip=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
     fi
 
     ac_fn_c_check_header_compile "$LINENO" "zip.h" "ac_cv_header_zip_h" "$ac_includes_default"
@@ -31351,14 +31398,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for zip_open in -lzip" >&5
-printf %s "checking for zip_open in -lzip... " >&6; }
-if test ${ac_cv_lib_zip_zip_open+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$zip""_zip_open" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for zip_open in -l$zip" >&5
+printf %s "checking for zip_open in -l$zip... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lzip  $LIBS"
+LIBS="-l$zip  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31382,9 +31430,9 @@ return zip_open ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_zip_zip_open=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_zip_zip_open=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31392,9 +31440,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_zip_zip_open" >&5
-printf "%s\n" "$ac_cv_lib_zip_zip_open" >&6; }
-if test "x$ac_cv_lib_zip_zip_open" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -31405,10 +31454,8 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if libzip package is complete" >&5
 printf %s "checking if libzip package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
             have_libzip='no (failed tests)'
@@ -31416,9 +31463,23 @@ printf "%s\n" "no -- some components failed test" >&6; }
             LDFLAGS=$OLD_LDFLAGS
             LIBS=$OLD_LIBS
         else
+            if test -n "$LIBZIP_LIBS" ; then
+               LIB_ZIP=''
+               for token in ${LIBZIP_LIBS} ; do
+                 case $token in
+                   -l*)
+                     if test -n "$LIB_ZIP" ; then
+                       LIB_ZIP="$LIB_ZIP $token"
+                     else
+                       LIB_ZIP=$token
+                     fi
+                   ;;
+                 esac
+               done
+             else
+               LIB_ZIP="-l${zip}"
+             fi
             pkg_config_to_flags 'libzip' "${LIB_ZIP}" ''
-            LIB_ZIP='-lzip'
-            LIBS="$LIB_ZIP $LIBS"
 
 printf "%s\n" "#define HasLIBZIP 1" >>confdefs.h
 
@@ -31447,8 +31508,7 @@ fi
 #
 have_jbig='no'
 LIB_JBIG=''
-if test "$with_jbig" != 'no'
-then
+if test "$with_jbig" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JBIG support " >&5
 printf %s "checking for JBIG support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -31517,14 +31577,12 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if JBIG package is complete" >&5
 printf %s "checking if JBIG package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-    if test $failed -gt 0
-    then
+    if test $passed -gt 0 ; then
+      if test $failed -gt 0 ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
         have_jbig='no (failed tests)'
-    else
+      else
         LIB_JBIG='-ljbig'
         LIBS="$LIB_JBIG $LIBS"
 
@@ -31533,7 +31591,7 @@ printf "%s\n" "#define HasJBIG 1" >>confdefs.h
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
         have_jbig='yes'
-    fi
+      fi
     else
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
@@ -31554,8 +31612,7 @@ fi
 #
 have_tiff='no'
 LIB_TIFF=''
-if test "$with_tiff" != 'no'
-then
+if test "$with_tiff" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFF support " >&5
 printf %s "checking for TIFF support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -31638,21 +31695,31 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     #set -x
-    if test $failed -eq 0
-    then
-        if test -n "$VERBOSE"
-        then
+    if test $failed -eq 0 ; then
+        if test -n "$VERBOSE" ; then
             printf "TIFF_LIBS=${TIFF_LIBS}\n"
             printf "TIFF_CFLAGS=${TIFF_CFLAGS}\n"
         fi
         pkg_config_to_flags 'libtiff-4' "${TIFF_LIBS}" "${TIFF_CFLAGS}"
     else
-      if test -n "${TIFF_PKG_ERRORS}"
-      then
+      if test -n "${TIFF_PKG_ERRORS}" ; then
         printf "${TIFF_PKG_ERRORS}\n"
       fi
       failed=0
     fi
+
+    tiff=tiff
+    if test -n "$TIFF_LIBS" ; then
+      for arg in $TIFF_LIBS ; do
+        case $arg in
+          -l*)
+            tiff=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
+
     #set +x
     ac_fn_c_check_header_compile "$LINENO" "tiff.h" "ac_cv_header_tiff_h" "$ac_includes_default"
 if test "x$ac_cv_header_tiff_h" = xyes
@@ -31672,14 +31739,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFOpen in -ltiff" >&5
-printf %s "checking for TIFFOpen in -ltiff... " >&6; }
-if test ${ac_cv_lib_tiff_TIFFOpen+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$tiff""_TIFFOpen" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFOpen in -l$tiff" >&5
+printf %s "checking for TIFFOpen in -l$tiff... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltiff  $LIBS"
+LIBS="-l$tiff  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31703,9 +31771,9 @@ return TIFFOpen ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_tiff_TIFFOpen=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_tiff_TIFFOpen=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31713,9 +31781,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tiff_TIFFOpen" >&5
-printf "%s\n" "$ac_cv_lib_tiff_TIFFOpen" >&6; }
-if test "x$ac_cv_lib_tiff_TIFFOpen" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -31723,14 +31792,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFClientOpen in -ltiff" >&5
-printf %s "checking for TIFFClientOpen in -ltiff... " >&6; }
-if test ${ac_cv_lib_tiff_TIFFClientOpen+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$tiff""_TIFFClientOpen" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFClientOpen in -l$tiff" >&5
+printf %s "checking for TIFFClientOpen in -l$tiff... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltiff  $LIBS"
+LIBS="-l$tiff  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31754,9 +31824,9 @@ return TIFFClientOpen ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_tiff_TIFFClientOpen=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_tiff_TIFFClientOpen=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31764,9 +31834,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tiff_TIFFClientOpen" >&5
-printf "%s\n" "$ac_cv_lib_tiff_TIFFClientOpen" >&6; }
-if test "x$ac_cv_lib_tiff_TIFFClientOpen" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -31774,14 +31845,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFIsByteSwapped in -ltiff" >&5
-printf %s "checking for TIFFIsByteSwapped in -ltiff... " >&6; }
-if test ${ac_cv_lib_tiff_TIFFIsByteSwapped+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$tiff""_TIFFIsByteSwapped" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFIsByteSwapped in -l$tiff" >&5
+printf %s "checking for TIFFIsByteSwapped in -l$tiff... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltiff  $LIBS"
+LIBS="-l$tiff  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31805,9 +31877,9 @@ return TIFFIsByteSwapped ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_tiff_TIFFIsByteSwapped=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_tiff_TIFFIsByteSwapped=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31815,9 +31887,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tiff_TIFFIsByteSwapped" >&5
-printf "%s\n" "$ac_cv_lib_tiff_TIFFIsByteSwapped" >&6; }
-if test "x$ac_cv_lib_tiff_TIFFIsByteSwapped" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -31825,14 +31898,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFReadRGBATile in -ltiff" >&5
-printf %s "checking for TIFFReadRGBATile in -ltiff... " >&6; }
-if test ${ac_cv_lib_tiff_TIFFReadRGBATile+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$tiff""_TIFFReadRGBATile" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFReadRGBATile in -l$tiff" >&5
+printf %s "checking for TIFFReadRGBATile in -l$tiff... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltiff  $LIBS"
+LIBS="-l$tiff  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31856,9 +31930,9 @@ return TIFFReadRGBATile ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_tiff_TIFFReadRGBATile=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_tiff_TIFFReadRGBATile=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31866,9 +31940,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tiff_TIFFReadRGBATile" >&5
-printf "%s\n" "$ac_cv_lib_tiff_TIFFReadRGBATile" >&6; }
-if test "x$ac_cv_lib_tiff_TIFFReadRGBATile" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -31876,14 +31951,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFReadRGBAStrip in -ltiff" >&5
-printf %s "checking for TIFFReadRGBAStrip in -ltiff... " >&6; }
-if test ${ac_cv_lib_tiff_TIFFReadRGBAStrip+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$tiff""_TIFFReadRGBAStrip" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for TIFFReadRGBAStrip in -l$tiff" >&5
+printf %s "checking for TIFFReadRGBAStrip in -l$tiff... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ltiff  $LIBS"
+LIBS="-l$tiff  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -31907,9 +31983,9 @@ return TIFFReadRGBAStrip ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_tiff_TIFFReadRGBAStrip=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_tiff_TIFFReadRGBAStrip=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -31917,9 +31993,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tiff_TIFFReadRGBAStrip" >&5
-printf "%s\n" "$ac_cv_lib_tiff_TIFFReadRGBAStrip" >&6; }
-if test "x$ac_cv_lib_tiff_TIFFReadRGBAStrip" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -31929,10 +32006,8 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if TIFF package is complete" >&5
 printf %s "checking if TIFF package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
             have_tiff='no (failed tests)'
@@ -31940,7 +32015,22 @@ printf "%s\n" "no -- some components failed test" >&6; }
             CPPFLAGS=$OLD_CPPFLAGS
             LIBS=$OLD_LIBS
         else
-            LIB_TIFF='-ltiff'
+            if test -n "$TIFF_LIBS" ; then
+              LIB_TIFF=''
+              for token in ${TIFF_LIBS} ; do
+                 case $token in
+                   -l*)
+                     if test -n "$LIB_TIFF" ; then
+                       LIB_TIFF="$LIB_TIFF $token"
+                     else
+                       LIB_TIFF=$token
+                     fi
+                   ;;
+                 esac
+               done
+            else
+               LIB_TIFF="-l${tiff}"
+            fi
             pkg_config_to_flags 'libtiff-4' "${LIB_TIFF}" ''
             #LIBS="$LIB_TIFF $LIBS"
 
@@ -32026,8 +32116,7 @@ fi
 #
 have_jxl='no'
 LIB_JXL=''
-if test "$with_jxl" != 'no'
-then
+if test "$with_jxl" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JXL support " >&5
 printf %s "checking for JXL support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -32049,7 +32138,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     # libjxl needs libhwy to build but it is built as a static library so is not a dynamic dependency
     #
     # pkg-config --static --libs libjxl
-    # -L/usr/local/lib -ljxl -lm -lhwy -lbrotlienc -lbrotlidec -lbrotlicommon
+    # -L/work/lib -ljxl -lm -lc++ -lhwy -lbrotlienc -lbrotlidec -lbrotlicommon -ljxl_cms -lm -lc++
 
     # libjxl_threads
 
@@ -32123,23 +32212,32 @@ else
 printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
-    if test $failed -eq 0
-    then
-      if test -n "$VERBOSE"
-      then
+    if test $failed -eq 0 ; then
+      if test -n "$VERBOSE" ; then
         printf "LIBJXL_THREADS_LIBS=${LIBJXL_THREADS_LIBS}\n"
         printf "LIBJXL_THREADS_CFLAGS=${LIBJXL_THREADS_CFLAGS}\n"
       fi
       pkg_config_to_flags 'libjxl_threads' "${LIBJXL_THREADS_LIBS}" "${LIBJXL_THREADS_CFLAGS}"
     else
-      if test -n "${LIBJXL_THREADS_PKG_ERRORS}"
-      then
+      if test -n "${LIBJXL_THREADS_PKG_ERRORS}" ; then
         printf "${LIBJXL_THREADS_PKG_ERRORS}\n"
       fi
       failed=0
     fi
 
-    # [libjxl
+    jxl_threads=jxl_threads
+    if test -n "$JXL_THREADS_LIBS" ; then
+      for arg in $JXL_THREADS_LIBS ; do
+        case $arg in
+          -l*)
+            jxl_threads=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
+    fi
+
+    # libjxl
 
 pkg_failed=no
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libjxl" >&5
@@ -32211,20 +32309,29 @@ else
 printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
-    if test $failed -eq 0
-    then
-      if test -n "$VERBOSE"
-      then
+    if test $failed -eq 0 ; then
+      if test -n "$VERBOSE" ; then
         printf "LIBJXL_LIBS=${LIBJXL_LIBS}\n"
         printf "LIBJXL_CFLAGS=${LIBJXL_CFLAGS}\n"
       fi
       pkg_config_to_flags 'libjxl' "${LIBJXL_LIBS}" "${LIBJXL_CFLAGS}"
     else
-      if test -n "${LIBJXL_PKG_ERRORS}"
-      then
+      if test -n "${LIBJXL_PKG_ERRORS}" ; then
         printf "${LIBJXL_PKG_ERRORS}\n"
       fi
       failed=0
+    fi
+
+    jxl=jxl
+    if test -n "$JXL_LIBS" ; then
+      for arg in $JXL_LIBS ; do
+        case $arg in
+          -l*)
+            jxl=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
     fi
 
     ac_fn_cxx_check_header_compile "$LINENO" "jxl/decode.h" "ac_cv_header_jxl_decode_h" "$ac_includes_default"
@@ -32237,14 +32344,15 @@ esac
 fi
 
     # jxl always requires hwy/brotli no extra test needed
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JxlDecoderCreate in -ljxl" >&5
-printf %s "checking for JxlDecoderCreate in -ljxl... " >&6; }
-if test ${ac_cv_lib_jxl_JxlDecoderCreate+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$jxl""_JxlDecoderCreate" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JxlDecoderCreate in -l$jxl" >&5
+printf %s "checking for JxlDecoderCreate in -l$jxl... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljxl -lhwy -lbrotlidec -lbrotlienc -lbrotlicommon $LIBS"
+LIBS="-l$jxl -lhwy -lbrotlidec -lbrotlienc -lbrotlicommon $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -32261,9 +32369,9 @@ return conftest::JxlDecoderCreate ();
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"
 then :
-  ac_cv_lib_jxl_JxlDecoderCreate=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_jxl_JxlDecoderCreate=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -32271,9 +32379,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jxl_JxlDecoderCreate" >&5
-printf "%s\n" "$ac_cv_lib_jxl_JxlDecoderCreate" >&6; }
-if test "x$ac_cv_lib_jxl_JxlDecoderCreate" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`; LIB_JXL='-ljxl'
 else case e in #(
@@ -32281,14 +32390,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JxlThreadParallelRunnerCreate in -ljxl_threads" >&5
-printf %s "checking for JxlThreadParallelRunnerCreate in -ljxl_threads... " >&6; }
-if test ${ac_cv_lib_jxl_threads_JxlThreadParallelRunnerCreate+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$jxl_threads""_JxlThreadParallelRunnerCreate" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JxlThreadParallelRunnerCreate in -l$jxl_threads" >&5
+printf %s "checking for JxlThreadParallelRunnerCreate in -l$jxl_threads... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljxl_threads  $LIBS"
+LIBS="-l$jxl_threads  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -32305,9 +32415,9 @@ return conftest::JxlThreadParallelRunnerCreate ();
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"
 then :
-  ac_cv_lib_jxl_threads_JxlThreadParallelRunnerCreate=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_jxl_threads_JxlThreadParallelRunnerCreate=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -32315,56 +32425,12 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jxl_threads_JxlThreadParallelRunnerCreate" >&5
-printf "%s\n" "$ac_cv_lib_jxl_threads_JxlThreadParallelRunnerCreate" >&6; }
-if test "x$ac_cv_lib_jxl_threads_JxlThreadParallelRunnerCreate" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`; LIB_JXL="${LIB_JXL} -ljxl_threads"
-fi
-
-    # Testing for decoder should also cover encoder
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for BrotliDecoderVersion in -lbrotlidec" >&5
-printf %s "checking for BrotliDecoderVersion in -lbrotlidec... " >&6; }
-if test ${ac_cv_lib_brotlidec_BrotliDecoderVersion+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lbrotlidec -lbrotlicommon $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int BrotliDecoderVersion ();
-}
-int
-main (void)
-{
-return conftest::BrotliDecoderVersion ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_lib_brotlidec_BrotliDecoderVersion=yes
-else case e in #(
-  e) ac_cv_lib_brotlidec_BrotliDecoderVersion=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_brotlidec_BrotliDecoderVersion" >&5
-printf "%s\n" "$ac_cv_lib_brotlidec_BrotliDecoderVersion" >&6; }
-if test "x$ac_cv_lib_brotlidec_BrotliDecoderVersion" = xyes
-then :
-  passed=`expr $passed + 1`; LIB_JXL="${LIB_JXL} -lbrotlidec -lbrotlicommon"
-else case e in #(
-  e) failed=`expr $failed + 1` ;;
-esac
 fi
 
     ac_ext=c
@@ -32375,10 +32441,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if JXL package is complete" >&5
 printf %s "checking if JXL package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-        if test $failed -gt 0
-        then
+    if test $passed -gt 0 ; then
+        if test $failed -gt 0 ; then
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
             have_jxl='no (failed tests)'
@@ -32389,15 +32453,17 @@ printf "%s\n" "no -- some components failed test" >&6; }
             # JXL is a C++ Lib so it requires linking with stdc++.  This
             # is handled by inserting a C++ dummy shim file when JXL is
             # part of the build.
-            if test -n "${LIBJXL_LIBS}"
-            then
+            if test -n "${LIBJXL_LIBS}" ; then
                # Use pkg-config info
                LIB_JXL=''
-               for token in ${LIBJXL_LIBS} ${LIBJXL_THREADS_LIBS}
-               do
+               for token in ${LIBJXL_LIBS} ${LIBJXL_THREADS_LIBS} ; do
                    case $token in
                        -l*)
-                           LIB_JXL="$LIB_JXL $token"
+                           if test -n "$LIB_JXL" ; then
+                             LIB_JXL="$LIB_JXL $token"
+                           else
+                             LIB_JXL="$token"
+                           fi
                            ;;
                    esac
                done
@@ -32442,8 +32508,7 @@ have_wmf='no'
 LIB_WMF=''
 LIB_WMF_DEPS=''
 OLD_LIBS="$LIBS"
-if test "$with_wmf" != 'no'
-then
+if test "$with_wmf" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for WMF support " >&5
 printf %s "checking for WMF support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -32459,8 +32524,7 @@ then :
   have_libwmf_ipa_h='yes'
 fi
 
-    if test "$have_libwmf_ipa_h" = 'yes'
-    then
+    if test "$have_libwmf_ipa_h" = 'yes' ; then
 
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for wmf_lite_create in -lwmflite" >&5
 printf %s "checking for wmf_lite_create in -lwmflite... " >&6; }
@@ -32510,8 +32574,7 @@ then :
   have_libwmflite='yes'
 fi
 
-        if test "$have_libwmflite" = 'yes'
-        then
+        if test "$have_libwmflite" = 'yes' ; then
 
 printf "%s\n" "#define HasWMFlite 1" >>confdefs.h
 
@@ -32531,8 +32594,7 @@ printf "%s\n" "no -- some components failed test" >&6; }
 fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if WMF package is complete " >&5
 printf %s "checking if WMF package is complete ... " >&6; }
-if test "$have_wmf" = 'yes'
-then
+if test "$have_wmf" = 'yes' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 else
@@ -32555,8 +32617,7 @@ fi
 #
 have_heif='no'
 LIB_HEIF=''
-if test "$with_heif" != 'no'
-then
+if test "$with_heif" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for HEIF support " >&5
 printf %s "checking for HEIF support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -32645,15 +32706,13 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
+      if test -n "$VERBOSE" ; then
         printf "HEIF_LIBS=${HEIF_LIBS}\n"
         printf "HEIF_CFLAGS=${HEIF_CFLAGS}\n"
       fi
       pkg_config_to_flags 'libheif' "${HEIF_LIBS}" "${HEIF_CFLAGS}"
     else
-      if test -n "${HEIF_PKG_ERRORS}"
-      then
+      if test -n "${HEIF_PKG_ERRORS}" ; then
         printf "${HEIF_PKG_ERRORS}\n"
       fi
       failed=0
@@ -32739,10 +32798,8 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if HEIF package is complete" >&5
 printf %s "checking if HEIF package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-      if test $failed -gt 0
-      then
+    if test $passed -gt 0 ; then
+      if test $failed -gt 0 ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
         have_heif='no (failed tests)'
@@ -32760,11 +32817,11 @@ printf "%s\n" "#define HasHEIF 1" >>confdefs.h
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
         have_heif='yes'
-     fi
-     else
+      fi
+    else
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
-     fi
+    fi
 fi
  if test "$have_heif" = 'yes'; then
   HasHEIF_TRUE=
@@ -32781,8 +32838,7 @@ fi
 #
 have_jp2='no'
 LIB_JP2=''
-if test "$with_jp2" != 'no'
-then
+if test "$with_jp2" != 'no' ; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for JPEG version 2 \"Jasper\" support " >&5
 printf %s "checking for JPEG version 2 \"Jasper\" support ... " >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
@@ -32865,18 +32921,28 @@ printf "%s\n" "yes" >&6; }
 	passed=`expr $passed + 1`
 fi
     if test $failed -eq 0 ; then
-      if test -n "$VERBOSE"
-      then
+      if test -n "$VERBOSE" ; then
         printf "JASPER_LIBS=${JASPER_LIBS}\n"
         printf "JASPER_CFLAGS=${JASPER_CFLAGS}\n"
       fi
       pkg_config_to_flags 'jasper' "${JASPER_LIBS}" "${JASPER_CFLAGS}"
     else
-      if test -n "${JASPER_PKG_ERRORS}"
-      then
+      if test -n "${JASPER_PKG_ERRORS}" ; then
         printf "${JASPER_PKG_ERRORS}\n"
       fi
       failed=0
+    fi
+
+    jasper=jasper
+    if test -n "$JASPER_LIBS" ; then
+      for arg in $JASPER_LIBS ; do
+        case $arg in
+          -l*)
+            jasper=`printf -- "${arg}" | sed -nE 's/^-l(.*)/\1/p'`
+                        break 1
+          ;;
+        esac
+      done
     fi
 
     ac_fn_c_check_header_compile "$LINENO" "jasper/jasper.h" "ac_cv_header_jasper_jasper_h" "$ac_includes_default"
@@ -32888,14 +32954,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jas_stream_fopen in -ljasper" >&5
-printf %s "checking for jas_stream_fopen in -ljasper... " >&6; }
-if test ${ac_cv_lib_jasper_jas_stream_fopen+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$jasper""_jas_stream_fopen" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jas_stream_fopen in -l$jasper" >&5
+printf %s "checking for jas_stream_fopen in -l$jasper... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljasper  $LIBS"
+LIBS="-l$jasper  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -32919,9 +32986,9 @@ return jas_stream_fopen ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_jasper_jas_stream_fopen=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_jasper_jas_stream_fopen=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -32929,9 +32996,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jasper_jas_stream_fopen" >&5
-printf "%s\n" "$ac_cv_lib_jasper_jas_stream_fopen" >&6; }
-if test "x$ac_cv_lib_jasper_jas_stream_fopen" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -32939,14 +33007,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jas_image_strtofmt in -ljasper" >&5
-printf %s "checking for jas_image_strtofmt in -ljasper... " >&6; }
-if test ${ac_cv_lib_jasper_jas_image_strtofmt+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$jasper""_jas_image_strtofmt" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jas_image_strtofmt in -l$jasper" >&5
+printf %s "checking for jas_image_strtofmt in -l$jasper... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljasper  $LIBS"
+LIBS="-l$jasper  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -32970,9 +33039,9 @@ return jas_image_strtofmt ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_jasper_jas_image_strtofmt=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_jasper_jas_image_strtofmt=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -32980,9 +33049,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jasper_jas_image_strtofmt" >&5
-printf "%s\n" "$ac_cv_lib_jasper_jas_image_strtofmt" >&6; }
-if test "x$ac_cv_lib_jasper_jas_image_strtofmt" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -32990,14 +33060,15 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jas_image_decode in -ljasper" >&5
-printf %s "checking for jas_image_decode in -ljasper... " >&6; }
-if test ${ac_cv_lib_jasper_jas_image_decode+y}
+    as_ac_Lib=`printf "%s\n" "ac_cv_lib_$jasper""_jas_image_decode" | sed "$as_sed_sh"`
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for jas_image_decode in -l$jasper" >&5
+printf %s "checking for jas_image_decode in -l$jasper... " >&6; }
+if eval test \${$as_ac_Lib+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
   e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-ljasper  $LIBS"
+LIBS="-l$jasper  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -33021,9 +33092,9 @@ return jas_image_decode ();
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_jasper_jas_image_decode=yes
+  eval "$as_ac_Lib=yes"
 else case e in #(
-  e) ac_cv_lib_jasper_jas_image_decode=no ;;
+  e) eval "$as_ac_Lib=no" ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -33031,9 +33102,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jasper_jas_image_decode" >&5
-printf "%s\n" "$ac_cv_lib_jasper_jas_image_decode" >&6; }
-if test "x$ac_cv_lib_jasper_jas_image_decode" = xyes
+eval ac_res=\$$as_ac_Lib
+	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+printf "%s\n" "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"
 then :
   passed=`expr $passed + 1`
 else case e in #(
@@ -33043,17 +33115,15 @@ fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if JPEG version 2 support package is complete" >&5
 printf %s "checking if JPEG version 2 support package is complete... " >&6; }
-    if test $passed -gt 0
-    then
-    if test $failed -gt 0
-    then
+    if test $passed -gt 0 ; then
+      if test $failed -gt 0 ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
         have_jp2='no (failed tests)'
         CPPFLAGS=$OLD_CPPFLAGS
         LDFLAGS=$OLD_LDFLAGS
         LIBS=$OLD_LIBS
-    else
+      else
         LIB_JP2='-ljasper'
         pkg_config_to_flags 'jasper' "${LIB_JP2}" ''
         #LIBS="$LIB_JP2 $LIBS"
@@ -33070,9 +33140,9 @@ then :
 
 fi
 
-    fi
+      fi
     else
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
     fi
 fi
@@ -33090,8 +33160,7 @@ fi
 # Check for Windows gdi32/user32 libraries (for Windows clipboard support)
 #
 have_gdi32='no'
-if test "$with_gdi32" != 'no'
-then
+if test "$with_gdi32" != 'no' ; then
   LIB_GDI32=''
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Windows GDI32 support" >&5
 printf %s "checking for Windows GDI32 support... " >&6; }
@@ -33139,16 +33208,13 @@ fi
   #else
   #  failed=`expr $failed + 1`
   #fi
-  if test "$cygwin_build" = yes -o "$native_win32_build" = yes
-  then
+  if test "$cygwin_build" = yes -o "$native_win32_build" = yes ; then
         passed=`expr $passed + 1`
   fi
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if Windows GDI32 support is complete" >&5
 printf %s "checking if Windows GDI32 support is complete... " >&6; }
-  if test $passed -gt 0
-  then
-    if test $failed -gt 0
-    then
+  if test $passed -gt 0 ; then
+    if test $failed -gt 0 ; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no -- some components failed test" >&5
 printf "%s\n" "no -- some components failed test" >&6; }
       have_gdi32='no (failed tests)'
@@ -34825,8 +34891,7 @@ else
 fi
 
 # Prefer lpr to lp; lp needs options tacked on.
-if test "$LPRDelegate" != no
-then
+if test "$LPRDelegate" != no ; then
   PrintDelegate="$LPRDelegate"
 else
   PrintDelegate="$LPDelegate -c -s"
@@ -35176,12 +35241,10 @@ type_include_files=''
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Windows fonts directory (location of arial.ttf)" >&5
 printf %s "checking for Windows fonts directory (location of arial.ttf)... " >&6; }
 windows_font_dir=''
-if test "$with_windows_font_dir" != "yes" && test -n "$with_windows_font_dir"
-then
+if test "$with_windows_font_dir" != "yes" && test -n "$with_windows_font_dir" ; then
    windows_font_dir="${with_windows_font_dir}/"
 fi
-if test -z "$windows_font_dir"
-then
+if test -z "$windows_font_dir" ; then
   for dir in \
     '/usr/X11R6/lib/X11/fonts/truetype/' \
     '/usr/share/fonts/microsoft/' \
@@ -35195,8 +35258,7 @@ then
     fi
   done
 fi
-if test -n "$windows_font_dir"
-then
+if test -n "$windows_font_dir" ; then
   type_include_files="$type_include_files "'<include file="type-windows.mgk" />'
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $windows_font_dir" >&5
 printf "%s\n" "$windows_font_dir" >&6; }
@@ -35220,8 +35282,7 @@ case $host_os in
     fi
     ;;
 esac
-if test -n "$openwin_fonts"
-then
+if test -n "$openwin_fonts" ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $openwin_fonts" >&5
 printf "%s\n" "$openwin_fonts" >&6; }
 else
@@ -35236,8 +35297,7 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Artifex urw-base35 OTF fonts directory (location of URWGothic-Book.otf)" >&5
 printf %s "checking for Artifex urw-base35 OTF fonts directory (location of URWGothic-Book.otf)... " >&6; }
 urwbase35otf_font_dir=''
-if test "${with_urwbase35otf_font_dir}" != 'default'
-then
+if test "${with_urwbase35otf_font_dir}" != 'default' ; then
   urwbase35otf_font_dir="${with_urwbase35otf_font_dir}/"
 
 else
@@ -35247,8 +35307,7 @@ else
     # /usr/share/fonts/type1/urw-base35
     #
     # Debian/Ubuntu provide a font map at /etc/ghostscript/fontmap.d/10fonts-urw-base35.conf
-    for font_dir in "${prefix}/share/fonts/opentype/urw-base35/" /usr/share/fonts/opentype/urw-base35/
-    do
+    for font_dir in "${prefix}/share/fonts/opentype/urw-base35/" /usr/share/fonts/opentype/urw-base35/ ; do
       if test -f "${font_dir}URWGothic-Book.otf"
         then
           urwbase35otf_font_dir="${font_dir}"
@@ -35257,8 +35316,7 @@ else
     done
 fi
 
-if test "${urwbase35otf_font_dir}x" != 'x'
-then
+if test "${urwbase35otf_font_dir}x" != 'x' ; then
   type_include_files="${type_include_files} "'<include file="type-urw-base35-otf.mgk" />'
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $urwbase35otf_font_dir" >&5
 printf "%s\n" "$urwbase35otf_font_dir" >&6; }
@@ -35272,13 +35330,11 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Ghostscript fonts directory (location of a010013l.pfb)" >&5
 printf %s "checking for Ghostscript fonts directory (location of a010013l.pfb)... " >&6; }
 ghostscript_font_dir=''
-if test "${with_gs_font_dir}" != 'default'
-then
+if test "${with_gs_font_dir}" != 'default' ; then
   ghostscript_font_dir="${with_gs_font_dir}/"
 
 else
-  if test "${native_win32_build}" = 'yes'
-  then
+  if test "${native_win32_build}" = 'yes' ; then
     # Native Windows Build
     #
     # Ghostscript may install fonts to several default locations now.
@@ -35295,8 +35351,7 @@ else
     #
     #   cmd /c "reg query \"HKLM\Software\GPL Ghostscript\" /v GS_LIB /s"
     #
-    for font_dir in "c:\\Program Files\\gs\\fonts\\" "c:\\gs\\fonts\\"
-    do
+    for font_dir in "c:\\Program Files\\gs\\fonts\\" "c:\\gs\\fonts\\" ; do
       if test -f "${font_dir}a010013l.pfb"
       then
         ghostscript_font_dir="$font_dir"
@@ -35304,11 +35359,9 @@ else
       fi
     done
     if test "$with_gs" = 'yes' ; then
-      if test "${PSDelegate}" != "${PSDelegateDefault}"
-      then
+      if test "${PSDelegate}" != "${PSDelegateDefault}" ; then
         font_dir=`echo "${PSDelegate}" | sed -e 's:/gs/.*:/gs:;s:^/::;s/./&:/;s:/:\\\\:g'`"\\fonts\\"
-        if test -f "${font_dir}a010013l.pfb"
-        then
+        if test -f "${font_dir}a010013l.pfb" ; then
           ghostscript_font_dir="${font_dir}"
         fi
       fi
@@ -35324,8 +35377,7 @@ else
     # Debian puts Ghostscript fonts in /usr/share/fonts/type1/gsfonts
     #
     # Debian/Ubuntu provide a font map at /etc/ghostscript/fontmap.d/10gsfonts.conf
-    for font_dir in "${prefix}/share/ghostscript/fonts/" '/usr/share/fonts/default/Type1/' '/usr/share/ghostscript/fonts/' '/usr/share/fonts/ghostscript/' '/usr/share/fonts/type1/gsfonts/'
-    do
+    for font_dir in "${prefix}/share/ghostscript/fonts/" '/usr/share/fonts/default/Type1/' '/usr/share/ghostscript/fonts/' '/usr/share/fonts/ghostscript/' '/usr/share/fonts/type1/gsfonts/' ; do
       if test -f "${font_dir}a010013l.pfb"
       then
         ghostscript_font_dir="${font_dir}"
@@ -35334,11 +35386,9 @@ else
     done
 
     # Look for Ghostscript fonts relative to Ghostscript install directory
-    if test "${ghostscript_font_dir}x" = 'x'
-    then
+    if test "${ghostscript_font_dir}x" = 'x' ; then
       if test "$with_gs" = 'yes' ; then
-        if test "$PSDelegate" != "${PSDelegateDefault}"
-        then
+        if test "$PSDelegate" != "${PSDelegateDefault}" ; then
           font_dir=`echo "$PSDelegate" | sed -e 's:/bin/gs:/share/ghostscript/fonts:'`"/"
           if test -f "${font_dir}a010013l.pfb"
           then
@@ -35351,11 +35401,9 @@ else
   fi
 fi
 
-if test "${ghostscript_font_dir}x" != 'x'
-then
+if test "${ghostscript_font_dir}x" != 'x' ; then
   # Only include type-ghostscript.mgk when urwbase35otf_font_dir not found
-  if test "${urwbase35otf_font_dir}x" = 'x'
-  then
+  if test "${urwbase35otf_font_dir}x" = 'x' ; then
     type_include_files="${type_include_files} "'<include file="type-ghostscript.mgk" />'
   fi
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ghostscript_font_dir" >&5
@@ -35376,8 +35424,7 @@ esac
 #
 # Handle case where user doesn't want frozen paths
 #
-if test "$with_frozenpaths" != 'yes'
-then
+if test "$with_frozenpaths" != 'yes' ; then
   # Re-set delegate definitions to default (no paths)
   BrowseDelegate="$BrowseDelegateDefault"
   CGMDecodeDelegate="$CGMDecodeDelegateDefault"
@@ -35619,13 +35666,11 @@ GSPDFDevice=pdfwrite
 GSPSDevice=pswrite
 GSEPSDevice=epswrite
 GSVersion='unknown'
-if test $have_gs = 'yes'
-then
+if test $have_gs = 'yes' ; then
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for Ghostscript version" >&5
 printf %s "checking for Ghostscript version... " >&6; }
-  if GSVersion=`$PSDelegate --version`
-  then
+  if GSVersion=`$PSDelegate --version` ; then
     :
   else
     GSVersion=`$PSDelegate --help | sed -e '1q' | awk '{ print $3 }'`
@@ -35636,12 +35681,10 @@ printf "%s\n" "$GSVersion" >&6; }
   # GSColorDevice # AS_MESSAGE_LOG_FD
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs color device" >&5
 printf %s "checking for gs color device... " >&6; }
-  if $PSDelegate -q -dBATCH -sDEVICE=pnmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-  then
+  if $PSDelegate -q -dBATCH -sDEVICE=pnmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
     GSColorDevice=pnmraw
   else
-    if $PSDelegate -q -dBATCH -sDEVICE=ppmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-    then
+    if $PSDelegate -q -dBATCH -sDEVICE=ppmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
       GSColorDevice=ppmraw
     else
       GSColorDevice=ppmraw
@@ -35653,8 +35696,7 @@ printf "%s\n" "$GSColorDevice" >&6; }
   # GSColorAlphaDevice
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs color+alpha device" >&5
 printf %s "checking for gs color+alpha device... " >&6; }
-  if $PSDelegate -q -dBATCH -sDEVICE=pngalpha -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-  then
+  if $PSDelegate -q -dBATCH -sDEVICE=pngalpha -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
     GSColorAlphaDevice=pngalpha
   else
     GSColorAlphaDevice=$GSColorDevice
@@ -35665,8 +35707,7 @@ printf "%s\n" "$GSColorAlphaDevice" >&6; }
   # GSGrayDevice
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs gray device" >&5
 printf %s "checking for gs gray device... " >&6; }
-  if $PSDelegate -q -dBATCH -sDEVICE=pgmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-  then
+  if $PSDelegate -q -dBATCH -sDEVICE=pgmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
     GSGrayDevice=pgmraw
   else
     GSGrayDevice=ppmraw
@@ -35677,8 +35718,7 @@ printf "%s\n" "$GSGrayDevice" >&6; }
   # GSPaletteDevice
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs pallet device" >&5
 printf %s "checking for gs pallet device... " >&6; }
-  if $PSDelegate -q -dBATCH -sDEVICE=pcx256 -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-  then
+  if $PSDelegate -q -dBATCH -sDEVICE=pcx256 -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
     GSPaletteDevice=pcx256
   else
     GSPaletteDevice=ppmraw
@@ -35689,8 +35729,7 @@ printf "%s\n" "$GSPaletteDevice" >&6; }
   # GSMonoDevice
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs mono device" >&5
 printf %s "checking for gs mono device... " >&6; }
-  if $PSDelegate -q -dBATCH -sDEVICE=pbmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-  then
+  if $PSDelegate -q -dBATCH -sDEVICE=pbmraw -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
     GSMonoDevice=pbmraw
   else
     GSMonoDevice=ppmraw
@@ -35702,10 +35741,8 @@ printf "%s\n" "$GSMonoDevice" >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs CMYK device" >&5
 printf %s "checking for gs CMYK device... " >&6; }
   GSCMYKDevice=$GSColorDevice
-  for device in $GSCMYKDevices
-  do
-    if $PSDelegate -q -dBATCH -sDEVICE=$device -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-    then
+  for device in $GSCMYKDevices ; do
+    if $PSDelegate -q -dBATCH -sDEVICE=$device -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
       GSCMYKDevice=$device
       break
     fi
@@ -35716,8 +35753,7 @@ printf "%s\n" "$GSCMYKDevice" >&6; }
   # GSPDFDevice
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs PDF writing device" >&5
 printf %s "checking for gs PDF writing device... " >&6; }
-  if $PSDelegate -q -dBATCH -sDEVICE=pdfwrite -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-  then
+  if $PSDelegate -q -dBATCH -sDEVICE=pdfwrite -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
     GSPDFDevice=pdfwrite
   else
     GSPDFDevice=nodevice
@@ -35729,10 +35765,8 @@ printf "%s\n" "$GSPDFDevice" >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs PS writing device" >&5
 printf %s "checking for gs PS writing device... " >&6; }
   GSPSDevice=nodevice
-  for device in ps2write pswrite
-  do
-    if $PSDelegate -q -dBATCH -sDEVICE=$device -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-    then
+  for device in ps2write pswrite ; do
+    if $PSDelegate -q -dBATCH -sDEVICE=$device -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
       GSPSDevice=$device
       break
     fi
@@ -35744,10 +35778,8 @@ printf "%s\n" "$GSPSDevice" >&6; }
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gs EPS writing device" >&5
 printf %s "checking for gs EPS writing device... " >&6; }
   GSEPSDevice=nodevice
-  for device in eps2write epswrite
-  do
-    if $PSDelegate -q -dBATCH -sDEVICE=$device -sOutputFile=/dev/null < /dev/null 1>&5 2>&5
-    then
+  for device in eps2write epswrite ; do
+    if $PSDelegate -q -dBATCH -sDEVICE=$device -sOutputFile=/dev/null < /dev/null 1>&5 2>&5 ; then
       GSEPSDevice=$device
       break
     fi
@@ -35775,10 +35807,8 @@ fi
 # Look for PERL if PerlMagick requested
 # If name/path of desired PERL interpreter is specified, look for that one first
 have_perl='no'
-if test "$with_perl" != 'no'
-then
-    if test "$with_perl" != 'yes'
-    then
+if test "$with_perl" != 'no' ; then
+    if test "$with_perl" != 'yes' ; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for perl" >&5
 printf %s "checking for perl... " >&6; }
 if test ${ac_cv_path_PERL+y}
@@ -35843,8 +35873,7 @@ fi
 
   test -n "$PERL" && break
 done
-        if test "$ac_cv_path_PERL"
-        then
+        if test "$ac_cv_path_PERL" ; then
           have_perl="$ac_cv_path_PERL"
         fi
     fi
@@ -35856,15 +35885,12 @@ fi
 PERL_SUPPORTS_DESTDIR='no'
 with_perl_static='no'
 with_perl_dynamic='no'
-if test "$have_perl" != 'no'
-then
+if test "$have_perl" != 'no' ; then
   # Should we build shared libraries?
-  if test "$with_perl" != 'no' && test "$libtool_build_shared_libs" = 'no'
-  then
+  if test "$with_perl" != 'no' && test "$libtool_build_shared_libs" = 'no' ; then
     with_perl_static='yes'
   fi
-  if test "$with_perl" != 'no' && test "$libtool_build_shared_libs" = 'yes'
-  then
+  if test "$with_perl" != 'no' && test "$libtool_build_shared_libs" = 'yes' ; then
     with_perl_dynamic='yes'
   fi
 
@@ -35969,8 +35995,7 @@ fi
 # Determine path to pick up GraphicsMagick library from for use with building PerlMagick
 MAGICKLIBDIR="${LIB_DIR}"
 MAGICKLIB="-L${MAGICKLIBDIR} -lGraphicsMagick"
-if test $with_perl_static = 'yes'
-then
+if test $with_perl_static = 'yes' ; then
   # Find out where libtool hides its uninstalled libraries (as libtool_objdir)
   libtool_objdir=$objdir
 
@@ -36112,16 +36137,14 @@ MAGICK_FEATURES=`echo $MAGICK_FEATURES | sed -e 's/  */ /g'`
 #
 
 # Add '-p' if prof source profiling support enabled
-if test "$with_prof" = 'yes'
-then
+if test "$with_prof" = 'yes' ; then
   CFLAGS="-p $CFLAGS"
   CXXFLAGS="-p $CXXFLAGS"
   LDFLAGS="-p $LDFLAGS"
 fi
 
 # Add '-pg' if gprof source profiling support enabled
-if test "$with_gprof" = 'yes'
-then
+if test "$with_gprof" = 'yes' ; then
   CFLAGS="-pg $CFLAGS"
   CXXFLAGS="-pg $CXXFLAGS"
   LDFLAGS="-pg $LDFLAGS"
@@ -36129,8 +36152,7 @@ fi
 
 # Add '-ftest-coverage -fprofile-arcs' if gcov source profiling support enabled
 # This is a gcc-specific feature
-if test "$with_gcov" = 'yes'
-then
+if test "$with_gcov" = 'yes' ; then
   CFLAGS="-ftest-coverage -fprofile-arcs  $CFLAGS"
   CXXFLAGS="-ftest-coverage -fprofile-arcs  $CXXFLAGS"
   LDFLAGS="-ftest-coverage -fprofile-arcs $LDFLAGS"
@@ -36146,25 +36168,20 @@ fi
 
 #printf "LIBS=${LIBS}\n"
 
-if test "$build_modules" != 'no'
-then
+if test "$build_modules" != 'no' ; then
   MAGICK_DEP_LIBS=''
-  for token in $LIB_FPX $LCMS2_LIBS $FREETYPE_LIBS $LIB_XEXT $LIB_IPC $LIB_X11 $LIB_BZLIB $ZLIB_LIBS $LIB_LTDL $LIB_TRIO $LIB_GDI32 $LIBS_USER $LIB_MATH $LIB_THREAD $LIB_TCMALLOC $LIB_UMEM $LIB_MTMALLOC
-  do
+  for token in $LIB_FPX $LCMS2_LIBS $FREETYPE_LIBS $LIB_XEXT $LIB_IPC $LIB_X11 $LIB_BZLIB $ZLIB_LIBS $LIB_LTDL $LIB_TRIO $LIB_GDI32 $LIBS_USER $LIB_MATH $LIB_THREAD $LIB_TCMALLOC $LIB_UMEM $LIB_MTMALLOC ; do
     case $token in
       -l*)
         # Add token to MAGICK_DEP_LIBS if not already present
         add=yes;
-        for test_token in $MAGICK_DEP_LIBS
-        do
-          if test $token = $test_token
-          then
+        for test_token in $MAGICK_DEP_LIBS ; do
+          if test $token = $test_token ; then
             add=no
             break
           fi
         done
-        if test $add = yes
-        then
+        if test $add = yes ; then
           MAGICK_DEP_LIBS="$MAGICK_DEP_LIBS $token"
         fi
         ;;
@@ -36186,9 +36203,10 @@ MAGICK_EXTRA_DEP_LIBS="$LIB_OMP" # Extra libraries typically added due to CFLAGS
 # Remove extraneous spaces from output variables (asthetic)
 #
 X_CFLAGS=`echo $X_CFLAGS | sed -e 's/  */ /g'`
-X_PRE_LIBS=`echo $X_PRE_LIBS | sed -e 's/  */ /g'`
-X_LIBS=`echo $X_LIBS | sed -e 's/  */ /g'`
-X_EXTRA_LIBS=`echo $X_EXTRA_LIBS | sed -e 's/  */ /g'`
+LIB_XEXT=`echo $LIB_XEXT | sed -e 's/  */ /g'`
+LIB_X11_LIBS=`echo $LIB_XEXT $LIB_X11 | sed -e 's/  */ /g'`
+LIB_XML_LIBS=`echo $LIB_XML $LIB_XML_DEPS | sed -e 's/  */ /g'`
+LIB_WMF_LIBS=`echo $LIB_WMF $LIB_WMF_DEPS | sed -e 's/  */ /g'`
 
 CC=`echo $CC | sed -e 's/  */ /g'`
 CFLAGS=`echo $CFLAGS | sed -e 's/  */ /g'`
@@ -36198,7 +36216,6 @@ LDFLAGS=`echo $LDFLAGS | sed -e 's/  */ /g'`
 TESTED_LIBS=`echo $LIBS | sed -e 's/  */ /g'`
 MAGICK_DEP_LIBS=`echo $MAGICK_DEP_LIBS | sed -e 's/  */ /g'`
 MAGICK_EXTRA_DEP_LIBS=`echo $MAGICK_EXTRA_DEP_LIBS | sed -e 's/  */ /g'`
-#LIBS=`echo $LIBS | sed -e 's/  */ /g'`
 
 MAGICK_API_CFLAGS=$CFLAGS
 MAGICK_API_CPPFLAGS=`echo $MAGICK_API_CPPFLAGS | sed -e 's/  */ /g'`
@@ -39099,66 +39116,47 @@ printf "FreeType 2.0      --with-ttf=$with_ttf          \t$have_ttf\n"
 printf "Ghostscript       --with-gs=$with_gs            \t$PSDelegate ($GSVersion)\n"
 
 result_ghostscript_font_dir='none'
-if test "${ghostscript_font_dir}x" != 'x'
-then
+if test "${ghostscript_font_dir}x" != 'x' ; then
   result_ghostscript_font_dir="$ghostscript_font_dir"
 fi
 printf "Ghostscript fonts --with-gs-font-dir=$with_gs_font_dir\t$result_ghostscript_font_dir\n"
 
 result_urwbase35otf_font_dir='none'
-if test "${urwbase35otf_font_dir}x" != 'x'
-then
+if test "${urwbase35otf_font_dir}x" != 'x' ; then
   result_urwbase35otf_font_dir="$urwbase35otf_font_dir"
 fi
 printf "URW Base35 fonts  --with-base35otf-font-dir=$with_gs_font_dir\t$result_urwbase35otf_font_dir\n"
 
 printf "Windows GDI32     --with-gdi32=$with_gdi32      \t$have_gdi32\n"
-printf "JBIG              --with-jbig=$with_jbig        \t$have_jbig\n"
-printf "JPEG v1           --with-jpeg=$with_jpeg        \t$have_jpeg\n"
-printf "JPEG-2000         --with-jp2=$with_jp2          \t$have_jp2\n"
-printf "JPEG-XL           --with-jxl=$with_jxl          \t$have_jxl\n"
-printf "LCMS v2           --with-lcms2=$with_lcms2        \t$have_lcms2\n"
+printf "JBIG              --with-jbig=$with_jbig        \t$have_jbig" ; if test -n "$LIB_JBIG" ; then printf " ($LIB_JBIG)\n" ; else printf "\n" ; fi
+printf "JPEG v1           --with-jpeg=$with_jpeg        \t$have_jpeg" ; if test -n "$LIB_JPEG" ; then printf " ($LIB_JPEG)\n" ; else printf "\n" ; fi
+printf "JPEG-2000         --with-jp2=$with_jp2          \t$have_jp2" ; if test -n "$LIB_JP2" ; then printf " ($LIB_JP2)\n" ; else printf "\n" ; fi
+printf "JPEG-XL           --with-jxl=$with_jxl          \t$have_jxl" ; if test -n "$LIB_JXL" ; then printf " ($LIB_JXL)\n" ; else printf "\n" ; fi
+printf "LCMS v2           --with-lcms2=$with_lcms2        \t$have_lcms2" ; if test -n "$LIB_LCMS" ; then printf " ($LIB_LCMS)\n" ; else printf "\n" ; fi
 # printf "MPEG v2           --with-mpeg2=$with_mpeg2    \t$have_mpeg2\n"
-printf "LIBZIP            --with-libzip=$with_libzip      \t$have_libzip\n"
-printf "LZMA              --with-lzma=$with_lzma        \t$have_lzma\n"
+printf "LIBZIP            --with-libzip=$with_libzip      \t$have_libzip" ; if test -n "$LIB_ZIP" ; then printf " ($LIB_ZIP)\n" ; else printf "\n" ; fi
+printf "LZMA              --with-lzma=$with_lzma        \t$have_lzma" ; if test -n "$LIB_LZMA" ; then printf " ($LIB_LZMA)\n" ; else printf "\n" ; fi
 printf "Magick++          --with-magick-plus-plus=$with_magick_plus_plus\t$have_magick_plus_plus\n"
 printf "PERL              --with-perl=$with_perl        \t$have_perl\n"
-if test "${LIB_PNG}x" != 'x'
-then
-printf "PNG               --with-png=$with_png          \t$have_png ($LIB_PNG)\n"
-else
-printf "PNG               --with-png=$with_png          \t$have_png\n"
-fi
-printf "Google tcmalloc   --with-tcmalloc=$with_tcmalloc\t\t$have_tcmalloc\n"
-printf "Solaris mtmalloc  --with-mtmalloc=$with_mtmalloc\t\t$have_mtmalloc\n"
-printf "Solaris umem      --with-umem=$with_umem        \t$have_umem\n"
-printf "TIFF              --with-tiff=$with_tiff        \t$have_tiff\n"
-printf "TRIO              --with-trio=$with_trio        \t$have_trio\n"
-printf "WEBP              --with-webp=$with_webp        \t$have_webp\n"
-printf "HEIF              --with-heif=$with_heif        \t$have_heif\n"
+printf "PNG               --with-png=$with_png          \t$have_png" ; if test -n "$LIB_PNG" ; then printf " ($LIB_PNG)\n" ; else printf "\n" ; fi
+printf "Google tcmalloc   --with-tcmalloc=$with_tcmalloc\t\t$have_tcmalloc" ; if test -n "$LIB_TCMALLOC" ; then printf " ($LIB_TCMALLOC)\n" ; else printf "\n" ; fi
+printf "Solaris mtmalloc  --with-mtmalloc=$with_mtmalloc\t\t$have_mtmalloc" ; if test -n "$LIB_MTMALLOC" ; then printf " ($LIB_MTMALLOC)\n" ; else printf "\n" ; fi
+printf "Solaris umem      --with-umem=$with_umem        \t$have_umem" ; if test -n "$LIB_UMEM" ; then printf " ($LIB_UMEM)\n" ; else printf "\n" ; fi
+printf "TIFF              --with-tiff=$with_tiff        \t$have_tiff" ; if test -n "$LIB_TIFF" ; then printf " ($LIB_TIFF)\n" ; else printf "\n" ; fi
+printf "TRIO              --with-trio=$with_trio        \t$have_trio" ; if test -n "$LIB_TRIO" ; then printf " ($LIB_TRIO)\n" ; else printf "\n" ; fi
+printf "WEBP              --with-webp=$with_webp        \t$have_webp" ; if test -n "$LIB_WEBP" ; then printf " ($LIB_WEBP)\n" ; else printf "\n" ; fi
+printf "HEIF              --with-heif=$with_heif        \t$have_heif" ; if test -n "$LIB_HEIF" ; then printf " ($LIB_HEIF)\n" ; else printf "\n" ; fi
 result_windows_font_dir='none'
-if test "${windows_font_dir}x" != 'x'
-then
+if test "${windows_font_dir}x" != 'x' ; then
   result_windows_font_dir="${windows_font_dir}"
 fi
 printf "Windows fonts     --with-windows-font-dir=$with_windows_font_dir\t$result_windows_font_dir\n"
-printf "WMF               --with-wmf=$with_wmf          \t$have_wmf\n"
-printf "X11               --with-x=$with_x              \t$have_x\n"
-printf "XML               --with-xml=$with_xml          \t$have_xml\n"
-printf "ZLIB              --with-zlib=$with_zlib        \t$have_zlib\n"
-printf "ZSTD              --with-zstd=$with_zstd        \t$have_zstd\n"
-printf "\n"
-printf "X11 Configuration:\n"
-if test "$have_x" != 'no'
-then
-  printf "  X_CFLAGS     = $X_CFLAGS\n"
-  printf "  X_PRE_LIBS   = $X_PRE_LIBS\n"
-  printf "  X_LIBS       = $X_LIBS\n"
-  printf "  X_EXTRA_LIBS = $X_EXTRA_LIBS\n"
-else
-  printf "\n"
-  printf "  Not using X11.\n"
-fi
+printf "WMF               --with-wmf=$with_wmf          \t$have_wmf" ; if test -n "$LIB_WMF_LIBS" ; then printf " ($LIB_WMF_LIBS)\n" ; else printf "\n" ; fi
+printf "X11               --with-x=$with_x              \t$have_x" ; if test -n "$LIB_X11_LIBS" ; then printf " ($LIB_X11_LIBS)\n" ; else printf "\n" ; fi
+printf "XML               --with-xml=$with_xml          \t$have_xml" ; if test -n "$LIB_XML_LIBS" ; then printf " ($LIB_XML_LIBS)\n" ; else printf "\n" ; fi
+printf "ZIP               --with-libzip=$with_libzip       \t$have_libzip" ; if test -n "$LIB_ZIP" ; then printf " ($LIB_ZIP)\n" ; else printf "\n" ; fi
+printf "ZLIB              --with-zlib=$with_zlib        \t$have_zlib" ; if test -n "$LIB_ZLIB" ; then printf " ($LIB_ZLIB)\n" ; else printf "\n" ; fi
+printf "ZSTD              --with-zstd=$with_zstd        \t$have_zstd" ; if test -n "$LIB_ZSTD" ; then printf " ($LIB_ZSTD)\n" ; else printf "\n" ; fi
 printf "\n"
 printf "Options used to compile and link:\n"
 printf "  CC       = $CC\n"

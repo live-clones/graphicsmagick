@@ -1,3 +1,11 @@
+2025-08-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* configure.ac: Capture per-library dependency information from
+	pkg-config data and provide a per-library library dependency list
+	in the final configuration summary.  If pkg-config is executed
+	with the --static option, then much more information is revealed
+	by the configuration summary.
+
 2025-08-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* configure.ac: Remove quoting of PNG_LIBS which prevented
