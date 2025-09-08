@@ -1,3 +1,9 @@
+2025-09-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Pass -fno-sanitize=undefined when
+	building Jasper and libde265 because they are not prepared to pass
+	such testing.
+
 2025-08-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* configure.ac: Capture per-library dependency information from

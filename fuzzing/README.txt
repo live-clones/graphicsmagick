@@ -57,6 +57,7 @@ Build project fuzzer target::
     --architecture <x86_64/i386> graphicsmagick
 
   python3 infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 graphicsmagick
 
 Reproduce using local source checkout (mount local sources into the running container)::
 
@@ -82,6 +83,10 @@ Check the build (this can take very long!)::
 Get a shell into the container and compile::
 
   python3 infra/helper.py shell --sanitizer address --architecture x86_64 graphicsmagick
+    or
+  python3 infra/helper.py shell --sanitizer memory --architecture x86_64 graphicsmagick
+    or
+  python3 infra/helper.py shell --sanitizer undefined --architecture x86_64 graphicsmagick
   compile 2>&1 | tee build.log
 
 Copy fuzzing build script into running container (given simultaneous shell session)::
