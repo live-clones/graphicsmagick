@@ -42,7 +42,10 @@
 <blockquote>
 <ul class="simple">
 <li><p>magick/attribute.c (tag_table): Use bit-fields and OR logic to
-handle the case where mutiple TIFF tag types are accepted.</p></li>
+handle the case where mutiple TIFF tag types are accepted.
+(GenerateEXIFAttribute): Improve correctness of EXIF tables based
+on specifications and testing with real-world files.  Filter out
+GPS and EXIF tags which fail tests.  Enable use of bsearch().</p></li>
 </ul>
 </blockquote>
 <p>2025-09-08  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>

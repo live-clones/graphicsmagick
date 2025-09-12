@@ -1085,8 +1085,8 @@ Generate8BIMAttribute(Image *image,const char *key)
 #define EXIF_TAG_STOP  0xFFFF
 #define TAG_EXIF_OFFSET  0x8769
 #define TAG_INTEROP_OFFSET  0xa005
-#define GPS_TAG_START 0x0001
-#define GPS_TAG_STOP  0x001D
+#define GPS_TAG_START 0x0000
+#define GPS_TAG_STOP  0x001F
 #define GPS_OFFSET 0x8825
 #define GPS_LATITUDE 0x0002
 #define GPS_LONGITUDE 0x0004
@@ -1175,9 +1175,9 @@ tag_table[] =
     TAG_INFO(0x001E, F_USHORT, 1, "GPSDifferential"), /* GPS IFD */
     TAG_INFO(0x001F, F_URATIONAL, 1, "GPSHPositioningError"), /* GPS IFD */
 
-    TAG_INFO(0x0100, F_USHORT | F_ULONG, 1, "ImageWidth"),
-    TAG_INFO(0x0101, F_USHORT | F_ULONG, 1, "ImageLength"),
-    TAG_INFO(0x0102, F_USHORT, 3, "BitsPerSample"),
+    TAG_INFO(0x0100, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ImageWidth"),
+    TAG_INFO(0x0101, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ImageLength"),
+    TAG_INFO(0x0102, F_USHORT, AnyCount /* Could be 1, 3, 4! */, "BitsPerSample"),
     TAG_INFO(0x0103, F_USHORT, 1, "Compression"),
     TAG_INFO(0x0106, F_USHORT, 1, "PhotometricInterpretation"),
     TAG_INFO(0x010A, F_USHORT, 1, "FillOrder"),
@@ -1186,7 +1186,7 @@ tag_table[] =
     TAG_INFO(0x010F, F_ASCII, AnyCount, "Make"),
     TAG_INFO(0x0110, F_ASCII, AnyCount, "Model"),
     TAG_INFO(0x0111, F_USHORT | F_ULONG, 0, "StripOffsets"),
-    TAG_INFO(0x0112, F_USHORT, 1, "Orientation"),
+    TAG_INFO(0x0112, F_USHORT | F_SLONG /* TBD */, 1, "Orientation"),
     TAG_INFO(0x0115, F_USHORT, 1, "SamplesPerPixel"),
     TAG_INFO(0x0116, F_USHORT | F_ULONG, 1, "RowsPerStrip"),
     TAG_INFO(0x0117, F_ULONG  | F_USHORT, 0, "StripByteCounts"),
@@ -1208,7 +1208,7 @@ tag_table[] =
     TAG_INFO(0x0128, F_USHORT, 1, "ResolutionUnit"),
     TAG_INFO(0x012D, F_USHORT, 3*256  /* (1 or 3) * (1 << BitsPerSample) */, "TransferFunction"),
     TAG_INFO(0x0131, F_ASCII, 0, "Software"),
-    TAG_INFO(0x0132, F_ASCII, 20, "DateTime"),
+    TAG_INFO(0x0132, F_ASCII, 21 /* 20+NUL? TBD */, "DateTime"),
     TAG_INFO(0x013B, F_ASCII, 0, "Artist"),
     TAG_INFO(0x013C, F_ASCII, 0, "HostComputer"),
     TAG_INFO(0x013D, F_USHORT, 0, "Predictor"),
@@ -1216,10 +1216,10 @@ tag_table[] =
     TAG_INFO(0x013F, F_URATIONAL, 6, "PrimaryChromaticities"),
     TAG_INFO(0x0140, F_USHORT, 0, "ColorMap"),
     TAG_INFO(0x0141, F_USHORT, 0, "HalfToneHints"),
-    TAG_INFO(0x0142, F_USHORT, 0, "TileWidth"),
-    TAG_INFO(0x0143, F_USHORT, 0, "TileLength"),
-    TAG_INFO(0x0144, F_ULONG, 0, "TileOffsets"),
-    TAG_INFO(0x0145, F_USHORT, 0, "TileByteCounts"),
+    TAG_INFO(0x0142, F_ULONG, AnyCount /* TBD */, "TileWidth"),
+    TAG_INFO(0x0143, F_ULONG, AnyCount /* TBD */, "TileLength"),
+    TAG_INFO(0x0144, F_USHORT, AnyCount /* TBD */, "TileOffsets"),
+    TAG_INFO(0x0145, F_ULONG, AnyCount /* TBD */, "TileByteCounts"),
     TAG_INFO(0x014A, F_ULONG, 0, "SubIFD"),
     TAG_INFO(0x014C, F_USHORT, 0, "InkSet"),
     TAG_INFO(0x014D, F_ASCII, 0, "InkNames"),
@@ -1261,8 +1261,8 @@ tag_table[] =
       numeric space from EXIF/TIFF tags!
     */
     TAG_INFO(0x1000, F_NOTYPE, 0, "RelatedImageFileFormat"), /* Exif Interoperability IFD */
-    TAG_INFO(0x1001, F_ULONG, 0, "RelatedImageWidth"), /* Exif Interoperability IFD */
-    TAG_INFO(0x1002, F_ULONG, 0, "RelatedImageLength"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1001, F_USHORT | F_ULONG, 0, "RelatedImageWidth"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1002, F_USHORT | F_ULONG, 0, "RelatedImageLength"), /* Exif Interoperability IFD */
 
     TAG_INFO(0x5001, F_USHORT, 1, "ResolutionXUnit"), /* Microsoft Windows GDI+ */
     TAG_INFO(0x5002, F_USHORT, 1, "ResolutionYUnit"), /* Microsoft Windows GDI+ */
@@ -1349,7 +1349,7 @@ tag_table[] =
     TAG_INFO(0x8773, F_BYTE, AnyCount, "InterColorProfile"), /* ICCProfile */
     TAG_INFO(0x8822, F_USHORT, 1, "ExposureProgram"),
     TAG_INFO(0x8824, F_ASCII, AnyCount, "SpectralSensitivity"),
-    TAG_INFO(0x8825, F_ULONG, 1, "GPSInfo"), /* Offset to GPS IFD */
+    TAG_INFO(0x8825, F_SLONG | F_ULONG /* TBD */, 1, "GPSInfo"), /* Offset to GPS IFD */
     TAG_INFO(0x8827, F_USHORT, AnyCount, "PhotographicSensitivity"), /* Was "ISOSpeedRatings" */
     TAG_INFO(0x8828, F_UNDEFINED, AnyCount, "OECF"),
     TAG_INFO(0x8830, F_USHORT, 1, "SensitivityType"),
@@ -1366,10 +1366,10 @@ tag_table[] =
     TAG_INFO(0x9012, F_ASCII, 7, "OffsetTimeDigitized"),
     TAG_INFO(0x9101, F_UNDEFINED, 4, "ComponentsConfiguration"),
     TAG_INFO(0x9102, F_URATIONAL, 1, "CompressedBitsPerPixel"),
-    TAG_INFO(0x9201, F_SRATIONAL, 1, "ShutterSpeedValue"),
+    TAG_INFO(0x9201, F_URATIONAL | F_SRATIONAL /* TBD */, 1, "ShutterSpeedValue"),
     TAG_INFO(0x9202, F_URATIONAL, 1, "ApertureValue"),
     TAG_INFO(0x9203, F_SRATIONAL, 1, "BrightnessValue"),
-    TAG_INFO(0x9204, F_SRATIONAL, 1, "ExposureBiasValue"),
+    TAG_INFO(0x9204, F_SRATIONAL | F_URATIONAL /* TBD */, 1, "ExposureBiasValue"),
     TAG_INFO(0x9205, F_URATIONAL, 1, "MaxApertureValue"),
     TAG_INFO(0x9206, F_URATIONAL, 1, "SubjectDistance"),
     TAG_INFO(0x9207, F_USHORT, 1, "MeteringMode"),
@@ -1388,15 +1388,15 @@ tag_table[] =
     TAG_INFO(0x9403, F_SRATIONAL, 1, "WaterDepth"),
     TAG_INFO(0x9404, F_URATIONAL, 1, "Acceleration"),
     TAG_INFO(0x9405, F_SRATIONAL, 1, "CameraElevationAngle "),
-    TAG_INFO(0x9C9B, F_NOTYPE, AnyCount, "WinXP-Title"),     /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9C, F_NOTYPE, AnyCount, "WinXP-Comments"),  /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9D, F_NOTYPE, AnyCount, "WinXP-Author"),    /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9E, F_NOTYPE, AnyCount, "WinXP-Keywords"),  /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9F, F_NOTYPE, AnyCount, "WinXP-Subject"),   /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9B, F_BYTE, AnyCount, "WinXP-Title"),     /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9C, F_BYTE, AnyCount, "WinXP-Comments"),  /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9D, F_BYTE, AnyCount, "WinXP-Author"),    /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9E, F_BYTE, AnyCount, "WinXP-Keywords"),  /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9F, F_BYTE, AnyCount, "WinXP-Subject"),   /* Win XP specific, UTF-16 Unicode */
     TAG_INFO(0xA000, F_UNDEFINED, 4, "FlashPixVersion"),
     TAG_INFO(0xA001, F_USHORT , 1, "ColorSpace"),
-    TAG_INFO(0xA002, F_USHORT | F_ULONG, 1, "ExifImageWidth"),
-    TAG_INFO(0xA003, F_USHORT | F_ULONG, 1, "ExifImageLength"),
+    TAG_INFO(0xA002, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ExifImageWidth"),
+    TAG_INFO(0xA003, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ExifImageLength"),
     TAG_INFO(0xA004, F_ASCII, 13, "RelatedSoundFile"),
     TAG_INFO(0xA005, F_ULONG, 0, "InteroperabilityOffset"), /* Interoperability IFD Pointer */
     TAG_INFO(0xA20B, F_URATIONAL, 1, "FlashEnergy"),
@@ -1411,9 +1411,9 @@ tag_table[] =
     TAG_INFO(0xA214, F_USHORT, 2, "SubjectLocation"),
     TAG_INFO(0xA215, F_URATIONAL, 1, "ExposureIndex"),
     TAG_INFO(0xA216, F_NOTYPE, 0, "TIFF_EPStandardID"),
-    TAG_INFO(0xA217, F_USHORT, 1, "SensingMethod"),
-    TAG_INFO(0xA300, F_UNDEFINED, 1, "FileSource"),
-    TAG_INFO(0xA301, F_UNDEFINED, 1, "SceneType"),
+    TAG_INFO(0xA217, F_USHORT | F_BYTE /* TBD */, 1, "SensingMethod"),
+    TAG_INFO(0xA300, F_UNDEFINED, AnyCount /* varies, TBD */, "FileSource"),
+    TAG_INFO(0xA301, F_BYTE | F_UNDEFINED /* TBD */, 1, "SceneType"),
     TAG_INFO(0xA302, F_UNDEFINED, AnyCount, "CFAPattern"),
     TAG_INFO(0xA401, F_USHORT, 1, "CustomRendered"),
     TAG_INFO(0xA402, F_USHORT, 1, "ExposureMode"),
@@ -1421,7 +1421,7 @@ tag_table[] =
     TAG_INFO(0xA404, F_URATIONAL, 1, "DigitalZoomRatio"),
     TAG_INFO(0xA405, F_USHORT, 1, "FocalLengthIn35mmFilm"),
     TAG_INFO(0xA406, F_USHORT, 1, "SceneCaptureType"),
-    TAG_INFO(0xA407, F_URATIONAL, 1, "GainControl"),
+    TAG_INFO(0xA407, F_USHORT, 1, "GainControl"),
     TAG_INFO(0xA408, F_USHORT, 1, "Contrast"),
     TAG_INFO(0xA409, F_USHORT, 1, "Saturation"),
     TAG_INFO(0xA40A, F_USHORT, 1, "Sharpness"),
@@ -1449,7 +1449,7 @@ tag_table[] =
 
 /* Set to non-zero in order to use bsearch rather than linear search. */
 #if !defined(EXIF_USE_BSEARCH)
-#define EXIF_USE_BSEARCH 0
+#define EXIF_USE_BSEARCH 1
 #endif /* !defined(EXIF_USE_BSEARCH) */
 
 #if EXIF_USE_BSEARCH
@@ -1496,7 +1496,7 @@ FindEXIFTableEntryByTag(const unsigned int t,
   key.tag = t;
 
   key_p=(void *) bsearch((const void *) &key,(void *) tag_table,tag_table_entries,
-                                        sizeof(tag_table[0]),IFDTagTableTypeCompare);
+                         sizeof(tag_table[0]),IFDTagTableTypeCompare);
 #else
   register unsigned int
     ttt;
@@ -1647,6 +1647,76 @@ static const unsigned int
     4, /* SINGLE / FLOAT */
     8  /* DOUBLE */
   };
+
+/*
+  Translate from EXIF_FMT_FOO to F_FOO bit-field flag.
+*/
+static unsigned int ExifFmtToFmtBits(unsigned int f)
+{
+  unsigned int
+    bits;
+
+    switch (f)
+    {
+    case EXIF_FMT_NOTYPE:
+    default:
+      bits=F_NOTYPE;
+      break;
+    case EXIF_FMT_BYTE:
+      bits=F_BYTE;
+      break;
+    case EXIF_FMT_ASCII:
+      bits=F_ASCII;
+      break;
+    case EXIF_FMT_USHORT:
+      bits=F_USHORT;
+      break;
+    case EXIF_FMT_ULONG:
+      bits=F_ULONG;
+      break;
+    case EXIF_FMT_URATIONAL:
+      bits=F_URATIONAL;
+      break;
+    case EXIF_FMT_SBYTE:
+      bits=F_SBYTE;
+      break;
+    case EXIF_FMT_UNDEFINED:
+      bits=F_UNDEFINED;
+      break;
+    case EXIF_FMT_SSHORT:
+      bits=F_SSHORT;
+      break;
+    case EXIF_FMT_SLONG:
+      bits=F_SLONG;
+      break;
+    case EXIF_FMT_SRATIONAL:
+      bits=F_SRATIONAL;
+      break;
+    case EXIF_FMT_SINGLE:
+      bits=F_SINGLE;
+      break;
+    case EXIF_FMT_DOUBLE:
+      bits=F_DOUBLE;
+      break;
+    }
+    return bits;
+}
+
+/*
+  Get the expected bit-field bits for format and use it to verify if
+  it is an expected format (a bit matches).
+*/
+static MagickPassFail ValidateExifFmtAgainstBitField(const IFDTagTableType *key_p,const unsigned int fmt)
+{
+  MagickPassFail
+    status;
+
+  if (key_p->format & ExifFmtToFmtBits(fmt))
+    status=MagickPass;
+  else
+    status=MagickFail;
+  return status;
+}
 
 static magick_int16_t
 Read16s(int morder,unsigned char *ishort)
@@ -1823,13 +1893,13 @@ GenerateEXIFAttribute(Image *image,const char *specification)
     {
       if (logging)
         (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                      "No EXIF profile present");
+                              "No EXIF profile present");
       goto generate_attribute_failure;
     }
   if (logging && debug)
-        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                              "EXIF: profile_info=%p, profile_length=%" MAGICK_SIZE_T_F "u",
-                              profile_info, (MAGICK_SIZE_T) profile_length);
+    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                          "EXIF: profile_info=%p, profile_length=%" MAGICK_SIZE_T_F "u",
+                          profile_info, (MAGICK_SIZE_T) profile_length);
   /*
     If EXIF data exists, then try to parse the request for a tag in
     the form "EXIF:key".
@@ -1985,8 +2055,8 @@ GenerateEXIFAttribute(Image *image,const char *specification)
   if (Read16u(morder,tiffp+2) != 0x002a)
     {
       if (logging)
-          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                "EXIF: Expected 0x002a!");
+        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                              "EXIF: Expected 0x002a!");
       goto generate_attribute_failure;
     }
   /*
@@ -2032,9 +2102,9 @@ GenerateEXIFAttribute(Image *image,const char *specification)
         }
       nde=Read16u(morder,ifdp);
       if (logging && debug)
-            (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                  "EXIF: IFD at offset %" MAGICK_SSIZE_T_F "d has %u tags",
-                                  (MAGICK_SSIZE_T) (ifdp-tiffp), nde);
+        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                              "EXIF: IFD at offset %" MAGICK_SSIZE_T_F "d has %u tags",
+                              (MAGICK_SSIZE_T) (ifdp-tiffp), nde);
       if (nde > MAX_TAGS_PER_IFD)
         {
           nde=MAX_TAGS_PER_IFD;
@@ -2119,19 +2189,6 @@ GenerateEXIFAttribute(Image *image,const char *specification)
               pval=(unsigned char *)(tiffp+oval);
             }
 
-          if (logging && debug)
-            {
-              int expected_format=f;
-              const IFDTagTableType *key_p = FindEXIFTableEntryByTag(t,tag_table,ArraySize(tag_table));
-              if (key_p)
-                expected_format=key_p->format;
-
-              (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                    "EXIF: TagVal=%d  TagDescr=\"%s\" Format=%d (expected %d)  "
-                                    "FormatDescr=\"%s\"  Components=%u",t,
-                                    EXIFTagToDescription(t,tag_description),f,expected_format,
-                                    EXIFFormatToDescription(f),c);
-            }
           if ((pval < tiffp) || (pval > tiffp_max))
             {
               if (logging)
@@ -2143,11 +2200,11 @@ GenerateEXIFAttribute(Image *image,const char *specification)
 
           if (gpsfound)
             {
-              if ((t < GPS_TAG_START) || (t > GPS_TAG_STOP))
+              if (/* (t < GPS_TAG_START) || */ (t > GPS_TAG_STOP))
                 {
                   if (logging & debug)
                     (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                          "EXIF: Skipping bogus GPS IFD tag %d ...",t);
+                                          "EXIF: Skipping bogus GPS IFD tag %d (0x%04X) ...",t,t);
                   continue;
                 }
             }
@@ -2157,10 +2214,51 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                 {
                   if (logging & debug)
                     (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                          "EXIF: Skipping bogus EXIF IFD tag %d ...",t);
+                                          "EXIF: Skipping bogus EXIF IFD tag %d (0x%04X) ...",t,t);
                   continue;
                 }
             }
+
+          /* if (logging && debug) */
+            {
+              /*
+                Enable logging via:
+
+                MAGICK_DEBUG=transform MAGICK_DEBUG_EXIF=TRUE gm convert file.jpg -format '%[EXIF:*]' info:-
+              */
+              int expected_format=f;
+              int valid=MagickTrue;
+              const IFDTagTableType *key_p = FindEXIFTableEntryByTag(t,tag_table,ArraySize(tag_table));
+              if (key_p)
+                {
+                  /* Validate format */
+                  if (ValidateExifFmtAgainstBitField(key_p,expected_format) != MagickPass)
+                    {
+                      valid=MagickFalse;
+                    }
+
+                  /* Validate number of components */
+                  if (!((key_p->count == AnyCount) || (key_p->count <= 0) || (c <= (unsigned int) key_p->count)))
+                    {
+                      valid=MagickFalse;
+                    }
+                }
+
+              (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                    "EXIF: TagVal=%d (0x%04x) TagDescr=\"%s\" Format=%d "
+                                    "FormatDescr=\"%s\"  Components=%u Valid=%s",t,t,
+                                    EXIFTagToDescription(t,tag_description),f,
+                                    EXIFFormatToDescription(f),c,
+                                    valid == MagickFail ? "No" : "Yes");
+              if (valid != MagickTrue)
+                {
+                  if (logging & debug)
+                    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                          "EXIF: Skipping bogus EXIF tag %d (0x%04X) ...",t,t);
+                  continue;
+                }
+            }
+
 
           /*
             Return values for all the tags, or for a specific requested tag.
@@ -2263,7 +2361,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                     if (GPS_OFFSET == t)
                       {
                         gpsoffset=offset;
-                     }
+                      }
                     break;
                   }
                 case EXIF_FMT_SLONG:
@@ -2327,9 +2425,9 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                     if ((pval < tiffp) || ((pval+2*sizeof(magick_uint32_t)) > tiffp_max))
                       {
                         if (logging)
-                              (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                                    "EXIF: Offset %" MAGICK_SSIZE_T_F "d out of valid range!",
-                                                    (MAGICK_SSIZE_T) (pval-tiffp));
+                          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                                "EXIF: Offset %" MAGICK_SSIZE_T_F "d out of valid range!",
+                                                (MAGICK_SSIZE_T) (pval-tiffp));
                         goto generate_attribute_failure;
                       }
                     FormatString(s,"%d/%d",(int) Read32s(morder,pval),
@@ -2383,9 +2481,9 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                       binary=MagickFalse;
 
                     if (logging)
-                          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                                "EXIF: pval=%p (offset=%" MAGICK_SSIZE_T_F "d), n=%" MAGICK_SIZE_T_F "u",
-                                                pval, (MAGICK_SSIZE_T) (pval-tiffp), (MAGICK_SIZE_T) n);
+                      (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                            "EXIF: pval=%p (offset=%" MAGICK_SSIZE_T_F "d), n=%" MAGICK_SIZE_T_F "u",
+                                            pval, (MAGICK_SSIZE_T) (pval-tiffp), (MAGICK_SIZE_T) n);
 
                     if ((pval < tiffp) || (pval+n) > tiffp_max)
                       {
@@ -2419,7 +2517,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                             else
                               {
                                 i += snprintf(&value[i],(allocation_size-i),"\\%03o",
-                                             (unsigned int) pval[a]);
+                                              (unsigned int) pval[a]);
                                 binary |= MagickTrue;
                               }
                           }
@@ -2515,10 +2613,10 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                     }
                   if (dup_ifd)
                     {
-                       if (logging)
-                         (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                               "EXIF: Duplicate IFD detected, quitting to avoid loop!");
-                                               goto generate_attribute_failure;
+                      if (logging)
+                        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                              "EXIF: Duplicate IFD detected, quitting to avoid loop!");
+                      goto generate_attribute_failure;
                     }
 
                   /*
@@ -3085,17 +3183,17 @@ FindEXIFAttribute(const unsigned char *profile_info,
   while (length != 0)
     {
       if (ReadByte(&info,&length) != 0x45)
-    continue;
+        continue;
       if (ReadByte(&info,&length) != 0x78)
-    continue;
+        continue;
       if (ReadByte(&info,&length) != 0x69)
-    continue;
+        continue;
       if (ReadByte(&info,&length) != 0x66)
-    continue;
+        continue;
       if (ReadByte(&info,&length) != 0x00)
-    continue;
+        continue;
       if (ReadByte(&info,&length) != 0x00)
-    continue;
+        continue;
       break;
     }
   if (length < 16)
@@ -3187,7 +3285,7 @@ FindEXIFAttribute(const unsigned char *profile_info,
           else
             {
               unsigned long
-              oval;
+                oval;
 
               /*
                 The directory entry contains an offset.
@@ -3201,19 +3299,19 @@ FindEXIFAttribute(const unsigned char *profile_info,
           if (debug)
             {
               fprintf(stderr,
-                  "EXIF: TagVal=%d  TagDescr=\"%s\" Format=%d  "
-                  "FormatDescr=\"%s\"  Components=%u\n",t,
-                  EXIFTagToDescription(t,tag_description),f,
-                  EXIFFormatToDescription(f),c);
+                      "EXIF: TagVal=%d  TagDescr=\"%s\" Format=%d  "
+                      "FormatDescr=\"%s\"  Components=%u\n",t,
+                      EXIFTagToDescription(t,tag_description),f,
+                      EXIFFormatToDescription(f),c);
             }
 
           if (gpsfound)
             {
-              if ((t < GPS_TAG_START) || (t > GPS_TAG_STOP))
+              if (/* (t < GPS_TAG_START) || */ (t > GPS_TAG_STOP))
                 {
                   if (debug)
                     fprintf(stderr,
-                        "EXIF: Skipping bogus GPS IFD tag %d ...\n",t);
+                            "EXIF: Skipping bogus GPS IFD tag %d (0x%04X) ...\n",t,t);
                   continue;
                 }
             }
@@ -3223,7 +3321,7 @@ FindEXIFAttribute(const unsigned char *profile_info,
                 {
                   if (debug)
                     fprintf(stderr,
-                        "EXIF: Skipping bogus EXIF IFD tag %d ...\n",t);
+                            "EXIF: Skipping bogus EXIF IFD tag %d (0x%04X) ...\n",t,t);
                   continue;
                 }
             }
@@ -3478,7 +3576,7 @@ SetImageAttribute(Image *image,const char *key,const char *value)
               */
               min_l=p->length+attribute->length+1;
               for (realloc_l=2; realloc_l <= min_l; realloc_l *= 2)
-                    { /* nada */};
+                { /* nada */};
               MagickReallocMemory(char *,p->value,realloc_l);
               if (p->value != (char *) NULL)
                 {
