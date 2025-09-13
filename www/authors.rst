@@ -27,19 +27,18 @@ Bob Friesenhahn
                 and the C, C++, and Perl test suites used by ImageMagick
                 and GraphicsMagick.
 
+Former GraphicsMagick Contributors
+==================================
+
 Jaroslav Fojtik
-                Authored the ART, CUT, HRZ, JNX, MAC, MATLAB, TOPOL,
-                and WPG coder modules. Improved the FITS and TXT coder
-                modules.  VisualMagick 'configure' improvements and
-                build testing/fixes for many versions of Microsoft
-                Visual Studio.
+                Authored the AAI, ART, CUT, HRZ, JNX, MAC, MATLAB,
+                ORA, TOPOL, and WPG coder modules. Improved the FITS,
+                TGA, and TXT coder modules.  VisualMagick 'configure'
+                improvements and build testing/fixes for many versions
+                of Microsoft Visual Studio.
 
 Tobias Mark
                 Authored the HEIF and JPEG XL coder modules.
-
-
-Former GraphicsMagick Contributors
-==================================
 
 Glenn Randers-Pehrson
                 Contributed significantly to the utilities, including
