@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -66,10 +66,10 @@ typedef struct
                                    addresses of tiles in the raster (adreses
                                    are counted from 0) */
   magick_uint32_t TileByteCounts;/* offset to array of words, that contain amount of bytes stored in
-                                   tiles. The tile size might vary depending on
-                                   the value TileCompression */
+                                    tiles. The tile size might vary depending on
+                                    the value TileCompression */
   magick_uint8_t TileCompression;/* 0 - uncompressed, 1 - variant TIFF
-                                   Packbits, 2 - CCITT G3 */
+                                    Packbits, 2 - CCITT G3 */
 
   magick_uint8_t Dummy[423];
 } RasHeader;
@@ -359,7 +359,7 @@ static ImageInfo *CheckFName(ImageInfo *clone_info, size_t *i)
         }
       if (c=='/' || c=='\\' || c==':')
         {
-          j = *i;
+          j = (long) *i;
           break;	/* *i will remain intact. */
         }
     }
@@ -867,7 +867,7 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
   int bpp;
   ExportPixelAreaInfo export_info;
 
-	/* Open output image file. */
+  /* Open output image file. */
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *)NULL);
@@ -881,35 +881,35 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
   Header.Cols = image->columns;
   Header.Rows = image->rows;
   if (image->colors>=1 && image->colors<=256)
-  {
-    if (image->colors <= 2)
     {
-      Header.FileType = 0;
-      DataSize = ((size_t) Header.Cols+7) / 8;
-      qt = GrayQuantum;
-      bpp =1;
-    } else if (image->colors <= 16)
-    {
-      Header.FileType = 4;
-      DataSize = ((size_t) Header.Cols+1) / 2;
-      qt = IndexQuantum;
-      bpp = 4;
+      if (image->colors <= 2)
+        {
+          Header.FileType = 0;
+          DataSize = ((size_t) Header.Cols+7) / 8;
+          qt = GrayQuantum;
+          bpp =1;
+        } else if (image->colors <= 16)
+        {
+          Header.FileType = 4;
+          DataSize = ((size_t) Header.Cols+1) / 2;
+          qt = IndexQuantum;
+          bpp = 4;
+        }
+      else
+        {
+          Header.FileType = 2;
+          DataSize = Header.Cols;
+          qt = IndexQuantum;
+          bpp = 8;
+        }
     }
-    else
+  else /* RGB */
     {
-      Header.FileType = 2;
-      DataSize = Header.Cols;
-      qt = IndexQuantum;
+      Header.FileType = 5;
+      DataSize = (size_t) 3*Header.Cols;
+      qt = RGBQuantum;
       bpp = 8;
     }
-  }
-  else /* RGB */
-  {
-    Header.FileType = 5;
-    DataSize = (size_t) 3*Header.Cols;
-    qt = RGBQuantum;
-    bpp = 8;
-  }
 
   if (DataSize==0)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
@@ -945,32 +945,32 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
 
   WriteBlob(image, 423, Header.Dummy);
   if (GetBlobStatus(image))
-     ThrowWriterException(FileOpenError,UnableToWriteFile,image);
+    ThrowWriterException(FileOpenError,UnableToWriteFile,image);
 
-	/* Store image data. */
+  /* Store image data. */
   for (y=0; y<(long)image->rows; y++)
-  {
-    if (AcquireImagePixels(image,0,y,image->columns,1,&image->exception)  == (const PixelPacket *)NULL)
     {
-      status=MagickFail;
-      break;
+      if (AcquireImagePixels(image,0,y,image->columns,1,&image->exception)  == (const PixelPacket *)NULL)
+        {
+          status=MagickFail;
+          break;
+        }
+      if (ExportImagePixelArea(image,qt,bpp,pixels,0,&export_info) != MagickPass)
+        {
+          status = MagickFail;
+          break;
+        }
+      if (DataSize != export_info.bytes_exported)
+        {
+          status = MagickFail;
+          break;
+        }
+      if (WriteBlob(image,DataSize,pixels) != DataSize)
+        {
+          status = MagickFail;
+          break;
+        }
     }
-    if (ExportImagePixelArea(image,qt,bpp,pixels,0,&export_info) != MagickPass)
-    {
-      status = MagickFail;
-      break;
-    }
-    if (DataSize != export_info.bytes_exported)
-    {
-      status = MagickFail;
-      break;
-    }
-    if (WriteBlob(image,DataSize,pixels) != DataSize)
-    {
-      status = MagickFail;
-      break;
-    }
-  }
 
   status &= CloseBlob(image); /* valgrind reports write of uninitialized data */
   MagickFreeResourceLimitedMemory(pixels);
@@ -979,52 +979,52 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
     ThrowWriterException(FileOpenError,UnableToWriteFile,image);
 
 
-	/* Palette */
+  /* Palette */
   if (qt == IndexQuantum)
-  {
-    ImageInfo *clone_info;
-    size_t i;
-    if ((clone_info=CheckFName(CloneImageInfo(image_info),&i)) != NULL)
     {
-      (void)strlcpy(clone_info->filename+i,".pal",sizeof(clone_info->filename)-i);
-      if ((clone_info->file=fopen(clone_info->filename,"wb"))!=NULL)
-      {
-        Image *Palette;
-        if ((Palette=AllocateImage(clone_info)) != NULL)
+      ImageInfo *clone_info;
+      size_t i;
+      if ((clone_info=CheckFName(CloneImageInfo(image_info),&i)) != NULL)
         {
-          ExceptionInfo exception;
-          if (OpenBlob(clone_info,Palette,WriteBinaryBlobMode,&exception))
-          {
-            size_t j;
-            if (Header.FileType == 2)
-              j = 256;
-            else
-              j = 15;
-            WriteBlobByte(Palette,(magick_uint8_t) j);
-            for (i=0; i<j; i++)
+          (void)strlcpy(clone_info->filename+i,".pal",sizeof(clone_info->filename)-i);
+          if ((clone_info->file=fopen(clone_info->filename,"wb"))!=NULL)
             {
-              WriteBlobByte(Palette, i&0xFF);
-              if (i<image->colors)
-              {
-                WriteBlobByte(Palette, (magick_uint8_t)i);
-                WriteBlobByte(Palette, (magick_uint8_t)i);
-                WriteBlobByte(Palette, (magick_uint8_t)i);
-              }
-              else
-              {
-                WriteBlobByte(Palette,ScaleQuantumToChar(image->colormap[i].red));
-                WriteBlobByte(Palette,ScaleQuantumToChar(image->colormap[i].green));
-                WriteBlobByte(Palette,ScaleQuantumToChar(image->colormap[i].blue));
-              }
+              Image *Palette;
+              if ((Palette=AllocateImage(clone_info)) != NULL)
+                {
+                  ExceptionInfo exception;
+                  if (OpenBlob(clone_info,Palette,WriteBinaryBlobMode,&exception))
+                    {
+                      size_t j;
+                      if (Header.FileType == 2)
+                        j = 256;
+                      else
+                        j = 15;
+                      WriteBlobByte(Palette,(magick_uint8_t) j);
+                      for (i=0; i<j; i++)
+                        {
+                          WriteBlobByte(Palette, i&0xFF);
+                          if (i<image->colors)
+                            {
+                              WriteBlobByte(Palette, (magick_uint8_t)i);
+                              WriteBlobByte(Palette, (magick_uint8_t)i);
+                              WriteBlobByte(Palette, (magick_uint8_t)i);
+                            }
+                          else
+                            {
+                              WriteBlobByte(Palette,ScaleQuantumToChar(image->colormap[i].red));
+                              WriteBlobByte(Palette,ScaleQuantumToChar(image->colormap[i].green));
+                              WriteBlobByte(Palette,ScaleQuantumToChar(image->colormap[i].blue));
+                            }
+                        }
+                      status &= CloseBlob(Palette);
+                    }
+                  DestroyImage(Palette);
+                }
             }
-            status &= CloseBlob(Palette);
-          }
-          DestroyImage(Palette);
+          DestroyImageInfo(clone_info);
         }
-      }
-      DestroyImageInfo(clone_info);
     }
-  }
 
   if (logging)
     (void)LogMagickEvent(CoderEvent,GetMagickModule(),"return TopoL");

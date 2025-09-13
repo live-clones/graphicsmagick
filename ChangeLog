@@ -1,5 +1,9 @@
 2025-09-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/topol.c (CheckFName): Mask a needless type conversion
+	warning. Whitespace-cleanup and indent according to project
+	conventions.
+
 	* magick/blob.c (BlobToFile): Mask a needless type conversion warning.
 
 	* magick/magic.c (ListMagicInfo): Avoid needless type conversion warnings.
