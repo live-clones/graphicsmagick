@@ -371,7 +371,7 @@ ListMagicInfo(FILE *file,ExceptionInfo *exception)
     offset_size_max=offset_size,
     target_size_max=Max(target_size,16);
 
-  register unsigned int
+  register size_t
     i,
     j;
 

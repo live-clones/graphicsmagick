@@ -647,7 +647,7 @@ MagickExport MagickPassFail BlobToFile(const char *filename,const void *blob,
             amount;
 
           remaining=length - i;
-          amount=Min(remaining,block_size);
+          amount=(MAGICK_POSIX_IO_SIZE_T) Min(remaining,block_size);
           count=write(file,(char *) blob+i,amount);
           if (count <= 0)
             break;

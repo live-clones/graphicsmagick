@@ -1,3 +1,9 @@
+2025-09-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/blob.c (BlobToFile): Mask a needless type conversion warning.
+
+	* magick/magic.c (ListMagicInfo): Avoid needless type conversion warnings.
+
 2025-09-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/attribute.c (tag_table): Use bit-fields and OR logic to
