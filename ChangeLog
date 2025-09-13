@@ -1,5 +1,9 @@
 2025-09-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* www/authors.rst: Moved Jaroslav Fojtik and Tobias Mark to former
+	contributor status. Added missing contributions by Jaroslav
+	Fojtik.
+
 	* coders/topol.c (CheckFName): Mask a needless type conversion
 	warning. Whitespace-cleanup and indent according to project
 	conventions.
