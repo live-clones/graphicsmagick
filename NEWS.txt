@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to July 5, 2025.
+This file was last updated to reflect changes up to September 14, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -56,9 +56,13 @@ Bug fixes:
 * JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
   inverted. This bug is now fixed.
 
-* PNG: Fix broken tRNS table when writing via "PNG8". Warn if pixel
-  transparencies are independent of color palette, since this results
-  in a loss of image quality. Remove output file if an error occurs.
+* PNG8: It is decided that PNG8 does indeed mean indexed-color with
+  8-bit sample depth and only binary transparency is supported.  With
+  this objective, the PNG8 writer is re-implemented, including
+  attempting to produce reasonable output when the original image can
+  not be represented completely due to too many colors, or complex
+  opacity.  There is still much work to be done to produce optimum
+  output given complex/messy images.
 
 * MNG: Validate that Validate that MNG width or height is non-zero.
 
@@ -99,6 +103,10 @@ Bug fixes:
 * TransformImage(), and -crop: Sove the problem "-crop does not
   generate tiles when used with a percentage"
 
+* DrawImage(): Fix derefrence of a NULL pointer as well as shoring up
+  error handling related to DrawPatternPath().
+
+
 New Features:
 
 * Support the newer Artifex urw-base35-fonts.  Both OpenType and
@@ -122,6 +130,12 @@ New Features:
   multiple libraries are using libtiff within the same process.
 
 * EXIF attribute decoding is now updated to support Exif Version 3.0.
+
+* EXIF validation is added, based on the expected EXIF tag format and
+  expected number of components.  Quite a lot of testing was done to
+  discover (and allow) minor deviations from the specification. The
+  validation is done to detect and prevent the reproduction of
+  incorherent "garble".
 
 API Updates:
 
@@ -158,7 +172,18 @@ Build Changes:
   GraphicsMagick optionally uses had already adopted a C'99 or
   C'11 (2011) requirement.
 
-* Use Autoconf 2.72.
+* The Autoconf-based configure script is significantly re-written so
+  that it takes advantage of everything learned via pkg-config, but
+  continues to be able to function if pkg-config data is not
+  available. In particular, the primary library name (e.g. '-lpng16d')
+  produced by pkg-config data is deduced, and used, if available.  The
+  configuration summary at the end now includes a listing of all of
+  the direct dependencies required to link with each delegate library.
+  Static library based builds (as used in the oss-fuzz builds) require
+  that all of the dependencies are listed and so they produce a larger
+  dependency summary than when shared libraries are used.
+
+* Use Autoconf 2.72 and require Autoconf 2.71 (or later).
 
 * Use Automake 1.17.
 

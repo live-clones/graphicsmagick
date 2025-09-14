@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to July 5, 2025.</p>
+<p>This file was last updated to reflect changes up to September 14, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -133,9 +133,13 @@ image is indicated to be opaque. This avoids issues with code which
 assumes that the opacity channel is always initialized.</p></li>
 <li><p>JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
 inverted. This bug is now fixed.</p></li>
-<li><p>PNG: Fix broken tRNS table when writing via &quot;PNG8&quot;. Warn if pixel
-transparencies are independent of color palette, since this results
-in a loss of image quality. Remove output file if an error occurs.</p></li>
+<li><p>PNG8: It is decided that PNG8 does indeed mean indexed-color with
+8-bit sample depth and only binary transparency is supported.  With
+this objective, the PNG8 writer is re-implemented, including
+attempting to produce reasonable output when the original image can
+not be represented completely due to too many colors, or complex
+opacity.  There is still much work to be done to produce optimum
+output given complex/messy images.</p></li>
 <li><p>MNG: Validate that Validate that MNG width or height is non-zero.</p></li>
 <li><p>TclMagick: The TclMagick build uses the latest TEA tcl.m4 macros,
 while modernizing the Automake and Autoconf files. Many defects in
@@ -163,6 +167,8 @@ recursion.</p></li>
 default bounds.</p></li>
 <li><p>TransformImage(), and -crop: Sove the problem &quot;-crop does not
 generate tiles when used with a percentage&quot;</p></li>
+<li><p>DrawImage(): Fix derefrence of a NULL pointer as well as shoring up
+error handling related to DrawPatternPath().</p></li>
 </ul>
 <p>New Features:</p>
 <ul class="simple">
@@ -182,6 +188,11 @@ TIFFErrorExtR() in order to provide an error handling context per
 TIFF handle.  This improves concurrency and thread safety when
 multiple libraries are using libtiff within the same process.</p></li>
 <li><p>EXIF attribute decoding is now updated to support Exif Version 3.0.</p></li>
+<li><p>EXIF validation is added, based on the expected EXIF tag format and
+expected number of components.  Quite a lot of testing was done to
+discover (and allow) minor deviations from the specification. The
+validation is done to detect and prevent the reproduction of
+incorherent &quot;garble&quot;.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
@@ -215,7 +226,17 @@ adding the C'99 requirement is part of an effort to simplify
 GraphicsMagick configuration requirements.  Libraries that
 GraphicsMagick optionally uses had already adopted a C'99 or
 C'11 (2011) requirement.</p></li>
-<li><p>Use Autoconf 2.72.</p></li>
+<li><p>The Autoconf-based configure script is significantly re-written so
+that it takes advantage of everything learned via pkg-config, but
+continues to be able to function if pkg-config data is not
+available. In particular, the primary library name (e.g. '-lpng16d')
+produced by pkg-config data is deduced, and used, if available.  The
+configuration summary at the end now includes a listing of all of
+the direct dependencies required to link with each delegate library.
+Static library based builds (as used in the oss-fuzz builds) require
+that all of the dependencies are listed and so they produce a larger
+dependency summary than when shared libraries are used.</p></li>
+<li><p>Use Autoconf 2.72 and require Autoconf 2.71 (or later).</p></li>
 <li><p>Use Automake 1.17.</p></li>
 <li><p>Update Libtool to version 2.5.4.</p></li>
 <li><p>Test and demo programs are added to Coverity analysis.  This
