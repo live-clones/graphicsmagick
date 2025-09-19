@@ -1523,15 +1523,15 @@ FindEXIFTableEntryByTag(const unsigned int t,
 }
 
 /*
-  Convert an EXIF tag ID to a tag description
+  Convert an EXIF IFD tag ID to a tag description
 
-  An EXIF tag value to be translated, and a buffer of at least
+  An EXIF IFD tag value to be translated, and a buffer of at least
   MaxTextExtent length are passed as arguments.  For convenience, the
   converted string is returned.
 */
 
 static const char *
-EXIFTagToDescription(unsigned int t, char *tag_description)
+EXIFIfdTagToDescription(unsigned int t, char *tag_description)
 {
   const IFDTagTableType *key_p;
 
@@ -1564,10 +1564,10 @@ EXIFTagToDescription(unsigned int t, char *tag_description)
 }
 
 /*
-  Convert an EXIF tag description to a tag ID.
+  Convert an EXIF IFD tag description to a tag ID.
 */
 static int
-EXIFDescriptionToTag(const char *description)
+EXIFIfdTagDescriptionToTagId(const char *description)
 {
   unsigned int
     i;
@@ -1579,55 +1579,56 @@ EXIFDescriptionToTag(const char *description)
   return -1;
 }
 
+/*
+  Convert a TIFF IFD field value type to string description
+*/
 static const char *
-EXIFFormatToDescription(unsigned int f)
+EXIFIfdFieldTypeToStr(unsigned int f)
 {
   const char
-    *description;
-
-  description="unknown";
+    *str="unknown";
 
   switch (f)
     {
     case EXIF_FMT_BYTE:
-      description="BYTE";
+      str="BYTE";
       break;
     case EXIF_FMT_ASCII:
-      description="STRING";
+      str="STRING";
       break;
     case EXIF_FMT_USHORT:
-      description="USHORT";
+      str="USHORT";
       break;
     case EXIF_FMT_ULONG:
-      description="ULONG";
+      str="ULONG";
       break;
     case EXIF_FMT_URATIONAL:
-      description="URATIONAL";
+      str="URATIONAL";
       break;
     case EXIF_FMT_SBYTE:
-      description="SBYTE";
+      str="SBYTE";
       break;
     case EXIF_FMT_UNDEFINED:
-      description="UNDEFINED";
+      str="UNDEFINED";
       break;
     case EXIF_FMT_SSHORT:
-      description="SSHORT";
+      str="SSHORT";
       break;
     case EXIF_FMT_SLONG:
-      description="SLONG";
+      str="SLONG";
       break;
     case EXIF_FMT_SRATIONAL:
-      description="SRATIONAL";
+      str="SRATIONAL";
       break;
     case EXIF_FMT_SINGLE:
-      description="SINGLE";
+      str="SINGLE";
       break;
     case EXIF_FMT_DOUBLE:
-      description="DOUBLE";
+      str="DOUBLE";
       break;
     }
 
-  return description;
+  return str;
 }
 
 static const unsigned int
@@ -1716,6 +1717,45 @@ static MagickPassFail ValidateExifFmtAgainstBitField(const IFDTagTableType *key_
   else
     status=MagickFail;
   return status;
+}
+
+/*
+  For a given IFD type and tag, validate that the claimed format and components are valid.
+*/
+static MagickPassFail ValidateIfdTagFmt(const MagickBool gpstag, const unsigned int tag, const int claimed_format, const unsigned int claimed_components)
+{
+  int valid=MagickTrue;
+
+  if (gpstag)
+    {
+      if (/* (t < GPS_TAG_START) ||*/ (tag > GPS_TAG_STOP))
+        valid=MagickFalse;
+    }
+  else
+    {
+      if ((tag < EXIF_TAG_START) || ( tag > EXIF_TAG_STOP))
+        valid=MagickFalse;
+    }
+
+  if (valid)
+    {
+      const IFDTagTableType *key_p = FindEXIFTableEntryByTag(tag,tag_table,ArraySize(tag_table));
+      if (key_p)
+        {
+          /* Validate format */
+          if (ValidateExifFmtAgainstBitField(key_p,claimed_format) != MagickPass)
+            {
+              valid=MagickFalse;
+            }
+
+          /* Validate number of components */
+          if (!((key_p->count == AnyCount) || (key_p->count <= 0) || (claimed_components <= (unsigned int) key_p->count)))
+            {
+              valid=MagickFalse;
+            }
+        }
+    }
+  return valid;
 }
 
 static magick_int16_t
@@ -1995,7 +2035,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
         /*
           Try to match the text with a tag name instead.
         */
-        tag=EXIFDescriptionToTag(key);
+        tag=EXIFIfdTagDescriptionToTagId(key);
         if (logging && debug)
           (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                 "EXIF: Found tag %d for key \"%s\"",tag,key);
@@ -2198,63 +2238,34 @@ GenerateEXIFAttribute(Image *image,const char *specification)
               goto generate_attribute_failure;
             }
 
-          if (gpsfound)
-            {
-              if (/* (t < GPS_TAG_START) || */ (t > GPS_TAG_STOP))
-                {
-                  if (logging & debug)
-                    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                          "EXIF: Skipping bogus GPS IFD tag %d (0x%04X) ...",t,t);
-                  continue;
-                }
-            }
-          else
-            {
-              if ((t < EXIF_TAG_START) || ( t > EXIF_TAG_STOP))
-                {
-                  if (logging & debug)
-                    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                          "EXIF: Skipping bogus EXIF IFD tag %d (0x%04X) ...",t,t);
-                  continue;
-                }
-            }
-
           /* if (logging && debug) */
             {
+              const char *ifd_type;
+              if (gpsfound)
+                ifd_type="GPS";
+              else
+                ifd_type="EXIF";
+
               /*
                 Enable logging via:
 
                 MAGICK_DEBUG=transform MAGICK_DEBUG_EXIF=TRUE gm convert file.jpg -format '%[EXIF:*]' info:-
               */
-              int expected_format=f;
-              int valid=MagickTrue;
-              const IFDTagTableType *key_p = FindEXIFTableEntryByTag(t,tag_table,ArraySize(tag_table));
-              if (key_p)
-                {
-                  /* Validate format */
-                  if (ValidateExifFmtAgainstBitField(key_p,expected_format) != MagickPass)
-                    {
-                      valid=MagickFalse;
-                    }
-
-                  /* Validate number of components */
-                  if (!((key_p->count == AnyCount) || (key_p->count <= 0) || (c <= (unsigned int) key_p->count)))
-                    {
-                      valid=MagickFalse;
-                    }
-                }
+              int valid = ValidateIfdTagFmt(gpsfound,t,f,c);
 
               (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                    "EXIF: TagVal=%d (0x%04x) TagDescr=\"%s\" Format=%d "
-                                    "FormatDescr=\"%s\"  Components=%u Valid=%s",t,t,
-                                    EXIFTagToDescription(t,tag_description),f,
-                                    EXIFFormatToDescription(f),c,
+                                    "%s IFD: TagVal=%d (0x%04x) TagDescr=\"%s\" Format=%d "
+                                    "FormatDescr=\"%s\"  Components=%u Valid=%s",
+                                    ifd_type,
+                                    t,t,
+                                    EXIFIfdTagToDescription(t,tag_description),f,
+                                    EXIFIfdFieldTypeToStr(f),c,
                                     valid == MagickFail ? "No" : "Yes");
               if (valid != MagickTrue)
                 {
                   if (logging & debug)
                     (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                          "EXIF: Skipping bogus EXIF tag %d (0x%04X) ...",t,t);
+                                          "Skipping bogus %s tag %d (0x%04X) ...",ifd_type,t,t);
                   continue;
                 }
             }
@@ -2538,7 +2549,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                     {
                     case 1:
                       {
-                        description=EXIFTagToDescription(t,tag_description);
+                        description=EXIFIfdTagToDescription(t,tag_description);
                         FormatString(s,"%.1024s=",description);
                         (void) ConcatenateString(&final,s);
                         break;
@@ -3301,8 +3312,8 @@ FindEXIFAttribute(const unsigned char *profile_info,
               fprintf(stderr,
                       "EXIF: TagVal=%d  TagDescr=\"%s\" Format=%d  "
                       "FormatDescr=\"%s\"  Components=%u\n",t,
-                      EXIFTagToDescription(t,tag_description),f,
-                      EXIFFormatToDescription(f),c);
+                      EXIFIfdTagToDescription(t,tag_description),f,
+                      EXIFIfdFieldTypeToStr(f),c);
             }
 
           if (gpsfound)

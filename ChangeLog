@@ -1,3 +1,10 @@
+2025-09-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/attribute.c (ValidateIfdTagFmt): Extract tag validation
+	code into a reusable function.  Improve tracing.
+
+	* coders/tiff.c (AddIFDExifFields): Trace the field type name.
+
 2025-09-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.
