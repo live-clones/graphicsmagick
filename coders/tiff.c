@@ -4633,6 +4633,68 @@ static const char *FipFieldName(const TIFFField *fip)
   return "UNSUPPORTED";
 }
 
+static const char *FipFieldTypeToStr(const TIFFDataType data_type)
+{
+  const char *str = "UNKNOWN";
+  switch (data_type)
+    {
+    case TIFF_NOTYPE:     /* placeholder */
+      str = "NOTYPE";
+      break;
+    case TIFF_BYTE:       /* 8-bit unsigned integer */
+      str = "BYTE";
+      break;
+    case TIFF_ASCII:      /* 8-bit bytes w/ last byte null */
+      str = "STRING";     /* vs "ASCII */
+      break;
+    case TIFF_SHORT:      /* 16-bit unsigned integer */
+      str = "USHORT";
+      break;
+    case TIFF_LONG:       /* 32-bit unsigned integer */
+      str = "ULONG";
+      break;
+    case TIFF_RATIONAL:   /* 64-bit unsigned fraction */
+      str = "URATIONAL";
+      break;
+    case TIFF_SBYTE:      /* !8-bit signed integer */
+      str = "SBYTE";
+      break;
+    case TIFF_UNDEFINED:  /* !8-bit untyped data */
+      str = "UNDEFINED";
+      break;
+    case TIFF_SSHORT:     /* !16-bit signed integer */
+      str = "SSHORT";
+      break;
+    case TIFF_SLONG:      /* !32-bit signed integer */
+      str = "SLONG";
+      break;
+    case TIFF_SRATIONAL: /* !64-bit signed fraction */
+      str = "SRATIONAL";
+      break;
+    case TIFF_FLOAT:     /* !32-bit IEEE floating point */
+      str = "FLOAT";
+      break;
+    case TIFF_DOUBLE:    /* !64-bit IEEE floating point */
+      str = "DOUBLE";
+      break;
+    case TIFF_IFD:       /* %32-bit unsigned integer (offset) */
+      str = "IFD";
+      break;
+#if defined(HasBigTIFF)
+    case TIFF_LONG8:     /* BigTIFF 64-bit unsigned integer */
+      str = "LONG8";
+      break;
+    case TIFF_SLONG8:    /* BigTIFF 64-bit signed integer */
+      str = "SLONG8";
+      break;
+    case TIFF_IFD8:       /* BigTIFF 64-bit unsigned integer (offset) */
+      str = "IFD8";
+      break;
+#endif /* if defined(HasBigTIFF) */
+    }
+  return str;
+}
+
 
 static int CheckAndStoreStr(TIFF *tiff, const magick_uint16_t Tag, const char *String, const magick_uint32_t StrSize)
 {
@@ -4719,9 +4781,9 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
           fip = TIFFFindField(tiff, Tag, TIFF_ANY);
           if (logging && (Flags & FLAG_BASE) != 0)
             (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                                 "Extracted tag from EXIF %xh.H (%u), Field %u, Long2 %u, val %u %s",
-                                 (unsigned) Tag, (unsigned) Tag, (unsigned) Field, (unsigned) Long2,
-                                 (unsigned) Value, FipFieldName(fip));
+                                 "Extracted tag from EXIF %xh.H (%u), Field %u (%s), Long2 %u, val %u %s",
+                                 (unsigned) Tag, (unsigned) Tag, (unsigned) Field, FipFieldTypeToStr(Field),
+                                 (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
 
           if (Tag == TIFFTAG_COLORMAP ||
               Tag == TIFFTAG_COMPRESSION ||
@@ -4820,7 +4882,12 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                       if (FDT != Field)
                         break;                        /* Incompatible array type, might be converted in future. */
                       if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
-                        break;                        /* Fixed size arrays not handled. */
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"%s fixed size arrays are not supported yet.",
+                                                 FipFieldTypeToStr(Field));
+                          break;                      /* Fixed size arrays not handled. */
+                        }
                       if ((Value > (Value+2U*Long2)) || (Value+2U*Long2 >= profile_length-1))
                         break;
                       if (Long2 == 0)
@@ -4852,7 +4919,12 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                       if (FDT!=Field)
                         break;                        /* Incompatible array type, might be converted in future. */
                       if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
-                        break;                                   /* Fixed size arrays not handled. */
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"%s fixed size arrays are not supported yet.",
+                                                 FipFieldTypeToStr(Field));
+                          break;                      /* Fixed size arrays not handled. */
+                        }
                       if ((Value > (Value+4U*Long2)) || (Value+4U*Long2 >= profile_length-1))
                         break;
                       if (Long2==0)
