@@ -1,3 +1,13 @@
+2025-09-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* VisualMagick/CMakeLists.txt: Increase WINVER to 0x501 so that
+	configure may be compiled using Visual Studio 2022.
+	* VisualMagick/configure/welcome_page.cpp: Update welcome page
+	text so that it fits the screen, and it says that Visual Studio
+	2019 (or later) is required.
+	* VisualMagick/configure/configure.exe: Update pre-compiled
+	configure binary, which is compiled using Visual Studio 2022.
+
 2025-09-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/attribute.c (ValidateIfdTagFmt): Extract tag validation
