@@ -24,10 +24,11 @@ Prerequisites
 
   Windows release packages after June 18, 2025 require the common
   `Microsoft Visual C++ Redistributable version
-  <https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170>`
+  <https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170>`_
   to be installed in order to be able to execute.  Most modern Windows
   systems (Windows 8 and later) very likely already have this
-  installed.
+  installed, and it will be updated automatically by the Windows
+  update mechanisms.
 
   While multiple versions of GraphicsMagick may be installed at one
   time, if your intention is to replace a prior installation of

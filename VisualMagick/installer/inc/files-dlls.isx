@@ -1,6 +1,6 @@
 #ifdef COPYRIGHT
 ;
-; Copyright (C) 2003 - 2023 GraphicsMagick Group
+; Copyright (C) 2003-2025 GraphicsMagick Group
 ;
 ; This program is covered by multiple licenses, which are described in
 ; Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -18,12 +18,16 @@
   #ifdef VC_2013
    Source: "redist\VC2013\vcredist_x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: VCRedistNeedsInstall
   #else
-   Source: "redist\VC2008SP1\vcredist_x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: VCRedistNeedsInstall
+   ; Default to not bundling any run-time at all.  Just assume that the computer already has it!
+   ; See https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+   ;Source: "redist\VC2008SP1\vcredist_x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: VCRedistNeedsInstall
   #endif
  #endif
 #else
   #define  public CPUARCH "x86"
-  Source: "redist\VC2008SP1\vcredist_x86.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: VCRedistNeedsInstall
+  ; Default to not bundling any run-time at all.  Just assume that the computer already has it!
+  ; See https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+  ;Source: "redist\VC2008SP1\vcredist_x86.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: VCRedistNeedsInstall
 #endif
 
 ;

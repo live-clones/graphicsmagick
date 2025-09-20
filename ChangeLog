@@ -1,5 +1,11 @@
 2025-09-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* VisualMagick/installer/inc/files-dlls.isx: For modern Visual
+	Studio 2019 and later (which is all we support now), default to
+	not bundling any run-time at all.  Just assume that the computer
+	already has it!  Visual Studio 2015, 2017, 2019, and 2022 all use
+	the same runtime package, and it is a system component.
+
 	* VisualMagick/CMakeLists.txt: Increase WINVER to 0x501 so that
 	configure may be compiled using Visual Studio 2022.
 	* VisualMagick/configure/welcome_page.cpp: Update welcome page
