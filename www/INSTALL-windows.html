@@ -68,6 +68,7 @@
 <li><p><a class="reference internal" href="#visual-c-16-x-through-17-13-6-compilation" id="toc-entry-19">Visual C++ 16.X through 17.13.6 Compilation</a></p></li>
 <li><p><a class="reference internal" href="#environment-variables" id="toc-entry-20">Environment Variables</a></p></li>
 <li><p><a class="reference internal" href="#windows-distribution-build-procedure" id="toc-entry-21">Windows Distribution Build Procedure</a></p></li>
+<li><p><a class="reference internal" href="#windows-distribution-3rd-party-source-code" id="toc-entry-22">Windows Distribution 3rd Party Source Code</a></p></li>
 </ul>
 </li>
 </ul>
@@ -814,6 +815,113 @@ double-clicking from Windows Explorer.</p>
 <li><p>Distribution package is available named similar to
 <span class="docutils literal"><span class="pre">GM\VisualMagick\bin\GraphicsMagick-1.3-Q8-dll.exe</span></span></p></li>
 </ol>
+</blockquote>
+</section>
+<section id="windows-distribution-3rd-party-source-code">
+<h2><a class="toc-backref" href="#toc-entry-22" role="doc-backlink">Windows Distribution 3rd Party Source Code</a></h2>
+<p>The following is a summary of the bundled 3rd party sources which may
+be used in the Microsoft Windows Visual Studio build.</p>
+<p>The release version, and the year the code was last updated is
+indicated.</p>
+<p>Due to the technology available at the time (1998-2002), and ease of
+use, it was decided to bundle 3rd party code into the GraphicsMagick
+Mercurial repository.  This may have been best practice at the time,
+but it is not the preferred approach to building open-source code
+under Microsoft Windows any more (<a class="reference external" href="https://cmake.org/">CMake</a> in
+conjunction with <a class="reference external" href="https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell">vcpkg</a>
+is the popular solution now).  There was a cost incurred in that the
+3rd party code increased the Mercurial repository size and created
+more maintenance for GraphicsMagick.</p>
+<p>The bullet names are the subdirectory name where the source code may
+be found:</p>
+<blockquote>
+<ul>
+<li><p>bzlib</p>
+<p>bzlib 1.0.8 (from 2019)</p>
+<p>A library to support reading and writing files with bzip2 lossless,
+block-sorting data compression.  This compression is supported by
+the MIFF file format.</p>
+<p>This code only receives security and bug fixes.</p>
+</li>
+<li><p>dcraw</p>
+<p>dcraw 9.27 (from 2016)</p>
+<p>A delegate utility to read RAW camera files.</p>
+<p>This code is no longer developed.</p>
+</li>
+<li><p>hp2xx</p>
+<p>hp2xx 3.4.2 (from 2001)</p>
+<p>Very old source code to a 'hp2xx' delegate program necessary to read HPGL files.</p>
+<p>Hp2xx is protected by the full GPLv2 license.</p>
+<p>This code is no longer developed.</p>
+</li>
+<li><p>jbig</p>
+<p>JBIG-KIT 2.1 (from 2014)</p>
+<p>This is necessary to read and write JBIG files, or use JBIG compression in libtiff.</p>
+<p>Note that JBIG-KIT is protected by the full GPLv2 license (not
+LGPL), and use under some other license requires obtaining a
+commercial license from the authors.</p>
+<p>This code is no longer be developed.</p>
+</li>
+<li><p>jp2</p>
+<p>Jasper 2.0.33 (from 2021)</p>
+<p>This is necessary to read and write JPEG 2000 files.</p>
+</li>
+<li><p>jpeg</p>
+<p>jpeg 9f (from 2024)</p>
+<p>This is the IJG JPEG library, most recently developed and maintained by Guido Vollbeding.
+This is different than the libjpeg-turbo fork developed by Darrell R Commander (DRC).</p>
+</li>
+<li><p>lcms</p>
+<p>lcms 2.9 (from 2019)</p>
+<p>This is necessary in order to support CMS color profiles.</p>
+</li>
+<li><p>libxml</p>
+<p>libxml 2.9.10 (from 2019)</p>
+<p>This is necessary in order to parse XML files.  The SVG format
+reader and the 'conjure' utility use this library.</p>
+</li>
+<li><p>png</p>
+<p>libpng 1.6.37 (from 2019)</p>
+<p>This is necessary in order to read and write PNG and MNG files.</p>
+</li>
+<li><p>ralcgm</p>
+<p>RAL-CGM 3.50 (from 1995).</p>
+<p>This is extremely old source code for a delegate program ('ralcgm')
+necessary to read CGM (Computer Graphics Metafile) format
+standardized as ISO/IEC 8632.  Please note that the license for
+this code prohibits it from being sold for profit or incorporated
+into a product except via a commerical license.</p>
+<p>This code is no longer developed.</p>
+</li>
+<li><p>tiff</p>
+<p>libtiff 4.5.1 (from 2023)</p>
+<p>This library is necessary to read and write the TIFF file format.</p>
+</li>
+<li><p>ttf</p>
+<p>FreeType 2.6.2 (from 2015).</p>
+<p>This library is necessary to use TrueType and OpenType fonts.</p>
+</li>
+<li><p>wmf</p>
+<p>libwmf 0.2.2 (from 2001)</p>
+<p>This is necessary to parse and read 16-bit Windows Meta Files (WMF)
+files.</p>
+<p>This code is no longer developed.</p>
+<p>While there is a newer version of this library at SourceForge, it
+is actually somewhat corrupted by someone who was not previously a
+libwmf developer, and the license was changed to the full GPLv2
+license (rather than LGPL).</p>
+</li>
+<li><p>xlib</p>
+<p>This allows building GrapicsMagick with MIT X11 support under
+Microsoft Windows via a pre-compiled X11 DLL library.  This is not
+really used any more.</p>
+</li>
+<li><p>zlib</p>
+<p>zlib 1.2.11 (from 2019)</p>
+<p>This supports reading and writing gzipped (.gz) files, as well as
+gzip compression in the MIFF file format.</p>
+</li>
+</ul>
 </blockquote>
 </section>
 </section>

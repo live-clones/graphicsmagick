@@ -1,3 +1,11 @@
+2025-09-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* www/INSTALL-windows.rst: Provide a summary description of the
+	3rd party libraries included in the VisualMagick source tree.
+	Include when the source code was last updated by the original
+	authors, or last updated in the Mercurial repository if the code
+	is still being developed.
+
 2025-09-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* VisualMagick/installer/inc/files-dlls.isx: For modern Visual

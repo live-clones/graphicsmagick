@@ -786,3 +786,149 @@ Windows Distribution Build Procedure
 
   13. Distribution package is available named similar to
       ``GM\VisualMagick\bin\GraphicsMagick-1.3-Q8-dll.exe``
+
+Windows Distribution 3rd Party Source Code
+------------------------------------------
+
+The following is a summary of the bundled 3rd party sources which may
+be used in the Microsoft Windows Visual Studio build.
+
+The release version, and the year the code was last updated is
+indicated.
+
+Due to the technology available at the time (1998-2002), and ease of
+use, it was decided to bundle 3rd party code into the GraphicsMagick
+Mercurial repository.  This may have been best practice at the time,
+but it is not the preferred approach to building open-source code
+under Microsoft Windows any more (`CMake <https://cmake.org/>`_ in
+conjunction with `vcpkg
+<https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell>`_
+is the popular solution now).  There was a cost incurred in that the
+3rd party code increased the Mercurial repository size and created
+more maintenance for GraphicsMagick.
+
+The bullet names are the subdirectory name where the source code may
+be found:
+
+ * bzlib
+
+   bzlib 1.0.8 (from 2019)
+
+   A library to support reading and writing files with bzip2 lossless,
+   block-sorting data compression.  This compression is supported by
+   the MIFF file format.
+
+   This code only receives security and bug fixes.
+
+ * dcraw
+
+   dcraw 9.27 (from 2016)
+
+   A delegate utility to read RAW camera files.
+
+   This code is no longer developed.
+
+ * hp2xx
+
+   hp2xx 3.4.2 (from 2001)
+
+   Very old source code to a 'hp2xx' delegate program necessary to read HPGL files.
+
+   Hp2xx is protected by the full GPLv2 license.
+
+   This code is no longer developed.
+
+ * jbig
+
+   JBIG-KIT 2.1 (from 2014)
+
+   This is necessary to read and write JBIG files, or use JBIG compression in libtiff.
+
+   Note that JBIG-KIT is protected by the full GPLv2 license (not
+   LGPL), and use under some other license requires obtaining a
+   commercial license from the authors.
+
+   This code is no longer be developed.
+
+ * jp2
+
+   Jasper 2.0.33 (from 2021)
+
+   This is necessary to read and write JPEG 2000 files.
+
+ * jpeg
+
+   jpeg 9f (from 2024)
+
+   This is the IJG JPEG library, most recently developed and maintained by Guido Vollbeding.
+   This is different than the libjpeg-turbo fork developed by Darrell R Commander (DRC).
+
+ * lcms
+
+   lcms 2.9 (from 2019)
+
+   This is necessary in order to support CMS color profiles.
+
+ * libxml
+
+   libxml 2.9.10 (from 2019)
+
+   This is necessary in order to parse XML files.  The SVG format
+   reader and the 'conjure' utility use this library.
+
+ * png
+
+   libpng 1.6.37 (from 2019)
+
+   This is necessary in order to read and write PNG and MNG files.
+
+ * ralcgm
+
+   RAL-CGM 3.50 (from 1995).
+
+   This is extremely old source code for a delegate program ('ralcgm')
+   necessary to read CGM (Computer Graphics Metafile) format
+   standardized as ISO/IEC 8632.  Please note that the license for
+   this code prohibits it from being sold for profit or incorporated
+   into a product except via a commerical license.
+
+   This code is no longer developed.
+
+ * tiff
+
+   libtiff 4.5.1 (from 2023)
+
+   This library is necessary to read and write the TIFF file format.
+
+ * ttf
+
+   FreeType 2.6.2 (from 2015).
+
+   This library is necessary to use TrueType and OpenType fonts.
+
+ * wmf
+
+   libwmf 0.2.2 (from 2001)
+
+   This is necessary to parse and read 16-bit Windows Meta Files (WMF)
+   files.
+
+   This code is no longer developed.
+
+   While there is a newer version of this library at SourceForge, it
+   is actually somewhat corrupted by someone who was not previously a
+   libwmf developer, and the license was changed to the full GPLv2
+   license (rather than LGPL).
+
+ * xlib
+
+   This allows building GrapicsMagick with MIT X11 support under
+   Microsoft Windows via a pre-compiled X11 DLL library.  This is not
+   really used any more.
+
+ * zlib
+
+   zlib 1.2.11 (from 2019)
+
+   This supports reading and writing gzipped (.gz) files, as well as
+   gzip compression in the MIFF file format.
