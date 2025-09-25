@@ -1,3 +1,10 @@
+2025-09-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh (enable_de265): Remove libde265 from
+	the oss-fuzz build given that it obviously has never been fuzz
+	tested, does not appear to be maintained, and it is producing the
+	majority of the reports.
+
 2025-09-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* www/INSTALL-windows.rst: Provide a summary description of the

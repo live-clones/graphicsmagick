@@ -48,7 +48,7 @@ apt install autoconf-archive
 
 enable_aom=true
 enable_bzip2=true
-enable_de265=true
+enable_de265=false
 enable_freetype=true
 enable_heif=true
 enable_jasper=true
@@ -527,7 +527,7 @@ then
                  -DCMAKE_CXX_COMPILER=$CXX \
                  -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
                  -DCMAKE_C_COMPILER=$CC \
-                 -DCMAKE_C_FLAGS="$CFLAGS -fno-sanitize=undefined -fPIC" \
+                 -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
                  -DCMAKE_INSTALL_RPATH='/usr/local/lib' \
                  -DCMAKE_INSTALL_PREFIX="$WORK" \
                  -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
