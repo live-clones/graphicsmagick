@@ -1,5 +1,10 @@
 2025-09-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/attribute.c (GenerateEXIFAttribute): Provide a way to
+	accept somewhat incorrect field tags.  For the moment, accept
+	incorrect field tags, but provide a way to trace the "fishy" field
+	tags.
+
 	* fuzzing/oss-fuzz-build.sh (enable_de265): Remove libde265 from
 	the oss-fuzz build given that it obviously has never been fuzz
 	tested, does not appear to be maintained, and it is producing the

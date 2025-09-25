@@ -1098,10 +1098,10 @@ Generate8BIMAttribute(Image *image,const char *key)
 /* Bit-field flags for supporting OR logic to represent tags which accept multiple types */
 #define F_NOTYPE     0x0000  /* Not yet assigned, unknown */
 #define F_BYTE       0x0002  /* An 8-bit unsigned integer. */
-#define F_ASCII      0x0004  /* An 8-bit byte containing one 7-bit ASCII code. NUL terminated */
-#define F_USHORT     0x0008  /* A 16-bit (2-byte) unsigned integer */
-#define F_ULONG      0x0010  /* A 32-bit (4-byte) unsigned intege */
-#define F_URATIONAL  0x0020  /* Two LONGs. The first LONG is the numerator and the second LONG expresses the denominator. */
+#define F_ASCII      0x0004  /* An 8-bit byte containing one 7-bit ASCII code. NUL terminated (count includes NUL). */
+#define F_SHORT      0x0008  /* A 16-bit (2-byte) unsigned integer */
+#define F_LONG       0x0010  /* A 32-bit (4-byte) unsigned intege */
+#define F_RATIONAL   0x0020  /* Two LONGs. The first LONG is the numerator and the second LONG expresses the denominator. */
 #define F_SBYTE      0x0040  /* An 8-bit signed integer. */
 #define F_UNDEFINED  0x0080  /* An 8-bit byte that may take any value depending on the field definition. */
 #define F_SSHORT     0x0100  /* A 16-bit (2-byte) signed integer */
@@ -1112,15 +1112,23 @@ Generate8BIMAttribute(Image *image,const char *key)
 
 typedef struct _IFDTagTableType
 {
+  /* TIFF IFD tag number */
   unsigned short
     tag;
 
+   /* Accepted tag formats declared by a standard */
   short
     format;
 
+  /* Other formats for the tag discovered to be in use (likely due to a bug) */
   short
-    count; /* -1 == Any, 0 == not set yet */
+    format_alt;
 
+  /* Expected component count. -1 == Any, 0 == not set yet */
+  short
+    count;
+
+  /* Tag description */
   const char
     description[36];
 
@@ -1130,7 +1138,7 @@ typedef struct _IFDTagTableType
   */
 } IFDTagTableType;
 
-#define TAG_INFO(tag,format,count,description) {tag,format,count,description}
+#define TAG_INFO(tag,format,format_alt,count,description) {tag,format,format_alt,count,description}
 
 /* https://en.wikipedia.org/wiki/Exif */
 /* Microsoft Windows GDI+ tags are documented at https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-constant-property-tags-in-numerical-order */
@@ -1142,309 +1150,309 @@ tag_table[] =
       GPS Info IFD tags. These should be in a separate numeric space
       from EXIF/TIFF tags!
     */
-    TAG_INFO(0x0000, F_BYTE, 4, "GPSVersionID"), /* GPS IFD */
-    TAG_INFO(0x0001, F_ASCII, 2, "GPSLatitudeRef"), /* GPS IFD */
-    TAG_INFO(0x0002, F_URATIONAL, 3, "GPSLatitude"), /* GPS IFD */
-    TAG_INFO(0x0003, F_ASCII, 2, "GPSLongitudeRef"), /* GPS IFD */
-    TAG_INFO(0x0004, F_URATIONAL, 3, "GPSLongitude"), /* GPS IFD */
-    TAG_INFO(0x0005, F_BYTE, 1, "GPSAltitudeRef"), /* GPS IFD */
-    TAG_INFO(0x0006, F_URATIONAL, 1, "GPSAltitude"), /* GPS IFD */
-    TAG_INFO(0x0007, F_URATIONAL, 3, "GPSTimeStamp"), /* GPS IFD */
-    TAG_INFO(0x0008, F_ASCII, AnyCount, "GPSSatellites"), /* GPS IFD */
-    TAG_INFO(0x0009, F_ASCII, 2, "GPSStatus"), /* GPS IFD */
-    TAG_INFO(0x000A, F_ASCII, 2, "GPSMeasureMode"), /* GPS IFD */
-    TAG_INFO(0x000B, F_URATIONAL, 1, "GPSDOP"), /* GPS IFD */
-    TAG_INFO(0x000C, F_ASCII, 2, "GPSSpeedRef"), /* GPS IFD */
-    TAG_INFO(0x000D, F_URATIONAL, 1, "GPSSpeed"), /* GPS IFD */
-    TAG_INFO(0x000E, F_ASCII, 2, "GPSTrackRef"), /* GPS IFD */
-    TAG_INFO(0x000F, F_URATIONAL, 1, "GPSTrack"), /* GPS IFD */
-    TAG_INFO(0x0010, F_ASCII, 2, "GPSImgDirectionRef"), /* GPS IFD */
-    TAG_INFO(0x0011, F_URATIONAL, 1, "GPSImgDirection"), /* GPS IFD */
-    TAG_INFO(0x0012, F_ASCII, 0, "GPSMapDatum"), /* GPS IFD */
-    TAG_INFO(0x0013, F_ASCII, 2, "GPSDestLatitudeRef"), /* GPS IFD */
-    TAG_INFO(0x0014, F_URATIONAL, 3, "GPSDestLatitude"), /* GPS IFD */
-    TAG_INFO(0x0015, F_ASCII, 2, "GPSDestLongitudeRef"), /* GPS IFD */
-    TAG_INFO(0x0016, F_URATIONAL, 3, "GPSDestLongitude"), /* GPS IFD */
-    TAG_INFO(0x0017, F_ASCII, 2, "GPSDestBearingRef"), /* GPS IFD */
-    TAG_INFO(0x0018, F_URATIONAL, 1, "GPSDestBearing"), /* GPS IFD */
-    TAG_INFO(0x0019, F_ASCII, 2, "GPSDestDistanceRef"), /* GPS IFD */
-    TAG_INFO(0x001A, F_URATIONAL, 1, "GPSDestDistance"), /* GPS IFD */
-    TAG_INFO(0x001B, F_UNDEFINED, AnyCount, "GPSProcessingMethod"), /* GPS IFD */
-    TAG_INFO(0x001C, F_UNDEFINED, AnyCount, "GPSAreaInformation"), /* GPS IFD */
-    TAG_INFO(0x001D, F_ASCII, 11, "GPSDateStamp"), /* GPS IFD */
-    TAG_INFO(0x001E, F_USHORT, 1, "GPSDifferential"), /* GPS IFD */
-    TAG_INFO(0x001F, F_URATIONAL, 1, "GPSHPositioningError"), /* GPS IFD */
+    TAG_INFO(0x0000, F_BYTE, F_NOTYPE, 4, "GPSVersionID"), /* GPS IFD */
+    TAG_INFO(0x0001, F_ASCII, F_NOTYPE, 2, "GPSLatitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0002, F_RATIONAL, F_NOTYPE, 3, "GPSLatitude"), /* GPS IFD */
+    TAG_INFO(0x0003, F_ASCII, F_NOTYPE, 2, "GPSLongitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0004, F_RATIONAL, F_NOTYPE, 3, "GPSLongitude"), /* GPS IFD */
+    TAG_INFO(0x0005, F_BYTE, F_NOTYPE, 1, "GPSAltitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0006, F_RATIONAL, F_NOTYPE, 1, "GPSAltitude"), /* GPS IFD */
+    TAG_INFO(0x0007, F_RATIONAL, F_NOTYPE, 3, "GPSTimeStamp"), /* GPS IFD */
+    TAG_INFO(0x0008, F_ASCII, F_NOTYPE, AnyCount, "GPSSatellites"), /* GPS IFD */
+    TAG_INFO(0x0009, F_ASCII, F_NOTYPE, 2, "GPSStatus"), /* GPS IFD */
+    TAG_INFO(0x000A, F_ASCII, F_NOTYPE, 2, "GPSMeasureMode"), /* GPS IFD */
+    TAG_INFO(0x000B, F_RATIONAL, F_NOTYPE, 1, "GPSDOP"), /* GPS IFD */
+    TAG_INFO(0x000C, F_ASCII, F_NOTYPE, 2, "GPSSpeedRef"), /* GPS IFD */
+    TAG_INFO(0x000D, F_RATIONAL, F_NOTYPE, 1, "GPSSpeed"), /* GPS IFD */
+    TAG_INFO(0x000E, F_ASCII, F_NOTYPE, 2, "GPSTrackRef"), /* GPS IFD */
+    TAG_INFO(0x000F, F_RATIONAL, F_NOTYPE, 1, "GPSTrack"), /* GPS IFD */
+    TAG_INFO(0x0010, F_ASCII, F_NOTYPE, 2, "GPSImgDirectionRef"), /* GPS IFD */
+    TAG_INFO(0x0011, F_RATIONAL, F_NOTYPE, 1, "GPSImgDirection"), /* GPS IFD */
+    TAG_INFO(0x0012, F_ASCII, F_NOTYPE, 0, "GPSMapDatum"), /* GPS IFD */
+    TAG_INFO(0x0013, F_ASCII, F_NOTYPE, 2, "GPSDestLatitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0014, F_RATIONAL, F_NOTYPE, 3, "GPSDestLatitude"), /* GPS IFD */
+    TAG_INFO(0x0015, F_ASCII, F_NOTYPE, 2, "GPSDestLongitudeRef"), /* GPS IFD */
+    TAG_INFO(0x0016, F_RATIONAL, F_NOTYPE, 3, "GPSDestLongitude"), /* GPS IFD */
+    TAG_INFO(0x0017, F_ASCII, F_NOTYPE, 2, "GPSDestBearingRef"), /* GPS IFD */
+    TAG_INFO(0x0018, F_RATIONAL, F_NOTYPE, 1, "GPSDestBearing"), /* GPS IFD */
+    TAG_INFO(0x0019, F_ASCII, F_NOTYPE, 2, "GPSDestDistanceRef"), /* GPS IFD */
+    TAG_INFO(0x001A, F_RATIONAL, F_NOTYPE, 1, "GPSDestDistance"), /* GPS IFD */
+    TAG_INFO(0x001B, F_UNDEFINED, F_NOTYPE, AnyCount, "GPSProcessingMethod"), /* GPS IFD */
+    TAG_INFO(0x001C, F_UNDEFINED, F_NOTYPE, AnyCount, "GPSAreaInformation"), /* GPS IFD */
+    TAG_INFO(0x001D, F_ASCII, F_NOTYPE, 11, "GPSDateStamp"), /* GPS IFD */
+    TAG_INFO(0x001E, F_SHORT, F_NOTYPE, 1, "GPSDifferential"), /* GPS IFD */
+    TAG_INFO(0x001F, F_RATIONAL, F_NOTYPE, 1, "GPSHPositioningError"), /* GPS IFD */
 
-    TAG_INFO(0x0100, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ImageWidth"),
-    TAG_INFO(0x0101, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ImageLength"),
-    TAG_INFO(0x0102, F_USHORT, AnyCount /* Could be 1, 3, 4! */, "BitsPerSample"),
-    TAG_INFO(0x0103, F_USHORT, 1, "Compression"),
-    TAG_INFO(0x0106, F_USHORT, 1, "PhotometricInterpretation"),
-    TAG_INFO(0x010A, F_USHORT, 1, "FillOrder"),
-    TAG_INFO(0x010D, F_ASCII, AnyCount, "DocumentName"),
-    TAG_INFO(0x010E, F_ASCII, AnyCount, "ImageDescription"),
-    TAG_INFO(0x010F, F_ASCII, AnyCount, "Make"),
-    TAG_INFO(0x0110, F_ASCII, AnyCount, "Model"),
-    TAG_INFO(0x0111, F_USHORT | F_ULONG, 0, "StripOffsets"),
-    TAG_INFO(0x0112, F_USHORT | F_SLONG /* TBD */, 1, "Orientation"),
-    TAG_INFO(0x0115, F_USHORT, 1, "SamplesPerPixel"),
-    TAG_INFO(0x0116, F_USHORT | F_ULONG, 1, "RowsPerStrip"),
-    TAG_INFO(0x0117, F_ULONG  | F_USHORT, 0, "StripByteCounts"),
-    TAG_INFO(0x0118, F_USHORT, 0, "MinSampleValue"),
-    TAG_INFO(0x0119, F_USHORT, 0, "MaxSampleValue"),
-    TAG_INFO(0x011A, F_URATIONAL, 1, "XResolution"),
-    TAG_INFO(0x011B, F_URATIONAL, 1, "YResolution"),
-    TAG_INFO(0x011C, F_USHORT, 1, "PlanarConfiguration"),
-    TAG_INFO(0x011D, F_ASCII, 0, "PageName"),
-    TAG_INFO(0x011E, F_URATIONAL, 1, "XPosition"),
-    TAG_INFO(0x011F, F_URATIONAL, 1, "YPosition"),
+    TAG_INFO(0x0100, F_SHORT | F_LONG, F_SLONG, 1, "ImageWidth"),
+    TAG_INFO(0x0101, F_SHORT | F_LONG, F_SLONG, 1, "ImageLength"),
+    TAG_INFO(0x0102, F_SHORT, F_NOTYPE, AnyCount /* Could be 1, 3, 4! */, "BitsPerSample"),
+    TAG_INFO(0x0103, F_SHORT, F_NOTYPE, 1, "Compression"),
+    TAG_INFO(0x0106, F_SHORT, F_NOTYPE, 1, "PhotometricInterpretation"),
+    TAG_INFO(0x010A, F_SHORT, F_NOTYPE, 1, "FillOrder"),
+    TAG_INFO(0x010D, F_ASCII, F_NOTYPE, AnyCount, "DocumentName"),
+    TAG_INFO(0x010E, F_ASCII, F_NOTYPE, AnyCount, "ImageDescription"),
+    TAG_INFO(0x010F, F_ASCII, F_NOTYPE, AnyCount, "Make"),
+    TAG_INFO(0x0110, F_ASCII, F_NOTYPE, AnyCount, "Model"),
+    TAG_INFO(0x0111, F_SHORT | F_LONG, F_NOTYPE, 0, "StripOffsets"),
+    TAG_INFO(0x0112, F_SHORT, F_SLONG, 1, "Orientation"),
+    TAG_INFO(0x0115, F_SHORT, F_NOTYPE, 1, "SamplesPerPixel"),
+    TAG_INFO(0x0116, F_SHORT | F_LONG, F_NOTYPE, 1, "RowsPerStrip"),
+    TAG_INFO(0x0117, F_LONG  | F_SHORT, F_NOTYPE, 0, "StripByteCounts"),
+    TAG_INFO(0x0118, F_SHORT, F_NOTYPE, 0, "MinSampleValue"),
+    TAG_INFO(0x0119, F_SHORT, F_NOTYPE, 0, "MaxSampleValue"),
+    TAG_INFO(0x011A, F_RATIONAL, F_NOTYPE, 1, "XResolution"),
+    TAG_INFO(0x011B, F_RATIONAL, F_NOTYPE, 1, "YResolution"),
+    TAG_INFO(0x011C, F_SHORT, F_NOTYPE, 1, "PlanarConfiguration"),
+    TAG_INFO(0x011D, F_ASCII, F_NOTYPE, 0, "PageName"),
+    TAG_INFO(0x011E, F_RATIONAL, F_NOTYPE, 1, "XPosition"),
+    TAG_INFO(0x011F, F_RATIONAL, F_NOTYPE, 1, "YPosition"),
 
-    TAG_INFO(0x0120, F_ULONG, AnyCount, "FreeOffsets"), /* Defunct feature */
-    TAG_INFO(0x0121, F_ULONG, AnyCount, "FreeByteCounts"), /* Defunct feature */
-    TAG_INFO(0x0122, F_USHORT, 1, "GrayResponseUnit"),
-    TAG_INFO(0x0123, F_USHORT, 0 /* 2**BitsPerSample */, "GrayResponseCurve"),
-    TAG_INFO(0x0124, F_ULONG, 1, "T4Options"),
-    TAG_INFO(0x0125, F_ULONG, 1, "T6Options"),
-    TAG_INFO(0x0128, F_USHORT, 1, "ResolutionUnit"),
-    TAG_INFO(0x012D, F_USHORT, 3*256  /* (1 or 3) * (1 << BitsPerSample) */, "TransferFunction"),
-    TAG_INFO(0x0131, F_ASCII, 0, "Software"),
-    TAG_INFO(0x0132, F_ASCII, 21 /* 20+NUL? TBD */, "DateTime"),
-    TAG_INFO(0x013B, F_ASCII, 0, "Artist"),
-    TAG_INFO(0x013C, F_ASCII, 0, "HostComputer"),
-    TAG_INFO(0x013D, F_USHORT, 0, "Predictor"),
-    TAG_INFO(0x013E, F_URATIONAL, 2, "WhitePoint"),
-    TAG_INFO(0x013F, F_URATIONAL, 6, "PrimaryChromaticities"),
-    TAG_INFO(0x0140, F_USHORT, 0, "ColorMap"),
-    TAG_INFO(0x0141, F_USHORT, 0, "HalfToneHints"),
-    TAG_INFO(0x0142, F_ULONG, AnyCount /* TBD */, "TileWidth"),
-    TAG_INFO(0x0143, F_ULONG, AnyCount /* TBD */, "TileLength"),
-    TAG_INFO(0x0144, F_USHORT, AnyCount /* TBD */, "TileOffsets"),
-    TAG_INFO(0x0145, F_ULONG, AnyCount /* TBD */, "TileByteCounts"),
-    TAG_INFO(0x014A, F_ULONG, 0, "SubIFD"),
-    TAG_INFO(0x014C, F_USHORT, 0, "InkSet"),
-    TAG_INFO(0x014D, F_ASCII, 0, "InkNames"),
-    TAG_INFO(0x014E, F_USHORT, 0, "NumberOfInks"),
-    TAG_INFO(0x0150, F_BYTE | F_USHORT, 0 /* 2, or 2*SamplesPerPixel */, "DotRange"),
-    TAG_INFO(0x0151, F_ASCII, 0, "TargetPrinter"),
-    TAG_INFO(0x0152, F_USHORT, 0, "ExtraSample"),
-    TAG_INFO(0x0153, F_USHORT, 0, "SampleFormat"),
-    TAG_INFO(0x0154, F_BYTE | F_USHORT | F_ULONG | F_SRATIONAL | F_DOUBLE, 0, "SMinSampleValue"), /* BYTE or SHORT or LONG or RATIONAL or DOUBLE */
-    TAG_INFO(0x0155, F_BYTE | F_USHORT | F_ULONG | F_SRATIONAL | F_DOUBLE, 0, "SMaxSampleValue"), /* BYTE or SHORT or LONG or RATIONAL or DOUBLE */
-    TAG_INFO(0x0156, F_USHORT, 0, "TransferRange"),
-    TAG_INFO(0x0157, F_BYTE, AnyCount, "ClipPath"),
-    TAG_INFO(0x0158, F_ULONG, 1, "XClipPathUnits"),
-    TAG_INFO(0x0159, F_ULONG, 1, "YClipPathUnits"),
-    TAG_INFO(0x015A, F_USHORT, 1, "Indexed"),
-    TAG_INFO(0x015B, F_UNDEFINED, 0, "JPEGTables"),
-    TAG_INFO(0x015F, F_USHORT, 0, "OPIProxy"),
-    TAG_INFO(0x0200, F_USHORT, 0, "JPEGProc"),
-    TAG_INFO(0x0201, F_ULONG, 1, "JPEGInterchangeFormat"),
-    TAG_INFO(0x0202, F_ULONG, 1, "JPEGInterchangeFormatLength"),
-    TAG_INFO(0x0203, F_USHORT, 0, "JPEGRestartInterval"),
-    TAG_INFO(0x0205, F_USHORT, 0, "JPEGLosslessPredictors"),
-    TAG_INFO(0x0206, F_USHORT, 0, "JPEGPointTransforms"),
-    TAG_INFO(0x0207, F_ULONG, 0, "JPEGQTables"),
-    TAG_INFO(0x0208, F_ULONG, 0, "JPEGDCTables"),
-    TAG_INFO(0x0209, F_ULONG, 0, "JPEGACTables"),
-    TAG_INFO(0x0211, F_URATIONAL, 3, "YCbCrCoefficients"),
-    TAG_INFO(0x0212, F_USHORT, 2, "YCbCrSubSampling"),
-    TAG_INFO(0x0213, F_USHORT, 1, "YCbCrPositioning"),
-    TAG_INFO(0x0214, F_URATIONAL, 6, "ReferenceBlackWhite"),
-    TAG_INFO(0x02BC, F_NOTYPE, 0, "ExtensibleMetadataPlatform"), /* XMP */
-    TAG_INFO(0x0301, F_NOTYPE, 0, "Gamma"),
-    TAG_INFO(0x0302, F_NOTYPE, 0, "ICCProfileDescriptor"),
-    TAG_INFO(0x0303, F_NOTYPE, 0, "SRGBRenderingIntent"),
-    TAG_INFO(0x0320, F_NOTYPE, 0, "ImageTitle"),
+    TAG_INFO(0x0120, F_LONG, F_NOTYPE, AnyCount, "FreeOffsets"), /* Defunct feature */
+    TAG_INFO(0x0121, F_LONG, F_NOTYPE, AnyCount, "FreeByteCounts"), /* Defunct feature */
+    TAG_INFO(0x0122, F_SHORT, F_NOTYPE, 1, "GrayResponseUnit"),
+    TAG_INFO(0x0123, F_SHORT, F_NOTYPE, 0 /* 2**BitsPerSample */, "GrayResponseCurve"),
+    TAG_INFO(0x0124, F_LONG, F_NOTYPE, 1, "T4Options"),
+    TAG_INFO(0x0125, F_LONG, F_NOTYPE, 1, "T6Options"),
+    TAG_INFO(0x0128, F_SHORT, F_NOTYPE, 1, "ResolutionUnit"),
+    TAG_INFO(0x012D, F_SHORT, F_NOTYPE, 3*256  /* (1 or 3) * (1 << BitsPerSample) */, "TransferFunction"),
+    TAG_INFO(0x0131, F_ASCII, F_NOTYPE, AnyCount, "Software"),
+    TAG_INFO(0x0132, F_ASCII, F_NOTYPE, 21 /* 20+NUL? TIFF spec says 20 */, "DateTime"),
+    TAG_INFO(0x013B, F_ASCII, F_NOTYPE, AnyCount, "Artist"),
+    TAG_INFO(0x013C, F_ASCII, F_NOTYPE, AnyCount, "HostComputer"),
+    TAG_INFO(0x013D, F_SHORT, F_NOTYPE, 0, "Predictor"),
+    TAG_INFO(0x013E, F_RATIONAL, F_NOTYPE, 2, "WhitePoint"),
+    TAG_INFO(0x013F, F_RATIONAL, F_NOTYPE, 6, "PrimaryChromaticities"),
+    TAG_INFO(0x0140, F_SHORT, F_NOTYPE, 0 /* 3 * (2**BitsPerSample) */, "ColorMap"),
+    TAG_INFO(0x0141, F_SHORT, F_NOTYPE, 2, "HalfToneHints"),
+    TAG_INFO(0x0142, F_SHORT | F_LONG, F_NOTYPE, AnyCount /* TBD */, "TileWidth"),
+    TAG_INFO(0x0143, F_SHORT | F_LONG, F_NOTYPE, AnyCount /* TBD */, "TileLength"),
+    TAG_INFO(0x0144, F_LONG, F_NOTYPE, AnyCount /* TBD */, "TileOffsets"),
+    TAG_INFO(0x0145, F_SHORT | F_LONG, F_NOTYPE, AnyCount /* TBD */, "TileByteCounts"),
+    TAG_INFO(0x014A, F_LONG, F_NOTYPE, 1, "SubIFD"),
+    TAG_INFO(0x014C, F_SHORT, F_NOTYPE, 1, "InkSet"),
+    TAG_INFO(0x014D, F_ASCII, F_NOTYPE, AnyCount, "InkNames"),
+    TAG_INFO(0x014E, F_SHORT, F_NOTYPE, 1, "NumberOfInks"),
+    TAG_INFO(0x0150, F_BYTE | F_SHORT, F_NOTYPE, 0 /* 2, or 2*SamplesPerPixel */, "DotRange"),
+    TAG_INFO(0x0151, F_ASCII, F_NOTYPE, AnyCount, "TargetPrinter"),
+    TAG_INFO(0x0152, F_SHORT, F_NOTYPE, 0, "ExtraSample"),
+    TAG_INFO(0x0153, F_SHORT, F_NOTYPE, 0, "SampleFormat"),
+    TAG_INFO(0x0154, F_BYTE | F_SHORT | F_LONG | F_SRATIONAL | F_DOUBLE, F_NOTYPE, 0, "SMinSampleValue"), /* BYTE or SHORT or LONG or RATIONAL or DOUBLE */
+    TAG_INFO(0x0155, F_BYTE | F_SHORT | F_LONG | F_SRATIONAL | F_DOUBLE, F_NOTYPE, 0, "SMaxSampleValue"), /* BYTE or SHORT or LONG or RATIONAL or DOUBLE */
+    TAG_INFO(0x0156, F_SHORT, F_NOTYPE, 6, "TransferRange"),
+    TAG_INFO(0x0157, F_BYTE, F_NOTYPE, AnyCount, "ClipPath"),
+    TAG_INFO(0x0158, F_LONG, F_NOTYPE, 1, "XClipPathUnits"),
+    TAG_INFO(0x0159, F_LONG, F_NOTYPE, 1, "YClipPathUnits"),
+    TAG_INFO(0x015A, F_SHORT, F_NOTYPE, 1, "Indexed"),
+    TAG_INFO(0x015B, F_UNDEFINED, F_NOTYPE, 0, "JPEGTables"),
+    TAG_INFO(0x015F, F_SHORT, F_NOTYPE, 0, "OPIProxy"),
+    TAG_INFO(0x0200, F_SHORT, F_NOTYPE, 1, "JPEGProc"),
+    TAG_INFO(0x0201, F_LONG, F_NOTYPE, 1, "JPEGInterchangeFormat"),
+    TAG_INFO(0x0202, F_LONG, F_NOTYPE, 1, "JPEGInterchangeFormatLength"),
+    TAG_INFO(0x0203, F_SHORT, F_NOTYPE, 1, "JPEGRestartInterval"),
+    TAG_INFO(0x0205, F_SHORT, F_NOTYPE, 0, "JPEGLosslessPredictors"),
+    TAG_INFO(0x0206, F_SHORT, F_NOTYPE, 0, "JPEGPointTransforms"),
+    TAG_INFO(0x0207, F_LONG, F_NOTYPE, 0, "JPEGQTables"),
+    TAG_INFO(0x0208, F_LONG, F_NOTYPE, 0, "JPEGDCTables"),
+    TAG_INFO(0x0209, F_LONG, F_NOTYPE, 0, "JPEGACTables"),
+    TAG_INFO(0x0211, F_RATIONAL, F_NOTYPE, 3, "YCbCrCoefficients"),
+    TAG_INFO(0x0212, F_SHORT, F_NOTYPE, 2, "YCbCrSubSampling"),
+    TAG_INFO(0x0213, F_SHORT, F_NOTYPE, 1, "YCbCrPositioning"),
+    TAG_INFO(0x0214, F_RATIONAL, F_NOTYPE, 0 /* 2*SamplesPerPixel */, "ReferenceBlackWhite"),
+    TAG_INFO(0x02BC, F_NOTYPE, F_NOTYPE, 0, "ExtensibleMetadataPlatform"), /* XMP */
+    TAG_INFO(0x0301, F_NOTYPE, F_NOTYPE, 0, "Gamma"),
+    TAG_INFO(0x0302, F_NOTYPE, F_NOTYPE, 0, "ICCProfileDescriptor"),
+    TAG_INFO(0x0303, F_NOTYPE, F_NOTYPE, 0, "SRGBRenderingIntent"),
+    TAG_INFO(0x0320, F_NOTYPE, F_NOTYPE, 0, "ImageTitle"),
 
     /*
       Interoperability IFD tags.  These should be in a separate
       numeric space from EXIF/TIFF tags!
     */
-    TAG_INFO(0x1000, F_NOTYPE, 0, "RelatedImageFileFormat"), /* Exif Interoperability IFD */
-    TAG_INFO(0x1001, F_USHORT | F_ULONG, 0, "RelatedImageWidth"), /* Exif Interoperability IFD */
-    TAG_INFO(0x1002, F_USHORT | F_ULONG, 0, "RelatedImageLength"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1000, F_NOTYPE, F_NOTYPE, 0, "RelatedImageFileFormat"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1001, F_SHORT | F_LONG, F_NOTYPE, 0, "RelatedImageWidth"), /* Exif Interoperability IFD */
+    TAG_INFO(0x1002, F_SHORT | F_LONG, F_NOTYPE, 0, "RelatedImageLength"), /* Exif Interoperability IFD */
 
-    TAG_INFO(0x5001, F_USHORT, 1, "ResolutionXUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5002, F_USHORT, 1, "ResolutionYUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5003, F_USHORT, 1, "ResolutionXLengthUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5004, F_USHORT, 1, "ResolutionYLengthUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5005, F_ASCII, AnyCount /* Number of flags */, "PrintFlags"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5006, F_USHORT, 1, "PrintFlagsVersion"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5007, F_BYTE, 1, "PrintFlagsCrop"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5008, F_ULONG, 1, "PrintFlagsBleedWidth"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5009, F_USHORT, 1, "PrintFlagsBleedWidthScale"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x500A, F_URATIONAL, 1, "HalftoneLPI"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x500B, F_USHORT, 1, "HalftoneLPIUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x500C, F_URATIONAL, 1, "HalftoneDegree"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x500D, F_USHORT, 1, "HalftoneShape"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x500E, F_ULONG, 1, "HalftoneMisc"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x500F, F_BYTE, 1, "HalftoneScreen"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5010, F_USHORT, AnyCount, "JPEGQuality"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5011, F_UNDEFINED, AnyCount, "GridSize"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5012, F_ULONG, 1, "ThumbnailFormat"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5013, F_ULONG, 1, "ThumbnailWidth"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5014, F_ULONG, 1, "ThumbnailHeight"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5015, F_USHORT, 1, "ThumbnailColorDepth"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5016, F_USHORT, 1, "ThumbnailPlanes"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5017, F_ULONG, 1, "ThumbnailRawBytes"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5018, F_ULONG, 1, "ThumbnailSize"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5019, F_ULONG, 1, "ThumbnailCompressedSize"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x501A, F_UNDEFINED, 0, "ColorTransferFunction"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x501B, F_BYTE, 0, "ThumbnailData"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5020, F_ULONG | F_USHORT, 1, "ThumbnailImageWidth"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5021, F_ULONG | F_USHORT, 1, "ThumbnailImageHeight"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5022, F_USHORT, 1, "ThumbnailBitsPerSample"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5023, F_USHORT, 1, "ThumbnailCompression"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5024, F_USHORT, 1, "ThumbnailPhotometricInterp"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5025, F_ASCII, AnyCount, "ThumbnailImageDescription"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5026, F_ASCII, AnyCount, "ThumbnailEquipMake"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5027, F_ASCII, AnyCount, "ThumbnailEquipModel"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5028, F_ULONG | F_USHORT, 0, "ThumbnailStripOffsets"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5029, F_USHORT, 1, "ThumbnailOrientation"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x502A, F_USHORT, 1, "ThumbnailSamplesPerPixel"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x502B, F_ULONG | F_USHORT, 1, "ThumbnailRowsPerStrip"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x502C, F_ULONG | F_USHORT, 0, "ThumbnailStripBytesCount"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x502D, F_USHORT /* type provided by ThumbnailResolutionUnit */, 0, "ThumbnailResolutionX"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x502E, F_USHORT /* type provided by ThumbnailResolutionUnit */, 0, "ThumbnailResolutionY"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x502F, F_USHORT, 1, "ThumbnailPlanarConfig"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5030, F_USHORT, 1, "ThumbnailResolutionUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5031, F_USHORT, 0, "ThumbnailTransferFunction"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5032, F_ASCII, AnyCount, "ThumbnailSoftwareUsed"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5033, F_ASCII, AnyCount, "ThumbnailDateTime"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5034, F_ASCII, AnyCount, "ThumbnailArtist"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5035, F_URATIONAL, 2, "ThumbnailWhitePoint"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5036, F_URATIONAL, 6, "ThumbnailPrimaryChromaticities"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5037, F_URATIONAL, 3, "ThumbnailYCbCrCoefficients"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5038, F_USHORT, 2, "ThumbnailYCbCrSubsampling"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5039, F_USHORT, 1, "ThumbnailYCbCrPositioning"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x503A, F_URATIONAL, 6, "ThumbnailRefBlackWhite"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x503B, F_ASCII, AnyCount, "ThumbnailCopyRight"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5090, F_USHORT, 64, "LuminanceTable"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5091, F_USHORT, 64, "ChrominanceTable"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5100, F_ULONG, 0, "FrameDelay"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5101, F_USHORT, 1, "LoopCount"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5102, F_BYTE, 0, "GlobalPalette"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5103, F_BYTE, 1, "IndexBackground"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5104, F_BYTE, 1, "IndexTransparent"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5110, F_BYTE, 0, "PixelUnit"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5111, F_ULONG, 1, "PixelPerUnitX"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5112, F_ULONG, 1, "PixelPerUnitY"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x5113, F_BYTE, AnyCount, "PaletteHistogram"), /* Microsoft Windows GDI+ */
-    TAG_INFO(0x800D, F_ASCII, 0, "ImageID"), /* Adobe OPI */
-    TAG_INFO(0x80E3, F_NOTYPE, 0, "Matteing"),
-    TAG_INFO(0x80E4, F_NOTYPE, 0, "DataType"),
-    TAG_INFO(0x80E5, F_NOTYPE, 0, "ImageDepth"),
-    TAG_INFO(0x80E6, F_NOTYPE, 0, "TileDepth"),
-    TAG_INFO(0x828D, F_USHORT, 0, "CFARepeatPatternDim"),
-    TAG_INFO(0x828E, F_BYTE, 0, "CFAPattern"),
-    TAG_INFO(0x828F, F_URATIONAL, 0, "BatteryLevel"),
-    TAG_INFO(0x8298, F_ASCII, AnyCount, "Copyright"),
-    TAG_INFO(0x829A, F_URATIONAL, 1, "ExposureTime"),
-    TAG_INFO(0x829D, F_URATIONAL, 1, "FNumber"),
-    TAG_INFO(0x83BB, F_ULONG, 0, "IPTC/NAA"),
-    TAG_INFO(0x84E3, F_NOTYPE, 0, "IT8RasterPadding"),
-    TAG_INFO(0x84E5, F_NOTYPE, 0, "IT8ColorTable"),
-    TAG_INFO(0x8649, F_NOTYPE, 0, "ImageResourceInformation"),
-    TAG_INFO(0x8769, F_ULONG, 1, "ExifOffset"), /* Exif IFD Pointer */
-    TAG_INFO(0x8773, F_BYTE, AnyCount, "InterColorProfile"), /* ICCProfile */
-    TAG_INFO(0x8822, F_USHORT, 1, "ExposureProgram"),
-    TAG_INFO(0x8824, F_ASCII, AnyCount, "SpectralSensitivity"),
-    TAG_INFO(0x8825, F_SLONG | F_ULONG /* TBD */, 1, "GPSInfo"), /* Offset to GPS IFD */
-    TAG_INFO(0x8827, F_USHORT, AnyCount, "PhotographicSensitivity"), /* Was "ISOSpeedRatings" */
-    TAG_INFO(0x8828, F_UNDEFINED, AnyCount, "OECF"),
-    TAG_INFO(0x8830, F_USHORT, 1, "SensitivityType"),
-    TAG_INFO(0x8831, F_ULONG, 1, "StandardOutputSensitivity"),
-    TAG_INFO(0x8832, F_ULONG, 1, "RecommendedExposureIndex"),
-    TAG_INFO(0x8833, F_ULONG, 1, "ISOSpeed"),
-    TAG_INFO(0x8834, F_ULONG, 1, "ISOSpeedLatitudeyyy"),
-    TAG_INFO(0x8835, F_ULONG, 1, "ISOSpeedLatitudezzz"),
-    TAG_INFO(0x9000, F_UNDEFINED, 4, "ExifVersion"), /* e.g. "0300" without NUL */
-    TAG_INFO(0x9003, F_ASCII, 20, "DateTimeOriginal"),
-    TAG_INFO(0x9004, F_ASCII, 20, "DateTimeDigitized"),
-    TAG_INFO(0x9010, F_ASCII, 7, "OffsetTime"),
-    TAG_INFO(0x9011, F_ASCII, 7, "OffsetTimeOriginal"),
-    TAG_INFO(0x9012, F_ASCII, 7, "OffsetTimeDigitized"),
-    TAG_INFO(0x9101, F_UNDEFINED, 4, "ComponentsConfiguration"),
-    TAG_INFO(0x9102, F_URATIONAL, 1, "CompressedBitsPerPixel"),
-    TAG_INFO(0x9201, F_URATIONAL | F_SRATIONAL /* TBD */, 1, "ShutterSpeedValue"),
-    TAG_INFO(0x9202, F_URATIONAL, 1, "ApertureValue"),
-    TAG_INFO(0x9203, F_SRATIONAL, 1, "BrightnessValue"),
-    TAG_INFO(0x9204, F_SRATIONAL | F_URATIONAL /* TBD */, 1, "ExposureBiasValue"),
-    TAG_INFO(0x9205, F_URATIONAL, 1, "MaxApertureValue"),
-    TAG_INFO(0x9206, F_URATIONAL, 1, "SubjectDistance"),
-    TAG_INFO(0x9207, F_USHORT, 1, "MeteringMode"),
-    TAG_INFO(0x9208, F_USHORT, 1, "LightSource"),
-    TAG_INFO(0x9209, F_USHORT, 1, "Flash"),
-    TAG_INFO(0x920A, F_URATIONAL, 1, "FocalLength"),
-    TAG_INFO(0x9214, F_USHORT, AnyCount /* 2 or 3 or 4 */, "SubjectArea"),
-    TAG_INFO(0x927C, F_UNDEFINED, AnyCount, "MakerNote"),
-    TAG_INFO(0x9286, F_UNDEFINED, AnyCount, "UserComment"),
-    TAG_INFO(0x9290, F_ASCII, AnyCount, "SubSecTime"),
-    TAG_INFO(0x9291, F_ASCII, AnyCount, "SubSecTimeOriginal"),
-    TAG_INFO(0x9292, F_ASCII, AnyCount, "SubSecTimeDigitized"),
-    TAG_INFO(0x9400, F_SRATIONAL, 1, "Temperature"),
-    TAG_INFO(0x9401, F_URATIONAL, 1, "Humidity"),
-    TAG_INFO(0x9402, F_URATIONAL, 1, "Pressure"),
-    TAG_INFO(0x9403, F_SRATIONAL, 1, "WaterDepth"),
-    TAG_INFO(0x9404, F_URATIONAL, 1, "Acceleration"),
-    TAG_INFO(0x9405, F_SRATIONAL, 1, "CameraElevationAngle "),
-    TAG_INFO(0x9C9B, F_BYTE, AnyCount, "WinXP-Title"),     /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9C, F_BYTE, AnyCount, "WinXP-Comments"),  /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9D, F_BYTE, AnyCount, "WinXP-Author"),    /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9E, F_BYTE, AnyCount, "WinXP-Keywords"),  /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0x9C9F, F_BYTE, AnyCount, "WinXP-Subject"),   /* Win XP specific, UTF-16 Unicode */
-    TAG_INFO(0xA000, F_UNDEFINED, 4, "FlashPixVersion"),
-    TAG_INFO(0xA001, F_USHORT , 1, "ColorSpace"),
-    TAG_INFO(0xA002, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ExifImageWidth"),
-    TAG_INFO(0xA003, F_USHORT | F_SLONG | F_ULONG /* TBD */, 1, "ExifImageLength"),
-    TAG_INFO(0xA004, F_ASCII, 13, "RelatedSoundFile"),
-    TAG_INFO(0xA005, F_ULONG, 0, "InteroperabilityOffset"), /* Interoperability IFD Pointer */
-    TAG_INFO(0xA20B, F_URATIONAL, 1, "FlashEnergy"),
-    TAG_INFO(0xA20C, F_UNDEFINED, AnyCount, "SpatialFrequencyResponse"),
-    TAG_INFO(0xA20D, F_NOTYPE, 0, "Noise"),
-    TAG_INFO(0xA20E, F_URATIONAL, 1, "FocalPlaneXResolution"),
-    TAG_INFO(0xA20F, F_URATIONAL, 1, "FocalPlaneYResolution"),
-    TAG_INFO(0xA210, F_USHORT, 1, "FocalPlaneResolutionUnit"),
-    TAG_INFO(0xA211, F_NOTYPE, 0, "ImageNumber"),
-    TAG_INFO(0xA212, F_NOTYPE, 0, "SecurityClassification"),
-    TAG_INFO(0xA213, F_NOTYPE, 0, "ImageHistory"),
-    TAG_INFO(0xA214, F_USHORT, 2, "SubjectLocation"),
-    TAG_INFO(0xA215, F_URATIONAL, 1, "ExposureIndex"),
-    TAG_INFO(0xA216, F_NOTYPE, 0, "TIFF_EPStandardID"),
-    TAG_INFO(0xA217, F_USHORT | F_BYTE /* TBD */, 1, "SensingMethod"),
-    TAG_INFO(0xA300, F_UNDEFINED, AnyCount /* varies, TBD */, "FileSource"),
-    TAG_INFO(0xA301, F_BYTE | F_UNDEFINED /* TBD */, 1, "SceneType"),
-    TAG_INFO(0xA302, F_UNDEFINED, AnyCount, "CFAPattern"),
-    TAG_INFO(0xA401, F_USHORT, 1, "CustomRendered"),
-    TAG_INFO(0xA402, F_USHORT, 1, "ExposureMode"),
-    TAG_INFO(0xA403, F_USHORT, 1, "WhiteBalance"),
-    TAG_INFO(0xA404, F_URATIONAL, 1, "DigitalZoomRatio"),
-    TAG_INFO(0xA405, F_USHORT, 1, "FocalLengthIn35mmFilm"),
-    TAG_INFO(0xA406, F_USHORT, 1, "SceneCaptureType"),
-    TAG_INFO(0xA407, F_USHORT, 1, "GainControl"),
-    TAG_INFO(0xA408, F_USHORT, 1, "Contrast"),
-    TAG_INFO(0xA409, F_USHORT, 1, "Saturation"),
-    TAG_INFO(0xA40A, F_USHORT, 1, "Sharpness"),
-    TAG_INFO(0xA40B, F_UNDEFINED, AnyCount, "DeviceSettingDescription"),
-    TAG_INFO(0xA40C, F_USHORT, 1, "SubjectDistanceRange"),
-    TAG_INFO(0xA420, F_ASCII, 33, "ImageUniqueID"),
-    TAG_INFO(0xA430, F_ASCII, AnyCount, "CameraOwnerName"),
-    TAG_INFO(0xA431, F_ASCII, AnyCount, "BodySerialNumber"),
-    TAG_INFO(0xA432, F_URATIONAL, 4, "LensSpecification"),
-    TAG_INFO(0xA433, F_ASCII, AnyCount, "LensMake"),
-    TAG_INFO(0xA434, F_ASCII, AnyCount, "LensModel"),
-    TAG_INFO(0xA435, F_ASCII, AnyCount, "LensSerialNumber"),
-    TAG_INFO(0xA436, F_ASCII, AnyCount, "ImageTitle"),
-    TAG_INFO(0xA437, F_ASCII, AnyCount, "Photographer"),
-    TAG_INFO(0xA438, F_ASCII, AnyCount, "ImageEditor"),
-    TAG_INFO(0xA439, F_ASCII, AnyCount, "CameraFirmware"),
-    TAG_INFO(0xA43A, F_ASCII, AnyCount, "RAWDevelopingSoftware"),
-    TAG_INFO(0xA43B, F_ASCII, AnyCount, "ImageEditingSoftware"),
-    TAG_INFO(0xA43C, F_ASCII, AnyCount, "MetadataEditingSoftware"),
-    TAG_INFO(0xA460, F_USHORT, 1, "CompositeImage"),
-    TAG_INFO(0xA461, F_USHORT, 2, "SourceImageNumberOfCompositeImage"),
-    TAG_INFO(0xA462, F_UNDEFINED, AnyCount, "SourceExposureTimesOfCompositeImage"),
-    TAG_INFO(0xA500, F_URATIONAL, 1, "Gamma")
+    TAG_INFO(0x5001, F_SHORT, F_NOTYPE, 1, "ResolutionXUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5002, F_SHORT, F_NOTYPE, 1, "ResolutionYUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5003, F_SHORT, F_NOTYPE, 1, "ResolutionXLengthUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5004, F_SHORT, F_NOTYPE, 1, "ResolutionYLengthUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5005, F_ASCII, F_NOTYPE, AnyCount /* Number of flags */, "PrintFlags"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5006, F_SHORT, F_NOTYPE, 1, "PrintFlagsVersion"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5007, F_BYTE, F_NOTYPE, 1, "PrintFlagsCrop"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5008, F_LONG, F_NOTYPE, 1, "PrintFlagsBleedWidth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5009, F_SHORT, F_NOTYPE, 1, "PrintFlagsBleedWidthScale"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500A, F_RATIONAL, F_NOTYPE, 1, "HalftoneLPI"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500B, F_SHORT, F_NOTYPE, 1, "HalftoneLPIUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500C, F_RATIONAL, F_NOTYPE, 1, "HalftoneDegree"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500D, F_SHORT, F_NOTYPE, 1, "HalftoneShape"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500E, F_LONG, F_NOTYPE, 1, "HalftoneMisc"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x500F, F_BYTE, F_NOTYPE, 1, "HalftoneScreen"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5010, F_SHORT, F_NOTYPE, AnyCount, "JPEGQuality"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5011, F_UNDEFINED, F_NOTYPE, AnyCount, "GridSize"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5012, F_LONG, F_NOTYPE, 1, "ThumbnailFormat"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5013, F_LONG, F_NOTYPE, 1, "ThumbnailWidth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5014, F_LONG, F_NOTYPE, 1, "ThumbnailHeight"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5015, F_SHORT, F_NOTYPE, 1, "ThumbnailColorDepth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5016, F_SHORT, F_NOTYPE, 1, "ThumbnailPlanes"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5017, F_LONG, F_NOTYPE, 1, "ThumbnailRawBytes"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5018, F_LONG, F_NOTYPE, 1, "ThumbnailSize"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5019, F_LONG, F_NOTYPE, 1, "ThumbnailCompressedSize"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x501A, F_UNDEFINED, F_NOTYPE, 0, "ColorTransferFunction"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x501B, F_BYTE, F_NOTYPE, 0, "ThumbnailData"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5020, F_LONG | F_SHORT, F_NOTYPE, 1, "ThumbnailImageWidth"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5021, F_LONG | F_SHORT, F_NOTYPE, 1, "ThumbnailImageHeight"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5022, F_SHORT, F_NOTYPE, 1, "ThumbnailBitsPerSample"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5023, F_SHORT, F_NOTYPE, 1, "ThumbnailCompression"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5024, F_SHORT, F_NOTYPE, 1, "ThumbnailPhotometricInterp"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5025, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailImageDescription"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5026, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailEquipMake"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5027, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailEquipModel"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5028, F_LONG | F_SHORT, F_NOTYPE, 0, "ThumbnailStripOffsets"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5029, F_SHORT, F_NOTYPE, 1, "ThumbnailOrientation"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502A, F_SHORT, F_NOTYPE, 1, "ThumbnailSamplesPerPixel"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502B, F_LONG | F_SHORT, F_NOTYPE, 1, "ThumbnailRowsPerStrip"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502C, F_LONG | F_SHORT, F_NOTYPE, 0, "ThumbnailStripBytesCount"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502D, F_SHORT /* type provided by ThumbnailResolutionUnit */, F_NOTYPE, 0, "ThumbnailResolutionX"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502E, F_SHORT /* type provided by ThumbnailResolutionUnit */, F_NOTYPE, 0, "ThumbnailResolutionY"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x502F, F_SHORT, F_NOTYPE, 1, "ThumbnailPlanarConfig"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5030, F_SHORT, F_NOTYPE, 1, "ThumbnailResolutionUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5031, F_SHORT, F_NOTYPE, 0, "ThumbnailTransferFunction"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5032, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailSoftwareUsed"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5033, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailDateTime"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5034, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailArtist"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5035, F_RATIONAL, F_NOTYPE, 2, "ThumbnailWhitePoint"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5036, F_RATIONAL, F_NOTYPE, 6, "ThumbnailPrimaryChromaticities"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5037, F_RATIONAL, F_NOTYPE, 3, "ThumbnailYCbCrCoefficients"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5038, F_SHORT, F_NOTYPE, 2, "ThumbnailYCbCrSubsampling"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5039, F_SHORT, F_NOTYPE, 1, "ThumbnailYCbCrPositioning"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x503A, F_RATIONAL, F_NOTYPE, 6, "ThumbnailRefBlackWhite"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x503B, F_ASCII, F_NOTYPE, AnyCount, "ThumbnailCopyRight"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5090, F_SHORT, F_NOTYPE, 64, "LuminanceTable"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5091, F_SHORT, F_NOTYPE, 64, "ChrominanceTable"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5100, F_LONG, F_NOTYPE, 0, "FrameDelay"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5101, F_SHORT, F_NOTYPE, 1, "LoopCount"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5102, F_BYTE, F_NOTYPE, 0, "GlobalPalette"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5103, F_BYTE, F_NOTYPE, 1, "IndexBackground"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5104, F_BYTE, F_NOTYPE, 1, "IndexTransparent"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5110, F_BYTE, F_NOTYPE, 0, "PixelUnit"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5111, F_LONG, F_NOTYPE, 1, "PixelPerUnitX"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5112, F_LONG, F_NOTYPE, 1, "PixelPerUnitY"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x5113, F_BYTE, F_NOTYPE, AnyCount, "PaletteHistogram"), /* Microsoft Windows GDI+ */
+    TAG_INFO(0x800D, F_ASCII, F_NOTYPE, AnyCount, "ImageID"), /* Adobe OPI */
+    TAG_INFO(0x80E3, F_NOTYPE, F_NOTYPE, 0, "Matteing"),
+    TAG_INFO(0x80E4, F_NOTYPE, F_NOTYPE, 0, "DataType"),
+    TAG_INFO(0x80E5, F_NOTYPE, F_NOTYPE, 0, "ImageDepth"),
+    TAG_INFO(0x80E6, F_NOTYPE, F_NOTYPE, 0, "TileDepth"),
+    TAG_INFO(0x828D, F_SHORT, F_NOTYPE, 0, "CFARepeatPatternDim"),
+    TAG_INFO(0x828E, F_BYTE, F_NOTYPE, 0, "CFAPattern"),
+    TAG_INFO(0x828F, F_RATIONAL, F_NOTYPE, 0, "BatteryLevel"),
+    TAG_INFO(0x8298, F_ASCII, F_NOTYPE, AnyCount, "Copyright"),
+    TAG_INFO(0x829A, F_RATIONAL, F_NOTYPE, 1, "ExposureTime"),
+    TAG_INFO(0x829D, F_RATIONAL, F_NOTYPE, 1, "FNumber"),
+    TAG_INFO(0x83BB, F_LONG, F_NOTYPE, 0, "IPTC/NAA"),
+    TAG_INFO(0x84E3, F_NOTYPE, F_NOTYPE, 0, "IT8RasterPadding"),
+    TAG_INFO(0x84E5, F_NOTYPE, F_NOTYPE, 0, "IT8ColorTable"),
+    TAG_INFO(0x8649, F_NOTYPE, F_NOTYPE, 0, "ImageResourceInformation"),
+    TAG_INFO(0x8769, F_LONG, F_NOTYPE, 1, "ExifOffset"), /* Exif IFD Pointer */
+    TAG_INFO(0x8773, F_BYTE, F_NOTYPE, AnyCount, "InterColorProfile"), /* ICCProfile */
+    TAG_INFO(0x8822, F_SHORT, F_NOTYPE, 1, "ExposureProgram"),
+    TAG_INFO(0x8824, F_ASCII, F_NOTYPE, AnyCount, "SpectralSensitivity"),
+    TAG_INFO(0x8825, F_LONG /* TBD */, F_SLONG, 1, "GPSInfo"), /* Offset to GPS IFD */
+    TAG_INFO(0x8827, F_SHORT, F_NOTYPE, AnyCount, "PhotographicSensitivity"), /* Was "ISOSpeedRatings" */
+    TAG_INFO(0x8828, F_UNDEFINED, F_NOTYPE, AnyCount, "OECF"),
+    TAG_INFO(0x8830, F_SHORT, F_NOTYPE, 1, "SensitivityType"),
+    TAG_INFO(0x8831, F_LONG, F_NOTYPE, 1, "StandardOutputSensitivity"),
+    TAG_INFO(0x8832, F_LONG, F_NOTYPE, 1, "RecommendedExposureIndex"),
+    TAG_INFO(0x8833, F_LONG, F_NOTYPE, 1, "ISOSpeed"),
+    TAG_INFO(0x8834, F_LONG, F_NOTYPE, 1, "ISOSpeedLatitudeyyy"),
+    TAG_INFO(0x8835, F_LONG, F_NOTYPE, 1, "ISOSpeedLatitudezzz"),
+    TAG_INFO(0x9000, F_UNDEFINED, F_NOTYPE, 4, "ExifVersion"), /* e.g. "0300" without NUL */
+    TAG_INFO(0x9003, F_ASCII, F_NOTYPE, 20, "DateTimeOriginal"),
+    TAG_INFO(0x9004, F_ASCII, F_NOTYPE, 20, "DateTimeDigitized"),
+    TAG_INFO(0x9010, F_ASCII, F_NOTYPE, 7, "OffsetTime"),
+    TAG_INFO(0x9011, F_ASCII, F_NOTYPE, 7, "OffsetTimeOriginal"),
+    TAG_INFO(0x9012, F_ASCII, F_NOTYPE, 7, "OffsetTimeDigitized"),
+    TAG_INFO(0x9101, F_UNDEFINED, F_NOTYPE, 4, "ComponentsConfiguration"),
+    TAG_INFO(0x9102, F_RATIONAL, F_NOTYPE, 1, "CompressedBitsPerPixel"),
+    TAG_INFO(0x9201, F_SRATIONAL /* TBD */, F_RATIONAL, 1, "ShutterSpeedValue"),
+    TAG_INFO(0x9202, F_RATIONAL, F_NOTYPE, 1, "ApertureValue"),
+    TAG_INFO(0x9203, F_SRATIONAL, F_NOTYPE, 1, "BrightnessValue"),
+    TAG_INFO(0x9204, F_SRATIONAL /* TBD */, F_RATIONAL, 1, "ExposureBiasValue"),
+    TAG_INFO(0x9205, F_RATIONAL, F_NOTYPE, 1, "MaxApertureValue"),
+    TAG_INFO(0x9206, F_RATIONAL, F_NOTYPE, 1, "SubjectDistance"),
+    TAG_INFO(0x9207, F_SHORT, F_NOTYPE, 1, "MeteringMode"),
+    TAG_INFO(0x9208, F_SHORT, F_NOTYPE, 1, "LightSource"),
+    TAG_INFO(0x9209, F_SHORT, F_NOTYPE, 1, "Flash"),
+    TAG_INFO(0x920A, F_RATIONAL, F_NOTYPE, 1, "FocalLength"),
+    TAG_INFO(0x9214, F_SHORT, F_NOTYPE, AnyCount /* 2 or 3 or 4 */, "SubjectArea"),
+    TAG_INFO(0x927C, F_UNDEFINED, F_NOTYPE, AnyCount, "MakerNote"),
+    TAG_INFO(0x9286, F_UNDEFINED, F_NOTYPE, AnyCount, "UserComment"),
+    TAG_INFO(0x9290, F_ASCII, F_NOTYPE, AnyCount, "SubSecTime"),
+    TAG_INFO(0x9291, F_ASCII, F_NOTYPE, AnyCount, "SubSecTimeOriginal"),
+    TAG_INFO(0x9292, F_ASCII, F_NOTYPE, AnyCount, "SubSecTimeDigitized"),
+    TAG_INFO(0x9400, F_SRATIONAL, F_NOTYPE, 1, "Temperature"),
+    TAG_INFO(0x9401, F_RATIONAL, F_NOTYPE, 1, "Humidity"),
+    TAG_INFO(0x9402, F_RATIONAL, F_NOTYPE, 1, "Pressure"),
+    TAG_INFO(0x9403, F_SRATIONAL, F_NOTYPE, 1, "WaterDepth"),
+    TAG_INFO(0x9404, F_RATIONAL, F_NOTYPE, 1, "Acceleration"),
+    TAG_INFO(0x9405, F_SRATIONAL, F_NOTYPE, 1, "CameraElevationAngle "),
+    TAG_INFO(0x9C9B, F_BYTE, F_NOTYPE, AnyCount, "WinXP-Title"),     /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9C, F_BYTE, F_NOTYPE, AnyCount, "WinXP-Comments"),  /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9D, F_BYTE, F_NOTYPE, AnyCount, "WinXP-Author"),    /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9E, F_BYTE, F_NOTYPE, AnyCount, "WinXP-Keywords"),  /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0x9C9F, F_BYTE, F_NOTYPE, AnyCount, "WinXP-Subject"),   /* Win XP specific, UTF-16 Unicode */
+    TAG_INFO(0xA000, F_UNDEFINED, F_NOTYPE, 4, "FlashPixVersion"),
+    TAG_INFO(0xA001, F_SHORT , F_NOTYPE, 1, "ColorSpace"),
+    TAG_INFO(0xA002, F_SHORT | F_LONG /* TBD */, F_SLONG, 1, "PixelXDimension"), /* Was "ExifImageWidth" */
+    TAG_INFO(0xA003, F_SHORT | F_LONG /* TBD */, F_SLONG, 1, "PixelYDimension"), /* Was "ExifImageLength" */
+    TAG_INFO(0xA004, F_ASCII, F_NOTYPE, 13, "RelatedSoundFile"),
+    TAG_INFO(0xA005, F_LONG, F_NOTYPE, 0, "InteroperabilityOffset"), /* Interoperability IFD Pointer */
+    TAG_INFO(0xA20B, F_RATIONAL, F_NOTYPE, 1, "FlashEnergy"),
+    TAG_INFO(0xA20C, F_UNDEFINED, F_NOTYPE, AnyCount, "SpatialFrequencyResponse"),
+    TAG_INFO(0xA20D, F_NOTYPE, F_NOTYPE, 0, "Noise"),
+    TAG_INFO(0xA20E, F_RATIONAL, F_NOTYPE, 1, "FocalPlaneXResolution"),
+    TAG_INFO(0xA20F, F_RATIONAL, F_NOTYPE, 1, "FocalPlaneYResolution"),
+    TAG_INFO(0xA210, F_SHORT, F_NOTYPE, 1, "FocalPlaneResolutionUnit"),
+    TAG_INFO(0xA211, F_NOTYPE, F_NOTYPE, 0, "ImageNumber"),
+    TAG_INFO(0xA212, F_NOTYPE, F_NOTYPE, 0, "SecurityClassification"),
+    TAG_INFO(0xA213, F_NOTYPE, F_NOTYPE, 0, "ImageHistory"),
+    TAG_INFO(0xA214, F_SHORT, F_NOTYPE, 2, "SubjectLocation"),
+    TAG_INFO(0xA215, F_RATIONAL, F_NOTYPE, 1, "ExposureIndex"),
+    TAG_INFO(0xA216, F_NOTYPE, F_NOTYPE, 0, "TIFF_EPStandardID"),
+    TAG_INFO(0xA217, F_SHORT, F_BYTE, 1, "SensingMethod"),
+    TAG_INFO(0xA300, F_UNDEFINED, F_BYTE, AnyCount /* varies (0,1,2,3), TBD */, "FileSource"),
+    TAG_INFO(0xA301, F_UNDEFINED, F_BYTE, 1, "SceneType"),
+    TAG_INFO(0xA302, F_UNDEFINED, F_NOTYPE, AnyCount, "CFAPattern"),
+    TAG_INFO(0xA401, F_SHORT, F_NOTYPE, 1, "CustomRendered"),
+    TAG_INFO(0xA402, F_SHORT, F_NOTYPE, 1, "ExposureMode"),
+    TAG_INFO(0xA403, F_SHORT, F_NOTYPE, 1, "WhiteBalance"),
+    TAG_INFO(0xA404, F_RATIONAL, F_NOTYPE, 1, "DigitalZoomRatio"),
+    TAG_INFO(0xA405, F_SHORT, F_NOTYPE, 1, "FocalLengthIn35mmFilm"),
+    TAG_INFO(0xA406, F_SHORT, F_NOTYPE, 1, "SceneCaptureType"),
+    TAG_INFO(0xA407, F_SHORT, F_NOTYPE, 1, "GainControl"),
+    TAG_INFO(0xA408, F_SHORT, F_NOTYPE, 1, "Contrast"),
+    TAG_INFO(0xA409, F_SHORT, F_NOTYPE, 1, "Saturation"),
+    TAG_INFO(0xA40A, F_SHORT, F_NOTYPE, 1, "Sharpness"),
+    TAG_INFO(0xA40B, F_UNDEFINED, F_NOTYPE, AnyCount, "DeviceSettingDescription"),
+    TAG_INFO(0xA40C, F_SHORT, F_NOTYPE, 1, "SubjectDistanceRange"),
+    TAG_INFO(0xA420, F_ASCII, F_NOTYPE, 33, "ImageUniqueID"),
+    TAG_INFO(0xA430, F_ASCII, F_NOTYPE, AnyCount, "CameraOwnerName"),
+    TAG_INFO(0xA431, F_ASCII, F_NOTYPE, AnyCount, "BodySerialNumber"),
+    TAG_INFO(0xA432, F_RATIONAL, F_NOTYPE, 4, "LensSpecification"),
+    TAG_INFO(0xA433, F_ASCII, F_NOTYPE, AnyCount, "LensMake"),
+    TAG_INFO(0xA434, F_ASCII, F_NOTYPE, AnyCount, "LensModel"),
+    TAG_INFO(0xA435, F_ASCII, F_NOTYPE, AnyCount, "LensSerialNumber"),
+    TAG_INFO(0xA436, F_ASCII, F_NOTYPE, AnyCount, "ImageTitle"),
+    TAG_INFO(0xA437, F_ASCII, F_NOTYPE, AnyCount, "Photographer"),
+    TAG_INFO(0xA438, F_ASCII, F_NOTYPE, AnyCount, "ImageEditor"),
+    TAG_INFO(0xA439, F_ASCII, F_NOTYPE, AnyCount, "CameraFirmware"),
+    TAG_INFO(0xA43A, F_ASCII, F_NOTYPE, AnyCount, "RAWDevelopingSoftware"),
+    TAG_INFO(0xA43B, F_ASCII, F_NOTYPE, AnyCount, "ImageEditingSoftware"),
+    TAG_INFO(0xA43C, F_ASCII, F_NOTYPE, AnyCount, "MetadataEditingSoftware"),
+    TAG_INFO(0xA460, F_SHORT, F_NOTYPE, 1, "CompositeImage"),
+    TAG_INFO(0xA461, F_SHORT, F_NOTYPE, 2, "SourceImageNumberOfCompositeImage"),
+    TAG_INFO(0xA462, F_UNDEFINED, F_NOTYPE, AnyCount, "SourceExposureTimesOfCompositeImage"),
+    TAG_INFO(0xA500, F_RATIONAL, F_NOTYPE, 1, "Gamma")
   };
 
 /* Set to non-zero in order to use bsearch rather than linear search. */
@@ -1597,13 +1605,13 @@ EXIFIfdFieldTypeToStr(unsigned int f)
       str="STRING";
       break;
     case EXIF_FMT_USHORT:
-      str="USHORT";
+      str="SHORT";
       break;
     case EXIF_FMT_ULONG:
-      str="ULONG";
+      str="LONG";
       break;
     case EXIF_FMT_URATIONAL:
-      str="URATIONAL";
+      str="RATIONAL";
       break;
     case EXIF_FMT_SBYTE:
       str="SBYTE";
@@ -1670,13 +1678,13 @@ static unsigned int ExifFmtToFmtBits(unsigned int f)
       bits=F_ASCII;
       break;
     case EXIF_FMT_USHORT:
-      bits=F_USHORT;
+      bits=F_SHORT;
       break;
     case EXIF_FMT_ULONG:
-      bits=F_ULONG;
+      bits=F_LONG;
       break;
     case EXIF_FMT_URATIONAL:
-      bits=F_URATIONAL;
+      bits=F_RATIONAL;
       break;
     case EXIF_FMT_SBYTE:
       bits=F_SBYTE;
@@ -1707,55 +1715,34 @@ static unsigned int ExifFmtToFmtBits(unsigned int f)
   Get the expected bit-field bits for format and use it to verify if
   it is an expected format (a bit matches).
 */
-static MagickPassFail ValidateExifFmtAgainstBitField(const IFDTagTableType *key_p,const unsigned int fmt)
+typedef enum
+  {
+    ExifFmtGood,
+    ExifFmtFishy,
+    ExifFmtBad
+  } ExifFmtStatus;
+
+static ExifFmtStatus ValidateExifFmtAgainstBitField(const IFDTagTableType *key_p,const unsigned int fmt)
 {
   MagickPassFail
     status;
 
   if (key_p->format & ExifFmtToFmtBits(fmt))
-    status=MagickPass;
+    {
+      /* Totally good! */
+      status=ExifFmtGood;
+    }
+  else if ((key_p->format | key_p->format_alt) & ExifFmtToFmtBits(fmt))
+    {
+      /* Fishy */
+      status=ExifFmtFishy;
+    }
   else
-    status=MagickFail;
+    {
+      /* Bad */
+      status=ExifFmtBad;
+    }
   return status;
-}
-
-/*
-  For a given IFD type and tag, validate that the claimed format and components are valid.
-*/
-static MagickPassFail ValidateIfdTagFmt(const MagickBool gpstag, const unsigned int tag, const int claimed_format, const unsigned int claimed_components)
-{
-  int valid=MagickTrue;
-
-  if (gpstag)
-    {
-      if (/* (t < GPS_TAG_START) ||*/ (tag > GPS_TAG_STOP))
-        valid=MagickFalse;
-    }
-  else
-    {
-      if ((tag < EXIF_TAG_START) || ( tag > EXIF_TAG_STOP))
-        valid=MagickFalse;
-    }
-
-  if (valid)
-    {
-      const IFDTagTableType *key_p = FindEXIFTableEntryByTag(tag,tag_table,ArraySize(tag_table));
-      if (key_p)
-        {
-          /* Validate format */
-          if (ValidateExifFmtAgainstBitField(key_p,claimed_format) != MagickPass)
-            {
-              valid=MagickFalse;
-            }
-
-          /* Validate number of components */
-          if (!((key_p->count == AnyCount) || (key_p->count <= 0) || (claimed_components <= (unsigned int) key_p->count)))
-            {
-              valid=MagickFalse;
-            }
-        }
-    }
-  return valid;
 }
 
 static magick_int16_t
@@ -2238,21 +2225,86 @@ GenerateEXIFAttribute(Image *image,const char *specification)
               goto generate_attribute_failure;
             }
 
-          /* if (logging && debug) */
+          if (gpsfound)
             {
-              const char *ifd_type;
-              if (gpsfound)
-                ifd_type="GPS";
-              else
-                ifd_type="EXIF";
+              if (/* (t < GPS_TAG_START) || */ (t > GPS_TAG_STOP))
+                {
+                  if (logging & debug)
+                    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                          "EXIF: Skipping bogus GPS IFD tag %d ...",t);
+                  continue;
+                }
+            }
+          else
+            {
+              if ((t < EXIF_TAG_START) || ( t > EXIF_TAG_STOP))
+                {
+                  if (logging & debug)
+                    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                          "EXIF: Skipping bogus EXIF IFD tag %d ...",t);
+                  continue;
+                }
+            }
 
+          /* if (logging && debug) */
+          {
+            const char *ifd_type;
+            int valid = MagickTrue;
+
+            if (gpsfound)
+              ifd_type="GPS";
+            else
+              ifd_type="EXIF";
+
+            /*
+              Enable logging via:
+
+              MAGICK_DEBUG=transform MAGICK_DEBUG_EXIF=TRUE gm convert file.jpg -format '%[EXIF:*]' info:-
+            */
+
+            {
               /*
-                Enable logging via:
-
-                MAGICK_DEBUG=transform MAGICK_DEBUG_EXIF=TRUE gm convert file.jpg -format '%[EXIF:*]' info:-
+                For a given IFD type and tag, validate that the claimed format and components are valid.
               */
-              int valid = ValidateIfdTagFmt(gpsfound,t,f,c);
+              const IFDTagTableType *key_p = FindEXIFTableEntryByTag(t,tag_table,ArraySize(tag_table));
+              if (key_p)
+                {
+                  /* Validate format */
+                  ExifFmtStatus fmt_status = ValidateExifFmtAgainstBitField(key_p,f);
 
+                  switch (fmt_status)
+                    {
+                    case ExifFmtGood:
+                      break;
+                    case ExifFmtFishy:
+                      /* Support tracing tags which use the wrong field type */
+                      if (logging)
+                        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                              "%s IFD: TagVal=%d (0x%04x) TagDescr=\"%s\" Fishy field type %d (%s)",
+                                              ifd_type,
+                                              t,t,
+                                              EXIFIfdTagToDescription(t,tag_description), f, EXIFIfdFieldTypeToStr(f));
+                      break;
+                    case ExifFmtBad:
+                      valid=MagickFalse;
+                      break;
+                    }
+
+                  /* Validate number of components */
+                  if (!((key_p->count == AnyCount) || (key_p->count <= 0) || (c <= (unsigned int) key_p->count)))
+                    {
+                      if (logging)
+                        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                              "%s IFD: TagVal=%d (0x%04x) TagDescr=\"%s\" Expected %u components (have %u)",
+                                              ifd_type,
+                                              t,t,
+                                              EXIFIfdTagToDescription(t,tag_description), (unsigned int) key_p->count, c);
+                      valid=MagickFalse;
+                    }
+                }
+            }
+
+            if (logging)
               (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                     "%s IFD: TagVal=%d (0x%04x) TagDescr=\"%s\" Format=%d "
                                     "FormatDescr=\"%s\"  Components=%u Valid=%s",
@@ -2261,14 +2313,14 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                     EXIFIfdTagToDescription(t,tag_description),f,
                                     EXIFIfdFieldTypeToStr(f),c,
                                     valid == MagickFail ? "No" : "Yes");
-              if (valid != MagickTrue)
-                {
-                  if (logging & debug)
-                    (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                          "Skipping bogus %s tag %d (0x%04X) ...",ifd_type,t,t);
-                  continue;
-                }
-            }
+            if (valid != MagickTrue)
+              {
+                if (logging & debug)
+                  (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                        "Skipping bogus %s tag %d (0x%04X) ...",ifd_type,t,t);
+                continue;
+              }
+          }
 
 
           /*

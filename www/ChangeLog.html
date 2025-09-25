@@ -41,6 +41,10 @@
 <p>2025-09-25  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/attribute.c (GenerateEXIFAttribute): Provide a way to
+accept somewhat incorrect field tags.  For the moment, accept
+incorrect field tags, but provide a way to trace the &quot;fishy&quot; field
+tags.</p></li>
 <li><p>fuzzing/oss-fuzz-build.sh (enable_de265): Remove libde265 from
 the oss-fuzz build given that it obviously has never been fuzz
 tested, does not appear to be maintained, and it is producing the
