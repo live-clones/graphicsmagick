@@ -6,6 +6,8 @@
 GraphicsMagick vs ImageMagick Benchmarks
 =============================================================
 
+.. _`Hyperfine` : https://github.com/sharkdp/hyperfine
+
 .. contents::
   :local:
 
@@ -56,17 +58,23 @@ performance that the typical user observes.
 This new benchmark reveals the following performance criteria:
 
   * Basic execution overhead of the software.
-  
+
   * Image processing algorithmic efficiency.
-  
+
   * Efficacy of OpenMP enhancements.
 
-The Benchmark
-=============
+The Simple Benchmark
+====================
 
 The benchmark is quite simple. It reads a list of commands to execute
 from a file named "commands.txt" and times how long it takes to
 execute each command 40 times using GraphicsMagick and ImageMagick.
+This script will work with ImageMagick up to version 6.X, but not with
+ImageMagick 7.X given that there is no longer a 'convert' command.
+
+A sample set of commands to test with (not all of which will work with
+ImageMagick) may be found in the GraphicsMagick source tree as
+"utilities/tests/convert-cmds.txt".
 
 Here is the simple benchmark script::
 
@@ -114,7 +122,7 @@ Here is the simple benchmark script::
   cat commands.txt | while read subcommand
   do
     echo ${subcommand}
-  
+
     command1="${convert1} ${input_image} ${subcommand} ${output_image}"
     i=0
     count=$iterations
@@ -124,7 +132,7 @@ Here is the simple benchmark script::
       let i=i+1
     done
     sleep 1
-  
+
     command2="${convert2} ${input_image} ${subcommand} ${output_image}"
     i=0
     count=$iterations
@@ -133,7 +141,44 @@ Here is the simple benchmark script::
       eval "${command2}"
       let i=i+1
     done
-  
+
     echo
     sleep 1
   done 2>&1
+
+Performance testing with 'hyperfine'
+====================================
+
+Recently I learned about a Linux benchmark utility called
+`Hyperfine`_. Hyperfine is available via GitHub, or as a package in
+Linux distributions.
+
+Hyperfine_ provides a handy way to evaluate the performance of two commands.
+For example to evaluate the performance of a rotate request::
+
+  cd /tmp
+  gm convert rose: -resize 5000% -verbose rose.pnm
+  hyperfine --warmup 2 --min-runs 20 'gm convert rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
+  hyperfine --warmup 2 --min-runs 20 'magick rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
+  hyperfine --warmup 2 --min-runs 20 'gm convert rose.pnm -rotate 90 output.pnm' --cleanup 'rm -f output.pnm'
+  hyperfine --warmup 2 --min-runs 20 'magick rose.pnm -rotate 90 output.pnm' --cleanup 'rm -f output.pnm'
+
+produces output like this on my laptop::
+
+  ROSE PPM 70x46=>3500x2300+0+0 DirectClass 8-bit 0.000u 0m:0.000056s
+  rose.pnm PNM 70x46=>3500x2300+0+0 DirectClass 8-bit 23.0Mi 0.130u 0m:0.021209s (148.3Ki pixels/s)
+  Benchmark 1: gm convert rose.pnm -rotate 92 output.pnm
+    Time (mean ± σ):     178.0 ms ±  15.4 ms    [User: 787.9 ms, System: 151.0 ms]
+    Range (min … max):   165.6 ms … 224.1 ms    20 runs
+
+  Benchmark 1: magick rose.pnm -rotate 92 output.pnm
+    Time (mean ± σ):     785.3 ms ±  62.0 ms    [User: 2039.6 ms, System: 93.3 ms]
+    Range (min … max):   714.9 ms … 921.5 ms    20 runs
+
+  Benchmark 1: gm convert rose.pnm -rotate 90 output.pnm
+    Time (mean ± σ):      77.1 ms ±   3.1 ms    [User: 75.7 ms, System: 63.6 ms]
+    Range (min … max):    70.6 ms …  81.6 ms    41 runs
+
+  Benchmark 1: magick rose.pnm -rotate 90 output.pnm
+    Time (mean ± σ):     187.8 ms ±   9.5 ms    [User: 128.0 ms, System: 78.3 ms]
+    Range (min … max):   177.0 ms … 206.6 ms    20 runs
