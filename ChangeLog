@@ -1,5 +1,10 @@
 2025-09-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/braille.c (WriteBRAILLEImage): Eliminate a Clang
+	scan-build gripe regarding access off the end of an array. In
+	practice, this would never happen given that the inputs are
+	already sanitized.
+
 	* coders/xpm.c (ParseColor): Eliminate a Clang scan-build gripe
 	about use of a "garbage value". It is not clear to me that the
 	implementation could actually provoke this issue given the huge

@@ -41,6 +41,10 @@
 <p>2025-09-28  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/braille.c (WriteBRAILLEImage): Eliminate a Clang
+scan-build gripe regarding access off the end of an array. In
+practice, this would never happen given that the inputs are
+already sanitized.</p></li>
 <li><p>coders/xpm.c (ParseColor): Eliminate a Clang scan-build gripe
 about use of a &quot;garbage value&quot;. It is not clear to me that the
 implementation could actually provoke this issue given the huge
