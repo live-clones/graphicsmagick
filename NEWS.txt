@@ -95,7 +95,8 @@ Bug fixes:
 * TIFF: Only handle EXIF and GPS IFDs once in order to avoid infinite
   recursion.
 
-* TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION and TIFFTAG_COLORMAP tags.
+* TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION and
+  TIFFTAG_COLORMAP tags.
 
 * GetImageBoundingBox(): If image rows or columns is zero, then return
   default bounds.

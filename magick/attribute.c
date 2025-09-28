@@ -2307,7 +2307,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
             if (logging)
               (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                     "%s IFD: TagVal=%d (0x%04x) TagDescr=\"%s\" Format=%d "
-                                    "FormatDescr=\"%s\"  Components=%u Valid=%s",
+                                    "FormatDescr=\"%s\" Components=%u Valid=%s",
                                     ifd_type,
                                     t,t,
                                     EXIFIfdTagToDescription(t,tag_description),f,

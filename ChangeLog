@@ -1,3 +1,10 @@
+2025-09-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/xpm.c (ParseColor): Eliminate a Clang scan-build gripe
+	about use of a "garbage value". It is not clear to me that the
+	implementation could actually provoke this issue given the huge
+	amount of successful fuzzer tests.
+
 2025-09-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/attribute.c (GenerateEXIFAttribute): Provide a way to
