@@ -53,6 +53,9 @@ Bug fixes:
   image is indicated to be opaque. This avoids issues with code which
   assumes that the opacity channel is always initialized.
 
+* BRAILLE: Eliminate a Clang scan-build gripe regarding access off the
+  end of an array.
+
 * JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
   inverted. This bug is now fixed.
 
@@ -97,6 +100,8 @@ Bug fixes:
 
 * TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION and
   TIFFTAG_COLORMAP tags.
+
+* XPM: Eliminate a Clang scan-build gripe about use of a "garbage value".
 
 * GetImageBoundingBox(): If image rows or columns is zero, then return
   default bounds.

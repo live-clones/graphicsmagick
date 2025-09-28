@@ -1,5 +1,13 @@
 2025-09-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* NEWS.txt: Update the news.
+
+	* www/benchmarks.rst: Provide an example of how to use Hyperfine
+	to benchmark two commands under Linux.
+
+	* www/index.rst: Add/update Coverity and Clang 15 scan-build
+	metrics.
+
 	* coders/braille.c (WriteBRAILLEImage): Eliminate a Clang
 	scan-build gripe regarding access off the end of an array. In
 	practice, this would never happen given that the inputs are
