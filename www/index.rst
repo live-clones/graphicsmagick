@@ -131,6 +131,12 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
+  * GM has 0.00 (zero) defects per 1000 lines of code (377,082 total
+    lines included) according to `Coverity Analysis Metrics`_ on
+    September 28th, 2025.
+
+  * GM has zero issues detected by Clang 15 scan-build.
+
   * GM comes with a comprehensive `manual page`_.
 
   * GM provides API and ABI stability and managed releases that you can
@@ -149,10 +155,6 @@ other popular software:
   * GM source code is managed in Mercurial_, a distributed source
     control management tool which supports management of local
     changes.  The repository history goes back to 1998.
-
-  * GM has 0.00 (zero) defects per 1000 lines of code (376,347 total
-    lines included) according to `Coverity Analysis Metrics`_ on June
-    13th, 2025.
 
   * GM developers contribute to other free projects for the public good.
 
