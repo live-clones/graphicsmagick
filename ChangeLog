@@ -1,5 +1,7 @@
 2025-09-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/jp2.c (ReadJP2Image): Assume 3 samples per pixel.
+
 	* fuzzing/utils.cc (MagickState): Also set the PixelsResource
 	limit.
 

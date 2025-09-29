@@ -853,7 +853,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
                               "%" MAGICK_UINTMAX_F "u, max_samples_pixels = %" MAGICK_UINTMAX_F "u",
                               max_samples_rectangle, max_samples_pixels);
 
-        FormatString(option_keyval,"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples);
+        FormatString(option_keyval,"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples*3);
         ConcatenateString(&options,option_keyval);
       }
 
