@@ -1,3 +1,9 @@
+2025-09-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/jp2.c (ReadJP2Image): Include width and height resource
+	limits, as well as image pixel memory requirements when estimating
+	the Jasper max_samples limit value.
+
 2025-09-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

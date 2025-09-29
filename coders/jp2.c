@@ -842,8 +842,16 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
     */
     if (!max_samples_specified)
       {
+        const magick_uintmax_t width_limit = (magick_uintmax_t) GetMagickResourceLimit(WidthResource);
+        const magick_uintmax_t height_limit = (magick_uintmax_t) GetMagickResourceLimit(HeightResource);
         const magick_uintmax_t memory_limit = (magick_uintmax_t) GetMagickResourceLimit(MemoryResource);
-        const magick_uintmax_t max_samples = memory_limit/4U * sizeof(magick_uint32_t);
+        const magick_uintmax_t max_samples_dimension = width_limit*height_limit;
+        const magick_uintmax_t max_samples_memory = memory_limit/((sizeof(PixelPacket)+sizeof(IndexPacket))*8U);
+        const magick_uintmax_t max_samples = Min(max_samples_dimension,max_samples_memory);
+
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "max_samples limits: max_samples_dimension = %zu, max_samples_memory = %zu",
+                              max_samples_dimension, max_samples_memory);
 
         FormatString(option_keyval,"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples);
         ConcatenateString(&options,option_keyval);
