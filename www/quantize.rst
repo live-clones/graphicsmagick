@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 =================================
 GraphicsMagick Color Quantization
@@ -85,10 +85,10 @@ For Cmax=255,
 
   Maximum tree depth = log (256)
   2
- 
+
   = log (256) / log (2)
   e e
- 
+
   = 8
 
 A tree of this depth generally allows the best representation of the
@@ -180,7 +180,7 @@ when color reducing an image. Here the algorithm is as described except
 each pixel is a point in the alternate color space. For convenience, the
 color components are normalized to the range 0 to a maximum value, Cmax.
 The color reduction can then proceed as described.
- 
+
 
 Measuring Color Reduction Error
 ===============================
@@ -227,7 +227,7 @@ specified on the command line:
 Authors
 =======
 
-John Cristy, magick@imagemagick.org, ImageMagick Studio.
+John Cristy, ImageMagick Studio.
 
 Acknowledgements
 ================

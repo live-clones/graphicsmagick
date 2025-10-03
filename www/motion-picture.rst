@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ===========================================
 GraphicsMagick Cineon and SMTPE DPX Support
@@ -13,9 +13,7 @@ GraphicsMagick Cineon and SMTPE DPX Support
    :keywords: GraphicsMagick, Cineon, DPX, SMPTE 268M, Motion Picture
 
 .. _GraphicsMagick : index.html
-.. _SMPTE : http://www.smpte.org/
-.. _typical pixel resolutions : http://www.surrealroad.com/digital/index.php/archives/2005/standard-data-resolutions/
-.. _Surreal Road : http://blog.surrealroad.com//
+.. _SMPTE : https://www.smpte.org/
 
 .. _animate : animate.html
 .. _composite : composite.html
@@ -45,9 +43,9 @@ arbitrary image pixel size.  The Cineon implementation supports 8 and
 Film images are usually captured at *2K* resolution (82 pixels/mm),
 *4K* resolution (164 pixels/mm), or even *8K* resolution (328
 pixels/mm), where the actual resolution values approximate the
-horizontal dimension of the image. A table of `typical pixel
-resolutions`_ for various film sizes may be found on the `Surreal
-Road`_ site (table reproduced here for convenience). File sizes may be
+horizontal dimension of the image. A table of typical pixel
+resolutions for various film sizes used to be found on the Surreal
+Road site (table reproduced here for convenience). File sizes may be
 quite large and range in size from 8MB to as much as 180MB. The common
 10-bit *2K* format consumes 12MB of disk while a 10-bit *4K* scan
 consumes 50MB of disk.

@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ==================
 GraphicsMagick FAQ
@@ -96,7 +96,7 @@ the few remaining algorithms, or remove inefficiencies in algorithms
 which don't see as much speed-up as they should.  Linear speedup as
 cores are added is typical for CPU-bound algorithms on well-designed
 CPUs.  Regardless, `Amdahl's law
-<http://en.wikipedia.org/wiki/Amdal%27s_law>`_ is a significant factor
+<https://en.wikipedia.org/wiki/Amdal%27s_law>`_ is a significant factor
 in GraphicsMagick, with non-parallelizable code paths often dominating
 the time.
 
@@ -122,8 +122,8 @@ What is the meaning of "magick"?
 --------------------------------
 
 According to the infamous British occultist `Aleister Crowley
-<http://en.wikipedia.org/wiki/Aleister_Crowley>`_, the definition of
-`magick <http://en.wikipedia.org/wiki/Magick_(Aleister_Crowley)>`_ is
+<https://en.wikipedia.org/wiki/Aleister_Crowley>`_, the definition of
+`magick <https://en.wikipedia.org/wiki/Magick_(Aleister_Crowley)>`_ is
 "the science and art of causing change to occur in conformity with the
 will".
 

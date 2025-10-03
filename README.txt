@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 =========================
 Installing GraphicsMagick
@@ -31,7 +31,7 @@ Availability
 ------------
 
 GraphicsMagick release files may be downloaded from SourceForge
-at http://sourceforge.net/projects/graphicsmagick/files/.
+at https://sourceforge.net/projects/graphicsmagick/files/.
 
 GraphicsMagick is a continual work in progress. The very latest code
 is available via the Mercurial distributed source control management
@@ -40,7 +40,7 @@ from foss.heptapod.net or SourceForge via one of the following commands:
 
   hg clone https://foss.heptapod.net/graphicsmagick/graphicsmagick GM
 
-  hg clone http://hg.code.sf.net/p/graphicsmagick/code/ GM
+  hg clone https://hg.code.sf.net/p/graphicsmagick/code/ GM
 
 Mercurial provides a complete stand-alone repository which contains
 the full history of the GraphicsMagick project.  You may use the
@@ -81,16 +81,13 @@ building under Microsoft Windows:
 
 * GraphicsMagick requires the BZLIB library from
 
-    http://www.sourceware.org/bzip2/
+    https://www.sourceware.org/bzip2/
 
   to read and write BZip compressed MIFF images.
 
-* GraphicsMagick requires 'ralcgm' from
-
-    http://www.agocg.ac.uk/train/cgm/ralcgm.htm
-
-  to read the Computer Graphics Metafile (CGM) image format. You also
-  need Ghostscript and Ghostscript/URW Fonts (see below).
+* GraphicsMagick requires 'ralcgm' to read the Computer Graphics
+  Metafile (CGM) image format. You also need Ghostscript and
+  Ghostscript/URW Fonts (see below).
 
 * GraphicsMagick requires 'dcraw' (version 8.95 or later) from
 
@@ -103,7 +100,7 @@ building under Microsoft Windows:
 * GraphicsMagick requires 'fig2dev' provided in the transfig package
   from
 
-    http://mcj.sourceforge.net/
+    https://mcj.sourceforge.net/
 
   to read the Fig image format. Ghostscript and Ghostscript/URW Fonts (see
   below) are also required.
@@ -111,7 +108,7 @@ building under Microsoft Windows:
 * GraphicsMagick requires the FreeType software, version 2.0 or above,
   available as
 
-    http://www.freetype.org/
+    https://www.freetype.org/
 
   to annotate with TrueType, OpenType, and Postscript Type 1 fonts.
 
@@ -148,7 +145,7 @@ building under Microsoft Windows:
 
 * GraphicsMagick requires hp2xx available from
 
-     http://www.gnu.org/software/hp2xx/hp2xx.html
+     https://www.gnu.org/software/hp2xx/hp2xx.html
 
   to read the HP-GL image format. Note that HPGL is a plotter file
   format. HP printers usually accept PCL format rather than HPGL
@@ -157,13 +154,13 @@ building under Microsoft Windows:
 * GraphicsMagick requires the lcms library (2.0 or later) available
   from
 
-     http://www.littlecms.com/
+     https://www.littlecms.com/
 
   to perform ICC CMS color management.
 
 * GraphicsMagick requires Graphviz available from
 
-     http://www.graphviz.org/
+     https://www.graphviz.org/
 
   to read Graphvis 'dot' digraph files (with extension dot).
   Ghostscript (see above) is also required.
@@ -177,7 +174,7 @@ building under Microsoft Windows:
 * GraphicsMagick requires the JBIG-Kit software available via
   HTTP from
 
-     http://www.cl.cam.ac.uk/~mgk25/jbigkit/
+     https://www.cl.cam.ac.uk/~mgk25/jbigkit/
 
   to read and write the JBIG image format.
 
@@ -191,7 +188,7 @@ building under Microsoft Windows:
 * GraphicsMagick requires the Independent JPEG Group's software
   available from
 
-     http://www.ijg.org/
+     https://www.ijg.org/
 
   or libjpeg-turbo available from
 
@@ -216,9 +213,9 @@ building under Microsoft Windows:
 * On Unix-type systems, Windows/MinGW, and Windows/Cygwin,
   GraphicsMagick requires libltdl from libtool in order to support
   building GraphicsMagick with dynamically loadable modules.  Libtool
-  is available via anonymous FTP from
+  is available from
 
-     ftp://ftp.gnu.org/pub/gnu/libtool/
+     https://www.gnu.org/software/libtool/
 
 * GraphicsMagick requires the MPEG utilities
   (`mpeg2vidcodec_v12.tar.gz`) from the MPEG Software Simulation Group
@@ -226,7 +223,7 @@ building under Microsoft Windows:
 
 * GraphicsMagick requires the LIBPNG library, version 1.0 or above, from
 
-     http://www.libpng.org/pub/png/pngcode.html
+     https://www.libpng.org/pub/png/pngcode.html
 
   to read or write the PNG, MNG, or JNG image formats.  LIBPNG depends
   upon the ZLIB library (see below).
@@ -251,7 +248,7 @@ building under Microsoft Windows:
 
 * GraphicsMagick may optionally use the TRIO library from
 
-     http://sourceforge.net/projects/ctrio/
+     https://sourceforge.net/projects/ctrio/
 
   to substitute for the vsnprintf function when the operating system
   does not provide one. Older operating systems (e.g. Solaris 2.5) may
@@ -284,7 +281,7 @@ building under Microsoft Windows:
 
 * GraphicsMagick requires libwmflite from libwmf 0.2.5 (or later) from
 
-     http://sourceforge.net/projects/wvware/
+     https://sourceforge.net/projects/wvware/
 
   to render files in the Windows Meta File (WMF) metafile format
   (16-bit WMF files only, not 32-bit "EMF"). This is the format
@@ -310,7 +307,7 @@ building under Microsoft Windows:
   background while "-texture plasma:fractal" renders on a fractal image.
 
    A free set of Microsoft Windows fonts may be retrieved from
-   http://sourceforge.net/projects/corefonts/. Note that the license
+   https://sourceforge.net/projects/corefonts/. Note that the license
    for these fonts requires that they be distributed in the original
    .exe form, but the Linux folks have found ways to deal with that on
    non-Windows systems.
@@ -324,11 +321,11 @@ building under Microsoft Windows:
   Cygwin and may be selected from the Cygwin installer. Cygwin is
   available from
 
-     http://www.cygwin.com/
+     https://www.cygwin.com/
 
 * GraphicsMagick requires libxml2 available from
 
-     http://xmlsoft.org/
+     https://gitlab.gnome.org/GNOME/libxml2
 
   to read the SVG image format and to retrieve files from over a
   network via FTP and HTTP.
@@ -344,7 +341,7 @@ building under Microsoft Windows:
 
 * GraphicsMagick requires the ZLIB library from
 
-     http://www.zlib.net/
+     https://www.zlib.net/
 
   to read or write the PNG or Zip compressed MIFF images.
 

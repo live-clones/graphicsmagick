@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 =======================
 GraphicsMagick Security
@@ -22,13 +22,13 @@ GraphicsMagick is very powerful and complex software supporting many
 capabilities and so untrusted parties should never be allowed to
 submit arbitrary requests into it.
 
-GraphicsMagick includes the ability to access arbitrary http and ftp
-URLs as well as local image, font, and SVG files.  The SVG renderer
-supports read access to http and ftp URLs as well as local files
-according to the SVG specification.  Since URLs and local file paths
-may be included in SVG files, untrusted SVG files may create a Server
-Side Request Forgery (`SSRF`_) vulnerability since URL requests are
-done by the computer executing the SVG, which may be in a realm of
+GraphicsMagick may include the ability to access arbitrary http and
+ftp URLs as well as local image, font, and SVG files.  The SVG
+renderer may support read access to http and ftp URLs as well as local
+files according to the SVG specification.  Since URLs and local file
+paths may be included in SVG files, untrusted SVG files may create a
+Server Side Request Forgery (`SSRF`_) vulnerability since URL requests
+are done by the computer executing the SVG, which may be in a realm of
 trust (e.g. inside the firewall and able to access "localhost"
 addresses).
 
@@ -45,7 +45,7 @@ not constraining what its users may do with the software.
 Reporting Issues
 ----------------
 
-.. _`GraphicsMagick Security`: mailto:graphicsmagick-security@graphicsmagick.org
+.. _`GraphicsMagick Security`: mailto:graphicsmagick.project@gmail.com
 
 .. _`GraphicsMagick Bug Tracker`: https://sourceforge.net/p/graphicsmagick/bugs/
 
@@ -55,8 +55,8 @@ maintainers or to the `GraphicsMagick Security`_ mail address.  More
 minor issues are best addressed via the `GraphicsMagick Bug Tracker`_
 at SourceForge.  Please remember to set the bug to 'private' if you
 use the bug tracker or else someone may acquire a zero-day exploit from
-your report.  We will set the bug to 'public' as soon as a remedy has
-been made available.
+your report!  We will set the bug to 'public' as soon as a remedy has
+been made available..
 
 Reporting an issue will allow us to fix it so that future releases of
 the software won't suffer from the problem.

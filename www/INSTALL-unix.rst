@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ===================================
 UNIX/Cygwin/MinGW/MSYS2 Compilation
@@ -18,7 +18,7 @@ The source code must be extracted prior to compilation as follows:
 7z
 
     7-Zip archive format. The Z-Zip format may be extracted under Unix
-    using '7za' from the P7ZIP package (http://p7zip.sourceforge.net/).
+    using '7za' from the P7ZIP package (https://p7zip.sourceforge.net/).
     Extract similar to::
 
       7za x GraphicsMagick-1.3.7z
@@ -26,7 +26,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.bz2
 
     BZip2 compressed tar archive format. Requires that both the bzip2
-    (http://www.sourceware.org/bzip2/) and tar programs to be available. Extract
+    (https://www.sourceware.org/bzip2/) and tar programs to be available. Extract
     similar to::
 
       bzip2 -d GraphicsMagick-1.3.tar.bz | tar -xvf -
@@ -34,7 +34,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.gz
 
     Gzip compressed tar archive format. Requires that both the gzip
-    (http://www.gzip.org/) and tar programs to be available. Extract
+    (https://www.gzip.org/) and tar programs to be available. Extract
     similar to::
 
       gzip -d GraphicsMagick-1.3.tar.gz | tar -xvf -
@@ -42,7 +42,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.lz
 
     Lzip compressed tar archive format.  Requires that both the lzip
-    (http://lzip.nongnu.org/lzip.html) and tar programs to be
+    (https://lzip.nongnu.org/lzip.html) and tar programs to be
     available. Extract similar to::
 
       lzip -d -c GraphicsMagick-1.3.tar.gz | tar -xvf -
@@ -50,7 +50,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.xz
 
     LZMA compressed tar archive format. Requires that LZMA utils
-    (http://tukaani.org/lzma/) and tar programs to be available. Extract
+    (https://tukaani.org/lzma/) and tar programs to be available. Extract
     similar to::
 
       xz -d GraphicsMagick-1.3.tar.xz | tar -xvf -
@@ -58,7 +58,7 @@ The source code must be extracted prior to compilation as follows:
 zip
 
     PK-ZIP archive format. Requires that the unzip program from Info-Zip
-    (http://www.info-zip.org/UnZip.html) be available. Extract similar to::
+    (https://www.info-zip.org/UnZip.html) be available. Extract similar to::
 
       unzip GraphicsMagick-1.3.zip
 
@@ -922,7 +922,7 @@ Building under Cygwin
 GraphicsMagick may be built under the Windows Cygwin Unix-emulation
 environment available for free from
 
-    http://www.cygwin.com/
+    https://www.cygwin.com/
 
 It is suggested that the X11R6 package be installed since this enables
 GraphicsMagick's X11 support (animate, display, and import

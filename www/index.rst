@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ======================================
 GraphicsMagick Image Processing System
@@ -8,17 +8,17 @@ GraphicsMagick Image Processing System
 
 .. meta::
    :description: GraphicsMagick is a robust collection of tools and
-                 libraries to read, write, and manipulate an image in any
-                 of the more popular image formats including GIF, JPEG,
-                 PNG, PDF, and WebP. With GraphicsMagick you can
-                 create GIFs dynamically making it suitable for Web
-                 applications. You can also resize, rotate, sharpen,
-                 color reduce, or add special effects to an image and
-                 save your completed work in the same or differing image
-                 format.
+                 libraries to read, write, and manipulate an image in
+                 any of the more popular image formats including GIF,
+                 JPEG, JPEG-2000, PNG, PDF, and WebP. With
+                 GraphicsMagick you can create GIFs dynamically making
+                 it suitable for Web applications. You can also
+                 resize, rotate, sharpen, color reduce, or add special
+                 effects to an image and save your completed work in
+                 the same or differing image format.
 
-   :keywords: GraphicsMagick, GM, PerlMagick, Perl Magick, Perl Magic,
-              image processing, software development, TclMagick, Magick++
+   :keywords: GraphicsMagick, GM, PerlMagick, image processing,
+              software development, TclMagick, Magick++
 
 
 .. _`download GraphicsMagick release` : https://sourceforge.net/projects/graphicsmagick/files/
@@ -67,7 +67,7 @@ version of this page.
 .. _`Coverity Analysis Metrics` : https://scan.coverity.com/projects/graphicsmagick
 
 GraphicsMagick is the swiss army knife of image processing. Comprised
-of 284K physical lines (according to David A. Wheeler's `SLOCCount`_)
+of 286K physical lines (according to David A. Wheeler's `SLOCCount`_)
 of source code in the base package, it provides a robust and efficient
 collection of tools and libraries which support reading, writing, and
 manipulating an image in over 92 major formats including important
@@ -131,9 +131,9 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (377,082 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (377,132 total
     lines included) according to `Coverity Analysis Metrics`_ on
-    September 28th, 2025.
+    September 30th, 2025.
 
   * GM has zero issues detected by Clang 15 scan-build.
 

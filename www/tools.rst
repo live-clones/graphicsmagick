@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 =======================================
 GraphicsMagick Tools
@@ -137,7 +137,7 @@ Import: capture an application or X server screen
 Import_ reads an image from any visible window on an X server and outputs
 it as an image file. You can capture a single window, the entire screen,
 or any rectangular portion of the screen.
-     
+
 The target window can be specified by id, name, or may be selected by
 clicking the mouse in the desired window. If you press a button and then
 drag, a rectangle will form which expands and contracts as the mouse

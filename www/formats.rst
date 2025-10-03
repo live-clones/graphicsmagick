@@ -20,60 +20,56 @@ GraphicsMagick Supported Formats
 .. _AAI : https://fileinfo.com/extension/aai
 .. _AVI : http://www.jmcgowan.com/avi.html
 .. _AVIF : https://aomediacodec.github.io/av1-avif/
-.. _BMP : http://www.fileformat.info/format/bmp/egff.htm
+.. _BMP : https://www.fileformat.info/format/bmp/egff.htm
 .. _color : color.html
-.. _CALS : http://www.fileformat.info/format/cals/egff.htm
-.. _CGM : http://www.fileformat.info/format/cgm/egff.htm
+.. _CALS : https://www.fileformat.info/format/cals/egff.htm
+.. _CGM : https://www.fileformat.info/format/cgm/egff.htm
 .. _CIN : motion-picture.html
-.. _DICOM : http://dicom.nema.org/
+.. _DICOM : https://www.dicomstandard.org/
 .. _DICONDE : http://www.geinspectiontechnologies.com/en/products/software/diconde.html
 .. _DPX : motion-picture.html
 .. _FIG : foo.bar
-.. _FITS : http://www.cv.nrao.edu/fits/
-.. _Ghostscript : http://pages.cs.wisc.edu/~ghost/
-.. _GIF : http://www.fileformat.info/format/gif/egff.htm
-.. _`Hald CLUT` : http://www.quelsolaar.com/technology/clut.html
+.. _FITS : https://www.cv.nrao.edu/fits/
+.. _Ghostscript : https://www.ghostscript.com/
+.. _GIF : https://www.fileformat.info/format/gif/egff.htm
+.. _`Hald CLUT` : https://www.quelsolaar.com/technology/clut.html
 .. _HEIF : https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format
-.. _JBIG : http://www.jpeg.org/
-.. _JNG : http://www.libmng.com/
-.. _JPEG : http://www.jpeg.org/
+.. _JBIG : https://jpeg.org/
+.. _JPEG : https://jpeg.org/
 .. _JXL : https://github.com/libjxl/libjxl/
 .. _JXLLOC : https://www.loc.gov/preservation/digital/formats/fdd/fdd000538.shtml
-.. _M2V : http://www.mpeg.org/
+.. _M2V : https://www.mpeg.org/
 .. _MIFF : miff.html
-.. _MNG : http://www.libmng.com/
 .. _MPEG : http://www.mpeg.org/
-.. _MTV : http://www.fileformat.info/format/mtv/egff.htm
-.. _MathWorks : http://www.mathworks.com/
-.. _PAM : http://netpbm.sourceforge.net/doc/pam.html
-.. _PBM : http://www.fileformat.info/format/pbm/egff.htm
-.. _PCX : http://www.fileformat.info/format/pcx/egff.htm
-.. _PWP : http://www.photoworks.com/
+.. _MTV : https://www.fileformat.info/format/mtv/egff.htm
+.. _MathWorks : https://www.mathworks.com/
+.. _PAM : https://netpbm.sourceforge.net/doc/pam.html
+.. _PBM : https://www.fileformat.info/format/pbm/egff.htm
+.. _PCX : https://www.fileformat.info/format/pcx/egff.htm
 .. _README : README.html
-.. _Radiance : http://radsite.lbl.gov/radiance/HOME.html
-.. _SANE : http://www.mostang.com/sane/
-.. _SCT : http://oreilly.com/www/centers/gff/formats/scitex/
-.. _SFW : http://www.algonet.se/~cyren/sfw/
-.. _SMPTE : http://www.smpte.org/
-.. _SVG : http://www.w3.org/Graphics/SVG/
+.. _Radiance : https://radsite.lbl.gov/radiance/HOME.html
+.. _SCT : https://en.wikipedia.org/wiki/Scitex_CT
+.. _SFW : http://justsolve.archiveteam.org/wiki/Seattle_FilmWorks
+.. _SMPTE : https://www.smpte.org/
+.. _SVG : https://www.w3.org/Graphics/SVG/
 .. _TIFF : http://www.simplesystems.org/libtiff/
-.. _TopoL : http://www.topol.cz/english/share/index.php3
-.. _VIFF : http://www.fileformat.info/format/viff/egff.htm
-.. _WBMP : http://www.openmobilealliance.org/Technical/wapindex.aspx
+.. _TopoL : http://www.topol.eu/
+.. _VIFF : https://www.fileformat.info/format/viff/egff.htm
+.. _WBMP : https://www.openmobilealliance.org/home
 .. _WebP : https://developers.google.com/speed/webp/
-.. _WMF : http://www.fileformat.info/format/wmf/egff.htm
-.. _WPG : http://www.fileformat.info/format/wpg/egff.htm
-.. _XBM : http://www.fileformat.info/format/xbm/egff.htm
-.. _XPM : http://www.fileformat.info/format/xpm/egff.htm
-.. _XWD : http://www.fileformat.info/format/xwd/egff.htm
-.. _freetype2 : http://www.freetype.org/
-.. _hp2xx : http://www.gnu.org/software/hp2xx/hp2xx.html
-.. _html2ps : http://user.it.uu.se/~jan/
-.. _jasper : http://www.ece.uvic.ca/~mdadams/jasper/
-.. _jbigkit : http://www.cl.cam.ac.uk/~mgk25/jbigkit/
-.. _libxml2 : http://xmlsoft.org/
+.. _WMF : https://www.fileformat.info/format/wmf/egff.htm
+.. _WPG : https://www.fileformat.info/format/wpg/egff.htm
+.. _XBM : https://www.fileformat.info/format/xbm/egff.htm
+.. _XPM : https://www.fileformat.info/format/xpm/egff.htm
+.. _XWD : https://www.fileformat.info/format/xwd/egff.htm
+.. _freetype2 : https://freetype.org/
+.. _hp2xx : https://www.gnu.org/software/hp2xx/hp2xx.html
+.. _html2ps : https://github.com/deepin-community/html2ps
+.. _jasper : https://www.ece.uvic.ca/~frodo/jasper/
+.. _jbigkit : https://www.cl.cam.ac.uk/~mgk25/jbigkit/
+.. _libxml2 : https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 .. _mpeg2vidcodec : foo.bar
-.. _ralcgm : http://www.agocg.ac.uk/train/cgm/ralcgm.htm
+.. _ralcgm : https://github.com/flaviut/ralcgm
 
 GraphicsMagick uses an ASCII string known as "magick" (e.g. "GIF") to
 identify file formats, algorithms acting as formats, built-in images, and
@@ -224,7 +220,7 @@ image formats.
    |              |      | interchange format        |                                                  |
    +--------------+------+---------------------------+--------------------------------------------------+
    |              |      |                           | JPEG_ in a PNG-style wrapper with transparency.  |
-   | JNG_         | RW   | JPEG_ Network Graphics    | Requires libjpeg and libpng-1.0.2 or later,      |
+   | JNG          | RW   | JPEG_ Network Graphics    | Requires libjpeg and libpng-1.0.2 or later,      |
    |              |      |                           | libpng-1.2.5 or later recommended.               |
    +--------------+------+---------------------------+--------------------------------------------------+
    | JP2          | RW   | JPEG-2000 JP2 File Format | Requires jasper_ 1.600.0 or later                |
@@ -255,7 +251,7 @@ image formats.
    | MONO         | RW   | least-significant-byte    |                                                  |
    |              |      | first order               |                                                  |
    +--------------+------+---------------------------+--------------------------------------------------+
-   | MNG_         | RW   | Multiple-image Network    | Requires libpng-1.0.2 or later, libpng-1.2.5 or  |
+   | MNG          | RW   | Multiple-image Network    | Requires libpng-1.0.2 or later, libpng-1.2.5 or  |
    |              |      | Graphics                  | later recommended.                               |
    +--------------+------+---------------------------+--------------------------------------------------+
    |              |      | Motion Picture Experts    |                                                  |
@@ -374,7 +370,7 @@ image formats.
    |              |      |                           | of an icon. The desired sub-image size may be    |
    |              |      |                           | specified when reading via the -size option.     |
    +--------------+------+---------------------------+--------------------------------------------------+
-   | PWP_         | R    | Seattle File Works        |                                                  |
+   | PWP          | R    | Seattle File Works        |                                                  |
    |              |      | multi-image file          |                                                  |
    +--------------+------+---------------------------+--------------------------------------------------+
    | RAS          | R    | TopoL_ (GIS)              |                                                  |
@@ -400,7 +396,7 @@ image formats.
    | SCT_         | R    | Scitex Continuous Tone    |                                                  |
    |              |      | Picture                   |                                                  |
    +--------------+------+---------------------------+--------------------------------------------------+
-   | SFW_         | R    | Seattle File Works image  |                                                  |
+   | SFW_         | R    | Seattle FilmWorks image   |                                                  |
    +--------------+------+---------------------------+--------------------------------------------------+
    | SGI          | RW   | Irix RGB image            |                                                  |
    +--------------+------+---------------------------+--------------------------------------------------+
@@ -547,7 +543,7 @@ following table lists these pseudo image formats:
    | PRINT        | W    | computer printer          | LPDEST (for 'lpr') environment variables to                 |
    |              |      |                           | select the desired printer.                                 |
    +--------------+------+---------------------------+-------------------------------------------------------------+
-   |              |      | Import image from a       | Requires SANE_ Specify the device name and path             |
+   |              |      | Import image from a       | Requires SANE Specify the device name and path              |
    | SCAN         | R    | scanner device            | as the filename (e.g. "scan:mustek:/dev/scanner").          |
    |              |      |                           |                                                             |
    +--------------+------+---------------------------+-------------------------------------------------------------+

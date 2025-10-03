@@ -1,3 +1,9 @@
+2025-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* www/: Update URLs in documentation to use https where possible,
+	update to re-directed locations, or remove URLs where no viable
+	substitute can be found.
+
 2025-09-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/jp2.c (ReadJP2Image): Assume 3 samples per pixel.

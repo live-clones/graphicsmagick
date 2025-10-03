@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 =====================
 Related Links
@@ -11,19 +11,19 @@ Related Links
 GraphicsMagick Topics
 =====================
 
-`Free Software Foundation <http://directory.fsf.org/project/GraphicsMagick/>`_ GraphicsMagick Entry.
+`Free Software Foundation <https://directory.fsf.org/project/GraphicsMagick/>`_ GraphicsMagick Entry.
 
 `FreeBSD port <https://www.freshports.org/graphics/GraphicsMagick/>`_ for GraphicsMagick.
 
-`NetBSD/pkgsrc port <http://pkgsrc.se/graphics/GraphicsMagick/>`_ for GraphicsMagick.
+`NetBSD/pkgsrc port <https://pkgsrc.se/graphics/GraphicsMagick/>`_ for GraphicsMagick.
 
-`Gentoo Sunrise <http://bugs.gentoo.org/show_bug.cgi?id=190372>`_ Bug Tracker Entry.
+`Gentoo Sunrise <https://bugs.gentoo.org/190372>`_ Bug Tracker Entry.
 
 `Red Hat Linux <https://bugzilla.redhat.com/buglist.cgi?component=GraphicsMagick&product=Fedora>`_ GraphicsMagick related bugs.
 
-Debian `GraphicsMagick packages <http://packages.debian.org/search?keywords=GraphicsMagick&amp;searchon=names&amp;suite=all&amp;section=main>`_.
+Debian `GraphicsMagick packages <https://packages.debian.org/search?keywords=GraphicsMagick&amp;searchon=names&amp;suite=all&amp;section=main>`_.
 
-`WikiPedia <http://en.wikipedia.org/wiki/GraphicsMagick>`_ GraphicsMagick Entry.
+`WikiPedia <https://en.wikipedia.org/wiki/GraphicsMagick>`_ GraphicsMagick Entry.
 
 `Black Duck | Open HUB <https://www.openhub.net/p/graphics_magick>`_ GraphicsMagick Entry.
 
@@ -33,7 +33,7 @@ Debian `GraphicsMagick packages <http://packages.debian.org/search?keywords=Grap
 
 `GraphicsMagick questions on StackOverflow <http://stackoverflow.com/questions/tagged/graphicsmagick?>`_.
 
-`GraphicsMagick ABI/API Changes <https://abi-laboratory.pro/tracker/timeline/graphicsmagick/>`_.
+`GraphicsMagick ABI/API Changes <https://abi-laboratory.pro/?view=timeline&l=graphicsmagick>`_.
 
 
 
@@ -68,20 +68,20 @@ __ oss_fuzz_build_status_
 Image Processing Topics
 ============================
 
-`HyperMedia Image Processing Reference <http://homepages.inf.ed.ac.uk/rbf/HIPR2/>`_,
+`HyperMedia Image Processing Reference <https://homepages.inf.ed.ac.uk/rbf/HIPR2/>`_,
 A guide to image processing algorithms, many of which are supported by GraphicsMagick.
 
 
 Color Technology Related Topics
 ======================================
 
-Charles Poynton's `Color technology FAQs <http://poynton.ca/Poynton-color.html>`_,
+Charles Poynton's `Color technology FAQs <https://poynton.ca/Poynton-color.html>`_,
 very useful documentation on color technologies.
 
 `International Color Consortium <https://www.color.org/>`_,
 the organization responsible for color profile standards.
 
-`Argyll Color Management System <http://www.argyllcms.com/>`_,
+`Argyll Color Management System <https://www.argyllcms.com/>`_,
 a free experimental color management system.
 
 `Littlecms <https://www.littlecms.com/>`_,
@@ -119,7 +119,7 @@ less than 14 bits per sample.
 The following documents and pages provide interesting information on
 gamma-related topics:
 
-`Charles Poynton's Gamma FAQ <http://poynton.ca/GammaFAQ.html>`_,
+`Charles Poynton's Gamma FAQ <https://poynton.ca/GammaFAQ.html>`_,
 provides an excellent description of what gamma is, why it is good,
 and when you don't want it.
 
@@ -130,9 +130,12 @@ TIFF Related Topics
 `LibTIFF <https://libtiff.gitlab.io/libtiff/>`_,
 Libtiff library and TIFF format mailing list.
 
-AWare Systems `TIFF <https://www.awaresystems.be/imaging/tiff.html>`_ site.
-Detailed TIFF-related information which goes beyond the TIFF specification,
-list archives for the libtiff mailing list, and information regarding the emerging Big TIFF format.
+AWare Systems `TIFF <https://web.archive.org/web/20240329145220/https://www.awaresystems.be/imaging/tiff.html>`_ site.
+Detailed TIFF-related information which goes beyond the TIFF
+specification.  Please note that AWare Systems is now permanently
+off-line (the author passed away) so this data is accessed via the
+WayBack Machine. Any parts of the site which depend on scripting will
+be broken.
 
 `Digital Negative (DNG) <https://helpx.adobe.com/camera-raw/digital-negative.html>`_,
 Adobe TIFF specification for digital camera raw images.
@@ -143,23 +146,23 @@ A way to store HDR images using TIFF.
 JPEG Related Topics
 ==========================
 
-`Independent JPEG Group <http://www.ijg.org/>`_ (home of IJG JPEG library).
+`Independent JPEG Group <https://www.ijg.org/>`_ (home of IJG JPEG library).
 
-`Guido Vollbeding's JPEG site <http://jpegclub.org/>`_, including various patches to IJG JPEG release 6b.
+`Guido Vollbeding's JPEG site <https://jpegclub.org/>`_, including various patches to IJG JPEG release 6b.
 
 DICOM Related Topics
 ============================
 
-`David Clunie's Medical Image Format Site <http://www.dclunie.com/>`_,
+`David Clunie's Medical Image Format Site <https://www.dclunie.com/>`_,
 information about medical images.
 
 Metadata (Associated Data) Topics
 =========================================
 
-`Extensible Metadata Platform (XMP) <http://www.adobe.com/products/xmp/index.html>`_,
+`Extensible Metadata Platform (XMP) <https://www.adobe.com/products/xmp.html>`_,
 Adobe's XML-based embedded metadata format.
 
-`EXIF <https://www.exif.org/>`_,
+`EXIF <https://en.wikipedia.org/wiki/Exif>`_,
 Format for metadata in images, particularly JPEG files from digital cameras.
 
 High Dynamic Range Topics
@@ -171,7 +174,7 @@ An analsys by Greg Ward of various HDR encodings.
 `LogLuv Encoding for TIFF Images <http://www.anyhere.com/gward/pixformat/tiffluv.html>`_,
 A way to store HDR images using TIFF.
 
-`OpenEXR <http://www.openexr.com/>`_,
+`OpenEXR <https://www.openexr.com/>`_,
 library and sample tools for dealing with high dynamic-range (HDR) images.
 
 Motion Picture Links
@@ -180,13 +183,13 @@ Motion Picture Links
 `Digital Cinema Initiatives <https://www.dcimovies.com/>`_,
 DCI offers the first complete specification for digital cinema delivery.
 
-`Ingex <http://ingex.sourceforge.net/index.html>`_ Tapeless video &
+`Ingex <https://ingex.sourceforge.net/index.html>`_ Tapeless video &
 audio capture, transcoding and network file serving.  From the BBC.
 
 Video Topics
 =============
 
-`Video Codecs and Pixel Formats <http://www.fourcc.org/>`_, offers a summary of YUV encoding formats.
+`Video Codecs and Pixel Formats <https://www.fourcc.org/>`_, offers a summary of YUV encoding formats.
 
 Other Software Packages
 ========================
@@ -203,7 +206,7 @@ large images, and which comes with an unusual GUI.
 `FreeImage <https://freeimage.sourceforge.io/index.html>`_,
 a free image processing library.
 
-`ImageJ <https://imagej.nih.gov/ij/>`_ Image Processing and Analysis in Java.
+`ImageJ <https://imagej.net/ij/>`_ Image Processing and Analysis in Java.
 
 `Pstoedit <http://www.pstoedit.net/>`_,
 A Postscript to editable vector translation utility.
@@ -213,9 +216,6 @@ a utility to read and manipulate raw images from digital cameras.
 
 `LPROF <http://lprof.sourceforge.net/index.html>`_,
 an open source ICC profiler with graphical user interface.
-
-`Gallery <http://gallery.menalto.com/>`_,
-a facinating web-based photo album organizer.  Works with GraphicsMagick!.
 
 `DJV Imaging <https://darbyjohnston.github.io/DJV/>`_, professional movie
 playback and image processing software for the film and computer

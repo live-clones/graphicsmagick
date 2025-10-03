@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ===================================
 GraphicsMagick Windows Installation
@@ -37,12 +37,12 @@ Prerequisites
   installing the newer version.
 
   While it is not a requirement, it is strongly recommended that the
-  `Ghostscript <http://sourceforge.net/projects/ghostscript/>`_
+  `Ghostscript <https://ghostscript.com/>`_
   package (GraphicsMagick is tested with version 9.27) be
   installed. GraphicsMagick uses Ghostscript to render Postscript and
   PDF files, as well as formats where a translator to Postscript is
   available. GraphicsMagick will use the `Ghostscript Fonts
-  <http://sourceforge.net/projects/gs-fonts/>`_ (also known as "URW
+  <https://sourceforge.net/projects/gs-fonts/>`_ (also known as "URW
   Fonts") to support the standard set of Adobe Postscript fonts like
   "Helvetica" and "Times Roman" if these fonts are not available as
   TrueType fonts.  The Ghostscript fonts need to manually installed

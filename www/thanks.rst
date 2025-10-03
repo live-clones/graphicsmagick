@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ======================
 GraphicsMagick Thanks
@@ -58,7 +58,7 @@ Security Analysis/Reports
 Static Code Analysis
 --------------------
 
-.. _`Coverity` : http://www.synopsys.com/software/coverity/
+.. _`Coverity` : https://scan.coverity.com/projects/graphicsmagick
 
   * `Coverity`_ was used (free of charge) to perform static code
     analysis of the software.  After resolving many issues, there are
@@ -67,13 +67,13 @@ Static Code Analysis
 Software Analysis Tools
 -----------------------
 
-.. _`AddressSanitizer` : https://code.google.com/p/address-sanitizer/
+.. _`AddressSanitizer` : https://github.com/google/sanitizers
 
-.. _`Valgrind` : http://www.valgrind.org/
+.. _`Valgrind` : https://www.valgrind.org/
 
-.. _`American fuzzy lop` : http://lcamtuf.coredump.cx/afl/
+.. _`American fuzzy lop` : https://lcamtuf.coredump.cx/afl/
 
-.. _`QuickFuzz` : http://quickfuzz.org/
+.. _`QuickFuzz` : https://dl.acm.org/doi/10.1145/2976002.2976017
 
   * `American fuzzy lop`_ was used (by many) to produce and discover
     many of the files which caused problems for the software.
@@ -81,7 +81,7 @@ Software Analysis Tools
   * `QuickFuzz`_ was used (by Gustavo Grieco) to discover issues in the
     SVG renderer.  `QuickFuzz`_ provides specific support for a set of
     file formats and is very good at chasing down and isolating
-    weaknesses.
+    weaknesses. Please make us aware of where to find QuickFuzz again!
 
   * `AddressSanitizer`_ (ASan) was used to detect and isolate memory
     access issues.
@@ -93,37 +93,37 @@ Additional Acknowledgements
 ---------------------------
 
 David Pensak, E. I. du Pont de Nemours and Company
-		For providing the computing environment that made
-		developing ImageMagick possible.
+                For providing the computing environment that made
+                developing ImageMagick possible.
 
 Alexander Zimmermann
-		Responsible for the ImageMagick Linux binary
-		distributions for many years. His efforts are very much
-		appreciated.
+                Responsible for the ImageMagick Linux binary
+                distributions for many years. His efforts are very much
+                appreciated.
 
 Paul Heckbert, Carnegie Mellon University
-		Image resizing is based on Paul Heckbert's Zoom program.
+                Image resizing is based on Paul Heckbert's Zoom program.
 
 Paul Raveling, USC Information Sciences Institute
-		The spatial subdivision color reduction algorithm is
-		based on his Img software.		
+                The spatial subdivision color reduction algorithm is
+                based on his Img software.
 
 Michael Halle, Spatial Imaging Group at MIT
-		For the initial implementation of Alan Paeth's image
-		rotation algorithm.
+                For the initial implementation of Alan Paeth's image
+                rotation algorithm.
 
 Peder Langlo, Hewlett Packard
-		Made hundreds of suggestions and bug reports. Without
-		Peder, this software would not be nearly as useful as it
-		is today.
+                Made hundreds of suggestions and bug reports. Without
+                Peder, this software would not be nearly as useful as it
+                is today.
 
 Rod Bogart and John W. Peterson, University of Utah
-		Image compositing is loosely based on rlecomp of the
-		Utah Raster Toolkit.
+                Image compositing is loosely based on rlecomp of the
+                Utah Raster Toolkit.
 
 Alvy Ray Smith and Eric Ray Lyons
-		HWB color transform and algorithm.
+                HWB color transform and algorithm.
 
 Thomas R Crimmins
-		Inventor of the eight hull algorithm used for speckle
-		reduction.
+                Inventor of the eight hull algorithm used for speckle
+                reduction.
