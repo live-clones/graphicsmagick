@@ -43,7 +43,7 @@ increased significantly if you have a proven track-record of success
 on other open source projects, are a recognized expert in the field,
 or have already demonstrated your capabilities and commitment by
 contributing to the project in other ways. Please contact Bob
-Friesenhahn <graphicsmagick.project@gmail.com> in order to be
+Friesenhahn <bobjfriesenhahn@gmail.com> in order to be
 considered for group membership.
 
 Areas To Contribute

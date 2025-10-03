@@ -45,7 +45,7 @@ not constraining what its users may do with the software.
 Reporting Issues
 ----------------
 
-.. _`GraphicsMagick Security`: mailto:graphicsmagick.project@gmail.com
+.. _`GraphicsMagick Security`: mailto:bobjfriesenhahn@gmail.com
 
 .. _`GraphicsMagick Bug Tracker`: https://sourceforge.net/p/graphicsmagick/bugs/
 
