@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to September 14, 2025.
+This file was last updated to reflect changes up to October 3, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -37,6 +37,9 @@ Security Fixes:
 * MSL: Use libxml2's SAX handlers for the MVG XML-based scripting
   implementation.  This removes a lot of archaic cruft which might
   suffer from security issues.
+
+* JP2: Fix Jasper max_samples calculation to avoid DOS due to huge
+  image dimensions.
 
 * JXL: Apply image dimension resource limits. Fix heap buffer write
   overflow while reading image.

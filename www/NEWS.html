@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to September 14, 2025.</p>
+<p>This file was last updated to reflect changes up to October 3, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -119,6 +119,8 @@ all targets.</p></li>
 <li><p>MSL: Use libxml2's SAX handlers for the MVG XML-based scripting
 implementation.  This removes a lot of archaic cruft which might
 suffer from security issues.</p></li>
+<li><p>JP2: Fix Jasper max_samples calculation to avoid DOS due to huge
+image dimensions.</p></li>
 <li><p>JXL: Apply image dimension resource limits. Fix heap buffer write
 overflow while reading image.</p></li>
 <li><p>SVG: Use libxml2's SAX handlers for the SVG renderer.  This removes
