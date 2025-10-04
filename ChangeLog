@@ -1,3 +1,12 @@
+2025-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Add build rules for libwmf. Leave
+	disabled until the oss-fuzz project picks up changes to the
+	Dockerfile.
+
+	* www/INSTALL-windows.rst: Document a new upstream source for
+	libwmf.
+
 2025-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

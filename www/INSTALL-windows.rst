@@ -913,12 +913,9 @@ be found:
    This is necessary to parse and read 16-bit Windows Meta Files (WMF)
    files.
 
-   This code is no longer developed.
-
-   While there is a newer version of this library at SourceForge, it
-   is actually somewhat corrupted by someone who was not previously a
-   libwmf developer, and the license was changed to the full GPLv2
-   license (rather than LGPL).
+   The current upstream for libwmf is at
+   https://github.com/caolanm/libwmf and it is still/now maintained by
+   its original author (Caolán McNamara).
 
  * xlib
 

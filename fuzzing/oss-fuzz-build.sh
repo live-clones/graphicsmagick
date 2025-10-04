@@ -62,6 +62,7 @@ enable_openjpeg=true
 enable_png=true
 enable_tiff=true
 enable_webp=true
+enable_libwmf=false
 enable_x265=true
 enable_xml=true
 enable_xz=true
@@ -174,11 +175,11 @@ then
     popd
 fi
 
-printf "=== Building ${SRC}/libpng...\n"
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libpng --libs
 #    -L/work/lib -lpng16 -lm -lz
 if $enable_png
 then
+    printf "=== Building ${SRC}/libpng...\n"
     pushd "$SRC/libpng"
     autoreconf -fiv
     ./configure \
@@ -267,6 +268,30 @@ if $enable_webp
        make -j$(nproc)
        make install
        popd
+fi
+
+# PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libwmf --libs
+# -L/work/lib -lwmf -lwmflite -lfreetype -lbz2 -lpng18 -lm -lz -lm
+#
+# We only build libwmflite, which has no dependencies.
+# There is no pkg-config support for libwmflite (but there is for libwmf).
+if $enable_libwmf
+then
+    printf "=== Building ${SRC}/libwmf...\n"
+    pushd "$SRC/libwmf"
+    autoreconf -fiv
+    ./configure \
+        --prefix="$WORK" \
+        --disable-heavy \
+        --disable-shared \
+        --enable-static \
+        CPPFLAGS="-I$WORK/include" \
+        CFLAGS="${CFLAGS} -fPIC" \
+        LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
+    make clean
+    make -j$(nproc)
+    make install
+    popd
 fi
 
 if $enable_bzip2
