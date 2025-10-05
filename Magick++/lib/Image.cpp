@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2024
+// Copyright Bob Friesenhahn, 1999-2025
 //
 // Implementation of Image
 //
@@ -2257,13 +2257,37 @@ void Magick::Image::attribute ( const std::string name_,
                                 const char * value_ )
 {
   modifyImage();
-  SetImageAttribute( image(), name_.c_str(), value_ );
+  if ((MagickLib::LocaleCompare(name_.c_str(),"comment") == 0) ||
+      (MagickLib::LocaleCompare(name_.c_str(),"label") == 0))
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  value_);
+      SetImageAttribute( image(), name_.c_str(), translated );
+      MagickFreeMemory(translated);
+    }
+  else
+    {
+      SetImageAttribute( image(), name_.c_str(), value_ );
+    }
 }
 void Magick::Image::attribute ( const std::string name_,
                                 const std::string value_ )
 {
   modifyImage();
-  SetImageAttribute( image(), name_.c_str(), value_.c_str() );
+  if ((MagickLib::LocaleCompare(name_.c_str(),"comment") == 0) ||
+      (MagickLib::LocaleCompare(name_.c_str(),"label") == 0))
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  value_.c_str());
+      SetImageAttribute( image(), name_.c_str(), translated );
+      MagickFreeMemory(translated);
+    }
+  else
+    {
+      SetImageAttribute( image(), name_.c_str(), value_.c_str() );
+    }
 }
 std::string Magick::Image::attribute ( const std::string name_ )
 {
@@ -2636,7 +2660,13 @@ void Magick::Image::comment ( const std::string &comment_ )
   modifyImage();
   SetImageAttribute( image(), "Comment", NULL );
   if ( comment_.length() > 0 )
-    SetImageAttribute( image(), "Comment", comment_.c_str() );
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  comment_.c_str());
+      SetImageAttribute( image(), "Comment", translated );
+      MagickFreeMemory(translated);
+    }
   throwImageException();
 }
 std::string Magick::Image::comment ( void ) const
@@ -3111,7 +3141,13 @@ void Magick::Image::label ( const std::string &label_ )
   modifyImage();
   SetImageAttribute ( image(), "Label", NULL );
   if ( label_.length() > 0 )
-    SetImageAttribute ( image(), "Label", label_.c_str() );
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  label_.c_str());
+      SetImageAttribute ( image(), "Label", label_.c_str() );
+      MagickFreeMemory(translated);
+    }
   throwImageException();
 }
 std::string Magick::Image::label ( void ) const

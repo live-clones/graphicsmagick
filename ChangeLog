@@ -1,5 +1,10 @@
 2025-10-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* Magick++/lib/Image.cpp: Translate text with TranslateText()
+	prior to setting an attribute with SetImageAttribute for the
+	"comment" and "label" attributes given that SetImageAttribute() no
+	longer implicitly does that.
+
 	* PerlMagick/Magick.xs: Translate text with TranslateText() prior
 	to setting an attribute with SetImageAttribute for the "comment"
 	and "label" attributes given that SetImageAttribute() no longer
