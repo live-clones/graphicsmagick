@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright (C) 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1968,7 +1968,23 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
   if (image == (Image *) NULL)
     MagickError(OptionError,UnrecognizedAttribute,attribute);
   for ( ; image; image=image->next)
-    (void) SetImageAttribute(image,attribute,SvPV(sval,na));
+    {
+      if ((LocaleCompare(attribute,"comment") == 0) ||
+          (LocaleCompare(attribute,"label") == 0))
+        {
+          char *translated_text;
+          translated_text=TranslateText(info->image_info,image,SvPV(sval,na));
+          if (translated_text != (char *) NULL)
+            {
+              (void) SetImageAttribute(image,attribute,translated_text);
+              MagickFreeMemory(translated_text);
+            }
+        }
+      else
+        {
+          (void) SetImageAttribute(image,attribute,SvPV(sval,na));
+        }
+    }
 }
 
 /*
@@ -4915,20 +4931,30 @@ Mogrify(ref,...)
         }
         case 1:  /* Comment */
         {
+          char *translated_text;
           if (!attribute_flag[0])
             argument_list[0].string_reference=(char *) NULL;
           (void) SetImageAttribute(image,"comment",(char *) NULL);
-          (void) SetImageAttribute(image,"comment",
-            argument_list[0].string_reference);
+          translated_text=TranslateText(info->image_info,image,argument_list[0].string_reference);
+          if (translated_text != (char *) NULL)
+            {
+              (void) SetImageAttribute(image,"comment",translated_text);
+              MagickFreeMemory(translated_text);
+            }
           break;
         }
         case 2:  /* Label */
         {
+          char *translated_text;
           if (!attribute_flag[0])
             argument_list[0].string_reference=(char *) NULL;
           (void) SetImageAttribute(image,"label",(char *) NULL);
-          (void) SetImageAttribute(image,"label",
-            argument_list[0].string_reference);
+          translated_text=TranslateText(info->image_info,image,argument_list[0].string_reference);
+          if (translated_text != (char *) NULL)
+            {
+              (void) SetImageAttribute(image,"label",translated_text);
+              MagickFreeMemory(translated_text);
+            }
           break;
         }
         case 3:  /* AddNoise */
@@ -6669,8 +6695,14 @@ Montage(ref,...)
         {
           if (LocaleCompare(attribute,"label") == 0)
             {
-              for (next=image; next; next=next->next)
-                (void) SetImageAttribute(next,"label",SvPV(ST(i),na));
+              char *translated_text;
+              translated_text=TranslateText(info->image_info,image,SvPV(ST(i),na));
+              if (translated_text != (char *) NULL)
+                {
+                  for (next=image; next; next=next->next)
+                    (void) SetImageAttribute(next,"label",translated_text);
+                  MagickFreeMemory(translated_text);
+                }
               break;
             }
           MagickError(OptionError,UnrecognizedAttribute,attribute);
