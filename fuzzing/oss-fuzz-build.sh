@@ -270,30 +270,6 @@ if $enable_webp
        popd
 fi
 
-# PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libwmf --libs
-# -L/work/lib -lwmf -lwmflite -lfreetype -lbz2 -lpng18 -lm -lz -lm
-#
-# We only build libwmflite, which has no dependencies.
-# There is no pkg-config support for libwmflite (but there is for libwmf).
-if $enable_libwmf
-then
-    printf "=== Building ${SRC}/libwmf...\n"
-    pushd "$SRC/libwmf"
-    autoreconf -fiv
-    ./configure \
-        --prefix="$WORK" \
-        --disable-heavy \
-        --disable-shared \
-        --enable-static \
-        CPPFLAGS="-I$WORK/include" \
-        CFLAGS="${CFLAGS} -fPIC" \
-        LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
-    make clean
-    make -j$(nproc)
-    make install
-    popd
-fi
-
 if $enable_bzip2
 then
     printf "=== Building ${SRC}/bzip2...\n"
@@ -750,6 +726,30 @@ then
         make install
         popd
     fi
+fi
+
+# PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libwmf --libs
+# -L/work/lib -lwmf -lwmflite -lfreetype -lbz2 -lpng18 -lm -lz -lm
+#
+# We only build libwmflite, which has no dependencies.
+# There is no pkg-config support for libwmflite (but there is for libwmf).
+if $enable_libwmf
+then
+    printf "=== Building ${SRC}/libwmf...\n"
+    pushd "$SRC/libwmf"
+    autoreconf -fiv
+    ./configure \
+        --prefix="$WORK" \
+        --disable-heavy \
+        --disable-shared \
+        --enable-static \
+        CPPFLAGS="-I$WORK/include" \
+        CFLAGS="${CFLAGS} -fPIC" \
+        LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
+    make clean
+    make -j$(nproc)
+    make install
+    popd
 fi
 
 printf "Built libraries:\n"
