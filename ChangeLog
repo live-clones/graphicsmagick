@@ -1,3 +1,8 @@
+2025-10-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh (enable_libwmf): Enable building
+	libwmf in the oss-fuzz build.
+
 2025-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* fuzzing/oss-fuzz-build.sh: Add build rules for libwmf. Leave
