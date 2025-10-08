@@ -1,3 +1,12 @@
+2025-10-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/paint.c (ColorFloodfillImage): Disentangle loops and add
+	OpenMP to tile fill color or pattern onto floodplane.
+
+	* coders/wmf.c (lite_font_map): Fix memory leaks when type.mgk is
+	not found. Addresses oss-fuzz 450082723
+	"graphicsmagick:coder_WMF_fuzzer: Direct-leak in AcquireString".
+
 2025-10-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* Magick++/lib/Image.cpp: Translate text with TranslateText()

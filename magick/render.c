@@ -1452,6 +1452,10 @@ DrawAffineImage(Image *image,const Image *composite,
   y_max=(long) floor(edge.y2+0.5);
 
   monitor_active=MagickMonitorActive();
+  (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                        "image %lux%lu, composite %lux%lu, y_min=%ld,  y_max=%ld",
+                        image->columns, image->rows, composite->columns, composite->rows,
+                        y_min, y_max);
 
 #if defined(HAVE_OPENMP)
 #  if defined(TUNE_OPENMP)

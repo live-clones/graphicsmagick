@@ -38,6 +38,16 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-10-08  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/paint.c (ColorFloodfillImage): Disentangle loops and add
+OpenMP to tile fill color or pattern onto floodplane.</p></li>
+<li><p>coders/wmf.c (lite_font_map): Fix memory leaks when type.mgk is
+not found. Addresses oss-fuzz 450082723
+&quot;graphicsmagick:coder_WMF_fuzzer: Direct-leak in AcquireString&quot;.</p></li>
+</ul>
+</blockquote>
 <p>2025-10-05  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

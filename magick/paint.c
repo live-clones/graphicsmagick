@@ -87,8 +87,9 @@
 %
 %  The format of the ColorFloodfillImage method is:
 %
-%      unsigned int ColorFloodfillImage(Image *image,const DrawInfo *draw_info,
-%        const PixelPacket target,const long x_offset,const long y_offset,
+%      MagickPassFail ColorFloodfillImage(Image *image,
+%        const DrawInfo *draw_info, const PixelPacket target,
+%        const long x_offset,const long y_offset,
 %        const PaintMethod method)
 %
 %  A description of each parameter follows:
@@ -107,8 +108,11 @@
 */
 
 MagickExport MagickPassFail ColorFloodfillImage(Image *image,
-  const DrawInfo *draw_info,const PixelPacket target,const long x_offset,
-  const long y_offset,const PaintMethod method)
+                                                const DrawInfo *draw_info,
+                                                const PixelPacket target,
+                                                const long x_offset,
+                                                const long y_offset,
+                                                const PaintMethod method)
 {
   Image
     *pattern;
@@ -160,13 +164,13 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
   */
   if (FuzzyColorMatch(&draw_info->fill,&target,image->fuzz))
     return(MagickFail);
-  floodplane=MagickAllocateClearedArray(unsigned char *,image->columns,image->rows);
-  segment_stack=MagickAllocateArray(SegmentInfo *,MaxStacksize,sizeof(SegmentInfo));
+  floodplane=MagickAllocateResourceLimitedClearedArray(unsigned char *,image->columns,image->rows);
+  segment_stack=MagickAllocateResourceLimitedArray(SegmentInfo *,MaxStacksize,sizeof(SegmentInfo));
   if ((floodplane== (unsigned char *) NULL) ||
       (segment_stack == (SegmentInfo *) NULL))
     {
-      MagickFreeMemory(floodplane);
-      MagickFreeMemory(segment_stack);
+      MagickFreeResourceLimitedMemory(floodplane);
+      MagickFreeResourceLimitedMemory(segment_stack);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
                             UnableToFloodfillImage);
     }
@@ -181,140 +185,236 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
   Push(y,x,x,1);
   Push((ptrdiff_t)y+1,x,x,-1);
   while (s > segment_stack)
-  {
-    /*
-      Pop segment off stack.
-    */
-    s--;
-    x1=(long) s->x1;
-    x2=(long) s->x2;
-    offset=(long) s->y2;
-    y=(long) s->y1+offset;
-    /*
-      Recolor neighboring pixels.
-    */
-    q=GetImagePixels(image,0,y,x1+1,1);
-    if (q == (PixelPacket *) NULL)
-      {
-        status=MagickFail;
-        break;
-      }
-    q+=x1;
-    for (x=x1; x >= 0; x--)
     {
+      /*
+        Pop segment off stack.
+      */
+      s--;
+      x1=(long) s->x1;
+      x2=(long) s->x2;
+      offset=(long) s->y2;
+      y=(long) s->y1+offset;
+      /*
+        Recolor neighboring pixels.
+      */
+
+      /*
+        These two method loops are the same except for the fuzzy-match
+        logic.
+      */
       if (method == FloodfillMethod)
         {
-          if (!FuzzyColorMatch(q,&target,image->fuzz))
-            break;
-        }
-      else
-        if (FuzzyColorMatch(q,&target,image->fuzz) ||
-            FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
-          break;
-      floodplane[y*image->columns+x]=True;
-      *q=draw_info->fill;
-      q--;
-    }
-    if (!SyncImagePixels(image))
-      {
-        status=MagickFail;
-        break;
-      }
-    skip=x >= x1;
-    if (!skip)
-      {
-        start=x+1;
-        if (start < x1)
-          Push(y,start,(ptrdiff_t)x1-1,-offset);
-        x=x1+1;
-      }
-    do
-    {
-      if (!skip)
-        {
-          if (x < (long) image->columns)
-            {
-              q=GetImagePixels(image,x,y,image->columns-x,1);
-              if (q == (PixelPacket *) NULL)
-                {
-                  status=MagickFail;
-                  break;
-                }
-              for ( ; x < (long) image->columns; x++)
-              {
-                if (method == FloodfillMethod)
-                  {
-                    if (!FuzzyColorMatch(q,&target,image->fuzz))
-                      break;
-                  }
-                else
-                  if (FuzzyColorMatch(q,&target,image->fuzz) ||
-                      FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
-                    break;
-                floodplane[y*image->columns+x]=True;
-                *q=draw_info->fill;
-                q++;
-              }
-              if (!SyncImagePixels(image))
-                {
-                  status=MagickFail;
-                  break;
-                }
-            }
-          Push(y,start, (ptrdiff_t)x-1,offset);
-          if (x > ((ptrdiff_t)x2+1))
-            Push(y, (ptrdiff_t)x2+1, (ptrdiff_t)x-1,-offset);
-        }
-      skip=False;
-      x++;
-      if (x <= x2)
-        {
-          q=GetImagePixels(image,x,y,x2-x+1,1);
+          q=GetImagePixels(image,0,y,x1+1,1);
           if (q == (PixelPacket *) NULL)
             {
               status=MagickFail;
               break;
             }
-          for ( ; x <= x2; x++)
-          {
-            if (method == FloodfillMethod)
-              {
-                if (FuzzyColorMatch(q,&target,image->fuzz))
-                  break;
-              }
-            else
-              if (!FuzzyColorMatch(q,&target,image->fuzz) &&
-                  !FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+          q+=x1;
+
+          for (x=x1; x >= 0; x--)
+            {
+              if (!FuzzyColorMatch(q,&target,image->fuzz))
                 break;
-            q++;
-          }
+              floodplane[y*image->columns+x]=MagickTrue;
+              *q=draw_info->fill;
+              q--;
+            }
+
+          if (!SyncImagePixels(image))
+            {
+              status=MagickFail;
+              break;
+            }
         }
-      start=x;
-    } while (x <= x2);
-  }
+      else /* method == FillToBorderMethod */
+        {
+          q=GetImagePixels(image,0,y,x1+1,1);
+          if (q == (PixelPacket *) NULL)
+            {
+              status=MagickFail;
+              break;
+            }
+          q+=x1;
+
+          for (x=x1; x >= 0; x--)
+            {
+              if (FuzzyColorMatch(q,&target,image->fuzz) ||
+                  FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+                break;
+              floodplane[y*image->columns+x]=MagickTrue;
+              *q=draw_info->fill;
+              q--;
+            }
+
+          if (!SyncImagePixels(image))
+            {
+              status=MagickFail;
+              break;
+            }
+        }
+
+      skip=x >= x1;
+      if (!skip)
+        {
+          start=x+1;
+          if (start < x1)
+            Push(y,start,(ptrdiff_t)x1-1,-offset);
+          x=x1+1;
+        }
+      do
+        {
+          if (!skip)
+            {
+              if (x < (long) image->columns)
+                {
+                  /*
+                    These two method loops are the same except for the
+                    fuzzy-match logic.
+                  */
+                  if (method == FloodfillMethod)
+                    {
+                      q=GetImagePixels(image,x,y,image->columns-x,1);
+                      if (q == (PixelPacket *) NULL)
+                        {
+                          status=MagickFail;
+                          break;
+                        }
+
+                      for ( ; x < (long) image->columns; x++)
+                        {
+                          if (!FuzzyColorMatch(q,&target,image->fuzz))
+                            break;
+                          floodplane[y*image->columns+x]=MagickTrue;
+                          *q=draw_info->fill;
+                          q++;
+                        }
+
+                      if (!SyncImagePixels(image))
+                        {
+                          status=MagickFail;
+                          break;
+                        }
+                    }
+                  else /* method == FillToBorderMethod */
+                    {
+                      q=GetImagePixels(image,x,y,image->columns-x,1);
+                      if (q == (PixelPacket *) NULL)
+                        {
+                          status=MagickFail;
+                          break;
+                        }
+
+                      for ( ; x < (long) image->columns; x++)
+                        {
+                          if (FuzzyColorMatch(q,&target,image->fuzz) ||
+                              FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+                            break;
+                          floodplane[y*image->columns+x]=True;
+                          *q=draw_info->fill;
+                          q++;
+                        }
+
+                      if (!SyncImagePixels(image))
+                        {
+                          status=MagickFail;
+                          break;
+                        }
+                    }
+                }
+              Push(y,start, (ptrdiff_t)x-1,offset);
+              if (x > ((ptrdiff_t)x2+1))
+                Push(y, (ptrdiff_t)x2+1, (ptrdiff_t)x-1,-offset);
+            }
+          skip=False;
+          x++;
+          if (x <= x2)
+            {
+              /*
+                These two method loops are the same except for the
+                fuzzy-match logic.
+              */
+              if (method == FloodfillMethod)
+                {
+                  q=GetImagePixels(image,x,y,x2-x+1,1);
+                  if (q == (PixelPacket *) NULL)
+                    {
+                      status=MagickFail;
+                      break;
+                    }
+
+                  for ( ; x <= x2; x++)
+                    {
+                      if (FuzzyColorMatch(q,&target,image->fuzz))
+                        break;
+                      q++;
+                    }
+                }
+              else /* method == FillToBorderMethod */
+                {
+                  q=GetImagePixels(image,x,y,x2-x+1,1);
+                  if (q == (PixelPacket *) NULL)
+                    {
+                      status=MagickFail;
+                      break;
+                    }
+
+                  for ( ; x <= x2; x++)
+                    {
+                      if (!FuzzyColorMatch(q,&target,image->fuzz) &&
+                          !FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+                        break;
+                      q++;
+                    }
+                }
+            }
+          start=x;
+        } while (x <= x2);
+    }
   pattern=draw_info->fill_pattern;
   if (pattern == (Image *) NULL)
-    for (y=0; y < (long) image->rows; y++)
     {
       /*
         Tile fill color onto floodplane.
       */
-      q=GetImagePixels(image,0,y,image->columns,1);
-      if (q == (PixelPacket *) NULL)
+      if (status == MagickPass)
         {
-          status=MagickFail;
-          break;
-        }
-      for (x=0; x < (long) image->columns; x++)
-      {
-        if (floodplane[y*image->columns+x])
-          *q=draw_info->fill;
-        q++;
-      }
-      if (!SyncImagePixels(image))
-        {
-          status=MagickFail;
-          break;
+#if defined(HAVE_OPENMP)
+#  pragma omp parallel for schedule(static,64) shared(status)
+#endif
+          for (y=0; y < (long) image->rows; y++)
+            {
+              PixelPacket
+                * restrict p;
+
+              if (status == MagickFail)
+                continue;
+
+              p=GetImagePixels(image,0,y,image->columns,1);
+              if (p == (PixelPacket *) NULL)
+                {
+                  goto tile_color_fail;
+                }
+              for (x=0; x < (long) image->columns; x++)
+                {
+                  if (floodplane[y*image->columns+x])
+                    *p=draw_info->fill;
+                  p++;
+                }
+              if (!SyncImagePixels(image))
+                {
+                  goto tile_color_fail;
+                }
+              /* Continue loop processing */
+              continue;
+
+              /* There was a problem */
+            tile_color_fail:;
+              status=MagickFail;
+#if defined(HAVE_OPENMP)
+#  pragma omp flush (status)
+#endif
+            }
         }
     }
   else
@@ -322,38 +422,61 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       /*
         Tile image onto floodplane.
       */
-      for (y=0; y < (long) image->rows; y++)
-      {
-        q=GetImagePixels(image,0,y,image->columns,1);
-        if (q == (PixelPacket *) NULL)
-          {
-            status=MagickFail;
-            break;
-          }
-        for (x=0; x < (long) image->columns; x++)
+      if (status == MagickPass)
         {
-          if (floodplane[y*image->columns+x])
+#if defined(HAVE_OPENMP)
+#  pragma omp parallel for schedule(static,64) shared(status)
+#endif
+          for (y=0; y < (long) image->rows; y++)
             {
-              (void) AcquireOnePixelByReference(pattern,&color,(long) ((unsigned long)
-                (x-pattern->tile_info.x) % pattern->columns),(long)
-                ((unsigned long) (y-pattern->tile_info.y) % pattern->rows),
-                &image->exception);
-              if (!pattern->matte)
-                color.opacity=OpaqueOpacity;
-              if (color.opacity != TransparentOpacity)
-                AlphaCompositePixel(q,&color,color.opacity,q,q->opacity);
-            }
-          q++;
-        }
-        if (!SyncImagePixels(image))
-          {
-            status=MagickFail;
-            break;
-          }
-      }
+              PixelPacket
+                * restrict p;
+
+              if (status == MagickFail)
+                continue;
+
+              p=GetImagePixels(image,0,y,image->columns,1);
+              if (p == (PixelPacket *) NULL)
+                goto tile_pattern_fail;
+
+              for (x=0; x < (long) image->columns; x++)
+                {
+                  if (floodplane[y*image->columns+x])
+                    {
+                      if (!AcquireOnePixelByReference(pattern,
+                                                      &color,
+                                                      (long) ((unsigned long)
+                                                              (x-pattern->tile_info.x) %
+                                                              pattern->columns),
+                                                      (long) ((unsigned long)
+                                                              (y-pattern->tile_info.y) %
+                                                              pattern->rows),
+                                                      &image->exception))
+                        goto tile_pattern_fail;
+                      if (!pattern->matte)
+                        color.opacity=OpaqueOpacity;
+                      if (color.opacity != TransparentOpacity)
+                        AlphaCompositePixel(p,&color,color.opacity,p,p->opacity);
+                    }
+                  p++;
+                } /* for x ... */
+              if (!SyncImagePixels(image))
+                goto tile_pattern_fail;
+
+              /* Continue loop processing */
+              continue;
+
+              /* There was a problem */
+            tile_pattern_fail:;
+              status=MagickFail;
+#if defined(HAVE_OPENMP)
+#  pragma omp flush (status)
+#endif
+            } /* for y ... */
+        } /* if status ... */
     }
-  MagickFreeMemory(segment_stack);
-  MagickFreeMemory(floodplane);
+  MagickFreeResourceLimitedMemory(segment_stack);
+  MagickFreeResourceLimitedMemory(floodplane);
   return(status);
 }
 
