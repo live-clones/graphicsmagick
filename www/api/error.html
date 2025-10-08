@@ -87,7 +87,8 @@ the exception as a warning, error, or fatal depending on the severity.</p>
 <section id="description-1">
 <h2>Description</h2>
 <p>CopyException() copies exception data from one ExceptionInfo structure
-to another.</p>
+('original') to another, while freeing any existing ExceptionInfo data
+in the destination ('copy').</p>
 <p>The format of the CopyException method is:</p>
 <pre class="literal-block">void CopyException( <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *copy, const <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *original );</pre>
 <p>A description of each parameter follows:</p>

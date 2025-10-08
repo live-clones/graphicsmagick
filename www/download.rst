@@ -97,6 +97,9 @@ The signing key used (currently DSA key id
 EBDFDB21B020EE8FD151A88DE301047DE1198975) may be downloaded in several
 different ways.
 
+Please note that this signing key expires on 2028-10-25 and I *should*
+publish a new key before then.
+
 The key may be extracted from the text of
 http://www.graphicsmagick.org/security.html or www/security.rst from
 the source repository.
