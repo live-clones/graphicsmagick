@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2018 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -50,17 +50,28 @@
   (((color)->opacity == (target)->opacity) && \
    FuzzyColorMatch(color,target,fuzz))
 #define MaxStacksize  (((size_t) 1) << 15)
-#define Push(up,left,right,delta) \
-  if ((s < (segment_stack+MaxStacksize)) && \
-      ((((ptrdiff_t)up)+((ptrdiff_t)delta)) >= 0) && \
-      ((((ptrdiff_t)up)+((ptrdiff_t)delta)) < (long) image->rows)) \
-    { \
-      s->y1=(up); \
-      s->x1=(left); \
-      s->x2=(right); \
-      s->y2=(delta); \
-      s++; \
-    }
+#define Push(up,left,right,delta)                                       \
+  {                                                                     \
+    if (s >= (segment_stack+MaxStacksize))                              \
+      {                                                                 \
+        MagickFreeResourceLimitedMemory(floodplane);                    \
+        MagickFreeResourceLimitedMemory(segment_stack);                 \
+        ThrowBinaryException2(DrawError,"SegmentStackOverflow",         \
+                              image->filename);                         \
+      }                                                                 \
+    else                                                                \
+      {                                                                 \
+        if (((((ptrdiff_t)up)+((ptrdiff_t)delta)) >= 0) &&              \
+            ((((ptrdiff_t)up)+((ptrdiff_t)delta)) < (long) image->rows)) \
+          {                                                             \
+            s->y1=(up);                                                 \
+            s->x1=(left);                                               \
+            s->x2=(right);                                              \
+            s->y2=(delta);                                              \
+            s++;                                                        \
+          }                                                             \
+      }                                                                 \
+  }
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,6 +175,17 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
   */
   if (FuzzyColorMatch(&draw_info->fill,&target,image->fuzz))
     return(MagickFail);
+  /*
+    The flood-fill algorithm may lock-up if a clip-mask is present
+    because the pixels just written may not be what is read later.
+
+    Perhaps we will update the algorithm to respect the clip-mask later.
+  */
+  if (*ImageGetClipMaskInlined(image))
+    {
+      ThrowException(&image->exception,DrawError,UnableToFloodFillImageDueToClipMask,image->filename);
+      return(MagickFail);
+    }
   floodplane=MagickAllocateResourceLimitedClearedArray(unsigned char *,image->columns,image->rows);
   segment_stack=MagickAllocateResourceLimitedArray(SegmentInfo *,MaxStacksize,sizeof(SegmentInfo));
   if ((floodplane== (unsigned char *) NULL) ||
@@ -549,6 +571,9 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
 
   SegmentInfo
     *segment_stack;
+
+  void
+    *floodplane = (void *) NULL; /* Only to make common Push macro happy */
 
   MagickPassFail
     status=MagickPass;

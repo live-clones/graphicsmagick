@@ -1283,6 +1283,12 @@ unable to draw on image
 .
 
 MessageId       = +1
+SymbolicName    = DrawErrorUnableToFloodFillImageDueToClipMask
+Language        = English
+unable to flood-fill image with clip mask
+.
+
+MessageId       = +1
 SymbolicName    = DrawErrorUnableToPrint
 Language        = English
 Unable to print

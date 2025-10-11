@@ -712,6 +712,9 @@
       <Message name="UnableToDrawOnImage">
         unable to draw on image
       </Message>
+      <Message name="UnableToFloodFillImageDueToClipMask">
+        unable to flood-fill image with clip mask
+      </Message>
     </Error>
     <FatalError>
       <Message name="Default">
