@@ -4,6 +4,8 @@
 	"graphicsmagick:coder_WMF_fuzzer: Timeout in coder_WMF_fuzzer".
 	The problem is that the floodfill algorithm may not converge if a
 	clip-mask is present.
+	(MatteFloodfillImage): Use resource limited memory for segment
+	stack. Throw an error if a clip-mask is present.
 
 2025-10-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

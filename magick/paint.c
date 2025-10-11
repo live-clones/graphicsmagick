@@ -595,9 +595,20 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
   if (q->opacity == opacity)
     return(MagickFail);
   /*
+    The flood-fill algorithm may lock-up if a clip-mask is present
+    because the pixels just written may not be what is read later.
+
+    Perhaps we will update the algorithm to respect the clip-mask later.
+  */
+  if (*ImageGetClipMaskInlined(image))
+    {
+      ThrowException(&image->exception,DrawError,UnableToFloodFillImageDueToClipMask,image->filename);
+      return(MagickFail);
+    }
+  /*
     Allocate segment stack.
   */
-  segment_stack=MagickAllocateMemory(SegmentInfo *,MaxStacksize*sizeof(SegmentInfo));
+  segment_stack=MagickAllocateResourceLimitedArray(SegmentInfo *,MaxStacksize,sizeof(SegmentInfo));
   if (segment_stack == (SegmentInfo *) NULL)
     ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
       UnableToFloodfillImage);
@@ -715,7 +726,7 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
       start=x;
     } while (x <= x2);
   }
-  MagickFreeMemory(segment_stack);
+  MagickFreeResourceLimitedMemory(segment_stack);
   return(status);
 }
 
