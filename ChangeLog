@@ -1,3 +1,10 @@
+2025-10-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* Magick++/drawing-primitives.txt: Update some of the drawing
+	primitives summary.
+
+	* magick/render.c (DrawImage): Add support for "decorate none".
+
 2025-10-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/paint.c (ColorFloodfillImage): Address oss-fuzz 450182424

@@ -3106,6 +3106,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         if (LocaleCompare("decorate",keyword) == 0)
           {
             MagickGetToken(q,&q,token,token_max_length);
+            if (LocaleCompare("none",token) == 0)
+              {
+                graphic_context[n]->decorate=NoDecoration;
+                break;
+              }
             if (LocaleCompare("underline",token) == 0)
               {
                 graphic_context[n]->decorate=UnderlineDecoration;
@@ -3338,6 +3343,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         if (LocaleCompare("gradient-units",keyword) == 0)
           {
             MagickGetToken(q,&q,token,token_max_length);
+            /* FIXME: Not implemented! */
             break;
           }
         if (LocaleCompare("gravity",keyword) == 0)
