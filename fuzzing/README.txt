@@ -185,3 +185,21 @@ With sources under /home/bfriesen/src/libheif::
   cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER=on -DWITH_UNCOMPRESSED_CODEC=on /home/bfriesen/src/libheif
   make -j 8
   make install
+
+libwmf
+++++++
+
+Sources come from https://github.com/caolanm/libwmf
+
+With sources under /home/bfriesen/src/libwmf::
+
+  autoreconf -fiv
+  ./configure \
+        --prefix=/usr/local \
+        --enable-heavy \
+        --enable-shared \
+        --enable-static \
+        CC=gcc-13 CXX=g++-13 \
+        CPPFLAGS="-I/usr/local/include" \
+        CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' \
+        LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'
