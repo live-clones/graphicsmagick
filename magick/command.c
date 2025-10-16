@@ -9052,8 +9052,9 @@ MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
             }
           UnlockSemaphoreInfo(command_semaphore);
 
-          return(commands[i].command_vector)(image_info,argc,argv,
-            commands[i].pass_metadata ? metadata : (char **) NULL,exception);
+          if (commands[i].command_vector != (CommandVectorHandler) NULL)
+            return(commands[i].command_vector)(image_info,argc,argv,
+              commands[i].pass_metadata ? metadata : (char **) NULL,exception);
         }
     }
   ThrowException(exception,OptionError,UnrecognizedCommand,option);

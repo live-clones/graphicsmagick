@@ -1,3 +1,10 @@
+2025-10-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/command.c (MagickCommand): Avoid a crash if
+	command_vector is null. Resolves SourceForge issue #758 "gm
+	benchmark: NULL pointer dereference when "batch" subcommand is
+	passed".
+
 2025-10-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* Magick++/drawing-primitives.txt: Update some of the drawing
