@@ -75,9 +75,9 @@ Add-On Libraries & Programs
 ---------------------------
 
 To further enhance the capabilities of GraphicsMagick, you may want to
-get these programs or libraries. Note that these packages are already
-integrated into the GraphicsMagick Mercurial repository for use when
-building under Microsoft Windows:
+get these programs or libraries. Note that *some* of these packages
+are already integrated into the GraphicsMagick Mercurial repository
+for use when building under Microsoft Windows:
 
 * GraphicsMagick requires the BZLIB library from
 
@@ -279,9 +279,9 @@ building under Microsoft Windows:
   multiple frees, use of uninitialized data, use of freed data, and
   many other common programming errors.
 
-* GraphicsMagick requires libwmflite from libwmf 0.2.5 (or later) from
+* GraphicsMagick requires libwmflite from libwmf 0.2.13 (or later) from
 
-     https://sourceforge.net/projects/wvware/
+     https://github.com/caolanm/libwmf
 
   to render files in the Windows Meta File (WMF) metafile format
   (16-bit WMF files only, not 32-bit "EMF"). This is the format
@@ -362,11 +362,12 @@ building under Microsoft Windows:
   https://github.com/ebiggers/libdeflate).  Linking with this library
   may be necessary for builds where libtiff depends on libdeflate.
 
-* GraphicsMagick requires the heif library from
+* GraphicsMagick requires the heif library (not yet incorporated in
+  the Windows Visual Studio build) from
 
     https://github.com/strukturag/libheif
 
-    and the libde265 library from
+  and the libde265 library from
 
     https://github.com/strukturag/libde265
 
@@ -387,6 +388,36 @@ building under Microsoft Windows:
   entity has paid to allow use of any applicable HEVC patents on their
   device, or that the patents do not apply in their country.
 
+  Libheif optionally supports many more dependencies (see
+  https://github.com/strukturag/libheif for details):
+
+  The x256 library from
+
+    https://bitbucket.org/multicoreware/x265_git/src/master
+
+  to support h.265/HEVC encoding.
+
+  The openh264 library from
+
+    https://github.com/cisco/openh264
+
+  to support H.264 encoding and decoding.
+
+  The aom library from
+
+    https://aomedia.googlesource.com/aom
+
+  to support AV1 encoding and decoding.
+
+  The OpenJPEG library from
+
+    https://github.com/uclouvain/openjpeg
+
+  To support JPEG 2000 encoding and decoding.
+
 * GraphicsMagick requires the JPEG XL (JXL) library (release 0.7.0 or
-  later) from https://github.com/libjxl/libjxl to read and write JPEG
-  XL files.
+  later) from
+
+    https://github.com/libjxl/libjxl
+
+  to read and write JPEG XL files.

@@ -104,12 +104,16 @@ Building libheif (and dependencies) for development
 de265
 +++++
 
-With sources under /home/bfriesen/src/libde265 (from https://github.com/strukturag/libde265)::
+Sources come from https://github.com/strukturag/libde265.
+
+With sources under /home/bfriesen/src/libde265::
 
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=ON /home/bfriesen/src/libde265
 
 x265
 ++++
+
+Sources come from https://bitbucket.org/multicoreware/x265_git/src/master.
 
 With sources under /home/bfriesen/src/x265-stable::
 
@@ -121,6 +125,8 @@ With sources under /home/bfriesen/src/x265-stable::
 
 openh264
 ++++++++
+
+Sources come from https://github.com/cisco/openh264.
 
 The openh264 build is based on a well-designed pure GNU Makefile.
 
@@ -135,6 +141,8 @@ With sources under /home/bfriesen/src/openh264::
 aom
 +++
 
+Sources come from https://aomedia.googlesource.com/aom.
+
 With sources under /home/bfriesen/src/aom::
 
   cmake -G "Unix Makefiles" -DAOM_TARGET_CPU=generic -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE  /home/bfriesen/src/aom
@@ -143,6 +151,8 @@ With sources under /home/bfriesen/src/aom::
 
 openjpeg
 ++++++++
+
+Sources come from https://github.com/uclouvain/openjpeg.
 
 With sources under /home/bfriesen/src/openjpeg::
 
@@ -153,6 +163,8 @@ With sources under /home/bfriesen/src/openjpeg::
 jpeg
 ++++
 
+Sources come from https://github.com/libjpeg-turbo/libjpeg-turbo.
+
 With sources under libjpeg-turbo::
 
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DWITH_JPEG8=1 /home/bfriesen/src/libjpeg-turbo
@@ -162,7 +174,9 @@ With sources under libjpeg-turbo::
 libjxl
 +++++++
 
-The initial git checkout looks like::
+Sources come from https://github.com/libjxl/libjxl.git.
+
+The initial git checkout (from project at https://github.com/libjxl) looks like::
 
   git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules
 

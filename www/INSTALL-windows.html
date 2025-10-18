@@ -89,7 +89,7 @@ section.</p>
 <p>Windows release packages after June 18, 2025 require the common
 <a class="reference external" href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170">Microsoft Visual C++ Redistributable version</a>
 to be installed in order to be able to execute.  Most modern Windows
-systems (Windows 8 and later) very likely already have this
+systems (Windows 10 and later) very likely already have this
 installed, and it will be updated automatically by the Windows
 update mechanisms.</p>
 <p>While multiple versions of GraphicsMagick may be installed at one
@@ -364,8 +364,8 @@ performance).</p>
 so Visual Studio 2019 (Visual C++ 2019 aka 16.X.X) or later are
 required.  Non-commercial users are recommended to use the free
 Visual Studio Community Edition.</p>
-<p>The Visual C++ distribution targeted at Windows 8 through Windows 11
-does not provide any stock workspace (DSW) or project files (DSP)
+<p>The Visual C++ distribution targeted at Windows 10 through Windows
+11 does not provide any stock workspace (DSW) or project files (DSP)
 except for those included with third party libraries. Instead, there
 is a &quot;configure&quot; program that must run to create build environments
 to satisfy various requirements.</p>
@@ -418,9 +418,8 @@ distribution is built using #1 from above with the X11 libraries
 excluded. This results build using all DLL's for everything and
 multi-threaded support (the only option for DLL's).</p>
 <p>To do a build for your requirements, simply go to the configure sub-
-directory under VisualMagick and open the configure.dsw workspace
-(for Visual C++ 6.0) or configure.sln (for Visual C++ 7.X through
-9.X). Set the build configuration to &quot;Release&quot; under the</p>
+directory under VisualMagick and open the configure.sln
+workspace. Set the build configuration to &quot;Release&quot; under the</p>
 <blockquote>
 <p>&quot;Build..., Set Active Configuration...&quot;  menu.</p>
 </blockquote>

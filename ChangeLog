@@ -1,3 +1,8 @@
+2025-10-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* README.txt, fuzzing/README.txt, www/INSTALL-windows.rst:
+	Documentation updates.
+
 2025-10-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/command.c (MagickCommand): Avoid a crash if

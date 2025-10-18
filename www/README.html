@@ -112,9 +112,9 @@ HTML equivalents):</p>
 <section id="add-on-libraries-programs">
 <h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">Add-On Libraries &amp; Programs</a></h1>
 <p>To further enhance the capabilities of GraphicsMagick, you may want to
-get these programs or libraries. Note that these packages are already
-integrated into the GraphicsMagick Mercurial repository for use when
-building under Microsoft Windows:</p>
+get these programs or libraries. Note that <em>some</em> of these packages
+are already integrated into the GraphicsMagick Mercurial repository
+for use when building under Microsoft Windows:</p>
 <ul>
 <li><p>GraphicsMagick requires the BZLIB library from</p>
 <blockquote>
@@ -309,9 +309,9 @@ performance for multi-threaded programs and provides access to
 debugging features that detect memory leaks, buffer overruns,
 multiple frees, use of uninitialized data, use of freed data, and
 many other common programming errors.</p></li>
-<li><p>GraphicsMagick requires libwmflite from libwmf 0.2.5 (or later) from</p>
+<li><p>GraphicsMagick requires libwmflite from libwmf 0.2.13 (or later) from</p>
 <blockquote>
-<p><a class="reference external" href="https://sourceforge.net/projects/wvware/">https://sourceforge.net/projects/wvware/</a></p>
+<p><a class="reference external" href="https://github.com/caolanm/libwmf">https://github.com/caolanm/libwmf</a></p>
 </blockquote>
 <p>to render files in the Windows Meta File (WMF) metafile format
 (16-bit WMF files only, not 32-bit &quot;EMF&quot;). This is the format
@@ -390,10 +390,13 @@ likely that other purposes will be found for Zstd.</p>
 <a class="reference external" href="https://github.com/ebiggers/libdeflate">https://github.com/ebiggers/libdeflate</a>).  Linking with this library
 may be necessary for builds where libtiff depends on libdeflate.</p>
 </li>
-<li><p>GraphicsMagick requires the heif library from</p>
+<li><p>GraphicsMagick requires the heif library (not yet incorporated in
+the Windows Visual Studio build) from</p>
 <blockquote>
 <p><a class="reference external" href="https://github.com/strukturag/libheif">https://github.com/strukturag/libheif</a></p>
+</blockquote>
 <p>and the libde265 library from</p>
+<blockquote>
 <p><a class="reference external" href="https://github.com/strukturag/libde265">https://github.com/strukturag/libde265</a></p>
 </blockquote>
 <p>to read HEIF/h.265 files and HEIF/AVIF files. Libheif makes use of
@@ -411,10 +414,36 @@ vendor has already paid for it.  Some countries do not support
 software patents.  The user is responsible for assuring that some
 entity has paid to allow use of any applicable HEVC patents on their
 device, or that the patents do not apply in their country.</p>
+<p>Libheif optionally supports many more dependencies (see
+<a class="reference external" href="https://github.com/strukturag/libheif">https://github.com/strukturag/libheif</a> for details):</p>
+<p>The x256 library from</p>
+<blockquote>
+<p><a class="reference external" href="https://bitbucket.org/multicoreware/x265_git/src/master">https://bitbucket.org/multicoreware/x265_git/src/master</a></p>
+</blockquote>
+<p>to support h.265/HEVC encoding.</p>
+<p>The openh264 library from</p>
+<blockquote>
+<p><a class="reference external" href="https://github.com/cisco/openh264">https://github.com/cisco/openh264</a></p>
+</blockquote>
+<p>to support H.264 encoding and decoding.</p>
+<p>The aom library from</p>
+<blockquote>
+<p><a class="reference external" href="https://aomedia.googlesource.com/aom">https://aomedia.googlesource.com/aom</a></p>
+</blockquote>
+<p>to support AV1 encoding and decoding.</p>
+<p>The OpenJPEG library from</p>
+<blockquote>
+<p><a class="reference external" href="https://github.com/uclouvain/openjpeg">https://github.com/uclouvain/openjpeg</a></p>
+</blockquote>
+<p>To support JPEG 2000 encoding and decoding.</p>
 </li>
 <li><p>GraphicsMagick requires the JPEG XL (JXL) library (release 0.7.0 or
-later) from <a class="reference external" href="https://github.com/libjxl/libjxl">https://github.com/libjxl/libjxl</a> to read and write JPEG
-XL files.</p></li>
+later) from</p>
+<blockquote>
+<p><a class="reference external" href="https://github.com/libjxl/libjxl">https://github.com/libjxl/libjxl</a></p>
+</blockquote>
+<p>to read and write JPEG XL files.</p>
+</li>
 </ul>
 </section>
 </main>

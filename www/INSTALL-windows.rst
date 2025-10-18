@@ -26,7 +26,7 @@ Prerequisites
   `Microsoft Visual C++ Redistributable version
   <https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170>`_
   to be installed in order to be able to execute.  Most modern Windows
-  systems (Windows 8 and later) very likely already have this
+  systems (Windows 10 and later) very likely already have this
   installed, and it will be updated automatically by the Windows
   update mechanisms.
 
@@ -287,8 +287,8 @@ Visual C++ 16.X through 17.13.6 Compilation
   required.  Non-commercial users are recommended to use the free
   Visual Studio Community Edition.
 
-  The Visual C++ distribution targeted at Windows 8 through Windows 11
-  does not provide any stock workspace (DSW) or project files (DSP)
+  The Visual C++ distribution targeted at Windows 10 through Windows
+  11 does not provide any stock workspace (DSW) or project files (DSP)
   except for those included with third party libraries. Instead, there
   is a "configure" program that must run to create build environments
   to satisfy various requirements.
@@ -352,9 +352,8 @@ Visual C++ 16.X through 17.13.6 Compilation
   multi-threaded support (the only option for DLL's).
 
   To do a build for your requirements, simply go to the configure sub-
-  directory under VisualMagick and open the configure.dsw workspace
-  (for Visual C++ 6.0) or configure.sln (for Visual C++ 7.X through
-  9.X). Set the build configuration to "Release" under the
+  directory under VisualMagick and open the configure.sln
+  workspace. Set the build configuration to "Release" under the
 
       "Build..., Set Active Configuration..."  menu.
 
