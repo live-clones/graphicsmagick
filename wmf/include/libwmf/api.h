@@ -20,8 +20,7 @@
 #ifndef LIBWMF_API_H
 #define LIBWMF_API_H
 
-// #include <zlib.h>
-typedef void *gzFile; // This is all that was obtained from zlib.h
+#include <zlib.h>
 
 #include <libwmf/types.h>
 
@@ -349,7 +348,7 @@ extern wmf_error_t wmf_wmfxml_import (wmfAPI*,const char*);
  * 
  * (debug build only)
  */
-#define WMF_DEBUG(Z,M)
+#define WMF_DEBUG(Z,M) (void)Z
 
 /**
  * @param Z the API handle

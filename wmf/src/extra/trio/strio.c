@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * $Id$
+ * $Id: strio.c,v 1.1 2001/06/07 08:23:02 fjfranklin Exp $
  *
  * Copyright (C) 1998 Bjorn Reese and Daniel Stenberg.
  *
@@ -20,8 +20,6 @@
  * - StrToLongDouble
  */
  
-static const char rcsid[] = "@(#)$Id$";
-
 #if defined(unix) || defined(__xlC__)
 # define PLATFORM_UNIX
 #elif defined(WIN32) || defined(_WIN32)
@@ -414,7 +412,7 @@ char *StrSubstringMax(const char *string, size_t max, const char *find)
  * sign ::= ( '-' | '+' )
  * decimal_point ::= '.'
  */
-double StrToDouble(const char *source, const char **endp)
+double StrToDouble(const char *source, char **endp)
 {
 #if defined(TRIO_C99)
   return strtod(source, endp);
@@ -534,7 +532,7 @@ double StrToDouble(const char *source, const char **endp)
 /*************************************************************************
  * StrToFloat
  */
-float StrToFloat(const char *source, const char **endp)
+float StrToFloat(const char *source, char **endp)
 {
 #if defined(TRIO_C99)
   return strtof(source, endp);

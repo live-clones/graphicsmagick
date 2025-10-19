@@ -31,7 +31,7 @@ static void ipa_font_add_ps (wmfAPI*,wmfMapping*);
 static void ipa_font_add_cache (wmfAPI*,wmfFT_CacheEntry*);
 static void ipa_font_add_api (wmfAPI*,char*);
 
-static float ipa_char_position (wmfAPI*,wmfFont*,char*,char*);
+static float ipa_char_position (wmfFont*,char*,char*);
 
 static wmfXML_FontInfo* ipa_font_sys_map (wmfAPI*,wmfFont*);
 static FT_Face          ipa_font_sys_face (wmfAPI*,wmfFont*,wmfXML_FontInfo*);
@@ -64,7 +64,7 @@ struct _XML2_FontData
 
 static void            ipa_font_gs_file (wmfAPI* API,wmfGS_FontData* FD,char* file);
 static void            ipa_font_gs_add (wmfAPI* API,wmfGS_FontData* FD,char* name,char* alias);
-static char*           ipa_font_gs_alias (wmfAPI* API,wmfGS_FontData* FD,char* name);
+static char*           ipa_font_gs_alias (wmfGS_FontData* FD,char* name);
 static char*           ipa_font_gs_readline (wmfAPI* API,FILE* in);
 static wmfGS_FontInfo* ipa_font_gs_map (wmfAPI* API,wmfFont* font);
 static FT_Face         ipa_font_gs_face (wmfAPI* API,wmfFont* font,wmfGS_FontInfo* FI);
@@ -80,19 +80,19 @@ static char* ipa_font_std (wmfAPI* API,wmfFont* font);
 /* postscript (standard 13) font name mapping to type 1 font file
  */
 static wmfMapping PSFontMap[13] = {
-	{	"Courier",		"n022003l.pfb",	ft_encoding_adobe_standard	},
-	{	"Courier-Oblique",	"n022023l.pfb",	ft_encoding_adobe_standard	},
-	{	"Courier-Bold",		"n022004l.pfb",	ft_encoding_adobe_standard	},
-	{	"Courier-BoldOblique",	"n022024l.pfb",	ft_encoding_adobe_standard	},
-	{	"Helvetica",		"n019003l.pfb",	ft_encoding_adobe_standard	},
-	{	"Helvetica-Oblique",	"n019023l.pfb",	ft_encoding_adobe_standard	},
-	{	"Helvetica-Bold",	"n019004l.pfb",	ft_encoding_adobe_standard	},
-	{	"Helvetica-BoldOblique","n019024l.pfb",	ft_encoding_adobe_standard	},
-	{	"Times-Roman",		"n021003l.pfb",	ft_encoding_adobe_standard	},
-	{	"Times-Italic",		"n021023l.pfb",	ft_encoding_adobe_standard	},
-	{	"Times-Bold",		"n021004l.pfb",	ft_encoding_adobe_standard	},
-	{	"Times-BoldItalic",	"n021024l.pfb",	ft_encoding_adobe_standard	},
-	{	"Symbol",		"s050000l.pfb",	ft_encoding_adobe_custom  	}};
+	{	"Courier",		"NimbusMonoPS-Regular.t1",	ft_encoding_adobe_standard	},
+	{	"Courier-Oblique",	"NimbusMonoPS-Italic.t1",	ft_encoding_adobe_standard	},
+	{	"Courier-Bold",		"NimbusMonoPS-Bold.t1",	ft_encoding_adobe_standard	},
+	{	"Courier-BoldOblique",	"NimbusMonoPS-BoldItalic.t1",	ft_encoding_adobe_standard	},
+	{	"Helvetica",		"NimbusSans-Regular.t1",	ft_encoding_adobe_standard	},
+	{	"Helvetica-Oblique",	"NimbusSans-Italic.t1",	ft_encoding_adobe_standard	},
+	{	"Helvetica-Bold",	"NimbusSans-Bold.t1",	ft_encoding_adobe_standard	},
+	{	"Helvetica-BoldOblique","NimbusSans-BoldItalic.t1",	ft_encoding_adobe_standard	},
+	{	"Times-Roman",		"NimbusRoman-Regular.t1",	ft_encoding_adobe_standard	},
+	{	"Times-Italic",		"NimbusRoman-Italic.t1",	ft_encoding_adobe_standard	},
+	{	"Times-Bold",		"NimbusRoman-Bold.t1",	ft_encoding_adobe_standard	},
+	{	"Times-BoldItalic",	"NimbusRoman-BoldItalic.t1",	ft_encoding_adobe_standard	},
+	{	"Symbol",		"StandardSymbolsPS.t1",	ft_encoding_adobe_custom  	}};
 
 /* exact WMF font name to postscript (standard 13) equivalent...
  * well, yeah, I know. :-(
@@ -110,15 +110,15 @@ static wmfFontMap WMFFontMap[] = {
 /* Sub-string match if not in the above list;
  */
 static wmfMapping SubFontMap[] = {
-	{	"Arial",		"Helvetica"	},
-	{	"Courier",		"Courier"	},
-	{	"Fixed",		"Courier"	},
-	{	"Helvetica",		"Helvetica"	},
-	{	"Sans",			"Helvetica"	},
-	{	"Sym",			"Symbol"	},
-	{	"Terminal",		"Courier"	},
-	{	"Times",		"Times"		},
-	{	"Wingdings",		"Symbol"	}};
+	{	"Arial",		"Helvetica", ft_encoding_adobe_standard	},
+	{	"Courier",		"Courier", ft_encoding_adobe_standard	},
+	{	"Fixed",		"Courier", ft_encoding_adobe_standard	},
+	{	"Helvetica",		"Helvetica", ft_encoding_adobe_standard	},
+	{	"Sans",			"Helvetica", ft_encoding_adobe_standard	},
+	{	"Sym",			"Symbol", ft_encoding_adobe_standard	},
+	{	"Terminal",		"Courier", ft_encoding_adobe_standard	},
+	{	"Times",		"Times", ft_encoding_adobe_standard	},
+	{	"Wingdings",		"Symbol", ft_encoding_adobe_standard	}};
 
 /* If all else fails, assume Times
  */

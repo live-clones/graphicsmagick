@@ -20,7 +20,8 @@
 /* This is called by wmf_play() the *first* time the meta file is played
  */
 static void wmf_fig_device_open (wmfAPI* API)
-{	wmf_fig_t* ddata = WMF_FIG_GetData (API);
+{	
+/*	wmf_fig_t* ddata = WMF_FIG_GetData (API); */
 
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]device_open");
 
@@ -30,7 +31,8 @@ static void wmf_fig_device_open (wmfAPI* API)
 /* This is called by wmf_api_destroy()
  */
 static void wmf_fig_device_close (wmfAPI* API)
-{	wmf_fig_t* ddata = WMF_FIG_GetData (API);
+{
+/*	wmf_fig_t* ddata = WMF_FIG_GetData (API); */
 
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]device_close");
 
@@ -40,7 +42,8 @@ static void wmf_fig_device_close (wmfAPI* API)
 /* This is called from the beginning of each play for initial page setup
  */
 static void wmf_fig_device_begin (wmfAPI* API)
-{	wmf_fig_t* ddata = WMF_FIG_GetData (API);
+{	
+	wmf_fig_t* ddata = WMF_FIG_GetData (API);
 
 	wmfStream* out = ddata->out;
 
@@ -53,24 +56,8 @@ static void wmf_fig_device_begin (wmfAPI* API)
 	float ratio_def;
 	float ratio_page;
 
-	float Ox;
-	float Oy;
-
-	float xScale;
-	float yScale;
-	
-	int i;
-	
-	int zero;
-	int colno;
-
-	char clr[10];
-	char c;
-
 	time_t t;
 
-	float fu;
-	
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]device_begin");
 
 	if (out == 0) return;
@@ -121,7 +108,7 @@ static void wmf_fig_device_begin (wmfAPI* API)
 			page_height -= 144;
 		}
 
-		if ((ddata->fig_width > page_width) || (ddata->fig_height > page_height) || WMF_FIG_MAXPECT)
+		if ((ddata->fig_width > page_width) || (ddata->fig_height > page_height) || (ddata->flags & WMF_FIG_MAXPECT))
 		{	ratio_def = def_height / def_width;
 			ratio_page = (float) page_height / (float) page_width;
 

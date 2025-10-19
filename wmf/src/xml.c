@@ -312,7 +312,7 @@ static void xml_end (void * user_data, const char * name)
 		remaining -= 2;
 		length++;
 	}
-	if (remaining == 1) WMF_DEBUG (API, "xml_end: WMF Record has unexpected length!");
+	if (remaining == 1) { WMF_DEBUG (API, "xml_end: WMF Record has unexpected length!"); }
 
 	if (length)
 	{	mem_append (input_data, buffer, length);
@@ -451,9 +451,9 @@ wmf_error_t wmf_wmfxml_import (wmfAPI * API, const char * wmfxml_filename)
 
 	memset ((void*) (&sax), 0, sizeof (xmlSAXHandler));
 
-	sax.startElement = xml_start;
-	sax.endElement   = xml_end;
-	sax.characters   = xml_data;
+	sax.startElement = (startElementSAXFunc)xml_start;
+	sax.endElement   = (endElementSAXFunc)xml_end;
+	sax.characters   = (charactersSAXFunc)xml_data;
 
 	ctxt = xmlCreateFileParserCtxt (wmfxml_filename);
 

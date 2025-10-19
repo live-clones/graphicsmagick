@@ -25,7 +25,7 @@ char *
 gdImageStringTTF (gdImage * im, int *brect, int fg, char *fontlist,
 		  double ptsize, double angle, int x, int y, char *string)
 {
-  gdImageStringFT (im, brect, fg, fontlist, ptsize,
+  return gdImageStringFT (im, brect, fg, fontlist, ptsize,
 		   angle, x, y, string);
 }
 
@@ -331,10 +331,11 @@ fontFetch (char **error, void *key)
   int n;
   int font_found = 0;
   unsigned short platform, encoding;
-  char *fontsearchpath, *fontpath, *fontlist;
+  char *fontsearchpath, *fontlist;
   char *fullname = NULL;
   char *name, *path, *dir;
-  char *strtok_ptr;
+  char dummy = 0;
+  char *strtok_ptr = &dummy;
   FT_Error err;
   FT_CharMap found = 0;
   FT_CharMap charmap;
@@ -393,16 +394,19 @@ fontFetch (char **error, void *key)
   if (!font_found)
     {
       *error = "Could not find/open font";
+      gdFree (fullname);
+      gdFree (a);
       return NULL;
     }
 
   err = FT_New_Face (*b->library, fullname, 0, &a->face);
+  gdFree (fullname);
   if (err)
     {
       *error = "Could not read font";
+      gdFree (a);
       return NULL;
     }
-  gdFree (fullname);
 
 /* FIXME - This mapping stuff is imcomplete - where is the spec? */
 
@@ -443,6 +447,7 @@ fontFetch (char **error, void *key)
   if (!found)
     {
       *error = "Unable to find a CharMap that I can handle";
+      gdFree (a);
       return NULL;
     }
 
@@ -487,6 +492,8 @@ tweenColorFetch (char **error, void *key)
   tweencolorkey_t *b = (tweencolorkey_t *) key;
   int pixel, npixel, bg, fg;
   gdImagePtr im;
+
+  (void)error;
 
   a = (tweencolor_t *) gdMalloc (sizeof (tweencolor_t));
   pixel = a->pixel = b->pixel;
@@ -533,12 +540,13 @@ tweenColorRelease (void *element)
 }
 
 /* draw_bitmap - transfers glyph bitmap to GD image */
-/* static */ char *
+static char *
 gdft_draw_bitmap (gdImage * im, int fg, FT_Bitmap bitmap, int pen_x, int pen_y)
 {
-  unsigned char *pixel;
-  int *tpixel;
-  int x, y, row, col, pc;
+  unsigned char *pixel = 0;
+  int *tpixel = 0;
+  int x, y, pc;
+  unsigned row, col;
 
   tweencolor_t *tc_elem;
   tweencolorkey_t tc_key;
@@ -566,6 +574,7 @@ gdft_draw_bitmap (gdImage * im, int fg, FT_Bitmap bitmap, int pen_x, int pen_y)
 
       for (col = 0; col < bitmap.width; col++, pc++)
 	{
+	  const int trueColor = im->trueColor;
 	  if (bitmap.pixel_mode == ft_pixel_mode_grays)
 	    {
 	      /*
@@ -595,7 +604,7 @@ gdft_draw_bitmap (gdImage * im, int fg, FT_Bitmap bitmap, int pen_x, int pen_y)
 	      if (x >= im->sx || x < 0)
 		continue;
 	      /* get pixel location in gd buffer */
-	      if (im->trueColor)
+	      if (trueColor)
 		{
 		  tpixel = &im->tpixels[y][x];
 		}
@@ -606,7 +615,7 @@ gdft_draw_bitmap (gdImage * im, int fg, FT_Bitmap bitmap, int pen_x, int pen_y)
 	      if (tc_key.pixel == NUMCOLORS)
 		{
 		  /* use fg color directly */
-		  if (im->trueColor)
+		  if (trueColor)
 		    {
 		      *tpixel = fg;
 		    }
@@ -617,23 +626,17 @@ gdft_draw_bitmap (gdImage * im, int fg, FT_Bitmap bitmap, int pen_x, int pen_y)
 		}
 	      else
 		{
+		  tc_elem = (tweencolor_t *) gdCacheGet (tc_cache, &tc_key);
+		  if (!tc_elem) return tc_cache->error;
 		  /* find antialised color */
-		  if (im->trueColor)
+		  if (trueColor)
 		    {
 		      tc_key.bgcolor = *tpixel;
-		    }
-		  else
-		    {
-		      tc_key.bgcolor = *pixel;
-		    }
-		  tc_elem = (tweencolor_t *) gdCacheGet (
-							  tc_cache, &tc_key);
-		  if (im->trueColor)
-		    {
 		      *tpixel = tc_elem->tweencolor;
 		    }
 		  else
 		    {
+		      tc_key.bgcolor = *pixel;
 		      *pixel = tc_elem->tweencolor;
 		    }
 		}
@@ -643,7 +646,17 @@ gdft_draw_bitmap (gdImage * im, int fg, FT_Bitmap bitmap, int pen_x, int pen_y)
   return (char *) NULL;
 }
 
+static int
+gdroundupdown (FT_F26Dot6 v1, int updown)
+{
+  return (!updown)
+    ? (v1 < 0 ? ((v1 - 63) >> 6) : v1 >> 6)
+    : (v1 > 0 ? ((v1 + 63) >> 6) : v1 >> 6);
+}
+
+#pragma GCC visibility push(hidden)
 extern int any2eucjp (char *, char *, unsigned int);
+#pragma GCC visibility pop
 
 /********************************************************************/
 /* gdImageStringFT -  render a utf8 string onto a gd image          */
@@ -668,7 +681,7 @@ gdImageStringFT (gdImage * im, int *brect, int fg, char *fontlist,
   font_t *font;
   fontkey_t fontkey;
   char *next;
-  char *tmpstr = 0;
+  char *tmpstr = NULL;
   int render = (im && (im->trueColor || (fg <= 255 && fg >= -255)));
   FT_BitmapGlyph bm;
 
@@ -720,7 +733,7 @@ gdImageStringFT (gdImage * im, int *brect, int fg, char *fontlist,
   if (font->have_char_map_sjis)
     {
 #endif
-      if (tmpstr = (char *) gdMalloc (BUFSIZ))
+      if ((tmpstr = (char *) gdMalloc (BUFSIZ)))
 	{
 	  any2eucjp (tmpstr, string, BUFSIZ);
 	  next = tmpstr;
@@ -801,7 +814,7 @@ gdImageStringFT (gdImage * im, int *brect, int fg, char *fontlist,
 	    {
 	      ch = c & 0xFF;	/* don't extend sign */
 	    }
-	  next++;
+	  if (*next) next++;
 	}
       else
 	{
@@ -835,7 +848,10 @@ gdImageStringFT (gdImage * im, int *brect, int fg, char *fontlist,
       /* load glyph image into the slot (erase previous one) */
       err = FT_Load_Glyph (face, glyph_index, FT_LOAD_DEFAULT);
       if (err)
+      {
+	gdFree (tmpstr);
 	return "Problem loading glyph";
+      }
 
       /* transform glyph image */
       FT_Get_Glyph (slot, &image);
@@ -871,7 +887,10 @@ gdImageStringFT (gdImage * im, int *brect, int fg, char *fontlist,
 	    {
 	      err = FT_Glyph_To_Bitmap (&image, ft_render_mode_normal, 0, 1);
 	      if (err)
+	      {
+		gdFree (tmpstr);
 		return "Problem rendering glyph";
+	      }
 	    }
 
 	  /* now, draw to our target surface */
@@ -920,17 +939,8 @@ gdImageStringFT (gdImage * im, int *brect, int fg, char *fontlist,
       brect[7] = y - gdroundupdown (brect[7], d2 < 0);
     }
 
-  if (tmpstr)
-    gdFree (tmpstr);
+  gdFree (tmpstr);
   return (char *) NULL;
-}
-
-int
-gdroundupdown (FT_F26Dot6 v1, int updown)
-{
-  return (!updown)
-    ? (v1 < 0 ? ((v1 - 63) >> 6) : v1 >> 6)
-    : (v1 > 0 ? ((v1 + 63) >> 6) : v1 >> 6);
 }
 
 #endif /* HAVE_LIBFREETYPE */

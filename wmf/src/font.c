@@ -35,6 +35,45 @@
 
 #include "font.h"
 
+#ifdef _WIN32
+
+extern char* _libwmf_get_fontdir();
+
+static char* _libwmf_get_xtra_fontmap (void)
+{
+	static char retval[1000] = "";
+
+	if (retval[0] == '\0')
+	{	strcpy (retval, _libwmf_get_fontdir ());
+		strcat (retval, "\\share\\libwmf\\fonts\\fontmap");
+	}
+
+	return retval;
+}
+
+#undef WMF_XTRA_FONTMAP
+#define WMF_XTRA_FONTMAP _libwmf_get_xtra_fontmap ()
+
+static char* remap_font_file_name(wmfAPI* API,char* filename)
+{
+	/* If filename is prefixed with the compile-time WMF_FONTDIR,
+	 * substitute the run-time font directory.
+	 */
+	char* retval;
+	if (strncmp (filename, WMF_FONTDIR "/", strlen (WMF_FONTDIR "/")) == 0)
+	{	retval = wmf_malloc (API,strlen (filename) - strlen (WMF_FONTDIR) + strlen (_libwmf_get_fontdir ()) + 1);
+		strcpy (retval,_libwmf_get_fontdir ());
+		strcat (retval,filename + strlen (WMF_FONTDIR));
+	}
+	else
+	{	retval = wmf_strdup (API,filename);
+	}
+
+	return retval;
+}
+
+#endif
+
 static void ipa_font_add_wmf (wmfAPI* API,wmfFontMap* mapping)
 {	wmfFontmapData* font_data = (wmfFontmapData*) ((wmfFontData*) API->font_data)->user_data;
 
@@ -496,6 +535,8 @@ static void ipa_font_add_api (wmfAPI* API,char* name)
 float wmf_ipa_font_stringwidth (wmfAPI* API,wmfFont* font,char* str)
 {	FT_Face face = WMF_FONT_FTFACE (font);
 
+	if (!face) return 0.0;
+
 	FT_Vector delta;
 
 	FT_Bool use_kerning;
@@ -550,8 +591,10 @@ float wmf_ipa_font_stringwidth (wmfAPI* API,wmfFont* font,char* str)
 	return (width*72/(300*12));
 }
 
-static float ipa_char_position (wmfAPI* API,wmfFont* font,char* str,char* last)
+static float ipa_char_position (wmfFont* font,char* str,char* last)
 {	FT_Face face = WMF_FONT_FTFACE (font);
+
+	if (!face) return 0.0;
 
 	FT_Vector delta;
 
@@ -625,7 +668,7 @@ void wmf_ipa_draw_text (wmfAPI* API,wmfDrawText_t* draw_text,wmfCharDrawer ipa_d
 		buffer[0] = draw_text->str[i];
 		buffer[1] = 0;
 
-		text_width = ipa_char_position (API,draw_text->dc->font,draw_text->str,draw_text->str+i);
+		text_width = ipa_char_position (draw_text->dc->font,draw_text->str,draw_text->str+i);
 
 		text_width = (float) ((double) text_width * draw_text->font_height * draw_text->font_ratio);
 
@@ -872,11 +915,6 @@ static void xml2_start (void* user_data,const char* tag,const char** attributes)
 	FI.version = 0;
 	FI.alias = 0;
 
-	if (attributes == 0)
-	{	WMF_DEBUG (API,"xml2_start: found NULL instead of ptr-to-NULL!\n");
-		return;
-	}
-
 	attr = attributes;
 	while (*attr)
 	{	if (strcmp ((*attr),"format") == 0)
@@ -1072,7 +1110,7 @@ static void ipa_font_gs_add (wmfAPI* API,wmfGS_FontData* FD,char* name,char* ali
 	FD->len++;
 }
 
-static char* ipa_font_gs_alias (wmfAPI* API,wmfGS_FontData* FD,char* name)
+static char* ipa_font_gs_alias (wmfGS_FontData* FD,char* name)
 {	char* alias = 0;
 
 	unsigned int i;
@@ -1184,14 +1222,19 @@ static char* ipa_font_gs_readline (wmfAPI* API,FILE* in)
 		line = more;
 
 		if (line == 0)
-		{	fContinue = wmf_false;
+		{
 			break;
 		}
 	}
 
 	if (line == 0) return (0);
 
-	if (fReadExtra) while (buf[strlen(buf)-1] != '\n') fgets (buf,128,in);
+	if (fReadExtra)
+	{
+		while (buf[strlen(buf)-1] != '\n')
+			if (fgets (buf,128,in) == 0)
+				break;
+	}
 
 	/* Strip the string */
 
@@ -1338,11 +1381,13 @@ static wmfXML_FontInfo* ipa_font_sys_map (wmfAPI* API,wmfFont* font)
  * Checks XML Fontmap entry is valid before loading face.
  */
 static FT_Face ipa_font_sys_face (wmfAPI* API,wmfFont* font,wmfXML_FontInfo* FI)
-{	wmfFontmapData* font_data = (wmfFontmapData*) ((wmfFontData*) API->font_data)->user_data;
+{	
+#if 0
+	wmfFontmapData* font_data = (wmfFontmapData*) ((wmfFontData*) API->font_data)->user_data;
+	struct stat stat_buf;
+#endif
 
 	FT_Face face = 0;
-
-	struct stat stat_buf;
 
 	if (FI == 0) return (0);
 
@@ -1388,11 +1433,9 @@ static wmfGS_FontInfo* ipa_font_gs_map (wmfAPI* API,wmfFont* font)
 	if (GS->len == 0) return (0);
 
 	name = font->lfFaceName;
-	if (name == 0)
-	{	WMF_DEBUG (API,"No font name?");
-		API->err = wmf_E_Glitch;
-		return (0);
-	}
+
+	if (name == 0 || name[0] == 0)
+		name = "Times";
 
 	/* Find first white-space character or eol
 	 */
@@ -1448,8 +1491,6 @@ static FT_Face ipa_font_gs_face (wmfAPI* API,wmfFont* font,wmfGS_FontInfo* FI)
 
 	FT_Face face = 0;
 
-	unsigned int i;
-
 	char* aalias = 0;
 
 	if (FI == 0) return (0);
@@ -1460,7 +1501,9 @@ static FT_Face ipa_font_gs_face (wmfAPI* API,wmfFont* font,wmfGS_FontInfo* FI)
 
 	if (FI->alias[0] != '/') return (0);
 
-	aalias = ipa_font_gs_alias (API,&(font_data->GS),FI->alias+1);
+	aalias = ipa_font_gs_alias (&(font_data->GS),FI->alias+1);
+
+	if (!aalias) return 0;
 
 	if (aalias[0] != '(')
 	{	WMF_DEBUG (API,"font lookup is too complicated! Giving up...");
@@ -1618,10 +1661,16 @@ static FT_Face ipa_font_face_open (wmfAPI* API,char* ps_name,char* glyphs,char* 
 
 	struct stat stat_buf;
 
+#ifdef _WIN32
+	glyphs = remap_font_file_name (API,glyphs);
+#endif
 	if (stat (glyphs,&stat_buf))
 	{	WMF_ERROR (API,"unable to stat font file:");
 		WMF_ERROR (API,glyphs);
 		API->err = wmf_E_BadFile;
+#ifdef _WIN32
+		wmf_free (API,glyphs);
+#endif
 		return (0);
 	}
 
@@ -1629,9 +1678,18 @@ static FT_Face ipa_font_face_open (wmfAPI* API,char* ps_name,char* glyphs,char* 
 	{	WMF_ERROR (API,"Failed to open font:");
 		WMF_ERROR (API,glyphs);
 		API->err = wmf_E_DeviceError;
+#ifdef _WIN32
+		wmf_free (API,glyphs);
+#endif
 		return (0);
 	}
 
+#ifdef _WIN32
+	if (metrics)
+	{
+		metrics = remap_font_file_name (API,metrics);
+	}
+#endif
 	if (metrics)
 	{	if (stat (metrics,&stat_buf))
 		{	WMF_DEBUG (API,"unable to stat font metrics file:");

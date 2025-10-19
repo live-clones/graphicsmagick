@@ -37,7 +37,7 @@ void wmf_set_viewport_origin (wmfAPI* API,wmfD_Coord d_pt)
 	P->Viewport_Origin = d_pt;
 }
 
-static wmfL_Coord L_Coord (wmfAPI* API,U16 u16_x,U16 u16_y)
+static wmfL_Coord L_Coord (U16 u16_x,U16 u16_y)
 {	wmfL_Coord l_pt;
 
 	l_pt.x = U16_2_S32 (u16_x);
@@ -106,8 +106,8 @@ static wmfL_Coord wmf_L_Coord_translate (wmfAPI* API,wmfD_Coord d_pt)
 	d_pt.x += P->Viewport_Origin.x;
 	d_pt.y += P->Viewport_Origin.y;
 
-	l_pt.x = (S32) ((double) d_pt.x / PixelWidth (API));
-	l_pt.y = (S32) ((double) d_pt.y / PixelHeight (API));
+	l_pt.x = (float) ((double) d_pt.x / PixelWidth (API));
+	l_pt.y = (float) ((double) d_pt.y / PixelHeight (API));
 
 	l_pt.x += P->dc->Window.Ox;
 	l_pt.y += P->dc->Window.Oy;
@@ -222,7 +222,8 @@ static double PixelWidth (wmfAPI* API)
 	case (MM_HIENGLISH): /* each unit is 0.001 inch */
 	case (MM_TWIPS):     /* each unit is 1/1440 inch */
 	case (MM_DPI):       /* isotropic; placeable meta file */
-
+		if (P->dc->Window.width < 0)
+			return -P->dc->pixel_width;
 	break;
 
 	default:
@@ -267,7 +268,8 @@ static double PixelHeight (wmfAPI* API)
 	case (MM_HIENGLISH): /* each unit is 0.001 inch */
 	case (MM_TWIPS):     /* each unit is 1/1440 inch */
 	case (MM_DPI):       /* isotropic; placeable meta file */
-
+		if (P->dc->Window.height < 0)
+			return -P->dc->pixel_height;
 	break;
 
 	default:

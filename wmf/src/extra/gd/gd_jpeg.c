@@ -3,7 +3,7 @@
 /*
  * gd_jpeg.c: Read and write JPEG (JFIF) format image files using the
  * gd graphics library (http://www.boutell.com/gd/).
- * 
+ *
  * This software is based in part on the work of the Independent JPEG
  * Group.  For more information on the IJG JPEG software (and JPEG
  * documentation, etc.), see ftp://ftp.uu.net/graphics/jpeg/.
@@ -72,6 +72,8 @@ fatal_jpeg_error (j_common_ptr cinfo)
   exit (99);
 }
 
+static int _gdImageJpegCtx(gdImagePtr im, gdIOCtx *outfile, int quality);
+
 /*
  * Write IM to OUTFILE as a JFIF-formatted JPEG image, using quality
  * QUALITY.  If QUALITY is in the range 0-100, increasing values
@@ -93,16 +95,26 @@ gdImageJpegPtr (gdImagePtr im, int *size, int quality)
 {
   void *rv;
   gdIOCtx *out = gdNewDynamicCtx (2048, NULL);
-  gdImageJpegCtx (im, out, quality);
-  rv = gdDPExtractData (out, size);
+  if (out == NULL) return NULL;
+  if (!_gdImageJpegCtx(im, out, quality)) {
+    rv = gdDPExtractData(out, size);
+  } else {
+    rv = NULL;
+  }
   out->free (out);
   return rv;
 }
 
-void jpeg_gdIOCtx_dest (j_compress_ptr cinfo, gdIOCtx * outfile);
+static void jpeg_gdIOCtx_dest (j_compress_ptr cinfo, gdIOCtx * outfile);
 
 void
 gdImageJpegCtx (gdImagePtr im, gdIOCtx * outfile, int quality)
+{
+  _gdImageJpegCtx(im, outfile, quality);
+}
+
+/* returns 0 on success, 1 on failure */
+static int _gdImageJpegCtx(gdImagePtr im, gdIOCtx *outfile, int quality)
 {
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
@@ -139,7 +151,7 @@ gdImageJpegCtx (gdImagePtr im, gdIOCtx * outfile, int quality)
       /* we're here courtesy of longjmp */
       if (row)
 	gdFree (row);
-      return;
+      return 1;
     }
 
   cinfo.err->error_exit = fatal_jpeg_error;
@@ -173,7 +185,7 @@ gdImageJpegCtx (gdImagePtr im, gdIOCtx * outfile, int quality)
       fprintf (stderr, "gd-jpeg: error: unable to allocate JPEG row "
 	       "structure: gdCalloc returns NULL\n");
       jpeg_destroy_compress (&cinfo);
-      return;
+      return 1;
     }
 
   rowptr[0] = row;
@@ -249,9 +261,12 @@ gdImageJpegCtx (gdImagePtr im, gdIOCtx * outfile, int quality)
 	}
     }
   jpeg_finish_compress (&cinfo);
+#if BITS_IN_JSAMPLE == 12
 error:
+#endif
   jpeg_destroy_compress (&cinfo);
   gdFree (row);
+  return 0;
 }
 
 gdImagePtr
@@ -264,11 +279,11 @@ gdImageCreateFromJpeg (FILE * inFile)
   return im;
 }
 
-void
+static void
   jpeg_gdIOCtx_src (j_decompress_ptr cinfo,
 		    gdIOCtx * infile);
 
-/* 
+/*
  * Create a gd-format image from the JPEG-format INFILE.  Returns the
  * image, or NULL upon error.
  */
@@ -282,7 +297,8 @@ gdImageCreateFromJpegCtx (gdIOCtx * infile)
   volatile JSAMPROW row = 0;
   volatile gdImagePtr im = 0;
   JSAMPROW rowptr[1];
-  int i, j, retval;
+  JDIMENSION i, j;
+  int retval;
   JDIMENSION nrows;
 
 #ifdef JPEG_DEBUG
@@ -338,8 +354,8 @@ gdImageCreateFromJpegCtx (gdIOCtx * infile)
     }
 
   /*
-   * Force the image into RGB colorspace, but don't 
-   * reduce the number of colors anymore (GD 2.0) 
+   * Force the image into RGB colorspace, but don't
+   * reduce the number of colors anymore (GD 2.0)
    */
   cinfo.out_color_space = JCS_RGB;
 
@@ -401,7 +417,7 @@ gdImageCreateFromJpegCtx (gdIOCtx * infile)
      latest libjpeg, replaced by something else. Unfortunately
      there is still no right way to find out if the file was
      progressive or not; just declare your intent before you
-     write one by calling gdImageInterlace(im, 1) yourself. 
+     write one by calling gdImageInterlace(im, 1) yourself.
      After all, we're not really supposed to rework JPEGs and
      write them out again anyway. Lossy compression, remember? */
 #if 0
@@ -496,7 +512,7 @@ typedef struct
     gdIOCtx *infile;		/* source stream */
     unsigned char *buffer;	/* start of buffer */
     safeboolean start_of_file;	/* have we gotten any data yet? */
-     
+
   }
 my_source_mgr;
 
@@ -509,7 +525,7 @@ typedef my_source_mgr *my_src_ptr;
  * before any data is actually read.
  */
 
-void
+static void
 init_source (j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr) cinfo->src;
@@ -557,43 +573,37 @@ init_source (j_decompress_ptr cinfo)
 
 #define END_JPEG_SEQUENCE "\r\n[*]--:END JPEG:--[*]\r\n"
 
-safeboolean
+static safeboolean
 fill_input_buffer (j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr) cinfo->src;
-  size_t nbytes = 0;
-  
+  int nbytes = 0;
+
   /* size_t got; */
   /* char *s; */
     memset (src->buffer, 0, INPUT_BUF_SIZE);
-  
+
     while (nbytes < INPUT_BUF_SIZE)
     {
-      
-	int got = gdGetBuf (src->buffer + nbytes, 
+
+	int got = gdGetBuf (src->buffer + nbytes,
 			    INPUT_BUF_SIZE - nbytes,
 			    src->infile);
-      
+
 	if ((got == EOF) || (got == 0))
 	{
-	  
 	  /* EOF or error. If we got any data, don't worry about it.
-	     If we didn't, then this is unexpected. */ 
+	     If we didn't, then this is unexpected. */
 	    if (!nbytes)
 	    {
-	      
 		nbytes = -1;
-	      
 	    }
-	  
 	    break;
-	  
 	}
-      
+
 	nbytes += got;
-      
     }
-  
+
     if (nbytes <= 0)
     {
       if (src->start_of_file)	/* Treat empty input file as fatal error */
@@ -625,7 +635,7 @@ fill_input_buffer (j_decompress_ptr cinfo)
  * buffer is the application writer's problem.
  */
 
-void
+static void
 skip_input_data (j_decompress_ptr cinfo, long num_bytes)
 {
   my_src_ptr src = (my_src_ptr) cinfo->src;
@@ -667,14 +677,13 @@ skip_input_data (j_decompress_ptr cinfo, long num_bytes)
  * for error exit.
  */
 
-void
+static void
 term_source (j_decompress_ptr cinfo)
 {
-  
+  (void)cinfo;
 #if 0
 /* never used */
     my_src_ptr src = (my_src_ptr) cinfo->src;
-  
 #endif
 }
 
@@ -707,7 +716,6 @@ jpeg_gdIOCtx_src (j_decompress_ptr cinfo,
       src->buffer = (unsigned char *)
 	(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
 				    INPUT_BUF_SIZE * sizeof (unsigned char));
-      
     }
 
   src = (my_src_ptr) cinfo->src;
@@ -740,7 +748,7 @@ typedef my_destination_mgr *my_dest_ptr;
  * before any data is actually written.
  */
 
-void
+static void
 init_destination (j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
@@ -778,7 +786,7 @@ init_destination (j_compress_ptr cinfo)
  * write it out when emptying the buffer externally.
  */
 
-safeboolean
+static safeboolean
 empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
@@ -803,11 +811,11 @@ empty_output_buffer (j_compress_ptr cinfo)
  * for error exit.
  */
 
-void
+static void
 term_destination (j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
-  size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
+  int datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
 
   /* Write any data remaining in the buffer */
   if (datacount > 0)

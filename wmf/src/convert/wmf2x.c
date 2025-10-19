@@ -239,7 +239,8 @@ int wmf2x_draw (PlotData* pdata)
 
 			XGetWindowAttributes (ddata->display,ddata->window,&attributes);
 
-			if ((ddata->x_width != attributes.width) || (ddata->x_height != attributes.height))
+			if ((ddata->x_width != (unsigned int)attributes.width) ||
+		            (ddata->x_height != (unsigned int)attributes.height))
 			{	ddata->x_width  = attributes.width;
 				ddata->x_height = attributes.height;
 
@@ -293,7 +294,8 @@ void wmf2x_init (PlotData* pdata,int argc,char** argv)
 }
 
 void wmf2x_help (PlotData* pdata)
-{	fputs ("\
+{	(void)pdata;
+	fputs ("\
 Usage: wmf2x [OPTION]... <file.wmf>\n\
 Display metafile image.\n\
 \n\
@@ -404,7 +406,8 @@ int main (int argc,char** argv)
 }
 
 int explicit_wmf_error (char* str,wmf_error_t err)
-{	int status = 0;
+{	(void)str;
+	int status = 0;
 
 	switch (err)
 	{

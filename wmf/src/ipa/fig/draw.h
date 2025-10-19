@@ -19,7 +19,7 @@
 
 static void wmf_fig_flood_interior (wmfAPI* API,wmfFlood_t* flood)
 {	/* wmf_fig_t* ddata = WMF_FIG_GetData (API); */
-
+	(void)flood;
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]flood_interior");
 
 	if (API->flags & WMF_OPT_IGNORE_NONFATAL)
@@ -33,7 +33,7 @@ static void wmf_fig_flood_interior (wmfAPI* API,wmfFlood_t* flood)
 
 static void wmf_fig_flood_exterior (wmfAPI* API,wmfFlood_t* flood)
 {	/* wmf_fig_t* ddata = WMF_FIG_GetData (API); */
-
+	(void)flood;
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]flood_exterior");
 
 	if (API->flags & WMF_OPT_IGNORE_NONFATAL)
@@ -114,7 +114,8 @@ static void wmf_fig_draw_pie (wmfAPI* API,wmfDrawArc_t* draw_arc)
 }
 
 static void wmf_fig_draw_chord (wmfAPI* API,wmfDrawArc_t* draw_arc)
-{	wmf_fig_t* ddata = WMF_FIG_GetData (API);
+{	(void)draw_arc;
+	wmf_fig_t* ddata = WMF_FIG_GetData (API);
 
 	wmfStream* out = ddata->out;
 	
@@ -260,11 +261,6 @@ static void wmf_fig_draw_ellipse (wmfAPI* API,wmfDrawArc_t* draw_arc)
 	int a;
 	int b;
 
-	int start_x;
-	int start_y;
-	int end_x;
-	int end_y;
-	
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]draw_ellipse");
 
 	wmf_stream_printf (API,out,"# wmf_[fig_]draw_ellipse\n");
@@ -389,8 +385,6 @@ static void wmf_fig_poly_line (wmfAPI* API,wmfPolyLine_t* poly_line)
 	U16 sub_length;
 	U16 sub_count;
 
-	int npoints;
-
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]poly_line");
 
 	if (out == 0) return;
@@ -461,8 +455,6 @@ static void wmf_fig_draw_polygon (wmfAPI* API,wmfPolyLine_t* poly_line)
 
 	U16 i;
 
-	int npoints;
-	
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]draw_polygon");
 
 	if (out == 0) return;
