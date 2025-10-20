@@ -2209,6 +2209,11 @@ MagickExport Image *ThumbnailImage(const Image *image,
   FilterTypes
     resize_filter;
 
+  if ((columns == 0) || (rows == 0) ||
+      (image->columns == 0) || (image->rows == 0))
+    ThrowImageException(ImageError,UnableToResizeImage,
+                        MagickMsg(OptionError,NonzeroWidthAndHeightRequired));
+
   /*
     Thumbnailing defaults to a fast box filter, but allow user to
     override the filter used.

@@ -1,5 +1,10 @@
 2025-10-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/resize.c (ThumbnailImage): Prevent a divide by zero crash
+	similar to ImageMagick's security advisory GHSA-fh55-q5pj-pxgw
+	"Divide-by-zero in ThumbnailImage via montage -geometry ":" leads
+	to crash".
+
 	* www/INSTALL-windows.rst: Document use of newer (v0.2.13+) libwmf
 	version. Jumping forward 24 years!
 

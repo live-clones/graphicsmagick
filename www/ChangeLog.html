@@ -41,6 +41,10 @@
 <p>2025-10-20  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/resize.c (ThumbnailImage): Prevent a divide by zero crash
+similar to ImageMagick's security advisory GHSA-fh55-q5pj-pxgw
+&quot;Divide-by-zero in ThumbnailImage via montage -geometry &quot;:&quot; leads
+to crash&quot;.</p></li>
 <li><p>www/INSTALL-windows.rst: Document use of newer (v0.2.13+) libwmf
 version. Jumping forward 24 years!</p></li>
 <li><p>VisualMagick/wmf: Support compilation of libwmf v0.2.13+ with
