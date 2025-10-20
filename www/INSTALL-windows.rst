@@ -37,11 +37,11 @@ Prerequisites
   installing the newer version.
 
   While it is not a requirement, it is strongly recommended that the
-  `Ghostscript <https://ghostscript.com/>`_
-  package (GraphicsMagick is tested with version 9.27) be
-  installed. GraphicsMagick uses Ghostscript to render Postscript and
-  PDF files, as well as formats where a translator to Postscript is
-  available. GraphicsMagick will use the `Ghostscript Fonts
+  `Ghostscript <https://ghostscript.com/>`_ package (GraphicsMagick is
+  tested with version 9.27) be installed. GraphicsMagick uses
+  Ghostscript to render Postscript and PDF files, as well as formats
+  where a translator to Postscript is available. GraphicsMagick will
+  use the legacy `Ghostscript Fonts
   <https://sourceforge.net/projects/gs-fonts/>`_ (also known as "URW
   Fonts") to support the standard set of Adobe Postscript fonts like
   "Helvetica" and "Times Roman" if these fonts are not available as
@@ -60,6 +60,13 @@ Prerequisites
   Ghostscript.  The installation order of the two packages is not
   important.  Both 32 and 64-bit versions of GraphicsMagick and
   Ghostscript may be installed at the same time.
+
+  The modern `URW Base35 Fonts
+  <https://github.com/ArtifexSoftware/urw-base35-fonts>`_ (Postscript
+  Type1, OTF, or TTF format) may also be used under Windows, given an
+  appropriate XML type map file.  The Adobe Type1 form of these fonts
+  is provided with recent Ghostscript releases (some time after
+  Ghostscript 9.27).
 
 Retrieve Install Package
 ------------------------
@@ -817,7 +824,8 @@ be found:
    block-sorting data compression.  This compression is supported by
    the MIFF file format.
 
-   This code only receives security and bug fixes.
+   This code only receives security and bug fixes. 1.0.8 is the latest
+   version at this time.
 
  * dcraw
 
@@ -831,7 +839,8 @@ be found:
 
    hp2xx 3.4.2 (from 2001)
 
-   Very old source code to a 'hp2xx' delegate program necessary to read HPGL files.
+   Very old source code to a 'hp2xx' delegate program necessary to
+   read HPGL files.
 
    Hp2xx is protected by the full GPLv2 license.
 
@@ -841,7 +850,8 @@ be found:
 
    JBIG-KIT 2.1 (from 2014)
 
-   This is necessary to read and write JBIG files, or use JBIG compression in libtiff.
+   This is necessary to read and write JBIG files, or use JBIG
+   compression in libtiff.
 
    Note that JBIG-KIT is protected by the full GPLv2 license (not
    LGPL), and use under some other license requires obtaining a
@@ -859,8 +869,9 @@ be found:
 
    jpeg 9f (from 2024)
 
-   This is the IJG JPEG library, most recently developed and maintained by Guido Vollbeding.
-   This is different than the libjpeg-turbo fork developed by Darrell R Commander (DRC).
+   This is the IJG JPEG library, most recently developed and
+   maintained by Guido Vollbeding.  This is different than the
+   libjpeg-turbo fork developed by Darrell R Commander (DRC).
 
  * lcms
 

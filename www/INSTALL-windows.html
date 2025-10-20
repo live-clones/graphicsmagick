@@ -98,11 +98,11 @@ GraphicsMagick with a newer version, then it is wise to uninstall
 the existing GraphicsMagick (see uninstall procedure) prior to
 installing the newer version.</p>
 <p>While it is not a requirement, it is strongly recommended that the
-<a class="reference external" href="https://ghostscript.com/">Ghostscript</a>
-package (GraphicsMagick is tested with version 9.27) be
-installed. GraphicsMagick uses Ghostscript to render Postscript and
-PDF files, as well as formats where a translator to Postscript is
-available. GraphicsMagick will use the <a class="reference external" href="https://sourceforge.net/projects/gs-fonts/">Ghostscript Fonts</a> (also known as &quot;URW
+<a class="reference external" href="https://ghostscript.com/">Ghostscript</a> package (GraphicsMagick is
+tested with version 9.27) be installed. GraphicsMagick uses
+Ghostscript to render Postscript and PDF files, as well as formats
+where a translator to Postscript is available. GraphicsMagick will
+use the legacy <a class="reference external" href="https://sourceforge.net/projects/gs-fonts/">Ghostscript Fonts</a> (also known as &quot;URW
 Fonts&quot;) to support the standard set of Adobe Postscript fonts like
 &quot;Helvetica&quot; and &quot;Times Roman&quot; if these fonts are not available as
 TrueType fonts.  The Ghostscript fonts need to manually installed
@@ -117,6 +117,11 @@ installing a 64-bit GraphicsMagick, you should install a 64-bit
 Ghostscript.  The installation order of the two packages is not
 important.  Both 32 and 64-bit versions of GraphicsMagick and
 Ghostscript may be installed at the same time.</p>
+<p>The modern <a class="reference external" href="https://github.com/ArtifexSoftware/urw-base35-fonts">URW Base35 Fonts</a> (Postscript
+Type1, OTF, or TTF format) may also be used under Windows, given an
+appropriate XML type map file.  The Adobe Type1 form of these fonts
+is provided with recent Ghostscript releases (some time after
+Ghostscript 9.27).</p>
 </blockquote>
 </section>
 <section id="retrieve-install-package">
@@ -840,7 +845,8 @@ be found:</p>
 <p>A library to support reading and writing files with bzip2 lossless,
 block-sorting data compression.  This compression is supported by
 the MIFF file format.</p>
-<p>This code only receives security and bug fixes.</p>
+<p>This code only receives security and bug fixes. 1.0.8 is the latest
+version at this time.</p>
 </li>
 <li><p>dcraw</p>
 <p>dcraw 9.27 (from 2016)</p>
@@ -849,13 +855,15 @@ the MIFF file format.</p>
 </li>
 <li><p>hp2xx</p>
 <p>hp2xx 3.4.2 (from 2001)</p>
-<p>Very old source code to a 'hp2xx' delegate program necessary to read HPGL files.</p>
+<p>Very old source code to a 'hp2xx' delegate program necessary to
+read HPGL files.</p>
 <p>Hp2xx is protected by the full GPLv2 license.</p>
 <p>This code is no longer developed.</p>
 </li>
 <li><p>jbig</p>
 <p>JBIG-KIT 2.1 (from 2014)</p>
-<p>This is necessary to read and write JBIG files, or use JBIG compression in libtiff.</p>
+<p>This is necessary to read and write JBIG files, or use JBIG
+compression in libtiff.</p>
 <p>Note that JBIG-KIT is protected by the full GPLv2 license (not
 LGPL), and use under some other license requires obtaining a
 commercial license from the authors.</p>
@@ -867,8 +875,9 @@ commercial license from the authors.</p>
 </li>
 <li><p>jpeg</p>
 <p>jpeg 9f (from 2024)</p>
-<p>This is the IJG JPEG library, most recently developed and maintained by Guido Vollbeding.
-This is different than the libjpeg-turbo fork developed by Darrell R Commander (DRC).</p>
+<p>This is the IJG JPEG library, most recently developed and
+maintained by Guido Vollbeding.  This is different than the
+libjpeg-turbo fork developed by Darrell R Commander (DRC).</p>
 </li>
 <li><p>lcms</p>
 <p>lcms 2.9 (from 2019)</p>
