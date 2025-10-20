@@ -1708,6 +1708,22 @@ MagickExport int NTGhostscriptFonts(char *path, int path_length)
     c:/gs/gs9.10/Resource/Init ; c:/gs/gs9.10/lib ;
     c:/gs/gs9.10/Resource/Font ; c:/gs/fonts
 
+    FIXME: Ghostscript has an unstable history of font installation
+    locations and has now changed to long font file names. Recent
+    Ghostscript uses long font file names. In releases some time after
+    Ghostscript 9.27 (which installed fonts to c:/gs/gs9.27/Fonts),
+    Ghostscript now puts new-style (long names) Postscript fonts in a
+    directory similar to c:/gs/gs10.06.0/Resource/Font.  We need a way
+    to dynamically support the old and new file names based on testing
+    for files. A possible solution is to support both XML type lists
+    at once and make errors "soft" errors until there is an ultimate
+    failure. The font files could be checked for existence when the
+    XML type list is loaded.
+
+    The new Ghostscript font files are Type 1 and only come with the
+    glyphs (no .afm file), and without a file extension.  Can these be
+    used?
+
   */
   {
 #define URW_FONT_HELVETICA_FILE "n019003l.pfb"
