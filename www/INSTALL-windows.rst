@@ -907,7 +907,7 @@ be found:
 
  * wmf
 
-   libwmf 0.2.2 (from 2001)
+   libwmf 0.2.13+ (up to commit ec63c9b as of January 14, 2025).
 
    This is necessary to parse and read 16-bit Windows Meta Files (WMF)
    files.

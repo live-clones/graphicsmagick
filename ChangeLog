@@ -1,3 +1,14 @@
+2025-10-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* www/INSTALL-windows.rst: Document use of newer (v0.2.13+) libwmf
+	version. Jumping forward 24 years!
+
+	* VisualMagick/wmf: Support compilation of libwmf v0.2.13+ with
+	Visual Studio 2022.
+
+	* wmf: Import https://github.com/caolanm/libwmf files (v0.2.13+)
+	up to commit ec63c9b as of 1/14/25
+
 2025-10-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* README.txt, fuzzing/README.txt, www/INSTALL-windows.rst:
