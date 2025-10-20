@@ -1,5 +1,9 @@
 2025-10-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/heif.c (apply_security_limits): Start using the
+	heif_context_get_security_limits() interface to update
+	limits. Still limited to a pixels limit for the moment.
+
 	* magick/resize.c (ThumbnailImage): Prevent a divide by zero crash
 	similar to ImageMagick's security advisory GHSA-fh55-q5pj-pxgw
 	"Divide-by-zero in ThumbnailImage via montage -geometry ":" leads

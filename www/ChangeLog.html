@@ -41,6 +41,9 @@
 <p>2025-10-20  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/heif.c (apply_security_limits): Start using the
+heif_context_get_security_limits() interface to update
+limits. Still limited to a pixels limit for the moment.</p></li>
 <li><p>magick/resize.c (ThumbnailImage): Prevent a divide by zero crash
 similar to ImageMagick's security advisory GHSA-fh55-q5pj-pxgw
 &quot;Divide-by-zero in ThumbnailImage via montage -geometry &quot;:&quot; leads

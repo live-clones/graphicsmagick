@@ -39,6 +39,10 @@
 /* Set to 1 to enable the currently non-functional progress monitor callbacks */
 #define HEIF_ENABLE_PROGRESS_MONITOR 0
 
+/* Compute LIBHEIF_NUMERIC_VERSION based on constituent values */
+#define COMPUTE_LIBHEIF_NUMERIC_VERSION(major,minor,patch) \
+  (((major) << 24) | ((minor) << 16) | ((patch) << 8) | 0)
+
 #include <libheif/heif.h>
 #ifdef HAVE_HEIF_INIT
 static MagickBool heif_initialized = MagickFalse;
@@ -468,6 +472,85 @@ static void end_progress(enum heif_progress_step step, void* progress_user_data)
 
 #endif /* if HEIF_ENABLE_PROGRESS_MONITOR */
 
+/*
+  Apply security limits
+ */
+static MagickPassFail apply_security_limits(const ImageInfo *image_info,
+                                            struct heif_context *heif_context)
+{
+  (void) image_info; /* For later, to support user options */
+#if LIBHEIF_NUMERIC_VERSION >= COMPUTE_LIBHEIF_NUMERIC_VERSION(1,19,0)
+  struct heif_security_limits
+    *security_limits;
+
+  magick_uintmax_t
+    width_limit,
+    height_limit,
+    pixels_limit;
+
+  security_limits=heif_context_get_security_limits(heif_context);
+
+  width_limit = (magick_uintmax_t) GetMagickResourceLimit(WidthResource);
+  if (width_limit > INT_MAX)
+    width_limit = INT_MAX;
+  height_limit = (magick_uintmax_t) GetMagickResourceLimit(HeightResource);
+  if (height_limit > INT_MAX)
+    height_limit = INT_MAX;
+  pixels_limit = (magick_uintmax_t) GetMagickResourceLimit(PixelsResource);
+  if ((width_limit < pixels_limit) && (height_limit < pixels_limit) &&
+      (width_limit*height_limit < pixels_limit))
+    pixels_limit = width_limit*height_limit;
+
+  security_limits->max_image_size_pixels = (uint64_t) pixels_limit;
+
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u", pixels_limit);
+  /*
+    Version 1 interface has:
+
+    uint64_t max_image_size_pixels;
+    uint64_t max_number_of_tiles;
+    uint32_t max_bayer_pattern_pixels;
+    uint32_t max_items;
+
+    uint32_t max_color_profile_size;
+    uint64_t max_memory_block_size;
+
+    uint32_t max_components;
+
+    uint32_t max_iloc_extents_per_item;
+    uint32_t max_size_entity_group;
+
+    uint32_t max_children_per_box; // for all boxes that are not covered by other limits
+
+    and the version 2 interface adds:
+
+    uint64_t max_total_memory;
+    uint32_t max_sample_description_box_entries;
+    uint32_t max_sample_group_description_box_entries;
+
+  */
+#else
+#if defined(HAVE_HEIF_CONTEXT_SET_MAXIMUM_IMAGE_SIZE_LIMIT)
+  {
+    /* DEPRECATED: Add an image size limit based on maximum_width ^ 2 */
+    magick_int64_t width_limit = GetMagickResourceLimit(WidthResource);
+    if (MagickResourceInfinity != width_limit)
+      {
+        if (width_limit > INT_MAX)
+          width_limit =  INT_MAX;
+        heif_context_set_maximum_image_size_limit(heif, (int) width_limit);
+      }
+  }
+#endif /* if defined(HAVE_HEIF_CONTEXT_SET_MAXIMUM_IMAGE_SIZE_LIMIT) */
+
+#endif /* if LIBHEIF_NUMERIC_VERSION >= COMPUTE_LIBHEIF_NUMERIC_VERSION(1,19,0) */
+
+  return MagickPass;
+}
+/* FIXME: Add security limit code here */
+
 static Image *ReadHEIFImage(const ImageInfo *image_info,
                             ExceptionInfo *exception)
 {
@@ -546,7 +629,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   if (ReadBlob(image,in_len,in_buf) != in_len)
     ThrowHEIFReaderException(CorruptImageError, UnexpectedEndOfFile, image);
 
-#if LIBHEIF_NUMERIC_VERSION >= 0x01090000
+#if LIBHEIF_NUMERIC_VERSION >= COMPUTE_LIBHEIF_NUMERIC_VERSION(1,9,0) /* 0x01090000 */
   ignore_transformations = MagickFalse;
   {
     const char
@@ -564,18 +647,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   /* Init HEIF-Decoder handles */
   heif=heif_context_alloc();
 
-#if defined(HAVE_HEIF_CONTEXT_SET_MAXIMUM_IMAGE_SIZE_LIMIT)
-  {
-    /* Add an image size limit */
-    magick_int64_t width_limit = GetMagickResourceLimit(WidthResource);
-    if (MagickResourceInfinity != width_limit)
-      {
-        if (width_limit > INT_MAX)
-          width_limit =  INT_MAX;
-        heif_context_set_maximum_image_size_limit(heif, (int) width_limit);
-      }
-  }
-#endif /* if defined(HAVE_HEIF_CONTEXT_SET_MAXIMUM_IMAGE_SIZE_LIMIT) */
+  /* Apply security limits */
+  (void) apply_security_limits(image_info,heif);
 
   /* FIXME: DEPRECATED: use heif_context_read_from_memory_without_copy() instead. */
   heif_status=heif_context_read_from_memory(heif, in_buf, in_len, NULL);
@@ -673,7 +746,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   progress_user_data.progress = 0;
 
   /* version 1 options */
-#if LIBHEIF_NUMERIC_VERSION >= 0x01090000
+#if LIBHEIF_NUMERIC_VERSION >= COMPUTE_LIBHEIF_NUMERIC_VERSION(1,9,0) /* 0x01090000 */
   decode_options->ignore_transformations = (ignore_transformations == MagickTrue) ? 1 : 0;
 #else
   decode_options->ignore_transformations = 1;
@@ -686,7 +759,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   decode_options->progress_user_data = &progress_user_data;
 
   /* version 2 options */
-#if LIBHEIF_NUMERIC_VERSION > 0x01070000
+#if LIBHEIF_NUMERIC_VERSION > COMPUTE_LIBHEIF_NUMERIC_VERSION(1,7,0) /* 0x01070000 */
   decode_options->convert_hdr_to_8bit = 1;
 #endif /* if LIBHEIF_NUMERIC_VERSION > 0x01070000 */
 
@@ -717,7 +790,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 
     These functions are apparently added in libheif 1.9
   */
-#if LIBHEIF_NUMERIC_VERSION >= 0x01090000
+#if LIBHEIF_NUMERIC_VERSION >= COMPUTE_LIBHEIF_NUMERIC_VERSION(1,9,0) /* 0x01090000 */
   image->columns=heif_image_get_primary_width(heif_image);
   image->rows=heif_image_get_primary_height(heif_image);
 
