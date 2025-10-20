@@ -1,11 +1,42 @@
 #ECF - this file contains additional configuration info.
 DEFINE = HAVE_CONFIG_H
 DEFINE = _CRT_SECURE_NO_WARNINGS
+
+# src
+EXCLUDE = io-wmf.c
+EXCLUDE = font.c
+EXCLUDE = font.h
+EXCLUDE = wmf.c
+EXCLUDE = stream.c
+EXCLUDE = stream.h
+EXCLUDE = xml.c
+EXCLUDE = xml.h
+
+# include/libwmf
+EXCLUDE = canvas.h
+EXCLUDE = color.h
+EXCLUDE = defs.h
+EXCLUDE = eps.h
+EXCLUDE = fig.h
+EXCLUDE = font.h
+EXCLUDE = foreign.h
+EXCLUDE = fund.h
+EXCLUDE = gd.h
+EXCLUDE = ipa.h
+EXCLUDE = macro.h
+EXCLUDE = plot.h
+EXCLUDE = svg.h
+EXCLUDE = template.h
+EXCLUDE = x.h
+
+# src/ipa
 EXCLUDE = eps.c
 EXCLUDE = eps.h
 EXCLUDE = fig.c
 EXCLUDE = fig.h
 EXCLUDE = foreign.c
+EXCLUDE = ipa.c
+EXCLUDE = ipa.h
 EXCLUDE = gd.c
 EXCLUDE = plot.c
 EXCLUDE = plot.h
@@ -17,11 +48,3 @@ EXCLUDE = x.c
 EXCLUDE = x.h
 EXCLUDE = xgd.c
 EXCLUDE = xgd.h
-EXCLUDE = ipa.c
-EXCLUDE = io-wmf.c
-EXCLUDE = font.c
-EXCLUDE = font.h
-EXCLUDE = wmf.c
-EXCLUDE = stream.c
-EXCLUDE = stream.h
-EXCLUDE = xml.c
