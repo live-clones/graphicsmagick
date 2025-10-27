@@ -3131,8 +3131,8 @@ if test "$with_heif" != 'no' ; then
       failed=0
     fi
     AC_CHECK_HEADER([libheif/heif.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`])
-    AC_CHECK_LIB([heif],[heif_context_alloc],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[${HEIF_LIBS}])
-    AC_CHECK_FUNCS([heif_init heif_deinit heif_context_set_maximum_image_size_limit])
+    # Libheif 1.14.0 (November 17, 2022) added heif_init(), so it is a good way to enforce at least that version.
+    AC_CHECK_LIB([heif],[heif_init],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[${HEIF_LIBS}])
     AC_MSG_CHECKING([if HEIF package is complete])
     if test $passed -gt 0 ; then
       if test $failed -gt 0 ; then

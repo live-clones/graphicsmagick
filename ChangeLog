@@ -1,3 +1,10 @@
+2025-10-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (ReadHEIFImage): Re-write the HEIF reader (AVIF,
+	HEIC, etc.) to be based on heif_image_get_plane_readonly2().
+	There is still more to do, such as to provide more user control
+	over the decoding.
+
 2025-10-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (apply_security_limits): Start using the

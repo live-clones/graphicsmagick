@@ -32726,9 +32726,10 @@ else case e in #(
 esac
 fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for heif_context_alloc in -lheif" >&5
-printf %s "checking for heif_context_alloc in -lheif... " >&6; }
-if test ${ac_cv_lib_heif_heif_context_alloc+y}
+    # Libheif 1.14.0 (November 17, 2022) added heif_init(), so it is a good way to enforce at least that version.
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for heif_init in -lheif" >&5
+printf %s "checking for heif_init in -lheif... " >&6; }
+if test ${ac_cv_lib_heif_heif_init+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
@@ -32746,20 +32747,20 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char heif_context_alloc (void);
+char heif_init (void);
 int
 main (void)
 {
-return heif_context_alloc ();
+return heif_init ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"
 then :
-  ac_cv_lib_heif_heif_context_alloc=yes
+  ac_cv_lib_heif_heif_init=yes
 else case e in #(
-  e) ac_cv_lib_heif_heif_context_alloc=no ;;
+  e) ac_cv_lib_heif_heif_init=no ;;
 esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
@@ -32767,33 +32768,14 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 LIBS=$ac_check_lib_save_LIBS ;;
 esac
 fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_heif_heif_context_alloc" >&5
-printf "%s\n" "$ac_cv_lib_heif_heif_context_alloc" >&6; }
-if test "x$ac_cv_lib_heif_heif_context_alloc" = xyes
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_heif_heif_init" >&5
+printf "%s\n" "$ac_cv_lib_heif_heif_init" >&6; }
+if test "x$ac_cv_lib_heif_heif_init" = xyes
 then :
   passed=`expr $passed + 1`
 else case e in #(
   e) failed=`expr $failed + 1` ;;
 esac
-fi
-
-    ac_fn_c_check_func "$LINENO" "heif_init" "ac_cv_func_heif_init"
-if test "x$ac_cv_func_heif_init" = xyes
-then :
-  printf "%s\n" "#define HAVE_HEIF_INIT 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "heif_deinit" "ac_cv_func_heif_deinit"
-if test "x$ac_cv_func_heif_deinit" = xyes
-then :
-  printf "%s\n" "#define HAVE_HEIF_DEINIT 1" >>confdefs.h
-
-fi
-ac_fn_c_check_func "$LINENO" "heif_context_set_maximum_image_size_limit" "ac_cv_func_heif_context_set_maximum_image_size_limit"
-if test "x$ac_cv_func_heif_context_set_maximum_image_size_limit" = xyes
-then :
-  printf "%s\n" "#define HAVE_HEIF_CONTEXT_SET_MAXIMUM_IMAGE_SIZE_LIMIT 1" >>confdefs.h
-
 fi
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if HEIF package is complete" >&5
