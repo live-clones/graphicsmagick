@@ -1,3 +1,15 @@
+2025-10-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (apply_security_limits): Support setting some
+	security limits using 'heif' attributes 'max-number-of-tiles',
+	'max-bayer-pattern-pixels', 'max-items', 'max-components',
+	'max-iloc-extents-per-item', 'max-size-entity-group', and
+	'max-children-per-box'.  Patterned after what was already done in
+	ImageMagick, except using 'heif' rather than 'heic'.
+
+	* magick/utility.c (MagickAtoULLChk): New private function to
+	decode string to an 'unsigned long long'.
+
 2025-10-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImage): Re-write the HEIF reader (AVIF,

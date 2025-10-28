@@ -60,6 +60,56 @@
 #  error "Libheif must be at least 1.14.0!"
 #endif
 
+#define MagickAttributeToU32(image_info, magick, name, out_val)         \
+  {                                                                     \
+    const char *string_value;                                           \
+    if ((string_value = AccessDefinition(image_info,magick,name)))      \
+      {                                                                 \
+        unsigned int ui_value;                                          \
+        if (MagickAtoUIChk(string_value, &ui_value) != MagickFail)      \
+          {                                                             \
+            out_val = ui_value;                                         \
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),         \
+                                  "security limits: %s = "              \
+                                  "%" MAGICK_UINTMAX_F "u", name,       \
+                                  (magick_uintmax_t) out_val);          \
+          }                                                             \
+      }                                                                 \
+  }
+
+/* Rely on the compiler to remove unused code */
+#define MagickAttributeToU64(image_info, magick, name, out_val)         \
+  {                                                                     \
+    const char *string_value;                                           \
+    if ((string_value = AccessDefinition(image_info,magick,name)))      \
+    {                                                                   \
+      if (sizeof(long) == 64)                                           \
+        {                                                               \
+          unsigned long ul_value;                                       \
+          if (MagickAtoULChk(string_value, &ul_value) != MagickFail)    \
+            {                                                           \
+              out_val = ul_value;                                       \
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),       \
+                                    "security limits: %s = "            \
+                                    "%" MAGICK_UINTMAX_F "u", name,     \
+                                    (magick_uintmax_t) out_val);        \
+            }                                                           \
+        }                                                               \
+      else                                                              \
+        {                                                               \
+          unsigned long long ull_value;                                 \
+          if (MagickAtoULLChk(string_value, &ull_value) != MagickFail)  \
+            {                                                           \
+              out_val = ull_value;                                      \
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),       \
+                                    "security limits: %s = "            \
+                                    "%" MAGICK_UINTMAX_F "u", name,     \
+                                    (magick_uintmax_t) out_val);        \
+            }                                                           \
+        }                                                               \
+    }                                                                   \
+  }
+
 #include <libheif/heif.h>
 static MagickBool heif_initialized = MagickFalse;
 
@@ -498,7 +548,6 @@ static void end_progress(enum heif_progress_step step, void* progress_user_data)
 static MagickPassFail apply_security_limits(const ImageInfo *image_info,
                                             struct heif_context *heif_context)
 {
-  (void) image_info; /* For later, to support user options */
 #if LIBHEIF_NUMERIC_VERSION >= LIBHEIF_MAKE_VERSION(1,19,0)
   struct heif_security_limits
     *security_limits;
@@ -526,6 +575,7 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "security limits:"
                         "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u", pixels_limit);
+
   /*
     Version 1 interface has:
 
@@ -551,6 +601,20 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
     uint32_t max_sample_group_description_box_entries;
 
   */
+  MagickAttributeToU64(image_info,"heif","max-number-of-tiles",
+                       security_limits->max_number_of_tiles);
+  MagickAttributeToU32(image_info,"heif","max-bayer-pattern-pixels",
+                       security_limits->max_bayer_pattern_pixels);
+  MagickAttributeToU32(image_info,"heif","max-items",
+                       security_limits->max_items);
+  MagickAttributeToU32(image_info,"heif","max-components",
+                       security_limits->max_components);
+  MagickAttributeToU32(image_info,"heif","max-iloc-extents-per-item",
+                       security_limits->max_iloc_extents_per_item);
+  MagickAttributeToU32(image_info,"heif","max-size-entity-group",
+                       security_limits->max_size_entity_group);
+  MagickAttributeToU32(image_info,"heif","max-children-per-box",
+                       security_limits->max_children_per_box);
 #else
   {
     /* DEPRECATED: Add an image size limit based on maximum_width ^ 2 */

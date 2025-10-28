@@ -3728,6 +3728,31 @@ MagickExport MagickPassFail MagickAtoULChk(const char *str, unsigned long *value
 }
 
 /*
+  Access to the 'long long' type is assured by C'99
+*/
+MagickExport MagickPassFail MagickAtoULLChk(const char *str, unsigned long long *value)
+{
+  MagickPassFail status = MagickPass;
+  char *estr=0;
+  long long lvalue;
+  lvalue=strtoll(str,&estr, 10);
+  if (str == estr)
+    {
+      lvalue=0L;
+      status=MagickFail;
+      errno=EINVAL;
+    }
+  else if ((long long) ((unsigned long long) lvalue) != lvalue)
+    {
+      lvalue=0LL;
+      status=MagickFail;
+      errno=ERANGE;
+    }
+  *value=(unsigned long long) lvalue;
+  return status;
+}
+
+/*
   Convert a double to a long, with clipping.
   Someday a warning or an error may be produced here.
 */
