@@ -1,4 +1,4 @@
-.TH gm 1 "2025/06/10" "GraphicsMagick"
+.TH gm 1 "2025/10/28" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1314,6 +1314,146 @@ in the writer.
 .in 20
 
 Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) applied.
+
+.in 15
+.in 15
+.B "heif:preserve-colorspace={true|false}"
+.in 20
+ \fR
+.in 20
+ Return HEIF image in its original colorspace.  This allows an
+image to be returned in the original YCbCr colorspace rather than RGB.
+
+.in 15
+.in 15
+.B "heif:max-image-size-pixels=number"
+.in 20
+ \fR
+.in 20
+
+An image may be comprised of many pixels. If there are a huge number of
+pixels, it may take a long time to return an image.  Please refer to
+libheif source code (or documentation) for 'max_image_size_pixels'.
+Please note that GraphicsMagick already computes a value for this
+parameter based on total pixel limits, or width/height limits so
+supplying this parameter will override that.
+
+.in 15
+.in 15
+.B "heif:max-number-of-tiles=number"
+.in 20
+ \fR
+.in 20
+
+An image may be comprised of many tiles. If there are a huge number of
+tiles, it may take a long time to return an image.  Please refer to
+libheif source code (or documentation) for 'max_number_of_tiles'.
+
+.in 15
+.in 15
+.B "heif:max-bayer-pattern-pixels=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_bayer_pattern_pixels'.
+
+.in 15
+.in 15
+.B "heif:max-items=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_items'.
+
+.in 15
+.in 15
+.B "heif:max-color-profile-size=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_color_profile_size'.
+
+.in 15
+.in 15
+.B "heif:max-memory-block-size=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_memory_block_size'.
+
+.in 15
+.in 15
+.B "heif:max-components=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_components'.
+
+.in 15
+.in 15
+.B "heif:max-iloc-extents-per-item=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_iloc_extents_per_item'.
+
+.in 15
+.in 15
+.B "heif:max-size-entity-group=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_size_entity_group'.
+
+.in 15
+.in 15
+.B "heif:max-children-per-box=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_children_per_box'.
+
+.in 15
+.in 15
+.B "heif:max-total-memory=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_total_memory'.
+
+.in 15
+.in 15
+.B "heif:max-sample-description-box-entries=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_sample_description_box_entries'.
+
+.in 15
+.in 15
+.B "heif:max-sample-group-description-box-entries=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_sample_group_description_box_entries'.
 
 .in 15
 .in 15

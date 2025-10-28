@@ -1517,6 +1517,76 @@ in the writer.
 <dd>
 Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) applied.
 </dd>
+<dt>heif:preserve-colorspace={true|false}</dt>
+<dd> Return HEIF image in its original colorspace.  This allows an
+image to be returned in the original YCbCr colorspace rather than RGB.
+</dd>
+<dt>heif:max-image-size-pixels=number</dt>
+<dd>
+An image may be comprised of many pixels. If there are a huge number of
+pixels, it may take a long time to return an image.  Please refer to
+libheif source code (or documentation) for 'max_image_size_pixels'.
+Please note that GraphicsMagick already computes a value for this
+parameter based on total pixel limits, or width/height limits so
+supplying this parameter will override that.
+</dd>
+<dt>heif:max-number-of-tiles=number</dt>
+<dd>
+An image may be comprised of many tiles. If there are a huge number of
+tiles, it may take a long time to return an image.  Please refer to
+libheif source code (or documentation) for 'max_number_of_tiles'.
+</dd>
+<dt>heif:max-bayer-pattern-pixels=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_bayer_pattern_pixels'.
+</dd>
+<dt>heif:max-items=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for 'max_items'.
+</dd>
+<dt>heif:max-color-profile-size=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for 'max_color_profile_size'.
+</dd>
+<dt>heif:max-memory-block-size=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for 'max_memory_block_size'.
+</dd>
+<dt>heif:max-components=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for 'max_components'.
+</dd>
+<dt>heif:max-iloc-extents-per-item=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_iloc_extents_per_item'.
+</dd>
+<dt>heif:max-size-entity-group=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_size_entity_group'.
+</dd>
+<dt>heif:max-children-per-box=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_children_per_box'.
+</dd>
+<dt>heif:max-total-memory=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_total_memory'.
+</dd>
+<dt>heif:max-sample-description-box-entries=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_sample_description_box_entries'.
+</dd>
+<dt>heif:max-sample-group-description-box-entries=number</dt>
+<dd>
+Please refer to libheif source code (or documentation) for
+'max_sample_group_description_box_entries'.
+</dd>
 <dt>gradient:direction={South|North|West|East|NorthWest|NorthEast|SouthWest|SouthEast}</dt>
 <dd>By default, the gradient coder produces a gradient from top to
 bottom ("South").  Since GraphicsMagick 1.3.35, the gradient direction

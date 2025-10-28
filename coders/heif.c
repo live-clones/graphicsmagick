@@ -60,6 +60,8 @@
 #  error "Libheif must be at least 1.14.0!"
 #endif
 
+/* FIXME: It would be nice to use MagickSizeStrToInt64(), but it does
+   not provide error status */
 #define MagickAttributeToU32(image_info, magick, name, out_val)         \
   {                                                                     \
     const char *string_value;                                           \
@@ -78,6 +80,9 @@
   }
 
 /* Rely on the compiler to remove unused code */
+
+/* FIXME: It would be nice to use MagickSizeStrToInt64(), but it does
+   not provide error status */
 #define MagickAttributeToU64(image_info, magick, name, out_val)         \
   {                                                                     \
     const char *string_value;                                           \
@@ -601,12 +606,22 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
     uint32_t max_sample_group_description_box_entries;
 
   */
+  /* version 1 interface */
+  MagickAttributeToU64(image_info,"heif","max-image-size-pixels",
+                       security_limits->max_image_size_pixels);
   MagickAttributeToU64(image_info,"heif","max-number-of-tiles",
                        security_limits->max_number_of_tiles);
   MagickAttributeToU32(image_info,"heif","max-bayer-pattern-pixels",
                        security_limits->max_bayer_pattern_pixels);
   MagickAttributeToU32(image_info,"heif","max-items",
                        security_limits->max_items);
+  MagickAttributeToU32(image_info,"heif","max-color-profile-size",
+                       security_limits->max_color_profile_size);
+
+
+  MagickAttributeToU64(image_info,"heif","max-memory-block-size",
+                       security_limits->max_memory_block_size);
+
   MagickAttributeToU32(image_info,"heif","max-components",
                        security_limits->max_components);
   MagickAttributeToU32(image_info,"heif","max-iloc-extents-per-item",
@@ -615,6 +630,20 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
                        security_limits->max_size_entity_group);
   MagickAttributeToU32(image_info,"heif","max-children-per-box",
                        security_limits->max_children_per_box);
+
+  /* version 2 interface */
+
+  /* Added in 1.13.0, September 2, 2022 */
+  MagickAttributeToU64(image_info,"heif","max-total-memory",
+                       security_limits->max_total_memory);
+
+  /* Added in 1.13.0, September 2, 2022 */
+  MagickAttributeToU32(image_info,"heif","max-sample-description-box-entries",
+                       security_limits->max_sample_description_box_entries);
+
+  /* Added in 1.17.6? ?*/
+  MagickAttributeToU32(image_info,"heif","max-sample-group-description-box-entries",
+                       security_limits->max_sample_group_description_box_entries);
 #else
   {
     /* DEPRECATED: Add an image size limit based on maximum_width ^ 2 */

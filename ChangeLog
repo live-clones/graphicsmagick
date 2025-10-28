@@ -1,5 +1,11 @@
 2025-10-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* doc/options.imdoc: Document the HEIF security limits settings,
+	as much as they already are by the libheif code.
+
+	* coders/heif.c (apply_security_limits): Support all of the
+	heif_security_limits options.
+
 	* coders/jpeg.c (WriteJPEGImage): Enforce that JPEG is written as
 	RGB unless a different colorspace was specified.
 

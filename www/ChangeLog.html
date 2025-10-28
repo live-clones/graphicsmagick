@@ -41,6 +41,10 @@
 <p>2025-10-28  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>doc/options.imdoc: Document the HEIF security limits settings,
+as much as they already are by the libheif code.</p></li>
+<li><p>coders/heif.c (apply_security_limits): Support all of the
+heif_security_limits options.</p></li>
 <li><p>coders/jpeg.c (WriteJPEGImage): Enforce that JPEG is written as
 RGB unless a different colorspace was specified.</p></li>
 <li><p>coders/heif.c (apply_security_limits): Support setting some
