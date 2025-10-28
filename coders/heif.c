@@ -1038,7 +1038,29 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
         /* FIXME: Add control over whether to return original YBbCr or RGB */
 #if 1
     if (heif_colorspace_decode == heif_colorspace_YCbCr)
-      heif_colorspace_decode=heif_colorspace_RGB;
+      {
+        const char *string_value;
+        MagickBool preserve_colorspace = MagickFalse;
+        /*
+          Use heif:preserve-colorspace=true or
+          heif:preserve-colorspace=1 to return the image in the
+          original colorspace.  This prevents the conversion of a
+          YCbCr image to RGB.  GraphicsMagick will usually
+          automatically YCbCr image to RGB when necessary but explicit
+          conversion to RGB colorspace may sometimes be
+          necessary. Preserving the original colorspace is useful in
+          case YCbCr is needed, or to avoid quality loss when the
+          output will be in YCbCr.
+        */
+        if ((string_value = AccessDefinition(image_info,"heif","preserve-colorspace")))
+          {
+            if ((LocaleCompare(string_value,"true") == 0) ||
+                (LocaleCompare(string_value,"1") == 0))
+              preserve_colorspace = MagickTrue;
+          }
+        if (preserve_colorspace == MagickFalse)
+          heif_colorspace_decode=heif_colorspace_RGB;
+      }
 #endif
 
     heif_status=heif_decode_image(heif_image_handle,
