@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to October 3, 2025.
+This file was last updated to reflect changes up to October 29, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -19,7 +19,7 @@ release and not attempt to patch older releases.
 .. contents::
   :local:
 
-1.3.46 (???? ??, 2025)
+1.3.46 (October 29, 2025)
 ===========================
 
 Special Issues:
@@ -30,7 +30,8 @@ Special Issues:
   already (and contributed to ImageMagick and GraphicsMagick combined
   for 29 years already).  Volunteers are needed to add/improve
   new/existing file format support, and to assure correct operation on
-  all targets.
+  all targets.  Donations are requested in order to purchase a new
+  computer to run Windows 11.
 
 Security Fixes:
 
@@ -50,6 +51,12 @@ Security Fixes:
 * WPG: Assure that the palette buffer is allocated and the current
   size (SourceForge bug #750).
 
+* ColorFloodfillImage(): For floodfill, return an error if a clip-mask
+  is present. The problem is that the algorithm may not converge if a
+  clip-mask is present.
+
+* ThumbnailImage(): Prevent a divide by zero crash.
+
 Bug fixes:
 
 * BMP: Assure that the opacity channel is initialized, even if the
@@ -61,6 +68,9 @@ Bug fixes:
 
 * JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
   inverted. This bug is now fixed.
+
+* JPEG: Enforce that JPEG is written as RGB unless a different
+  colorspace was specified.
 
 * PNG8: It is decided that PNG8 does indeed mean indexed-color with
   8-bit sample depth and only binary transparency is supported.  With
@@ -115,7 +125,6 @@ Bug fixes:
 * DrawImage(): Fix derefrence of a NULL pointer as well as shoring up
   error handling related to DrawPatternPath().
 
-
 New Features:
 
 * Support the newer Artifex urw-base35-fonts.  Both OpenType and
@@ -145,6 +154,14 @@ New Features:
   discover (and allow) minor deviations from the specification. The
   validation is done to detect and prevent the reproduction of
   incorherent "garble".
+
+* HEIF (HEIC, AVIF, etc.), rewrite the Re-write the HEIF reader (AVIF,
+  HEIC, etc.) to be based on heif_image_get_plane_readonly2().  With
+  the re-write comes support for deep images, as well as returning
+  YCbCr and monochrome images.  Use '-define
+  heif:preserve-colorspace=true' to return the image in its original
+  colorspace. Defines are provided to support all currently existing
+  security limits.
 
 API Updates:
 
@@ -210,6 +227,12 @@ Build Changes:
   subtantially updated to build a fully-featured libheif, with a set
   of common libraries it depends on. In fact, all of the dependencies
   (except for some rarely-used libtiff dependencies) are now included.
+
+Windows Delegate Updates/Additions:
+
+* libwmf: Update/import https://github.com/caolanm/libwmf files
+  (v0.2.13+) up to commit ec63c9b as of 1/14/25.  This is a leap
+  forward of 24 years!
 
 1.3.45 (August 27, 2024)
 ===========================

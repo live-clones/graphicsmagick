@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to October 3, 2025.</p>
+<p>This file was last updated to reflect changes up to October 29, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -50,7 +50,7 @@ every release, it is recommended to update to the most current
 release and not attempt to patch older releases.</p>
 <nav class="contents local" id="contents" role="doc-toc">
 <ul class="simple">
-<li><p><a class="reference internal" href="#section-1" id="toc-entry-1">1.3.46 (???? ??, 2025)</a></p></li>
+<li><p><a class="reference internal" href="#october-29-2025" id="toc-entry-1">1.3.46 (October 29, 2025)</a></p></li>
 <li><p><a class="reference internal" href="#august-27-2024" id="toc-entry-2">1.3.45 (August 27, 2024)</a></p></li>
 <li><p><a class="reference internal" href="#august-18-2024" id="toc-entry-3">1.3.44 (August 18, 2024)</a></p></li>
 <li><p><a class="reference internal" href="#march-23-2024" id="toc-entry-4">1.3.43 (March 23, 2024)</a></p></li>
@@ -102,8 +102,8 @@ release and not attempt to patch older releases.</p>
 <li><p><a class="reference internal" href="#released-in-may-2003" id="toc-entry-50">1.0 (Released in May, 2003)</a></p></li>
 </ul>
 </nav>
-<section id="section-1">
-<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">1.3.46 (???? ??, 2025)</a></h1>
+<section id="october-29-2025">
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">1.3.46 (October 29, 2025)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick needs some additional productive volunteers.  For
@@ -112,7 +112,8 @@ Friesenhahn).  I have been sheparding the project for 23 years
 already (and contributed to ImageMagick and GraphicsMagick combined
 for 29 years already).  Volunteers are needed to add/improve
 new/existing file format support, and to assure correct operation on
-all targets.</p></li>
+all targets.  Donations are requested in order to purchase a new
+computer to run Windows 11.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
@@ -127,6 +128,10 @@ overflow while reading image.</p></li>
 a lot of archaic cruft which might suffer from security issues.</p></li>
 <li><p>WPG: Assure that the palette buffer is allocated and the current
 size (SourceForge bug #750).</p></li>
+<li><p>ColorFloodfillImage(): For floodfill, return an error if a clip-mask
+is present. The problem is that the algorithm may not converge if a
+clip-mask is present.</p></li>
+<li><p>ThumbnailImage(): Prevent a divide by zero crash.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
@@ -137,6 +142,8 @@ assumes that the opacity channel is always initialized.</p></li>
 end of an array.</p></li>
 <li><p>JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
 inverted. This bug is now fixed.</p></li>
+<li><p>JPEG: Enforce that JPEG is written as RGB unless a different
+colorspace was specified.</p></li>
 <li><p>PNG8: It is decided that PNG8 does indeed mean indexed-color with
 8-bit sample depth and only binary transparency is supported.  With
 this objective, the PNG8 writer is re-implemented, including
@@ -199,6 +206,13 @@ expected number of components.  Quite a lot of testing was done to
 discover (and allow) minor deviations from the specification. The
 validation is done to detect and prevent the reproduction of
 incorherent &quot;garble&quot;.</p></li>
+<li><p>HEIF (HEIC, AVIF, etc.), rewrite the Re-write the HEIF reader (AVIF,
+HEIC, etc.) to be based on heif_image_get_plane_readonly2().  With
+the re-write comes support for deep images, as well as returning
+YCbCr and monochrome images.  Use '-define
+heif:preserve-colorspace=true' to return the image in its original
+colorspace. Defines are provided to support all currently existing
+security limits.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
@@ -255,6 +269,12 @@ FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is defined.</p></li>
 subtantially updated to build a fully-featured libheif, with a set
 of common libraries it depends on. In fact, all of the dependencies
 (except for some rarely-used libtiff dependencies) are now included.</p></li>
+</ul>
+<p>Windows Delegate Updates/Additions:</p>
+<ul class="simple">
+<li><p>libwmf: Update/import <a class="reference external" href="https://github.com/caolanm/libwmf">https://github.com/caolanm/libwmf</a> files
+(v0.2.13+) up to commit ec63c9b as of 1/14/25.  This is a leap
+forward of 24 years!</p></li>
 </ul>
 </section>
 <section id="august-27-2024">

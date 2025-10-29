@@ -1,3 +1,7 @@
+2025-10-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* NEWS.txt: Update the news.
+
 2025-10-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* doc/options.imdoc: Document the HEIF security limits settings,
