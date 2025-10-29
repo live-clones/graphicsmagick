@@ -21,6 +21,9 @@ public:
         MagickLib::SetMagickResourceLimit(MagickLib::MemoryResource, 268435456);
         MagickLib::SetMagickResourceLimit(MagickLib::WidthResource, 2048);
         MagickLib::SetMagickResourceLimit(MagickLib::HeightResource, 2048);
+        MagickLib::SetMagickResourceLimit(MagickLib::PixelsResource,
+                                          MagickLib::GetMagickResourceLimit(MagickLib::WidthResource)*
+                                          MagickLib::GetMagickResourceLimit(MagickLib::HeightResource));
         MagickLib::SetMagickResourceLimit(MagickLib::DiskResource, 0);
         MagickLib::SetMagickResourceLimit(MagickLib::ReadResource, 900000);
         MagickLib::SetMagickResourceLimit(MagickLib::WriteResource, 1118720);

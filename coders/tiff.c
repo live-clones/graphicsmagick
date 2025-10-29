@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -837,8 +837,8 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
       if (NEWSP_REMAINING(text,p,length) < 8)
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u remaining"
+                                "Truncated profile: %" MAGICK_SIZE_T_F "u"
+                                " bytes, %" MAGICK_SSIZE_T_F "u remaining"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
                                 (MAGICK_SSIZE_T) NEWSP_REMAINING(text,p,length));
@@ -849,8 +849,8 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
       if (NEWSP_REMAINING(text,p,length) < 8)
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u remaining"
+                                "Truncated profile: %" MAGICK_SIZE_T_F "u"
+                                " bytes, %" MAGICK_SSIZE_T_F "u remaining"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
                                 (MAGICK_SSIZE_T) NEWSP_REMAINING(text,p,length));
@@ -864,8 +864,8 @@ ReadNewsProfile(const unsigned char *text,const size_t length,Image *image,const
           ((ssize_t) hdr_length > NEWSP_REMAINING(text,p,length)))
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Truncated profile: %" MAGICK_SIZE_T_F
-                                "u bytes, %" MAGICK_SSIZE_T_F "u "
+                                "Truncated profile: %" MAGICK_SIZE_T_F "u"
+                                " bytes, %" MAGICK_SSIZE_T_F "u "
                                 "remaining (need %u more bytes)"
                                 ", ignoring profile.",
                                 (MAGICK_SIZE_T) length,
@@ -935,13 +935,26 @@ TIFFCloseBlob(thandle_t image_handle)
 
 /* Report errors. */
 static void
-TIFFReadErrors(const char *module,const char *format,
-               va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+TIFFReadErrorsHandler(const char *module,const char *format,
+                      va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(2,0);
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFReadErrorsHandlerExtR(TIFF *tif, void *user_data,
+                          const char *module, const char *format, va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 static void
-TIFFWriteErrors(const char *module,const char *format,
-                va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+TIFFWriteErrorsHandler(const char *module,const char *format,
+                       va_list warning) MAGICK_FUNC_PRINTF_FORMAT(2,0);
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFWriteErrorsHandlerExtR(TIFF *tif, void *user_data,
+                           const char *module, const char *format, va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 static void
-TIFFReadErrors(const char *module,const char *format,
+TIFFReadErrorsHandler(const char *module,const char *format,
   va_list warning)
 {
   ExceptionInfo
@@ -961,8 +974,37 @@ TIFFReadErrors(const char *module,const char *format,
   ThrowException2(tiff_exception,CorruptImageError,message,module);
 }
 
+#if defined(HAVE_TIFFERROREXTR)
+static int TIFFReadErrorsHandlerExtR(TIFF *tif, void *user_data,
+                                     const char *module, const char *format,
+                                     va_list warning)
+{
+  ExceptionInfo
+    *tiff_exception;
+
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+#define UNKNOWN_TAG_ERROR "Internal error, unknown tag"
+  if (LocaleNCompare(message,UNKNOWN_TAG_ERROR,sizeof(UNKNOWN_TAG_ERROR)-1) == 0)
+    return 0;
+  (void) strlcat(message,".",MaxTextExtent);
+  tiff_exception=(ExceptionInfo *) user_data;
+  ThrowException2(tiff_exception,CorruptImageError,message,module);
+  /*
+    0: both functions TIFFErrorHandler() and TIFFErrorHandlerExt() are called.
+    non-zero: no further error message function is called.
+  */
+  return 1;
+}
+#endif /* if defined(HAVE_TIFFERROREXTR) */
+
 static void
-TIFFWriteErrors(const char *module,const char *format,
+TIFFWriteErrorsHandler(const char *module,const char *format,
   va_list warning)
 {
   ExceptionInfo
@@ -978,6 +1020,33 @@ TIFFWriteErrors(const char *module,const char *format,
   tiff_exception=(ExceptionInfo *) MagickTsdGetSpecific(tsd_key);
   ThrowException2(tiff_exception,CoderError,message,module);
 }
+
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFWriteErrorsHandlerExtR(TIFF *tif, void *user_data,
+                           const char *module, const char *format, va_list warning)
+{
+  ExceptionInfo
+    *tiff_exception;
+
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+  (void) strlcat(message,".",MaxTextExtent);
+  tiff_exception=(ExceptionInfo *) user_data;
+  ThrowException2(tiff_exception,CoderError,message,module);
+
+  /*
+    0: both functions TIFFWarningHandler() and TIFFWarningHandlerExt() are called.
+    non-zero: no further warning message function is called.
+   */
+  return 1;
+}
+#endif /* if defined(HAVE_TIFFERROREXTR) */
 
 /* Memory map entire input file in read-only mode. */
 static int
@@ -1018,9 +1087,9 @@ TIFFReadBlob(thandle_t image_handle,tdata_t data,tsize_t size)
 #if LOG_TIFF_BLOB_IO
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "TIFF read blob: data=0x%p size=%"
-                          MAGICK_SIZE_T_F "u, returns %"
-                          MAGICK_SIZE_T_F "u",
+                          "TIFF read blob: data=0x%p size="
+                          "%" MAGICK_SIZE_T_F "u, returns "
+                          "%" MAGICK_SIZE_T_F "u",
                           data, (MAGICK_SIZE_T) size,
                           (MAGICK_SIZE_T) result);
 #endif /* LOG_TIFF_BLOB_IO */
@@ -1097,9 +1166,72 @@ TIFFUnmapBlob(thandle_t image_handle,
 #endif  /* LOG_TIFF_BLOB_IO */
 }
 
+#if defined(HAVE_TIFFERROREXTR)
+static int
+TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
+                                  const char *module, const char *format, va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
+static int TIFFReadWarningHandlerExtRLogOnly(TIFF *tif, void *user_data,
+                                             const char *module, const char *format,
+                                             va_list warning)
+{
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  (void) user_data;
+  (void) module;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+  (void) strlcat(message,".",MaxTextExtent);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "TIFF Warning: %s",message);
+  /*
+    0: both functions TIFFErrorHandler() and TIFFErrorHandlerExt() are called.
+    non-zero: no further error message function is called.
+  */
+  return 1;
+}
+
+static int
+TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
+                                         const char *module, const char *format, va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(4,0);
+static int TIFFReadWarningHandlerExtRThrowException(TIFF *tif, void *user_data,
+                                                    const char *module, const char *format,
+                                                    va_list warning)
+{
+  ExceptionInfo
+    *tiff_exception;
+
+  char
+    message[MaxTextExtent];
+
+  (void) tif;
+  errno=0;
+  (void) vsnprintf(message,MaxTextExtent-2,format,warning);
+  message[MaxTextExtent-2]='\0';
+#define UNKNOWN_TAG_ERROR "Internal error, unknown tag"
+  if (LocaleNCompare(message,UNKNOWN_TAG_ERROR,sizeof(UNKNOWN_TAG_ERROR)-1) == 0)
+    return 0;
+  (void) strlcat(message,".",MaxTextExtent);
+  tiff_exception=(ExceptionInfo *) user_data;
+  ThrowException2(tiff_exception,CoderWarning,message,module);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "TIFF Warning: %s",message);
+  /*
+    0: both functions TIFFWarningHandler() and then TIFFWarningHandlerExt() are called.
+    non-zero: no further error message function is called.
+  */
+  return 1;
+}
+#endif /* if defined(HAVE_TIFFERROREXTR) */
+
 /* Report warnings as a coder log message. */
 static void
-TIFFWarningsLogOnly(const char *module,const char *format,va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+TIFFWarningsLogOnly(const char *module,const char *format,va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(2,0);
 static void
 TIFFWarningsLogOnly(const char *module,const char *format,va_list warning)
 {
@@ -1122,7 +1254,8 @@ TIFFWarningsLogOnly(const char *module,const char *format,va_list warning)
 
 /* Report warnings as exception in thread-specific ExceptionInfo */
 static void
-TIFFWarningsThrowException(const char *module,const char *format,va_list warning) MAGICK_ATTRIBUTE((__format__ (__printf__,2,0)));
+TIFFWarningsThrowException(const char *module,const char *format,va_list warning)
+  MAGICK_FUNC_PRINTF_FORMAT(2,0);
 static void
 TIFFWarningsThrowException(const char *module,const char *format,va_list warning)
 {
@@ -1158,8 +1291,9 @@ TIFFWriteBlob(thandle_t image_handle,tdata_t data,tsize_t size)
 #if LOG_TIFF_BLOB_IO
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "TIFF write blob: data=0x%p size=%" MAGICK_SIZE_T_F
-                          "u, returns %" MAGICK_SIZE_T_F "u",
+                          "TIFF write blob: data=0x%p size="
+                          "%" MAGICK_SIZE_T_F "u, returns "
+                          "%" MAGICK_SIZE_T_F "u",
                           data, (MAGICK_SIZE_T) size,
                           (MAGICK_SIZE_T) result);
 #endif  /* LOG_TIFF_BLOB_IO */
@@ -1933,20 +2067,41 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   file_size = GetBlobSize(image);
   (void) MagickTsdSetSpecific(tsd_key,(void *) exception);
-  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFReadErrors);
+
+  /*
+    Set global thread-specific reader errors and warnings handlers.
+  */
+  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFReadErrorsHandler);
   (void) TIFFSetWarningHandler((TIFFErrorHandler) (CheckThrowWarnings(image_info) ?
                                                    TIFFWarningsThrowException :
                                                    TIFFWarningsLogOnly));
   client_data.image=image;
   client_data.image_info=image_info;
-  tiff=TIFFClientOpen(image->filename,"rb",(thandle_t) &client_data,TIFFReadBlob,
+#if defined(HAVE_TIFFERROREXTR)
+  {
+    TIFFOpenOptions *open_options = TIFFOpenOptionsAlloc();
+    TIFFOpenOptionsSetErrorHandlerExtR(open_options, TIFFReadErrorsHandlerExtR, (void *) exception);
+    TIFFOpenOptionsSetWarningHandlerExtR(open_options,
+                                         (CheckThrowWarnings(image_info) ?
+                                          TIFFReadWarningHandlerExtRThrowException : TIFFReadWarningHandlerExtRLogOnly),
+                                         (void *) exception); /* FIXME */
+    tiff=TIFFClientOpenExt(image->filename,"rb",(thandle_t) &client_data,
+                           TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,TIFFCloseBlob,
+                           TIFFGetBlobSize,TIFFMapBlob,TIFFUnmapBlob,
+                           open_options);
+    TIFFOpenOptionsFree(open_options);
+  }
+#else
+  tiff=TIFFClientOpen(image->filename,"rb",(thandle_t) &client_data,
+                      TIFFReadBlob,
                       TIFFWriteBlob,TIFFSeekBlob,TIFFCloseBlob,
                       TIFFGetBlobSize,TIFFMapBlob,TIFFUnmapBlob);
+#endif /* if defined(HAVE_TIFFERROREXTR) */
   if (tiff == (TIFF *) NULL)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
 
   /*
-    Report error if error was reported via TIFFReadErrors() while in
+    Report error if error was reported via TIFFReadErrorsHandler() while in
     TIFFClientOpen().
   */
   if (exception->severity > ErrorException)
@@ -2336,7 +2491,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       /*
         Does alpha type deserve a matte channel?
       */
-      switch(alpha_type)
+      switch (alpha_type)
         {
         case UnspecifiedAlpha:
           break;
@@ -2358,7 +2513,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
           char
             alpha_string[MaxTextExtent];
 
-          switch(alpha_type)
+          switch (alpha_type)
             {
             default:
             case UnspecifiedAlpha:
@@ -2411,9 +2566,16 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
              { TIFFTAG_MODEL, "model" },
              { TIFFTAG_PAGENAME, "label" },
              { TIFFTAG_SOFTWARE, "software" },
-             { TIFFTAG_OPIIMAGEID, "imageid" }, /* Causes TIFFFieldWithTag() to return NULL */
+#if 1
+             /*
+               These three cause TIFFFieldWithTag() to return NULL and
+               therefore produce "TIFF Warning: Warning, unknown tag" exceptions
+               while reading!
+              */
+             { TIFFTAG_OPIIMAGEID, "imageid" },
              { 33423, "kodak-33423" },
              { 36867, "kodak-36867" }
+#endif
             };
 
         for (i = 0; i < ArraySize(text_tags); i++)
@@ -2764,8 +2926,8 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
             if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Request to allocate scanline buffer of %"
-                                    MAGICK_SIZE_T_F "u bytes",
+                                    "Request to allocate scanline buffer of "
+                                    "%" MAGICK_SIZE_T_F "u bytes",
                                     (MAGICK_SIZE_T) scanline_size);
 
             /*
@@ -3145,7 +3307,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
             /*
               Obtain tile geometry
             */
-            if(!(TIFFGetField(tiff,TIFFTAG_TILEWIDTH,&tile_columns) == 1) ||
+            if (!(TIFFGetField(tiff,TIFFTAG_TILEWIDTH,&tile_columns) == 1) ||
                !(TIFFGetField(tiff,TIFFTAG_TILELENGTH,&tile_rows) == 1))
               {
                 ThrowTIFFReaderException(CoderError,ImageIsNotTiled,image);
@@ -4184,7 +4346,7 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
 
-  if(!AcquireTemporaryFileName(temporary_filename))
+  if (!AcquireTemporaryFileName(temporary_filename))
     ThrowWriterException(FileOpenError,UnableToCreateTemporaryFile,image);
 
   huffman_image=CloneImage(image,0,0,True,&image->exception);
@@ -4213,7 +4375,7 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
     }
 
   (void) MagickTsdSetSpecific(tsd_key,(void *) (&image->exception));
-  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrors);
+  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrorsHandler);
   (void) TIFFSetWarningHandler((TIFFErrorHandler) (CheckThrowWarnings(image_info) ?
                                                    TIFFWarningsThrowException :
                                                    TIFFWarningsLogOnly));
@@ -4461,331 +4623,479 @@ static magick_uint16_t LD_UINT16_HI(const unsigned char *Mem)
 
 static const char *FipFieldName(const TIFFField *fip)
 {
-  if(fip)
-  {
-    const char * const FName = TIFFFieldName(fip);
-    if(FName==NULL) return "N/A";
-    return FName;
-  }
+  if (fip)
+    {
+      const char * const FName = TIFFFieldName(fip);
+      if (FName==NULL)
+        return "N/A";
+      return FName;
+    }
   return "UNSUPPORTED";
+}
+
+static const char *FipFieldTypeToStr(const TIFFDataType data_type)
+{
+  const char *str = "UNKNOWN";
+  switch (data_type)
+    {
+    case TIFF_NOTYPE:     /* placeholder */
+      str = "NOTYPE";
+      break;
+    case TIFF_BYTE:       /* 8-bit unsigned integer */
+      str = "BYTE";
+      break;
+    case TIFF_ASCII:      /* 8-bit bytes w/ last byte null */
+      str = "STRING";     /* vs "ASCII */
+      break;
+    case TIFF_SHORT:      /* 16-bit unsigned integer */
+      str = "USHORT";
+      break;
+    case TIFF_LONG:       /* 32-bit unsigned integer */
+      str = "ULONG";
+      break;
+    case TIFF_RATIONAL:   /* 64-bit unsigned fraction */
+      str = "URATIONAL";
+      break;
+    case TIFF_SBYTE:      /* !8-bit signed integer */
+      str = "SBYTE";
+      break;
+    case TIFF_UNDEFINED:  /* !8-bit untyped data */
+      str = "UNDEFINED";
+      break;
+    case TIFF_SSHORT:     /* !16-bit signed integer */
+      str = "SSHORT";
+      break;
+    case TIFF_SLONG:      /* !32-bit signed integer */
+      str = "SLONG";
+      break;
+    case TIFF_SRATIONAL: /* !64-bit signed fraction */
+      str = "SRATIONAL";
+      break;
+    case TIFF_FLOAT:     /* !32-bit IEEE floating point */
+      str = "FLOAT";
+      break;
+    case TIFF_DOUBLE:    /* !64-bit IEEE floating point */
+      str = "DOUBLE";
+      break;
+    case TIFF_IFD:       /* %32-bit unsigned integer (offset) */
+      str = "IFD";
+      break;
+#if defined(HasBigTIFF)
+    case TIFF_LONG8:     /* BigTIFF 64-bit unsigned integer */
+      str = "LONG8";
+      break;
+    case TIFF_SLONG8:    /* BigTIFF 64-bit signed integer */
+      str = "SLONG8";
+      break;
+    case TIFF_IFD8:       /* BigTIFF 64-bit unsigned integer (offset) */
+      str = "IFD8";
+      break;
+#endif /* if defined(HasBigTIFF) */
+    }
+  return str;
 }
 
 
 static int CheckAndStoreStr(TIFF *tiff, const magick_uint16_t Tag, const char *String, const magick_uint32_t StrSize)
 {
-magick_uint32_t i = StrSize;
+  magick_uint32_t i = StrSize;
 
-  if(Tag==TIFFTAG_INKNAMES)             /* Variant of call is tag dependent, too bad. */
-  {
-    if(StrSize>0xFFFF) return 0;
-    /* TIFFTAG_INKNAMES needs only uint16_t https://libtiff.gitlab.io/libtiff/functions/TIFFSetField.html#c.TIFFSetField */
-    return TIFFSetField(tiff, Tag, (magick_uint16_t)StrSize, String);
-  }
-
-        /* Look for zero terminator. */
-  while(i>0)
-  {
-    i--;
-    if(String[i]==0)
+  if (Tag == TIFFTAG_INKNAMES)             /* Variant of call is tag dependent, too bad. */
     {
-      return TIFFSetField(tiff, Tag, String);
+      if (StrSize > 0xFFFF)
+        return 0;
+      /* TIFFTAG_INKNAMES needs only uint16_t https://libtiff.gitlab.io/libtiff/functions/TIFFSetField.html#c.TIFFSetField */
+      return TIFFSetField(tiff, Tag, (magick_uint16_t)StrSize, String);
     }
-  }
 
-  if(StrSize>0)
-  {     /* Try to duplicate unterminated string. */
-    char *StringDup = MagickAllocateResourceLimitedMemory(char *, StrSize+1);
-    if(StringDup!=NULL)
+  /* Look for zero terminator. */
+  while (i > 0)
     {
-      memcpy(StringDup,String,StrSize);
-      StringDup[StrSize] = 0;
-      i = TIFFSetField(tiff, Tag, String);
-      MagickFreeResourceLimitedMemory(StringDup);
-      return i;
+      i--;
+      if (String[i] == 0)
+        {
+          return TIFFSetField(tiff, Tag, String);
+        }
     }
-  }
+
+  if (StrSize > 0)
+    {
+      /* Try to duplicate unterminated string. */
+      char *StringDup = MagickAllocateResourceLimitedMemory(char *, StrSize+1);
+      if (StringDup != NULL)
+        {
+          memcpy(StringDup,String,StrSize);
+          StringDup[StrSize] = 0;
+          i = TIFFSetField(tiff, Tag, String);
+          MagickFreeResourceLimitedMemory(StringDup);
+          return i;
+        }
+    }
   return 0;
 }
 
 
-static int AddIFDExifFields(TIFF *tiff, const unsigned char * const profile_data, const unsigned char *IFD_data, const size_t profile_length,
-                MagickBool logging, magick_uint16_t Flags)
+static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
+                            const unsigned char * const profile_data,
+                            const unsigned char *IFD_data,
+                            const size_t profile_length,
+                            MagickBool logging, magick_uint16_t Flags)
 {
-magick_uint32_t(*LD_UINT32)(const unsigned char *Mem);
-magick_uint16_t(*LD_UINT16)(const unsigned char *Mem);
-const TIFFField *fip;
-magick_uint16_t EntryNum;
-magick_uint16_t Tag, Field;
-magick_uint32_t Long2, Value;
-int FieldCount = 0;
+  magick_uint32_t(*LD_UINT32)(const unsigned char *Mem);
+  magick_uint16_t(*LD_UINT16)(const unsigned char *Mem);
+  const TIFFField *fip;
+  magick_uint16_t EntryNum;
+  magick_uint16_t Tag, Field;
+  magick_uint32_t Long2, Value;
+  int FieldCount = 0;
 
-  if(*profile_data=='M')
-  {
-    LD_UINT32 = LD_UINT32_HI;
-    LD_UINT16 = LD_UINT16_HI;
-  }
-  else
-  {
-    if(*profile_data!='I') return 0;
-    LD_UINT32 = LD_UINT32_LO;
-    LD_UINT16 = LD_UINT16_LO;
-  }
-
-  do
-  {
-    if(profile_length < (size_t)(IFD_data-profile_data)+2) return 0;
-    EntryNum = LD_UINT16(IFD_data);
-    if(profile_length < (size_t)(IFD_data-profile_data)+(EntryNum*12)) return 0;
-    IFD_data+=2;
-
-    while(EntryNum>0)
+  if (*profile_data == 'M')
     {
-      Tag = LD_UINT16(IFD_data);
-      Field = LD_UINT16(IFD_data+2);
-      Long2 = LD_UINT32(IFD_data+4);
-      Value = LD_UINT32(IFD_data+8);
-
-      fip = TIFFFindField(tiff, Tag, TIFF_ANY);
-      if(logging && (Flags & FLAG_BASE)!=0)
-        (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Extracted tag from EXIF %xh, Field %d, Long2 %d, val %d %s",
-                           Tag, Field, Long2, Value, FipFieldName(fip));
-
-      if(Tag==TIFFTAG_COMPRESSION ||
-         Tag==TIFFTAG_IMAGELENGTH || Tag==TIFFTAG_IMAGEWIDTH ||
-         Tag==TIFFTAG_SAMPLESPERPIXEL || Tag==TIFFTAG_BITSPERSAMPLE || Tag==TIFFTAG_SAMPLEFORMAT ||
-         Tag==TIFFTAG_STRIPOFFSETS || Tag==TIFFTAG_ROWSPERSTRIP || Tag==TIFFTAG_STRIPBYTECOUNTS ||
-         Tag==TIFFTAG_ORIENTATION ||            /* Orientation is handled different way. */
-         Tag==TIFFTAG_XRESOLUTION || Tag==TIFFTAG_YRESOLUTION)
-      {
-          goto NextItem;        /* Banned TIFF tags that cannot be copyed from EXIF. */
-      }
-
-      if(Tag == TIFFTAG_EXIFIFD)
-      {
-        if(Value >= profile_length) goto NextItem;
-        if((Flags & FLAG_EXIF) != 0)
-          FieldCount += AddIFDExifFields(tiff, profile_data, profile_data+Value, profile_length, logging, Flags|FLAG_BASE);
-        goto NextItem;
-      }
-      if(Tag == TIFFTAG_GPSIFD)
-      {
-        if(Value >= profile_length) goto NextItem;
-        if((Flags & FLAG_GPS) != 0)
-          FieldCount += AddIFDExifFields(tiff, profile_data, profile_data+Value, profile_length, logging, Flags|FLAG_BASE);
-        goto NextItem;
-      }
-
-      if(fip!=NULL && (Flags & FLAG_BASE)!=0)           /* libtiff doesn't understand these */
-      {
-        const TIFFDataType FDT = TIFFFieldDataType(fip);
-        const int WriteCount = TIFFFieldWriteCount(fip);
-        switch(Field)
-        {
-          case TIFF_ASCII:
-                         if(FDT!=TIFF_ASCII)
-                             break;             /* Incompatible recipe.*/
-                         if(Long2<=4)
-                         {
-                           if(CheckAndStoreStr(tiff, Tag, (const char *) IFD_data+8, Long2))    /* The short string is inside Value. */
-                             FieldCount++;
-                         }
-                         else
-                         {
-                           if(Value+Long2>=profile_length-1) break;             /* String outside EXIF boundary. */
-                           if(CheckAndStoreStr(tiff, Tag, (const char *) profile_data+Value, Long2))
-                             FieldCount++;
-                         }
-                         break;
-
-            case TIFF_SHORT:
-                         if(WriteCount!=1)
-                         {
-                           magick_uint16_t *Array;
-                           magick_uint32_t i;
-                           if(FDT!=Field) break;                        /* Incompatible array type, might be converted in future. */
-                           if(WriteCount!=TIFF_VARIABLE && WriteCount!=TIFF_VARIABLE2)
-                               break;                                   /* Fixed size arrays not handled. */
-                           if(Value+2*Long2>=profile_length-1) break;
-                           if(Long2==0) break;
-                           Array = MagickAllocateResourceLimitedMemory(magick_uint16_t *, 2*Long2);
-                           if(Array==NULL) break;
-                           for(i=0; i<Long2; i++)
-                               Array[i] = LD_UINT16(profile_data+Value+2*i);
-                           if(WriteCount==TIFF_VARIABLE)
-                           {
-                             if(TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
-                               FieldCount++;
-                           } else if(WriteCount==TIFF_VARIABLE2)
-                           {
-                             if(TIFFSetField(tiff, Tag, Long2, Array))          /* Argument 3 type uint32_t, argument 4 uint16_t*.. */
-                               FieldCount++;
-                           }
-                           MagickFreeResourceLimitedMemory(Array);
-                           break;
-                         }
-                         goto Scalar;
-
-            case TIFF_LONG:
-                         if(WriteCount!=1)
-                         {
-                           magick_uint32_t *Array;
-                           magick_uint32_t i;
-                           if(FDT!=Field) break;                        /* Incompatible array type, might be converted in future. */
-                           if(WriteCount!=TIFF_VARIABLE && WriteCount!=TIFF_VARIABLE2)
-                               break;                                   /* Fixed size arrays not handled. */
-                           if(Value+4*Long2>=profile_length-1) break;
-                           if(Long2==0) break;
-                           Array = MagickAllocateResourceLimitedMemory(magick_uint32_t *, 4*Long2);
-                           if(Array==NULL) break;
-                           for(i=0; i<Long2; i++)
-                               Array[i] = LD_UINT32(profile_data+Value+4*i);
-                           if(WriteCount==TIFF_VARIABLE)
-                           {
-                             if(TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint32_t*. */
-                               FieldCount++;
-                           } else if(WriteCount==TIFF_VARIABLE2)
-                           {
-                             if(TIFFSetField(tiff, Tag, Long2, Array))           /* Argument 3 type uint32_t, argument 4 uint32_t*. */
-                               FieldCount++;
-                           }
-                           MagickFreeResourceLimitedMemory(Array);
-                           break;
-                         }
-                         goto Scalar;
-
-            case TIFF_BYTE:
-                         if(WriteCount!=1)
-                         {
-                           if(FDT!=Field) break;                        /* Incompatible array type, might be converted in future. */
-                           if(WriteCount!=TIFF_VARIABLE && WriteCount!=TIFF_VARIABLE2)
-                           {
-                             if((WriteCount<=0)||(Long2<(magick_uint32_t)WriteCount)) break;            /* Too small amount of mandatory items. */
-                             if(Long2<(magick_uint32_t)WriteCount) break;               /* Too small amount of mandatory items. */
-                             if(Long2<=4)
-                             {
-                               if(TIFFSetField(tiff, Tag, IFD_data+8))  /* Argument 3 uint8_t[4]. */
-                                 FieldCount++;
-                             }
-                             else
-                             {
-                               if(Value+Long2>=profile_length-1) break;
-                               if(TIFFSetField(tiff, Tag, profile_data+Value))  /* Argument 3 uint8_t[4]. */
-                                 FieldCount++;
-                             }
-                             break;                                     /* Fixed size arrays not handled. */
-                           }
-                           if(Value+Long2>=profile_length-1) break;
-                               /* No need to convert endianity for BYTES. */
-                           if(WriteCount==TIFF_VARIABLE)
-                           {
-                             if(TIFFSetField(tiff, Tag, (int)Long2, profile_data+Value)) /* Argument 3 type int, argument 4 uint8_t*. */
-                               FieldCount++;
-                           } else if(WriteCount==TIFF_VARIABLE2)
-                           {
-                             if(TIFFSetField(tiff, Tag, Long2, profile_data+Value))     /* Argument 3 type uint32_t, argument 4 uint8_t*. */
-                               FieldCount++;
-                           }
-                           break;
-                         }
-
-Scalar:                  if(FDT==TIFF_SHORT)
-                         {
-                           if(TIFFSetField(tiff, Tag, (unsigned)Value & 0xFFFF))
-                             FieldCount++;
-                         }
-                         if(FDT!=TIFF_BYTE && FDT!=TIFF_LONG)
-                             break;
-                         if(TIFFSetField(tiff, Tag, Value))
-                             FieldCount++;
-                         break;
-
-            case TIFF_SRATIONAL:
-                         if(logging && (Flags & FLAG_BASE)!=0)
-                             (void)LogMagickEvent(CoderEvent,GetMagickModule(),"TIFF_SRATIONAL type is not supported yet.");
-                         break;
-            case TIFF_RATIONAL:
-                         if(FDT!=TIFF_RATIONAL) break;
-                         if(WriteCount!=1)
-                         {
-                           if(WriteCount>1)
-                           {
-                             if(Long2<(magick_uint32_t)WriteCount) break;       /* Too small amount of mandatory items. */
-                             if(Value+8*WriteCount>=profile_length-1) break;    /* Array falls over blob boundary. */
-#if TIFFLIB_VERSION >= 20230609
-                             {
-                               int i;
-                               switch(TIFFFieldSetGetSize(fip))
-                                 {
-                                 case 8:                /* double array is required in input. */
-                                   {
-                                     double *ArrayD;
-                                     ArrayD = MagickAllocateResourceLimitedMemory(double *, sizeof(double)*WriteCount);
-                                     if(ArrayD==NULL) break;
-                                     for(i=0; i<WriteCount; i++)
-                                       {
-                                         const magick_uint32_t val = LD_UINT32(profile_data+Value+4+8*i);
-                                         ArrayD[i] = (val==0) ? 0.0 : (LD_UINT32(profile_data+Value+8*i) / (double)val);
-                                       }
-                                     if(TIFFSetField(tiff, Tag, ArrayD))
-                                       FieldCount++;
-                                     MagickFreeResourceLimitedMemory(ArrayD);
-                                   }
-                                   break;
-                                 case 4:                /* float array is required in input. */
-                                   {
-                                     float *ArrayF;
-                                     ArrayF = MagickAllocateResourceLimitedMemory(float *, sizeof(float)*WriteCount);
-                                     if(ArrayF==NULL) break;
-                                     for(i=0; i<WriteCount; i++)
-                                       {
-                                         const magick_uint32_t val = LD_UINT32(profile_data+Value+4+8*i);
-                                         ArrayF[i] = (val==0) ? 0.0f : (LD_UINT32(profile_data+Value+8*i) / (float)val);
-                                       }
-                                     if(TIFFSetField(tiff, Tag, ArrayF))
-                                       FieldCount++;
-                                     MagickFreeResourceLimitedMemory(ArrayF);
-                                   }
-                                   break;
-                                 }
-                             }
-#endif
-                             break;
-                           }
-
-                           if(WriteCount==TIFF_VARIABLE || WriteCount==TIFF_VARIABLE2)
-                           {
-                             if(logging && (Flags & FLAG_BASE)!=0)
-                                 (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Variable size fractional arrays are not supported yet.");
-                             break;
-                           }
-                           break;
-                         }
-                         else           /* Process as scalar. */
-                         {
-                           double d;
-                           if(Value+8>=profile_length) break;
-                           d = LD_UINT32(profile_data+Value+4);
-                           if(d==0) break;              /* Prevent division by 0. */
-                           d = LD_UINT32(profile_data+Value) / d;
-                           if(TIFFSetField(tiff, Tag, d))
-                               FieldCount++;
-                         }
-                         break;
-        }
-      }
-
-NextItem:
-      if(profile_length <= 12)
-          break;
-      IFD_data += 12;
-      EntryNum--;
+      LD_UINT32 = LD_UINT32_HI;
+      LD_UINT16 = LD_UINT16_HI;
+    }
+  else
+    {
+      if (*profile_data != 'I')
+        return 0;
+      LD_UINT32 = LD_UINT32_LO;
+      LD_UINT16 = LD_UINT16_LO;
     }
 
-    if(profile_length < (size_t)(IFD_data-profile_data)+4) break;
-    Value = LD_UINT32(IFD_data);
-    if(Value>=profile_length) break;
-    IFD_data = profile_data+Value;
-  } while(Value>8);
+  do
+    {
+      if (profile_length < (size_t)(IFD_data-profile_data)+2)
+        return 0;
+      EntryNum = LD_UINT16(IFD_data);
+      if (profile_length < (size_t)(IFD_data-profile_data)+(EntryNum*12))
+        return 0;
+      IFD_data += 2;
+
+      while (EntryNum>0)
+        {
+          Tag = LD_UINT16(IFD_data);
+          Field = LD_UINT16(IFD_data+2);
+          Long2 = LD_UINT32(IFD_data+4);
+          Value = LD_UINT32(IFD_data+8);
+
+          fip = TIFFFindField(tiff, Tag, TIFF_ANY);
+          if (logging && (Flags & FLAG_BASE) != 0)
+            (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                 "Extracted tag from EXIF %xh.H (%u), Field %u (%s), Long2 %u, val %u %s",
+                                 (unsigned) Tag, (unsigned) Tag, (unsigned) Field, FipFieldTypeToStr(Field),
+                                 (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
+
+          if (Tag == TIFFTAG_COLORMAP ||
+              Tag == TIFFTAG_COMPRESSION ||
+              Tag == TIFFTAG_IMAGELENGTH ||
+              Tag == TIFFTAG_IMAGEWIDTH ||
+              Tag == TIFFTAG_SAMPLESPERPIXEL ||
+              Tag == TIFFTAG_BITSPERSAMPLE ||
+              Tag == TIFFTAG_SAMPLEFORMAT ||
+              Tag == TIFFTAG_STRIPOFFSETS ||
+              Tag == TIFFTAG_ROWSPERSTRIP ||
+              Tag == TIFFTAG_STRIPBYTECOUNTS ||
+              Tag == TIFFTAG_ORIENTATION || /* Orientation is handled different way. */
+              Tag == TIFFTAG_XRESOLUTION ||
+              Tag == TIFFTAG_YRESOLUTION ||
+              Tag == TIFFTAG_TRANSFERFUNCTION /* Depends on TIFFTAG_BITSPERSAMPLE and TIFFTAG_SAMPLESPERPIXEL (above) */
+              )
+            {
+              goto NextItem;        /* Banned TIFF tags that cannot be copied from EXIF. */
+            }
+
+          if (Tag == TIFFTAG_EXIFIFD)
+            {
+              if (Value >= profile_length)
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                         "EXIF IFD data length (%u) exceeds profile length (%zu)!",
+                                         (unsigned) Value, profile_length);
+                  goto NextItem;
+                }
+              if (((Flags & FLAG_EXIF) != 0) && ((*ifds_handled & FLAG_EXIF) == 0))
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing into EXIF IFD...");
+                  *ifds_handled |= FLAG_EXIF;
+
+                  FieldCount += AddIFDExifFields(tiff, ifds_handled, profile_data, profile_data+Value,
+                                                 profile_length, logging, Flags|FLAG_BASE);
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing out of EXIF IFD...");
+                }
+              goto NextItem;
+            }
+          if (Tag == TIFFTAG_GPSIFD)
+            {
+              if (Value >= profile_length)
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                         "GPS IFD data length (%u) exceeds profile length (%zu)!",
+                                         (unsigned) Value, profile_length);
+                  goto NextItem;
+                }
+              if (((Flags & FLAG_GPS) != 0) && ((*ifds_handled & FLAG_GPS) == 0))
+                {
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing into GPS IFD...");
+                  *ifds_handled |= FLAG_GPS;
+
+                  FieldCount += AddIFDExifFields(tiff, ifds_handled, profile_data, profile_data+Value,
+                                                 profile_length, logging, Flags|FLAG_BASE);
+                  if (logging)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Recursing out of GPS IFD...");
+                }
+              goto NextItem;
+            }
+
+          if (fip!=NULL && (Flags & FLAG_BASE)!=0)           /* libtiff doesn't understand these */
+            {
+              const TIFFDataType FDT = TIFFFieldDataType(fip);
+              const int WriteCount = TIFFFieldWriteCount(fip);
+              switch (Field)
+                {
+                case TIFF_ASCII:
+                  if (FDT != TIFF_ASCII)
+                    break;             /* Incompatible recipe.*/
+                  if (Long2 <= 4)
+                    {
+                      if (CheckAndStoreStr(tiff, Tag, (const char *) IFD_data+8, Long2))    /* The short string is inside Value. */
+                        FieldCount++;
+                    }
+                  else
+                    {
+                      if ((Value > (Value+Long2)) || (Value+Long2 >= profile_length-1))
+                        break;             /* String outside EXIF boundary. */
+                      if (CheckAndStoreStr(tiff, Tag, (const char *) profile_data+Value, Long2))
+                        FieldCount++;
+                    }
+                  break;
+
+                case TIFF_SHORT:
+                  if (WriteCount!=1)
+                    {
+                      magick_uint16_t *Array;
+                      magick_uint32_t i;
+                      if (FDT != Field)
+                        break;                        /* Incompatible array type, might be converted in future. */
+                      if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"%s fixed size arrays are not supported yet.",
+                                                 FipFieldTypeToStr(Field));
+                          break;                      /* Fixed size arrays not handled. */
+                        }
+                      if ((Value > (Value+2U*Long2)) || (Value+2U*Long2 >= profile_length-1))
+                        break;
+                      if (Long2 == 0)
+                        break;
+                      Array = MagickAllocateResourceLimitedMemory(magick_uint16_t *, 2*Long2);
+                      if (Array == NULL)
+                        break;
+                      for (i=0; i < Long2; i++)
+                        Array[i] = LD_UINT16(profile_data+Value+2*i);
+                      if (WriteCount == TIFF_VARIABLE)
+                        {
+                          if (TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
+                            FieldCount++;
+                        } else if (WriteCount == TIFF_VARIABLE2)
+                        {
+                          if (TIFFSetField(tiff, Tag, Long2, Array))          /* Argument 3 type uint32_t, argument 4 uint16_t*.. */
+                            FieldCount++;
+                        }
+                      MagickFreeResourceLimitedMemory(Array);
+                      break;
+                    }
+                  goto Scalar;
+
+                case TIFF_LONG:
+                  if (WriteCount!=1)
+                    {
+                      magick_uint32_t *Array;
+                      magick_uint32_t i;
+                      if (FDT!=Field)
+                        break;                        /* Incompatible array type, might be converted in future. */
+                      if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"%s fixed size arrays are not supported yet.",
+                                                 FipFieldTypeToStr(Field));
+                          break;                      /* Fixed size arrays not handled. */
+                        }
+                      if ((Value > (Value+4U*Long2)) || (Value+4U*Long2 >= profile_length-1))
+                        break;
+                      if (Long2==0)
+                        break;
+                      Array = MagickAllocateResourceLimitedMemory(magick_uint32_t *, 4*Long2);
+                      if (Array == NULL)
+                        break;
+                      for (i=0; i < Long2; i++)
+                        Array[i] = LD_UINT32(profile_data+Value+4*i);
+                      if (WriteCount == TIFF_VARIABLE)
+                        {
+                          if (TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint32_t*. */
+                            FieldCount++;
+                        } else if (WriteCount == TIFF_VARIABLE2)
+                        {
+                          if (TIFFSetField(tiff, Tag, Long2, Array))           /* Argument 3 type uint32_t, argument 4 uint32_t*. */
+                            FieldCount++;
+                        }
+                      MagickFreeResourceLimitedMemory(Array);
+                      break;
+                    }
+                  goto Scalar;
+
+                case TIFF_BYTE:
+                  if (WriteCount != 1)
+                    {
+                      if (FDT != Field)
+                        break;                        /* Incompatible array type, might be converted in future. */
+                      if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
+                        {
+                          if ((WriteCount <= 0) || (Long2 < (magick_uint32_t)WriteCount))
+                            break;            /* Too small amount of mandatory items. */
+                          if (Long2 < (magick_uint32_t)WriteCount)
+                            break;               /* Too small amount of mandatory items. */
+                          if (Long2 <= 4)
+                            {
+                              if (TIFFSetField(tiff, Tag, IFD_data+8))  /* Argument 3 uint8_t[4]. */
+                                FieldCount++;
+                            }
+                          else
+                            {
+                              if ((Value > (Value+Long2)) || (Value+Long2 >= profile_length-1))
+                                break;
+                              if (TIFFSetField(tiff, Tag, profile_data+Value))  /* Argument 3 uint8_t[4]. */
+                                FieldCount++;
+                            }
+                          break;                                     /* Fixed size arrays not handled. */
+                        }
+                      if ((Value > (Value+Long2)) || (Value+Long2 >= profile_length-1))
+                        break;
+                      /* No need to convert endianity for BYTES. */
+                      if (WriteCount == TIFF_VARIABLE)
+                        {
+                          if (TIFFSetField(tiff, Tag, (int)Long2, profile_data+Value)) /* Argument 3 type int, argument 4 uint8_t*. */
+                            FieldCount++;
+                        } else if (WriteCount == TIFF_VARIABLE2)
+                        {
+                          if (TIFFSetField(tiff, Tag, Long2, profile_data+Value))     /* Argument 3 type uint32_t, argument 4 uint8_t*. */
+                            FieldCount++;
+                        }
+                      break;
+                    }
+
+                Scalar:
+                  if (FDT == TIFF_SHORT)
+                    {
+                      if (TIFFSetField(tiff, Tag, (unsigned)Value & 0xFFFF))
+                        FieldCount++;
+                    }
+                  if (FDT != TIFF_BYTE && FDT != TIFF_LONG)
+                    break;
+                  if (TIFFSetField(tiff, Tag, Value))
+                    FieldCount++;
+                  break;
+
+                case TIFF_SRATIONAL:
+                  if (logging && (Flags & FLAG_BASE) != 0)
+                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"TIFF_SRATIONAL type is not supported yet.");
+                  break;
+                case TIFF_RATIONAL:
+                  if (FDT != TIFF_RATIONAL)
+                    break;
+                  if (WriteCount != 1)
+                    {
+                      if (WriteCount > 1)
+                        {
+                          if (Long2 < (magick_uint32_t)WriteCount)
+                            break;       /* Too small amount of mandatory items. */
+                          if ((Value > (Value+8*WriteCount)) || (Value+8*WriteCount >= profile_length-1))
+                            break;    /* Array falls over blob boundary. */
+#if TIFFLIB_VERSION >= 20230609
+                          {
+                            int i;
+                            switch (TIFFFieldSetGetSize(fip))
+                              {
+                              case 8:                /* double array is required in input. */
+                                {
+                                  double *ArrayD;
+                                  ArrayD = MagickAllocateResourceLimitedMemory(double *, sizeof(double)*WriteCount);
+                                  if (ArrayD == NULL)
+                                    break;
+                                  for (i=0; i < WriteCount; i++)
+                                    {
+                                      const magick_uint32_t val = LD_UINT32(profile_data+Value+4+8*i);
+                                      ArrayD[i] = (val==0) ? 0.0 : (LD_UINT32(profile_data+Value+8*i) / (double)val);
+                                    }
+                                  if (TIFFSetField(tiff, Tag, ArrayD))
+                                    FieldCount++;
+                                  MagickFreeResourceLimitedMemory(ArrayD);
+                                }
+                                break;
+                              case 4:                /* float array is required in input. */
+                                {
+                                  float *ArrayF;
+                                  ArrayF = MagickAllocateResourceLimitedMemory(float *, sizeof(float)*WriteCount);
+                                  if (ArrayF==NULL)
+                                    break;
+                                  for (i=0; i < WriteCount; i++)
+                                    {
+                                      const magick_uint32_t val = LD_UINT32(profile_data+Value+4+8*i);
+                                      ArrayF[i] = (val==0) ? 0.0f : (LD_UINT32(profile_data+Value+8*i) / (float)val);
+                                    }
+                                  if (TIFFSetField(tiff, Tag, ArrayF))
+                                    FieldCount++;
+                                  MagickFreeResourceLimitedMemory(ArrayF);
+                                }
+                                break;
+                              }
+                          }
+#endif
+                          break;
+                        }
+
+                      if (WriteCount == TIFF_VARIABLE || WriteCount == TIFF_VARIABLE2)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Variable size fractional arrays are not supported yet.");
+                          break;
+                        }
+                      break;
+                    }
+                  else           /* Process as scalar. */
+                    {
+                      double d;
+                      if ((Value > (Value+8U)) || (Value+8U >= profile_length))
+                        break;
+                      d = LD_UINT32(profile_data+Value+4);
+                      if (d == 0)
+                        break;              /* Prevent division by 0. */
+                      d = LD_UINT32(profile_data+Value) / d;
+                      if (TIFFSetField(tiff, Tag, d))
+                        FieldCount++;
+                    }
+                  break;
+                }
+            }
+
+        NextItem:
+          if (profile_length <= 12)
+            break;
+          IFD_data += 12;
+          EntryNum--;
+        }
+
+      if (profile_length < (size_t)(IFD_data-profile_data)+4)
+        break;
+      Value = LD_UINT32(IFD_data);
+      if (Value >= profile_length)
+        break;
+      IFD_data = profile_data+Value;
+    } while (Value>8);
 
   return FieldCount;
 }
@@ -4793,21 +5103,29 @@ NextItem:
 
 static int AddExifFields(TIFF *tiff, const unsigned char *profile_data, size_t profile_length, MagickBool logging, magick_uint16_t Flags)
 {
-const char EXIF[6] = {'E','x','i','f',0,0};
+  const char EXIF[6]
+    = {'E','x','i','f',0,0};
 
-  if(profile_data==NULL || profile_length<12+8) return 0;
-  if(memcmp(EXIF,profile_data,6)==0)
-  {
-    profile_data+=6;
-    profile_length-=6;
-    if(profile_length<12+8) return 0;
-  }
+  unsigned int
+    ifds_handled = 0;
 
-  if(profile_data[0] != profile_data[1]) return 0;
+  if (profile_data==NULL || profile_length < 12+8)
+    return 0;
 
-  return AddIFDExifFields(tiff, profile_data,
-                profile_data + ((profile_data[0]=='M')?LD_UINT32_HI(profile_data+4):LD_UINT32_LO(profile_data+4)),
-                profile_length-2, logging, Flags);
+  if (memcmp(EXIF,profile_data,6)==0)
+    {
+      profile_data += 6;
+      profile_length -= 6;
+      if (profile_length < 12+8)
+        return 0;
+    }
+
+  if (profile_data[0] != profile_data[1])
+    return 0;
+
+  return AddIFDExifFields(tiff, &ifds_handled, profile_data,
+                          profile_data + ((profile_data[0]=='M')?LD_UINT32_HI(profile_data+4):LD_UINT32_LO(profile_data+4)),
+                          profile_length-2, logging, Flags);
 }
 
 #endif /* if TIFFLIB_VERSION >= 20120922 */
@@ -4880,7 +5198,7 @@ WriteNewsProfile(TIFF *tiff,
       /* Tag is type TIFF_LONG so byte length is divided by four */
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "TIFFSetField(tiff=0x%p,tag=%d,"
-                            "length=%"MAGICK_SIZE_T_F"u,data=0x%p)",
+                            "length=%" MAGICK_SIZE_T_F "u,data=0x%p)",
                             tiff,profile_tag,(MAGICK_SIZE_T) length/4,profile);
       (void) TIFFSetField(tiff,profile_tag,(uint32) length/4,(void *) profile);
     }
@@ -4909,7 +5227,7 @@ WriteNewsProfile(TIFF *tiff,
 #endif
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "TIFFSetField(tiff=0x%p,tag=%d,"
-                            "length=%"MAGICK_SIZE_T_F"u,data=0x%p)",
+                            "length=%" MAGICK_SIZE_T_F "u,data=0x%p)",
                             tiff,profile_tag,(MAGICK_SIZE_T) length,profile);
       (void) TIFFSetField(tiff,profile_tag,(uint32) length,(void *) profile);
     }
@@ -5009,7 +5327,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
   if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   (void) MagickTsdSetSpecific(tsd_key,(void *) (&image->exception));
-  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrors);
+  (void) TIFFSetErrorHandler((TIFFErrorHandler) TIFFWriteErrorsHandler);
   (void) TIFFSetWarningHandler((TIFFErrorHandler) (CheckThrowWarnings(image_info) ?
                                                    TIFFWarningsThrowException :
                                                    TIFFWarningsLogOnly));
@@ -5065,10 +5383,26 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                           filename,open_flags);
   client_data.image=image;
   client_data.image_info=image_info;
-  tiff=TIFFClientOpen(filename,open_flags,(thandle_t) &client_data,
-                      TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,
-                      TIFFCloseBlob,TIFFGetBlobSize,TIFFMapBlob,
-                      TIFFUnmapBlob);
+#if defined(HAVE_TIFFERROREXTR)
+  {
+    TIFFOpenOptions *open_options = TIFFOpenOptionsAlloc();
+    TIFFOpenOptionsSetErrorHandlerExtR(open_options, TIFFWriteErrorsHandlerExtR, (void *) &image->exception);
+    TIFFOpenOptionsSetWarningHandlerExtR(open_options, TIFFWriteErrorsHandlerExtR, (void *) &image->exception); /* FIXME */
+    tiff=TIFFClientOpenExt(filename,open_flags,(thandle_t) &client_data,
+                           TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,
+                           TIFFCloseBlob,TIFFGetBlobSize,TIFFMapBlob,
+                           TIFFUnmapBlob,
+                           open_options);
+    TIFFOpenOptionsFree(open_options);
+  }
+#else
+  {
+    tiff=TIFFClientOpen(filename,open_flags,(thandle_t) &client_data,
+                        TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,
+                        TIFFCloseBlob,TIFFGetBlobSize,TIFFMapBlob,
+                        TIFFUnmapBlob);
+  }
+#endif /* if defined(HAVE_TIFFERROREXTR) */
   if (tiff == (TIFF *) NULL)
     {
       if (GetBlobIsOpen(image))
@@ -6114,7 +6448,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           }
         }
 
-      if(rows_per_strip==0 || scanline_size==0)
+      if (rows_per_strip==0 || scanline_size==0)
         rows_per_strip=1;
       else
       {
@@ -6247,11 +6581,11 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
 
 #if EXPERIMENTAL_EXIF_TAGS
 #if TIFFLIB_VERSION >= 20120922
-        if(status!=MagickFail)
+        if (status!=MagickFail)
         {
           const unsigned char *profile_data;
           size_t profile_length;
-          if((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
+          if ((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
           {
             AddExifFields(tiff,profile_data,profile_length,logging, FLAG_BASE);
           }
@@ -6916,7 +7250,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
         }
       if (image_info->verbose > 1)
         TIFFPrintDirectory(tiff,stdout,MagickFalse);
-      if(!TIFFWriteDirectory(tiff))
+      if (!TIFFWriteDirectory(tiff))
         {
           status=MagickFail;
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -6926,11 +7260,11 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
 #if EXPERIMENTAL_EXIF_TAGS
 #if TIFFLIB_VERSION >= 20120922
 
-        if(status!=MagickFail)
+        if (status!=MagickFail)
         {
           const unsigned char *profile_data;
           size_t profile_length;
-          if((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
+          if ((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
           {
             magick_uint64_t dir_EXIF_offset = 0;
             magick_uint64_t dir_GPS_offset = 0;
@@ -6940,15 +7274,15 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           * corrected. This means that the provided code to determíne/handle current directory number here is just a current work around.
           */
             tdir_t current_mainifd = TIFFCurrentDirectory(tiff);
-            if(TIFFCurrentDirOffset(tiff) > 0 && current_mainifd > 0) current_mainifd--;
+            if (TIFFCurrentDirOffset(tiff) > 0 && current_mainifd > 0) current_mainifd--;
 
             TIFFFreeDirectory(tiff);
-            if(TIFFCreateEXIFDirectory(tiff) == 0)
+            if (TIFFCreateEXIFDirectory(tiff) == 0)
             {
-              if(AddExifFields(tiff,profile_data,profile_length,logging, FLAG_EXIF) > 0)
+              if (AddExifFields(tiff,profile_data,profile_length,logging, FLAG_EXIF) > 0)
                 {             /* Now write the directory of Exif data */
 
-                if(!TIFFWriteCustomDirectory(tiff, &dir_EXIF_offset))
+                if (!TIFFWriteCustomDirectory(tiff, &dir_EXIF_offset))
                 {
                   LogMagickEvent(CoderEvent,GetMagickModule(),"Failed TIFFWriteCustomDirectory() of the Exif data");
                 }
@@ -6956,11 +7290,11 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
             }
 
 #if TIFFLIB_VERSION >= 20230609
-            if(TIFFCreateGPSDirectory(tiff) == 0)
+            if (TIFFCreateGPSDirectory(tiff) == 0)
             {
-              if(AddExifFields(tiff,profile_data,profile_length,logging, FLAG_GPS) > 0)
+              if (AddExifFields(tiff,profile_data,profile_length,logging, FLAG_GPS) > 0)
                 {             /* Now write the directory of Exif data */
-                if(!TIFFWriteCustomDirectory(tiff, &dir_GPS_offset))
+                if (!TIFFWriteCustomDirectory(tiff, &dir_GPS_offset))
                 {
                   LogMagickEvent(CoderEvent,GetMagickModule(),"Failed TIFFWriteCustomDirectory() of the ExifGPS data");
                 }
@@ -6970,32 +7304,32 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
             }
 #endif
 
-            if(dir_EXIF_offset>0 || dir_GPS_offset>0)
+            if (dir_EXIF_offset>0 || dir_GPS_offset>0)
               {          /* Go back to the first directory, and add the EXIFIFD pointer. */
               TIFFSetDirectory(tiff, 0);
-              if(dir_EXIF_offset>0)
+              if (dir_EXIF_offset>0)
                   TIFFSetField(tiff, TIFFTAG_EXIFIFD, dir_EXIF_offset);
-              if(dir_GPS_offset>0)
+              if (dir_GPS_offset>0)
                   TIFFSetField(tiff, TIFFTAG_GPSIFD, dir_GPS_offset);
             }
 
                 /* Save changed tiff-directory to file */
-            if(image->next != (Image *)NULL)
+            if (image->next != (Image *)NULL)
             {
-              if(!TIFFWriteDirectory(tiff))
+              if (!TIFFWriteDirectory(tiff))
               {
                 (void)LogMagickEvent(CoderEvent, GetMagickModule(), "TIFFWriteDirectory returns failed status!");
               }
               /* Re configure directory status for next image. Reset current IFD number. */
-              if(!TIFFSetDirectory(tiff, current_mainifd))
+              if (!TIFFSetDirectory(tiff, current_mainifd))
               {
-                if(logging)
+                if (logging)
                   LogMagickEvent(CoderEvent,GetMagickModule(),"TIFFSetDirectory() failed.\n");
               }
               TIFFFreeDirectory(tiff);
-              if(!TIFFCreateDirectory(tiff))
+              if (!TIFFCreateDirectory(tiff))
               {
-                if(logging)
+                if (logging)
                   LogMagickEvent(CoderEvent,GetMagickModule(),"TIFFCreateDirectory() failed.\n");
               }
             }

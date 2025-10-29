@@ -156,7 +156,6 @@ static void wmf_svg_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 	svgPoint pt;
 
 	float font_height;
-	float font_ratio;
 
 	float sin_theta;
 	float cos_theta;
@@ -172,8 +171,6 @@ static void wmf_svg_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 	pt = svg_translate (API,draw_text->pt);
 
 	font_height = svg_height (API,(float)  draw_text->font_height);
-	font_ratio  = svg_width  (API,(float) (draw_text->font_height * draw_text->font_ratio));
-	font_ratio /= font_height;
 
 	theta = - WMF_TEXT_ANGLE (draw_text->dc->font);
 
@@ -216,34 +213,26 @@ static void wmf_svg_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 
 static void wmf_svg_udata_init (wmfAPI* API,wmfUserData_t* user_data)
 {	/* wmf_svg_t* ddata = WMF_SVG_GetData (API); */
-
+	(void)user_data;
 	WMF_DEBUG (API,"~~~~~~~~wmf_[svg_]udata_init");
-
-	
 }
 
 static void wmf_svg_udata_copy (wmfAPI* API,wmfUserData_t* user_data)
 {	/* wmf_svg_t* ddata = WMF_SVG_GetData (API); */
-
+	(void)user_data;
 	WMF_DEBUG (API,"~~~~~~~~wmf_[svg_]udata_copy");
-
-	
 }
 
 static void wmf_svg_udata_set (wmfAPI* API,wmfUserData_t* user_data)
 {	/* wmf_svg_t* ddata = WMF_SVG_GetData (API); */
-
+	(void)user_data;
 	WMF_DEBUG (API,"~~~~~~~~wmf_[svg_]udata_set");
-
-	
 }
 
 static void wmf_svg_udata_free (wmfAPI* API,wmfUserData_t* user_data)
 {	/* wmf_svg_t* ddata = WMF_SVG_GetData (API); */
-
+	(void)user_data;
 	WMF_DEBUG (API,"~~~~~~~~wmf_[svg_]udata_free");
-
-	
 }
 
 static svgFont svg_font (char* ps_name)
@@ -301,7 +290,6 @@ static char* svg_color_closest (wmfRGB* rgb)
 static void svg_style_fill (wmfAPI* API,wmfDC* dc)
 {	wmf_svg_t* ddata = WMF_SVG_GetData (API);
 
-	wmfRGB* bg_color;
 	wmfRGB* brush_color;
 
 	wmfBMP* brush_bmp;
@@ -310,10 +298,8 @@ static void svg_style_fill (wmfAPI* API,wmfDC* dc)
 
 	unsigned int fill_opaque;
 	unsigned int fill_polyfill;
-	unsigned int fill_ROP;
 
 	unsigned int brush_style;
-	unsigned int brush_hatch;
 
 	wmfStream* out = ddata->out;
 
@@ -323,14 +309,10 @@ static void svg_style_fill (wmfAPI* API,wmfDC* dc)
 
 	fill_opaque   = (unsigned int) WMF_DC_OPAQUE (dc);
 	fill_polyfill = (unsigned int) WMF_DC_POLYFILL (dc);
-	fill_ROP      = (unsigned int) WMF_DC_ROP (dc);
-
-	bg_color = WMF_DC_BACKGROUND (dc);
 
 	brush = WMF_DC_BRUSH (dc);
 
 	brush_style = (unsigned int) WMF_BRUSH_STYLE (brush);
-	brush_hatch = (unsigned int) WMF_BRUSH_HATCH (brush);
 
 	brush_color = WMF_BRUSH_COLOR (brush);
 
@@ -467,7 +449,7 @@ static void svg_style_fill (wmfAPI* API,wmfDC* dc)
 				break;
 			}
 		}
-		/* no break here - TODO: implement bitmap fill */
+		/* fallthrough - TODO: implement bitmap fill */
 	default:
 		if (API->flags & WMF_OPT_IGNORE_NONFATAL)
 		{	WMF_DEBUG (API,"Unsupported brush style!");
@@ -478,6 +460,7 @@ static void svg_style_fill (wmfAPI* API,wmfDC* dc)
 			API->err = wmf_E_Glitch;
 			break;
 		}
+		/* fallthrough - no break here */
 	case BS_SOLID:
 	break;
 	}
@@ -497,7 +480,6 @@ static void svg_style_stroke (wmfAPI* API,wmfDC* dc)
 	unsigned int pen_style;
 	unsigned int pen_endcap;
 	unsigned int pen_join;
-	unsigned int pen_type;
 
 	wmfStream* out = ddata->out;
 
@@ -515,7 +497,6 @@ static void svg_style_stroke (wmfAPI* API,wmfDC* dc)
 	pen_style  = (unsigned int) WMF_PEN_STYLE (pen);
 	pen_endcap = (unsigned int) WMF_PEN_ENDCAP (pen);
 	pen_join   = (unsigned int) WMF_PEN_JOIN (pen);
-	pen_type   = (unsigned int) WMF_PEN_TYPE (pen);
 
 	if (pen_style == PS_NULL)
 	{	wmf_stream_printf (API,out,"stroke:none");

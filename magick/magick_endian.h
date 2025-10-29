@@ -8,7 +8,7 @@
   Word-swapping functions.
 */
 extern MagickExport void
-  MagickReverseBits(unsigned char *cp, size_t n),
+  MagickReverseBits(unsigned char *cp, size_t n) MAGICK_FUNC_DEPRECATED,
   MagickSwabArrayOfDouble(double *dp, size_t n),
   MagickSwabArrayOfFloat(float *fp, size_t n),
   MagickSwabArrayOfUInt16(magick_uint16_t *wp, size_t n),
@@ -19,7 +19,7 @@ extern MagickExport void
   MagickSwabUInt32(magick_uint32_t *lp);
 
 extern MagickExport const unsigned char
-  *MagickGetBitRevTable(int) MAGICK_FUNC_CONST;
+  *MagickGetBitRevTable(int) MAGICK_FUNC_CONST MAGICK_FUNC_DEPRECATED;
 
 /*
  * Local Variables:

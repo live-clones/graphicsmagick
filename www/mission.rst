@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ================================
 GraphicsMagick Mission Statement

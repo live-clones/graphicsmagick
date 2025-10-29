@@ -1,11 +1,12 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999 - 2018
+// Copyright Bob Friesenhahn, 1999-2024
 //
 // Tests for setting/getting Magick::Image attributes
 //
 
 #include <Magick++.h>
+#include <cstdlib>
 #include <string>
 #include <iostream>
 
@@ -15,9 +16,8 @@ using namespace Magick;
 
 int main( int /*argc*/, char ** argv)
 {
-
-  // Initialize ImageMagick install location for Windows
-  InitializeMagick(*argv);
+  // Initialize/Deinitialize GraphicsMagick (scope based)
+  InitializeMagickSentinel sentinel(*argv);
 
   volatile int failures=0;
 
@@ -793,16 +793,16 @@ int main( int /*argc*/, char ** argv)
       }
 
     //
-    // formatExpression
+    // formatExpressionRef
     //
     {
-      std::string formatSpec("%wx%h");
-      std::string expected("640x480");
-      if ( image.formatExpression(formatSpec) != expected )
+      const std::string formatSpec("%wx%h");
+      const std::string expected("640x480");
+      if ( image.formatExpressionRef(formatSpec) != expected )
         {
           ++failures;
           cout << "Line: " << __LINE__
-               << ", formatExpression (" << image.formatExpression(formatSpec)
+               << ", formatExpression (" << image.formatExpressionRef(formatSpec)
                << ") is not expected value" << endl;
         }
     }
@@ -1525,19 +1525,19 @@ int main( int /*argc*/, char ** argv)
   catch( Exception &error_ )
     {
       cout << "Caught exception: " << error_.what() << endl;
-      return 1;
+      return EXIT_FAILURE;
     }
   catch( exception &error_ )
     {
       cout << "Caught exception: " << error_.what() << endl;
-      return 1;
+      return EXIT_FAILURE;
     }
 
   if ( failures )
     {
       cout << failures << " failures" << endl;
-      return 1;
+      return EXIT_FAILURE;
     }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

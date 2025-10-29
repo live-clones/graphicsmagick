@@ -39,127 +39,127 @@
 <main id="drawing-wand">
 <h1 class="title">drawing_wand</h1>
 <p class="subtitle" id="wand-vector-drawing-interfaces">Wand vector drawing interfaces</p>
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents" role="doc-toc">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#clonedrawingwand" id="id227">CloneDrawingWand</a></p></li>
-<li><p><a class="reference internal" href="#destroydrawingwand" id="id228">DestroyDrawingWand</a></p></li>
-<li><p><a class="reference internal" href="#drawannotation" id="id229">DrawAnnotation</a></p></li>
-<li><p><a class="reference internal" href="#drawaffine" id="id230">DrawAffine</a></p></li>
-<li><p><a class="reference internal" href="#drawallocatewand" id="id231">DrawAllocateWand</a></p></li>
-<li><p><a class="reference internal" href="#drawarc" id="id232">DrawArc</a></p></li>
-<li><p><a class="reference internal" href="#drawbezier" id="id233">DrawBezier</a></p></li>
-<li><p><a class="reference internal" href="#drawcircle" id="id234">DrawCircle</a></p></li>
-<li><p><a class="reference internal" href="#drawclearexception" id="id235">DrawClearException</a></p></li>
-<li><p><a class="reference internal" href="#drawgetclippath" id="id236">DrawGetClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawsetclippath" id="id237">DrawSetClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawgetcliprule" id="id238">DrawGetClipRule</a></p></li>
-<li><p><a class="reference internal" href="#drawsetcliprule" id="id239">DrawSetClipRule</a></p></li>
-<li><p><a class="reference internal" href="#drawgetclipunits" id="id240">DrawGetClipUnits</a></p></li>
-<li><p><a class="reference internal" href="#drawgetexception" id="id241">DrawGetException</a></p></li>
-<li><p><a class="reference internal" href="#drawsetclipunits" id="id242">DrawSetClipUnits</a></p></li>
-<li><p><a class="reference internal" href="#drawcolor" id="id243">DrawColor</a></p></li>
-<li><p><a class="reference internal" href="#drawcomment" id="id244">DrawComment</a></p></li>
-<li><p><a class="reference internal" href="#drawellipse" id="id245">DrawEllipse</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfillcolor" id="id246">DrawGetFillColor</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfillcolor" id="id247">DrawSetFillColor</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfillpatternurl" id="id248">DrawSetFillPatternURL</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfillopacity" id="id249">DrawGetFillOpacity</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfillopacity" id="id250">DrawSetFillOpacity</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfillrule" id="id251">DrawGetFillRule</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfillrule" id="id252">DrawSetFillRule</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfont" id="id253">DrawGetFont</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfont" id="id254">DrawSetFont</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfontfamily" id="id255">DrawGetFontFamily</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfontfamily" id="id256">DrawSetFontFamily</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfontsize" id="id257">DrawGetFontSize</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfontsize" id="id258">DrawSetFontSize</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfontstretch" id="id259">DrawGetFontStretch</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfontstretch" id="id260">DrawSetFontStretch</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfontstyle" id="id261">DrawGetFontStyle</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfontstyle" id="id262">DrawSetFontStyle</a></p></li>
-<li><p><a class="reference internal" href="#drawgetfontweight" id="id263">DrawGetFontWeight</a></p></li>
-<li><p><a class="reference internal" href="#drawsetfontweight" id="id264">DrawSetFontWeight</a></p></li>
-<li><p><a class="reference internal" href="#drawgetgravity" id="id265">DrawGetGravity</a></p></li>
-<li><p><a class="reference internal" href="#drawsetgravity" id="id266">DrawSetGravity</a></p></li>
-<li><p><a class="reference internal" href="#drawcomposite" id="id267">DrawComposite</a></p></li>
-<li><p><a class="reference internal" href="#drawline" id="id268">DrawLine</a></p></li>
-<li><p><a class="reference internal" href="#drawmatte" id="id269">DrawMatte</a></p></li>
-<li><p><a class="reference internal" href="#drawpathclose" id="id270">DrawPathClose</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetoabsolute" id="id271">DrawPathCurveToAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetorelative" id="id272">DrawPathCurveToRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbezierabsolute" id="id273">DrawPathCurveToQuadraticBezierAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbezierrelative" id="id274">DrawPathCurveToQuadraticBezierRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbeziersmoothabsolute" id="id275">DrawPathCurveToQuadraticBezierSmoothAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbeziersmoothrelative" id="id276">DrawPathCurveToQuadraticBezierSmoothRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetosmoothabsolute" id="id277">DrawPathCurveToSmoothAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathcurvetosmoothrelative" id="id278">DrawPathCurveToSmoothRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathellipticarcabsolute" id="id279">DrawPathEllipticArcAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathellipticarcrelative" id="id280">DrawPathEllipticArcRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathfinish" id="id281">DrawPathFinish</a></p></li>
-<li><p><a class="reference internal" href="#drawpathlinetoabsolute" id="id282">DrawPathLineToAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathlinetorelative" id="id283">DrawPathLineToRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathlinetohorizontalabsolute" id="id284">DrawPathLineToHorizontalAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathlinetohorizontalrelative" id="id285">DrawPathLineToHorizontalRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathlinetoverticalabsolute" id="id286">DrawPathLineToVerticalAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathlinetoverticalrelative" id="id287">DrawPathLineToVerticalRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathmovetoabsolute" id="id288">DrawPathMoveToAbsolute</a></p></li>
-<li><p><a class="reference internal" href="#drawpathmovetorelative" id="id289">DrawPathMoveToRelative</a></p></li>
-<li><p><a class="reference internal" href="#drawpathstart" id="id290">DrawPathStart</a></p></li>
-<li><p><a class="reference internal" href="#drawpeekgraphiccontext" id="id291">DrawPeekGraphicContext</a></p></li>
-<li><p><a class="reference internal" href="#drawpoint" id="id292">DrawPoint</a></p></li>
-<li><p><a class="reference internal" href="#drawpolygon" id="id293">DrawPolygon</a></p></li>
-<li><p><a class="reference internal" href="#drawpolyline" id="id294">DrawPolyline</a></p></li>
-<li><p><a class="reference internal" href="#drawpopclippath" id="id295">DrawPopClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawpopdefs" id="id296">DrawPopDefs</a></p></li>
-<li><p><a class="reference internal" href="#drawpopgraphiccontext" id="id297">DrawPopGraphicContext</a></p></li>
-<li><p><a class="reference internal" href="#drawpoppattern" id="id298">DrawPopPattern</a></p></li>
-<li><p><a class="reference internal" href="#drawpushclippath" id="id299">DrawPushClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawpushdefs" id="id300">DrawPushDefs</a></p></li>
-<li><p><a class="reference internal" href="#drawpushgraphiccontext" id="id301">DrawPushGraphicContext</a></p></li>
-<li><p><a class="reference internal" href="#drawpushpattern" id="id302">DrawPushPattern</a></p></li>
-<li><p><a class="reference internal" href="#drawrectangle" id="id303">DrawRectangle</a></p></li>
-<li><p><a class="reference internal" href="#drawrender" id="id304">DrawRender</a></p></li>
-<li><p><a class="reference internal" href="#drawrotate" id="id305">DrawRotate</a></p></li>
-<li><p><a class="reference internal" href="#drawroundrectangle" id="id306">DrawRoundRectangle</a></p></li>
-<li><p><a class="reference internal" href="#drawscale" id="id307">DrawScale</a></p></li>
-<li><p><a class="reference internal" href="#drawskewx" id="id308">DrawSkewX</a></p></li>
-<li><p><a class="reference internal" href="#drawskewy" id="id309">DrawSkewY</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstopcolor" id="id310">DrawSetStopColor</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokecolor" id="id311">DrawGetStrokeColor</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokecolor" id="id312">DrawSetStrokeColor</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokepatternurl" id="id313">DrawSetStrokePatternURL</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokeantialias" id="id314">DrawGetStrokeAntialias</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokeantialias" id="id315">DrawSetStrokeAntialias</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokedasharray" id="id316">DrawGetStrokeDashArray</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokedasharray" id="id317">DrawSetStrokeDashArray</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokedashoffset" id="id318">DrawGetStrokeDashOffset</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokedashoffset" id="id319">DrawSetStrokeDashOffset</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokelinecap" id="id320">DrawGetStrokeLineCap</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokelinecap" id="id321">DrawSetStrokeLineCap</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokelinejoin" id="id322">DrawGetStrokeLineJoin</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokelinejoin" id="id323">DrawSetStrokeLineJoin</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokemiterlimit" id="id324">DrawGetStrokeMiterLimit</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokemiterlimit" id="id325">DrawSetStrokeMiterLimit</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokeopacity" id="id326">DrawGetStrokeOpacity</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokeopacity" id="id327">DrawSetStrokeOpacity</a></p></li>
-<li><p><a class="reference internal" href="#drawgetstrokewidth" id="id328">DrawGetStrokeWidth</a></p></li>
-<li><p><a class="reference internal" href="#drawsetstrokewidth" id="id329">DrawSetStrokeWidth</a></p></li>
-<li><p><a class="reference internal" href="#drawgettextantialias" id="id330">DrawGetTextAntialias</a></p></li>
-<li><p><a class="reference internal" href="#drawsettextantialias" id="id331">DrawSetTextAntialias</a></p></li>
-<li><p><a class="reference internal" href="#drawgettextdecoration" id="id332">DrawGetTextDecoration</a></p></li>
-<li><p><a class="reference internal" href="#drawsettextdecoration" id="id333">DrawSetTextDecoration</a></p></li>
-<li><p><a class="reference internal" href="#drawgettextencoding" id="id334">DrawGetTextEncoding</a></p></li>
-<li><p><a class="reference internal" href="#drawsettextencoding" id="id335">DrawSetTextEncoding</a></p></li>
-<li><p><a class="reference internal" href="#drawgettextundercolor" id="id336">DrawGetTextUnderColor</a></p></li>
-<li><p><a class="reference internal" href="#drawsettextundercolor" id="id337">DrawSetTextUnderColor</a></p></li>
-<li><p><a class="reference internal" href="#drawtranslate" id="id338">DrawTranslate</a></p></li>
-<li><p><a class="reference internal" href="#drawsetviewbox" id="id339">DrawSetViewbox</a></p></li>
-<li><p><a class="reference internal" href="#newdrawingwand" id="id340">NewDrawingWand</a></p></li>
+<li><p><a class="reference internal" href="#clonedrawingwand" id="toc-entry-1">CloneDrawingWand</a></p></li>
+<li><p><a class="reference internal" href="#destroydrawingwand" id="toc-entry-2">DestroyDrawingWand</a></p></li>
+<li><p><a class="reference internal" href="#drawannotation" id="toc-entry-3">DrawAnnotation</a></p></li>
+<li><p><a class="reference internal" href="#drawaffine" id="toc-entry-4">DrawAffine</a></p></li>
+<li><p><a class="reference internal" href="#drawallocatewand" id="toc-entry-5">DrawAllocateWand</a></p></li>
+<li><p><a class="reference internal" href="#drawarc" id="toc-entry-6">DrawArc</a></p></li>
+<li><p><a class="reference internal" href="#drawbezier" id="toc-entry-7">DrawBezier</a></p></li>
+<li><p><a class="reference internal" href="#drawcircle" id="toc-entry-8">DrawCircle</a></p></li>
+<li><p><a class="reference internal" href="#drawclearexception" id="toc-entry-9">DrawClearException</a></p></li>
+<li><p><a class="reference internal" href="#drawgetclippath" id="toc-entry-10">DrawGetClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawsetclippath" id="toc-entry-11">DrawSetClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawgetcliprule" id="toc-entry-12">DrawGetClipRule</a></p></li>
+<li><p><a class="reference internal" href="#drawsetcliprule" id="toc-entry-13">DrawSetClipRule</a></p></li>
+<li><p><a class="reference internal" href="#drawgetclipunits" id="toc-entry-14">DrawGetClipUnits</a></p></li>
+<li><p><a class="reference internal" href="#drawgetexception" id="toc-entry-15">DrawGetException</a></p></li>
+<li><p><a class="reference internal" href="#drawsetclipunits" id="toc-entry-16">DrawSetClipUnits</a></p></li>
+<li><p><a class="reference internal" href="#drawcolor" id="toc-entry-17">DrawColor</a></p></li>
+<li><p><a class="reference internal" href="#drawcomment" id="toc-entry-18">DrawComment</a></p></li>
+<li><p><a class="reference internal" href="#drawellipse" id="toc-entry-19">DrawEllipse</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfillcolor" id="toc-entry-20">DrawGetFillColor</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfillcolor" id="toc-entry-21">DrawSetFillColor</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfillpatternurl" id="toc-entry-22">DrawSetFillPatternURL</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfillopacity" id="toc-entry-23">DrawGetFillOpacity</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfillopacity" id="toc-entry-24">DrawSetFillOpacity</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfillrule" id="toc-entry-25">DrawGetFillRule</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfillrule" id="toc-entry-26">DrawSetFillRule</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfont" id="toc-entry-27">DrawGetFont</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfont" id="toc-entry-28">DrawSetFont</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfontfamily" id="toc-entry-29">DrawGetFontFamily</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfontfamily" id="toc-entry-30">DrawSetFontFamily</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfontsize" id="toc-entry-31">DrawGetFontSize</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfontsize" id="toc-entry-32">DrawSetFontSize</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfontstretch" id="toc-entry-33">DrawGetFontStretch</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfontstretch" id="toc-entry-34">DrawSetFontStretch</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfontstyle" id="toc-entry-35">DrawGetFontStyle</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfontstyle" id="toc-entry-36">DrawSetFontStyle</a></p></li>
+<li><p><a class="reference internal" href="#drawgetfontweight" id="toc-entry-37">DrawGetFontWeight</a></p></li>
+<li><p><a class="reference internal" href="#drawsetfontweight" id="toc-entry-38">DrawSetFontWeight</a></p></li>
+<li><p><a class="reference internal" href="#drawgetgravity" id="toc-entry-39">DrawGetGravity</a></p></li>
+<li><p><a class="reference internal" href="#drawsetgravity" id="toc-entry-40">DrawSetGravity</a></p></li>
+<li><p><a class="reference internal" href="#drawcomposite" id="toc-entry-41">DrawComposite</a></p></li>
+<li><p><a class="reference internal" href="#drawline" id="toc-entry-42">DrawLine</a></p></li>
+<li><p><a class="reference internal" href="#drawmatte" id="toc-entry-43">DrawMatte</a></p></li>
+<li><p><a class="reference internal" href="#drawpathclose" id="toc-entry-44">DrawPathClose</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetoabsolute" id="toc-entry-45">DrawPathCurveToAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetorelative" id="toc-entry-46">DrawPathCurveToRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbezierabsolute" id="toc-entry-47">DrawPathCurveToQuadraticBezierAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbezierrelative" id="toc-entry-48">DrawPathCurveToQuadraticBezierRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbeziersmoothabsolute" id="toc-entry-49">DrawPathCurveToQuadraticBezierSmoothAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetoquadraticbeziersmoothrelative" id="toc-entry-50">DrawPathCurveToQuadraticBezierSmoothRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetosmoothabsolute" id="toc-entry-51">DrawPathCurveToSmoothAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathcurvetosmoothrelative" id="toc-entry-52">DrawPathCurveToSmoothRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathellipticarcabsolute" id="toc-entry-53">DrawPathEllipticArcAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathellipticarcrelative" id="toc-entry-54">DrawPathEllipticArcRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathfinish" id="toc-entry-55">DrawPathFinish</a></p></li>
+<li><p><a class="reference internal" href="#drawpathlinetoabsolute" id="toc-entry-56">DrawPathLineToAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathlinetorelative" id="toc-entry-57">DrawPathLineToRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathlinetohorizontalabsolute" id="toc-entry-58">DrawPathLineToHorizontalAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathlinetohorizontalrelative" id="toc-entry-59">DrawPathLineToHorizontalRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathlinetoverticalabsolute" id="toc-entry-60">DrawPathLineToVerticalAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathlinetoverticalrelative" id="toc-entry-61">DrawPathLineToVerticalRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathmovetoabsolute" id="toc-entry-62">DrawPathMoveToAbsolute</a></p></li>
+<li><p><a class="reference internal" href="#drawpathmovetorelative" id="toc-entry-63">DrawPathMoveToRelative</a></p></li>
+<li><p><a class="reference internal" href="#drawpathstart" id="toc-entry-64">DrawPathStart</a></p></li>
+<li><p><a class="reference internal" href="#drawpeekgraphiccontext" id="toc-entry-65">DrawPeekGraphicContext</a></p></li>
+<li><p><a class="reference internal" href="#drawpoint" id="toc-entry-66">DrawPoint</a></p></li>
+<li><p><a class="reference internal" href="#drawpolygon" id="toc-entry-67">DrawPolygon</a></p></li>
+<li><p><a class="reference internal" href="#drawpolyline" id="toc-entry-68">DrawPolyline</a></p></li>
+<li><p><a class="reference internal" href="#drawpopclippath" id="toc-entry-69">DrawPopClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawpopdefs" id="toc-entry-70">DrawPopDefs</a></p></li>
+<li><p><a class="reference internal" href="#drawpopgraphiccontext" id="toc-entry-71">DrawPopGraphicContext</a></p></li>
+<li><p><a class="reference internal" href="#drawpoppattern" id="toc-entry-72">DrawPopPattern</a></p></li>
+<li><p><a class="reference internal" href="#drawpushclippath" id="toc-entry-73">DrawPushClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawpushdefs" id="toc-entry-74">DrawPushDefs</a></p></li>
+<li><p><a class="reference internal" href="#drawpushgraphiccontext" id="toc-entry-75">DrawPushGraphicContext</a></p></li>
+<li><p><a class="reference internal" href="#drawpushpattern" id="toc-entry-76">DrawPushPattern</a></p></li>
+<li><p><a class="reference internal" href="#drawrectangle" id="toc-entry-77">DrawRectangle</a></p></li>
+<li><p><a class="reference internal" href="#drawrender" id="toc-entry-78">DrawRender</a></p></li>
+<li><p><a class="reference internal" href="#drawrotate" id="toc-entry-79">DrawRotate</a></p></li>
+<li><p><a class="reference internal" href="#drawroundrectangle" id="toc-entry-80">DrawRoundRectangle</a></p></li>
+<li><p><a class="reference internal" href="#drawscale" id="toc-entry-81">DrawScale</a></p></li>
+<li><p><a class="reference internal" href="#drawskewx" id="toc-entry-82">DrawSkewX</a></p></li>
+<li><p><a class="reference internal" href="#drawskewy" id="toc-entry-83">DrawSkewY</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstopcolor" id="toc-entry-84">DrawSetStopColor</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokecolor" id="toc-entry-85">DrawGetStrokeColor</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokecolor" id="toc-entry-86">DrawSetStrokeColor</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokepatternurl" id="toc-entry-87">DrawSetStrokePatternURL</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokeantialias" id="toc-entry-88">DrawGetStrokeAntialias</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokeantialias" id="toc-entry-89">DrawSetStrokeAntialias</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokedasharray" id="toc-entry-90">DrawGetStrokeDashArray</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokedasharray" id="toc-entry-91">DrawSetStrokeDashArray</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokedashoffset" id="toc-entry-92">DrawGetStrokeDashOffset</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokedashoffset" id="toc-entry-93">DrawSetStrokeDashOffset</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokelinecap" id="toc-entry-94">DrawGetStrokeLineCap</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokelinecap" id="toc-entry-95">DrawSetStrokeLineCap</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokelinejoin" id="toc-entry-96">DrawGetStrokeLineJoin</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokelinejoin" id="toc-entry-97">DrawSetStrokeLineJoin</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokemiterlimit" id="toc-entry-98">DrawGetStrokeMiterLimit</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokemiterlimit" id="toc-entry-99">DrawSetStrokeMiterLimit</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokeopacity" id="toc-entry-100">DrawGetStrokeOpacity</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokeopacity" id="toc-entry-101">DrawSetStrokeOpacity</a></p></li>
+<li><p><a class="reference internal" href="#drawgetstrokewidth" id="toc-entry-102">DrawGetStrokeWidth</a></p></li>
+<li><p><a class="reference internal" href="#drawsetstrokewidth" id="toc-entry-103">DrawSetStrokeWidth</a></p></li>
+<li><p><a class="reference internal" href="#drawgettextantialias" id="toc-entry-104">DrawGetTextAntialias</a></p></li>
+<li><p><a class="reference internal" href="#drawsettextantialias" id="toc-entry-105">DrawSetTextAntialias</a></p></li>
+<li><p><a class="reference internal" href="#drawgettextdecoration" id="toc-entry-106">DrawGetTextDecoration</a></p></li>
+<li><p><a class="reference internal" href="#drawsettextdecoration" id="toc-entry-107">DrawSetTextDecoration</a></p></li>
+<li><p><a class="reference internal" href="#drawgettextencoding" id="toc-entry-108">DrawGetTextEncoding</a></p></li>
+<li><p><a class="reference internal" href="#drawsettextencoding" id="toc-entry-109">DrawSetTextEncoding</a></p></li>
+<li><p><a class="reference internal" href="#drawgettextundercolor" id="toc-entry-110">DrawGetTextUnderColor</a></p></li>
+<li><p><a class="reference internal" href="#drawsettextundercolor" id="toc-entry-111">DrawSetTextUnderColor</a></p></li>
+<li><p><a class="reference internal" href="#drawtranslate" id="toc-entry-112">DrawTranslate</a></p></li>
+<li><p><a class="reference internal" href="#drawsetviewbox" id="toc-entry-113">DrawSetViewbox</a></p></li>
+<li><p><a class="reference internal" href="#newdrawingwand" id="toc-entry-114">NewDrawingWand</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="clonedrawingwand">
-<h1><a class="toc-backref" href="#id227">CloneDrawingWand</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">CloneDrawingWand</a></h1>
 <section id="synopsis">
 <h2>Synopsis</h2>
 <pre class="literal-block">DrawingWand *CloneDrawingWand( const DrawingWand *drawing_wand );</pre>
@@ -179,12 +179,12 @@ of an existing drawing wand.</p>
 </section>
 </section>
 <section id="destroydrawingwand">
-<h1><a class="toc-backref" href="#id228">DestroyDrawingWand</a></h1>
-<section id="id1">
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">DestroyDrawingWand</a></h1>
+<section id="synopsis-1">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DestroyDrawingWand( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id2">
+<section id="description-1">
 <h2>Description</h2>
 <p>DestroyDrawingWand() frees all resources associated with the drawing
 wand. Once the drawing wand has been freed, it should not be used
@@ -200,13 +200,13 @@ any further unless it re-allocated.</p>
 </section>
 </section>
 <section id="drawannotation">
-<h1><a class="toc-backref" href="#id229">DrawAnnotation</a></h1>
-<section id="id3">
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">DrawAnnotation</a></h1>
+<section id="synopsis-2">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawAnnotation( DrawingWand *drawing_wand, const double x, const double y,
                      const unsigned char *text );</pre>
 </section>
-<section id="id4">
+<section id="description-2">
 <h2>Description</h2>
 <p>DrawAnnotation() draws text on the image.</p>
 <p>The format of the DrawAnnotation method is:</p>
@@ -229,12 +229,12 @@ any further unless it re-allocated.</p>
 </section>
 </section>
 <section id="drawaffine">
-<h1><a class="toc-backref" href="#id230">DrawAffine</a></h1>
-<section id="id5">
+<h1><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">DrawAffine</a></h1>
+<section id="synopsis-3">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawAffine( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#affinematrix">AffineMatrix</a> *affine );</pre>
 </section>
-<section id="id6">
+<section id="description-3">
 <h2>Description</h2>
 <p>DrawAffine() adjusts the current affine transformation matrix with
 the specified affine transformation matrix. Note that the current affine
@@ -253,12 +253,12 @@ transform is adjusted rather than replaced.</p>
 </section>
 </section>
 <section id="drawallocatewand">
-<h1><a class="toc-backref" href="#id231">DrawAllocateWand</a></h1>
-<section id="id7">
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">DrawAllocateWand</a></h1>
+<section id="synopsis-4">
 <h2>Synopsis</h2>
 <pre class="literal-block">DrawingWand DrawAllocateWand( const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info, <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
 </section>
-<section id="id8">
+<section id="description-4">
 <h2>Description</h2>
 <p>DrawAllocateWand() allocates an initial drawing wand which is an
 opaque handle required by the remaining drawing methods.</p>
@@ -277,13 +277,13 @@ ImageMagick defaults.</p>
 </section>
 </section>
 <section id="drawarc">
-<h1><a class="toc-backref" href="#id232">DrawArc</a></h1>
-<section id="id9">
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">DrawArc</a></h1>
+<section id="synopsis-5">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawArc( DrawingWand *drawing_wand, const double sx, const double sy, const double ex,
               const double ey, const double sd, const double ed );</pre>
 </section>
-<section id="id10">
+<section id="description-5">
 <h2>Description</h2>
 <p>DrawArc() draws an arc falling within a specified bounding rectangle on the
 image.</p>
@@ -316,13 +316,13 @@ image.</p>
 </section>
 </section>
 <section id="drawbezier">
-<h1><a class="toc-backref" href="#id233">DrawBezier</a></h1>
-<section id="id11">
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">DrawBezier</a></h1>
+<section id="synopsis-6">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawBezier( DrawingWand *drawing_wand, const unsigned long number_coordinates,
                  const <a class="reference external" href="../api/types.html#pointinfo">PointInfo</a> *coordinates );</pre>
 </section>
-<section id="id12">
+<section id="description-6">
 <h2>Description</h2>
 <p>DrawBezier() draws a bezier curve through a set of points on the image.</p>
 <p>The format of the DrawBezier method is:</p>
@@ -342,13 +342,13 @@ image.</p>
 </section>
 </section>
 <section id="drawcircle">
-<h1><a class="toc-backref" href="#id234">DrawCircle</a></h1>
-<section id="id13">
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">DrawCircle</a></h1>
+<section id="synopsis-7">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawCircle( DrawingWand *drawing_wand, const double ox, const double oy, const double px,
                  const double py );</pre>
 </section>
-<section id="id14">
+<section id="description-7">
 <h2>Description</h2>
 <p>DrawCircle() draws a circle on the image.</p>
 <p>The format of the DrawCircle method is:</p>
@@ -374,12 +374,12 @@ image.</p>
 </section>
 </section>
 <section id="drawclearexception">
-<h1><a class="toc-backref" href="#id235">DrawClearException</a></h1>
-<section id="id15">
+<h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">DrawClearException</a></h1>
+<section id="synopsis-8">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail DrawClearException( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id16">
+<section id="description-8">
 <h2>Description</h2>
 <p>DrawClearException() clears any existing exception from the drawing wand.</p>
 <p>The format of the DrawGetException method is:</p>
@@ -393,12 +393,12 @@ image.</p>
 </section>
 </section>
 <section id="drawgetclippath">
-<h1><a class="toc-backref" href="#id236">DrawGetClipPath</a></h1>
-<section id="id17">
+<h1><a class="toc-backref" href="#toc-entry-10" role="doc-backlink">DrawGetClipPath</a></h1>
+<section id="synopsis-9">
 <h2>Synopsis</h2>
 <pre class="literal-block">char *DrawGetClipPath( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id18">
+<section id="description-9">
 <h2>Description</h2>
 <p>DrawGetClipPath() obtains the current clipping path ID. The value returned
 must be deallocated by the user when it is no longer needed.</p>
@@ -413,12 +413,12 @@ must be deallocated by the user when it is no longer needed.</p>
 </section>
 </section>
 <section id="drawsetclippath">
-<h1><a class="toc-backref" href="#id237">DrawSetClipPath</a></h1>
-<section id="id19">
+<h1><a class="toc-backref" href="#toc-entry-11" role="doc-backlink">DrawSetClipPath</a></h1>
+<section id="synopsis-10">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetClipPath( DrawingWand *drawing_wand, const char *clip_path );</pre>
 </section>
-<section id="id20">
+<section id="description-10">
 <h2>Description</h2>
 <p>DrawSetClipPath() associates a named clipping path with the image.  Only
 the areas drawn on by the clipping path will be modified as long as it
@@ -437,12 +437,12 @@ remains in effect.</p>
 </section>
 </section>
 <section id="drawgetcliprule">
-<h1><a class="toc-backref" href="#id238">DrawGetClipRule</a></h1>
-<section id="id21">
+<h1><a class="toc-backref" href="#toc-entry-12" role="doc-backlink">DrawGetClipRule</a></h1>
+<section id="synopsis-11">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#fillrule">FillRule</a> DrawGetClipRule( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id22">
+<section id="description-11">
 <h2>Description</h2>
 <p>DrawGetClipRule() returns the current polygon fill rule to be used by the
 clipping path.</p>
@@ -457,12 +457,12 @@ clipping path.</p>
 </section>
 </section>
 <section id="drawsetcliprule">
-<h1><a class="toc-backref" href="#id239">DrawSetClipRule</a></h1>
-<section id="id23">
+<h1><a class="toc-backref" href="#toc-entry-13" role="doc-backlink">DrawSetClipRule</a></h1>
+<section id="synopsis-12">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetClipRule( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#fillrule">FillRule</a> fill_rule );</pre>
 </section>
-<section id="id24">
+<section id="description-12">
 <h2>Description</h2>
 <p>DrawSetClipRule() set the polygon fill rule to be used by the clipping path.</p>
 <p>The format of the DrawSetClipRule method is:</p>
@@ -479,12 +479,12 @@ clipping path.</p>
 </section>
 </section>
 <section id="drawgetclipunits">
-<h1><a class="toc-backref" href="#id240">DrawGetClipUnits</a></h1>
-<section id="id25">
+<h1><a class="toc-backref" href="#toc-entry-14" role="doc-backlink">DrawGetClipUnits</a></h1>
+<section id="synopsis-13">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#clippathunits">ClipPathUnits</a> DrawGetClipUnits( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id26">
+<section id="description-13">
 <h2>Description</h2>
 <p>DrawGetClipUnits() returns the interpretation of clip path units.</p>
 <p>The format of the DrawGetClipUnits method is:</p>
@@ -498,12 +498,12 @@ clipping path.</p>
 </section>
 </section>
 <section id="drawgetexception">
-<h1><a class="toc-backref" href="#id241">DrawGetException</a></h1>
-<section id="id27">
+<h1><a class="toc-backref" href="#toc-entry-15" role="doc-backlink">DrawGetException</a></h1>
+<section id="synopsis-14">
 <h2>Synopsis</h2>
 <pre class="literal-block">char *DrawGetException( const DrawingWand *drawing_wand, <a class="reference external" href="../api/types.html#exceptiontype">ExceptionType</a> *severity );</pre>
 </section>
-<section id="id28">
+<section id="description-14">
 <h2>Description</h2>
 <p>DrawGetException() obtains error information associated with the last
 exception (if any).  If an exception did occur, an allocated text string
@@ -522,12 +522,12 @@ string must be deallocated by the user once it is no longer needed.</p>
 </section>
 </section>
 <section id="drawsetclipunits">
-<h1><a class="toc-backref" href="#id242">DrawSetClipUnits</a></h1>
-<section id="id29">
+<h1><a class="toc-backref" href="#toc-entry-16" role="doc-backlink">DrawSetClipUnits</a></h1>
+<section id="synopsis-15">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetClipUnits( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#clippathunits">ClipPathUnits</a> clip_units );</pre>
 </section>
-<section id="id30">
+<section id="description-15">
 <h2>Description</h2>
 <p>DrawSetClipUnits() sets the interpretation of clip path units.</p>
 <p>The format of the DrawSetClipUnits method is:</p>
@@ -543,13 +543,13 @@ string must be deallocated by the user once it is no longer needed.</p>
 </section>
 </section>
 <section id="drawcolor">
-<h1><a class="toc-backref" href="#id243">DrawColor</a></h1>
-<section id="id31">
+<h1><a class="toc-backref" href="#toc-entry-17" role="doc-backlink">DrawColor</a></h1>
+<section id="synopsis-16">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawColor( DrawingWand *drawing_wand, const double x, const double y,
                 const <a class="reference external" href="../api/types.html#paintmethod">PaintMethod</a> paintMethod );</pre>
 </section>
-<section id="id32">
+<section id="description-16">
 <h2>Description</h2>
 <p>DrawColor() draws color on image using the current fill color, starting at
 specified position, and using specified paint method. The available paint
@@ -579,12 +579,12 @@ ResetMethod: Recolor all pixels.</p>
 </section>
 </section>
 <section id="drawcomment">
-<h1><a class="toc-backref" href="#id244">DrawComment</a></h1>
-<section id="id33">
+<h1><a class="toc-backref" href="#toc-entry-18" role="doc-backlink">DrawComment</a></h1>
+<section id="synopsis-17">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawComment( DrawingWand *drawing_wand, const char *comment );</pre>
 </section>
-<section id="id34">
+<section id="description-17">
 <h2>Description</h2>
 <p>DrawComment() adds a comment to a vector output stream.</p>
 <p>The format of the DrawComment method is:</p>
@@ -601,13 +601,13 @@ ResetMethod: Recolor all pixels.</p>
 </section>
 </section>
 <section id="drawellipse">
-<h1><a class="toc-backref" href="#id245">DrawEllipse</a></h1>
-<section id="id35">
+<h1><a class="toc-backref" href="#toc-entry-19" role="doc-backlink">DrawEllipse</a></h1>
+<section id="synopsis-18">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawEllipse( DrawingWand *drawing_wand, const double ox, const double oy, const double rx,
                   const double ry, const double start, const double end );</pre>
 </section>
-<section id="id36">
+<section id="description-18">
 <h2>Description</h2>
 <p>DrawEllipse() draws an ellipse on the image.</p>
 <p>The format of the DrawEllipse method is:</p>
@@ -639,12 +639,12 @@ ResetMethod: Recolor all pixels.</p>
 </section>
 </section>
 <section id="drawgetfillcolor">
-<h1><a class="toc-backref" href="#id246">DrawGetFillColor</a></h1>
-<section id="id37">
+<h1><a class="toc-backref" href="#toc-entry-20" role="doc-backlink">DrawGetFillColor</a></h1>
+<section id="synopsis-19">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawGetFillColor( const DrawingWand *drawing_wand, PixelWand *fill_color );</pre>
 </section>
-<section id="id38">
+<section id="description-19">
 <h2>Description</h2>
 <p>DrawGetFillColor() returns the fill color used for drawing filled objects.</p>
 <p>The format of the DrawGetFillColor method is:</p>
@@ -660,12 +660,12 @@ ResetMethod: Recolor all pixels.</p>
 </section>
 </section>
 <section id="drawsetfillcolor">
-<h1><a class="toc-backref" href="#id247">DrawSetFillColor</a></h1>
-<section id="id39">
+<h1><a class="toc-backref" href="#toc-entry-21" role="doc-backlink">DrawSetFillColor</a></h1>
+<section id="synopsis-20">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFillColor( DrawingWand *drawing_wand, const PixelWand *fill_wand );</pre>
 </section>
-<section id="id40">
+<section id="description-20">
 <h2>Description</h2>
 <p>DrawSetFillColor() sets the fill color to be used for drawing filled objects.</p>
 <p>The format of the DrawSetFillColor method is:</p>
@@ -681,12 +681,12 @@ ResetMethod: Recolor all pixels.</p>
 </section>
 </section>
 <section id="drawsetfillpatternurl">
-<h1><a class="toc-backref" href="#id248">DrawSetFillPatternURL</a></h1>
-<section id="id41">
+<h1><a class="toc-backref" href="#toc-entry-22" role="doc-backlink">DrawSetFillPatternURL</a></h1>
+<section id="synopsis-21">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFillPatternURL( DrawingWand *drawing_wand, const char *fill_url );</pre>
 </section>
-<section id="id42">
+<section id="description-21">
 <h2>Description</h2>
 <p>DrawSetFillPatternURL() sets the URL to use as a fill pattern for filling
 objects. Only local URLs (&quot;#identifier&quot;) are supported at this time. These
@@ -705,12 +705,12 @@ DrawPushPattern/DrawPopPattern.</p>
 </section>
 </section>
 <section id="drawgetfillopacity">
-<h1><a class="toc-backref" href="#id249">DrawGetFillOpacity</a></h1>
-<section id="id43">
+<h1><a class="toc-backref" href="#toc-entry-23" role="doc-backlink">DrawGetFillOpacity</a></h1>
+<section id="synopsis-22">
 <h2>Synopsis</h2>
 <pre class="literal-block">double DrawGetFillOpacity( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id44">
+<section id="description-22">
 <h2>Description</h2>
 <p>DrawGetFillOpacity() returns the opacity used when drawing using the fill
 color or fill texture.  Fully opaque is 1.0.</p>
@@ -725,12 +725,12 @@ color or fill texture.  Fully opaque is 1.0.</p>
 </section>
 </section>
 <section id="drawsetfillopacity">
-<h1><a class="toc-backref" href="#id250">DrawSetFillOpacity</a></h1>
-<section id="id45">
+<h1><a class="toc-backref" href="#toc-entry-24" role="doc-backlink">DrawSetFillOpacity</a></h1>
+<section id="synopsis-23">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFillOpacity( DrawingWand *drawing_wand, const double fill_opacity );</pre>
 </section>
-<section id="id46">
+<section id="description-23">
 <h2>Description</h2>
 <p>DrawSetFillOpacity() sets the opacity to use when drawing using the fill
 color or fill texture.  Fully opaque is 1.0.</p>
@@ -747,12 +747,12 @@ color or fill texture.  Fully opaque is 1.0.</p>
 </section>
 </section>
 <section id="drawgetfillrule">
-<h1><a class="toc-backref" href="#id251">DrawGetFillRule</a></h1>
-<section id="id47">
+<h1><a class="toc-backref" href="#toc-entry-25" role="doc-backlink">DrawGetFillRule</a></h1>
+<section id="synopsis-24">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#fillrule">FillRule</a> DrawGetFillRule( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id48">
+<section id="description-24">
 <h2>Description</h2>
 <p>DrawGetFillRule() returns the fill rule used while drawing polygons.</p>
 <p>The format of the DrawGetFillRule method is:</p>
@@ -766,12 +766,12 @@ color or fill texture.  Fully opaque is 1.0.</p>
 </section>
 </section>
 <section id="drawsetfillrule">
-<h1><a class="toc-backref" href="#id252">DrawSetFillRule</a></h1>
-<section id="id49">
+<h1><a class="toc-backref" href="#toc-entry-26" role="doc-backlink">DrawSetFillRule</a></h1>
+<section id="synopsis-25">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFillRule( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#fillrule">FillRule</a> fill_rule );</pre>
 </section>
-<section id="id50">
+<section id="description-25">
 <h2>Description</h2>
 <p>DrawSetFillRule() sets the fill rule to use while drawing polygons.</p>
 <p>The format of the DrawSetFillRule method is:</p>
@@ -788,12 +788,12 @@ color or fill texture.  Fully opaque is 1.0.</p>
 </section>
 </section>
 <section id="drawgetfont">
-<h1><a class="toc-backref" href="#id253">DrawGetFont</a></h1>
-<section id="id51">
+<h1><a class="toc-backref" href="#toc-entry-27" role="doc-backlink">DrawGetFont</a></h1>
+<section id="synopsis-26">
 <h2>Synopsis</h2>
 <pre class="literal-block">char *DrawGetFont( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id52">
+<section id="description-26">
 <h2>Description</h2>
 <p>DrawGetFont() returns a null-terminaged string specifying the font used
 when annotating with text. The value returned must be freed by the user
@@ -809,12 +809,12 @@ when no longer needed.</p>
 </section>
 </section>
 <section id="drawsetfont">
-<h1><a class="toc-backref" href="#id254">DrawSetFont</a></h1>
-<section id="id53">
+<h1><a class="toc-backref" href="#toc-entry-28" role="doc-backlink">DrawSetFont</a></h1>
+<section id="synopsis-27">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFont( DrawingWand *drawing_wand, const char *font_name );</pre>
 </section>
-<section id="id54">
+<section id="description-27">
 <h2>Description</h2>
 <p>DrawSetFont() sets the fully-sepecified font to use when annotating with
 text.</p>
@@ -832,12 +832,12 @@ text.</p>
 </section>
 </section>
 <section id="drawgetfontfamily">
-<h1><a class="toc-backref" href="#id255">DrawGetFontFamily</a></h1>
-<section id="id55">
+<h1><a class="toc-backref" href="#toc-entry-29" role="doc-backlink">DrawGetFontFamily</a></h1>
+<section id="synopsis-28">
 <h2>Synopsis</h2>
 <pre class="literal-block">char *DrawGetFontFamily( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id56">
+<section id="description-28">
 <h2>Description</h2>
 <p>DrawGetFontFamily() returns the font family to use when annotating with text.
 The value returned must be freed by the user when it is no longer needed.</p>
@@ -852,12 +852,12 @@ The value returned must be freed by the user when it is no longer needed.</p>
 </section>
 </section>
 <section id="drawsetfontfamily">
-<h1><a class="toc-backref" href="#id256">DrawSetFontFamily</a></h1>
-<section id="id57">
+<h1><a class="toc-backref" href="#toc-entry-30" role="doc-backlink">DrawSetFontFamily</a></h1>
+<section id="synopsis-29">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFontFamily( DrawingWand *drawing_wand, const char *font_family );</pre>
 </section>
-<section id="id58">
+<section id="description-29">
 <h2>Description</h2>
 <p>DrawSetFontFamily() sets the font family to use when annotating with text.</p>
 <p>The format of the DrawSetFontFamily method is:</p>
@@ -874,12 +874,12 @@ The value returned must be freed by the user when it is no longer needed.</p>
 </section>
 </section>
 <section id="drawgetfontsize">
-<h1><a class="toc-backref" href="#id257">DrawGetFontSize</a></h1>
-<section id="id59">
+<h1><a class="toc-backref" href="#toc-entry-31" role="doc-backlink">DrawGetFontSize</a></h1>
+<section id="synopsis-30">
 <h2>Synopsis</h2>
 <pre class="literal-block">double DrawGetFontSize( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id60">
+<section id="description-30">
 <h2>Description</h2>
 <p>DrawGetFontSize() returns the font pointsize used when annotating with text.</p>
 <p>The format of the DrawGetFontSize method is:</p>
@@ -893,12 +893,12 @@ The value returned must be freed by the user when it is no longer needed.</p>
 </section>
 </section>
 <section id="drawsetfontsize">
-<h1><a class="toc-backref" href="#id258">DrawSetFontSize</a></h1>
-<section id="id61">
+<h1><a class="toc-backref" href="#toc-entry-32" role="doc-backlink">DrawSetFontSize</a></h1>
+<section id="synopsis-31">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFontSize( DrawingWand *drawing_wand, const double pointsize );</pre>
 </section>
-<section id="id62">
+<section id="description-31">
 <h2>Description</h2>
 <p>DrawSetFontSize() sets the font pointsize to use when annotating with text.</p>
 <p>The format of the DrawSetFontSize method is:</p>
@@ -915,12 +915,12 @@ The value returned must be freed by the user when it is no longer needed.</p>
 </section>
 </section>
 <section id="drawgetfontstretch">
-<h1><a class="toc-backref" href="#id259">DrawGetFontStretch</a></h1>
-<section id="id63">
+<h1><a class="toc-backref" href="#toc-entry-33" role="doc-backlink">DrawGetFontStretch</a></h1>
+<section id="synopsis-32">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#stretchtype">StretchType</a> DrawGetFontStretch( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id64">
+<section id="description-32">
 <h2>Description</h2>
 <p>DrawGetFontStretch() returns the font stretch used when annotating with text.</p>
 <p>The format of the DrawGetFontStretch method is:</p>
@@ -934,12 +934,12 @@ The value returned must be freed by the user when it is no longer needed.</p>
 </section>
 </section>
 <section id="drawsetfontstretch">
-<h1><a class="toc-backref" href="#id260">DrawSetFontStretch</a></h1>
-<section id="id65">
+<h1><a class="toc-backref" href="#toc-entry-34" role="doc-backlink">DrawSetFontStretch</a></h1>
+<section id="synopsis-33">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFontStretch( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#stretchtype">StretchType</a> font_stretch );</pre>
 </section>
-<section id="id66">
+<section id="description-33">
 <h2>Description</h2>
 <p>DrawSetFontStretch() sets the font stretch to use when annotating with text.
 The AnyStretch enumeration acts as a wild-card &quot;don't care&quot; option.</p>
@@ -959,12 +959,12 @@ ExtraExpandedStretch, UltraExpandedStretch, AnyStretch)</p>
 </section>
 </section>
 <section id="drawgetfontstyle">
-<h1><a class="toc-backref" href="#id261">DrawGetFontStyle</a></h1>
-<section id="id67">
+<h1><a class="toc-backref" href="#toc-entry-35" role="doc-backlink">DrawGetFontStyle</a></h1>
+<section id="synopsis-34">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#styletype">StyleType</a> DrawGetFontStyle( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id68">
+<section id="description-34">
 <h2>Description</h2>
 <p>DrawGetFontStyle() returns the font style used when annotating with text.</p>
 <p>The format of the DrawGetFontStyle method is:</p>
@@ -978,12 +978,12 @@ ExtraExpandedStretch, UltraExpandedStretch, AnyStretch)</p>
 </section>
 </section>
 <section id="drawsetfontstyle">
-<h1><a class="toc-backref" href="#id262">DrawSetFontStyle</a></h1>
-<section id="id69">
+<h1><a class="toc-backref" href="#toc-entry-36" role="doc-backlink">DrawSetFontStyle</a></h1>
+<section id="synopsis-35">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFontStyle( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#styletype">StyleType</a> style );</pre>
 </section>
-<section id="id70">
+<section id="description-35">
 <h2>Description</h2>
 <p>DrawSetFontStyle() sets the font style to use when annotating with text.
 The AnyStyle enumeration acts as a wild-card &quot;don't care&quot; option.</p>
@@ -1001,12 +1001,12 @@ The AnyStyle enumeration acts as a wild-card &quot;don't care&quot; option.</p>
 </section>
 </section>
 <section id="drawgetfontweight">
-<h1><a class="toc-backref" href="#id263">DrawGetFontWeight</a></h1>
-<section id="id71">
+<h1><a class="toc-backref" href="#toc-entry-37" role="doc-backlink">DrawGetFontWeight</a></h1>
+<section id="synopsis-36">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned long DrawGetFontWeight( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id72">
+<section id="description-36">
 <h2>Description</h2>
 <p>DrawGetFontWeight() returns the font weight used when annotating with text.</p>
 <p>The format of the DrawGetFontWeight method is:</p>
@@ -1020,12 +1020,12 @@ The AnyStyle enumeration acts as a wild-card &quot;don't care&quot; option.</p>
 </section>
 </section>
 <section id="drawsetfontweight">
-<h1><a class="toc-backref" href="#id264">DrawSetFontWeight</a></h1>
-<section id="id73">
+<h1><a class="toc-backref" href="#toc-entry-38" role="doc-backlink">DrawSetFontWeight</a></h1>
+<section id="synopsis-37">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetFontWeight( DrawingWand *drawing_wand, const unsigned long font_weight );</pre>
 </section>
-<section id="id74">
+<section id="description-37">
 <h2>Description</h2>
 <p>DrawSetFontWeight() sets the font weight to use when annotating with text.</p>
 <p>The format of the DrawSetFontWeight method is:</p>
@@ -1041,12 +1041,12 @@ The AnyStyle enumeration acts as a wild-card &quot;don't care&quot; option.</p>
 </section>
 </section>
 <section id="drawgetgravity">
-<h1><a class="toc-backref" href="#id265">DrawGetGravity</a></h1>
-<section id="id75">
+<h1><a class="toc-backref" href="#toc-entry-39" role="doc-backlink">DrawGetGravity</a></h1>
+<section id="synopsis-38">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#gravitytype">GravityType</a> DrawGetGravity( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id76">
+<section id="description-38">
 <h2>Description</h2>
 <p>DrawGetGravity() returns the text placement gravity used when annotating
 with text.</p>
@@ -1061,12 +1061,12 @@ with text.</p>
 </section>
 </section>
 <section id="drawsetgravity">
-<h1><a class="toc-backref" href="#id266">DrawSetGravity</a></h1>
-<section id="id77">
+<h1><a class="toc-backref" href="#toc-entry-40" role="doc-backlink">DrawSetGravity</a></h1>
+<section id="synopsis-39">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetGravity( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#gravitytype">GravityType</a> gravity );</pre>
 </section>
-<section id="id78">
+<section id="description-39">
 <h2>Description</h2>
 <p>DrawSetGravity() sets the text placement gravity to use when annotating
 with text.</p>
@@ -1087,14 +1087,14 @@ SouthEastGravity)</p>
 </section>
 </section>
 <section id="drawcomposite">
-<h1><a class="toc-backref" href="#id267">DrawComposite</a></h1>
-<section id="id79">
+<h1><a class="toc-backref" href="#toc-entry-41" role="doc-backlink">DrawComposite</a></h1>
+<section id="synopsis-40">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawComposite( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#compositeoperator">CompositeOperator</a> composite_operator,
                     const double x, const double y, const double width, const double height,
                     const <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
 </section>
-<section id="id80">
+<section id="description-40">
 <h2>Description</h2>
 <p>DrawComposite() composites an image onto the current image, using the
 specified composition operator, specified position, and at the specified
@@ -1131,13 +1131,13 @@ to use existing height.</p>
 </section>
 </section>
 <section id="drawline">
-<h1><a class="toc-backref" href="#id268">DrawLine</a></h1>
-<section id="id81">
+<h1><a class="toc-backref" href="#toc-entry-42" role="doc-backlink">DrawLine</a></h1>
+<section id="synopsis-41">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawLine( DrawingWand *drawing_wand, const double sx, const double sy, const double ex,
                const double ey );</pre>
 </section>
-<section id="id82">
+<section id="description-41">
 <h2>Description</h2>
 <p>DrawLine() draws a line on the image using the current stroke color,
 stroke opacity, and stroke width.</p>
@@ -1164,13 +1164,13 @@ stroke opacity, and stroke width.</p>
 </section>
 </section>
 <section id="drawmatte">
-<h1><a class="toc-backref" href="#id269">DrawMatte</a></h1>
-<section id="id83">
+<h1><a class="toc-backref" href="#toc-entry-43" role="doc-backlink">DrawMatte</a></h1>
+<section id="synopsis-42">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawMatte( DrawingWand *drawing_wand, const double x, const double y,
                 const <a class="reference external" href="../api/types.html#paintmethod">PaintMethod</a> paint_method );</pre>
 </section>
-<section id="id84">
+<section id="description-42">
 <h2>Description</h2>
 <p>DrawMatte() paints on the image's opacity channel in order to set effected
 pixels to transparent.
@@ -1200,12 +1200,12 @@ ResetMethod: Select all pixels.</p>
 </section>
 </section>
 <section id="drawpathclose">
-<h1><a class="toc-backref" href="#id270">DrawPathClose</a></h1>
-<section id="id85">
+<h1><a class="toc-backref" href="#toc-entry-44" role="doc-backlink">DrawPathClose</a></h1>
+<section id="synopsis-43">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathClose( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id86">
+<section id="description-43">
 <h2>Description</h2>
 <p>DrawPathClose() adds a path element to the current path which closes the
 current subpath by drawing a straight line from the current point to the
@@ -1222,14 +1222,14 @@ moveto point).</p>
 </section>
 </section>
 <section id="drawpathcurvetoabsolute">
-<h1><a class="toc-backref" href="#id271">DrawPathCurveToAbsolute</a></h1>
-<section id="id87">
+<h1><a class="toc-backref" href="#toc-entry-45" role="doc-backlink">DrawPathCurveToAbsolute</a></h1>
+<section id="synopsis-44">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToAbsolute( DrawingWand *drawing_wand, const double x1, const double y1,
                               const double x2, const double y2, const double x,
                               const double y );</pre>
 </section>
-<section id="id88">
+<section id="description-44">
 <h2>Description</h2>
 <p>DrawPathCurveToAbsolute() draws a cubic Bezier curve from the current
 point to (x,y) using (x1,y1) as the control point at the beginning of
@@ -1266,14 +1266,14 @@ becomes the final (x,y) coordinate pair used in the polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetorelative">
-<h1><a class="toc-backref" href="#id272">DrawPathCurveToRelative</a></h1>
-<section id="id89">
+<h1><a class="toc-backref" href="#toc-entry-46" role="doc-backlink">DrawPathCurveToRelative</a></h1>
+<section id="synopsis-45">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToRelative( DrawingWand *drawing_wand, const double x1, const double y1,
                               const double x2, const double y2, const double x,
                               const double y );</pre>
 </section>
-<section id="id90">
+<section id="description-45">
 <h2>Description</h2>
 <p>DrawPathCurveToRelative() draws a cubic Bezier curve from the current
 point to (x,y) using (x1,y1) as the control point at the beginning of
@@ -1310,13 +1310,13 @@ becomes the final (x,y) coordinate pair used in the polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetoquadraticbezierabsolute">
-<h1><a class="toc-backref" href="#id273">DrawPathCurveToQuadraticBezierAbsolute</a></h1>
-<section id="id91">
+<h1><a class="toc-backref" href="#toc-entry-47" role="doc-backlink">DrawPathCurveToQuadraticBezierAbsolute</a></h1>
+<section id="synopsis-46">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToQuadraticBezierAbsolute( DrawingWand *drawing_wand, const double x1,
                                              const double y1, onst double x, const double y );</pre>
 </section>
-<section id="id92">
+<section id="description-46">
 <h2>Description</h2>
 <p>DrawPathCurveToQuadraticBezierAbsolute() draws a quadratic Bezier curve
 from the current point to (x,y) using (x1,y1) as the control point using
@@ -1345,14 +1345,14 @@ becomes the final (x,y) coordinate pair used in the polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetoquadraticbezierrelative">
-<h1><a class="toc-backref" href="#id274">DrawPathCurveToQuadraticBezierRelative</a></h1>
-<section id="id93">
+<h1><a class="toc-backref" href="#toc-entry-48" role="doc-backlink">DrawPathCurveToQuadraticBezierRelative</a></h1>
+<section id="synopsis-47">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToQuadraticBezierRelative( DrawingWand *drawing_wand, const double x1,
                                              const double y1, const double x,
                                              const double y );</pre>
 </section>
-<section id="id94">
+<section id="description-47">
 <h2>Description</h2>
 <p>DrawPathCurveToQuadraticBezierRelative() draws a quadratic Bezier curve
 from the current point to (x,y) using (x1,y1) as the control point using
@@ -1382,13 +1382,13 @@ becomes the final (x,y) coordinate pair used in the polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetoquadraticbeziersmoothabsolute">
-<h1><a class="toc-backref" href="#id275">DrawPathCurveToQuadraticBezierSmoothAbsolute</a></h1>
-<section id="id95">
+<h1><a class="toc-backref" href="#toc-entry-49" role="doc-backlink">DrawPathCurveToQuadraticBezierSmoothAbsolute</a></h1>
+<section id="synopsis-48">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToQuadraticBezierSmoothAbsolute( DrawingWand *drawing_wand, const double x,
                                                    const double y );</pre>
 </section>
-<section id="id96">
+<section id="description-48">
 <h2>Description</h2>
 <p>DrawPathCurveToQuadraticBezierSmoothAbsolute() draws a quadratic
 Bezier curve (using absolute coordinates) from the current point to
@@ -1419,13 +1419,13 @@ polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetoquadraticbeziersmoothrelative">
-<h1><a class="toc-backref" href="#id276">DrawPathCurveToQuadraticBezierSmoothRelative</a></h1>
-<section id="id97">
+<h1><a class="toc-backref" href="#toc-entry-50" role="doc-backlink">DrawPathCurveToQuadraticBezierSmoothRelative</a></h1>
+<section id="synopsis-49">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToQuadraticBezierSmoothRelative( DrawingWand *drawing_wand, const double x,
                                                    const double y );</pre>
 </section>
-<section id="id98">
+<section id="description-49">
 <h2>Description</h2>
 <p>DrawPathCurveToQuadraticBezierSmoothRelative() draws a quadratic
 Bezier curve (using relative coordinates) from the current point to
@@ -1456,13 +1456,13 @@ polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetosmoothabsolute">
-<h1><a class="toc-backref" href="#id277">DrawPathCurveToSmoothAbsolute</a></h1>
-<section id="id99">
+<h1><a class="toc-backref" href="#toc-entry-51" role="doc-backlink">DrawPathCurveToSmoothAbsolute</a></h1>
+<section id="synopsis-50">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToSmoothAbsolute( DrawingWand *drawing_wand, const double x2const double y2,
                                     const double x, const double y );</pre>
 </section>
-<section id="id100">
+<section id="description-50">
 <h2>Description</h2>
 <p>DrawPathCurveToSmoothAbsolute() draws a cubic Bezier curve from the
 current point to (x,y) using absolute coordinates. The first control
@@ -1498,13 +1498,13 @@ final (x,y) coordinate pair used in the polybezier.</p>
 </section>
 </section>
 <section id="drawpathcurvetosmoothrelative">
-<h1><a class="toc-backref" href="#id278">DrawPathCurveToSmoothRelative</a></h1>
-<section id="id101">
+<h1><a class="toc-backref" href="#toc-entry-52" role="doc-backlink">DrawPathCurveToSmoothRelative</a></h1>
+<section id="synopsis-51">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathCurveToSmoothRelative( DrawingWand *drawing_wand, const double x2,
                                     const double y2, const double x, const double y );</pre>
 </section>
-<section id="id102">
+<section id="description-51">
 <h2>Description</h2>
 <p>DrawPathCurveToSmoothRelative() draws a cubic Bezier curve from the
 current point to (x,y) using relative coordinates. The first control
@@ -1540,15 +1540,15 @@ final (x,y) coordinate pair used in the polybezier.</p>
 </section>
 </section>
 <section id="drawpathellipticarcabsolute">
-<h1><a class="toc-backref" href="#id279">DrawPathEllipticArcAbsolute</a></h1>
-<section id="id103">
+<h1><a class="toc-backref" href="#toc-entry-53" role="doc-backlink">DrawPathEllipticArcAbsolute</a></h1>
+<section id="synopsis-52">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathEllipticArcAbsolute( DrawingWand *drawing_wand, const double rx, const double ry,
                                   const double x_axis_rotation,
                                   unsigned int large_arc_flag, unsigned int sweep_flag,
                                   const double x, const double y );</pre>
 </section>
-<section id="id104">
+<section id="description-52">
 <h2>Description</h2>
 <p>DrawPathEllipticArcAbsolute() draws an elliptical arc from the current
 point to (x, y) using absolute coordinates. The size and orientation
@@ -1591,15 +1591,15 @@ clock-wise rotation</p>
 </section>
 </section>
 <section id="drawpathellipticarcrelative">
-<h1><a class="toc-backref" href="#id280">DrawPathEllipticArcRelative</a></h1>
-<section id="id105">
+<h1><a class="toc-backref" href="#toc-entry-54" role="doc-backlink">DrawPathEllipticArcRelative</a></h1>
+<section id="synopsis-53">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathEllipticArcRelative( DrawingWand *drawing_wand, const double rx, const double ry,
                                   const double x_axis_rotation,
                                   unsigned int large_arc_flag, unsigned int sweep_flag,
                                   const double x, const double y );</pre>
 </section>
-<section id="id106">
+<section id="description-53">
 <h2>Description</h2>
 <p>DrawPathEllipticArcRelative() draws an elliptical arc from the current
 point to (x, y) using relative coordinates. The size and orientation
@@ -1642,12 +1642,12 @@ clock-wise rotation</p>
 </section>
 </section>
 <section id="drawpathfinish">
-<h1><a class="toc-backref" href="#id281">DrawPathFinish</a></h1>
-<section id="id107">
+<h1><a class="toc-backref" href="#toc-entry-55" role="doc-backlink">DrawPathFinish</a></h1>
+<section id="synopsis-54">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathFinish( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id108">
+<section id="description-54">
 <h2>Description</h2>
 <p>DrawPathFinish() terminates the current path.</p>
 <p>The format of the DrawPathFinish method is:</p>
@@ -1661,12 +1661,12 @@ clock-wise rotation</p>
 </section>
 </section>
 <section id="drawpathlinetoabsolute">
-<h1><a class="toc-backref" href="#id282">DrawPathLineToAbsolute</a></h1>
-<section id="id109">
+<h1><a class="toc-backref" href="#toc-entry-56" role="doc-backlink">DrawPathLineToAbsolute</a></h1>
+<section id="synopsis-55">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathLineToAbsolute( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id110">
+<section id="description-55">
 <h2>Description</h2>
 <p>DrawPathLineToAbsolute() draws a line path from the current point to the
 given coordinate using absolute coordinates. The coordinate then becomes
@@ -1688,12 +1688,12 @@ the new current point.</p>
 </section>
 </section>
 <section id="drawpathlinetorelative">
-<h1><a class="toc-backref" href="#id283">DrawPathLineToRelative</a></h1>
-<section id="id111">
+<h1><a class="toc-backref" href="#toc-entry-57" role="doc-backlink">DrawPathLineToRelative</a></h1>
+<section id="synopsis-56">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathLineToRelative( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id112">
+<section id="description-56">
 <h2>Description</h2>
 <p>DrawPathLineToRelative() draws a line path from the current point to the
 given coordinate using relative coordinates. The coordinate then becomes
@@ -1714,13 +1714,13 @@ the new current point.</p>
 </section>
 </section>
 <section id="drawpathlinetohorizontalabsolute">
-<h1><a class="toc-backref" href="#id284">DrawPathLineToHorizontalAbsolute</a></h1>
-<section id="id113">
+<h1><a class="toc-backref" href="#toc-entry-58" role="doc-backlink">DrawPathLineToHorizontalAbsolute</a></h1>
+<section id="synopsis-57">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathLineToHorizontalAbsolute( DrawingWand *drawing_wand, const PathMode mode,
                                        const double x );</pre>
 </section>
-<section id="id114">
+<section id="description-57">
 <h2>Description</h2>
 <p>DrawPathLineToHorizontalAbsolute() draws a horizontal line path from the
 current point to the target point using absolute coordinates.  The target
@@ -1739,12 +1739,12 @@ point then becomes the new current point.</p>
 </section>
 </section>
 <section id="drawpathlinetohorizontalrelative">
-<h1><a class="toc-backref" href="#id285">DrawPathLineToHorizontalRelative</a></h1>
-<section id="id115">
+<h1><a class="toc-backref" href="#toc-entry-59" role="doc-backlink">DrawPathLineToHorizontalRelative</a></h1>
+<section id="synopsis-58">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathLineToHorizontalRelative( DrawingWand *drawing_wand, const double x );</pre>
 </section>
-<section id="id116">
+<section id="description-58">
 <h2>Description</h2>
 <p>DrawPathLineToHorizontalRelative() draws a horizontal line path from the
 current point to the target point using relative coordinates.  The target
@@ -1762,12 +1762,12 @@ point then becomes the new current point.</p>
 </section>
 </section>
 <section id="drawpathlinetoverticalabsolute">
-<h1><a class="toc-backref" href="#id286">DrawPathLineToVerticalAbsolute</a></h1>
-<section id="id117">
+<h1><a class="toc-backref" href="#toc-entry-60" role="doc-backlink">DrawPathLineToVerticalAbsolute</a></h1>
+<section id="synopsis-59">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathLineToVerticalAbsolute( DrawingWand *drawing_wand, const double y );</pre>
 </section>
-<section id="id118">
+<section id="description-59">
 <h2>Description</h2>
 <p>DrawPathLineToVerticalAbsolute() draws a vertical line path from the
 current point to the target point using absolute coordinates.  The target
@@ -1785,12 +1785,12 @@ point then becomes the new current point.</p>
 </section>
 </section>
 <section id="drawpathlinetoverticalrelative">
-<h1><a class="toc-backref" href="#id287">DrawPathLineToVerticalRelative</a></h1>
-<section id="id119">
+<h1><a class="toc-backref" href="#toc-entry-61" role="doc-backlink">DrawPathLineToVerticalRelative</a></h1>
+<section id="synopsis-60">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathLineToVerticalRelative( DrawingWand *drawing_wand, const double y );</pre>
 </section>
-<section id="id120">
+<section id="description-60">
 <h2>Description</h2>
 <p>DrawPathLineToVerticalRelative() draws a vertical line path from the
 current point to the target point using relative coordinates.  The target
@@ -1808,12 +1808,12 @@ point then becomes the new current point.</p>
 </section>
 </section>
 <section id="drawpathmovetoabsolute">
-<h1><a class="toc-backref" href="#id288">DrawPathMoveToAbsolute</a></h1>
-<section id="id121">
+<h1><a class="toc-backref" href="#toc-entry-62" role="doc-backlink">DrawPathMoveToAbsolute</a></h1>
+<section id="synopsis-61">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathMoveToAbsolute( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id122">
+<section id="description-61">
 <h2>Description</h2>
 <p>DrawPathMoveToAbsolute() starts a new sub-path at the given coordinate
 using absolute coordinates. The current point then becomes the
@@ -1834,12 +1834,12 @@ specified coordinate.</p>
 </section>
 </section>
 <section id="drawpathmovetorelative">
-<h1><a class="toc-backref" href="#id289">DrawPathMoveToRelative</a></h1>
-<section id="id123">
+<h1><a class="toc-backref" href="#toc-entry-63" role="doc-backlink">DrawPathMoveToRelative</a></h1>
+<section id="synopsis-62">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathMoveToRelative( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id124">
+<section id="description-62">
 <h2>Description</h2>
 <p>DrawPathMoveToRelative() starts a new sub-path at the given coordinate
 using relative coordinates. The current point then becomes the
@@ -1860,12 +1860,12 @@ specified coordinate.</p>
 </section>
 </section>
 <section id="drawpathstart">
-<h1><a class="toc-backref" href="#id290">DrawPathStart</a></h1>
-<section id="id125">
+<h1><a class="toc-backref" href="#toc-entry-64" role="doc-backlink">DrawPathStart</a></h1>
+<section id="synopsis-63">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPathStart( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id126">
+<section id="description-63">
 <h2>Description</h2>
 <p>DrawPathStart() declares the start of a path drawing list which is terminated
 by a matching DrawPathFinish() command. All other DrawPath commands must
@@ -1883,12 +1883,12 @@ function by themselves.</p>
 </section>
 </section>
 <section id="drawpeekgraphiccontext">
-<h1><a class="toc-backref" href="#id291">DrawPeekGraphicContext</a></h1>
-<section id="id127">
+<h1><a class="toc-backref" href="#toc-entry-65" role="doc-backlink">DrawPeekGraphicContext</a></h1>
+<section id="synopsis-64">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *DrawPeekGraphicContext( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id128">
+<section id="description-64">
 <h2>Description</h2>
 <p>DrawPeekGraphicContext() returns the current graphic drawing_wand.</p>
 <p>The format of the DrawPeekGraphicContext method is:</p>
@@ -1902,12 +1902,12 @@ function by themselves.</p>
 </section>
 </section>
 <section id="drawpoint">
-<h1><a class="toc-backref" href="#id292">DrawPoint</a></h1>
-<section id="id129">
+<h1><a class="toc-backref" href="#toc-entry-66" role="doc-backlink">DrawPoint</a></h1>
+<section id="synopsis-65">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPoint( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id130">
+<section id="description-65">
 <h2>Description</h2>
 <p>DrawPoint() draws a point using the current stroke color and stroke
 thickness at the specified coordinates.</p>
@@ -1928,13 +1928,13 @@ thickness at the specified coordinates.</p>
 </section>
 </section>
 <section id="drawpolygon">
-<h1><a class="toc-backref" href="#id293">DrawPolygon</a></h1>
-<section id="id131">
+<h1><a class="toc-backref" href="#toc-entry-67" role="doc-backlink">DrawPolygon</a></h1>
+<section id="synopsis-66">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPolygon( DrawingWand *drawing_wand, const unsigned long number_coordinates,
                   const <a class="reference external" href="../api/types.html#pointinfo">PointInfo</a> *coordinates );</pre>
 </section>
-<section id="id132">
+<section id="description-66">
 <h2>Description</h2>
 <p>DrawPolygon() draws a polygon using the current stroke, stroke width, and
 fill color or texture, using the specified array of coordinates.</p>
@@ -1955,13 +1955,13 @@ fill color or texture, using the specified array of coordinates.</p>
 </section>
 </section>
 <section id="drawpolyline">
-<h1><a class="toc-backref" href="#id294">DrawPolyline</a></h1>
-<section id="id133">
+<h1><a class="toc-backref" href="#toc-entry-68" role="doc-backlink">DrawPolyline</a></h1>
+<section id="synopsis-67">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPolyline( DrawingWand *drawing_wand, const unsigned long number_coordinates,
                    const <a class="reference external" href="../api/types.html#pointinfo">PointInfo</a> *coordinates );</pre>
 </section>
-<section id="id134">
+<section id="description-67">
 <h2>Description</h2>
 <p>DrawPolyline() draws a polyline using the current stroke, stroke width, and
 fill color or texture, using the specified array of coordinates.</p>
@@ -1982,12 +1982,12 @@ fill color or texture, using the specified array of coordinates.</p>
 </section>
 </section>
 <section id="drawpopclippath">
-<h1><a class="toc-backref" href="#id295">DrawPopClipPath</a></h1>
-<section id="id135">
+<h1><a class="toc-backref" href="#toc-entry-69" role="doc-backlink">DrawPopClipPath</a></h1>
+<section id="synopsis-68">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPopClipPath( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id136">
+<section id="description-68">
 <h2>Description</h2>
 <p>DrawPopClipPath() terminates a clip path definition.</p>
 <p>The format of the DrawPopClipPath method is:</p>
@@ -2001,12 +2001,12 @@ fill color or texture, using the specified array of coordinates.</p>
 </section>
 </section>
 <section id="drawpopdefs">
-<h1><a class="toc-backref" href="#id296">DrawPopDefs</a></h1>
-<section id="id137">
+<h1><a class="toc-backref" href="#toc-entry-70" role="doc-backlink">DrawPopDefs</a></h1>
+<section id="synopsis-69">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPopDefs( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id138">
+<section id="description-69">
 <h2>Description</h2>
 <p>DrawPopDefs() terminates a definition list</p>
 <p>The format of the DrawPopDefs method is:</p>
@@ -2020,12 +2020,12 @@ fill color or texture, using the specified array of coordinates.</p>
 </section>
 </section>
 <section id="drawpopgraphiccontext">
-<h1><a class="toc-backref" href="#id297">DrawPopGraphicContext</a></h1>
-<section id="id139">
+<h1><a class="toc-backref" href="#toc-entry-71" role="doc-backlink">DrawPopGraphicContext</a></h1>
+<section id="synopsis-70">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPopGraphicContext( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id140">
+<section id="description-70">
 <h2>Description</h2>
 <p>DrawPopGraphicContext() destroys the current drawing_wand returning to the
 previously pushed drawing wand. Multiple drawing wand  may exist. It is an
@@ -2042,12 +2042,12 @@ proper form to pop all drawing_wands which have been pushed.</p>
 </section>
 </section>
 <section id="drawpoppattern">
-<h1><a class="toc-backref" href="#id298">DrawPopPattern</a></h1>
-<section id="id141">
+<h1><a class="toc-backref" href="#toc-entry-72" role="doc-backlink">DrawPopPattern</a></h1>
+<section id="synopsis-71">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPopPattern( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id142">
+<section id="description-71">
 <h2>Description</h2>
 <p>DrawPopPattern() terminates a pattern definition.</p>
 <p>The format of the DrawPopPattern method is:</p>
@@ -2061,12 +2061,12 @@ proper form to pop all drawing_wands which have been pushed.</p>
 </section>
 </section>
 <section id="drawpushclippath">
-<h1><a class="toc-backref" href="#id299">DrawPushClipPath</a></h1>
-<section id="id143">
+<h1><a class="toc-backref" href="#toc-entry-73" role="doc-backlink">DrawPushClipPath</a></h1>
+<section id="synopsis-72">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPushClipPath( DrawingWand *drawing_wand, const char *clip_path_id );</pre>
 </section>
-<section id="id144">
+<section id="description-72">
 <h2>Description</h2>
 <p>DrawPushClipPath() starts a clip path definition which is comprized of
 any number of drawing commands and terminated by a DrawPopClipPath()
@@ -2086,12 +2086,12 @@ later use.</p>
 </section>
 </section>
 <section id="drawpushdefs">
-<h1><a class="toc-backref" href="#id300">DrawPushDefs</a></h1>
-<section id="id145">
+<h1><a class="toc-backref" href="#toc-entry-74" role="doc-backlink">DrawPushDefs</a></h1>
+<section id="synopsis-73">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPushDefs( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id146">
+<section id="description-73">
 <h2>Description</h2>
 <p>DrawPushDefs() indicates that commands up to a terminating DrawPopDefs()
 command create named elements (e.g. clip-paths, textures, etc.) which
@@ -2107,12 +2107,12 @@ may safely be processed earlier for the sake of efficiency.</p>
 </section>
 </section>
 <section id="drawpushgraphiccontext">
-<h1><a class="toc-backref" href="#id301">DrawPushGraphicContext</a></h1>
-<section id="id147">
+<h1><a class="toc-backref" href="#toc-entry-75" role="doc-backlink">DrawPushGraphicContext</a></h1>
+<section id="synopsis-74">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPushGraphicContext( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id148">
+<section id="description-74">
 <h2>Description</h2>
 <p>DrawPushGraphicContext() clones the current drawing wand to create a
 new drawing wand. The original drawing drawing_wand(s) may be returned to
@@ -2130,13 +2130,13 @@ equivalent Push.</p>
 </section>
 </section>
 <section id="drawpushpattern">
-<h1><a class="toc-backref" href="#id302">DrawPushPattern</a></h1>
-<section id="id149">
+<h1><a class="toc-backref" href="#toc-entry-76" role="doc-backlink">DrawPushPattern</a></h1>
+<section id="synopsis-75">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawPushPattern( DrawingWand *drawing_wand, const char *pattern_id, const double x,
                       const double y, const double width, const double height );</pre>
 </section>
-<section id="id150">
+<section id="description-75">
 <h2>Description</h2>
 <p>DrawPushPattern() indicates that subsequent commands up to a
 DrawPopPattern() command comprise the definition of a named pattern.
@@ -2170,13 +2170,13 @@ Named patterns may be used as stroke or brush definitions.</p>
 </section>
 </section>
 <section id="drawrectangle">
-<h1><a class="toc-backref" href="#id303">DrawRectangle</a></h1>
-<section id="id151">
+<h1><a class="toc-backref" href="#toc-entry-77" role="doc-backlink">DrawRectangle</a></h1>
+<section id="synopsis-76">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawRectangle( DrawingWand *drawing_wand, const double x1, const double y1,
                     const double x2, const double y2 );</pre>
 </section>
-<section id="id152">
+<section id="description-76">
 <h2>Description</h2>
 <p>DrawRectangle() draws a rectangle given two coordinates and using
 the current stroke, stroke width, and fill settings.</p>
@@ -2200,12 +2200,12 @@ the current stroke, stroke width, and fill settings.</p>
 </section>
 </section>
 <section id="drawrender">
-<h1><a class="toc-backref" href="#id304">DrawRender</a></h1>
-<section id="id153">
+<h1><a class="toc-backref" href="#toc-entry-78" role="doc-backlink">DrawRender</a></h1>
+<section id="synopsis-77">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned int DrawRender( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id154">
+<section id="description-77">
 <h2>Description</h2>
 <p>DrawRender() renders all preceding drawing commands onto the image.
 This function is deprecated.  Use MagickDrawImage() instead.</p>
@@ -2220,12 +2220,12 @@ This function is deprecated.  Use MagickDrawImage() instead.</p>
 </section>
 </section>
 <section id="drawrotate">
-<h1><a class="toc-backref" href="#id305">DrawRotate</a></h1>
-<section id="id155">
+<h1><a class="toc-backref" href="#toc-entry-79" role="doc-backlink">DrawRotate</a></h1>
+<section id="synopsis-78">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawRotate( DrawingWand *drawing_wand, const double degrees );</pre>
 </section>
-<section id="id156">
+<section id="description-78">
 <h2>Description</h2>
 <p>DrawRotate() applies the specified rotation to the current coordinate space.</p>
 <p>The format of the DrawRotate method is:</p>
@@ -2242,13 +2242,13 @@ This function is deprecated.  Use MagickDrawImage() instead.</p>
 </section>
 </section>
 <section id="drawroundrectangle">
-<h1><a class="toc-backref" href="#id306">DrawRoundRectangle</a></h1>
-<section id="id157">
+<h1><a class="toc-backref" href="#toc-entry-80" role="doc-backlink">DrawRoundRectangle</a></h1>
+<section id="synopsis-79">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawRoundRectangle( DrawingWand *drawing_wand, double x1, double y1, double x2, double y2,
                          double rx, double ry );</pre>
 </section>
-<section id="id158">
+<section id="description-79">
 <h2>Description</h2>
 <p>DrawRoundRectangle() draws a rounted rectangle given two coordinates,
 x &amp; y corner radiuses and using the current stroke, stroke width,
@@ -2282,12 +2282,12 @@ and fill settings.</p>
 </section>
 </section>
 <section id="drawscale">
-<h1><a class="toc-backref" href="#id307">DrawScale</a></h1>
-<section id="id159">
+<h1><a class="toc-backref" href="#toc-entry-81" role="doc-backlink">DrawScale</a></h1>
+<section id="synopsis-80">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawScale( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id160">
+<section id="description-80">
 <h2>Description</h2>
 <p>DrawScale() adjusts the scaling factor to apply in the horizontal and
 vertical directions to the current coordinate space.</p>
@@ -2308,12 +2308,12 @@ vertical directions to the current coordinate space.</p>
 </section>
 </section>
 <section id="drawskewx">
-<h1><a class="toc-backref" href="#id308">DrawSkewX</a></h1>
-<section id="id161">
+<h1><a class="toc-backref" href="#toc-entry-82" role="doc-backlink">DrawSkewX</a></h1>
+<section id="synopsis-81">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSkewX( DrawingWand *drawing_wand, const double degrees );</pre>
 </section>
-<section id="id162">
+<section id="description-81">
 <h2>Description</h2>
 <p>DrawSkewX() skews the current coordinate system in the horizontal
 direction.</p>
@@ -2331,12 +2331,12 @@ direction.</p>
 </section>
 </section>
 <section id="drawskewy">
-<h1><a class="toc-backref" href="#id309">DrawSkewY</a></h1>
-<section id="id163">
+<h1><a class="toc-backref" href="#toc-entry-83" role="doc-backlink">DrawSkewY</a></h1>
+<section id="synopsis-82">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSkewY( DrawingWand *drawing_wand, const double degrees );</pre>
 </section>
-<section id="id164">
+<section id="description-82">
 <h2>Description</h2>
 <p>DrawSkewY() skews the current coordinate system in the vertical
 direction.</p>
@@ -2354,13 +2354,13 @@ direction.</p>
 </section>
 </section>
 <section id="drawsetstopcolor">
-<h1><a class="toc-backref" href="#id310">DrawSetStopColor</a></h1>
-<section id="id165">
+<h1><a class="toc-backref" href="#toc-entry-84" role="doc-backlink">DrawSetStopColor</a></h1>
+<section id="synopsis-83">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStopColor( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#pixelpacket">PixelPacket</a> *stop_color,
                        const double offset );</pre>
 </section>
-<section id="id166">
+<section id="description-83">
 <h2>Description</h2>
 <p>DrawSetStopColor() sets the stop color and offset for gradients</p>
 <p>The format of the DrawSetStopColor method is:</p>
@@ -2376,12 +2376,12 @@ direction.</p>
 </section>
 </section>
 <section id="drawgetstrokecolor">
-<h1><a class="toc-backref" href="#id311">DrawGetStrokeColor</a></h1>
-<section id="id167">
+<h1><a class="toc-backref" href="#toc-entry-85" role="doc-backlink">DrawGetStrokeColor</a></h1>
+<section id="synopsis-84">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawGetStrokeColor( const DrawingWand *drawing_wand, ;</pre>
 </section>
-<section id="id168">
+<section id="description-84">
 <h2>Description</h2>
 <p>DrawGetStrokeColor() returns the color used for stroking object outlines.</p>
 <p>The format of the DrawGetStrokeColor method is:</p>
@@ -2397,12 +2397,12 @@ direction.</p>
 </section>
 </section>
 <section id="drawsetstrokecolor">
-<h1><a class="toc-backref" href="#id312">DrawSetStrokeColor</a></h1>
-<section id="id169">
+<h1><a class="toc-backref" href="#toc-entry-86" role="doc-backlink">DrawSetStrokeColor</a></h1>
+<section id="synopsis-85">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeColor( DrawingWand *drawing_wand, const PixelWand *stroke_wand );</pre>
 </section>
-<section id="id170">
+<section id="description-85">
 <h2>Description</h2>
 <p>DrawSetStrokeColor() sets the color used for stroking object outlines.</p>
 <p>The format of the DrawSetStrokeColor method is:</p>
@@ -2418,12 +2418,12 @@ direction.</p>
 </section>
 </section>
 <section id="drawsetstrokepatternurl">
-<h1><a class="toc-backref" href="#id313">DrawSetStrokePatternURL</a></h1>
-<section id="id171">
+<h1><a class="toc-backref" href="#toc-entry-87" role="doc-backlink">DrawSetStrokePatternURL</a></h1>
+<section id="synopsis-86">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokePatternURL( DrawingWand *drawing_wand, const char *stroke_url );</pre>
 </section>
-<section id="id172">
+<section id="description-86">
 <h2>Description</h2>
 <p>DrawSetStrokePatternURL() sets the pattern used for stroking object outlines.</p>
 <p>The format of the DrawSetStrokePatternURL method is:</p>
@@ -2439,12 +2439,12 @@ direction.</p>
 </section>
 </section>
 <section id="drawgetstrokeantialias">
-<h1><a class="toc-backref" href="#id314">DrawGetStrokeAntialias</a></h1>
-<section id="id173">
+<h1><a class="toc-backref" href="#toc-entry-88" role="doc-backlink">DrawGetStrokeAntialias</a></h1>
+<section id="synopsis-87">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned int DrawGetStrokeAntialias( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id174">
+<section id="description-87">
 <h2>Description</h2>
 <p>DrawGetStrokeAntialias() returns the current stroke antialias setting.
 Stroked outlines are antialiased by default.  When antialiasing is disabled
@@ -2461,13 +2461,13 @@ underlying canvas color should be used.</p>
 </section>
 </section>
 <section id="drawsetstrokeantialias">
-<h1><a class="toc-backref" href="#id315">DrawSetStrokeAntialias</a></h1>
-<section id="id175">
+<h1><a class="toc-backref" href="#toc-entry-89" role="doc-backlink">DrawSetStrokeAntialias</a></h1>
+<section id="synopsis-88">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeAntialias( DrawingWand *drawing_wand,
                              const unsigned int stroke_antialias );</pre>
 </section>
-<section id="id176">
+<section id="description-88">
 <h2>Description</h2>
 <p>DrawSetStrokeAntialias() controls whether stroked outlines are antialiased.
 Stroked outlines are antialiased by default.  When antialiasing is disabled
@@ -2487,13 +2487,13 @@ underlying canvas color should be used.</p>
 </section>
 </section>
 <section id="drawgetstrokedasharray">
-<h1><a class="toc-backref" href="#id316">DrawGetStrokeDashArray</a></h1>
-<section id="id177">
+<h1><a class="toc-backref" href="#toc-entry-90" role="doc-backlink">DrawGetStrokeDashArray</a></h1>
+<section id="synopsis-89">
 <h2>Synopsis</h2>
 <pre class="literal-block">double *DrawGetStrokeDashArray( const DrawingWand *drawing_wand,
                                 unsigned long *number_elements );</pre>
 </section>
-<section id="id178">
+<section id="description-89">
 <h2>Description</h2>
 <p>DrawGetStrokeDashArray() returns an array representing the pattern of
 dashes and gaps used to stroke paths (see DrawSetStrokeDashArray). The
@@ -2512,13 +2512,13 @@ array must be freed once it is no longer required by the user.</p>
 </section>
 </section>
 <section id="drawsetstrokedasharray">
-<h1><a class="toc-backref" href="#id317">DrawSetStrokeDashArray</a></h1>
-<section id="id179">
+<h1><a class="toc-backref" href="#toc-entry-91" role="doc-backlink">DrawSetStrokeDashArray</a></h1>
+<section id="synopsis-90">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeDashArray( DrawingWand *drawing_wand, const unsigned long number_elements,
                              const double *dash_array );</pre>
 </section>
-<section id="id180">
+<section id="description-90">
 <h2>Description</h2>
 <p>DrawSetStrokeDashArray() specifies the pattern of dashes and gaps used to
 stroke paths. The stroke dash array represents an array of numbers that
@@ -2544,12 +2544,12 @@ A typical stroke dash array might contain the members 5 3 2.</p>
 </section>
 </section>
 <section id="drawgetstrokedashoffset">
-<h1><a class="toc-backref" href="#id318">DrawGetStrokeDashOffset</a></h1>
-<section id="id181">
+<h1><a class="toc-backref" href="#toc-entry-92" role="doc-backlink">DrawGetStrokeDashOffset</a></h1>
+<section id="synopsis-91">
 <h2>Synopsis</h2>
 <pre class="literal-block">double DrawGetStrokeDashOffset( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id182">
+<section id="description-91">
 <h2>Description</h2>
 <p>DrawGetStrokeDashOffset() returns the offset into the dash pattern to
 start the dash.</p>
@@ -2564,12 +2564,12 @@ start the dash.</p>
 </section>
 </section>
 <section id="drawsetstrokedashoffset">
-<h1><a class="toc-backref" href="#id319">DrawSetStrokeDashOffset</a></h1>
-<section id="id183">
+<h1><a class="toc-backref" href="#toc-entry-93" role="doc-backlink">DrawSetStrokeDashOffset</a></h1>
+<section id="synopsis-92">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeDashOffset( DrawingWand *drawing_wand, const double dash_offset );</pre>
 </section>
-<section id="id184">
+<section id="description-92">
 <h2>Description</h2>
 <p>DrawSetStrokeDashOffset() specifies the offset into the dash pattern to
 start the dash.</p>
@@ -2586,12 +2586,12 @@ start the dash.</p>
 </section>
 </section>
 <section id="drawgetstrokelinecap">
-<h1><a class="toc-backref" href="#id320">DrawGetStrokeLineCap</a></h1>
-<section id="id185">
+<h1><a class="toc-backref" href="#toc-entry-94" role="doc-backlink">DrawGetStrokeLineCap</a></h1>
+<section id="synopsis-93">
 <h2>Synopsis</h2>
 <pre class="literal-block">LineCap DrawGetStrokeLineCap( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id186">
+<section id="description-93">
 <h2>Description</h2>
 <p>DrawGetStrokeLineCap() returns the shape to be used at the end of
 open subpaths when they are stroked. Values of LineCap are
@@ -2607,12 +2607,12 @@ UndefinedCap, ButtCap, RoundCap, and SquareCap.</p>
 </section>
 </section>
 <section id="drawsetstrokelinecap">
-<h1><a class="toc-backref" href="#id321">DrawSetStrokeLineCap</a></h1>
-<section id="id187">
+<h1><a class="toc-backref" href="#toc-entry-95" role="doc-backlink">DrawSetStrokeLineCap</a></h1>
+<section id="synopsis-94">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeLineCap( DrawingWand *drawing_wand, const LineCap linecap );</pre>
 </section>
-<section id="id188">
+<section id="description-94">
 <h2>Description</h2>
 <p>DrawSetStrokeLineCap() specifies the shape to be used at the end of
 open subpaths when they are stroked. Values of LineCap are
@@ -2630,12 +2630,12 @@ UndefinedCap, ButtCap, RoundCap, and SquareCap.</p>
 </section>
 </section>
 <section id="drawgetstrokelinejoin">
-<h1><a class="toc-backref" href="#id322">DrawGetStrokeLineJoin</a></h1>
-<section id="id189">
+<h1><a class="toc-backref" href="#toc-entry-96" role="doc-backlink">DrawGetStrokeLineJoin</a></h1>
+<section id="synopsis-95">
 <h2>Synopsis</h2>
 <pre class="literal-block">LineJoin DrawGetStrokeLineJoin( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id190">
+<section id="description-95">
 <h2>Description</h2>
 <p>DrawGetStrokeLineJoin() returns the shape to be used at the
 corners of paths (or other vector shapes) when they are
@@ -2652,12 +2652,12 @@ and BevelJoin.</p>
 </section>
 </section>
 <section id="drawsetstrokelinejoin">
-<h1><a class="toc-backref" href="#id323">DrawSetStrokeLineJoin</a></h1>
-<section id="id191">
+<h1><a class="toc-backref" href="#toc-entry-97" role="doc-backlink">DrawSetStrokeLineJoin</a></h1>
+<section id="synopsis-96">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeLineJoin( DrawingWand *drawing_wand, const LineJoin linejoin );</pre>
 </section>
-<section id="id192">
+<section id="description-96">
 <h2>Description</h2>
 <p>DrawSetStrokeLineJoin() specifies the shape to be used at the
 corners of paths (or other vector shapes) when they are
@@ -2676,12 +2676,12 @@ and BevelJoin.</p>
 </section>
 </section>
 <section id="drawgetstrokemiterlimit">
-<h1><a class="toc-backref" href="#id324">DrawGetStrokeMiterLimit</a></h1>
-<section id="id193">
+<h1><a class="toc-backref" href="#toc-entry-98" role="doc-backlink">DrawGetStrokeMiterLimit</a></h1>
+<section id="synopsis-97">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned long DrawGetStrokeMiterLimit( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id194">
+<section id="description-97">
 <h2>Description</h2>
 <p>DrawGetStrokeMiterLimit() returns the miter limit. When two line
 segments meet at a sharp angle and miter joins have been specified for
@@ -2699,12 +2699,12 @@ limit on the ratio of the miter length to the 'lineWidth'.</p>
 </section>
 </section>
 <section id="drawsetstrokemiterlimit">
-<h1><a class="toc-backref" href="#id325">DrawSetStrokeMiterLimit</a></h1>
-<section id="id195">
+<h1><a class="toc-backref" href="#toc-entry-99" role="doc-backlink">DrawSetStrokeMiterLimit</a></h1>
+<section id="synopsis-98">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeMiterLimit( DrawingWand *drawing_wand, const unsigned long miterlimit );</pre>
 </section>
-<section id="id196">
+<section id="description-98">
 <h2>Description</h2>
 <p>DrawSetStrokeMiterLimit() specifies the miter limit. When two line
 segments meet at a sharp angle and miter joins have been specified for
@@ -2724,12 +2724,12 @@ limit on the ratio of the miter length to the 'lineWidth'.</p>
 </section>
 </section>
 <section id="drawgetstrokeopacity">
-<h1><a class="toc-backref" href="#id326">DrawGetStrokeOpacity</a></h1>
-<section id="id197">
+<h1><a class="toc-backref" href="#toc-entry-100" role="doc-backlink">DrawGetStrokeOpacity</a></h1>
+<section id="synopsis-99">
 <h2>Synopsis</h2>
 <pre class="literal-block">double DrawGetStrokeOpacity( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id198">
+<section id="description-99">
 <h2>Description</h2>
 <p>DrawGetStrokeOpacity() returns the opacity of stroked object outlines.</p>
 <p>The format of the DrawGetStrokeOpacity method is:</p>
@@ -2743,12 +2743,12 @@ limit on the ratio of the miter length to the 'lineWidth'.</p>
 </section>
 </section>
 <section id="drawsetstrokeopacity">
-<h1><a class="toc-backref" href="#id327">DrawSetStrokeOpacity</a></h1>
-<section id="id199">
+<h1><a class="toc-backref" href="#toc-entry-101" role="doc-backlink">DrawSetStrokeOpacity</a></h1>
+<section id="synopsis-100">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeOpacity( DrawingWand *drawing_wand, const double stroke_opacity );</pre>
 </section>
-<section id="id200">
+<section id="description-100">
 <h2>Description</h2>
 <p>DrawSetStrokeOpacity() specifies the opacity of stroked object outlines.</p>
 <p>The format of the DrawSetStrokeOpacity method is:</p>
@@ -2764,12 +2764,12 @@ limit on the ratio of the miter length to the 'lineWidth'.</p>
 </section>
 </section>
 <section id="drawgetstrokewidth">
-<h1><a class="toc-backref" href="#id328">DrawGetStrokeWidth</a></h1>
-<section id="id201">
+<h1><a class="toc-backref" href="#toc-entry-102" role="doc-backlink">DrawGetStrokeWidth</a></h1>
+<section id="synopsis-101">
 <h2>Synopsis</h2>
 <pre class="literal-block">double DrawGetStrokeWidth( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id202">
+<section id="description-101">
 <h2>Description</h2>
 <p>DrawGetStrokeWidth() returns the width of the stroke used to draw object
 outlines.</p>
@@ -2784,12 +2784,12 @@ outlines.</p>
 </section>
 </section>
 <section id="drawsetstrokewidth">
-<h1><a class="toc-backref" href="#id329">DrawSetStrokeWidth</a></h1>
-<section id="id203">
+<h1><a class="toc-backref" href="#toc-entry-103" role="doc-backlink">DrawSetStrokeWidth</a></h1>
+<section id="synopsis-102">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetStrokeWidth( DrawingWand *drawing_wand, const double stroke_width );</pre>
 </section>
-<section id="id204">
+<section id="description-102">
 <h2>Description</h2>
 <p>DrawSetStrokeWidth() sets the width of the stroke used to draw object
 outlines.</p>
@@ -2806,12 +2806,12 @@ outlines.</p>
 </section>
 </section>
 <section id="drawgettextantialias">
-<h1><a class="toc-backref" href="#id330">DrawGetTextAntialias</a></h1>
-<section id="id205">
+<h1><a class="toc-backref" href="#toc-entry-104" role="doc-backlink">DrawGetTextAntialias</a></h1>
+<section id="synopsis-103">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned int DrawGetTextAntialias( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id206">
+<section id="description-103">
 <h2>Description</h2>
 <p>DrawGetTextAntialias() returns the current text antialias setting, which
 determines whether text is antialiased.  Text is antialiased by default.</p>
@@ -2826,12 +2826,12 @@ determines whether text is antialiased.  Text is antialiased by default.</p>
 </section>
 </section>
 <section id="drawsettextantialias">
-<h1><a class="toc-backref" href="#id331">DrawSetTextAntialias</a></h1>
-<section id="id207">
+<h1><a class="toc-backref" href="#toc-entry-105" role="doc-backlink">DrawSetTextAntialias</a></h1>
+<section id="synopsis-104">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetTextAntialias( DrawingWand *drawing_wand, const unsigned int text_antialias );</pre>
 </section>
-<section id="id208">
+<section id="description-104">
 <h2>Description</h2>
 <p>DrawSetTextAntialias() controls whether text is antialiased.  Text is
 antialiased by default.</p>
@@ -2849,12 +2849,12 @@ antialiasing.</p>
 </section>
 </section>
 <section id="drawgettextdecoration">
-<h1><a class="toc-backref" href="#id332">DrawGetTextDecoration</a></h1>
-<section id="id209">
+<h1><a class="toc-backref" href="#toc-entry-106" role="doc-backlink">DrawGetTextDecoration</a></h1>
+<section id="synopsis-105">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#decorationtype">DecorationType</a> DrawGetTextDecoration( DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id210">
+<section id="description-105">
 <h2>Description</h2>
 <p>DrawGetTextDecoration() returns the decoration applied when annotating with
 text.</p>
@@ -2869,12 +2869,12 @@ text.</p>
 </section>
 </section>
 <section id="drawsettextdecoration">
-<h1><a class="toc-backref" href="#id333">DrawSetTextDecoration</a></h1>
-<section id="id211">
+<h1><a class="toc-backref" href="#toc-entry-107" role="doc-backlink">DrawSetTextDecoration</a></h1>
+<section id="synopsis-106">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetTextDecoration( DrawingWand *drawing_wand, const <a class="reference external" href="../api/types.html#decorationtype">DecorationType</a> decoration );</pre>
 </section>
-<section id="id212">
+<section id="description-106">
 <h2>Description</h2>
 <p>DrawSetTextDecoration() specifies a decoration to be applied when
 annotating with text.</p>
@@ -2892,12 +2892,12 @@ OverlineDecoration, or LineThroughDecoration</p>
 </section>
 </section>
 <section id="drawgettextencoding">
-<h1><a class="toc-backref" href="#id334">DrawGetTextEncoding</a></h1>
-<section id="id213">
+<h1><a class="toc-backref" href="#toc-entry-108" role="doc-backlink">DrawGetTextEncoding</a></h1>
+<section id="synopsis-107">
 <h2>Synopsis</h2>
 <pre class="literal-block">char *DrawGetTextEncoding( const DrawingWand *drawing_wand );</pre>
 </section>
-<section id="id214">
+<section id="description-107">
 <h2>Description</h2>
 <p>DrawGetTextEncoding() returns a null-terminated string which specifies the
 code set used for text annotations. The string must be freed by the user
@@ -2913,12 +2913,12 @@ once it is no longer required.</p>
 </section>
 </section>
 <section id="drawsettextencoding">
-<h1><a class="toc-backref" href="#id335">DrawSetTextEncoding</a></h1>
-<section id="id215">
+<h1><a class="toc-backref" href="#toc-entry-109" role="doc-backlink">DrawSetTextEncoding</a></h1>
+<section id="synopsis-108">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetTextEncoding( DrawingWand *drawing_wand, const char *encoding );</pre>
 </section>
-<section id="id216">
+<section id="description-108">
 <h2>Description</h2>
 <p>DrawSetTextEncoding() specifies specifies the code set to use for
 text annotations. The only character encoding which may be specified
@@ -2940,12 +2940,12 @@ designed to support Unicode.</p>
 </section>
 </section>
 <section id="drawgettextundercolor">
-<h1><a class="toc-backref" href="#id336">DrawGetTextUnderColor</a></h1>
-<section id="id217">
+<h1><a class="toc-backref" href="#toc-entry-110" role="doc-backlink">DrawGetTextUnderColor</a></h1>
+<section id="synopsis-109">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawGetTextUnderColor( const DrawingWand *drawing_wand, PixelWand *under_color );</pre>
 </section>
-<section id="id218">
+<section id="description-109">
 <h2>Description</h2>
 <p>DrawGetTextUnderColor() returns the color of a background rectangle
 to place under text annotations.</p>
@@ -2962,12 +2962,12 @@ to place under text annotations.</p>
 </section>
 </section>
 <section id="drawsettextundercolor">
-<h1><a class="toc-backref" href="#id337">DrawSetTextUnderColor</a></h1>
-<section id="id219">
+<h1><a class="toc-backref" href="#toc-entry-111" role="doc-backlink">DrawSetTextUnderColor</a></h1>
+<section id="synopsis-110">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetTextUnderColor( DrawingWand *drawing_wand, const PixelWand *under_wand );</pre>
 </section>
-<section id="id220">
+<section id="description-110">
 <h2>Description</h2>
 <p>DrawSetTextUnderColor() specifies the color of a background rectangle
 to place under text annotations.</p>
@@ -2984,12 +2984,12 @@ to place under text annotations.</p>
 </section>
 </section>
 <section id="drawtranslate">
-<h1><a class="toc-backref" href="#id338">DrawTranslate</a></h1>
-<section id="id221">
+<h1><a class="toc-backref" href="#toc-entry-112" role="doc-backlink">DrawTranslate</a></h1>
+<section id="synopsis-111">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawTranslate( DrawingWand *drawing_wand, const double x, const double y );</pre>
 </section>
-<section id="id222">
+<section id="description-111">
 <h2>Description</h2>
 <p>DrawTranslate() applies a translation to the current coordinate
 system which moves the coordinate system origin to the specified
@@ -3010,13 +3010,13 @@ coordinate.</p>
 </section>
 </section>
 <section id="drawsetviewbox">
-<h1><a class="toc-backref" href="#id339">DrawSetViewbox</a></h1>
-<section id="id223">
+<h1><a class="toc-backref" href="#toc-entry-113" role="doc-backlink">DrawSetViewbox</a></h1>
+<section id="synopsis-112">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DrawSetViewbox( DrawingWand *drawing_wand, unsigned long x1, unsigned long y1,
                      unsigned long x2, unsigned long y2 );</pre>
 </section>
-<section id="id224">
+<section id="description-112">
 <h2>Description</h2>
 <p>DrawSetViewbox() sets the overall canvas size to be recorded with the
 drawing vector data.  Usually this will be specified using the same
@@ -3046,12 +3046,12 @@ a viewer will render the vector data on.</p>
 </section>
 </section>
 <section id="newdrawingwand">
-<h1><a class="toc-backref" href="#id340">NewDrawingWand</a></h1>
-<section id="id225">
+<h1><a class="toc-backref" href="#toc-entry-114" role="doc-backlink">NewDrawingWand</a></h1>
+<section id="synopsis-113">
 <h2>Synopsis</h2>
 <pre class="literal-block">DrawingWand *NewDrawingWand( void );</pre>
 </section>
-<section id="id226">
+<section id="description-113">
 <h2>Description</h2>
 <p>NewDrawingWand() returns a drawing wand required for all other methods in
 the API.</p>
@@ -3064,7 +3064,7 @@ the API.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002 - 2024<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ======================================
 GraphicsMagick Copyrights and Licenses
@@ -23,7 +23,7 @@ The licenses which components of this software fall under are as follows.
   from ImageMagick Studio's ImageMagick and applied the "MIT" style
   license:
 
-  Copyright (C) 2002-2024 GraphicsMagick Group
+  Copyright (C) 2002-2025 GraphicsMagick Group
 
   Permission is hereby granted, free of charge, to any person
   obtaining a copy of this software and associated documentation files
@@ -242,7 +242,7 @@ The licenses which components of this software fall under are as follows.
 
   The GraphicsMagick HaldClutImagePixels() function in magick/hclut.c
   is based on source code from the HaldCLUT package by Eskil Steenberg
-  (http://www.quelsolaar.com/technology/clut.html) which is
+  (https://www.quelsolaar.com/technology/clut.html) which is
   distributed under the following license:
 
   Copyright (c) 2005 Eskil Steenberg.  All rights reserved.

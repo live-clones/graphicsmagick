@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005-2021 GraphicsMagick Group
+  Copyright (C) 2005-2025 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -63,7 +63,7 @@ MagickExport MagickPassFail MagickTsdKeyCreate2(MagickTsdKey_t *key,
   if (*keyd != (void *) NULL)
     {
       (*keyd)->nvalues=omp_get_max_threads();
-      (*keyd)->values=MagickAllocateArray(void *,sizeof(void *),(*keyd)->nvalues);
+      (*keyd)->values=MagickAllocateArray(void *,(*keyd)->nvalues, sizeof(void *));
       (*keyd)->destructor=destructor;
       if ((*keyd)->values == (void *) NULL)
         {

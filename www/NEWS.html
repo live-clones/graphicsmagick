@@ -41,68 +41,244 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to August 18, 2024.</p>
+<p>This file was last updated to reflect changes up to October 29, 2025.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
 <p>Due to significant issues being discovered and addressed for almost
 every release, it is recommended to update to the most current
 release and not attempt to patch older releases.</p>
-<div class="contents local topic" id="contents">
+<nav class="contents local" id="contents" role="doc-toc">
 <ul class="simple">
-<li><p><a class="reference internal" href="#august-27-2024" id="id2">1.3.45 (August 27, 2024)</a></p></li>
-<li><p><a class="reference internal" href="#august-18-2024" id="id3">1.3.44 (August 18, 2024)</a></p></li>
-<li><p><a class="reference internal" href="#march-23-2024" id="id4">1.3.43 (March 23, 2024)</a></p></li>
-<li><p><a class="reference internal" href="#september-23-2023" id="id5">1.3.42 (September 23, 2023)</a></p></li>
-<li><p><a class="reference internal" href="#august-12-2023" id="id6">1.3.41 (August 12, 2023)</a></p></li>
-<li><p><a class="reference internal" href="#january-14-2023" id="id7">1.3.40 (January 14, 2023)</a></p></li>
-<li><p><a class="reference internal" href="#december-26-2022" id="id8">1.3.39 (December 26, 2022)</a></p></li>
-<li><p><a class="reference internal" href="#march-26-2022" id="id9">1.3.38 (March 26, 2022)</a></p></li>
-<li><p><a class="reference internal" href="#december-12-2021" id="id10">1.3.37 (December 12, 2021)</a></p></li>
-<li><p><a class="reference internal" href="#december-26-2020" id="id11">1.3.36 (December 26, 2020)</a></p></li>
-<li><p><a class="reference internal" href="#february-23-2020" id="id12">1.3.35 (February 23, 2020)</a></p></li>
-<li><p><a class="reference internal" href="#december-24-2019" id="id13">1.3.34 (December 24, 2019)</a></p></li>
-<li><p><a class="reference internal" href="#july-20-2019" id="id14">1.3.33 (July 20, 2019)</a></p></li>
-<li><p><a class="reference internal" href="#june-15-2019" id="id15">1.3.32 (June 15, 2019)</a></p></li>
-<li><p><a class="reference internal" href="#november-17-2018" id="id16">1.3.31 (November 17, 2018)</a></p></li>
-<li><p><a class="reference internal" href="#june-23-2018" id="id17">1.3.30 (June 23, 2018)</a></p></li>
-<li><p><a class="reference internal" href="#april-29-2018" id="id18">1.3.29 (April 29, 2018)</a></p></li>
-<li><p><a class="reference internal" href="#january-20-2018" id="id19">1.3.28 (January 20, 2018)</a></p></li>
-<li><p><a class="reference internal" href="#december-9-2017" id="id20">1.3.27 (December 9, 2017)</a></p></li>
-<li><p><a class="reference internal" href="#july-4-2017" id="id21">1.3.26 (July 4, 2017)</a></p></li>
-<li><p><a class="reference internal" href="#september-5-2016" id="id22">1.3.25 (September 5, 2016)</a></p></li>
-<li><p><a class="reference internal" href="#may-30-2016" id="id23">1.3.24 (May 30, 2016)</a></p></li>
-<li><p><a class="reference internal" href="#november-7-2015" id="id24">1.3.23 (November 7, 2015)</a></p></li>
-<li><p><a class="reference internal" href="#october-4-2015" id="id25">1.3.22 (October 4, 2015)</a></p></li>
-<li><p><a class="reference internal" href="#february-28-2015" id="id26">1.3.21 (February 28, 2015)</a></p></li>
-<li><p><a class="reference internal" href="#august-16-2014" id="id27">1.3.20 (August 16, 2014)</a></p></li>
-<li><p><a class="reference internal" href="#december-31-2013" id="id28">1.3.19 (December 31, 2013)</a></p></li>
-<li><p><a class="reference internal" href="#march-10-2013" id="id29">1.3.18 (March 10, 2013)</a></p></li>
-<li><p><a class="reference internal" href="#october-13-2012" id="id30">1.3.17 (October 13, 2012)</a></p></li>
-<li><p><a class="reference internal" href="#june-24-2012" id="id31">1.3.16 (June 24, 2012)</a></p></li>
-<li><p><a class="reference internal" href="#april-28-2012" id="id32">1.3.15 (April 28, 2012)</a></p></li>
-<li><p><a class="reference internal" href="#february-25-2012" id="id33">1.3.14 (February 25, 2012)</a></p></li>
-<li><p><a class="reference internal" href="#december-24-2011" id="id34">1.3.13 (December 24, 2011)</a></p></li>
-<li><p><a class="reference internal" href="#march-8-2010" id="id35">1.3.12 (March 8, 2010)</a></p></li>
-<li><p><a class="reference internal" href="#february-21-2010" id="id36">1.3.11 (February 21, 2010)</a></p></li>
-<li><p><a class="reference internal" href="#february-10-2010" id="id37">1.3.10 (February 10, 2010)</a></p></li>
-<li><p><a class="reference internal" href="#february-4-2010" id="id38">1.3.9 (February 4, 2010)</a></p></li>
-<li><p><a class="reference internal" href="#january-21-2010" id="id39">1.3.8 (January 21, 2010)</a></p></li>
-<li><p><a class="reference internal" href="#september-17-2009" id="id40">1.3.7 (September 17, 2009)</a></p></li>
-<li><p><a class="reference internal" href="#july-25-2009" id="id41">1.3.6 (July 25, 2009)</a></p></li>
-<li><p><a class="reference internal" href="#january-26-2009" id="id42">1.3.5 (January 26, 2009)</a></p></li>
-<li><p><a class="reference internal" href="#january-13-2009" id="id43">1.3.4 (January 13, 2009)</a></p></li>
-<li><p><a class="reference internal" href="#december-9-2008" id="id44">1.3.3 (December 9, 2008)</a></p></li>
-<li><p><a class="reference internal" href="#november-29-2008" id="id45">1.3.2 (November 29, 2008)</a></p></li>
-<li><p><a class="reference internal" href="#november-17-2008" id="id46">1.3.1 (November 17, 2008)</a></p></li>
-<li><p><a class="reference internal" href="#november-9-2008" id="id47">1.3 (November 9, 2008)</a></p></li>
-<li><p><a class="reference internal" href="#april-29-2008" id="id48">1.2 (April 29, 2008)</a></p></li>
-<li><p><a class="reference internal" href="#released-april-4-2004" id="id49">1.1 (Released April 4, 2004)</a></p></li>
-<li><p><a class="reference internal" href="#released-in-may-2003" id="id50">1.0 (Released in May, 2003)</a></p></li>
+<li><p><a class="reference internal" href="#october-29-2025" id="toc-entry-1">1.3.46 (October 29, 2025)</a></p></li>
+<li><p><a class="reference internal" href="#august-27-2024" id="toc-entry-2">1.3.45 (August 27, 2024)</a></p></li>
+<li><p><a class="reference internal" href="#august-18-2024" id="toc-entry-3">1.3.44 (August 18, 2024)</a></p></li>
+<li><p><a class="reference internal" href="#march-23-2024" id="toc-entry-4">1.3.43 (March 23, 2024)</a></p></li>
+<li><p><a class="reference internal" href="#september-23-2023" id="toc-entry-5">1.3.42 (September 23, 2023)</a></p></li>
+<li><p><a class="reference internal" href="#august-12-2023" id="toc-entry-6">1.3.41 (August 12, 2023)</a></p></li>
+<li><p><a class="reference internal" href="#january-14-2023" id="toc-entry-7">1.3.40 (January 14, 2023)</a></p></li>
+<li><p><a class="reference internal" href="#december-26-2022" id="toc-entry-8">1.3.39 (December 26, 2022)</a></p></li>
+<li><p><a class="reference internal" href="#march-26-2022" id="toc-entry-9">1.3.38 (March 26, 2022)</a></p></li>
+<li><p><a class="reference internal" href="#december-12-2021" id="toc-entry-10">1.3.37 (December 12, 2021)</a></p></li>
+<li><p><a class="reference internal" href="#december-26-2020" id="toc-entry-11">1.3.36 (December 26, 2020)</a></p></li>
+<li><p><a class="reference internal" href="#february-23-2020" id="toc-entry-12">1.3.35 (February 23, 2020)</a></p></li>
+<li><p><a class="reference internal" href="#december-24-2019" id="toc-entry-13">1.3.34 (December 24, 2019)</a></p></li>
+<li><p><a class="reference internal" href="#july-20-2019" id="toc-entry-14">1.3.33 (July 20, 2019)</a></p></li>
+<li><p><a class="reference internal" href="#june-15-2019" id="toc-entry-15">1.3.32 (June 15, 2019)</a></p></li>
+<li><p><a class="reference internal" href="#november-17-2018" id="toc-entry-16">1.3.31 (November 17, 2018)</a></p></li>
+<li><p><a class="reference internal" href="#june-23-2018" id="toc-entry-17">1.3.30 (June 23, 2018)</a></p></li>
+<li><p><a class="reference internal" href="#april-29-2018" id="toc-entry-18">1.3.29 (April 29, 2018)</a></p></li>
+<li><p><a class="reference internal" href="#january-20-2018" id="toc-entry-19">1.3.28 (January 20, 2018)</a></p></li>
+<li><p><a class="reference internal" href="#december-9-2017" id="toc-entry-20">1.3.27 (December 9, 2017)</a></p></li>
+<li><p><a class="reference internal" href="#july-4-2017" id="toc-entry-21">1.3.26 (July 4, 2017)</a></p></li>
+<li><p><a class="reference internal" href="#september-5-2016" id="toc-entry-22">1.3.25 (September 5, 2016)</a></p></li>
+<li><p><a class="reference internal" href="#may-30-2016" id="toc-entry-23">1.3.24 (May 30, 2016)</a></p></li>
+<li><p><a class="reference internal" href="#november-7-2015" id="toc-entry-24">1.3.23 (November 7, 2015)</a></p></li>
+<li><p><a class="reference internal" href="#october-4-2015" id="toc-entry-25">1.3.22 (October 4, 2015)</a></p></li>
+<li><p><a class="reference internal" href="#february-28-2015" id="toc-entry-26">1.3.21 (February 28, 2015)</a></p></li>
+<li><p><a class="reference internal" href="#august-16-2014" id="toc-entry-27">1.3.20 (August 16, 2014)</a></p></li>
+<li><p><a class="reference internal" href="#december-31-2013" id="toc-entry-28">1.3.19 (December 31, 2013)</a></p></li>
+<li><p><a class="reference internal" href="#march-10-2013" id="toc-entry-29">1.3.18 (March 10, 2013)</a></p></li>
+<li><p><a class="reference internal" href="#october-13-2012" id="toc-entry-30">1.3.17 (October 13, 2012)</a></p></li>
+<li><p><a class="reference internal" href="#june-24-2012" id="toc-entry-31">1.3.16 (June 24, 2012)</a></p></li>
+<li><p><a class="reference internal" href="#april-28-2012" id="toc-entry-32">1.3.15 (April 28, 2012)</a></p></li>
+<li><p><a class="reference internal" href="#february-25-2012" id="toc-entry-33">1.3.14 (February 25, 2012)</a></p></li>
+<li><p><a class="reference internal" href="#december-24-2011" id="toc-entry-34">1.3.13 (December 24, 2011)</a></p></li>
+<li><p><a class="reference internal" href="#march-8-2010" id="toc-entry-35">1.3.12 (March 8, 2010)</a></p></li>
+<li><p><a class="reference internal" href="#february-21-2010" id="toc-entry-36">1.3.11 (February 21, 2010)</a></p></li>
+<li><p><a class="reference internal" href="#february-10-2010" id="toc-entry-37">1.3.10 (February 10, 2010)</a></p></li>
+<li><p><a class="reference internal" href="#february-4-2010" id="toc-entry-38">1.3.9 (February 4, 2010)</a></p></li>
+<li><p><a class="reference internal" href="#january-21-2010" id="toc-entry-39">1.3.8 (January 21, 2010)</a></p></li>
+<li><p><a class="reference internal" href="#september-17-2009" id="toc-entry-40">1.3.7 (September 17, 2009)</a></p></li>
+<li><p><a class="reference internal" href="#july-25-2009" id="toc-entry-41">1.3.6 (July 25, 2009)</a></p></li>
+<li><p><a class="reference internal" href="#january-26-2009" id="toc-entry-42">1.3.5 (January 26, 2009)</a></p></li>
+<li><p><a class="reference internal" href="#january-13-2009" id="toc-entry-43">1.3.4 (January 13, 2009)</a></p></li>
+<li><p><a class="reference internal" href="#december-9-2008" id="toc-entry-44">1.3.3 (December 9, 2008)</a></p></li>
+<li><p><a class="reference internal" href="#november-29-2008" id="toc-entry-45">1.3.2 (November 29, 2008)</a></p></li>
+<li><p><a class="reference internal" href="#november-17-2008" id="toc-entry-46">1.3.1 (November 17, 2008)</a></p></li>
+<li><p><a class="reference internal" href="#november-9-2008" id="toc-entry-47">1.3 (November 9, 2008)</a></p></li>
+<li><p><a class="reference internal" href="#april-29-2008" id="toc-entry-48">1.2 (April 29, 2008)</a></p></li>
+<li><p><a class="reference internal" href="#released-april-4-2004" id="toc-entry-49">1.1 (Released April 4, 2004)</a></p></li>
+<li><p><a class="reference internal" href="#released-in-may-2003" id="toc-entry-50">1.0 (Released in May, 2003)</a></p></li>
 </ul>
-</div>
+</nav>
+<section id="october-29-2025">
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">1.3.46 (October 29, 2025)</a></h1>
+<p>Special Issues:</p>
+<ul class="simple">
+<li><p>GraphicsMagick needs some additional productive volunteers.  For
+several years now, the burden has entirely been on me (Bob
+Friesenhahn).  I have been sheparding the project for 23 years
+already (and contributed to ImageMagick and GraphicsMagick combined
+for 29 years already).  Volunteers are needed to add/improve
+new/existing file format support, and to assure correct operation on
+all targets.  Donations are requested in order to purchase a new
+computer to run Windows 11.</p></li>
+</ul>
+<p>Security Fixes:</p>
+<ul class="simple">
+<li><p>MSL: Use libxml2's SAX handlers for the MVG XML-based scripting
+implementation.  This removes a lot of archaic cruft which might
+suffer from security issues.</p></li>
+<li><p>JP2: Fix Jasper max_samples calculation to avoid DOS due to huge
+image dimensions.</p></li>
+<li><p>JXL: Apply image dimension resource limits. Fix heap buffer write
+overflow while reading image.</p></li>
+<li><p>SVG: Use libxml2's SAX handlers for the SVG renderer.  This removes
+a lot of archaic cruft which might suffer from security issues.</p></li>
+<li><p>WPG: Assure that the palette buffer is allocated and the current
+size (SourceForge bug #750).</p></li>
+<li><p>ColorFloodfillImage(): For floodfill, return an error if a clip-mask
+is present. The problem is that the algorithm may not converge if a
+clip-mask is present.</p></li>
+<li><p>ThumbnailImage(): Prevent a divide by zero crash.</p></li>
+</ul>
+<p>Bug fixes:</p>
+<ul class="simple">
+<li><p>BMP: Assure that the opacity channel is initialized, even if the
+image is indicated to be opaque. This avoids issues with code which
+assumes that the opacity channel is always initialized.</p></li>
+<li><p>BRAILLE: Eliminate a Clang scan-build gripe regarding access off the
+end of an array.</p></li>
+<li><p>JPEG: Since GraphicsMagick 1.3.43, CMYK JPEG has been writing
+inverted. This bug is now fixed.</p></li>
+<li><p>JPEG: Enforce that JPEG is written as RGB unless a different
+colorspace was specified.</p></li>
+<li><p>PNG8: It is decided that PNG8 does indeed mean indexed-color with
+8-bit sample depth and only binary transparency is supported.  With
+this objective, the PNG8 writer is re-implemented, including
+attempting to produce reasonable output when the original image can
+not be represented completely due to too many colors, or complex
+opacity.  There is still much work to be done to produce optimum
+output given complex/messy images.</p></li>
+<li><p>MNG: Validate that Validate that MNG width or height is non-zero.</p></li>
+<li><p>TclMagick: The TclMagick build uses the latest TEA tcl.m4 macros,
+while modernizing the Automake and Autoconf files. Many defects in
+the C code are corrected.  The libttkcommon &quot;shim&quot; library,
+previously used to allow TkMagick to work, is completely
+eliminated. The names of installed shared objects now match the
+names generated by the TEA tcl.m4 module.  The TclMagick tests are
+integrated into the build via 'make check' and 'make test'.  Even
+'make distcheck' works now.</p></li>
+<li><p>HEIF: Only apply Exif orientation if ignore-transformations is true
+since HEIF native transformations will handle orientation otherwise.</p></li>
+<li><p>HEIF: Use primary image for HEIC even when it has multiple images.</p></li>
+<li><p>Hull transform: Fix a arithemetic overflow regression added on
+October 21, 2023.</p></li>
+<li><p>JXL: Free profile memory if JxlDecoderSetBoxBuffer() fails.</p></li>
+<li><p>Magick++ 'analyze' demo: Request &quot;Analyze&quot; rather than &quot;analyze&quot;. It
+is not clear how this was working before.</p></li>
+<li><p>TIFF: EXPERIMENTAL_EXIF_TAGS is enabled by default again since all
+known security issues have been addressed.  Use
+CPPFLAGS=-DEXPERIMENTAL_EXIF_TAGS=0 to disable it.</p></li>
+<li><p>TIFF: Only handle EXIF and GPS IFDs once in order to avoid infinite
+recursion.</p></li>
+<li><p>TIFF: Do not transfer image-dependent TIFFTAG_TRANSFERFUNCTION and
+TIFFTAG_COLORMAP tags.</p></li>
+<li><p>XPM: Eliminate a Clang scan-build gripe about use of a &quot;garbage value&quot;.</p></li>
+<li><p>GetImageBoundingBox(): If image rows or columns is zero, then return
+default bounds.</p></li>
+<li><p>TransformImage(), and -crop: Sove the problem &quot;-crop does not
+generate tiles when used with a percentage&quot;</p></li>
+<li><p>DrawImage(): Fix derefrence of a NULL pointer as well as shoring up
+error handling related to DrawPatternPath().</p></li>
+</ul>
+<p>New Features:</p>
+<ul class="simple">
+<li><p>Support the newer Artifex urw-base35-fonts.  Both OpenType and
+Postscript Type 1 fonts are supported.  This is in response to to
+Debian bug 1019717 &quot;Display of an SVG file broken due to gsfonts
+transition&quot;,
+<a class="reference external" href="https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1019717">https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1019717</a>.</p></li>
+<li><p>Support XML predefined entities when reading delegates.mgk so that
+it may be expressed in valid XML.</p></li>
+<li><p>Header Magic: When identifying files via their header, there is now
+a magic description field to indicate the sub-format used.</p></li>
+<li><p>Header Magic: Include a format description in the output of 'gm
+convert -list magic'.</p></li>
+<li><p>TIFF: Add support for libtiff 4.5 TIFFWarningExtR() and
+TIFFErrorExtR() in order to provide an error handling context per
+TIFF handle.  This improves concurrency and thread safety when
+multiple libraries are using libtiff within the same process.</p></li>
+<li><p>EXIF attribute decoding is now updated to support Exif Version 3.0.</p></li>
+<li><p>EXIF validation is added, based on the expected EXIF tag format and
+expected number of components.  Quite a lot of testing was done to
+discover (and allow) minor deviations from the specification. The
+validation is done to detect and prevent the reproduction of
+incorherent &quot;garble&quot;.</p></li>
+<li><p>HEIF (HEIC, AVIF, etc.), rewrite the Re-write the HEIF reader (AVIF,
+HEIC, etc.) to be based on heif_image_get_plane_readonly2().  With
+the re-write comes support for deep images, as well as returning
+YCbCr and monochrome images.  Use '-define
+heif:preserve-colorspace=true' to return the image in its original
+colorspace. Defines are provided to support all currently existing
+security limits.</p></li>
+</ul>
+<p>API Updates:</p>
+<ul class="simple">
+<li><p>Magick++: Added InitializeMagickSentinel helper class, which
+performs the function of InitializeMagick() and invokes
+DestroyMagick() when an object created based on it goes out of
+scope.  The Magick++ demos and tests are updated to use this class.</p></li>
+<li><p>Wand: MagickSetImagePixels(), If update image has matte, then
+promote canvas image to have matte.  Support composing individual
+channels 'R', 'G', 'B', 'A', 'O', 'T', 'C', 'M', 'Y', 'K'.</p></li>
+</ul>
+<p>Behavior Changes:</p>
+<ul class="simple">
+<li><p>Magick++: Support for automatic cleanup via a 'MagickCleanUp' static
+object is removed due to race conditions with static destruction in
+other libraries.</p></li>
+<li><p>SetImageAttribute(): No longer translate format requests for special
+format characters (e.g. &quot;%m:%f %wx%h&quot;) in attribute text.  Any code
+which was relying on this should use TranslateText() to perform the
+translations prior to calling SetImageAttribute().</p></li>
+</ul>
+<p>Build Changes:</p>
+<ul class="simple">
+<li><p>The build now requires a C'99 compatible compiler (inttypes.h,
+stdint.h, and printf 'j', 'z', and 't' formatters).  This means that
+(absent additional porting efforts) Solaris 10 U8 (released in
+October 2009) may be the oldest system supported.  C'89 is obviously
+from 1989 and although I was glad to hear that systems from the
+mid'90s were still able to compile and use recent GraphicsMagick,
+adding the C'99 requirement is part of an effort to simplify
+GraphicsMagick configuration requirements.  Libraries that
+GraphicsMagick optionally uses had already adopted a C'99 or
+C'11 (2011) requirement.</p></li>
+<li><p>The Autoconf-based configure script is significantly re-written so
+that it takes advantage of everything learned via pkg-config, but
+continues to be able to function if pkg-config data is not
+available. In particular, the primary library name (e.g. '-lpng16d')
+produced by pkg-config data is deduced, and used, if available.  The
+configuration summary at the end now includes a listing of all of
+the direct dependencies required to link with each delegate library.
+Static library based builds (as used in the oss-fuzz builds) require
+that all of the dependencies are listed and so they produce a larger
+dependency summary than when shared libraries are used.</p></li>
+<li><p>Use Autoconf 2.72 and require Autoconf 2.71 (or later).</p></li>
+<li><p>Use Automake 1.17.</p></li>
+<li><p>Update Libtool to version 2.5.4.</p></li>
+<li><p>Test and demo programs are added to Coverity analysis.  This
+necessitated fixing test/demo code to use &quot;secure&quot; buffer handling.</p></li>
+<li><p>Build the software differently for the oss-fuzz build so that
+features not useful, or harmful to, oss-fuzz testing are
+removed. This is indicated when
+FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is defined.</p></li>
+<li><p>The oss-fuzz build script (fuzzing/oss-fuzz-build.sh) is
+subtantially updated to build a fully-featured libheif, with a set
+of common libraries it depends on. In fact, all of the dependencies
+(except for some rarely-used libtiff dependencies) are now included.</p></li>
+</ul>
+<p>Windows Delegate Updates/Additions:</p>
+<ul class="simple">
+<li><p>libwmf: Update/import <a class="reference external" href="https://github.com/caolanm/libwmf">https://github.com/caolanm/libwmf</a> files
+(v0.2.13+) up to commit ec63c9b as of 1/14/25.  This is a leap
+forward of 24 years!</p></li>
+</ul>
+</section>
 <section id="august-27-2024">
-<h1><a class="toc-backref" href="#id2">1.3.45 (August 27, 2024)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">1.3.45 (August 27, 2024)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick needs some additional productive volunteers.  For
@@ -142,7 +318,7 @@ converting PDF with multiple pages).</p></li>
 </ul>
 </section>
 <section id="august-18-2024">
-<h1><a class="toc-backref" href="#id3">1.3.44 (August 18, 2024)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">1.3.44 (August 18, 2024)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick needs some additional productive volunteers.  For
@@ -263,7 +439,7 @@ bytes) on maximum filesystem block size.</p></li>
 </ul>
 </section>
 <section id="march-23-2024">
-<h1><a class="toc-backref" href="#id4">1.3.43 (March 23, 2024)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">1.3.43 (March 23, 2024)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>Due to my Internet provider (which I have used since 2001) failing
@@ -375,7 +551,7 @@ oss-fuzz testing.</p></li>
 </ul>
 </section>
 <section id="september-23-2023">
-<h1><a class="toc-backref" href="#id5">1.3.42 (September 23, 2023)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">1.3.42 (September 23, 2023)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick really does need some additional productive
@@ -453,7 +629,7 @@ introduced in 1.3.41 has been disabled.</p></li>
 </ul>
 </section>
 <section id="august-12-2023">
-<h1><a class="toc-backref" href="#id6">1.3.41 (August 12, 2023)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">1.3.41 (August 12, 2023)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick really does need some additional productive
@@ -558,7 +734,7 @@ expose code which is using this feature.</p></li>
 </ul>
 </section>
 <section id="january-14-2023">
-<h1><a class="toc-backref" href="#id7">1.3.40 (January 14, 2023)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">1.3.40 (January 14, 2023)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick really does need some additional productive
@@ -630,7 +806,7 @@ pointer to the first image in the list is needed.</p></li>
 </ul>
 </section>
 <section id="december-26-2022">
-<h1><a class="toc-backref" href="#id8">1.3.39 (December 26, 2022)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">1.3.39 (December 26, 2022)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>GraphicsMagick really does need some additional productive
@@ -760,7 +936,7 @@ disabled (otherwise there is an internal compiler error in effect.c).</p></li>
 </ul>
 </section>
 <section id="march-26-2022">
-<h1><a class="toc-backref" href="#id9">1.3.38 (March 26, 2022)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">1.3.38 (March 26, 2022)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>The FTP site ftp.graphicsmagick.org is now shut down due to a lack
@@ -861,7 +1037,7 @@ support PGP-signed development snapshots.</p></li>
 </ul>
 </section>
 <section id="december-12-2021">
-<h1><a class="toc-backref" href="#id10">1.3.37 (December 12, 2021)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-10" role="doc-backlink">1.3.37 (December 12, 2021)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>The FTP site ftp.graphicsmagick.org is now shut down due to a lack
@@ -996,7 +1172,7 @@ centimeters if units is in pixels-per-centimeter.</p></li>
 </ul>
 </section>
 <section id="december-26-2020">
-<h1><a class="toc-backref" href="#id11">1.3.36 (December 26, 2020)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-11" role="doc-backlink">1.3.36 (December 26, 2020)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -1157,7 +1333,7 @@ programs using GraphicsMagick.</p></li>
 </ul>
 </section>
 <section id="february-23-2020">
-<h1><a class="toc-backref" href="#id12">1.3.35 (February 23, 2020)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-12" role="doc-backlink">1.3.35 (February 23, 2020)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>It has been discovered that the 'ICU' library (a perhaps 30MB C++
@@ -1267,7 +1443,7 @@ notice and be concerned about it.</p></li>
 </ul>
 </section>
 <section id="december-24-2019">
-<h1><a class="toc-backref" href="#id13">1.3.34 (December 24, 2019)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-13" role="doc-backlink">1.3.34 (December 24, 2019)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>It has been discovered that the 'ICU' library (a perhaps 30MB C++
@@ -1384,7 +1560,7 @@ without &quot;administrator&quot; privileges.</p></li>
 </ul>
 </section>
 <section id="july-20-2019">
-<h1><a class="toc-backref" href="#id14">1.3.33 (July 20, 2019)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-14" role="doc-backlink">1.3.33 (July 20, 2019)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>It has been discovered that the 'ICU' library (a perhaps 30MB C++
@@ -1468,7 +1644,7 @@ color is marked as transparent.</p></li>
 </ul>
 </section>
 <section id="june-15-2019">
-<h1><a class="toc-backref" href="#id15">1.3.32 (June 15, 2019)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-15" role="doc-backlink">1.3.32 (June 15, 2019)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>It has been discovered that the 'ICU' library (a perhaps 30MB C++
@@ -1593,12 +1769,6 @@ Write Shared Libraries</a>.</p>
 the 1.3.31 and 1.3.32 releases for a simple shared library with all
 features supported:</p>
 <table>
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 25%" />
-<col style="width: 35%" />
-<col style="width: 23%" />
-</colgroup>
 <thead>
 <tr><th class="head"><p>Release</p></th>
 <th class="head"><p>Relocations</p></th>
@@ -1623,12 +1793,6 @@ features supported:</p>
 1.3.32 for a shared library using the modules option (recommended!)
 with all features supported:</p>
 <table>
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 25%" />
-<col style="width: 35%" />
-<col style="width: 23%" />
-</colgroup>
 <thead>
 <tr><th class="head"><p>Release</p></th>
 <th class="head"><p>Relocations</p></th>
@@ -1678,7 +1842,7 @@ advance on the text string using TranslateText() if need be.</p></li>
 </ul>
 </section>
 <section id="november-17-2018">
-<h1><a class="toc-backref" href="#id16">1.3.31 (November 17, 2018)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-16" role="doc-backlink">1.3.31 (November 17, 2018)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>Firmware and operating system updates to address the Spectre
@@ -1770,7 +1934,7 @@ forever.</p></li>
 </ul>
 </section>
 <section id="june-23-2018">
-<h1><a class="toc-backref" href="#id17">1.3.30 (June 23, 2018)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-17" role="doc-backlink">1.3.30 (June 23, 2018)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -1849,7 +2013,7 @@ compilation via the MaxWarningCount definition in coders/jpeg.c.</p></li>
 </ul>
 </section>
 <section id="april-29-2018">
-<h1><a class="toc-backref" href="#id18">1.3.29 (April 29, 2018)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-18" role="doc-backlink">1.3.29 (April 29, 2018)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -1943,7 +2107,7 @@ to the efforts of Greg Wolfe.</p></li>
 </ul>
 </section>
 <section id="january-20-2018">
-<h1><a class="toc-backref" href="#id19">1.3.28 (January 20, 2018)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-19" role="doc-backlink">1.3.28 (January 20, 2018)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -2022,7 +2186,7 @@ renaming.</p></li>
 </ul>
 </section>
 <section id="december-9-2017">
-<h1><a class="toc-backref" href="#id20">1.3.27 (December 9, 2017)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-20" role="doc-backlink">1.3.27 (December 9, 2017)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -2180,7 +2344,7 @@ removed from shared library or DLL namespace.</p></li>
 </ul>
 </section>
 <section id="july-4-2017">
-<h1><a class="toc-backref" href="#id21">1.3.26 (July 4, 2017)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-21" role="doc-backlink">1.3.26 (July 4, 2017)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -2283,7 +2447,7 @@ source tree.  All of these depend on proprietary components.</p></li>
 </ul>
 </section>
 <section id="september-5-2016">
-<h1><a class="toc-backref" href="#id22">1.3.25 (September 5, 2016)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-22" role="doc-backlink">1.3.25 (September 5, 2016)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>None</p></li>
@@ -2360,7 +2524,7 @@ seconds precision in in elapsed time output.</p></li>
 </ul>
 </section>
 <section id="may-30-2016">
-<h1><a class="toc-backref" href="#id23">1.3.24 (May 30, 2016)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-23" role="doc-backlink">1.3.24 (May 30, 2016)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>A shell exploit (CVE-2016-5118) was discovered associated with a
@@ -2482,7 +2646,7 @@ delegate.mgk file.</p></li>
 </ul>
 </section>
 <section id="november-7-2015">
-<h1><a class="toc-backref" href="#id24">1.3.23 (November 7, 2015)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-24" role="doc-backlink">1.3.23 (November 7, 2015)</a></h1>
 <p>Special Issues:</p>
 <ul class="simple">
 <li><p>Due to <a class="reference external" href="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53967">GCC bug 53967</a>, several key agorithms (e.g. convolution)
@@ -2547,7 +2711,7 @@ available in recent Ghostscript.</p></li>
 </ul>
 </section>
 <section id="october-4-2015">
-<h1><a class="toc-backref" href="#id25">1.3.22 (October 4, 2015)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-25" role="doc-backlink">1.3.22 (October 4, 2015)</a></h1>
 <p>Thanks:</p>
 <ul class="simple">
 <li><p>Coverity: We thank Coverity for providing free service for free
@@ -2656,7 +2820,7 @@ The STL function-object equivalent of the deprecated method is removed
 entirely.</p>
 </section>
 <section id="february-28-2015">
-<h1><a class="toc-backref" href="#id26">1.3.21 (February 28, 2015)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-26" role="doc-backlink">1.3.21 (February 28, 2015)</a></h1>
 <p>Thanks:</p>
 <blockquote>
 <ul class="simple">
@@ -2893,7 +3057,7 @@ for an RGB image.</p></li>
 </blockquote>
 </section>
 <section id="august-16-2014">
-<h1><a class="toc-backref" href="#id27">1.3.20 (August 16, 2014)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-27" role="doc-backlink">1.3.20 (August 16, 2014)</a></h1>
 <p>Special Issues:</p>
 <blockquote>
 <ul class="simple">
@@ -3057,7 +3221,7 @@ optimizations since their implementations have been problematic.</p></li>
 </blockquote>
 </section>
 <section id="december-31-2013">
-<h1><a class="toc-backref" href="#id28">1.3.19 (December 31, 2013)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-28" role="doc-backlink">1.3.19 (December 31, 2013)</a></h1>
 <p>Special Issues:</p>
 <blockquote>
 <ul class="simple">
@@ -3216,7 +3380,7 @@ multiple Ghostscript versions.</p></li>
 </blockquote>
 </section>
 <section id="march-10-2013">
-<h1><a class="toc-backref" href="#id29">1.3.18 (March 10, 2013)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-29" role="doc-backlink">1.3.18 (March 10, 2013)</a></h1>
 <p>Special Issues:</p>
 <blockquote>
 <ul class="simple">
@@ -3330,7 +3494,7 @@ color is in the same colorspace as the image.</p></li>
 </blockquote>
 </section>
 <section id="october-13-2012">
-<h1><a class="toc-backref" href="#id30">1.3.17 (October 13, 2012)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-30" role="doc-backlink">1.3.17 (October 13, 2012)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3417,7 +3581,7 @@ will search for firefox, google-chrome, mozilla (in that order).</p></li>
 </blockquote>
 </section>
 <section id="june-24-2012">
-<h1><a class="toc-backref" href="#id31">1.3.16 (June 24, 2012)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-31" role="doc-backlink">1.3.16 (June 24, 2012)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3484,7 +3648,7 @@ include OpenMP support for it by default.</p></li>
 </blockquote>
 </section>
 <section id="april-28-2012">
-<h1><a class="toc-backref" href="#id32">1.3.15 (April 28, 2012)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-32" role="doc-backlink">1.3.15 (April 28, 2012)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3558,7 +3722,7 @@ anticipate the automatic file numbering.</p></li>
 </blockquote>
 </section>
 <section id="february-25-2012">
-<h1><a class="toc-backref" href="#id33">1.3.14 (February 25, 2012)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-33" role="doc-backlink">1.3.14 (February 25, 2012)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3615,7 +3779,7 @@ was using the filter setting from the Image structure instead.</p></li>
 </blockquote>
 </section>
 <section id="december-24-2011">
-<h1><a class="toc-backref" href="#id34">1.3.13 (December 24, 2011)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-34" role="doc-backlink">1.3.13 (December 24, 2011)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <p>None</p>
@@ -3770,7 +3934,7 @@ static builds.</p></li>
 </blockquote>
 </section>
 <section id="march-8-2010">
-<h1><a class="toc-backref" href="#id35">1.3.12 (March 8, 2010)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-35" role="doc-backlink">1.3.12 (March 8, 2010)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3814,7 +3978,7 @@ would be written.</p></li>
 </blockquote>
 </section>
 <section id="february-21-2010">
-<h1><a class="toc-backref" href="#id36">1.3.11 (February 21, 2010)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-36" role="doc-backlink">1.3.11 (February 21, 2010)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3866,7 +4030,7 @@ opaque.</p></li>
 </blockquote>
 </section>
 <section id="february-10-2010">
-<h1><a class="toc-backref" href="#id37">1.3.10 (February 10, 2010)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-37" role="doc-backlink">1.3.10 (February 10, 2010)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3913,7 +4077,7 @@ scene number substition is desired in the output file names.</p></li>
 </blockquote>
 </section>
 <section id="february-4-2010">
-<h1><a class="toc-backref" href="#id38">1.3.9 (February 4, 2010)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-38" role="doc-backlink">1.3.9 (February 4, 2010)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -3972,7 +4136,7 @@ image in the list if it is not already opaque.</p></li>
 </blockquote>
 </section>
 <section id="january-21-2010">
-<h1><a class="toc-backref" href="#id39">1.3.8 (January 21, 2010)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-39" role="doc-backlink">1.3.8 (January 21, 2010)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4126,7 +4290,7 @@ distributed.</p></li>
 </blockquote>
 </section>
 <section id="september-17-2009">
-<h1><a class="toc-backref" href="#id40">1.3.7 (September 17, 2009)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-40" role="doc-backlink">1.3.7 (September 17, 2009)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4216,7 +4380,7 @@ structure is clean prior to invoking a function.</p></li>
 </blockquote>
 </section>
 <section id="july-25-2009">
-<h1><a class="toc-backref" href="#id41">1.3.6 (July 25, 2009)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-41" role="doc-backlink">1.3.6 (July 25, 2009)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4350,7 +4514,7 @@ progressive JPEG.</p></li>
 </blockquote>
 </section>
 <section id="january-26-2009">
-<h1><a class="toc-backref" href="#id42">1.3.5 (January 26, 2009)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-42" role="doc-backlink">1.3.5 (January 26, 2009)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4389,7 +4553,7 @@ not available.</p></li>
 </blockquote>
 </section>
 <section id="january-13-2009">
-<h1><a class="toc-backref" href="#id43">1.3.4 (January 13, 2009)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-43" role="doc-backlink">1.3.4 (January 13, 2009)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4428,7 +4592,7 @@ not available.</p></li>
 </blockquote>
 </section>
 <section id="december-9-2008">
-<h1><a class="toc-backref" href="#id44">1.3.3 (December 9, 2008)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-44" role="doc-backlink">1.3.3 (December 9, 2008)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4460,7 +4624,7 @@ used in a directory containing a million files.</p></li>
 </blockquote>
 </section>
 <section id="november-29-2008">
-<h1><a class="toc-backref" href="#id45">1.3.2 (November 29, 2008)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-45" role="doc-backlink">1.3.2 (November 29, 2008)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4493,7 +4657,7 @@ process the opacity channel unless the image has one.</p></li>
 </blockquote>
 </section>
 <section id="november-17-2008">
-<h1><a class="toc-backref" href="#id46">1.3.1 (November 17, 2008)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-46" role="doc-backlink">1.3.1 (November 17, 2008)</a></h1>
 <p>Security Fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4532,7 +4696,7 @@ encoding is used via jpeg:optimize-coding define.</p></li>
 </blockquote>
 </section>
 <section id="november-9-2008">
-<h1><a class="toc-backref" href="#id47">1.3 (November 9, 2008)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-47" role="doc-backlink">1.3 (November 9, 2008)</a></h1>
 <p>Security fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -4747,7 +4911,7 @@ dither any named channel.</p></li>
 </blockquote>
 </section>
 <section id="april-29-2008">
-<h1><a class="toc-backref" href="#id48">1.2 (April 29, 2008)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-48" role="doc-backlink">1.2 (April 29, 2008)</a></h1>
 <p>Security fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -5003,7 +5167,7 @@ distributed).</p></li>
 </blockquote>
 </section>
 <section id="released-april-4-2004">
-<h1><a class="toc-backref" href="#id49">1.1 (Released April 4, 2004)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-49" role="doc-backlink">1.1 (Released April 4, 2004)</a></h1>
 <p>Bug fixes:</p>
 <blockquote>
 <ul class="simple">
@@ -5243,7 +5407,7 @@ logging system.</p></li>
 </section>
 <hr class="docutils" />
 <section id="released-in-may-2003">
-<h1><a class="toc-backref" href="#id50">1.0 (Released in May, 2003)</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-50" role="doc-backlink">1.0 (Released in May, 2003)</a></h1>
 <p>GraphicsMagick support services:</p>
 <blockquote>
 <ul class="simple">
@@ -5394,7 +5558,7 @@ ImageMagick, several days before the ImageMagick 5.5.2 release.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="Copyright.html">Copyright</a> © GraphicsMagick Group 2002 - 2024<!--SPONSOR_LOGO--></p>
+    <p><a href="Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

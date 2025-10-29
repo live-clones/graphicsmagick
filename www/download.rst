@@ -1,12 +1,12 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 =======================
 GraphicsMagick Download
 =======================
 
-.. _Bob Friesenhahn : mailto:bfriesen@graphicsmagick.org
+.. _Bob Friesenhahn : mailto:bobjfriesenhahn@gmail.com
 .. _SourceForge Download : https://sourceforge.net/projects/graphicsmagick/files/
 .. _tar : https://en.wikipedia.org/wiki/Tar_(computing)
 
@@ -97,10 +97,12 @@ The signing key used (currently DSA key id
 EBDFDB21B020EE8FD151A88DE301047DE1198975) may be downloaded in several
 different ways.
 
-The key may be downloaded directly from
-http://www.simplesystems.org/users/bfriesen/public-key.txt, or it may
-be extracted from the text of
-http://www.graphicsmagick.org/security.html.
+Please note that this signing key expires on 2028-10-25 and I *should*
+publish a new key before then.
+
+The key may be extracted from the text of
+http://www.graphicsmagick.org/security.html or www/security.rst from
+the source repository.
 
 It may be also downloaded from a public key server (if you are lucky)
 like::

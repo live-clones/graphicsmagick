@@ -20,8 +20,7 @@
 #ifndef LIBWMF_API_H
 #define LIBWMF_API_H
 
-// #include <zlib.h>
-typedef void *gzFile; // This is all that was obtained from zlib.h
+#include <zlib.h>
 
 #include <libwmf/types.h>
 
@@ -106,7 +105,8 @@ extern wmf_error_t wmf_mem_close (wmfAPI*);
 /**
  * Creates compressed character output file stream
  */
-extern wmfStream* wmf_ztream_create (wmfAPI*,gzFile);
+
+/* extern wmfStream* wmf_ztream_create(wmfAPI*, gzFile); */ /* FIXME: wmf\include\libwmf\api.h(109,46): error C2081: 'gzFile': name in formal parameter list illegal */
 
 /**
  * Creates uncompressed character output file or memory stream
@@ -349,7 +349,7 @@ extern wmf_error_t wmf_wmfxml_import (wmfAPI*,const char*);
  * 
  * (debug build only)
  */
-#define WMF_DEBUG(Z,M)
+#define WMF_DEBUG(Z,M) (void)Z
 
 /**
  * @param Z the API handle

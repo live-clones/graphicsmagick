@@ -41,14 +41,14 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents" role="doc-toc">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#coordinate-structure" id="id8">Coordinate structure</a></p></li>
-<li><p><a class="reference internal" href="#drawable-classes" id="id9">Drawable classes</a></p></li>
-<li><p><a class="reference internal" href="#vector-path-classes" id="id10">Vector Path Classes</a></p></li>
+<li><p><a class="reference internal" href="#coordinate-structure" id="toc-entry-1">Coordinate structure</a></p></li>
+<li><p><a class="reference internal" href="#drawable-classes" id="toc-entry-2">Drawable classes</a></p></li>
+<li><p><a class="reference internal" href="#vector-path-classes" id="toc-entry-3">Vector Path Classes</a></p></li>
 </ul>
-</div>
+</nav>
 <p>Drawable provides a convenient interface for preparing vector, image,
 or text arguments for the Image::draw() method. Each instance of a
 Drawable sub-class represents a single drawable object. Drawable
@@ -147,7 +147,7 @@ int main(int /*argc*/,char **/*argv*/)
   return 0;
 }</pre>
 <section id="coordinate-structure">
-<h1><a class="toc-backref" href="#id8">Coordinate structure</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">Coordinate structure</a></h1>
 <p>Drawable depends on the simple Coordinate structure which represents a
 pair of x,y coodinates. The Coordinate structure is defined as
 follows:</p>
@@ -174,62 +174,62 @@ public:
 };</pre>
 </section>
 <section id="drawable-classes">
-<h1><a class="toc-backref" href="#id9">Drawable classes</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">Drawable classes</a></h1>
 <p>Drawable classes represent objects to be drawn on the image.</p>
-<div class="contents local topic" id="id2">
+<nav class="contents local" id="topic-1">
 <p class="topic-title">Drawable classes</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#drawableaffine" id="id11">DrawableAffine</a></p></li>
-<li><p><a class="reference internal" href="#drawablearc" id="id12">DrawableArc</a></p></li>
-<li><p><a class="reference internal" href="#drawablebezier" id="id13">DrawableBezier</a></p></li>
-<li><p><a class="reference internal" href="#drawableclippath" id="id14">DrawableClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawablecircle" id="id15">DrawableCircle</a></p></li>
-<li><p><a class="reference internal" href="#drawablecolor" id="id16">DrawableColor</a></p></li>
-<li><p><a class="reference internal" href="#drawablecompositeimage" id="id17">DrawableCompositeImage</a></p></li>
-<li><p><a class="reference internal" href="#drawabledasharray" id="id18">DrawableDashArray</a></p></li>
-<li><p><a class="reference internal" href="#drawabledashoffset" id="id19">DrawableDashOffset</a></p></li>
-<li><p><a class="reference internal" href="#drawableellipse" id="id20">DrawableEllipse</a></p></li>
-<li><p><a class="reference internal" href="#drawablefillcolor" id="id21">DrawableFillColor</a></p></li>
-<li><p><a class="reference internal" href="#drawablefillrule" id="id22">DrawableFillRule</a></p></li>
-<li><p><a class="reference internal" href="#drawablefillopacity" id="id23">DrawableFillOpacity</a></p></li>
-<li><p><a class="reference internal" href="#drawablefont" id="id24">DrawableFont</a></p></li>
-<li><p><a class="reference internal" href="#drawablegravity" id="id25">DrawableGravity</a></p></li>
-<li><p><a class="reference internal" href="#drawableline" id="id26">DrawableLine</a></p></li>
-<li><p><a class="reference internal" href="#drawablematte" id="id27">DrawableMatte</a></p></li>
-<li><p><a class="reference internal" href="#drawablemiterlimit" id="id28">DrawableMiterLimit</a></p></li>
-<li><p><a class="reference internal" href="#drawablepath" id="id29">DrawablePath</a></p></li>
-<li><p><a class="reference internal" href="#drawablepoint" id="id30">DrawablePoint</a></p></li>
-<li><p><a class="reference internal" href="#drawablepointsize" id="id31">DrawablePointSize</a></p></li>
-<li><p><a class="reference internal" href="#drawablepolygon" id="id32">DrawablePolygon</a></p></li>
-<li><p><a class="reference internal" href="#drawablepolyline" id="id33">DrawablePolyline</a></p></li>
-<li><p><a class="reference internal" href="#drawablepopclippath" id="id34">DrawablePopClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawablepopgraphiccontext" id="id35">DrawablePopGraphicContext</a></p></li>
-<li><p><a class="reference internal" href="#drawablepushclippath" id="id36">DrawablePushClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawablepushgraphiccontext" id="id37">DrawablePushGraphicContext</a></p></li>
-<li><p><a class="reference internal" href="#drawablepushpattern" id="id38">DrawablePushPattern</a></p></li>
-<li><p><a class="reference internal" href="#drawablepoppattern" id="id39">DrawablePopPattern</a></p></li>
-<li><p><a class="reference internal" href="#drawablerectangle" id="id40">DrawableRectangle</a></p></li>
-<li><p><a class="reference internal" href="#drawablerotation" id="id41">DrawableRotation</a></p></li>
-<li><p><a class="reference internal" href="#drawableroundrectangle" id="id42">DrawableRoundRectangle</a></p></li>
-<li><p><a class="reference internal" href="#drawablescaling" id="id43">DrawableScaling</a></p></li>
-<li><p><a class="reference internal" href="#drawableskewx" id="id44">DrawableSkewX</a></p></li>
-<li><p><a class="reference internal" href="#drawableskewy" id="id45">DrawableSkewY</a></p></li>
-<li><p><a class="reference internal" href="#drawablestrokeantialias" id="id46">DrawableStrokeAntialias</a></p></li>
-<li><p><a class="reference internal" href="#drawablestrokecolor" id="id47">DrawableStrokeColor</a></p></li>
-<li><p><a class="reference internal" href="#drawablestrokelinecap" id="id48">DrawableStrokeLineCap</a></p></li>
-<li><p><a class="reference internal" href="#drawablestrokelinejoin" id="id49">DrawableStrokeLineJoin</a></p></li>
-<li><p><a class="reference internal" href="#drawablestrokeopacity" id="id50">DrawableStrokeOpacity</a></p></li>
-<li><p><a class="reference internal" href="#drawablestrokewidth" id="id51">DrawableStrokeWidth</a></p></li>
-<li><p><a class="reference internal" href="#drawabletext" id="id52">DrawableText</a></p></li>
-<li><p><a class="reference internal" href="#drawabletextantialias" id="id53">DrawableTextAntialias</a></p></li>
-<li><p><a class="reference internal" href="#drawabletextdecoration" id="id54">DrawableTextDecoration</a></p></li>
-<li><p><a class="reference internal" href="#drawabletextundercolor" id="id55">DrawableTextUnderColor</a></p></li>
-<li><p><a class="reference internal" href="#drawabletranslation" id="id56">DrawableTranslation</a></p></li>
-<li><p><a class="reference internal" href="#drawableviewbox" id="id57">DrawableViewbox</a></p></li>
+<li><p><a class="reference internal" href="#drawableaffine" id="toc-entry-4">DrawableAffine</a></p></li>
+<li><p><a class="reference internal" href="#drawablearc" id="toc-entry-5">DrawableArc</a></p></li>
+<li><p><a class="reference internal" href="#drawablebezier" id="toc-entry-6">DrawableBezier</a></p></li>
+<li><p><a class="reference internal" href="#drawableclippath" id="toc-entry-7">DrawableClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawablecircle" id="toc-entry-8">DrawableCircle</a></p></li>
+<li><p><a class="reference internal" href="#drawablecolor" id="toc-entry-9">DrawableColor</a></p></li>
+<li><p><a class="reference internal" href="#drawablecompositeimage" id="toc-entry-10">DrawableCompositeImage</a></p></li>
+<li><p><a class="reference internal" href="#drawabledasharray" id="toc-entry-11">DrawableDashArray</a></p></li>
+<li><p><a class="reference internal" href="#drawabledashoffset" id="toc-entry-12">DrawableDashOffset</a></p></li>
+<li><p><a class="reference internal" href="#drawableellipse" id="toc-entry-13">DrawableEllipse</a></p></li>
+<li><p><a class="reference internal" href="#drawablefillcolor" id="toc-entry-14">DrawableFillColor</a></p></li>
+<li><p><a class="reference internal" href="#drawablefillrule" id="toc-entry-15">DrawableFillRule</a></p></li>
+<li><p><a class="reference internal" href="#drawablefillopacity" id="toc-entry-16">DrawableFillOpacity</a></p></li>
+<li><p><a class="reference internal" href="#drawablefont" id="toc-entry-17">DrawableFont</a></p></li>
+<li><p><a class="reference internal" href="#drawablegravity" id="toc-entry-18">DrawableGravity</a></p></li>
+<li><p><a class="reference internal" href="#drawableline" id="toc-entry-19">DrawableLine</a></p></li>
+<li><p><a class="reference internal" href="#drawablematte" id="toc-entry-20">DrawableMatte</a></p></li>
+<li><p><a class="reference internal" href="#drawablemiterlimit" id="toc-entry-21">DrawableMiterLimit</a></p></li>
+<li><p><a class="reference internal" href="#drawablepath" id="toc-entry-22">DrawablePath</a></p></li>
+<li><p><a class="reference internal" href="#drawablepoint" id="toc-entry-23">DrawablePoint</a></p></li>
+<li><p><a class="reference internal" href="#drawablepointsize" id="toc-entry-24">DrawablePointSize</a></p></li>
+<li><p><a class="reference internal" href="#drawablepolygon" id="toc-entry-25">DrawablePolygon</a></p></li>
+<li><p><a class="reference internal" href="#drawablepolyline" id="toc-entry-26">DrawablePolyline</a></p></li>
+<li><p><a class="reference internal" href="#drawablepopclippath" id="toc-entry-27">DrawablePopClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawablepopgraphiccontext" id="toc-entry-28">DrawablePopGraphicContext</a></p></li>
+<li><p><a class="reference internal" href="#drawablepushclippath" id="toc-entry-29">DrawablePushClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawablepushgraphiccontext" id="toc-entry-30">DrawablePushGraphicContext</a></p></li>
+<li><p><a class="reference internal" href="#drawablepushpattern" id="toc-entry-31">DrawablePushPattern</a></p></li>
+<li><p><a class="reference internal" href="#drawablepoppattern" id="toc-entry-32">DrawablePopPattern</a></p></li>
+<li><p><a class="reference internal" href="#drawablerectangle" id="toc-entry-33">DrawableRectangle</a></p></li>
+<li><p><a class="reference internal" href="#drawablerotation" id="toc-entry-34">DrawableRotation</a></p></li>
+<li><p><a class="reference internal" href="#drawableroundrectangle" id="toc-entry-35">DrawableRoundRectangle</a></p></li>
+<li><p><a class="reference internal" href="#drawablescaling" id="toc-entry-36">DrawableScaling</a></p></li>
+<li><p><a class="reference internal" href="#drawableskewx" id="toc-entry-37">DrawableSkewX</a></p></li>
+<li><p><a class="reference internal" href="#drawableskewy" id="toc-entry-38">DrawableSkewY</a></p></li>
+<li><p><a class="reference internal" href="#drawablestrokeantialias" id="toc-entry-39">DrawableStrokeAntialias</a></p></li>
+<li><p><a class="reference internal" href="#drawablestrokecolor" id="toc-entry-40">DrawableStrokeColor</a></p></li>
+<li><p><a class="reference internal" href="#drawablestrokelinecap" id="toc-entry-41">DrawableStrokeLineCap</a></p></li>
+<li><p><a class="reference internal" href="#drawablestrokelinejoin" id="toc-entry-42">DrawableStrokeLineJoin</a></p></li>
+<li><p><a class="reference internal" href="#drawablestrokeopacity" id="toc-entry-43">DrawableStrokeOpacity</a></p></li>
+<li><p><a class="reference internal" href="#drawablestrokewidth" id="toc-entry-44">DrawableStrokeWidth</a></p></li>
+<li><p><a class="reference internal" href="#drawabletext" id="toc-entry-45">DrawableText</a></p></li>
+<li><p><a class="reference internal" href="#drawabletextantialias" id="toc-entry-46">DrawableTextAntialias</a></p></li>
+<li><p><a class="reference internal" href="#drawabletextdecoration" id="toc-entry-47">DrawableTextDecoration</a></p></li>
+<li><p><a class="reference internal" href="#drawabletextundercolor" id="toc-entry-48">DrawableTextUnderColor</a></p></li>
+<li><p><a class="reference internal" href="#drawabletranslation" id="toc-entry-49">DrawableTranslation</a></p></li>
+<li><p><a class="reference internal" href="#drawableviewbox" id="toc-entry-50">DrawableViewbox</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="drawableaffine">
-<h2><a class="toc-backref" href="#id11">DrawableAffine</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">DrawableAffine</a></h2>
 <p>Specify a transformation matrix to adjust scaling, rotation, and
 translation (coordinate transformation) for subsequently drawn objects
 in the same or decendent drawing context.  The <cite>sx_</cite> &amp; <cite>sy_</cite> parameters
@@ -248,7 +248,7 @@ from their unity values:</p>
 <pre class="literal-block">DrawableAffine ( void );</pre>
 </section>
 <section id="drawablearc">
-<h2><a class="toc-backref" href="#id12">DrawableArc</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">DrawableArc</a></h2>
 <p>Draw an arc using the stroke color and based on the circle starting at
 coordinates <cite>startX_</cite>,`startY_`, and ending with coordinates
 <cite>endX_</cite>,`endY_`, and bounded by the rotational arc
@@ -258,18 +258,18 @@ coordinates <cite>startX_</cite>,`startY_`, and ending with coordinates
               double startDegrees_, double endDegrees_ );</pre>
 </section>
 <section id="drawablebezier">
-<h2><a class="toc-backref" href="#id13">DrawableBezier</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">DrawableBezier</a></h2>
 <p>Draw a bezier curve using the stroke color and based on the
 coordinates specified by the <cite>coordinates_</cite> list:</p>
 <pre class="literal-block">DrawableBezier ( const CoordinateList &amp;coordinates_ );</pre>
 </section>
 <section id="drawableclippath">
-<h2><a class="toc-backref" href="#id14">DrawableClipPath</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">DrawableClipPath</a></h2>
 <p>Select a drawing clip path matching <cite>id_</cite>:</p>
 <pre class="literal-block">DrawableClipPath ( const std::string &amp;id_ );</pre>
 </section>
 <section id="drawablecircle">
-<h2><a class="toc-backref" href="#id15">DrawableCircle</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">DrawableCircle</a></h2>
 <p>Draw a circle using the stroke color and thickness using specified
 origin and perimeter coordinates. If a fill color is specified, then
 the object is filled:</p>
@@ -277,7 +277,7 @@ the object is filled:</p>
                  double perimX_, double perimY_ )</pre>
 </section>
 <section id="drawablecolor">
-<h2><a class="toc-backref" href="#id16">DrawableColor</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">DrawableColor</a></h2>
 <p>Color image according to paintMethod. The point method recolors the
 target pixel.  The replace method recolors any pixel that matches the
 color of the target pixel.  Floodfill recolors any pixel that matches
@@ -288,7 +288,7 @@ reset recolors all pixels:</p>
                 PaintMethod paintMethod_ )</pre>
 </section>
 <section id="drawablecompositeimage">
-<h2><a class="toc-backref" href="#id17">DrawableCompositeImage</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-10" role="doc-backlink">DrawableCompositeImage</a></h2>
 <p>Composite current image with contents of specified image, at specified
 coordinates. If the matte attribute is set to true, then the image
 composition will consider an alpha channel, or transparency, present
@@ -332,7 +332,7 @@ DrawableCompositeImage ( double x_, double y_,
                          CompositeOperator composition_ );</pre>
 </section>
 <section id="drawabledasharray">
-<h2><a class="toc-backref" href="#id18">DrawableDashArray</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-11" role="doc-backlink">DrawableDashArray</a></h2>
 <p>Specify the pattern of dashes and gaps used to stroke paths. The
 strokeDashArray represents a zero-terminated array of numbers that
 specify the lengths of alternating dashes and gaps in pixels. If an
@@ -343,14 +343,14 @@ end of the pattern array:</p>
 <pre class="literal-block">DrawableDashArray( const double* dasharray_ );</pre>
 </section>
 <section id="drawabledashoffset">
-<h2><a class="toc-backref" href="#id19">DrawableDashOffset</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-12" role="doc-backlink">DrawableDashOffset</a></h2>
 <p>Specify the distance into the dash pattern to start the dash. See
 documentation on SVG's <a class="reference external" href="http://www.w3.org/TR/SVG/painting.html#StrokeDashoffsetProperty">stroke-dashoffset</a>
 property for usage details:</p>
 <pre class="literal-block">DrawableDashOffset ( const double offset_ )</pre>
 </section>
 <section id="drawableellipse">
-<h2><a class="toc-backref" href="#id20">DrawableEllipse</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-13" role="doc-backlink">DrawableEllipse</a></h2>
 <p>Draw an ellipse using the stroke color and thickness, specified
 origin, x &amp; y radius, as well as specified start and end of arc in
 degrees. If a fill color is specified, then the object is filled:</p>
@@ -359,14 +359,14 @@ degrees. If a fill color is specified, then the object is filled:</p>
                   double arcStart_, double arcEnd_ )</pre>
 </section>
 <section id="drawablefillcolor">
-<h2><a class="toc-backref" href="#id21">DrawableFillColor</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-14" role="doc-backlink">DrawableFillColor</a></h2>
 <p>Specify drawing object fill color:</p>
 <blockquote>
 <p>DrawableFillColor ( const Color &amp;color_ );</p>
 </blockquote>
 </section>
 <section id="drawablefillrule">
-<h2><a class="toc-backref" href="#id22">DrawableFillRule</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-15" role="doc-backlink">DrawableFillRule</a></h2>
 <p>Specify the algorithm which is to be used to determine what parts of
 the canvas are included inside the shape. See documentation on SVG's
 <a class="reference external" href="http://www.w3.org/TR/SVG/painting.html#FillRuleProperty">fill-rule</a>
@@ -374,12 +374,12 @@ property for usage details:</p>
 <pre class="literal-block">DrawableFillRule ( const FillRule fillRule_ )</pre>
 </section>
 <section id="drawablefillopacity">
-<h2><a class="toc-backref" href="#id23">DrawableFillOpacity</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-16" role="doc-backlink">DrawableFillOpacity</a></h2>
 <p>Specify opacity to use when drawing using fill color:</p>
 <pre class="literal-block">DrawableFillOpacity ( double opacity_ )</pre>
 </section>
 <section id="drawablefont">
-<h2><a class="toc-backref" href="#id24">DrawableFont</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-17" role="doc-backlink">DrawableFont</a></h2>
 <p>Specify font family, style, weight (one of the set { 100 | 200 | 300 |
 400 | 500 | 600 | 700 | 800 | 900 } with 400 being the normal size),
 and stretch to be used to select the font used when drawing
@@ -394,19 +394,19 @@ DrawableFont ( const std::string &amp;family_,
                StretchType stretch_ );</pre>
 </section>
 <section id="drawablegravity">
-<h2><a class="toc-backref" href="#id25">DrawableGravity</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-18" role="doc-backlink">DrawableGravity</a></h2>
 <p>Specify text positioning gravity:</p>
 <pre class="literal-block">DrawableGravity ( GravityType gravity_ )</pre>
 </section>
 <section id="drawableline">
-<h2><a class="toc-backref" href="#id26">DrawableLine</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-19" role="doc-backlink">DrawableLine</a></h2>
 <p>Draw a line using stroke color and thickness using starting and ending
 coordinates:</p>
 <pre class="literal-block">DrawableLine ( double startX_, double startY_,
                double endX_, double endY_ )</pre>
 </section>
 <section id="drawablematte">
-<h2><a class="toc-backref" href="#id27">DrawableMatte</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-20" role="doc-backlink">DrawableMatte</a></h2>
 <p>Change the pixel matte value to transparent. The point method changes
 the matte value of the target pixel.  The replace method changes the
 matte value of any pixel that matches the color of the target
@@ -418,7 +418,7 @@ color, Finally reset changes the matte value of all pixels:</p>
                 PaintMethod paintMethod_ )</pre>
 </section>
 <section id="drawablemiterlimit">
-<h2><a class="toc-backref" href="#id28">DrawableMiterLimit</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-21" role="doc-backlink">DrawableMiterLimit</a></h2>
 <p>Specify miter limit. When two line segments meet at a sharp angle and
 miter joins have been specified for 'lineJoin', it is possible for the
 miter to extend far beyond the thickness of the line stroking the
@@ -427,55 +427,55 @@ to the 'lineWidth'. The default value of this parameter is 4:</p>
 <pre class="literal-block">DrawableMiterLimit ( unsigned int miterlimit_ )</pre>
 </section>
 <section id="drawablepath">
-<h2><a class="toc-backref" href="#id29">DrawablePath</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-22" role="doc-backlink">DrawablePath</a></h2>
 <p>Draw on image using vector path:</p>
 <pre class="literal-block">DrawablePath ( const VPathList &amp;path_ );</pre>
 </section>
 <section id="drawablepoint">
-<h2><a class="toc-backref" href="#id30">DrawablePoint</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-23" role="doc-backlink">DrawablePoint</a></h2>
 <p>Draw a point using stroke color and thickness at coordinate:</p>
 <pre class="literal-block">DrawablePoint ( double x_, double y_ )</pre>
 </section>
 <section id="drawablepointsize">
-<h2><a class="toc-backref" href="#id31">DrawablePointSize</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-24" role="doc-backlink">DrawablePointSize</a></h2>
 <p>Set font point size:</p>
 <pre class="literal-block">DrawablePointSize ( double pointSize_ )</pre>
 </section>
 <section id="drawablepolygon">
-<h2><a class="toc-backref" href="#id32">DrawablePolygon</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-25" role="doc-backlink">DrawablePolygon</a></h2>
 <p>Draw an arbitrary polygon using stroke color and thickness consisting
 of three or more coordinates contained in an STL list. If a fill color
 is specified, then the object is filled:</p>
 <pre class="literal-block">DrawablePolygon ( const CoordinateList &amp;coordinates_ )</pre>
 </section>
 <section id="drawablepolyline">
-<h2><a class="toc-backref" href="#id33">DrawablePolyline</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-26" role="doc-backlink">DrawablePolyline</a></h2>
 <p>Draw an arbitrary polyline using stroke color and thickness consisting
 of three or more coordinates contained in an STL list. If a fill color
 is specified, then the object is filled:</p>
 <pre class="literal-block">DrawablePolyline ( const CoordinateList &amp;coordinates_ )</pre>
 </section>
 <section id="drawablepopclippath">
-<h2><a class="toc-backref" href="#id34">DrawablePopClipPath</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-27" role="doc-backlink">DrawablePopClipPath</a></h2>
 <p>Pop (terminate) clip path definition started by DrawablePushClipPath:</p>
 <pre class="literal-block">DrawablePopClipPath ( void )</pre>
 </section>
 <section id="drawablepopgraphiccontext">
-<h2><a class="toc-backref" href="#id35">DrawablePopGraphicContext</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-28" role="doc-backlink">DrawablePopGraphicContext</a></h2>
 <p>Pop Graphic Context. Removing the current graphic context from the
 graphic context stack restores the options to the values they had
 prior to the preceding <a class="reference internal" href="#drawablepushgraphiccontext">DrawablePushGraphicContext</a> operation:</p>
 <pre class="literal-block">DrawablePopGraphicContext ( void )</pre>
 </section>
 <section id="drawablepushclippath">
-<h2><a class="toc-backref" href="#id36">DrawablePushClipPath</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-29" role="doc-backlink">DrawablePushClipPath</a></h2>
 <p>Push (create) clip path definition with <cite>id_</cite>. Clip patch definition
 consists of subsequent drawing commands, terminated by
 <a class="reference internal" href="#drawablepopclippath">DrawablePopClipPath</a>:</p>
 <pre class="literal-block">DrawablePushClipPath ( const std::string &amp;id_)</pre>
 </section>
 <section id="drawablepushgraphiccontext">
-<h2><a class="toc-backref" href="#id37">DrawablePushGraphicContext</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-30" role="doc-backlink">DrawablePushGraphicContext</a></h2>
 <p>Push Graphic Context. When a graphic context is pushed, options set
 after the context is pushed (such as coordinate transformations, color
 settings, etc.) are saved to a new graphic context. This allows
@@ -487,7 +487,7 @@ operation are restored:</p>
 <pre class="literal-block">DrawablePushGraphicContext ( void )</pre>
 </section>
 <section id="drawablepushpattern">
-<h2><a class="toc-backref" href="#id38">DrawablePushPattern</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-31" role="doc-backlink">DrawablePushPattern</a></h2>
 <p>Start a pattern definition with arbitrary pattern name specified by
 <cite>id_</cite>, pattern offset specified by <cite>x_</cite> and <cite>y_</cite>, and pattern size
 specified by <cite>width_</cite> and <cite>height_</cite>. The pattern is defined within the
@@ -502,12 +502,12 @@ definition. Pattern definitions are terminated by a
                       long width_, long height_ )</pre>
 </section>
 <section id="drawablepoppattern">
-<h2><a class="toc-backref" href="#id39">DrawablePopPattern</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-32" role="doc-backlink">DrawablePopPattern</a></h2>
 <p>Terminate a pattern definition started via <a class="reference internal" href="#drawablepushpattern">DrawablePushPattern</a>:</p>
 <pre class="literal-block">DrawablePopPattern ( void )</pre>
 </section>
 <section id="drawablerectangle">
-<h2><a class="toc-backref" href="#id40">DrawableRectangle</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-33" role="doc-backlink">DrawableRectangle</a></h2>
 <p>Draw a rectangle using stroke color and thickness from upper-left
 coordinates to lower-right coordinates. If a fill color is specified,
 then the object is filled:</p>
@@ -515,12 +515,12 @@ then the object is filled:</p>
                     double lowerRightX_, double lowerRightY_ )</pre>
 </section>
 <section id="drawablerotation">
-<h2><a class="toc-backref" href="#id41">DrawableRotation</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-34" role="doc-backlink">DrawableRotation</a></h2>
 <p>Set rotation to use when drawing (coordinate transformation):</p>
 <pre class="literal-block">DrawableRotation ( double angle_ )</pre>
 </section>
 <section id="drawableroundrectangle">
-<h2><a class="toc-backref" href="#id42">DrawableRoundRectangle</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-35" role="doc-backlink">DrawableRoundRectangle</a></h2>
 <p>Draw a rounded rectangle using stroke color and thickness, with
 specified center coordinate, specified width and height, and specified
 corner width and height.  If a fill color is specified, then the
@@ -530,57 +530,57 @@ object is filled:</p>
                          double cornerWidth_, double cornerHeight_ )</pre>
 </section>
 <section id="drawablescaling">
-<h2><a class="toc-backref" href="#id43">DrawableScaling</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-36" role="doc-backlink">DrawableScaling</a></h2>
 <p>Apply scaling in x and y direction while drawing objects (coordinate
 transformation):</p>
 <pre class="literal-block">DrawableScaling ( double x_, double y_ )</pre>
 </section>
 <section id="drawableskewx">
-<h2><a class="toc-backref" href="#id44">DrawableSkewX</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-37" role="doc-backlink">DrawableSkewX</a></h2>
 <p>Apply Skew in X direction (coordinate transformation):</p>
 <pre class="literal-block">DrawableSkewX ( double angle_ )</pre>
 </section>
 <section id="drawableskewy">
-<h2><a class="toc-backref" href="#id45">DrawableSkewY</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-38" role="doc-backlink">DrawableSkewY</a></h2>
 <p>Apply Skew in Y direction:</p>
 <pre class="literal-block">DrawableSkewY ( double angle_ )</pre>
 </section>
 <section id="drawablestrokeantialias">
-<h2><a class="toc-backref" href="#id46">DrawableStrokeAntialias</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-39" role="doc-backlink">DrawableStrokeAntialias</a></h2>
 <p>Antialias while drawing lines or object outlines:</p>
 <pre class="literal-block">DrawableStrokeAntialias ( bool flag_ )</pre>
 </section>
 <section id="drawablestrokecolor">
-<h2><a class="toc-backref" href="#id47">DrawableStrokeColor</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-40" role="doc-backlink">DrawableStrokeColor</a></h2>
 <p>Set color to use when drawing lines or object outlines:</p>
 <pre class="literal-block">DrawableStrokeColor ( const Color &amp;color_ )</pre>
 </section>
 <section id="drawablestrokelinecap">
-<h2><a class="toc-backref" href="#id48">DrawableStrokeLineCap</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-41" role="doc-backlink">DrawableStrokeLineCap</a></h2>
 <p>Specify the shape to be used at the end of open subpaths when they are
 stroked. Values of LineCap are UndefinedCap, ButtCap, RoundCap, and
 SquareCap:</p>
 <pre class="literal-block">DrawableStrokeLineCap ( LineCap linecap_ )</pre>
 </section>
 <section id="drawablestrokelinejoin">
-<h2><a class="toc-backref" href="#id49">DrawableStrokeLineJoin</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-42" role="doc-backlink">DrawableStrokeLineJoin</a></h2>
 <p>Specify the shape to be used at the corners of paths (or other vector
 shapes) when they are stroked. Values of LineJoin are UndefinedJoin,
 MiterJoin, RoundJoin, and BevelJoin:</p>
 <pre class="literal-block">DrawableStrokeLineJoin ( LineJoin linejoin_ )</pre>
 </section>
 <section id="drawablestrokeopacity">
-<h2><a class="toc-backref" href="#id50">DrawableStrokeOpacity</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-43" role="doc-backlink">DrawableStrokeOpacity</a></h2>
 <p>Opacity to use when drawing lines or object outlines:</p>
 <pre class="literal-block">DrawableStrokeOpacity ( double opacity_ )</pre>
 </section>
 <section id="drawablestrokewidth">
-<h2><a class="toc-backref" href="#id51">DrawableStrokeWidth</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-44" role="doc-backlink">DrawableStrokeWidth</a></h2>
 <p>Set width to use when drawing lines or object outlines:</p>
 <pre class="literal-block">DrawableStrokeWidth ( double width_ )</pre>
 </section>
 <section id="drawabletext">
-<h2><a class="toc-backref" href="#id52">DrawableText</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-45" role="doc-backlink">DrawableText</a></h2>
 <p>Annotate image with text using stroke color, font, font pointsize, and
 box color (text background color), at specified coordinates. If text
 contains <a class="reference external" href="FormatCharacters.html">special format characters</a> the
@@ -604,28 +604,28 @@ Unicode:</p>
                const std::string &amp;text_, const std::string &amp;encoding_)</pre>
 </section>
 <section id="drawabletextantialias">
-<h2><a class="toc-backref" href="#id53">DrawableTextAntialias</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-46" role="doc-backlink">DrawableTextAntialias</a></h2>
 <p>Antialias while drawing text (default true). The main reason to
 disable text antialiasing is to avoid adding new colors to the image:</p>
 <pre class="literal-block">DrawableTextAntialias ( bool flag_ )</pre>
 </section>
 <section id="drawabletextdecoration">
-<h2><a class="toc-backref" href="#id54">DrawableTextDecoration</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-47" role="doc-backlink">DrawableTextDecoration</a></h2>
 <p>Specify decoration (e.g. UnderlineDecoration) to apply to text:</p>
 <pre class="literal-block">DrawableTextDecoration ( DecorationType decoration_ )</pre>
 </section>
 <section id="drawabletextundercolor">
-<h2><a class="toc-backref" href="#id55">DrawableTextUnderColor</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-48" role="doc-backlink">DrawableTextUnderColor</a></h2>
 <p>Draw a box under rendered text using the specified color:</p>
 <pre class="literal-block">DrawableTextUnderColor ( const Color &amp;color_ )</pre>
 </section>
 <section id="drawabletranslation">
-<h2><a class="toc-backref" href="#id56">DrawableTranslation</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-49" role="doc-backlink">DrawableTranslation</a></h2>
 <p>Apply coordinate translation (set new coordinate origin):</p>
 <pre class="literal-block">DrawableTranslation ( double x_, double y_ )</pre>
 </section>
 <section id="drawableviewbox">
-<h2><a class="toc-backref" href="#id57">DrawableViewbox</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-50" role="doc-backlink">DrawableViewbox</a></h2>
 <p>Dimensions of the output viewbox. If the image is to be written to a
 vector format (e.g. MVG or SVG), then a <a class="reference internal" href="#drawablepushgraphiccontext">DrawablePushGraphicContext</a>
 object should be pushed to the head of the list, followed by a
@@ -637,7 +637,7 @@ tail of the list:</p>
 </section>
 </section>
 <section id="vector-path-classes">
-<h1><a class="toc-backref" href="#id10">Vector Path Classes</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">Vector Path Classes</a></h1>
 <p>The vector paths supported by Magick++ are based on those supported by
 the <a class="reference external" href="http://www.w3.org/TR/SVG/paths.html">SVG XML specification</a>. Vector paths are not directly
 drawable, they must first be supplied as a constructor argument to the
@@ -649,17 +649,17 @@ the object may be positioned on the image by preceding it with a
 <a class="reference internal" href="#drawablepath">DrawablePath</a> which sets the current drawing coordinate. Alternatively
 coordinate transforms may be used to <a class="reference external" href="#DrawableTranslation">translate the origin</a> in order to position the object, rotate it,
 skew it, or scale it.</p>
-<div class="contents local topic" id="vector-path-commands">
+<nav class="contents local" id="vector-path-commands">
 <p class="topic-title">Vector path commands</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#the-moveto-commands" id="id58">The &quot;moveto&quot; commands</a></p></li>
-<li><p><a class="reference internal" href="#the-closepath-command" id="id59">The &quot;closepath&quot; command</a></p></li>
-<li><p><a class="reference internal" href="#the-lineto-commands" id="id60">The &quot;lineto&quot; commands</a></p></li>
-<li><p><a class="reference internal" href="#curve-commands" id="id61">Curve commands</a></p></li>
+<li><p><a class="reference internal" href="#the-moveto-commands" id="toc-entry-51">The &quot;moveto&quot; commands</a></p></li>
+<li><p><a class="reference internal" href="#the-closepath-command" id="toc-entry-52">The &quot;closepath&quot; command</a></p></li>
+<li><p><a class="reference internal" href="#the-lineto-commands" id="toc-entry-53">The &quot;lineto&quot; commands</a></p></li>
+<li><p><a class="reference internal" href="#curve-commands" id="toc-entry-54">Curve commands</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="the-moveto-commands">
-<h2><a class="toc-backref" href="#id58">The &quot;moveto&quot; commands</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-51" role="doc-backlink">The &quot;moveto&quot; commands</a></h2>
 <p>The &quot;moveto&quot; commands establish a new current point. The effect is as
 if the &quot;pen&quot; were lifted and moved to a new location. A path data
 segment must begin with either one of the &quot;moveto&quot; commands or one of
@@ -688,7 +688,7 @@ the subsequent pairs are treated as implicit lineto commands.</p>
 </section>
 </section>
 <section id="the-closepath-command">
-<h2><a class="toc-backref" href="#id59">The &quot;closepath&quot; command</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-52" role="doc-backlink">The &quot;closepath&quot; command</a></h2>
 <p>The &quot;closepath&quot; command causes an automatic straight line to be drawn from the current point to the initial point of the current subpath.</p>
 <section id="pathclosepath">
 <h3>PathClosePath</h3>
@@ -699,7 +699,7 @@ most recent moveto point):</p>
 </section>
 </section>
 <section id="the-lineto-commands">
-<h2><a class="toc-backref" href="#id60">The &quot;lineto&quot; commands</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-53" role="doc-backlink">The &quot;lineto&quot; commands</a></h2>
 <p>The various &quot;lineto&quot; commands draw straight lines from the current
 point to a new point.</p>
 <section id="pathlinetoabs">
@@ -760,7 +760,7 @@ supplied.  At the end of the command, the new current point becomes
 </section>
 </section>
 <section id="curve-commands">
-<h2><a class="toc-backref" href="#id61">Curve commands</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-54" role="doc-backlink">Curve commands</a></h2>
 <p>These three groups of commands draw curves:</p>
 <ul>
 <li><p>Cubic Bézier commands.</p>
@@ -775,28 +775,28 @@ point, and one control point.</p>
 <p>An elliptical arc segment draws a segment of an ellipse.</p>
 </li>
 </ul>
-<div class="contents local topic" id="id4">
+<nav class="contents local" id="topic-2">
 <p class="topic-title">Curve Commands</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#cubic-bezier-curve-commands" id="id62">Cubic Bézier curve commands</a></p></li>
-<li><p><a class="reference internal" href="#quadratic-bezier-curve-commands" id="id63">Quadratic Bézier curve commands</a></p></li>
-<li><p><a class="reference internal" href="#elliptical-arc-curve-commands" id="id64">Elliptical arc curve commands</a></p></li>
+<li><p><a class="reference internal" href="#cubic-bezier-curve-commands" id="toc-entry-55">Cubic Bézier curve commands</a></p></li>
+<li><p><a class="reference internal" href="#quadratic-bezier-curve-commands" id="toc-entry-56">Quadratic Bézier curve commands</a></p></li>
+<li><p><a class="reference internal" href="#elliptical-arc-curve-commands" id="toc-entry-57">Elliptical arc curve commands</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="cubic-bezier-curve-commands">
-<h3><a class="toc-backref" href="#id62">Cubic Bézier curve commands</a></h3>
-<div class="contents local topic" id="id5">
+<h3><a class="toc-backref" href="#toc-entry-55" role="doc-backlink">Cubic Bézier curve commands</a></h3>
+<nav class="contents local" id="topic-3">
 <p class="topic-title">Cubic Bézier curve commands</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#pathcurvetoargs" id="id65">PathCurvetoArgs</a></p></li>
-<li><p><a class="reference internal" href="#pathcurvetoabs" id="id66">PathCurvetoAbs</a></p></li>
-<li><p><a class="reference internal" href="#pathcurvetorel" id="id67">PathCurvetoRel</a></p></li>
-<li><p><a class="reference internal" href="#pathsmoothcurvetoabs" id="id68">PathSmoothCurvetoAbs</a></p></li>
-<li><p><a class="reference internal" href="#pathsmoothcurvetorel" id="id69">PathSmoothCurvetoRel</a></p></li>
+<li><p><a class="reference internal" href="#pathcurvetoargs" id="toc-entry-58">PathCurvetoArgs</a></p></li>
+<li><p><a class="reference internal" href="#pathcurvetoabs" id="toc-entry-59">PathCurvetoAbs</a></p></li>
+<li><p><a class="reference internal" href="#pathcurvetorel" id="toc-entry-60">PathCurvetoRel</a></p></li>
+<li><p><a class="reference internal" href="#pathsmoothcurvetoabs" id="toc-entry-61">PathSmoothCurvetoAbs</a></p></li>
+<li><p><a class="reference internal" href="#pathsmoothcurvetorel" id="toc-entry-62">PathSmoothCurvetoRel</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="pathcurvetoargs">
-<h4><a class="toc-backref" href="#id65">PathCurvetoArgs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-58" role="doc-backlink">PathCurvetoArgs</a></h4>
 <p>The cubic Bézier commands depend on the <a class="reference internal" href="#pathcurvetoargs">PathCurvetoArgs</a> argument
 class, which has the constructor signature:</p>
 <pre class="literal-block">PathCurvetoArgs( double x1_, double y1_,
@@ -813,14 +813,14 @@ polybezier. At the end of the command, the new current point becomes
 the final (<em>x</em>,*y*) coordinate pair used in the polybezier.</p>
 </section>
 <section id="pathcurvetoabs">
-<h4><a class="toc-backref" href="#id66">PathCurvetoAbs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-59" role="doc-backlink">PathCurvetoAbs</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathCurvetoAbs ( const PathCurvetoArgs &amp;args_ );</pre>
 <p>Draw multiple curves:</p>
 <pre class="literal-block">PathCurvetoAbs ( const PathCurveToArgsList &amp;args_ );</pre>
 </section>
 <section id="pathcurvetorel">
-<h4><a class="toc-backref" href="#id67">PathCurvetoRel</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-60" role="doc-backlink">PathCurvetoRel</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathCurvetoRel ( const PathCurvetoArgs &amp;args_ );</pre>
 <p>Draw multiple curves:</p>
@@ -841,7 +841,7 @@ command, the new current point becomes the final (x,y) coordinate pair
 used in the polybezier.</p>
 </section>
 <section id="pathsmoothcurvetoabs">
-<h4><a class="toc-backref" href="#id68">PathSmoothCurvetoAbs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-61" role="doc-backlink">PathSmoothCurvetoAbs</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathSmoothCurvetoAbs ( const Magick::Coordinate &amp;coordinates_ );</pre>
 <p>Draw multiple curves</p>
@@ -850,7 +850,7 @@ used in the polybezier.</p>
 </blockquote>
 </section>
 <section id="pathsmoothcurvetorel">
-<h4><a class="toc-backref" href="#id69">PathSmoothCurvetoRel</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-62" role="doc-backlink">PathSmoothCurvetoRel</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathSmoothCurvetoRel ( const Coordinate &amp;coordinates_ );</pre>
 <p>Draw multiple curves:</p>
@@ -858,47 +858,47 @@ used in the polybezier.</p>
 </section>
 </section>
 <section id="quadratic-bezier-curve-commands">
-<h3><a class="toc-backref" href="#id63">Quadratic Bézier curve commands</a></h3>
-<div class="contents local topic" id="id6">
+<h3><a class="toc-backref" href="#toc-entry-56" role="doc-backlink">Quadratic Bézier curve commands</a></h3>
+<nav class="contents local" id="topic-4">
 <p class="topic-title">Quadratic Bézier curve commands</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#pathquadraticcurvetoargs" id="id70">PathQuadraticCurvetoArgs</a></p></li>
-<li><p><a class="reference internal" href="#pathquadraticcurvetoabs" id="id71">PathQuadraticCurvetoAbs</a></p></li>
-<li><p><a class="reference internal" href="#pathquadraticcurvetorel" id="id72">PathQuadraticCurvetoRel</a></p></li>
-<li><p><a class="reference internal" href="#pathsmoothquadraticcurvetoabs" id="id73">PathSmoothQuadraticCurvetoAbs</a></p></li>
-<li><p><a class="reference internal" href="#pathsmoothquadraticcurvetorel" id="id74">PathSmoothQuadraticCurvetoRel</a></p></li>
+<li><p><a class="reference internal" href="#pathquadraticcurvetoargs" id="toc-entry-63">PathQuadraticCurvetoArgs</a></p></li>
+<li><p><a class="reference internal" href="#pathquadraticcurvetoabs" id="toc-entry-64">PathQuadraticCurvetoAbs</a></p></li>
+<li><p><a class="reference internal" href="#pathquadraticcurvetorel" id="toc-entry-65">PathQuadraticCurvetoRel</a></p></li>
+<li><p><a class="reference internal" href="#pathsmoothquadraticcurvetoabs" id="toc-entry-66">PathSmoothQuadraticCurvetoAbs</a></p></li>
+<li><p><a class="reference internal" href="#pathsmoothquadraticcurvetorel" id="toc-entry-67">PathSmoothQuadraticCurvetoRel</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="pathquadraticcurvetoargs">
-<h4><a class="toc-backref" href="#id70">PathQuadraticCurvetoArgs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-63" role="doc-backlink">PathQuadraticCurvetoArgs</a></h4>
 <p>The quadratic Bézier commands depend on the <a class="reference internal" href="#pathquadraticcurvetoargs">PathQuadraticCurvetoArgs</a>
 argument class, which has the constructor signature:</p>
 <pre class="literal-block">PathQuadraticCurvetoArgs( double x1_, double y1_,
                           double x_, double y_ );</pre>
 </section>
 <section id="pathquadraticcurvetoabs">
-<h4><a class="toc-backref" href="#id71">PathQuadraticCurvetoAbs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-64" role="doc-backlink">PathQuadraticCurvetoAbs</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathQuadraticCurvetoAbs ( const Magick::PathQuadraticCurvetoArgs &amp;args_ );</pre>
 <p>Draw multiple curves:</p>
 <pre class="literal-block">PathQuadraticCurvetoAbs ( const PathQuadraticCurvetoArgsList &amp;args_ );</pre>
 </section>
 <section id="pathquadraticcurvetorel">
-<h4><a class="toc-backref" href="#id72">PathQuadraticCurvetoRel</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-65" role="doc-backlink">PathQuadraticCurvetoRel</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathQuadraticCurvetoRel ( const Magick::PathQuadraticCurvetoArgs &amp;args_ );</pre>
 <p>Draw multiple curves:</p>
 <pre class="literal-block">PathQuadraticCurvetoRel ( const PathQuadraticCurvetoArgsList &amp;args_ );</pre>
 </section>
 <section id="pathsmoothquadraticcurvetoabs">
-<h4><a class="toc-backref" href="#id73">PathSmoothQuadraticCurvetoAbs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-66" role="doc-backlink">PathSmoothQuadraticCurvetoAbs</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathSmoothQuadraticCurvetoAbs ( const Magick::Coordinate &amp;coordinate_ );</pre>
 <p>Draw multiple curves:</p>
 <pre class="literal-block">PathSmoothQuadraticCurvetoAbs ( const CoordinateList &amp;coordinates_ );</pre>
 </section>
 <section id="pathsmoothquadraticcurvetorel">
-<h4><a class="toc-backref" href="#id74">PathSmoothQuadraticCurvetoRel</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-67" role="doc-backlink">PathSmoothQuadraticCurvetoRel</a></h4>
 <p>Draw a single curve:</p>
 <pre class="literal-block">PathSmoothQuadraticCurvetoRel ( const Magick::Coordinate &amp;coordinate_ );</pre>
 <p>Draw multiple curves:</p>
@@ -906,17 +906,17 @@ argument class, which has the constructor signature:</p>
 </section>
 </section>
 <section id="elliptical-arc-curve-commands">
-<h3><a class="toc-backref" href="#id64">Elliptical arc curve commands</a></h3>
-<div class="contents local topic" id="id7">
+<h3><a class="toc-backref" href="#toc-entry-57" role="doc-backlink">Elliptical arc curve commands</a></h3>
+<nav class="contents local" id="topic-5">
 <p class="topic-title">Elliptical arc curve commands</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#patharcargs" id="id75">PathArcArgs</a></p></li>
-<li><p><a class="reference internal" href="#patharcabs" id="id76">PathArcAbs</a></p></li>
-<li><p><a class="reference internal" href="#patharcrel" id="id77">PathArcRel</a></p></li>
+<li><p><a class="reference internal" href="#patharcargs" id="toc-entry-68">PathArcArgs</a></p></li>
+<li><p><a class="reference internal" href="#patharcabs" id="toc-entry-69">PathArcAbs</a></p></li>
+<li><p><a class="reference internal" href="#patharcrel" id="toc-entry-70">PathArcRel</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="patharcargs">
-<h4><a class="toc-backref" href="#id75">PathArcArgs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-68" role="doc-backlink">PathArcArgs</a></h4>
 <p>The elliptical arc curve commands depend on the PathArcArgs argument
 class, which has the constructor signature:</p>
 <pre class="literal-block">PathArcArgs( double radiusX_, double radiusY_,
@@ -934,14 +934,14 @@ arcs. If <em>sweepFlag</em> is true, then draw the arc matching a clock-wise
 rotation.</p>
 </section>
 <section id="patharcabs">
-<h4><a class="toc-backref" href="#id76">PathArcAbs</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-69" role="doc-backlink">PathArcAbs</a></h4>
 <p>Draw a single arc segment:</p>
 <pre class="literal-block">PathArcAbs ( const PathArcArgs &amp;coordinates_ );</pre>
 <p>Draw multiple arc segments:</p>
 <pre class="literal-block">PathArcAbs ( const PathArcArgsList &amp;coordinates_ );</pre>
 </section>
 <section id="patharcrel">
-<h4><a class="toc-backref" href="#id77">PathArcRel</a></h4>
+<h4><a class="toc-backref" href="#toc-entry-70" role="doc-backlink">PathArcRel</a></h4>
 <p>Draw a single arc segment:</p>
 <pre class="literal-block">PathArcRel ( const PathArcArgs &amp;coordinates_ );</pre>
 <p>Draw multiple arc segments:</p>
@@ -956,7 +956,7 @@ rotation.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002 - 2024<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

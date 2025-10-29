@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -206,23 +206,24 @@ static char **StringToListMod(char *text)
   return(textlist);
 }
 
-static char *ParseColor(char *data) MAGICK_FUNC_PURE;
+static char *ParseColor(char * restrict data) MAGICK_FUNC_PURE;
 
-static char *ParseColor(char *data)
+static char *ParseColor(char * restrict data)
 {
-#define NumberTargets  6
+#define NumberTargets 6U
+#define TargetsDimension 4U
 
   static const char
-    targets[NumberTargets][3] = { "c ", "g ", "g4 ", "m ", "b ", "s " };
+    targets[NumberTargets][TargetsDimension] = { "c ", "g ", "g4 ", "m ", "b ", "s " };
 
   register char
-    *p,
-    *r;
+    * restrict p, /* points into 'data' */
+    * restrict r; /* points into 'data' */
 
   register const char
-    *q;
+    *q; /* points into targets */
 
-  register long
+  register unsigned long
     i;
 
   for (i=0; i < NumberTargets; i++)
@@ -237,6 +238,8 @@ static char *ParseColor(char *data)
           p=r;
           for ( ; ; )
             {
+              if (q-targets[i] >= TargetsDimension)
+                return((char *) NULL);
               if (*q == '\0')
                 return(r);
               if (*p++ != *q++)
@@ -705,7 +708,7 @@ ModuleExport void RegisterXPMImage(void)
   entry->decoder=(DecoderHandler) ReadXPMImage;
   entry->encoder=(EncoderHandler) WriteXPMImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="X Windows system pixmap (color)";
   entry->module="XPM";
   (void) RegisterMagickInfo(entry);

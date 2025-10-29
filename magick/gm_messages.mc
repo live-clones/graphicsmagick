@@ -1283,6 +1283,12 @@ unable to draw on image
 .
 
 MessageId       = +1
+SymbolicName    = DrawErrorUnableToFloodFillImageDueToClipMask
+Language        = English
+unable to flood-fill image with clip mask
+.
+
+MessageId       = +1
 SymbolicName    = DrawErrorUnableToPrint
 Language        = English
 Unable to print
@@ -1769,6 +1775,18 @@ color separated image required
 .
 
 MessageId       = +1
+SymbolicName    = OptionErrorDisplayGammaIsOutOfRange
+Language        = English
+Display gamma is out of range
+.
+
+MessageId       = +1
+SymbolicName    = OptionErrorFilmGammaIsOutOfRange
+Language        = English
+Film gamma is out of range
+.
+
+MessageId       = +1
 SymbolicName    = OptionErrorFrameIsLessThanImageSize
 Language        = English
 frame is less than image size
@@ -1913,6 +1931,12 @@ Null blob argument
 .
 
 MessageId       = +1
+SymbolicName    = OptionErrorReferenceBlackIsOutOfRange
+Language        = English
+Reference black is out of range
+.
+
+MessageId       = +1
 SymbolicName    = OptionErrorReferenceImageRequired
 Language        = English
 Reference image required
@@ -1925,6 +1949,12 @@ Reference is not my type
 .
 
 MessageId       = +1
+SymbolicName    = OptionErrorReferenceWhiteIsOutOfRange
+Language        = English
+Reference white is out of range
+.
+
+MessageId       = +1
 SymbolicName    = OptionErrorRegionAreaExceedsLimit
 Language        = English
 Region area exceeds implementation limit
@@ -1934,6 +1964,12 @@ MessageId       = +1
 SymbolicName    = OptionErrorRequestDidNotReturnAnImage
 Language        = English
 Request did not return an image
+.
+
+MessageId       = +1
+SymbolicName    = OptionErrorSoftClipOffsetIsOutOfRange
+Language        = English
+Soft clip offset is out of range
 .
 
 MessageId       = +1
@@ -1982,6 +2018,12 @@ MessageId       = +1
 SymbolicName    = OptionErrorUnableToChopImage
 Language        = English
 unable to chop image
+.
+
+MessageId       = +1
+SymbolicName    = OptionErrorUnableToCineonLogRGBTransformColorspace
+Language        = English
+unable to Cineon Log transform colorspace
 .
 
 MessageId       = +1

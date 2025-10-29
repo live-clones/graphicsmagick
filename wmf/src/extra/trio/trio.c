@@ -1,6 +1,6 @@
 /*************************************************************************
  *
- * $Id$
+ * $Id: trio.c,v 1.1 2001/06/07 08:23:02 fjfranklin Exp $
  *
  * Copyright (C) 1998 Bjorn Reese and Daniel Stenberg.
  *
@@ -41,8 +41,6 @@
  *    immediately followed by an 's'.
  */
 
-static const char rcsid[] = "@(#)$Id$";
-
 #if defined(unix) || defined(__xlC__) /* AIX xlC workaround */
 # define PLATFORM_UNIX
 #elif defined(AMIGA) && defined(__GNUC__)
@@ -53,6 +51,7 @@ static const char rcsid[] = "@(#)$Id$";
  * Include files
  */
 
+#include <stddef.h>
 #include "trio.h"
 #include "triop.h"
 #include "strio.h"
@@ -920,6 +919,7 @@ TrioPreprocess(int type,
 			    {
 			      if (! positional)
 				currentParam = precision + 1;
+			      /* coverity[copy_paste_error : FALSE] - this is correct width, not precision */
 			      if (width > maxParam)
 				maxParam = precision;
 			    }
@@ -1152,6 +1152,11 @@ TrioPreprocess(int type,
 	    }
 	  if (flags & FLAGS_PRECISION_PARAMETER)
 	    {
+	      if (precision < 0 || precision >= MAX_PARAMETERS)
+	        {
+	          /* Bail out completely to make the error more obvious */
+	          return TRIO_ERROR_RETURN(TRIO_ETOOMANY, index);
+	        }
 #if defined(TRIO_ERRORS)
 	      usedEntries[precision] += 1;
 #endif
@@ -1161,6 +1166,11 @@ TrioPreprocess(int type,
 	    }
 	  if (flags & FLAGS_BASE_PARAMETER)
 	    {
+	      if (base < 0 || base >= MAX_PARAMETERS)
+	        {
+	          /* Bail out completely to make the error more obvious */
+	          return TRIO_ERROR_RETURN(TRIO_ETOOMANY, index);
+	        }
 #if defined(TRIO_ERRORS)
 	      usedEntries[base] += 1;
 #endif
@@ -1170,6 +1180,12 @@ TrioPreprocess(int type,
 	    }
 	  if (flags & FLAGS_SIZE_PARAMETER)
 	    {
+	      if (varsize < 0 || varsize >= MAX_PARAMETERS)
+	      {
+	        /* Bail out completely to make the error more obvious */
+	        return TRIO_ERROR_RETURN(TRIO_ETOOMANY, index);
+	      }
+
 #if defined(TRIO_ERRORS)
 	      usedEntries[varsize] += 1;
 #endif
@@ -1185,8 +1201,8 @@ TrioPreprocess(int type,
 #if defined(SPECIFIER_CHAR_UPPER)
 	    case SPECIFIER_CHAR_UPPER:
 	      flags |= FLAGS_LONG;
-	      /* FALLTHROUGH */
 #endif
+	      /* FALLTHROUGH */
 	    case SPECIFIER_CHAR:
 	      parameters[pos].type = FORMAT_CHAR;
 	      break;
@@ -1194,8 +1210,8 @@ TrioPreprocess(int type,
 #if defined(SPECIFIER_STRING_UPPER)
 	    case SPECIFIER_STRING_UPPER:
 	      flags |= FLAGS_LONG;
-	      /* FALLTHROUGH */
 #endif
+	      /* FALLTHROUGH */
 	    case SPECIFIER_STRING:
 	      parameters[pos].type = FORMAT_STRING;
 	      break;
@@ -1291,8 +1307,8 @@ TrioPreprocess(int type,
 # if defined(SPECIFIER_HEXFLOAT_UPPER)
 	    case SPECIFIER_HEXFLOAT_UPPER:
 	      flags |= FLAGS_UPPER;
-	      /* FALLTHROUGH */
 # endif
+	      /* FALLTHROUGH */
 	    case SPECIFIER_HEXFLOAT:
 	      base = BASE_HEX;
 	      parameters[pos].type = FORMAT_DOUBLE;
@@ -1329,10 +1345,20 @@ TrioPreprocess(int type,
 			    /* Adjust parameters for insertion of new one */
 			    pos++;
 # if defined(TRIO_ERRORS)
+			    if(currentParam >= MAX_PARAMETERS)
+			      {
+			        /* Bail out completely to make the error more obvious */
+			        return TRIO_ERROR_RETURN(TRIO_ETOOMANY, index);
+			      }
 			    usedEntries[currentParam] += 1;
 # endif
 			    parameters[pos].type = FORMAT_USER_DEFINED;
 			    currentParam++;
+			    if(currentParam >= MAX_PARAMETERS)
+			      {
+			        /* Bail out completely to make the error more obvious */
+			        return TRIO_ERROR_RETURN(TRIO_ETOOMANY, index);
+			      }
 			    indices[currentParam] = pos;
 			    if (currentParam > maxParam)
 			      maxParam = currentParam;
@@ -1371,6 +1397,12 @@ TrioPreprocess(int type,
 	    }
 
 #if defined(TRIO_ERRORS)
+	  if(currentParam >= MAX_PARAMETERS)
+	    {
+	      /* Bail out completely to make the error more obvious */
+	      return TRIO_ERROR_RETURN(TRIO_ETOOMANY, index);
+	    }
+
 	  /*  Count the number of times this entry has been used */
 	  usedEntries[currentParam] += 1;
 #endif
@@ -2190,7 +2222,7 @@ TrioWriteDouble(trio_T *self,
   if (exponentDigits > 0)
     expectedWidth += exponentDigits + sizeof("E+") - 1;
   if (isExponentNegative)
-    expectedWidth += sizeof('-') - 1;
+    expectedWidth += sizeof("-") - 1;
   if (isHex)
     expectedWidth += sizeof("0X") - 1;
   
@@ -3740,7 +3772,8 @@ TrioSkipWhitespaces(trio_T *self)
   int ch;
 
   ch = self->current;
-  while (isspace(ch))
+  //add in check for EOF to silence coverity warnings
+  while (ch != EOF && isspace(ch))
     {
       self->InStream(self, &ch);
     }
@@ -3819,7 +3852,6 @@ TrioGetCharacterClass(const char *format,
 	    {
 	      /* Trailing minus is included */
 	      characterclass[(int)ch]++;
-	      ch = range_end;
 	      break; /* for */
 	    }
 	  if (range_end == NIL)
@@ -3830,7 +3862,6 @@ TrioGetCharacterClass(const char *format,
 	  for (i = (int)range_begin; i <= (int)range_end; i++)
 	    characterclass[i]++;
 	    
-	  ch = range_end;
 	  break;
 
 	case QUALIFIER_COLON: /* Character class expressions */

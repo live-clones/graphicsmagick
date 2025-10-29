@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2023 GraphicsMagick Group
+% Copyright (C) 2023-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -571,6 +571,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                                       basic_info.alpha_bits, basic_info.num_color_channels,
                                       basic_info.have_animation == JXL_FALSE ? "False" : "True");
               }
+
             if (basic_info.num_extra_channels)
               {
                 size_t index;
@@ -637,6 +638,9 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 
             image->orientation=convert_orientation(basic_info.orientation);
 
+            if (CheckImagePixelLimits(image, exception) != MagickPass)
+              ThrowJXLReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+
             pixel_format.endianness=JXL_NATIVE_ENDIAN;
             pixel_format.align=0;
             if (basic_info.num_color_channels == 1)
@@ -654,7 +658,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                       ThrowJXLReaderException(ResourceLimitError,MemoryAllocationFailed,image);
                   }
                 grayscale=MagickTrue;
-                pixel_format.num_channels=1;
+                pixel_format.num_channels=image->matte ? 2 : 1;
                 pixel_format.data_type=(basic_info.bits_per_sample <= 8 ? JXL_TYPE_UINT8 :
                                         (basic_info.bits_per_sample <= 16 ? JXL_TYPE_UINT16 :
                                          JXL_TYPE_FLOAT));
@@ -839,6 +843,24 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
             size_t
               out_len;
 
+            if (image->logging)
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "JxlPixelFormat:\n"
+                                    "    num_channels: %u\n"
+                                    "    data_type: %s\n"
+                                    "    endianness: %s\n"
+                                    "    align: %" MAGICK_SIZE_T_F "u",
+                                    pixel_format.num_channels,
+                                    pixel_format.data_type == JXL_TYPE_FLOAT ? "float" :
+                                    (pixel_format.data_type == JXL_TYPE_UINT8 ? "uint8" :
+                                     (pixel_format.data_type == JXL_TYPE_UINT16 ? "uint16" :
+                                      (pixel_format.data_type == JXL_TYPE_FLOAT16 ? "float16" :
+                                       "unknown"))) ,
+                                    pixel_format.endianness == JXL_NATIVE_ENDIAN ? "native" :
+                                    (pixel_format.endianness == JXL_LITTLE_ENDIAN ? "little" :
+                                     (pixel_format.endianness == JXL_BIG_ENDIAN ? "big" : "unknown")),
+                                    pixel_format.align);
+
             status=JxlDecoderImageOutBufferSize(jxl_decoder,&pixel_format,&out_len);
             if (status != JXL_DEC_SUCCESS)
               {
@@ -848,6 +870,10 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                 break;
               }
 
+            if (image->logging)
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "JxlDecoderImageOutBufferSize() returns %" MAGICK_SIZE_T_F "u",
+                                    (MAGICK_SIZE_T) out_len);
             out_buf=MagickAllocateResourceLimitedArray(unsigned char *,out_len,sizeof(*out_buf));
             if (out_buf == (unsigned char *) NULL)
               ThrowJXLReaderException(ResourceLimitError,MemoryAllocationFailed,image);
@@ -1004,6 +1030,11 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                 if (LocaleNCompare(type,"Exif",sizeof(type)) == 0)
                   {
                     /*
+                      Assure that there is no leak if there are duplicate requests
+                    */
+                    MagickFreeResourceLimitedMemory(exif_profile);
+                    exif_size=0;
+                    /*
                       Allocate EXIF profile box buffer (plus a bit more)
                     */
                     if ((profile=MagickAllocateResourceLimitedClearedMemory(unsigned char *,
@@ -1016,10 +1047,21 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                             exif_profile=profile;
                             exif_size=profile_size;
                           }
+                        else
+                          {
+                            MagickFreeResourceLimitedMemory(profile);
+                            exif_profile=NULL;
+                            exif_size=0;
+                          }
                       }
                   }
                 if (LocaleNCompare(type,"xml ",sizeof(type)) == 0)
                   {
+                    /*
+                      Assure that there is no leak if there are duplicate requests
+                    */
+                    MagickFreeResourceLimitedMemory(xmp_profile);
+                    xmp_size=0;
                     /*
                       Allocate XMP profile box buffer
                     */
@@ -1030,6 +1072,12 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                           {
                             xmp_profile=profile;
                             xmp_size=profile_size;
+                          }
+                        else
+                          {
+                            MagickFreeResourceLimitedMemory(profile);
+                            xmp_profile=NULL;
+                            xmp_size=0;
                           }
                       }
                   }
@@ -1117,13 +1165,15 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
       (void) SetImageProfile(image,"EXIF",exif_profile,exif_size+exif_pad+4);
 
       MagickFreeResourceLimitedMemory(exif_profile);
+      exif_size=0;
     }
   if (xmp_profile != NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "XMP Box: Size %lu", (unsigned long) exif_size);
+                            "XMP Box: Size %lu", (unsigned long) xmp_size);
       (void) SetImageProfile(image,"XMP",xmp_profile,xmp_size);
       MagickFreeResourceLimitedMemory(xmp_profile);
+      xmp_size=0;
     }
   /* every break outside of success is some kind of error */
   if (status != JXL_DEC_SUCCESS) {

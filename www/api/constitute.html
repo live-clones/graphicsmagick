@@ -39,21 +39,21 @@
 <main id="constitute">
 <h1 class="title">constitute</h1>
 <p class="subtitle" id="read-or-write-an-image">Read or write an image</p>
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents" role="doc-toc">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#constituteimage" id="id15">ConstituteImage</a></p></li>
-<li><p><a class="reference internal" href="#dispatchimage" id="id16">DispatchImage</a></p></li>
-<li><p><a class="reference internal" href="#pingimage" id="id17">PingImage</a></p></li>
-<li><p><a class="reference internal" href="#readimage" id="id18">ReadImage</a></p></li>
-<li><p><a class="reference internal" href="#readinlineimage" id="id19">ReadInlineImage</a></p></li>
-<li><p><a class="reference internal" href="#writeimage" id="id20">WriteImage</a></p></li>
-<li><p><a class="reference internal" href="#writeimages" id="id21">WriteImages</a></p></li>
-<li><p><a class="reference internal" href="#writeimagesfile" id="id22">WriteImagesFile</a></p></li>
+<li><p><a class="reference internal" href="#constituteimage" id="toc-entry-1">ConstituteImage</a></p></li>
+<li><p><a class="reference internal" href="#dispatchimage" id="toc-entry-2">DispatchImage</a></p></li>
+<li><p><a class="reference internal" href="#pingimage" id="toc-entry-3">PingImage</a></p></li>
+<li><p><a class="reference internal" href="#readimage" id="toc-entry-4">ReadImage</a></p></li>
+<li><p><a class="reference internal" href="#readinlineimage" id="toc-entry-5">ReadInlineImage</a></p></li>
+<li><p><a class="reference internal" href="#writeimage" id="toc-entry-6">WriteImage</a></p></li>
+<li><p><a class="reference internal" href="#writeimages" id="toc-entry-7">WriteImages</a></p></li>
+<li><p><a class="reference internal" href="#writeimagesfile" id="toc-entry-8">WriteImagesFile</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="constituteimage">
-<h1><a class="toc-backref" href="#id15">ConstituteImage</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">ConstituteImage</a></h1>
 <section id="synopsis">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#image">Image</a> *ConstituteImage( const unsigned long width, const unsigned long height,
@@ -114,15 +114,15 @@ length varies depending on the values of width, height, map, and type.</p>
 </section>
 </section>
 <section id="dispatchimage">
-<h1><a class="toc-backref" href="#id16">DispatchImage</a></h1>
-<section id="id1">
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">DispatchImage</a></h1>
+<section id="synopsis-1">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail DispatchImage( const <a class="reference external" href="../api/types.html#image">Image</a> *image, const long x_offset, const long y_offset,
                               const unsigned long columns, const unsigned long rows,
                               const char *map, const <a class="reference external" href="../api/types.html#storagetype">StorageType</a> type, void *pixels,
                               <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id2">
+<section id="description-1">
 <h2>Description</h2>
 <p>DispatchImage() extracts pixel data from an Image into a raw memory array.
 The pixel data is written in scanline order top-to-bottom using an
@@ -176,12 +176,12 @@ length varies depending on the values of width, height, map, and type.</p>
 </section>
 </section>
 <section id="pingimage">
-<h1><a class="toc-backref" href="#id17">PingImage</a></h1>
-<section id="id3">
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">PingImage</a></h1>
+<section id="synopsis-2">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#image">Image</a> *PingImage( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id4">
+<section id="description-2">
 <h2>Description</h2>
 <p>PingImage() returns all the attributes of an image or image sequence
 except for the pixels.  It is much faster and consumes far less memory
@@ -202,12 +202,12 @@ this structure.</p>
 </section>
 </section>
 <section id="readimage">
-<h1><a class="toc-backref" href="#id18">ReadImage</a></h1>
-<section id="id5">
+<h1><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">ReadImage</a></h1>
+<section id="synopsis-3">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#image">Image</a> *ReadImage( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id6">
+<section id="description-3">
 <h2>Description</h2>
 <p>ReadImage() reads an image or image sequence from a file or file handle.
 The method returns a NULL if there is a memory shortage or if the image
@@ -228,13 +228,13 @@ this structure.</p>
 </section>
 </section>
 <section id="readinlineimage">
-<h1><a class="toc-backref" href="#id19">ReadInlineImage</a></h1>
-<section id="id7">
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">ReadInlineImage</a></h1>
+<section id="synopsis-4">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#image">Image</a> *ReadInlineImage( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, const char *content,
                         <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id8">
+<section id="description-4">
 <h2>Description</h2>
 <p>ReadInlineImage() reads a Base64-encoded inline image or image sequence.
 The method returns a NULL if there is a memory shortage or if the image
@@ -257,12 +257,12 @@ describes the reason for the failure.</p>
 </section>
 </section>
 <section id="writeimage">
-<h1><a class="toc-backref" href="#id20">WriteImage</a></h1>
-<section id="id9">
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">WriteImage</a></h1>
+<section id="synopsis-5">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail WriteImage( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
 </section>
-<section id="id10">
+<section id="description-5">
 <h2>Description</h2>
 <p>Use WriteImage() to write an image or an image sequence to a file or
 filehandle.  If writing to a file on disk, the name is defined by the
@@ -284,13 +284,13 @@ for any failure.</p>
 </section>
 </section>
 <section id="writeimages">
-<h1><a class="toc-backref" href="#id21">WriteImages</a></h1>
-<section id="id11">
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">WriteImages</a></h1>
+<section id="synopsis-6">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail WriteImages( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, <a class="reference external" href="../api/types.html#image">Image</a> *image,
                             const char *filename, <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id12">
+<section id="description-6">
 <h2>Description</h2>
 <p>WriteImages() writes an image sequence into one or more files.  While
 WriteImage() will also write an image sequence, it is limited to writing
@@ -320,13 +320,13 @@ to include a printf-style formatting string for the frame number (e.g.
 </section>
 </section>
 <section id="writeimagesfile">
-<h1><a class="toc-backref" href="#id22">WriteImagesFile</a></h1>
-<section id="id13">
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">WriteImagesFile</a></h1>
+<section id="synopsis-7">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned int WriteImagesFile( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, <a class="reference external" href="../api/types.html#image">Image</a> *image, FILE *file,
                               <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 </section>
-<section id="id14">
+<section id="description-7">
 <h2>Description</h2>
 <p>WriteImagesFile() writes an image or image sequence to a stdio
 FILE handle.  This may be used to append an encoded image to an already
@@ -356,7 +356,7 @@ of an existing file.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002 - 2024<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

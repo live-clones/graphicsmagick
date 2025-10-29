@@ -39,22 +39,22 @@
 <main id="memory">
 <h1 class="title">memory</h1>
 <p class="subtitle" id="memory-allocation-deallocation-functions">Memory allocation/deallocation functions</p>
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents" role="doc-toc">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#magickallocfunctions" id="id17">MagickAllocFunctions</a></p></li>
-<li><p><a class="reference internal" href="#magickmalloc" id="id18">MagickMalloc</a></p></li>
-<li><p><a class="reference internal" href="#magickmallocaligned" id="id19">MagickMallocAligned</a></p></li>
-<li><p><a class="reference internal" href="#magickmalloccleared" id="id20">MagickMallocCleared</a></p></li>
-<li><p><a class="reference internal" href="#magickclonememory" id="id21">MagickCloneMemory</a></p></li>
-<li><p><a class="reference internal" href="#magickrealloc" id="id22">MagickRealloc</a></p></li>
-<li><p><a class="reference internal" href="#magickreallocstd" id="id23">MagickReallocStd</a></p></li>
-<li><p><a class="reference internal" href="#magickfree" id="id24">MagickFree</a></p></li>
-<li><p><a class="reference internal" href="#magickfreealigned" id="id25">MagickFreeAligned</a></p></li>
+<li><p><a class="reference internal" href="#magickallocfunctions" id="toc-entry-1">MagickAllocFunctions</a></p></li>
+<li><p><a class="reference internal" href="#magickmalloc" id="toc-entry-2">MagickMalloc</a></p></li>
+<li><p><a class="reference internal" href="#magickmallocaligned" id="toc-entry-3">MagickMallocAligned</a></p></li>
+<li><p><a class="reference internal" href="#magickmalloccleared" id="toc-entry-4">MagickMallocCleared</a></p></li>
+<li><p><a class="reference internal" href="#magickclonememory" id="toc-entry-5">MagickCloneMemory</a></p></li>
+<li><p><a class="reference internal" href="#magickrealloc" id="toc-entry-6">MagickRealloc</a></p></li>
+<li><p><a class="reference internal" href="#magickreallocstd" id="toc-entry-7">MagickReallocStd</a></p></li>
+<li><p><a class="reference internal" href="#magickfree" id="toc-entry-8">MagickFree</a></p></li>
+<li><p><a class="reference internal" href="#magickfreealigned" id="toc-entry-9">MagickFreeAligned</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="magickallocfunctions">
-<h1><a class="toc-backref" href="#id17">MagickAllocFunctions</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">MagickAllocFunctions</a></h1>
 <section id="synopsis">
 <h2>Synopsis</h2>
 <pre class="literal-block">void MagickAllocFunctions( MagickFreeFunc free_func, MagickMallocFunc malloc_func,
@@ -83,12 +83,12 @@ function should be invoked prior to invoking InitializeMagick().</p>
 </section>
 </section>
 <section id="magickmalloc">
-<h1><a class="toc-backref" href="#id18">MagickMalloc</a></h1>
-<section id="id1">
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">MagickMalloc</a></h1>
+<section id="synopsis-1">
 <h2>Synopsis</h2>
 <pre class="literal-block">void *MagickMalloc( const size_t size );</pre>
 </section>
-<section id="id2">
+<section id="description-1">
 <h2>Description</h2>
 <p>MagickMalloc() returns a pointer to a block of memory of at least size
 bytes suitably aligned for any use.  NULL is returned if insufficient
@@ -104,12 +104,12 @@ memory is available or the requested size is zero.</p>
 </section>
 </section>
 <section id="magickmallocaligned">
-<h1><a class="toc-backref" href="#id19">MagickMallocAligned</a></h1>
-<section id="id3">
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">MagickMallocAligned</a></h1>
+<section id="synopsis-2">
 <h2>Synopsis</h2>
 <pre class="literal-block">void *MagickMallocAligned( size_t alignment, const size_t size );</pre>
 </section>
-<section id="id4">
+<section id="description-2">
 <h2>Description</h2>
 <p>MagickMallocAligned() allocates memory and returns a pointer to a
 block of memory capable of storing at least size bytes with the
@@ -140,12 +140,12 @@ memory.</p>
 </section>
 </section>
 <section id="magickmalloccleared">
-<h1><a class="toc-backref" href="#id20">MagickMallocCleared</a></h1>
-<section id="id5">
+<h1><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">MagickMallocCleared</a></h1>
+<section id="synopsis-3">
 <h2>Synopsis</h2>
 <pre class="literal-block">void *MagickMallocCleared( const size_t size );</pre>
 </section>
-<section id="id6">
+<section id="description-3">
 <h2>Description</h2>
 <p>MagickMallocCleared() returns a pointer to a block of memory of at least
 size bytes suitably aligned for any use.  NULL is returned if insufficient
@@ -162,12 +162,12 @@ from MagickMalloc in that the allocated bytes are cleared to zero.</p>
 </section>
 </section>
 <section id="magickclonememory">
-<h1><a class="toc-backref" href="#id21">MagickCloneMemory</a></h1>
-<section id="id7">
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">MagickCloneMemory</a></h1>
+<section id="synopsis-4">
 <h2>Synopsis</h2>
 <pre class="literal-block">void *MagickCloneMemory( void *destination, const void *source, const size_t size );</pre>
 </section>
-<section id="id8">
+<section id="description-4">
 <h2>Description</h2>
 <p>MagickCloneMemory() copies size bytes from memory area source to the
 destination.  Copying between objects that overlap will take place
@@ -182,12 +182,12 @@ correctly.  It returns destination.</p>
 </section>
 </section>
 <section id="magickrealloc">
-<h1><a class="toc-backref" href="#id22">MagickRealloc</a></h1>
-<section id="id9">
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">MagickRealloc</a></h1>
+<section id="synopsis-5">
 <h2>Synopsis</h2>
 <pre class="literal-block">void *MagickRealloc( void *memory, const size_t size );</pre>
 </section>
-<section id="id10">
+<section id="description-5">
 <h2>Description</h2>
 <p>MagickRealloc() changes the size of the memory and returns a pointer to
 the (possibly moved) block.  The contents will be unchanged up to the
@@ -211,12 +211,12 @@ contained pointers to allocated memory, then there is a leak!</p>
 </section>
 </section>
 <section id="magickreallocstd">
-<h1><a class="toc-backref" href="#id23">MagickReallocStd</a></h1>
-<section id="id11">
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">MagickReallocStd</a></h1>
+<section id="synopsis-6">
 <h2>Synopsis</h2>
 <pre class="literal-block">void *MagickReallocStd( void *memory, const size_t size );</pre>
 </section>
-<section id="id12">
+<section id="description-6">
 <h2>Description</h2>
 <p>MagickReallocStd() changes the size of the memory and returns a pointer to
 the (possibly moved) block.  The contents will be unchanged up to the
@@ -241,12 +241,12 @@ pointer value so that allocations can be cleaned up.</p>
 </section>
 </section>
 <section id="magickfree">
-<h1><a class="toc-backref" href="#id24">MagickFree</a></h1>
-<section id="id13">
+<h1><a class="toc-backref" href="#toc-entry-8" role="doc-backlink">MagickFree</a></h1>
+<section id="synopsis-7">
 <h2>Synopsis</h2>
 <pre class="literal-block">void MagickFree( void *memory );</pre>
 </section>
-<section id="id14">
+<section id="description-7">
 <h2>Description</h2>
 <p>MagickFree() frees memory that has already been allocated by
 MagickMalloc() or other other other allocators directly compatible
@@ -263,12 +263,12 @@ system malloc()). For convenience, a NULL argument is ignored.</p>
 </section>
 </section>
 <section id="magickfreealigned">
-<h1><a class="toc-backref" href="#id25">MagickFreeAligned</a></h1>
-<section id="id15">
+<h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">MagickFreeAligned</a></h1>
+<section id="synopsis-8">
 <h2>Synopsis</h2>
 <pre class="literal-block">void MagickFreeAligned( void *memory );</pre>
 </section>
-<section id="id16">
+<section id="description-8">
 <h2>Description</h2>
 <p>MagickFreeAligned() frees aligned memory that has previously been
 allocated via MagickMallocAligned(). For convenience, a NULL argument is
@@ -290,7 +290,7 @@ MagickMallocAligned() can not be used directly with MagickFree().</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002 - 2024<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

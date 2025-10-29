@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ======================================
 Magick Image File Format (version 1.0)
@@ -398,6 +398,6 @@ individual image (composed of a header and image data) into one file.
 Authors
 =======
 
-John Cristy, magick-users@imagemagick.org ImageMagick Studio LLC.
+John Cristy, ImageMagick Studio LLC.
 
 Maintained since 2002 by Bob Friesenhahn, GraphicsMagick Group.

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003, 2005, 2009 GraphicsMagick Group
+  Copyright (C) 2003-2024 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -11,6 +11,7 @@
 */
 
 #include <magick/studio.h>
+#include <magick/image.h> /* For MaxValueGivenBits() */
 #include <magick/bit_stream.h>
 
 #include <stdio.h>
@@ -33,6 +34,7 @@ int main ( int argc, char *argv[])
     result=0;
 
   unsigned int
+    status=EXIT_SUCCESS,
     quantum;
 
   FILE
@@ -40,17 +42,17 @@ int main ( int argc, char *argv[])
 
   if (argc < 2)
     {
-      (void) printf("usage: %s read/write/test args\n", argv[0]);
-      exit(1);
+      (void) fprintf(stderr, "usage: %s read/write/test args\n", argv[0]);
+      exit(EXIT_FAILURE);
     }
 
   mode = argv[1];
 
-  file=fopen("/dev/null","wb+");
+  file=fopen(MAGICK_DEVNULL,"wb+");
   if (!file)
     {
-      (void) printf("Failed to open file\n");
-      exit(1);
+      (void) fprintf(stderr, "Failed to open file %s\n", MAGICK_DEVNULL);
+      exit(EXIT_FAILURE);
     }
 
   if (strcmp(mode,"read") == 0)
@@ -66,18 +68,28 @@ int main ( int argc, char *argv[])
 
       if (argc != 4)
         {
-          (void) printf("usage: %s read repetitions bits\n", argv[0]);
-          exit(1);
+          (void) fprintf(stderr, "usage: %s read repetitions bits\n", argv[0]);
+          exit(EXIT_FAILURE);
         }
 
       reps = atoi(argv[2]);
+      if ((reps == 0) || (reps > INT_MAX))
+        {
+          (void) fprintf(stderr, "Unreasonable reps %u!\n", reps);
+          exit(EXIT_FAILURE);
+        }
       bits = atoi(argv[3]);
+      if ((bits == 0) || (bits > 32))
+        {
+          (void) fprintf(stderr, "Unreasonable bits %u!\n", bits);
+          exit(EXIT_FAILURE);
+        }
 
       bytes=(unsigned char *)malloc((size_t) reps*2);
       if (!bytes)
         {
-          (void) printf("Failed to allocate %lu bytes\n", (unsigned long) reps*2);
-          exit(1);
+          (void) fprintf(stderr, "Failed to allocate %lu bytes\n", (unsigned long) reps*2);
+          exit(EXIT_FAILURE);
         }
       for (rep=0; rep < reps*2; rep++)
         bytes[rep]=(unsigned char) rep;
@@ -107,18 +119,28 @@ int main ( int argc, char *argv[])
 
       if (argc != 4)
         {
-          (void) printf("usage: %s write repetitions bits\n", argv[0]);
-          exit(1);
+          (void) fprintf(stderr, "usage: %s write repetitions bits\n", argv[0]);
+          exit(EXIT_FAILURE);
         }
 
       reps = atoi(argv[2]);
+      if ((reps == 0) || (reps > INT_MAX))
+        {
+          (void) fprintf(stderr, "Unreasonable reps %u!\n", reps);
+          exit(EXIT_FAILURE);
+        }
       bits = atoi(argv[3]);
+      if ((bits == 0) || (bits > 32))
+        {
+          (void) fprintf(stderr, "Unreasonable bits %u!\n", bits);
+          exit(EXIT_FAILURE);
+        }
 
       bytes=(unsigned char *)calloc(reps,2);
       if (!bytes)
         {
-          (void) printf("Failed to allocate %lu bytes\n", (unsigned long) reps*2);
-          exit(1);
+          (void) fprintf(stderr, "Failed to allocate %lu bytes\n", (unsigned long) reps*2);
+          exit(EXIT_FAILURE);
         }
       (void) memset(bytes,0,(size_t) reps*2);
 
@@ -131,6 +153,8 @@ int main ( int argc, char *argv[])
               result += bytes[x];
             }
         }
+
+      free(bytes);
     }
   else if (strcmp(mode,"test") == 0)
     {
@@ -143,50 +167,64 @@ int main ( int argc, char *argv[])
       size_t
         allocated_bytes;
 
+      unsigned long
+        max_quantum_value;
+
       unsigned int
         bits,
         max_bits,
-        max_quantum,
         read_quantum,
         write_quantum;
 
       if (argc != 3)
         {
-          (void) printf("usage: %s test max_bits\n", argv[0]);
-          exit(1);
+          (void) fprintf(stderr, "usage: %s test max_bits\n", argv[0]);
+          exit(EXIT_FAILURE);
         }
 
       max_bits = atoi(argv[2]);
+      if ((max_bits == 0) || (max_bits > 32))
+        {
+          (void) fprintf(stderr, "Unreasonable max_bits %u!\n", max_bits);
+          exit(EXIT_FAILURE);
+        }
 
       for (bits=1 ; bits <= max_bits; bits++)
         {
-          max_quantum=0x01 << bits;
+          max_quantum_value=MaxValueGivenBits(bits);
 
-          allocated_bytes=max_quantum;
-          if (bits > 8)
+          allocated_bytes=max_quantum_value;
+          if (bits > 7)
             allocated_bytes *= 2;
-          if (bits > 16)
+          if (bits > 15)
             allocated_bytes *= 2;
 
           bytes=(unsigned char *)malloc(allocated_bytes);
           if (!bytes)
             {
-              (void) printf("Failed to allocate %lu bytes\n",(unsigned long) allocated_bytes);
-              exit(1);
+              (void) fprintf(stderr, "Failed to allocate %lu bytes\n",(unsigned long) allocated_bytes);
+              exit(EXIT_FAILURE);
+            }
+          else
+            {
+              (void) fprintf(stdout, "Bits %02u, Allocated %lu bytes\n",bits, (unsigned long) allocated_bytes);
+              (void) fflush(stdout);
             }
           (void) memset(bytes,0xff,allocated_bytes);
 
           MagickBitStreamInitializeWrite(&write_stream,bytes);
           MagickBitStreamInitializeRead(&read_stream,bytes);
 
-          for (write_quantum=0; write_quantum < max_quantum; write_quantum++)
+          for (write_quantum=0; write_quantum < max_quantum_value; write_quantum++)
             {
               MagickBitStreamMSBWrite(&write_stream,bits,write_quantum);
               read_quantum=MagickBitStreamMSBRead(&read_stream,bits);
               if (read_quantum != write_quantum)
                 {
-                  (void) printf("mismatch: bits=%u write_quantum=%u read_quantum=%u\n",
+                  (void) fprintf(stderr, "mismatch: bits=%u write_quantum=%u read_quantum=%u\n",
                          bits,write_quantum,read_quantum);
+                  status = EXIT_FAILURE;
+                  break;
                 }
             }
 
@@ -197,5 +235,5 @@ int main ( int argc, char *argv[])
   (void) fprintf(file,"result=%u\n",result);
   (void) fclose(file);
 
-  return 0;
+  return status;
 }

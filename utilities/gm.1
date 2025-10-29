@@ -1,4 +1,4 @@
-.TH gm 1 "2024/08/04" "GraphicsMagick"
+.TH gm 1 "2025/10/28" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1317,6 +1317,146 @@ Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) a
 
 .in 15
 .in 15
+.B "heif:preserve-colorspace={true|false}"
+.in 20
+ \fR
+.in 20
+ Return HEIF image in its original colorspace.  This allows an
+image to be returned in the original YCbCr colorspace rather than RGB.
+
+.in 15
+.in 15
+.B "heif:max-image-size-pixels=number"
+.in 20
+ \fR
+.in 20
+
+An image may be comprised of many pixels. If there are a huge number of
+pixels, it may take a long time to return an image.  Please refer to
+libheif source code (or documentation) for 'max_image_size_pixels'.
+Please note that GraphicsMagick already computes a value for this
+parameter based on total pixel limits, or width/height limits so
+supplying this parameter will override that.
+
+.in 15
+.in 15
+.B "heif:max-number-of-tiles=number"
+.in 20
+ \fR
+.in 20
+
+An image may be comprised of many tiles. If there are a huge number of
+tiles, it may take a long time to return an image.  Please refer to
+libheif source code (or documentation) for 'max_number_of_tiles'.
+
+.in 15
+.in 15
+.B "heif:max-bayer-pattern-pixels=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_bayer_pattern_pixels'.
+
+.in 15
+.in 15
+.B "heif:max-items=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_items'.
+
+.in 15
+.in 15
+.B "heif:max-color-profile-size=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_color_profile_size'.
+
+.in 15
+.in 15
+.B "heif:max-memory-block-size=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_memory_block_size'.
+
+.in 15
+.in 15
+.B "heif:max-components=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for 'max_components'.
+
+.in 15
+.in 15
+.B "heif:max-iloc-extents-per-item=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_iloc_extents_per_item'.
+
+.in 15
+.in 15
+.B "heif:max-size-entity-group=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_size_entity_group'.
+
+.in 15
+.in 15
+.B "heif:max-children-per-box=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_children_per_box'.
+
+.in 15
+.in 15
+.B "heif:max-total-memory=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_total_memory'.
+
+.in 15
+.in 15
+.B "heif:max-sample-description-box-entries=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_sample_description_box_entries'.
+
+.in 15
+.in 15
+.B "heif:max-sample-group-description-box-entries=number"
+.in 20
+ \fR
+.in 20
+
+Please refer to libheif source code (or documentation) for
+\'max_sample_group_description_box_entries'.
+
+.in 15
+.in 15
 .B "gradient:direction={South|North|West|East|NorthWest|NorthEast|SouthWest|SouthEast}"
 .in 20
  \fR
@@ -2384,21 +2524,26 @@ before the changes are obvious.
 .TP
 .B "-fill \fI<color>"\fP
 \fRcolor to use when filling a graphic primitive
-
-Colors are represented in GraphicsMagick in the same form used by SVG. Use "gm convert -list color" to list named colors:
+ Numeric colors specifications in GraphicsMagick are similar to
+RGB and RGBA color values as used by SVG and CSS Color Module Level 3
+(https://www.w3.org/TR/css-color-3/#numerical). Use "gm convert -list
+color" to list named colors:
 
 .nf
-    name               (named color)
-    #RGB               (hex numbers, 4 bits each)
-    #RRGGBB            (8 bits each)
-    #RRRGGGBBB         (12 bits each)
-    #RRRRGGGGBBBB      (16 bits each)
-    #RGBA              (4 bits each)
-    #RRGGBBAA          (8 bits each)
-    #RRRGGGBBBAAA      (12 bits each)
-    #RRRRGGGGBBBBAAAA  (16 bits each)
-    rgb(r,g,b)         (r,g,b are decimal numbers)
-    rgba(r,g,b,a)      (r,g,b,a are decimal numbers)
+    name                              (named color)
+    #RGB                              (hex numbers, 4 bits each)
+    #RRGGBB                           (8 bits each)
+    #RRRGGGBBB                        (12 bits each)
+    #RRRRGGGGBBBB                     (16 bits each)
+    #RRRRRRRRGGGGGGGGBBBBBBBB         (32 bits each)
+    #RGBA                             (4 bits each)
+    #RRGGBBAA                         (8 bits each)
+    #RRRRRRGGGGGGBBBBBB               (12 bits each)
+    #RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA (32 bits each)
+    rgb(r,g,b)                        (r,g,b are decimal numbers, range 0 to QuantumDepth)
+    rgb(r%,g%,b%)                     (r,g,b are decimal numbers, range 0 to 100%)
+    rgba(r,g,b,a)                     (r,g,b,a are decimal numbers, range 0 to QuantumDepth)
+    rgba(r%,g%,b%,a%)                 (r,g,b,a are decimal numbers, range 0 to 100%)
 .fi
 
 Enclose the color specification in quotation marks to prevent the "#"
@@ -2412,8 +2557,8 @@ For example,
     gm convert -fill "rgb(65000,65000,65535)" ...
 .fi
 
-The shorter forms are scaled up, if necessary by replication.  For example, 
-#3af, #33aaff, and #3333aaaaffff are all equivalent.
+The shorter forms are scaled up, if necessary by replication.  For example,
+ #3af, #33aaff, and #3333aaaaffff are all equivalent.
 
 See \fB-draw\fP for further details.
 .TP
@@ -2810,7 +2955,7 @@ height are treated as minimum values rather than maximum values.
 Append a ! (exclamation point) to the geometry to force the image size to
 exactly the size you specify. For example, if you specify
 640x480! the image width is set to 640 pixels and height to
-480.
+480, changing the image aspect ratio if necessary.
 
 If only the width is specified, without the trailing 'x', then height
 is set to width (e.g., -geometry 100 is the same as

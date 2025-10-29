@@ -12,7 +12,7 @@ check_types='bilevel gray palette truecolor truecolor_1x266'
 check_types_noone='bilevel gray palette truecolor'
 
 # Number of tests we plan to run
-test_plan_fn 857
+test_plan_fn 897
 
 # AAI format
 for type in ${check_types}
@@ -357,6 +357,34 @@ for type in ${check_types}
 do
   test_command_fn "PNG ${type}" -F PNG ${MEMCHECK} ${rwfile} -filespec "out_${type}_%d" "${SRCDIR}/input_${type}.miff" PNG
   test_command_fn "PNG ${type} (stdio)" -F PNG ${MEMCHECK} ${rwfile} -stdio -filespec "out_${type}_stdio_%d" "${SRCDIR}/input_${type}.miff" PNG
+done
+
+# PNG24 format
+for type in ${check_types}
+do
+  test_command_fn "PNG24 ${type}" -F PNG ${MEMCHECK} ${rwfile} -filespec "out_${type}_%d" "${SRCDIR}/input_${type}.miff" PNG24
+  test_command_fn "PNG24 ${type} (stdio)" -F PNG ${MEMCHECK} ${rwfile} -stdio -filespec "out_${type}_stdio_%d" "${SRCDIR}/input_${type}.miff" PNG24
+done
+
+# PNG32 format
+for type in ${check_types}
+do
+  test_command_fn "PNG32 ${type}" -F PNG ${MEMCHECK} ${rwfile} -filespec "out_${type}_%d" "${SRCDIR}/input_${type}.miff" PNG32
+  test_command_fn "PNG32 ${type} (stdio)" -F PNG ${MEMCHECK} ${rwfile} -stdio -filespec "out_${type}_stdio_%d" "${SRCDIR}/input_${type}.miff" PNG32
+done
+
+# PNG48 format
+for type in ${check_types}
+do
+  test_command_fn "PNG48 ${type}" -F PNG ${MEMCHECK} ${rwfile} -filespec "out_${type}_%d" "${SRCDIR}/input_${type}.miff" PNG48
+  test_command_fn "PNG48 ${type} (stdio)" -F PNG ${MEMCHECK} ${rwfile} -stdio -filespec "out_${type}_stdio_%d" "${SRCDIR}/input_${type}.miff" PNG48
+done
+
+# PNG8 format
+for type in ${check_types}
+do
+  test_command_fn "PNG8 ${type}" -F PNG ${MEMCHECK} ${rwfile} -filespec "out_${type}_%d" "${SRCDIR}/input_${type}.miff" PNG8
+  test_command_fn "PNG8 ${type} (stdio)" -F PNG ${MEMCHECK} ${rwfile} -stdio -filespec "out_${type}_stdio_%d" "${SRCDIR}/input_${type}.miff" PNG8
 done
 
 # PNM format

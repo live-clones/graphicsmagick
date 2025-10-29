@@ -31,6 +31,7 @@ extern MagickExport MagickPassFail MagickAtoIChk(const char *str, int *value);
 extern MagickExport MagickPassFail MagickAtoUIChk(const char *str, unsigned int *value);
 extern MagickExport MagickPassFail MagickAtoLChk(const char *str, long *value);
 extern MagickExport MagickPassFail MagickAtoULChk(const char *str, unsigned long *value);
+extern MagickExport MagickPassFail MagickAtoULLChk(const char *str, unsigned long long *value);
 extern MagickExport unsigned long MagickDoubleToULong(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
 extern MagickExport unsigned int MagickDoubleToUInt(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
 extern MagickExport long MagickDoubleToLong(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;

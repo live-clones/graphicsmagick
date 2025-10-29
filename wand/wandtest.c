@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2010 GraphicsMagick Group */
+/* Copyright (C) 2003-2025 GraphicsMagick Group */
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -71,6 +71,9 @@
 /*
   Include declarations.
 */
+#if defined(_VISUALC_) && (_MSC_VER < 1900)
+#include <magick/studio.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -142,19 +145,19 @@ int main(int argc,char **argv)
     }
   (void) fprintf(stdout,"Reading images...\n");
   {
+    static const char
+      filename[] = "sequence.miff";
+
     char
       *p,
       path[MaxTextExtent];
 
     path[0]=0;
     p=getenv("SRCDIR");
-    if (p)
-      {
-        strcpy(path,p);
-        if (path[strlen(path)-1] != '/')
-          strcat(path,"/");
-      }
-    strcat(path,"sequence.miff");
+    if (p && strlen(p))
+      (void) snprintf(path, sizeof(path), (p[strlen(p)-1] != '/') ? "%s/%s" : "%s%s", p, filename);
+    else
+      (void) snprintf(path, sizeof(path), "%s", filename);
 
     status=MagickReadImage(magick_wand,path);
   }

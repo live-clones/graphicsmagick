@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2021 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -2036,7 +2036,10 @@ static unsigned int ZLIBEncode2Image(Image *image,const size_t length,
       compressed_packets=stream.total_out;
     }
   if (status)
-    ThrowBinaryException(CoderError,UnableToZipCompressImage,(char *) NULL)
+    {
+      (void) deflateEnd(&stream);
+      ThrowBinaryException(CoderError,UnableToZipCompressImage,(char *) NULL);
+    }
   else
     for (i=0; i < (long) compressed_packets; i++)
       (void) (*write_byte)(image,(magick_uint8_t)compressed_pixels[i],info);

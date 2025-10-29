@@ -1,14 +1,16 @@
 #!/bin/bash -eu
 
-# This is intended to be run from OSS-Fuzz's build environment. We intend to
-# eventually refactor it to be easy to run locally.
-
+# This shell script is intended to be run from OSS-Fuzz's build
+# environment. We intend to eventually refactor it to be easy to run
+# locally.
+#
 # For local testing of fuzzing/oss-fuzz-build.sh in 'compile' mode do:
 #
 # Check 'compile' prompt for docker container id
 # (e.g. '04a46e46f7af'). Can also check the output of 'docker ps -lq'.
 #
 # Then do:
+#
 # ~/src/GM% docker cp fuzzing/oss-fuzz-build.sh 04a46e46f7af:/src/graphicsmagick/fuzzing/oss-fuzz-build.sh
 #
 # or maybe"
@@ -16,7 +18,7 @@
 # ~/src/GM% docker cp fuzzing/oss-fuzz-build.sh $(docker ps -lq):/src/graphicsmagick/fuzzing/oss-fuzz-build.sh
 # ~/src/GM% docker cp fuzzing/coder_fuzzer.cc $(docker ps -lq):/src/graphicsmagick/fuzzing/
 #
-# Execute in the oss-fuzz shell environment like "/src/build.sh" while
+# Execute in the oss-fuzz shell environment like "/src/build.sh 2>&1 | tee build.sh" while
 # in the initial "/src/graphicsmagick" directory.
 #
 #
@@ -41,9 +43,12 @@ printf "WORK=${WORK}\n"
 printf "OUT=${OUT}\n"
 printf "SRC=${SRC}\n"
 
+# Libtiff build now requires autoconf-archive
+apt install autoconf-archive
+
 enable_aom=true
 enable_bzip2=true
-enable_de265=true
+enable_de265=false
 enable_freetype=true
 enable_heif=true
 enable_jasper=true
@@ -51,14 +56,18 @@ enable_jbig=true
 enable_jpeg=true
 enable_jxl=true
 enable_lcms=true
+enable_libzip=true
+enable_openh264=true
+enable_openjpeg=true
 enable_png=true
 enable_tiff=true
 enable_webp=true
-enable_x265=false
-enable_xml=false
+enable_libwmf=true
+enable_x265=true
+enable_xml=true
 enable_xz=true
+enable_zlib=true
 enable_zstd=true
-enable_libzip=true
 
 export PKG_CONFIG_PATH="$WORK/lib/pkgconfig"
 export PKG_CONFIG='pkg-config --static'
@@ -88,17 +97,27 @@ rm -f ${OUT}/*_fuzzer
 
 set -x
 
+# For some reason, libxml2 requires automake 1.16.3 or later, and this
+# is handled by Dockerfile rules!
+
 # build zlib
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static zlib --libs
 #    -L/work/lib -lz
-printf "=== Building zlib...\n"
-pushd "$SRC/zlib"
-./configure \
-    --static \
-    --prefix="$WORK"
-make -j$(nproc) CFLAGS="$CFLAGS -fPIC"
-make install
-popd
+if $enable_zlib
+then
+    printf "=== Building zlib...\n"
+    ZLIB_SRC="${SRC}/zlib"
+    ZLIB_BUILD="${SRC}/zlib_build"
+    rm -rf "${ZLIB_BUILD}"
+    mkdir -p "${ZLIB_BUILD}"
+    pushd "${ZLIB_BUILD}"
+    ${ZLIB_SRC}/configure \
+                --static \
+                --prefix="$WORK"
+    make -j$(nproc) CFLAGS="$CFLAGS -fPIC"
+    make install
+    popd
+fi
 
 # build xz
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static liblzma --libs
@@ -156,11 +175,11 @@ then
     popd
 fi
 
-printf "=== Building ${SRC}/libpng...\n"
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libpng --libs
 #    -L/work/lib -lpng16 -lm -lz
 if $enable_png
 then
+    printf "=== Building ${SRC}/libpng...\n"
     pushd "$SRC/libpng"
     autoreconf -fiv
     ./configure \
@@ -180,13 +199,21 @@ if $enable_xml
 then
     printf "=== Building ${SRC}/libxml2...\n"
     pushd "$SRC/libxml2"
+    #
+    # Build is patterned after libxml2/fuzz/oss-fuzz-build.sh
+    #
+    # Don't enable zlib and liblzma with MSan
+    if [ "$SANITIZER" = memory ]; then
+        LIBXML2_EXTRA_CONFIG=''
+    else
+        LIBXML2_EXTRA_CONFIG='--with-zlib --with-lzma'
+    fi
     ./autogen.sh \
         --disable-shared \
         --without-debug \
-        --without-legacy \
+        --without-http \
         --without-python \
-        --without-schemas \
-        --without-schematron \
+        $LIBXML2_EXTRA_CONFIG \
         --prefix="${WORK}"
     make -j$(nproc)
     make install
@@ -202,7 +229,6 @@ then
     pushd "$SRC/libjpeg-turbo"
     CFLAGS="$CFLAGS -fPIC" cmake . \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
           -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
           -DCMAKE_INSTALL_PREFIX="$WORK" \
           -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
@@ -253,8 +279,6 @@ then
     pushd "${BZIP2_BUILD}"
     cmake -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_CXX_COMPILER=$CXX \
-          -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
           -DCMAKE_C_COMPILER=$CC \
           -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
           -DCMAKE_INSTALL_PREFIX="$WORK" \
@@ -286,6 +310,30 @@ then
 fi
 
 # FXIME: Add libdeflate, and libdeflate build here
+
+# Build OpenJPEG
+if $enable_openjpeg
+then
+    printf "=== Building ${SRC}/openjpeg...\n"
+    OPENJPEG_BUILD="${SRC}/openjpeg_build"
+    rm -rf "${OPENJPEG_BUILD}"
+    mkdir -p "${OPENJPEG_BUILD}"
+    pushd "${OPENJPEG_BUILD}"
+    cmake -G "Unix Makefiles" \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_C_COMPILER=$CC \
+          -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
+          -DCMAKE_INSTALL_PREFIX="$WORK" \
+          -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+          -DBUILD_CODEC=OFF \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DBUILD_STATIC_LIBS=ON \
+          ${SRC}/openjpeg
+    make clean
+    make -j$(nproc)
+    make install
+    popd
+fi
 
 # Build libtiff
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libtiff-4 --libs
@@ -341,6 +389,9 @@ fi
 # Build freetype
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static freetype2 --libs
 #    -L/work/lib -lfreetype -lpng16 -lm -lz
+#
+# Disable 'harfbuzz' to avoid compilation error of autofit module due
+# to "use of undeclared identifier 'RTLD_DEFAULT'".
 if $enable_freetype
 then
     printf "=== Building ${SRC}/freetype...\n"
@@ -353,9 +404,58 @@ then
         --disable-shared \
         --enable-freetype-config \
         --enable-static \
+        --without-harfbuzz \
         --prefix="$WORK"
     make -j$(nproc)
     make install
+    popd
+fi
+
+if $enable_jxl
+then
+    # Build libjxl
+    #  PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjxl_threads --libs
+    #    -L/work/lib -ljxl_threads -lm
+    #  PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjxl --libs
+    #    -L/work/lib -L -ljxl -lm -lhwy -lbrotlienc -lbrotlidec -lbrotlicommon -ljxl_cms -lm
+    #
+    # Removed -DJPEGXL_FORCE_SYSTEM_LCMS2=true
+    # Added -DJPEGXL_ENABLE_SKCMS=true
+    printf "=== Building ${SRC}/libjxl...\n"
+    LIBJXL_BUILD="${SRC}/libjxl_build"
+    rm -rf "${LIBJXL_BUILD}"
+    mkdir -p "${LIBJXL_BUILD}"
+    pushd "${LIBJXL_BUILD}"
+    cmake \
+        -DBUILD_SHARED_LIBS=false \
+        -DBUILD_TESTING=off \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_CXX_FLAGS="-DHWY_DISABLED_TARGETS=HWY_SSSE3 ${CXXFLAGS} -fPIC" \
+        -DCMAKE_C_FLAGS="-DHWY_DISABLED_TARGETS=HWY_SSSE3 ${CFLAGS} -fPIC" \
+        -DCMAKE_INSTALL_PREFIX=$WORK \
+        -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+        -DJPEGXL_ENABLE_BENCHMARK=false \
+        -DJPEGXL_ENABLE_EXAMPLES=false \
+        -DJPEGXL_ENABLE_FUZZERS=false \
+        -DJPEGXL_ENABLE_JPEGLI=false \
+        -DJPEGXL_ENABLE_JPEGLI=false \
+        -DJPEGXL_ENABLE_MANPAGES=OFF \
+        -DJPEGXL_ENABLE_SJPEG=false \
+        -DJPEGXL_ENABLE_SKCMS=false \
+        -DJPEGXL_ENABLE_TOOLS=true \
+        -DJPEGXL_ENABLE_VIEWERS=false \
+        -DJPEGXL_FORCE_SYSTEM_LCMS2=false \
+        "${SRC}/libjxl"
+    make -j$(nproc)
+    # libjxl claims to require libjxl_cms, but does not build/install one!
+    #sed -i 's/ libjxl_cms//' ./lib/libjxl.pc
+    make install
+    cp third_party/brotli/*.a $WORK/lib
+    cp third_party/brotli/*.pc $WORK/lib/pkgconfig
+    printf "==================\n"
+    printf "JXL version info\n"
+    ${WORK}/bin/cjxl --version
+    printf "==================\n"
     popd
 fi
 
@@ -366,10 +466,21 @@ then
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static x265 --libs
     #    -L/work/lib -lx265 -lc++ -lm -lrt -lm -ldl -lgcc_s -lgcc -lgcc_s -lgcc -lrt -ldl
     # include(Version) # determine X265_VERSION and X265_LATEST_TAG
+    #
+
+    # The source for this is in source/x265.pc.in
     if $enable_x265
        then
            libx265="$SRC/x265"
            libx265_build="${libx265}/build/linux"
+
+           # If source/cmake/Version.cmake detects that the source
+           # code is managed by git, it fails to build or install the
+           # x265.pc file that libheif demands!
+           if [ -d "${libx265}/.git" ]
+           then
+               mv -f "${libx265}/.git" "${libx265}/.git-moved"
+           fi
            if [ -d "${libx265_build}" ]
            then
                pushd "${libx265_build}"
@@ -382,9 +493,9 @@ then
                      -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
                      -DCMAKE_INSTALL_PREFIX="$WORK" \
                      -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
-                     -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                      -DENABLE_ASSEMBLY:BOOL=OFF \
                      -DENABLE_SHARED:STRING=off \
+                     -DX265_LATEST_TAG=TRUE \
                      ../../source
                make clean
                make -j$(nproc) x265-static
@@ -392,6 +503,11 @@ then
                popd
            else
                printf "=== Skipping missing ${libx265_build}! ===\n"
+           fi
+           # Restore original git directory
+           if [ -d "${libx265}/.git-moved" ]
+           then
+               mv -f "${libx265}/.git-moved" "${libx265}/.git"
            fi
     fi
 
@@ -404,26 +520,52 @@ then
        if [ -d "${libde265}" ]
        then
            printf "=== Building ${libde265}...\n"
-           pushd "${libde265}"
-           ./autogen.sh
-           ./configure \
-               CFLAGS="$CFLAGS -fPIC" \
-               --disable-acceleration_speed \
-               --disable-dec265 \
-               --disable-enc265 \
-               --disable-hdrcopy \
-               --disable-shared \
-               --disable-sherlock265 \
-               --enable-static \
-               --prefix="$WORK"
+           libde265_build="${libde265}_build"
+           mkdir -p "${libde265_build}"
+           pushd "${libde265_build}"
+           cmake -G "Unix Makefiles" \
+                 -DCMAKE_BUILD_TYPE=Debug \
+                 -DCMAKE_CXX_COMPILER=$CXX \
+                 -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+                 -DCMAKE_C_COMPILER=$CC \
+                 -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
+                 -DCMAKE_INSTALL_RPATH='/usr/local/lib' \
+                 -DCMAKE_INSTALL_PREFIX="$WORK" \
+                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+                 -DBUILD_SHARED_LIBS=OFF \
+                 -DENABLE_SDL=OFF \
+                 -DENABLE_DECODER=ON \
+                 -DENABLE_ENCODER=ON \
+                 "${libde265}"
            make clean
            make -j$(nproc)
-           # Fix broken libde265.pc
-           sed -i 's/@LIBS_PRIVATE@/-lc++/' libde265.pc
            make install
            popd
        else
            printf "=== Skipping missing ${libde265}! ===\n"
+       fi
+    fi
+
+    # Build openh264
+    openh264="$SRC/openh264"
+    if $enable_openh264
+    then
+        if [ -d "${openh264}" ]
+        then
+            printf "=== Building ${openh264}...\n"
+            pushd "${openh264}"
+            # Build using 'make', which is a GNU Makefile
+            if [[ $CXXFLAGS = *sanitize=memory* ]]; then
+                ASM_BUILD=No
+            else
+                ASM_BUILD=Yes
+            fi
+            make -j$(nproc) ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug clean
+            make -j$(nproc) ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug libopenh264.a
+            make -j$(nproc) ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug PREFIX="$WORK" install-static
+            popd
+        else
+            printf "=== Skipping missing ${openh264}! ===\n"
        fi
     fi
 
@@ -501,61 +643,16 @@ then
         -DCMAKE_INSTALL_PREFIX=$WORK \
         -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
         -DENABLE_PLUGIN_LOADING=off \
+        -DENABLE_MULTITHREADING_SUPPORT=on \
         -DWITH_EXAMPLES=off \
-        -DWITH_JPEG_DECODER=off \
-        -DWITH_JPEG_ENCODER=off \
+        -DWITH_JPEG_DECODER=on \
+        -DWITH_JPEG_ENCODER=on \
+        -DWITH_OpenJPEG_ENCODER=on \
+        -DWITH_OpenJPEG_DECODER=on \
+        -DWITH_UNCOMPRESSED_CODEC=on \
         "${SRC}/libheif"
     make -j$(nproc)
     make install
-    popd
-fi
-
-if $enable_jxl
-then
-    # Build libjxl
-    #  PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjxl_threads --libs
-    #    -L/work/lib -ljxl_threads -lm
-    #  PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjxl --libs
-    #    -L/work/lib -L -ljxl -lm -lhwy -lbrotlienc -lbrotlidec -lbrotlicommon -ljxl_cms -lm
-    #
-    # Removed -DJPEGXL_FORCE_SYSTEM_LCMS2=true
-    # Added -DJPEGXL_ENABLE_SKCMS=true, -DJPEGXL_BUNDLE_SKCMS=true
-    printf "=== Building ${SRC}/libjxl...\n"
-    LIBJXL_BUILD="${SRC}/libjxl_build"
-    rm -rf "${LIBJXL_BUILD}"
-    mkdir -p "${LIBJXL_BUILD}"
-    pushd "${LIBJXL_BUILD}"
-    cmake \
-        -DBUILD_SHARED_LIBS=false \
-        -DBUILD_TESTING=off \
-        -DCMAKE_BUILD_TYPE=Debug \
-        -DCMAKE_CXX_FLAGS="-DHWY_DISABLED_TARGETS=HWY_SSSE3 ${CXXFLAGS} -fPIC" \
-        -DCMAKE_C_FLAGS="-DHWY_DISABLED_TARGETS=HWY_SSSE3 ${CFLAGS} -fPIC" \
-        -DCMAKE_INSTALL_PREFIX=$WORK \
-        -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
-        -DJPEGXL_BUNDLE_SKCMS=false \
-        -DJPEGXL_ENABLE_BENCHMARK=false \
-        -DJPEGXL_ENABLE_EXAMPLES=false \
-        -DJPEGXL_ENABLE_FUZZERS=false \
-        -DJPEGXL_ENABLE_JPEGLI=false \
-        -DJPEGXL_ENABLE_JPEGLI=false \
-        -DJPEGXL_ENABLE_MANPAGES=OFF \
-        -DJPEGXL_ENABLE_SJPEG=false \
-        -DJPEGXL_ENABLE_SKCMS=false \
-        -DJPEGXL_ENABLE_TOOLS=true \
-        -DJPEGXL_ENABLE_VIEWERS=false \
-        -DJPEGXL_FORCE_SYSTEM_LCMS2=false \
-        "${SRC}/libjxl"
-    make -j$(nproc)
-    # libjxl claims to require libjxl_cms, but does not build/install one!
-    #sed -i 's/ libjxl_cms//' ./lib/libjxl.pc
-    make install
-    cp third_party/brotli/*.a $WORK/lib
-    cp third_party/brotli/*.pc $WORK/lib/pkgconfig
-    printf "==================\n"
-    printf "JXL version info\n"
-    ${WORK}/bin/cjxl --version
-    printf "==================\n"
     popd
 fi
 
@@ -575,7 +672,7 @@ then
       -DCMAKE_CXX_COMPILER=$CXX \
       -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
       -DCMAKE_C_COMPILER=$CC \
-      -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
+      -DCMAKE_C_FLAGS="$CFLAGS -fno-sanitize=undefined -fPIC" \
       -DCMAKE_INSTALL_PREFIX=$WORK \
       -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
       -DJAS_ENABLE_LIBHEIF=false \
@@ -610,10 +707,7 @@ then
         pushd ${LIBZIP_BUILD}
         cmake \
             -DBUILD_SHARED_LIBS=off \
-            -DBUILD_TESTING=off \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER=$CXX \
-            -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
             -DCMAKE_C_COMPILER=$CC \
             -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
             -DCMAKE_INSTALL_PREFIX=$WORK \
@@ -622,8 +716,7 @@ then
             -DBUILD_EXAMPLES=OFF \
             -DBUILD_OSSFUZZ=OFF \
             -DBUILD_REGRESS=OFF \
-            -DBUILD_TOOLS=OFF \
-            -DBUILD_TOOLS=OFF \
+            -DBUILD_TOOLS=ON \
             -DENABLE_GNUTLS=OFF \
             -DENABLE_MBEDTLS=OFF \
             -DENABLE_OPENSSL=OFF \
@@ -633,6 +726,30 @@ then
         make install
         popd
     fi
+fi
+
+# PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libwmf --libs
+# -L/work/lib -lwmf -lwmflite -lfreetype -lbz2 -lpng18 -lm -lz -lm
+#
+# We only build libwmflite, which has no dependencies.
+# There is no pkg-config support for libwmflite (but there is for libwmf).
+if $enable_libwmf
+then
+    printf "=== Building ${SRC}/libwmf...\n"
+    pushd "$SRC/libwmf"
+    autoreconf -fiv
+    ./configure \
+        --prefix="$WORK" \
+        --disable-heavy \
+        --disable-shared \
+        --enable-static \
+        CPPFLAGS="-I$WORK/include" \
+        CFLAGS="${CFLAGS} -fPIC" \
+        LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
+    make clean
+    make -j$(nproc)
+    make install
+    popd
 fi
 
 printf "Built libraries:\n"
@@ -654,9 +771,18 @@ case "${SANITIZER}" in
         EXTRA_LIBS='-lubsan -lc++'
     ;;
 esac
-./bootstrap
+
+# Re-bootstrap the GraphicsMagick Autotools and scripts. The
+# GraphicsMagick repository is already bootstrapped so
+# re-bootstrapping is not really necessary.  Sometimes this fails due
+# to issues with network access while updating config.guess and
+# config.sub.
+#
+#./bootstrap || printf "Failed to re-bootstrap GraphicsMagick!\n"
+
+# Configure GraphicsMagick
 PATH=$WORK/bin:$PATH PKG_CONFIG_PATH="$WORK/lib/pkgconfig" PKG_CONFIG='pkg-config --static' ./configure \
-    CPPFLAGS="-I$WORK/include/libpng16 -I$WORK/include/freetype2 -I$WORK/include/libxml2 -I$WORK/include" \
+    CPPFLAGS="-DEXPERIMENTAL_EXIF_TAGS=1 -I$WORK/include/libpng16 -I$WORK/include/freetype2 -I$WORK/include/libxml2 -I$WORK/include" \
     CFLAGS="${CFLAGS}" \
     LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
     LIBS="${EXTRA_LIBS}" \
@@ -732,7 +858,10 @@ for item in $("$WORK/coder_list"); do
         set +x
     fi
 
+    # Copy over any fuzzing dictionaries
     if [ -f "fuzzing/dictionaries/${coder}.dict" ]; then
+        set -x
         cp "fuzzing/dictionaries/${coder}.dict" "${OUT}/coder_${coder}_fuzzer.dict"
+        set +x
     fi
 done

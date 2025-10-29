@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ===================================
 UNIX/Cygwin/MinGW/MSYS2 Compilation
@@ -18,7 +18,7 @@ The source code must be extracted prior to compilation as follows:
 7z
 
     7-Zip archive format. The Z-Zip format may be extracted under Unix
-    using '7za' from the P7ZIP package (http://p7zip.sourceforge.net/).
+    using '7za' from the P7ZIP package (https://p7zip.sourceforge.net/).
     Extract similar to::
 
       7za x GraphicsMagick-1.3.7z
@@ -26,7 +26,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.bz2
 
     BZip2 compressed tar archive format. Requires that both the bzip2
-    (http://www.sourceware.org/bzip2/) and tar programs to be available. Extract
+    (https://www.sourceware.org/bzip2/) and tar programs to be available. Extract
     similar to::
 
       bzip2 -d GraphicsMagick-1.3.tar.bz | tar -xvf -
@@ -34,7 +34,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.gz
 
     Gzip compressed tar archive format. Requires that both the gzip
-    (http://www.gzip.org/) and tar programs to be available. Extract
+    (https://www.gzip.org/) and tar programs to be available. Extract
     similar to::
 
       gzip -d GraphicsMagick-1.3.tar.gz | tar -xvf -
@@ -42,7 +42,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.lz
 
     Lzip compressed tar archive format.  Requires that both the lzip
-    (http://lzip.nongnu.org/lzip.html) and tar programs to be
+    (https://lzip.nongnu.org/lzip.html) and tar programs to be
     available. Extract similar to::
 
       lzip -d -c GraphicsMagick-1.3.tar.gz | tar -xvf -
@@ -50,7 +50,7 @@ The source code must be extracted prior to compilation as follows:
 .tar.xz
 
     LZMA compressed tar archive format. Requires that LZMA utils
-    (http://tukaani.org/lzma/) and tar programs to be available. Extract
+    (https://tukaani.org/lzma/) and tar programs to be available. Extract
     similar to::
 
       xz -d GraphicsMagick-1.3.tar.xz | tar -xvf -
@@ -58,7 +58,7 @@ The source code must be extracted prior to compilation as follows:
 zip
 
     PK-ZIP archive format. Requires that the unzip program from Info-Zip
-    (http://www.info-zip.org/UnZip.html) be available. Extract similar to::
+    (https://www.info-zip.org/UnZip.html) be available. Extract similar to::
 
       unzip GraphicsMagick-1.3.zip
 
@@ -72,6 +72,15 @@ a command similar to::
 
 Build Configuration
 -------------------
+
+As of June 17, 2025, GraphicsMagick requires a C'99 compiler, with
+standard inttypes.h and stdint.h header files, and working printf
+support (e.g. 'j', 'z', and 't' size specifiers) for types declared in
+stdint.h.  For releases prior to this date, GraphicsMagick built its
+own type definitions based on the data types/sizes available. Users of
+modern Unix/Linux systems should have no issues due to this change,
+but Unix-style builds under Microsoft Windows (e.g. MinGW) may be
+negatively impacted if the compiler is too old.
 
 Use 'configure' to automatically configure, build, and install
 GraphicsMagick. The configure script may be executed from the
@@ -245,8 +254,10 @@ Optional Features
 --enable-maintainer-mode
 
     enable additional Makefile rules which update generated files
-    included in the distribution. Requires GNU make as well as a
-    number of utilities and tools.
+    included in the distribution. Requires GNU make, Python 3, as well
+    as a number of common development utilities and tools.  Python 3
+    Docutils (0.17.1 or later) are required to format ".rst"
+    reStructuredText files to HTML format.
 
 --enable-quantum-library-names
 
@@ -375,6 +386,10 @@ Optional Packages/Options
 --with-gs-font-dir
 
     directory containing Ghostscript fonts
+
+--with-gs-font-dir
+
+   directory containing Artifex URW Base35 OTF fonts
 
 --with-windows-font-dir
 
@@ -782,6 +797,26 @@ Several configure options require special note:
     Ubuntu Linux    fonts-urw-base35       /usr/share/fonts/type1/gsfonts
     ==============  =====================  =============================
 
+--with-urwbase35otf-font-dir
+
+  Specify the directory containing the Artifex OpenType font files
+  (e.g. 'URWGothic-Book.otf') from the urw-base35-fonts package
+  available from https://github.com/ArtifexSoftware/urw-base35-fonts.
+  These fonts are a modern replacement for the older 'psfonts' and
+  older 'urw-base35-fonts' (which use short file names).  If Artifex
+  urw-base35-fonts are available, they are used (by default) rather
+  than the legacy 'psfonts'/'urw-base35-fonts' package described above
+  (i.e. --with-gs-font-dir).
+
+  .. table:: URW Font Packages
+
+    ==============  =====================  ====================================
+    Distribution    Package Name           Fonts Installation Path
+    ==============  =====================  ====================================
+    Debian Linux    fonts-urw-base35       /usr/share/fonts/opentype/urw-base35
+    Ubuntu Linux    fonts-urw-base35       /usr/share/fonts/opentype/urw-base35
+    ==============  =====================  ====================================
+
 --with-windows-font-dir
 
   Specify the directory containing MS-Windows-compatible fonts. This is
@@ -874,9 +909,11 @@ GraphicsMagick)::
   ttf-mscorefonts-installer
 
 These additional packages are useful in order to maintain
-GraphicsMagick itself::
+GraphicsMagick itself (see the ``--enable-maintainer-mode`` configure
+option)::
 
-  autoconf, automake, graphviz, libtool, docutils-common, python, m4
+  autoconf, automake, graphviz, libtool, python3-docutils,
+  docutils-common, python3, m4
 
 
 Building under Cygwin
@@ -885,7 +922,7 @@ Building under Cygwin
 GraphicsMagick may be built under the Windows Cygwin Unix-emulation
 environment available for free from
 
-    http://www.cygwin.com/
+    https://www.cygwin.com/
 
 It is suggested that the X11R6 package be installed since this enables
 GraphicsMagick's X11 support (animate, display, and import
@@ -893,9 +930,8 @@ sub-commands will work) and it includes the Freetype v2 DLL required
 to support TrueType and Postscript Type 1 fonts. Make sure that
 /usr/X11R6/bin is in your PATH prior to running configure.
 
-If you are using Cygwin version 1.3.9 or later, you may specify the
-configure option '--enable-shared' to build Cygwin DLLs, and
-additionally '--with-modules' to enable use of loadable
+You may specify the configure option '--enable-shared' to build Cygwin
+DLLs, and additionally '--with-modules' to enable use of loadable
 modules. Specifying '--enable-shared' is required if you want to build
 PerlMagick under Cygwin because Cygwin does not provide the libperl.a
 static library required to create a static PerlMagick.  Note that

@@ -1,189 +1,151 @@
-/* wmfconfig.h.in.  Generated automatically from configure.ac by autoheader.  */
+/* wmfconfig.h.  Generated from wmfconfig.h.in by configure.  */
+/* wmfconfig.h.in.  Generated from configure.ac by autoheader.  */
 
-#ifndef LIBWMF_CONFIG_H
-#define LIBWMF_CONFIG_H
-
-
-/* Define if you have expat.  */
-/* #undef HAVE_EXPAT */
-
-/* Define if you have libxml2.  */
-/* #undef HAVE_XML2 */
-
-/* Define if you have libpng.  */
-/* #undef HAVE_LIBPNG */
-
-/* Define if you have libjpeg.  */
-/* #undef HAVE_LIBJPEG */
-
-/* defining this will disable egs, fig, svg & foreign layers */
-/* #undef WITHOUT_LAYERS */
-
-/* define if you have libgd */
-/* #undef HAVE_GD */
-
-/* define if you wish to build the magick device layer. */
-/* #undef ENABLE_MAGICK */
-
-/* Define if you have GNU plotutils (libplot) >= 2.4.0.  */
-/* #undef HAVE_LIBPLOT */
-
-/* Define if you have the <unistd.h> header file.  */
-/* #undef HAVE_UNISTD_H */
-
-/* define if you have strstr */
-#define HAVE_STRSTR
-
-/* define if you have [_]vsnprintf */
-#define HAVE_VSNPRINTF
-
-/* Define to `_vsnprintf' if necessary */
-/* #undef vsnprintf */
-
-/* define if you have [_]snprintf */
-/* #undef HAVE_SNPRINTF */
-
-/* Define to `_snprintf' if necessary */
-/* #undef snprintf */
-
-/* define if you have vfscanf */
-/* #undef HAVE_VFSCANF */
-
-/* Define to `unsigned' if <sys/types.h> doesn't define.  */
-/* #undef size_t */
-
-/* Define to `long' if <sys/types.h> does not define. */
-/* #undef off_t */
-
-
-/* define if you wish to build the magick device layer */
-/* #undef ENABLE_MAGICK */
-
-/* Define if you have the <dlfcn.h> header file. */
+/* Define to 1 if you have the <dlfcn.h> header file. */
 /* #undef HAVE_DLFCN_H */
 
-/* define if you have expat */
+/* Use expat as libwmf_xml */
 /* #undef HAVE_EXPAT */
 
-/* Define if you have the `fprintf' function. */
-#define HAVE_FPRINTF
+/* Define to 1 if you have the 'fprintf' function. */
+/* #undef HAVE_FPRINTF */
 
-/* Define if you have the `fscanf' function. */
-#define HAVE_FSCANF
+/* Define to 1 if you have the 'fscanf' function. */
+/* #undef HAVE_FSCANF */
 
-/* define if you have libgd */
+/* Library gd is available */
 /* #undef HAVE_GD */
 
-/* Define if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+/* Define to 1 if you have the <inttypes.h> header file. */
+#define HAVE_INTTYPES_H 1
 
-/* define if you have libjpeg */
+/* Library libjpeg is available */
 /* #undef HAVE_LIBJPEG */
 
-/* define if you have libplot */
+/* Library libplot is available */
 /* #undef HAVE_LIBPLOT */
 
-/* define if you have libpng */
+/* Library libpng is available */
 /* #undef HAVE_LIBPNG */
 
-/* Define if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H
+/* Use libxml2 as libwmf_xml */
+/* #undef HAVE_LIBXML2 */
 
-/* Define if you have the `printf' function. */
-#define HAVE_PRINTF
+/* Define to 1 if you have the 'printf' function. */
+/* #undef HAVE_PRINTF */
 
-/* Define if you have the `scanf' function. */
-#define HAVE_SCANF
+/* Define to 1 if you have the 'scanf' function. */
+/* #undef HAVE_SCANF */
 
-/* define if you have snprintf */
+/* Function _snprintf is available */
 /* #undef HAVE_SNPRINTF */
 
-/* Define if you have the `sprintf' function. */
-#define HAVE_SPRINTF
+/* Define to 1 if you have the 'sprintf' function. */
+/* #undef HAVE_SPRINTF */
 
-/* Define if you have the `sscanf' function. */
-#define HAVE_SSCANF
+/* Define to 1 if you have the 'sscanf' function. */
+/* #undef HAVE_SSCANF */
 
-/* Define if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+/* Define to 1 if you have the <stdint.h> header file. */
+#define HAVE_STDINT_H 1
 
-/* Define if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H
+/* Define to 1 if you have the <stdio.h> header file. */
+#define HAVE_STDIO_H 1
 
-/* Define if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
+/* Define to 1 if you have the <stdlib.h> header file. */
+#define HAVE_STDLIB_H 1
 
-/* Define if you have the <string.h> header file. */
-#define HAVE_STRING_H
+/* Define to 1 if you have the <strings.h> header file. */
+#define HAVE_STRINGS_H 1
 
-/* Define if you have the `strstr' function. */
-#define HAVE_STRSTR
+/* Define to 1 if you have the <string.h> header file. */
+#define HAVE_STRING_H 1
 
-/* Define if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H
+/* Define to 1 if you have the 'strstr' function. */
+#define HAVE_STRSTR 1
 
-/* Define if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#define HAVE_SYS_STAT_H 1
 
-/* Define if you have the <time.h> header file. */
-#define HAVE_TIME_H
+/* Define to 1 if you have the <sys/types.h> header file. */
+#define HAVE_SYS_TYPES_H 1
 
-/* Define if you have the <unistd.h> header file. */
-/* #undef HAVE_UNISTD_H */
+/* Define to 1 if you have the <time.h> header file. */
+#define HAVE_TIME_H 1
 
-/* Define if you have the `vfprintf' function. */
+/* Header unistd.h is available */
+/* #define HAVE_UNISTD_H */
+
+/* Define to 1 if you have the 'vfprintf' function. */
 /* #undef HAVE_VFPRINTF */
 
-/* define if you have vfscanf */
+/* Function vfscanf is available */
 /* #undef HAVE_VFSCANF */
 
-/* Define if you have the `vprintf' function. */
+/* Define to 1 if you have the 'vprintf' function. */
 /* #undef HAVE_VPRINTF */
 
-/* Define if you have the `vscanf' function. */
+/* Define to 1 if you have the 'vscanf' function. */
 /* #undef HAVE_VSCANF */
 
-/* define if you have vsnprintf */
+/* Function vsnprintf is available */
 /* #undef HAVE_VSNPRINTF */
 
-/* Define if you have the `vsprintf' function. */
+/* Define to 1 if you have the 'vsprintf' function. */
 /* #undef HAVE_VSPRINTF */
 
-/* Define if you have the `vsscanf' function. */
+/* Define to 1 if you have the 'vsscanf' function. */
 /* #undef HAVE_VSSCANF */
 
-/* define if you have libxml2 */
-/* #undef HAVE_XML2 */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#define LT_OBJDIR ".libs/"
 
-/* Define if you have the ANSI C header files. */
-#define STDC_HEADERS
+/* Name of package */
+#define PACKAGE "libwmf"
 
-/* If any *printf/*scanf functions are missing, cover them with trio functions
-   */
-/* #undef TRIO_REPLACE_STDIO */
+/* Define to the address where bug reports for this package should be sent. */
+#define PACKAGE_BUGREPORT ""
 
-/* defining this will disable egs, fig, svg & foreign layers */
-/* #undef WITHOUT_LAYERS */
+/* Define to the full name of this package. */
+#define PACKAGE_NAME "libwmf"
 
-/* Define if the X Window System is missing or not being used. */
+/* Define to the full name and version of this package. */
+#define PACKAGE_STRING "libwmf 0.2.12"
+
+/* Define to the one symbol short name of this package. */
+#define PACKAGE_TARNAME "libwmf"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
+
+/* Define to the version of this package. */
+#define PACKAGE_VERSION "0.2.12"
+
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
+#define STDC_HEADERS 1
+
+/* Version number of package */
+#define VERSION "0.2.12"
+
+/* Don't use layers */
+#define WITHOUT_LAYERS 1
+
+/* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
 
-/* Define to empty if `const' does not conform to ANSI C. */
+/* Define to empty if 'const' does not conform to ANSI C. */
 /* #undef const */
 
-/* Define to `long' if <sys/types.h> does not define. */
+/* Define to 'long int' if <sys/types.h> does not define. */
 /* #undef off_t */
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define as 'unsigned int' if <stddef.h> doesn't define. */
 /* #undef size_t */
 
-/* define to your implementation of snprintf */
+/* Use _snprintf instead of snprintf */
 /* #undef snprintf */
 
-/* define to your implementation of vsnprintf */
+/* Use _vsnprintf instead of vsnprintf */
 /* #undef vsnprintf */
-
-/* If any *printf/*scanf functions are missing, cover them with trio functions */
-/* #define TRIO_REPLACE_STDIO 1 */
-
-#endif /* ! LIBWMF_CONFIG_H */

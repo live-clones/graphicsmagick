@@ -39,20 +39,20 @@
 <main id="render">
 <h1 class="title">render</h1>
 <p class="subtitle" id="low-level-methods-to-draw-on-an-image">Low-level methods to draw on an image</p>
-<div class="contents topic" id="contents">
+<nav class="contents" id="contents" role="doc-toc">
 <p class="topic-title">Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#clonedrawinfo" id="id13">CloneDrawInfo</a></p></li>
-<li><p><a class="reference internal" href="#destroydrawinfo" id="id14">DestroyDrawInfo</a></p></li>
-<li><p><a class="reference internal" href="#drawaffineimage" id="id15">DrawAffineImage</a></p></li>
-<li><p><a class="reference internal" href="#drawclippath" id="id16">DrawClipPath</a></p></li>
-<li><p><a class="reference internal" href="#drawcompositemask" id="id17">DrawCompositeMask</a></p></li>
-<li><p><a class="reference internal" href="#drawimage" id="id18">DrawImage</a></p></li>
-<li><p><a class="reference internal" href="#drawpatternpath" id="id19">DrawPatternPath</a></p></li>
+<li><p><a class="reference internal" href="#clonedrawinfo" id="toc-entry-1">CloneDrawInfo</a></p></li>
+<li><p><a class="reference internal" href="#destroydrawinfo" id="toc-entry-2">DestroyDrawInfo</a></p></li>
+<li><p><a class="reference internal" href="#drawaffineimage" id="toc-entry-3">DrawAffineImage</a></p></li>
+<li><p><a class="reference internal" href="#drawclippath" id="toc-entry-4">DrawClipPath</a></p></li>
+<li><p><a class="reference internal" href="#drawcompositemask" id="toc-entry-5">DrawCompositeMask</a></p></li>
+<li><p><a class="reference internal" href="#drawimage" id="toc-entry-6">DrawImage</a></p></li>
+<li><p><a class="reference internal" href="#drawpatternpath" id="toc-entry-7">DrawPatternPath</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="clonedrawinfo">
-<h1><a class="toc-backref" href="#id13">CloneDrawInfo</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-1" role="doc-backlink">CloneDrawInfo</a></h1>
 <section id="synopsis">
 <h2>Synopsis</h2>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *CloneDrawInfo( const <a class="reference external" href="../api/types.html#imageinfo">ImageInfo</a> *image_info, const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info );</pre>
@@ -75,12 +75,12 @@ default values.</p>
 </section>
 </section>
 <section id="destroydrawinfo">
-<h1><a class="toc-backref" href="#id14">DestroyDrawInfo</a></h1>
-<section id="id1">
+<h1><a class="toc-backref" href="#toc-entry-2" role="doc-backlink">DestroyDrawInfo</a></h1>
+<section id="synopsis-1">
 <h2>Synopsis</h2>
 <pre class="literal-block">void DestroyDrawInfo( <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info );</pre>
 </section>
-<section id="id2">
+<section id="description-1">
 <h2>Description</h2>
 <p>DestroyDrawInfo() deallocates memory associated with an DrawInfo
 structure.  Nothing is done if the pointer passed is NULL.</p>
@@ -95,13 +95,13 @@ structure.  Nothing is done if the pointer passed is NULL.</p>
 </section>
 </section>
 <section id="drawaffineimage">
-<h1><a class="toc-backref" href="#id15">DrawAffineImage</a></h1>
-<section id="id3">
+<h1><a class="toc-backref" href="#toc-entry-3" role="doc-backlink">DrawAffineImage</a></h1>
+<section id="synopsis-2">
 <h2>Synopsis</h2>
 <pre class="literal-block">unsigned int DrawAffineImage( <a class="reference external" href="../api/types.html#image">Image</a> *image, const <a class="reference external" href="../api/types.html#image">Image</a> *composite,
                               const <a class="reference external" href="../api/types.html#affinematrix">AffineMatrix</a> *affine );</pre>
 </section>
-<section id="id4">
+<section id="description-2">
 <h2>Description</h2>
 <p>DrawAffineImage() composites the source over the destination image as
 dictated by the affine transform.</p>
@@ -122,13 +122,13 @@ dictated by the affine transform.</p>
 </section>
 </section>
 <section id="drawclippath">
-<h1><a class="toc-backref" href="#id16">DrawClipPath</a></h1>
-<section id="id5">
+<h1><a class="toc-backref" href="#toc-entry-4" role="doc-backlink">DrawClipPath</a></h1>
+<section id="synopsis-3">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail DrawClipPath( <a class="reference external" href="../api/types.html#image">Image</a> *image, const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info,
                              const char *name );</pre>
 </section>
-<section id="id6">
+<section id="description-3">
 <h2>Description</h2>
 <p>DrawClipPath() draws the clip path on the image mask.</p>
 <p>The format of the DrawClipPath method is:</p>
@@ -148,13 +148,13 @@ dictated by the affine transform.</p>
 </section>
 </section>
 <section id="drawcompositemask">
-<h1><a class="toc-backref" href="#id17">DrawCompositeMask</a></h1>
-<section id="id7">
+<h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">DrawCompositeMask</a></h1>
+<section id="synopsis-4">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail DrawCompositeMask( <a class="reference external" href="../api/types.html#image">Image</a> *image, const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info,
                                   const char *name );</pre>
 </section>
-<section id="id8">
+<section id="description-4">
 <h2>Description</h2>
 <p>DrawCompositeMask() draws the composite mask on the image mask.</p>
 <p>The format of the DrawCompositeMask method is:</p>
@@ -174,12 +174,12 @@ dictated by the affine transform.</p>
 </section>
 </section>
 <section id="drawimage">
-<h1><a class="toc-backref" href="#id18">DrawImage</a></h1>
-<section id="id9">
+<h1><a class="toc-backref" href="#toc-entry-6" role="doc-backlink">DrawImage</a></h1>
+<section id="synopsis-5">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail DrawImage( <a class="reference external" href="../api/types.html#image">Image</a> *image, const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info );</pre>
 </section>
-<section id="id10">
+<section id="description-5">
 <h2>Description</h2>
 <p>Use DrawImage() to draw a graphic primitive on your image.  The primitive
 may be represented as a string or filename.  Precede the filename with an
@@ -215,13 +215,13 @@ documented and less error prone.</p>
 </section>
 </section>
 <section id="drawpatternpath">
-<h1><a class="toc-backref" href="#id19">DrawPatternPath</a></h1>
-<section id="id11">
+<h1><a class="toc-backref" href="#toc-entry-7" role="doc-backlink">DrawPatternPath</a></h1>
+<section id="synopsis-6">
 <h2>Synopsis</h2>
 <pre class="literal-block">MagickPassFail DrawPatternPath( <a class="reference external" href="../api/types.html#image">Image</a> *image, const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info,
                                 const char *name, <a class="reference external" href="../api/types.html#image">Image</a> ** pattern );</pre>
 </section>
-<section id="id12">
+<section id="description-6">
 <h2>Description</h2>
 <p>DrawPatternPath() draws a pattern.</p>
 <p>The format of the DrawPatternPath method is:</p>
@@ -248,7 +248,7 @@ documented and less error prone.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002 - 2024<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

@@ -155,28 +155,32 @@ void wmf_x_function (wmfAPI* API)
 }
 
 static void wmf_x_udata_init (wmfAPI* API,wmfUserData_t* userdata)
-{	/* wmf_x_t* ddata = WMF_X_GetData (API); */
+{	(void)userdata;
+	/* wmf_x_t* ddata = WMF_X_GetData (API); */
 
 	WMF_DEBUG (API,"wmf_[x_]udata_init");
 
 }
 
 static void wmf_x_udata_copy (wmfAPI* API,wmfUserData_t* userdata)
-{	/* wmf_x_t* ddata = WMF_X_GetData (API); */
+{	(void)userdata;
+	/* wmf_x_t* ddata = WMF_X_GetData (API); */
 
 	WMF_DEBUG (API,"wmf_[x_]udata_copy");
 
 }
 
 static void wmf_x_udata_set (wmfAPI* API,wmfUserData_t* userdata)
-{	/* wmf_x_t* ddata = WMF_X_GetData (API); */
+{	(void)userdata;
+	/* wmf_x_t* ddata = WMF_X_GetData (API); */
 
 	WMF_DEBUG (API,"wmf_[x_]udata_set");
 
 }
 
 static void wmf_x_udata_free (wmfAPI* API,wmfUserData_t* userdata)
-{	/* wmf_x_t* ddata = WMF_X_GetData (API); */
+{	(void)userdata;
+	/* wmf_x_t* ddata = WMF_X_GetData (API); */
 
 	WMF_DEBUG (API,"wmf_[x_]udata_free");
 
@@ -191,7 +195,6 @@ static void setbrushstyle (wmfAPI* API,wmfDC* dc)
 
 	wmfBrush* brush = 0;
 
-	int opacity;
 	int fill_style;
 
 	U16 i;
@@ -245,7 +248,7 @@ static void setbrushstyle (wmfAPI* API,wmfDC* dc)
 
 		for (j = 0; j < bmp->height; j++)
 		{	for (i = 0; i < bmp->width; i++)
-			{	opacity = wmf_ipa_bmp_color (API,bmp,&pixel,i,j);
+			{	wmf_ipa_bmp_color (API,bmp,&pixel,i,j);
 
 				XSetForeground (ddata->display,ddata->gc,get_color (API,&pixel));
 

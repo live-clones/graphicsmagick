@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 - 2023 GraphicsMagick Group
+ * Copyright (C) 2003-2025 GraphicsMagick Group
  * Copyright (C) 2003 ImageMagick Studio
  * Copyright 1991-1999 E. I. du Pont de Nemours and Company
  *
@@ -18,6 +18,9 @@
  * enough) in order for the test to pass.
  * */
 
+#if defined(_VISUALC_) && (_MSC_VER < 1900)
+#include <magick/studio.h>
+#endif
 #include <magick/api.h>
 #include <magick/enum_strings.h>
 
@@ -168,7 +171,7 @@ int main ( int argc, char **argv )
             }
           else if (LocaleCompare("filespec",option+1) == 0)
             {
-              (void) strcpy(basefilespec,argv[++arg]);
+              (void) snprintf(basefilespec, sizeof(basefilespec), "%s", argv[++arg]);
             }
           else if (LocaleCompare("log",option+1) == 0)
             {
@@ -268,10 +271,11 @@ int main ( int argc, char **argv )
     }
   else
     {
-      (void) strncpy( imageInfo->filename, infile, MaxTextExtent );
-      imageInfo->filename[MaxTextExtent-1]='\0';
       if (!magick_info->adjoin || !check_for_added_frames)
-        (void) strcat( imageInfo->filename, "[0]" );
+        (void) snprintf( imageInfo->filename, sizeof(imageInfo->filename), "%.*s%s",
+                         (int)(sizeof(imageInfo->filename)-sizeof("[0]")-1), infile, "[0]");
+      else
+        (void) snprintf(imageInfo->filename, sizeof(imageInfo->filename), "%s", infile);
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Reading image %s", imageInfo->filename);
     }
@@ -308,11 +312,17 @@ int main ( int argc, char **argv )
   */
   size[0] = '\0';
   magick_info=GetMagickInfo(format,&exception);
+  if (magick_info == (MagickInfo *) NULL)
+    {
+      fprintf(stderr, "No support for \"%s\" format.\n",format);
+      exit_status = 1;
+      goto program_exit;
+    }
 
   if (magick_info->raw)
     {
       /*
-       * Specify original image size if format requires it
+       * Specify original image size (WIDTHxHEIGHT) if format requires it
        */
       FormatString( size, "%lux%lu", original->columns, original->rows );
     }
@@ -321,17 +331,17 @@ int main ( int argc, char **argv )
       /*
         Prepend magic specifier if extension will be ignored.
       */
-      (void) strcpy(filespec,format);
-      (void) strcat(filespec,":");
-      (void) strcat(filespec,basefilespec);
+      (void) snprintf(filespec, sizeof(filespec), "%.*s:%.*s%s", 32, format,
+                      (int) sizeof(filespec)-37, basefilespec, ".%s");
     }
   else
     {
-      strcpy(filespec,basefilespec);
+      (void) snprintf(filespec, sizeof(filespec), "%.*s%s",
+                      (int) (sizeof(filespec)-sizeof(".%s")), basefilespec,
+                      ".%s");
     }
 
-  (void) strcat(filespec,".%s");
-  (void) sprintf( filename, filespec, 1, format );
+  (void) snprintf( filename, sizeof(filename), filespec, 1, format );
   (void) remove(filename);
 
   /*

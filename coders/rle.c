@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -204,6 +204,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
     *image;
 
   int
+    b,
     opcode,
     operand,
     pixel,
@@ -280,10 +281,30 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
   rle_header.XSize=ReadBlobLSBShort(image);
   rle_header.YSize=ReadBlobLSBShort(image);
   rle_header.Flags=ReadBlobByte(image);
-  rle_header.Ncolors=ReadBlobByte(image);
-  rle_header.Pixelbits=ReadBlobByte(image);
-  rle_header.Ncmap=ReadBlobByte(image);
-  rle_header.Cmaplen=ReadBlobByte(image);
+  b=ReadBlobByte(image);
+  if (EOF == b)
+    ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+  if (b < 0)
+    ThrowRLEReaderException(CorruptImageError,ImproperImageHeader,image);
+  rle_header.Ncolors=(magick_uint8_t) b;
+  b=ReadBlobByte(image);
+  if (EOF == b)
+    ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+  if (b < 0)
+    ThrowRLEReaderException(CorruptImageError,ImproperImageHeader,image);
+  rle_header.Pixelbits=(magick_uint8_t) b;
+  b=ReadBlobByte(image);
+  if (EOF == b)
+    ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+  if (b < 0)
+    ThrowRLEReaderException(CorruptImageError,ImproperImageHeader,image);
+  rle_header.Ncmap=(magick_uint8_t) b;
+  b=ReadBlobByte(image);
+  if (EOF == b)
+    ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+  if (b < 0)
+    ThrowRLEReaderException(CorruptImageError,ImproperImageHeader,image);
+  rle_header.Cmaplen=(magick_uint8_t) b;
   if (EOFBlob(image))
     ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);
 

@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999 - 2020
+// Copyright Bob Friesenhahn, 1999-2025
 //
 // Inclusion of GraphicsMagick headers (with namespace magic)
 
@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <inttypes.h> /* Format constants, integer types */
+#include <stddef.h> /* ptrdiff_t, size_t */
 #include <time.h>
 #include <sys/types.h> /* POSIX 1990 header and declares size_t and ssize_t */
 
@@ -819,7 +821,7 @@ namespace Magick
   using MagickLib::DestroyExceptionInfo;
   using MagickLib::DestroyImageInfo;
   using MagickLib::DestroyImageList;
-  using MagickLib::DestroyMagick;
+  // using MagickLib::DestroyMagick;
   using MagickLib::DestroyQuantizeInfo;
   using MagickLib::DispatchImage;
   using MagickLib::DisplayImages;

@@ -208,6 +208,13 @@ extern "C" {
          (((__GNUC__) > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))))  /* 4.3+ */
 #      define MAGICK_OPTIMIZE_FUNC(opt) MAGICK_ATTRIBUTE((__optimize__ (opt)))
 #    endif
+#    if (MAGICK_HAS_ATTRIBUTE(__format__))
+#        if (defined(__clang__))
+#           define MAGICK_FUNC_PRINTF_FORMAT(string_index,first_to_check) MAGICK_ATTRIBUTE((format (__printf__, string_index, first_to_check)))
+#       else
+#           define MAGICK_FUNC_PRINTF_FORMAT(string_index,first_to_check) MAGICK_ATTRIBUTE((format (__gnu_printf__, string_index,first_to_check)))
+#    endif
+#endif
   /*
     GCC 7 and later support a fallthrough attribute to mark switch statement
     cases which are intended to fall through.  Clang 3.5.0 supports a
@@ -296,6 +303,9 @@ extern "C" {
 #endif
 #if !defined(MAGICK_OPTIMIZE_FUNC)
 #  define MAGICK_OPTIMIZE_FUNC(opt) /*nothing*/
+#endif
+#if !defined(MAGICK_FUNC_PRINTF_FORMAT)
+#  define MAGICK_FUNC_PRINTF_FORMAT(string_index,first_to_check) /*nothing*/
 #endif
 #if !defined(MAGICK_FALLTHROUGH)
 #  define MAGICK_FALLTHROUGH /*nothing*/

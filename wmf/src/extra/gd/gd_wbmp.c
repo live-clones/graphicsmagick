@@ -67,7 +67,7 @@
    ** Wrapper around gdPutC for use with writewbmp
    **
  */
-void
+static void
 gd_putout (int i, void *out)
 {
   gdPutC (i, (gdIOCtx *) out);
@@ -79,12 +79,13 @@ gd_putout (int i, void *out)
    ** Wrapper around gdGetC for use with readwbmp
    **
  */
-int
+static int
 gd_getin (void *in)
 {
   return (gdGetC ((gdIOCtx *) in));
 }
 
+static int _gdImageWBMPCtx(gdImagePtr image, int fg, gdIOCtx *out);
 
 /*      gdImageWBMPCtx
    **  --------------
@@ -98,6 +99,12 @@ gd_getin (void *in)
 void
 gdImageWBMPCtx (gdImagePtr image, int fg, gdIOCtx * out)
 {
+  _gdImageWBMPCtx(image, fg, out);
+}
+
+/* returns 0 on success, 1 on failure */
+static int _gdImageWBMPCtx(gdImagePtr image, int fg, gdIOCtx *out)
+{
 
   int x, y, pos;
   Wbmp *wbmp;
@@ -105,7 +112,10 @@ gdImageWBMPCtx (gdImagePtr image, int fg, gdIOCtx * out)
 
   /* create the WBMP */
   if ((wbmp = createwbmp (gdImageSX (image), gdImageSY (image), WBMP_WHITE)) == NULL)
-    fprintf (stderr, "Could not create WBMP\n");
+    {
+      fprintf (stderr, "Could not create WBMP\n");
+      return 1;
+    }
 
   /* fill up the WBMP structure */
   pos = 0;
@@ -123,9 +133,16 @@ gdImageWBMPCtx (gdImagePtr image, int fg, gdIOCtx * out)
 
   /* write the WBMP to a gd file descriptor */
   if (writewbmp (wbmp, &gd_putout, out))
+  {
     fprintf (stderr, "Could not save WBMP\n");
+    freewbmp (wbmp);
+    return 1;
+  }
+
   /* des submitted this bugfix: gdFree the memory. */
   freewbmp (wbmp);
+
+  return 0;
 }
 
 
@@ -211,8 +228,14 @@ gdImageWBMPPtr (gdImagePtr im, int *size, int fg)
 {
   void *rv;
   gdIOCtx *out = gdNewDynamicCtx (2048, NULL);
+  if (out == NULL) return NULL;
   gdImageWBMPCtx (im, fg, out);
-  rv = gdDPExtractData (out, size);
+  rv = gdDPExtractData(out, size);
+  if (!_gdImageWBMPCtx(im, fg, out)) {
+    rv = gdDPExtractData(out, size);
+  } else {
+    rv = NULL;
+  }
   out->free (out);
   return rv;
 }

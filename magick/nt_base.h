@@ -184,19 +184,21 @@ extern "C" {
     1100 MSVC 5.0
     1200 MSVC 6.0
     1300 MSVC 7.0 Visual C++ .NET 2002
-    1310 Visual C++ .NET 2003
-    1400 Visual C++ 2005
-    1500 Visual C++ 2008
-    1600 Visual C++ 2010
-    1700 Visual C++ 2012
-    1800 Visual C++ 2013
-    1900 Visual C++ 2015
-    1910 Visual C++ 2017
-    1920 Visual C++ 2019
-    1930 Visual C++ 2022
+    1310 Visual C++ .NET 2003 (7.1)
+    1400 Visual C++ 2005 (8.0)
+    1500 Visual C++ 2008 (8.0, 9.0)
+    1600 Visual C++ 2010 (10X)
+    1700 Visual C++ 2012 (11.X)
+    1800 Visual C++ 2013 (12.X)
+    1900 Visual C++ 2015 (14.X)
+    1910 Visual C++ 2017 (15.X, 15.X.X)
+    1920 Visual C++ 2019 (16.X.X) (_MSC_VER 1920 - 1929)
+    1930 Visual C++ 2022 (17.X.X) (_MSC_VER 1930 - 1942+)
 
   Should look at __CLR_VER ("Defines the version of the common language
   runtime used when the application was compiled.") as well.
+
+  Also see _MSC_FULL_VER introduced by Visual Studio 6.0 SP5.
 */
 #if defined(_VISUALC_) && (_MSC_VER >= 1310)
 #  define HAVE_GLOBALMEMORYSTATUSEX 1

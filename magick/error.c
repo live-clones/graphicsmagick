@@ -203,7 +203,8 @@ MagickExport void CatchException(const ExceptionInfo *exception)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  CopyException() copies exception data from one ExceptionInfo structure
-%  to another.
+%  ('original') to another, while freeing any existing ExceptionInfo data
+%  in the destination ('copy').
 %
 %  The format of the CopyException method is:
 %

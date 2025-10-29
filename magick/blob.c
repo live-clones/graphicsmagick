@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -102,7 +102,7 @@ typedef union _MagickFileHandle
 
 struct _BlobInfo
 {
-  magick_uint64_t
+  magick_uintmax_t
     read_limit,         /* Limit on data to return to API user */
     read_total,         /* Amount of data read thus far */
     write_limit,        /* Limit on data to accept from the API user */
@@ -647,7 +647,7 @@ MagickExport MagickPassFail BlobToFile(const char *filename,const void *blob,
             amount;
 
           remaining=length - i;
-          amount=Min(remaining,block_size);
+          amount=(MAGICK_POSIX_IO_SIZE_T) Min(remaining,block_size);
           count=write(file,(char *) blob+i,amount);
           if (count <= 0)
             break;
@@ -960,8 +960,8 @@ MagickExport MagickPassFail CloseBlob(Image *image)
                             image,blob,blob->reference_count);
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Blob "
-                            "wrote %" MAGICK_UINT64_F "u bytes, "
-                            "read %" MAGICK_UINT64_F "u bytes",
+                            "wrote %" MAGICK_UINTMAX_F "u bytes, "
+                            "read %" MAGICK_UINTMAX_F "u bytes",
                             blob->write_total, blob->read_total);
       UnlockSemaphoreInfo(image->blob->semaphore);
     }
@@ -2532,7 +2532,7 @@ MagickExport MagickPassFail ImageToFile(Image *image,const char *filename,
   (void) close(file);
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                          "Copied %"MAGICK_SIZE_T_F"u bytes from Blob stream to \"%s\"",
+                          "Copied %" MAGICK_SIZE_T_F "u bytes from Blob stream to \"%s\"",
                           (MAGICK_SIZE_T) total,filename);
   MagickFreeMemory(buffer);
   return (i < length ? MagickFail : MagickPass);
@@ -2835,8 +2835,8 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
       AttachBlob(image->blob,image_info->blob,image_info->length);
       if (image->blob->logging)
         (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                              "  attached data blob (addr %p, len %"
-                              MAGICK_SIZE_T_F "u) to image %p, blob %p",
+                              "  attached data blob (addr %p, len "
+                              "%" MAGICK_SIZE_T_F "u) to image %p, blob %p",
                               image_info->blob,
                               (MAGICK_SIZE_T) image_info->length,
                               image,image->blob);
@@ -2993,16 +2993,16 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                         {
                           if (image->blob->logging)
                             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                                                  "  setvbuf of %" MAGICK_SIZE_T_F
-                                                  "u bytes returns failure!",
+                                                  "  setvbuf of %" MAGICK_SIZE_T_F "u"
+                                                  " bytes returns failure!",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
                       else
                         {
                           if (image->blob->logging)
                             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                                                  "  I/O buffer set to %"
-                                                  MAGICK_SIZE_T_F "u bytes",
+                                                  "  I/O buffer set to "
+                                                  "%" MAGICK_SIZE_T_F "u bytes",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
                     }
@@ -3037,8 +3037,8 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                                          -(magick_off_t) count,SEEK_CUR);
                       if (image->blob->logging)
                         (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                                              "  read %" MAGICK_SIZE_T_F
-                                              "u magic header bytes",
+                                              "  read %" MAGICK_SIZE_T_F "u"
+                                              " magic header bytes",
                                               (MAGICK_SIZE_T) count);
 #if defined(POSIX)
                       /*
@@ -5135,8 +5135,8 @@ MagickExport MagickPassFail UnmapBlob(void *map,const size_t length)
     status;
 
   (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-    "Munmap file mapping at address %p and length %"
-                        MAGICK_SIZE_T_F "u",
+    "Munmap file mapping at address %p and length "
+                        "%" MAGICK_SIZE_T_F "u",
     map,(MAGICK_SIZE_T) length);
   status=MagickMunmap(map,length);
   return(status == 0);

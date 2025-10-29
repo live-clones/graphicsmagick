@@ -1,13 +1,12 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 .. _`Amdahl's law` : https://en.wikipedia.org/wiki/Amdahl%27s_law
 .. _`GOMP` : http://gcc.gnu.org/onlinedocs/libgomp/
-.. _`OpenMP` : http://openmp.org/
-.. _`Open64` : http://www.open64.net/home.html
+.. _`OpenMP` : https://openmp.org/
 .. _`Clang` : https://clang.llvm.org/
-.. _'MinGW-w64' : http://mingw-w64.sourceforge.net/
+.. _'MinGW-w64' : https://mingw-w64.sourceforge.net/
 .. _`karp-flatt metric` : https://en.wikipedia.org/wiki/Karp%E2%80%93Flatt_metric
 .. _`NUMA` : https://en.wikipedia.org/wiki/Non-uniform_memory_access
 
@@ -28,12 +27,12 @@ the super-computing world and has been available in one form or
 another since the late '90s.
 
 Since GCC 4.2 has introduced excellent OpenMP support via GOMP_,
-OpenMP has become available to the masses.  Recently, `Clang`_ has
-also implemented good OpenMP support. Microsoft Visual Studio
-Professional 2005 and later support OpenMP so Windows users can
-benefit as well. Any multi-CPU and/or multi-core system is potentially
-a good candidate for use with OpenMP.  Modern multi-core chipsets from
-AMD, Intel, IBM, Oracle, and ARM perform very well with OpenMP.
+OpenMP has become available to the masses.  `Clang`_ has also
+implemented good OpenMP support. Microsoft Visual Studio Professional
+2005 and later support OpenMP so Windows users can benefit as
+well. Any multi-CPU and/or multi-core system is potentially a good
+candidate for use with OpenMP.  Modern multi-core chipsets from AMD,
+Intel, IBM, Oracle, and ARM perform very well with OpenMP.
 
 Most image processing routines are comprised of loops which iterate
 through the image pixels, image rows, or image regions. These loops

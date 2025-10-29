@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -92,17 +92,35 @@ MagickExport MontageInfo *CloneMontageInfo(const ImageInfo *image_info,
   if (montage_info == (MontageInfo *) NULL)
     return(clone_info);
   if (montage_info->geometry != (char *) NULL)
-    clone_info->geometry=AllocateString(montage_info->geometry);
+    {
+      MagickFreeMemory(clone_info->geometry);
+      clone_info->geometry=AllocateString(montage_info->geometry);
+    }
   if (montage_info->tile != (char *) NULL)
-    clone_info->tile=AllocateString(montage_info->tile);
+    {
+      MagickFreeMemory(clone_info->tile);
+      clone_info->tile=AllocateString(montage_info->tile);
+    }
   if (montage_info->title != (char *) NULL)
-    clone_info->title=AllocateString(montage_info->title);
+    {
+      MagickFreeMemory(clone_info->title);
+      clone_info->title=AllocateString(montage_info->title);
+    }
   if (montage_info->frame != (char *) NULL)
-    clone_info->frame=AllocateString(montage_info->frame);
+    {
+      MagickFreeMemory(clone_info->frame);
+      clone_info->frame=AllocateString(montage_info->frame);
+    }
   if (montage_info->texture != (char *) NULL)
-    clone_info->texture=AllocateString(montage_info->texture);
+    {
+      MagickFreeMemory(clone_info->texture);
+      clone_info->texture=AllocateString(montage_info->texture);
+    }
   if (montage_info->font != (char *) NULL)
-    clone_info->font=AllocateString(montage_info->font);
+    {
+      MagickFreeMemory(clone_info->font);
+      clone_info->font=AllocateString(montage_info->font);
+    }
   clone_info->pointsize=montage_info->pointsize;
   clone_info->border_width=montage_info->border_width;
   clone_info->shadow=montage_info->shadow;

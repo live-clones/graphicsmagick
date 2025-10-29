@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 2003-2023 GraphicsMagick Group
+; Copyright (C) 2003-2025 GraphicsMagick Group
 ;
 ; This program is covered by multiple licenses, which are described in
 ; Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -15,6 +15,8 @@
 #define  public InstallPerlMagick 0
 ;#define  public VC_2010
 ;#define  public VC_2013
+;#define  public VC_2019
+#define  public VC_2022
 
 #include "inc\body.isx"
 

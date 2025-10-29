@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 - 2023 GraphicsMagick Group
+ * Copyright (C) 2003-2025 GraphicsMagick Group
  * Copyright (C) 2003 ImageMagick Studio
  * Copyright 1991-1999 E. I. du Pont de Nemours and Company
  *
@@ -18,6 +18,9 @@
  *
  */
 
+#if defined(_VISUALC_) && (_MSC_VER < 1900)
+#include <magick/studio.h>
+#endif
 #include <magick/api.h>
 #include <magick/enum_strings.h>
 
@@ -244,12 +247,13 @@ int main ( int argc, char **argv )
   DestroyImageInfo( imageInfo );
   imageInfo=CloneImageInfo(0);
   GetExceptionInfo( &exception );
-  imageInfo->dither = 0;
-  (void) strncpy( imageInfo->filename, infile, MaxTextExtent );
-  imageInfo->filename[MaxTextExtent-1]='\0';
 
+  imageInfo->dither = 0;
   if (!magick_info->adjoin && !check_for_added_frames)
-    (void) strcat( imageInfo->filename, "[0]" );
+    (void) snprintf( imageInfo->filename, sizeof(imageInfo->filename), "%.*s%s",
+                     (int)(sizeof(imageInfo->filename)-sizeof("[0]")-1), infile, "[0]");
+  else
+    (void) snprintf(imageInfo->filename, sizeof(imageInfo->filename), "%s", infile);
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Reading image %s", imageInfo->filename);

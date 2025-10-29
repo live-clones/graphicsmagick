@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <limits.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,8 +35,10 @@ typedef struct
   }
 t_chunk_info;
 
+#pragma GCC visibility push(hidden)
 extern int _gdGetColors (gdIOCtx * in, gdImagePtr im, int gd2xFlag);
 extern void _gdPutColors (gdImagePtr im, gdIOCtx * out);
+#pragma GCC visibility pop
 
 /* */
 /* Read the extra info in the gd2 header. */
@@ -48,7 +51,7 @@ _gd2GetHeader (gdIOCtxPtr in, int *sx, int *sy,
   int i;
   int ch;
   char id[5];
-  t_chunk_info *cidx;
+  t_chunk_info *cidx = NULL;
   int sidx;
   int nc;
 
@@ -143,6 +146,11 @@ _gd2GetHeader (gdIOCtxPtr in, int *sx, int *sy,
 
   if ((*fmt) == GD2_FMT_COMPRESSED)
     {
+      if (*ncx <= 0 || *ncy <= 0 || *ncx > INT_MAX / *ncy) {
+              GD2_DBG(printf ("Illegal chunk counts: %d * %d\n", *ncx, *ncy));
+              goto fail1;
+      }
+
       nc = (*ncx) * (*ncy);
       GD2_DBG (printf ("Reading %d chunk index entries\n", nc));
       sidx = sizeof (t_chunk_info) * nc;
@@ -159,6 +167,7 @@ _gd2GetHeader (gdIOCtxPtr in, int *sx, int *sy,
 	    };
 	};
       *chunkIdx = cidx;
+      cidx = NULL;
     };
 
   GD2_DBG (printf ("gd2 header complete\n"));
@@ -166,6 +175,7 @@ _gd2GetHeader (gdIOCtxPtr in, int *sx, int *sy,
   return 1;
 
 fail1:
+  gdFree (cidx);
   return 0;
 }
 
@@ -210,7 +220,7 @@ fail1:
 
 static
 int
-_gd2ReadChunk (int offset, char *compBuf, int compSize, char *chunkBuf, uLongf * chunkLen, gdIOCtx * in)
+_gd2ReadChunk (int offset, unsigned char *compBuf, int compSize, unsigned char *chunkBuf, uLongf * chunkLen, gdIOCtx * in)
 {
   int zerr;
 
@@ -231,8 +241,8 @@ _gd2ReadChunk (int offset, char *compBuf, int compSize, char *chunkBuf, uLongf *
       return FALSE;
     };
   GD2_DBG (printf ("Got %d bytes. Uncompressing into buffer of %d bytes\n", compSize, *chunkLen));
-  zerr = uncompress ((unsigned char *) chunkBuf, chunkLen,
-		     (unsigned char *) compBuf, compSize);
+  zerr = uncompress (chunkBuf, chunkLen,
+		     compBuf, compSize);
   if (zerr != Z_OK)
     {
       GD2_DBG (printf ("Error %d from uncompress\n", zerr));
@@ -262,16 +272,16 @@ gdImageCreateFromGd2Ctx (gdIOCtxPtr in)
   int i;
   int ncx, ncy, nc, cs, cx, cy;
   int x, y, ylo, yhi, xlo, xhi;
-  int ch, vers, fmt;
+  int vers, fmt;
   t_chunk_info *chunkIdx = NULL;	/* So we can gdFree it with impunity. */
   unsigned char *chunkBuf = NULL;	/* So we can gdFree it with impunity. */
   int chunkNum = 0;
-  int chunkMax;
+  int chunkMax=0;
   uLongf chunkLen;
-  int chunkPos;
+  int chunkPos=0;
   int compMax;
   int bytesPerPixel;
-  char *compBuf = NULL;		/* So we can gdFree it with impunity. */
+  unsigned char *compBuf = NULL;		/* So we can gdFree it with impunity. */
 
   gdImagePtr im;
 
@@ -280,6 +290,7 @@ gdImageCreateFromGd2Ctx (gdIOCtxPtr in)
 
   if (im == NULL)
     {
+      gdFree (chunkIdx);
       return 0;
     };
   bytesPerPixel = im->trueColor ? 4 : 1;
@@ -351,7 +362,7 @@ gdImageCreateFromGd2Ctx (gdIOCtxPtr in)
 		  xhi = im->sx;
 		};
 	      /*GD2_DBG(printf("y=%d: ",y)); */
-	      if (fmt == GD2_FMT_RAW)
+	      if (fmt != GD2_FMT_COMPRESSED)
 		{
 		  for (x = xlo; x < xhi; x++)
 		    {
@@ -360,10 +371,9 @@ gdImageCreateFromGd2Ctx (gdIOCtxPtr in)
 			{
 			  if (!gdGetInt (&im->tpixels[y][x], in))
 			    {
-			      /*printf("EOF while reading\n"); */
-			      /*gdImageDestroy(im); */
-			      /*return 0; */
-			      im->tpixels[y][x] = 0;
+                               fprintf(stderr, "gd2: EOF while reading\n");
+                               gdImageDestroy(im);
+                               return NULL;
 			    }
 			}
 		      else
@@ -371,10 +381,9 @@ gdImageCreateFromGd2Ctx (gdIOCtxPtr in)
 			  int ch;
 			  if (!gdGetByte (&ch, in))
 			    {
-			      /*printf("EOF while reading\n"); */
-			      /*gdImageDestroy(im); */
-			      /*return 0; */
-			      ch = 0;
+                              fprintf(stderr, "gd2: EOF while reading\n");
+                              gdImageDestroy(im);
+                              return NULL;
 			    }
 			  im->pixels[y][x] = ch;
 			}
@@ -448,13 +457,13 @@ gdImageCreateFromGd2PartCtx (gdIOCtx * in, int srcx, int srcy, int w, int h)
   int i;
   int ch, vers, fmt;
   t_chunk_info *chunkIdx = NULL;
-  char *chunkBuf = NULL;
+  unsigned char *chunkBuf = NULL;
   int chunkNum;
-  int chunkMax;
+  int chunkMax=0;
   uLongf chunkLen;
-  int chunkPos;
+  int chunkPos=0;
   int compMax;
-  char *compBuf = NULL;
+  unsigned char *compBuf = NULL;
 
   gdImagePtr im;
 
@@ -609,7 +618,7 @@ gdImageCreateFromGd2PartCtx (gdIOCtx * in, int srcx, int srcy, int w, int h)
 
 	      for (x = xlo; x < xhi; x++)
 		{
-		  if (fmt == GD2_FMT_RAW)
+		  if (fmt != GD2_FMT_COMPRESSED)
 		    {
 		      if (im->trueColor)
 			{
@@ -635,10 +644,11 @@ gdImageCreateFromGd2PartCtx (gdIOCtx * in, int srcx, int srcy, int w, int h)
 		    {
 		      if (im->trueColor)
 			{
-			  ch = chunkBuf[chunkPos++] << 24 +
-			    chunkBuf[chunkPos++] << 16 +
-			    chunkBuf[chunkPos++] << 8 +
-			    chunkBuf[chunkPos++];
+			  ch = (chunkBuf[chunkPos] << 24) +
+			    (chunkBuf[chunkPos+1] << 16) +
+			    (chunkBuf[chunkPos+2] << 8) +
+			    (chunkBuf[chunkPos+3]);
+			  chunkPos+=4;
 			}
 		      else
 			{
@@ -710,12 +720,12 @@ _gdImageGd2 (gdImagePtr im, gdIOCtx * out, int cs, int fmt)
   char *chunkData = NULL;	/* So we can gdFree it with impunity. */
   char *compData = NULL;	/* So we can gdFree it with impunity. */
   uLongf compLen;
-  int idxPos;
+  int idxPos=0;
   int idxSize;
   t_chunk_info *chunkIdx = NULL;
   int posSave;
   int bytesPerPixel = im->trueColor ? 4 : 1;
-  int compMax;
+  int compMax=0;
 
   /*printf("Trying to write GD2 file\n"); */
 

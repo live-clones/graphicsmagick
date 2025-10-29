@@ -48,8 +48,6 @@ BOOL CWelcomePage::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
 	m_welcomeText  =
-	"Welcome!\n"
-	"\n"
 	"This is the VisualMagick configuration wizard. It will set up your "
 	"GraphicsMagick build environment and customize the build process "
 	"for your needs. It's purpose is to create Visual Studio 2003 solution "
@@ -57,10 +55,8 @@ BOOL CWelcomePage::OnInitDialog()
 	"of Visual Studio actually used.\n"
 	"\n"
 	"When the build environment has been created and upgraded, you can build "
-	"the system in the Visual Studio IDE.\n"
-	"\n"
-	"NOTE: You cannot compile GraphicsMagick with Visual Studio older than "
-	"2008 and Visual Studio 2013 or later is required to compile 64 bit code.\n"
+	"the system in the Visual Studio IDE. Visual Studio 2019 (or later) is "
+	"required to compile GraphicsMagick 1.3.46 (or later).\n"
 	"\n"
 	"Good Luck - and thanks for all the fish!";
 

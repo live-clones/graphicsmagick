@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ======================
 GraphicsMagick Authors
@@ -27,19 +27,19 @@ Bob Friesenhahn
                 and the C, C++, and Perl test suites used by ImageMagick
                 and GraphicsMagick.
 
-Jaroslav Fojtik
-                Authored the ART, CUT, HRZ, JNX, MAC, MATLAB, TOPOL,
-                and WPG coder modules. Improved the FITS and TXT coder
-                modules.  VisualMagick 'configure' improvements and
-                build testing/fixes for many versions of Microsoft
-                Visual Studio.
+Former GraphicsMagick Contributors
+==================================
+
+Jaroslav Fojtik Authored the AAI, ART, CUT, HRZ, JNX, MAC, MATLAB,
+                ORA, TOPOL, and WPG coder modules. Improved the FITS,
+                TGA, and TXT coder modules. Implemented initial
+                support for transferring EXIF tags in the TIFF writer.
+                VisualMagick 'configure' improvements and build
+                testing/fixes for many versions of Microsoft Visual
+                Studio.
 
 Tobias Mark
                 Authored the HEIF and JPEG XL coder modules.
-
-
-Former GraphicsMagick Contributors
-==================================
 
 Glenn Randers-Pehrson
                 Contributed significantly to the utilities, including
@@ -85,8 +85,8 @@ Roman Hiestand
                 Contributed WebP coder improvements.
 
 Mike Chiarappa
-                Created and maintains the Borland C++ Builder 6.0 build
-                environment for GraphicsMagick.
+                Created the Borland C++ Builder 6.0 build
+                environment for GraphicsMagick (now defunct).
 
 Daniel Kobras
                 Provided many security patches and fixes from the Debian

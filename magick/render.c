@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -551,7 +551,7 @@ LogPolygonInfo(const PolygonInfo *polygon_info)
   p=polygon_info->edges;
   for (i=0; i < polygon_info->number_edges; i++)
   {
-    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      edge %"MAGICK_SIZE_T_F"u:",(MAGICK_SIZE_T) i);
+    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      edge %" MAGICK_SIZE_T_F "u:",(MAGICK_SIZE_T) i);
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      direction: %s",
       p->direction ? "down" : "up");
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"      ghostline: %s",
@@ -2437,6 +2437,8 @@ char *  ExtractTokensBetweenPushPop (
   Extract attribute name from input stream, get attribute, and insert it's
   value into the input stream.  Return updated pointer into input stream.
   Added to support new elements "use" and "class".
+
+  FIXME: Need to add anti-recursion measures.
 */
 static
 char * InsertAttributeIntoInputStream (
@@ -2459,7 +2461,7 @@ char * InsertAttributeIntoInputStream (
   size_t NeededLength;
 
   if (*pStatus == MagickFail)
-    return MagickFail;
+    return (char *) NULL;
 
   /* get attribute name, then get attribute value */
   if (MagickGetToken(q,&q,*ptoken,*ptoken_max_length) < 1)
@@ -2490,6 +2492,16 @@ char * InsertAttributeIntoInputStream (
   RemainingLength = *pprimitive_extent - (size_t)(q - *pprimitive);
   NeededLength = AttributeLength + RemainingLength;
 
+#if 0
+  if (image->logging)
+    (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                          "InsertAttributeIntoInputStream(): keyword \"%s\" "
+                          "AttributeName \"%s\", AttributeLength=%zu, "
+                          "RemainingLength=%zu, NeededLength=%zu",
+                          keyword, AttributeName, AttributeLength,
+                          RemainingLength, NeededLength);
+#endif
+
   if  ( NeededLength <= *pprimitive_extent )
     {/*combined strings fit in existing primitive buffer*/
 
@@ -2499,24 +2511,72 @@ char * InsertAttributeIntoInputStream (
     }/*combined strings fit in existing primitive buffer*/
   else
     {/*combined strings need bigger buffer*/
-
+#if 1
+      /*
+        Based on original free/new design
+      */
       char * primitiveNew;
+      char * tokenNew;
       *pprimitive_extent = NeededLength;
-      primitiveNew = MagickAllocateMemory(char *,NeededLength+1);
+      primitiveNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
       if (primitiveNew == (char *) NULL)
         {
           *pStatus = MagickFail;
           return(q);
         }
-      (void) memcpy(primitiveNew,attribute->value,AttributeLength);
-      (void) memcpy(primitiveNew+AttributeLength,q,RemainingLength);
+      (void) memcpy(primitiveNew,attribute->value,AttributeLength); /* Attribute value */
+      (void) memcpy(primitiveNew+AttributeLength,q,RemainingLength); /* Remaining */
       primitiveNew[NeededLength] = '\0';
 
-      MagickFreeMemory(*pprimitive);
+      MagickFreeResourceLimitedMemory(*pprimitive);
       q = *pprimitive = primitiveNew;
-      MagickFreeMemory(*ptoken);
-      *ptoken = MagickAllocateMemory(char *,NeededLength+1);
+      MagickFreeResourceLimitedMemory(*ptoken);
+      tokenNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
+      if (tokenNew == (char *) NULL)
+        {
+          *pStatus = MagickFail;
+          return(q);
+        }
+      *ptoken = tokenNew;
       *ptoken_max_length = NeededLength;
+#else
+      /*
+        Based on reallocation design
+      */
+      {
+        char * primitiveNew;
+        size_t Offset;
+        *pprimitive_extent = NeededLength;
+        Offset = q-*pprimitive;
+        primitiveNew = MagickReallocateResourceLimitedMemory(char *,*pprimitive,NeededLength+1);
+        if (primitiveNew == (char *) NULL)
+          {
+            *pStatus = MagickFail;
+            return(q);
+          }
+        /* FIXME: Need to verify this! */
+        (void) memmove(/* dest */primitiveNew+AttributeLength,/* source */primitiveNew+Offset,RemainingLength); /* Remaining */
+        (void) memcpy(primitiveNew,attribute->value,AttributeLength); /* Attribute value */
+        primitiveNew[NeededLength] = '\0';
+        q = *pprimitive = primitiveNew;
+      }
+      {
+        char * tokenNew;
+        tokenNew = MagickReallocateResourceLimitedMemory(char *,*ptoken,NeededLength+1);
+        if (tokenNew == (char *) NULL)
+          {
+            *pStatus = MagickFail;
+            return(q);
+          }
+        *ptoken = tokenNew;
+        *ptoken_max_length = NeededLength;
+      }
+#if 0
+     if (image->logging)
+        (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                              "InsertAttributeIntoInputStream(): \"%s\"", *pprimitive);
+#endif
+#endif
 
     }/*combined strings need bigger buffer*/
 
@@ -2541,7 +2601,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   size_t NeedAllocCount;
 
 #if 0
-  fprintf(stderr,"Needed = %"MAGICK_SIZE_T_F"u\n",(MAGICK_SIZE_T) Needed);
+  fprintf(stderr,"Needed = %" MAGICK_SIZE_T_F "u\n",(MAGICK_SIZE_T) Needed);
 #endif
   /* NeedAllocCount = p_PIMgr->StoreStartingAt + Needed + ((size_t)100 */
   status &= MagickAddSizeT(p_PIMgr->StoreStartingAt, Needed, &NeedAllocCount); /* + Needed */
@@ -2565,9 +2625,9 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
 
 #if 0
       fprintf(stderr,
-              "have_memory=%"MAGICK_SIZE_T_F"u (%"MAGICK_SIZE_T_F"u elem),"
-              " needed_memory=%"MAGICK_SIZE_T_F"u (%"MAGICK_SIZE_T_F"u elem),"
-              " added_memory=%"MAGICK_SIZE_T_F"u\n",
+              "have_memory=%" MAGICK_SIZE_T_F "u (%" MAGICK_SIZE_T_F "u elem),"
+              " needed_memory=%" MAGICK_SIZE_T_F "u (%" MAGICK_SIZE_T_F "u elem),"
+              " added_memory=%" MAGICK_SIZE_T_F "u\n",
               (MAGICK_SIZE_T) have_memory, (MAGICK_SIZE_T) *p_PIMgr->p_AllocCount,
               (MAGICK_SIZE_T) needed_memory, (MAGICK_SIZE_T) NeedAllocCount,
               (MAGICK_SIZE_T) added_memory);
@@ -2625,6 +2685,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     geometry[MaxTextExtent],
     name[MaxTextExtent],
     pattern[MaxTextExtent],
+    *original_primitive,
     *primitive,
     *q,
     *token;
@@ -2735,19 +2796,37 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   */
   if ((*draw_info->primitive == '@') &&
       (DrawImageGetCurrentRecurseLevel(image) == 1))
-    primitive=(char *)
-      FileToBlob(draw_info->primitive+1,&length,&image->exception);
+    {
+      original_primitive=(char *)
+        FileToBlob(draw_info->primitive+1,&length,&image->exception);
+    }
   else
-    primitive=AllocateString(draw_info->primitive);
-  if (primitive == (char *) NULL)
+    {
+      original_primitive=draw_info->primitive;
+    }
+  if (original_primitive == (char *) NULL)
     return(MagickFail);
-  primitive_extent=strlen(primitive);
+
 
   if (getenv("MAGICK_SKIP_RENDERING") != NULL)
     {
-      MagickFreeMemory(primitive);
+      if (original_primitive != draw_info->primitive)
+        MagickFreeMemory(original_primitive);
       return MagickPass;
     }
+
+    primitive_extent=strlen(original_primitive);
+    primitive = MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
+    if (primitive == (char *) NULL)
+      {
+        if (original_primitive != draw_info->primitive)
+          MagickFreeMemory(original_primitive);
+        return(MagickFail);
+      }
+    (void) memcpy(primitive, original_primitive, primitive_extent+1);
+    if (original_primitive != draw_info->primitive)
+          MagickFreeMemory(original_primitive);
+
   n=0;
   /*
     Allocate primitive info memory.
@@ -2755,7 +2834,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   graphic_context=MagickAllocateMemory(DrawInfo **,sizeof(DrawInfo *));
   if (graphic_context == (DrawInfo **) NULL)
     {
-      MagickFreeMemory(primitive);
+      MagickFreeResourceLimitedMemory(primitive);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
         UnableToDrawOnImage)
     }
@@ -2768,20 +2847,28 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
   if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass)
     {
-      MagickFreeMemory(primitive);
+      MagickFreeResourceLimitedMemory(primitive);
       MagickFreeMemory(graphic_context);
       return MagickFail;
     }
   if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
     {
-      MagickFreeMemory(primitive);
+      MagickFreeResourceLimitedMemory(primitive);
       MagickFreeMemory(graphic_context);
       return MagickFail;
     }
   graphic_context[n]=CloneDrawInfo((ImageInfo *) NULL,draw_info);
   /* next two lines: don't need copy of primitive, just a buffer of the same size */
-  token=MagickAllocateMemory(char *,primitive_extent+1);
+  token=MagickAllocateResourceLimitedMemory(char *,primitive_extent+1);
   token_max_length=primitive_extent;
+  if (token == (char *) NULL)
+    {
+      DestroyDrawInfo(graphic_context[n]);
+      graphic_context[n]=(DrawInfo *) NULL;
+      MagickFreeResourceLimitedMemory(primitive);
+      MagickFreeMemory(graphic_context);
+      return MagickFail;
+    }
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
   xTextCurrent = yTextCurrent = 0.0;  /* initialize current text position */
   /*
@@ -2848,7 +2935,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           q++;
         continue;
       }
-    p=q-strlen(keyword);
+    p=q-strlen(keyword); /* FIXME: Make sure that this rule works! */
     primitive_type=UndefinedPrimitive;
     current=graphic_context[n]->affine;
     IdentityAffine(&affine);
@@ -2936,6 +3023,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       {
         if (LocaleCompare("class",keyword) == 0)
           {/*class*/
+            /* FIXME: Deal with possible recursion */
             q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
                                                &token,&token_max_length,image,
                                                &status,MagickFalse/*UndefAttrIsError*/);
@@ -3018,6 +3106,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         if (LocaleCompare("decorate",keyword) == 0)
           {
             MagickGetToken(q,&q,token,token_max_length);
+            if (LocaleCompare("none",token) == 0)
+              {
+                graphic_context[n]->decorate=NoDecoration;
+                break;
+              }
             if (LocaleCompare("underline",token) == 0)
               {
                 graphic_context[n]->decorate=UnderlineDecoration;
@@ -3070,8 +3163,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               break;    /* if drawing clip path, ignore changes to fill color */
             FormatString(pattern,"[MVG:%.1024s]",token);
             if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
-              (void) DrawPatternPath(image,draw_info,token,
-                &graphic_context[n]->fill_pattern);
+              {
+                if (DrawPatternPath(image,draw_info,token,
+                                    &graphic_context[n]->fill_pattern) != MagickPass)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+              }
             else
               {/*fill color, not pattern*/
 
@@ -3244,6 +3343,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         if (LocaleCompare("gradient-units",keyword) == 0)
           {
             MagickGetToken(q,&q,token,token_max_length);
+            /* FIXME: Not implemented! */
             break;
           }
         if (LocaleCompare("gravity",keyword) == 0)
@@ -3567,7 +3667,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t width_resource_limit = GetMagickResourceLimit(WidthResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", width_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) width_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelWidthLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3577,7 +3677,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t hight_resource_limit = GetMagickResourceLimit(HeightResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", hight_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) hight_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelHeightLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3588,7 +3688,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     char resource_str[MaxTextExtent];
                     const magick_int64_t pixels_resource_limit = GetMagickResourceLimit(PixelsResource);
-                    FormatString(resource_str,"%" MAGICK_INT64_F "d", pixels_resource_limit);
+                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) pixels_resource_limit);
                     ThrowException(&image->exception,ResourceLimitError,
                                    ImagePixelLimitExceeded,resource_str);
                     status=MagickFail;
@@ -3795,16 +3895,25 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("graphic-context",token) == 0)
               {
                 n++;
+                /* FIXME: Change to managed memory. If this allocation
+                   fails (unlikely), then the existing DrawInfo
+                   allocations will be leaked! */
                 MagickReallocMemory(DrawInfo **,graphic_context,
                                     MagickArraySize(((size_t) n+1),sizeof(DrawInfo *)));
                 if (graphic_context == (DrawInfo **) NULL)
                   {
                     ThrowException3(&image->exception,ResourceLimitError,
-                      MemoryAllocationFailed,UnableToDrawOnImage);
+                                    MemoryAllocationFailed,UnableToDrawOnImage);
                     break;
                   }
                 graphic_context[n]=
                   CloneDrawInfo((ImageInfo *) NULL,graphic_context[n-1]);
+                if (graphic_context[n] == (DrawInfo *) NULL)
+                  {
+                    ThrowException3(&image->exception,ResourceLimitError,
+                                    MemoryAllocationFailed,UnableToDrawOnImage);
+                    break;
+                  }
                 FillOpacityPending = StrokeOpacityPending = MagickFalse;
                 break;
               }
@@ -3897,7 +4006,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               stop_color;
 
             MagickGetToken(q,&q,token,token_max_length);
-            (void) QueryColorDatabase(token,&stop_color,&image->exception);
+            if ((status &= QueryColorDatabase(token,&stop_color,&image->exception)) == MagickFail)
+              break;
             (void) GradientImage(image,&start_color,&stop_color);
             start_color=stop_color;
             MagickGetToken(q,&q,token,token_max_length);
@@ -3920,8 +4030,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
                 /* when setting new stroke color, try to preserve stroke-opacity */
                 Quantum StrokeOpacityOld = graphic_context[n]->stroke.opacity;
-                (void) QueryColorDatabase(token,&graphic_context[n]->stroke,&image->exception);
-
+                if ((status &= QueryColorDatabase(token,&graphic_context[n]->stroke,&image->exception)) == MagickFail)
+                  break;
                 if (graphic_context[n]->stroke.opacity != TransparentOpacity)
                   {/*stroke color != 'none'*/
 
@@ -4252,8 +4362,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         if (LocaleCompare("text-undercolor",keyword) == 0)
           {
             MagickGetToken(q,&q,token,token_max_length);
-            (void) QueryColorDatabase(token,&graphic_context[n]->undercolor,
-              &image->exception);
+            status &= QueryColorDatabase(token,&graphic_context[n]->undercolor,
+                                         &image->exception);
             break;
           }
         if (LocaleCompare("translate",keyword) == 0)
@@ -4274,6 +4384,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       {
         if (LocaleCompare("use",keyword) == 0)
           {
+            /* FIXME: nothing prevents infinite recursion of "use" */
             q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
                                                &token,&token_max_length,image,
                                                &status,MagickTrue/*UndefAttrIsError*/);
@@ -4325,7 +4436,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     if (primitive_type == UndefinedPrimitive)
       {
         (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",
-          (int) (q-p),p);
+                              (int) (q-p),p);
         continue;
       }
     /*
@@ -4894,11 +5005,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     Free resources.
   */
   DrawImageRecurseOut(image);
-  MagickFreeMemory(token);
+  MagickFreeResourceLimitedMemory(token);
   if (primitive_info != (PrimitiveInfo *) NULL)
     LiberateMagickResource(MemoryResource,(*PIMgr.p_AllocCount)*sizeof(PrimitiveInfo));
   MagickFreeMemory(primitive_info);
-  MagickFreeMemory(primitive);
+  MagickFreeResourceLimitedMemory(primitive);
   for ( ; n >= 0; n--)
     DestroyDrawInfo(graphic_context[n]);
   MagickFreeMemory(graphic_context);
@@ -4977,7 +5088,7 @@ DrawPatternPath(Image *image,const DrawInfo *draw_info,const char *name,
   image_info->size=AllocateString(geometry->value);
   *pattern=AllocateImage(image_info);
   DestroyImageInfo(image_info);
-  (void) QueryColorDatabase("none",&(*pattern)->background_color,
+  status &= QueryColorDatabase("none",&(*pattern)->background_color,
     &image->exception);
   (void) SetImage(*pattern,OpaqueOpacity);
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),
@@ -5232,6 +5343,7 @@ GetPixelOpacity(PolygonInfo * restrict polygon_info,const double mid,
   return(subpath_opacity);
 }
 
+#if defined(HAVE_OPENMP)
 static PolygonInfo* ClonePolygonInfo(const PolygonInfo* orig_polygon_info, ExceptionInfo *exception)
 {
   PolygonInfo
@@ -5291,6 +5403,7 @@ static PolygonInfo* ClonePolygonInfo(const PolygonInfo* orig_polygon_info, Excep
 
   return polygon_info;
 }
+#endif /* if defined(HAVE_OPENMP) */
 
 static MagickPassFail
 DrawPolygonPrimitive(Image *image,const DrawInfo *draw_info,
@@ -5392,8 +5505,12 @@ DrawPolygonPrimitive(Image *image,const DrawInfo *draw_info,
             */
             polygon_info=ConvertPathToPolygon(path_info,&image->exception);
             for (index=0; index < allocated_views; index++)
+#if defined(HAVE_OPENMP)
             AssignThreadViewData(polygon_set,index,index == 0 ? (void *) polygon_info :
                                  ClonePolygonInfo(polygon_info,&image->exception));
+#else
+            AssignThreadViewData(polygon_set,index,(void *) polygon_info);
+#endif /* if defined(HAVE_OPENMP) */
 
             /*
               Verify worker thread allocations.

@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2022
+// Copyright Bob Friesenhahn, 1999-2025
 //
 // Implementation of Image
 //
@@ -2257,13 +2257,37 @@ void Magick::Image::attribute ( const std::string name_,
                                 const char * value_ )
 {
   modifyImage();
-  SetImageAttribute( image(), name_.c_str(), value_ );
+  if ((MagickLib::LocaleCompare(name_.c_str(),"comment") == 0) ||
+      (MagickLib::LocaleCompare(name_.c_str(),"label") == 0))
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  value_);
+      SetImageAttribute( image(), name_.c_str(), translated );
+      MagickFreeMemory(translated);
+    }
+  else
+    {
+      SetImageAttribute( image(), name_.c_str(), value_ );
+    }
 }
 void Magick::Image::attribute ( const std::string name_,
                                 const std::string value_ )
 {
   modifyImage();
-  SetImageAttribute( image(), name_.c_str(), value_.c_str() );
+  if ((MagickLib::LocaleCompare(name_.c_str(),"comment") == 0) ||
+      (MagickLib::LocaleCompare(name_.c_str(),"label") == 0))
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  value_.c_str());
+      SetImageAttribute( image(), name_.c_str(), translated );
+      MagickFreeMemory(translated);
+    }
+  else
+    {
+      SetImageAttribute( image(), name_.c_str(), value_.c_str() );
+    }
 }
 std::string Magick::Image::attribute ( const std::string name_ )
 {
@@ -2636,7 +2660,13 @@ void Magick::Image::comment ( const std::string &comment_ )
   modifyImage();
   SetImageAttribute( image(), "Comment", NULL );
   if ( comment_.length() > 0 )
-    SetImageAttribute( image(), "Comment", comment_.c_str() );
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  comment_.c_str());
+      SetImageAttribute( image(), "Comment", translated );
+      MagickFreeMemory(translated);
+    }
   throwImageException();
 }
 std::string Magick::Image::comment ( void ) const
@@ -2970,7 +3000,9 @@ std::string Magick::Image::format ( void ) const
 // Format the specified expression similar to command line '-format'.
 // For example "%wx%h" is converted to a string containing image
 // WIDTHxHEIGHT like "640x480".
-std::string Magick::Image::formatExpression ( const std::string expression )
+//
+// The original interface definition "formatExpression" failed to pass by value!
+std::string Magick::Image::formatExpressionRef ( const std::string &expression )
 {
   // TranslateText throws exceptions into Image.
   modifyImage();
@@ -2986,6 +3018,10 @@ std::string Magick::Image::formatExpression ( const std::string expression )
     }
   throwImageException( image( )->exception );
   return translated_str;
+}
+std::string Magick::Image::formatExpression ( const std::string expression ) // deprecated
+{
+  return Magick::Image::formatExpressionRef( expression );
 }
 
 // Gamma adjustment
@@ -3105,7 +3141,13 @@ void Magick::Image::label ( const std::string &label_ )
   modifyImage();
   SetImageAttribute ( image(), "Label", NULL );
   if ( label_.length() > 0 )
-    SetImageAttribute ( image(), "Label", label_.c_str() );
+    {
+      char *translated = MagickLib::TranslateText(constImageInfo( ),
+                                                  image( ),
+                                                  label_.c_str());
+      SetImageAttribute ( image(), "Label", label_.c_str() );
+      MagickFreeMemory(translated);
+    }
   throwImageException();
 }
 std::string Magick::Image::label ( void ) const
@@ -4240,9 +4282,20 @@ void MagickDLLDecl Magick::InitializeMagick(const char *path_)
   if (!magick_initialized)
     {
       magick_initialized=true;
-//       atexit(MagickPlusPlusDestroyMagick);
     }
 }
+
+// C library destruction routine
+void MagickDLLDecl Magick::DestroyMagick(void)
+{
+  if (magick_initialized)
+    {
+      magick_initialized=false;
+      MagickLib::DestroyMagick();
+    }
+}
+
+#if defined(SUPPORT_MAGICK_CLEANUP)
 
 //
 // Cleanup class to ensure that ImageMagick singletons are destroyed
@@ -4273,3 +4326,5 @@ Magick::MagickCleanUp::~MagickCleanUp ( void )
 {
   MagickPlusPlusDestroyMagick();
 }
+
+#endif // if defined(SUPPORT_MAGICK_CLEANUP)

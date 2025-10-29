@@ -305,6 +305,8 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
             ';', ':', '4', '\\', '0', 'Z', '7', '(',
             '_', '?', 'W', ']', '#', 'Y', ')', '='
           };
+          if (cell >= 64)
+            cell = 0;
           (void) WriteBlobByte(image,iso_to_brf[cell]);
         }
     }

@@ -11,6 +11,11 @@
 /* Exported functions: */
 extern void gdImageGd (gdImagePtr im, FILE * out);
 
+#pragma GCC visibility push(hidden)
+int _gdGetColors (gdIOCtx * in, gdImagePtr im, int gd2xFlag);
+void _gdPutColors (gdImagePtr im, gdIOCtx * out);
+#pragma GCC visibility pop
+
 
 /* Use this for commenting out debug-print statements. */
 /* Just use the first '#define' to allow all the prints... */
@@ -34,6 +39,10 @@ _gdGetColors (gdIOCtx * in, gdImagePtr im, int gd2xFlag)
       if (!im->trueColor)
 	{
 	  if (!gdGetWord (&im->colorsTotal, in))
+	    {
+	      goto fail1;
+	    }
+	  if (im->colorsTotal > gdMaxColors)
 	    {
 	      goto fail1;
 	    }
@@ -126,6 +135,11 @@ _gdCreateFromFile (gdIOCtx * in, int *sx, int *sy)
 
   im = gdImageCreate (*sx, *sy);
 
+  if (!im)
+    {
+      goto fail1;
+    }
+
   if (!_gdGetColors (in, im, gd2xFlag))
     {
       goto fail2;
@@ -195,7 +209,6 @@ void
 _gdPutColors (gdImagePtr im, gdIOCtx * out)
 {
   int i;
-  int trans;
 
   gdPutC (im->trueColor, out);
   if (!im->trueColor)

@@ -78,8 +78,11 @@ static void
 gdPngReadData (png_structp png_ptr,
 	       png_bytep data, png_size_t length)
 {
-  gdGetBuf (data, length, (gdIOCtx *)
-	    png_get_io_ptr (png_ptr));
+  int check;
+  check = gdGetBuf (data, length, (gdIOCtx *) png_get_io_ptr (png_ptr));
+  if (check != (int)length) {
+    png_error(png_ptr, "Read Error: truncated data");
+  }
 }
 
 static void
@@ -93,6 +96,7 @@ gdPngWriteData (png_structp png_ptr,
 static void
 gdPngFlushData (png_structp png_ptr)
 {
+  (void)png_ptr;
 }
 
 gdImagePtr
@@ -115,9 +119,9 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
   png_byte sig[8];
   png_structp png_ptr;
   png_infop info_ptr;
-  png_uint_32 width, height, rowbytes;
+  png_uint_32 width, height, w, h, rowbytes;
   int bit_depth, color_type, interlace_type;
-  int num_palette, num_trans;
+  int num_palette = 0, num_trans;
   png_colorp palette;
   png_color_16p trans_gray_rgb;
   png_color_16p trans_color_rgb;
@@ -127,11 +131,9 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
   gdImagePtr im = NULL;
   int i, j, *open;
   volatile int transparent = -1;
-  volatile int palette_allocated = FALSE;
 
   /* Make sure the signature can't match by dumb luck -- TBB */
-  /* GRR: isn't sizeof(infile) equal to the size of the pointer? */
-  memset (infile, 0, sizeof (infile));
+  memset (sig, 0, sizeof (sig));
 
   /* first do a quick check that the file really is a PNG image; could
    * have used slightly more general png_sig_cmp() function instead */
@@ -173,6 +175,8 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
       return NULL;
     }
 #endif
+  open = NULL;
+  palette = NULL;
 
   png_set_sig_bytes (png_ptr, 8);	/* we already read the 8 signature bytes */
 
@@ -181,6 +185,14 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
 
   png_get_IHDR (png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
 		&interlace_type, NULL, NULL);
+  if (overflow2(sizeof (int), width)) 
+    {
+      return NULL;
+    }
+  if (overflow2(sizeof (int) * width, height)) 
+    {
+      return NULL;
+    }  
   if ((color_type == PNG_COLOR_TYPE_RGB) ||
       (color_type == PNG_COLOR_TYPE_RGB_ALPHA))
     {
@@ -239,9 +251,9 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
 	{
 	  fprintf (stderr, "gd-png error: cannot allocate gray palette\n");
 	  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+	  gdImageDestroy(im);
 	  return NULL;
 	}
-      palette_allocated = TRUE;
       if (bit_depth < 8)
 	{
 	  num_palette = 1 << bit_depth;
@@ -307,6 +319,8 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
     {
       fprintf (stderr, "gd-png error: cannot allocate image data\n");
       png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+      gdImageDestroy(im);
+      gdFree(palette);
       return NULL;
     }
   if ((row_pointers = (png_bytepp) gdMalloc (height * sizeof (png_bytep))) == NULL)
@@ -314,13 +328,15 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
       fprintf (stderr, "gd-png error: cannot allocate row pointers\n");
       png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
       gdFree (image_data);
+      gdImageDestroy(im);
+      gdFree(palette);
       return NULL;
     }
 
   /* set the individual row_pointers to point at the correct offsets */
-  for (j = 0; j < height; ++j)
+  for (h = 0; h < height; ++h)
     {
-      row_pointers[j] = image_data + j * rowbytes;
+      row_pointers[h] = image_data + h * rowbytes;
     }
 
   png_read_image (png_ptr, row_pointers);	/* read whole image... */
@@ -351,47 +367,50 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
   switch (color_type)
     {
     case PNG_COLOR_TYPE_RGB:
-      for (j = 0; j < height; j++)
+      for (h = 0; h < height; h++)
 	{
 	  int boffset = 0;
-	  for (i = 0; i < width; i++)
+	  for (w = 0; w < width; w++)
 	    {
-	      register png_byte r = row_pointers[j][boffset++];
-	      register png_byte g = row_pointers[j][boffset++];
-	      register png_byte b = row_pointers[j][boffset++];
-	      im->tpixels[j][i] = gdTrueColor (r, g, b);
+	      register png_byte r = row_pointers[w][boffset++];
+	      register png_byte g = row_pointers[w][boffset++];
+	      register png_byte b = row_pointers[w][boffset++];
+	      im->tpixels[h][w] = gdTrueColor (r, g, b);
 	    }
 	}
       break;
     case PNG_COLOR_TYPE_RGB_ALPHA:
-      for (j = 0; j < height; j++)
+      for (h = 0; h < height; h++)
 	{
 	  int boffset = 0;
-	  for (i = 0; i < width; i++)
+	  for (w = 0; w < width; w++)
 	    {
-	      register png_byte r = row_pointers[j][boffset++];
-	      register png_byte g = row_pointers[j][boffset++];
-	      register png_byte b = row_pointers[j][boffset++];
+	      register png_byte r = row_pointers[h][boffset++];
+	      register png_byte g = row_pointers[h][boffset++];
+	      register png_byte b = row_pointers[h][boffset++];
 	      /* gd has only 7 bits of alpha channel resolution, and
 	         127 is transparent, 0 opaque. A moment of convenience, 
 	         a lifetime of compatibility. */
 	      register png_byte a = gdAlphaMax -
-	      (row_pointers[j][boffset++] >> 1);
-	      im->tpixels[j][i] = gdTrueColorAlpha (r, g, b, a);
+	      (row_pointers[h][boffset++] >> 1);
+	      im->tpixels[h][w] = gdTrueColorAlpha (r, g, b, a);
 	    }
 	}
       break;
     default:
-      /* Palette image, or something coerced to be one */
-      for (j = 0; j < height; ++j)
-	{
-	  for (i = 0; i < width; ++i)
-	    {
-	      register png_byte idx = row_pointers[j][i];
-	      im->pixels[j][i] = idx;
-	      open[idx] = 0;
-	    }
-	}
+      if (!im->trueColor)
+      {
+        /* Palette image, or something coerced to be one */
+        for (h = 0; h < height; ++h)
+	  {
+	    for (w = 0; w < width; ++w)
+	      {
+	        register png_byte idx = row_pointers[h][w];
+	        im->pixels[h][w] = idx;
+	        open[idx] = 0;
+	      }
+	  }
+      }
     }
 #ifdef DEBUG
   if (!im->trueColor)
@@ -407,8 +426,7 @@ gdImageCreateFromPngCtx (gdIOCtx * infile)
     }
 #endif
 
-  if (palette_allocated)
-    gdFree (palette);
+  gdFree (palette);
   gdFree (image_data);
   gdFree (row_pointers);
 
@@ -424,17 +442,6 @@ gdImagePng (gdImagePtr im, FILE * outFile)
   out->free (out);
 }
 
-void *
-gdImagePngPtr (gdImagePtr im, int *size)
-{
-  void *rv;
-  gdIOCtx *out = gdNewDynamicCtx (2048, NULL);
-  gdImagePngCtx (im, out);
-  rv = gdDPExtractData (out, size);
-  out->free (out);
-  return rv;
-}
-
 /* This routine is based in part on code from Dale Lutz (Safe Software Inc.)
  *  and in part on demo code from Chapter 15 of "PNG: The Definitive Guide"
  *  (http://www.cdrom.com/pub/png/pngbook.html).
@@ -442,10 +449,10 @@ gdImagePngPtr (gdImagePtr im, int *size)
 void
 gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
 {
-  int i, j, bit_depth, interlace_type;
+  int i, j, bit_depth=1, interlace_type;
   int width = im->sx;
   int height = im->sy;
-  int colors = im->colorsTotal;
+  int colors;
   int *open = im->open;
   int mapping[gdMaxColors];	/* mapping[gd_index] == png_index */
   png_byte trans_values[256];
@@ -485,6 +492,7 @@ gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
       return;
     }
 #endif
+  colors = im->colorsTotal;
 
   png_set_write_fn (png_ptr, (void *) outfile, gdPngWriteData, gdPngFlushData);
 
@@ -579,7 +587,6 @@ gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
       int i;
       int j;
       int k;
-      int highTrans = -1;
       for (i = 0; (i < im->colorsTotal); i++)
 	{
 	  if ((!im->open[i]) &&
@@ -672,6 +679,7 @@ gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
       if (row_pointers == NULL)
 	{
 	  fprintf (stderr, "gd-png error: unable to allocate row_pointers\n");
+	  return;
 	}
       for (j = 0; j < height; ++j)
 	{
@@ -681,6 +689,7 @@ gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
 	      fprintf (stderr, "gd-png error: unable to allocate rows\n");
 	      for (i = 0; i < j; ++i)
 		gdFree (row_pointers[i]);
+	      gdFree (row_pointers);
 	      return;
 	    }
 	  for (i = 0; i < width; ++i)
@@ -718,6 +727,7 @@ gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
 	  if (row_pointers == NULL)
 	    {
 	      fprintf (stderr, "gd-png error: unable to allocate row_pointers\n");
+	      return;
 	    }
 	  for (j = 0; j < height; ++j)
 	    {
@@ -726,6 +736,7 @@ gdImagePngCtx (gdImagePtr im, gdIOCtx * outfile)
 		  fprintf (stderr, "gd-png error: unable to allocate rows\n");
 		  for (i = 0; i < j; ++i)
 		    gdFree (row_pointers[i]);
+		  gdFree (row_pointers);
 		  return;
 		}
 	      for (i = 0; i < width; ++i)

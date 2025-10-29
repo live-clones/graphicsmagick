@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -764,16 +764,16 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
   if (BlobIsSeekable(image))
     {
       magick_off_t file_size;
-      magick_int64_t expected_file_size;
+      magick_intmax_t expected_file_size;
 
       file_size = GetBlobSize(image);
 
       expected_file_size=pixels_offset+
-        ((((((magick_int64_t) image->rows*image->columns*number_of_channels+2UL)/3UL)
+        ((((((magick_intmax_t) image->rows*image->columns*number_of_channels+2UL)/3UL)
            *sizeof(U32)*8UL)+31UL)/32UL)*sizeof(U32);
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Expected file size %" MAGICK_UINT64_F "u bytes"
+                              "Expected file size %" MAGICK_UINTMAX_F "u bytes"
                               " (have %" MAGICK_OFF_F "d bytes)",
                               expected_file_size, file_size);
 

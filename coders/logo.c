@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
 % Parts Copyright (c) 1989-2000 by Brian V. Smith
 % Parts Copyright (c) 1991 by Paul King
@@ -4878,7 +4878,7 @@ static const unsigned char
 
 static const struct
 {
-  char                  name[20];       /* image name */
+  char                  name[21];       /* image name */
   char                  magick[4];      /* blob format */
   const void           *blob;           /* blob data */
   unsigned short        extent;         /* blob size */
@@ -5102,7 +5102,7 @@ ModuleExport void RegisterLOGOImage(void)
   entry=SetMagickInfo("GRANITE");
   entry->decoder=(DecoderHandler) ReadLOGOImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="Granite texture";
   entry->module="LOGO";
   entry->extension_treatment=IgnoreExtensionTreatment;
@@ -5113,7 +5113,7 @@ ModuleExport void RegisterLOGOImage(void)
   entry->decoder=(DecoderHandler) ReadLOGOImage;
   entry->encoder=(EncoderHandler) WriteLOGOImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="Internal format";
   entry->module="LOGO";
   entry->extension_treatment=IgnoreExtensionTreatment;
@@ -5133,7 +5133,7 @@ ModuleExport void RegisterLOGOImage(void)
   entry->decoder=(DecoderHandler) ReadLOGOImage;
   entry->encoder=(EncoderHandler) WriteLOGOImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="GraphicsMagick Logo";
   entry->module="LOGO";
   entry->extension_treatment=IgnoreExtensionTreatment;
@@ -5143,7 +5143,7 @@ ModuleExport void RegisterLOGOImage(void)
   entry=SetMagickInfo("NETSCAPE");
   entry->decoder=(DecoderHandler) ReadLOGOImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="Netscape 216 color cube";
   entry->module="LOGO";
   entry->extension_treatment=IgnoreExtensionTreatment;
@@ -5153,7 +5153,7 @@ ModuleExport void RegisterLOGOImage(void)
   entry=SetMagickInfo("PATTERN");
   entry->decoder=(DecoderHandler) ReadLOGOImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="Tiled pattern image";
   entry->module="LOGO";
   entry->extension_treatment=IgnoreExtensionTreatment;
@@ -5163,7 +5163,7 @@ ModuleExport void RegisterLOGOImage(void)
   entry=SetMagickInfo("ROSE");
   entry->decoder=(DecoderHandler) ReadLOGOImage;
   entry->adjoin=False;
-  entry->stealth=True;
+  entry->stealth=True; /* Don't list in '-list format' output */
   entry->description="70x46 Truecolor rose";
   entry->extension_treatment=IgnoreExtensionTreatment;
   entry->module="LOGO";

@@ -427,9 +427,6 @@ static void ipa_bmp_draw(wmfAPI *API, wmfBMP_Draw_t *bmp_draw)
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData(API);
 
-  ExceptionInfo
-    exception;
-
   Image
     *image;
 
@@ -446,11 +443,10 @@ static void ipa_bmp_draw(wmfAPI *API, wmfBMP_Draw_t *bmp_draw)
   if (bmp_draw->bmp.data == 0)
     return;
 
-  GetExceptionInfo(&exception);
   image = (Image*)bmp_draw->bmp.data;
   if (!image)
     {
-      CopyException(&ddata->image->exception,&exception);
+      /* FIXME: Report exception */
       return;
     }
 
@@ -471,7 +467,7 @@ static void ipa_bmp_draw(wmfAPI *API, wmfBMP_Draw_t *bmp_draw)
       crop_info.height = bmp_draw->crop.h;
 
       handler=SetMonitorHandler((MonitorHandler) NULL);
-      crop_image = CropImage(image, &crop_info, &exception);
+      crop_image = CropImage(image, &crop_info, &ddata->image->exception);
       (void) SetMonitorHandler(handler);
       if (crop_image)
         {
@@ -479,11 +475,9 @@ static void ipa_bmp_draw(wmfAPI *API, wmfBMP_Draw_t *bmp_draw)
           image = crop_image;
           bmp_draw->bmp.data = (void*)image;
         }
-      else
-        CopyException(&ddata->image->exception,&exception);
     }
 
-  (void) QueryColorDatabase("white", &white, &exception);
+  (void) QueryColorDatabase("white", &white, &ddata->image->exception);
 
   if (ddata->image_info->texture ||
       !(ColorMatch(&ddata->image_info->background_color, &white)) ||
@@ -540,9 +534,8 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
   MonitorHandler
     handler;
 
-  bmp_read->bmp.data = 0;
-
   GetExceptionInfo(&exception);
+  bmp_read->bmp.data = 0;
 
   image_info = CloneImageInfo((ImageInfo *) 0);
   (void) strlcpy(image_info->magick,"DIB",sizeof(image_info->magick));
@@ -572,6 +565,7 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
       FormatString(description,"packed DIB at offset %ld", bmp_read->offset);
       ThrowException2(&ddata->image->exception,CorruptImageError,
                       exception.reason,exception.description);
+      DestroyExceptionInfo(&exception);
     }
   else
     {
@@ -678,11 +672,6 @@ static void ipa_device_begin(wmfAPI * API)
       ImageInfo
         *image_info;
 
-      ExceptionInfo
-        exception;
-
-      GetExceptionInfo(&exception);
-
       image_info = CloneImageInfo((ImageInfo *) 0);
       (void) strlcpy(image_info->filename, ddata->image_info->texture,
                      sizeof(image_info->filename));
@@ -690,7 +679,7 @@ static void ipa_device_begin(wmfAPI * API)
       if (ddata->image_info->size)
         (void) CloneString(&image_info->size,ddata->image_info->size);
 
-      image = ReadImage(image_info,&exception);
+      image = ReadImage(image_info,&ddata->image->exception);
       DestroyImageInfo(image_info);
       if (image)
         {
@@ -715,7 +704,6 @@ static void ipa_device_begin(wmfAPI * API)
       else
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"reading texture image failed!");
-          CopyException(&ddata->image->exception,&exception);
         }
     }
 
@@ -1710,11 +1698,6 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
             const Image
               *image;
 
-            ExceptionInfo
-              exception;
-
-            GetExceptionInfo(&exception);
-
             image = (Image*)brush_bmp->data;
 
             mode = CopyCompositeOp;  /* Default is copy */
@@ -2212,9 +2195,6 @@ static void lite_font_map(wmfAPI* API, wmfFont* font)
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData(API);
 
-  ExceptionInfo
-    exception;
-
   const TypeInfo
     *type_info,
     *type_info_base;
@@ -2232,13 +2212,9 @@ static void lite_font_map(wmfAPI* API, wmfFont* font)
 
   MagickFreeMemory(magick_font->ps_name);
 
-  GetExceptionInfo(&exception);
-  type_info_base=GetTypeInfo("*",&exception);
-  if (type_info_base == 0)
-    {
-      CopyException(&ddata->image->exception,&exception);
-      return;
-    }
+  type_info_base=GetTypeInfo("*",&ddata->image->exception);
+  if (type_info_base == (const TypeInfo *) NULL)
+    return;
 
   /* Certain short-hand font names are not the proper Windows names
      and should be promoted to the proper names */

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1679,7 +1679,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       magick_off_t
         oldPos;
 
-      magick_uint32_t
+      unsigned int
         previous_offset;
 
       if (CheckImagePixelLimits(image, exception) != MagickPass)
@@ -1703,14 +1703,14 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Layer Offset[%lu] = %" MAGICK_UINT32_F "u",
+                                  "Layer Offset[%lu] = %u",
                                   number_layers, offset);
 
           if (offset >= doc_info.file_size)
             {
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "Layer Offset %" MAGICK_UINT32_F "u"
+                                      "Layer Offset %u"
                                       " is outside of file bounds",
                                       offset);
               ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
@@ -1722,7 +1722,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
             {
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "Layer Offset %" MAGICK_UINT32_F "u"
+                                      "Layer Offset %u"
                                       " is not ascending",
                                       offset);
               ThrowReaderException(CorruptImageError,ImproperImageHeader,image);

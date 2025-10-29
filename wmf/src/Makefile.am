@@ -3,24 +3,24 @@ LIBHEAVY = libwmf.la
 DIRHEAVY = extra ipa . convert
 DEFHEAVY = -DLIBWMF_INCLUDE_TRIO_H=1
 else
-LIBHEAVY = 
+LIBHEAVY =
 DIRHEAVY = .
-DEFHEAVY = 
+DEFHEAVY =
 endif
 
 if LIBWMF_GDK_PIXBUF
 GDK_PIXBUF_PLUGIN = io-wmf.la
 GDK_PIXBUF_DEFS = -DGDK_PIXBUF_ENABLE_BACKEND=1
 else
-GDK_PIXBUF_PLUGIN = 
-GDK_PIXBUF_DEFS = 
+GDK_PIXBUF_PLUGIN =
+GDK_PIXBUF_DEFS =
 endif
 
 DIST_SUBDIRS = extra ipa . convert
 
 SUBDIRS = $(DIRHEAVY)
 
-CFLAGS = @CFLAGS@ @WMF_CFLAGS@ @GDK_PIXBUF_CFLAGS@
+AM_CFLAGS += @GDK_PIXBUF_CFLAGS@
 
 DEFS = @DEFS@ @WMF_DEFS@ $(DEFHEAVY) $(GDK_PIXBUF_DEFS) \
 	-DPACKAGE=\"@PACKAGE@\" \
@@ -31,13 +31,13 @@ DEFS = @DEFS@ @WMF_DEFS@ $(DEFHEAVY) $(GDK_PIXBUF_DEFS) \
 	-DWMF_XTRA_FONTMAP=\"@WMF_XTRA_FONTMAP@\" \
 	-DWMF_GS_FONTMAP=\"@WMF_GS_FONTMAP@\"
 
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_builddir)
+AM_CPPFLAGS += -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_builddir)
 
 lib_LTLIBRARIES = libwmflite.la $(LIBHEAVY)
 
 libwmflite_la_SOURCES = api.c bbuf.c meta.c player.c recorder.c
 
-libwmflite_la_LDFLAGS = -lm \
+libwmflite_la_LDFLAGS = $(SYS_LIBM) \
 	-no-undefined \
 	-version-info $(LT_LITE_CURRENT):$(LT_LITE_REVISION):$(LT_LITE_AGE) \
 	-release $(LT_RELEASE) -export-dynamic
@@ -47,16 +47,16 @@ libwmf_la_SOURCES = font.c stream.c wmf.c xml.c
 if LIBWMF_OPT_TRIO
 LIBTRIO = extra/trio/libtrio.la
 else
-LIBTRIO = 
+LIBTRIO =
 endif
 
 if LIBWMF_OPT_SYS_GD
-LIBGD = 
+LIBGD =
 else
 LIBGD = extra/gd/libgd.la
 endif
 
-libwmf_la_LIBADD = ipa/libipa.la libwmflite.la $(LIBGD) $(LIBTRIO) @WMF_LIBFLAGS@
+libwmf_la_LIBADD = ipa/libipa.la libwmflite.la $(LIBGD) $(LIBTRIO)
 
 libwmf_la_LDFLAGS = \
 	-no-undefined \
@@ -69,7 +69,7 @@ loader_LTLIBRARIES = $(GDK_PIXBUF_PLUGIN)
 
 io_wmf_la_SOURCES = io-wmf.c
 
-io_wmf_la_LIBADD = libwmf.la @GDK_PIXBUF_LIBS@
+io_wmf_la_LIBADD = libwmf.la libwmflite.la @GDK_PIXBUF_LIBS@
 
 io_wmf_la_LDFLAGS = -no-undefined -module -avoid-version
 

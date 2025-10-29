@@ -1,4 +1,4 @@
-# Copyright (C) 2008 - 2024 GraphicsMagick Group
+# Copyright (C) 2008-2025 GraphicsMagick Group
 
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -59,6 +59,7 @@ RST2HTML_TARGETS = \
 	$(WWWDIR)/ChangeLog-2021.html \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
+	$(WWWDIR)/ChangeLog-2024.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -180,6 +181,7 @@ WWW_HTML_FILES = \
 	$(WWWDIR)/ChangeLog-2021.html \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
+	$(WWWDIR)/ChangeLog-2024.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -247,7 +249,7 @@ WWW_HTML_FILES = \
 	$(WWWDIR)/utilities.html\
 	$(WWWDIR)/wand/wand.html
 
-WWWW_EXTRA_DIST=$(WWW_HTML_FILES) $(WWW_RST_FILES)
+WWW_EXTRA_DIST=$(WWW_HTML_FILES) $(WWW_RST_FILES)
 
 WWW_MAINTAINER_TARGETS=$(WWW_HTML_FILES) $(WWWDIR)/color.html
 
@@ -282,6 +284,10 @@ CHANGELOG2RST=$(top_srcdir)/scripts/changelog2rst.sh
 $(top_srcdir)/www/ChangeLog.rst: $(top_srcdir)/ChangeLog
 	@printf "Updating $@ ...\n"
 	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog' < $^ > $@
+
+$(top_srcdir)/www/ChangeLog-2024.rst: $(top_srcdir)/ChangeLog.2024
+	@printf "Updating $@ ...\n"
+	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog - 2024' < $^ > $@
 
 $(top_srcdir)/www/ChangeLog-2023.rst: $(top_srcdir)/ChangeLog.2023
 	@printf "Updating $@ ...\n"

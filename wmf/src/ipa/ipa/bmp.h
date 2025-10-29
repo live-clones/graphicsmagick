@@ -127,7 +127,8 @@ static int ipa_b64_sink (void* context,const char* buffer,int length)
 	int i = 0;
 
 	while (i < length)
-	{	b64->buffer[b64->length] = buffer[i];
+	{	// coverity[overrun-local : FALSE] - coverity seems to fail to see that ipa_b64_flush resets length to 0
+		b64->buffer[b64->length] = buffer[i];
 		i++;
 		b64->length++;
 		if (b64->length == IPA_B64_BUFLEN) ipa_b64_flush (context);
@@ -512,8 +513,8 @@ wmfBMP wmf_ipa_bmp_copy (wmfAPI* API,wmfBMP* bmp,unsigned int width,unsigned int
 	float x;
 	float y;
 
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 
 	int opacity;
 
@@ -601,7 +602,7 @@ int wmf_ipa_bmp_color (wmfAPI* API,wmfBMP* bmp,wmfRGB* rgb,unsigned int x,unsign
 	rgb->g = 0;
 	rgb->b = 0;
 
-	if (bmp->data && (x >= 0) && (x < bmp->width) && (y >= 0) && (y < bmp->height))
+	if (bmp->data && x < bmp->width && y < bmp->height)
 	{	status = ExtractColor (API,bmp,rgb,x,y);
 	}
 	else if ((API->flags & WMF_OPT_IGNORE_NONFATAL) == 0)
@@ -642,22 +643,14 @@ int wmf_ipa_bmp_interpolate (wmfAPI* API,wmfBMP* bmp,wmfRGB* rgb,float x,float y
 	j1 = (unsigned int) floor (y);
 	j2 = (unsigned int) ceil (y);
 
-	if (i1 >= (bmp->width - 2))
+	if (i1 >= (unsigned int)(bmp->width - 2))
 	{	i1 = bmp->width - 2;
 		i2 = bmp->width - 1;
 	}
-	if (i1 < 0)
-	{	i1 = 0;
-		i2 = 1;
-	}
 
-	if (j1 >= (bmp->height - 2))
+	if (j1 >= (unsigned int)(bmp->height - 2))
 	{	j1 = bmp->height - 2;
 		j2 = bmp->height - 1;
-	}
-	if (j1 < 0)
-	{	j1 = 0;
-		j2 = 1;
 	}
 
 	if ((i1 == i2) && (j1 == j2)) return (wmf_ipa_bmp_color (API,bmp,rgb,i1,j1));
@@ -713,7 +706,7 @@ void wmf_ipa_bmp_setcolor (wmfAPI* API,wmfBMP* bmp,wmfRGB* rgb,unsigned char opa
 {
 	/* WMF_DEBUG (API,"~~~~~~~~wmf_[ipa_]bmp_setcolor"); */
 
-	if (bmp->data && (x >= 0) && (x < bmp->width) && (y >= 0) && (y < bmp->height))
+	if (bmp->data && x < bmp->width && y < bmp->height)
 	{	SetColor (API,bmp,rgb,opacity,x,y);
 	}
 	else if ((API->flags & WMF_OPT_IGNORE_NONFATAL) == 0)
@@ -814,8 +807,8 @@ static unsigned short ReadBlobLSBShort (BMPSource* src)
 	return (value);
 }
 
-static unsigned long ReadBlobLSBLong (BMPSource* src)
-{	unsigned long value;
+static unsigned int ReadBlobLSBLong (BMPSource* src)
+{	unsigned int value;
 
 	unsigned char buffer[4];
 
@@ -859,7 +852,7 @@ static long TellBlob (BMPSource* src)
 %
 %
 */
-static void DecodeImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src,unsigned int compression,unsigned char* pixels)
+static int DecodeImage (wmfBMP* bmp,BMPSource* src,unsigned int compression,unsigned char* pixels)
 {	int byte;
 	int count;
 	int i;
@@ -870,12 +863,14 @@ static void DecodeImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src,unsigned int com
 	U32 u;
 
 	unsigned char* q;
+	unsigned char* end;
 
 	for (u = 0; u < ((U32) bmp->width * (U32) bmp->height); u++) pixels[u] = 0;
 
 	byte = 0;
 	x = 0;
 	q = pixels;
+	end = pixels + bmp->width * bmp->height;
 
 	for (y = 0; y < bmp->height; )
 	{	count = ReadBlobByte (src);
@@ -884,7 +879,10 @@ static void DecodeImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src,unsigned int com
 		{	/* Encoded mode. */
 			byte = ReadBlobByte (src);
 			for (i = 0; i < count; i++)
-			{	if (compression == 1)
+			{	
+				if (q == end)
+					return 0;
+			 	if (compression == 1)
 				{	(*(q++)) = (unsigned char) byte;
 				}
 				else
@@ -896,13 +894,15 @@ static void DecodeImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src,unsigned int com
 		else
 		{	/* Escape mode. */
 			count = ReadBlobByte (src);
-			if (count == 0x01) return;
+			if (count == 0x01) return 1;
 			switch (count)
 			{
 			case 0x00:
 			 {	/* End of line. */
 				x = 0;
 				y++;
+				if (y >= bmp->height)
+					return 0;
 				q = pixels + y * bmp->width;
 				break;
 			 }
@@ -910,13 +910,20 @@ static void DecodeImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src,unsigned int com
 			 {	/* Delta mode. */
 				x += ReadBlobByte (src);
 				y += ReadBlobByte (src);
+				if (y >= bmp->height)
+					return 0;
+				if (x >= bmp->width)
+					return 0;
 				q = pixels + y * bmp->width + x;
 				break;
 			 }
 			default:
 			 {	/* Absolute mode. */
 				for (i = 0; i < count; i++)
-				{	if (compression == 1)
+				{
+					if (q == end)
+						return 0;
+					if (compression == 1)
 					{	(*(q++)) = ReadBlobByte (src);
 					}
 					else
@@ -940,10 +947,10 @@ static void DecodeImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src,unsigned int com
 		}
 /* ?? TODO 	if (QuantumTick (y,image->rows)) MagickMonitor (LoadImageText,y,image->rows); */
 	}
-	byte = ReadBlobByte (src);  /* end of line */
-	byte = ReadBlobByte (src);
+	ReadBlobByte (src);  /* end of line */
+	ReadBlobByte (src);
 
-	return;
+	return 1;
 }
 
 /*
@@ -981,8 +988,6 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 {	BMPInfo bmp_info;
 
 	BMPData* data = 0;
-
-	int byte;
 
 	long start_position = 0;
 
@@ -1037,7 +1042,7 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 
 		bmp_info.colors_important = ReadBlobLSBLong (src);
 
-		for (u = 0; u < (bmp_info.size - 40); u++) byte = ReadBlobByte (src);
+		for (u = 0; u < (bmp_info.size - 40); u++) ReadBlobByte (src);
 
 		if ( (bmp_info.compression == 3)
 		  && ((bmp_info.bits_per_pixel == 16) || (bmp_info.bits_per_pixel == 32)) )
@@ -1118,7 +1123,7 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	}
 
 	while (TellBlob (src) < (long) (start_position + bmp_info.offset_bits))
-	{	byte = ReadBlobByte (src);
+	{	ReadBlobByte (src);
 	}
 
 	/* Read image data. */
@@ -1143,8 +1148,18 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 		}
 	}
 	else
-	{	/* Convert run-length encoded raster pixels. */
-		DecodeImage (API,bmp,src,(unsigned int) bmp_info.compression,data->image);
+	{
+		if (bmp_info.bits_per_pixel == 8)	/* Convert run-length encoded raster pixels. */
+		{
+			if (!DecodeImage (bmp,src,(unsigned int) bmp_info.compression,data->image))
+			{	WMF_ERROR (API,"corrupt bmp");
+				API->err = wmf_E_BadFormat;
+			}
+		}
+		else
+		{	WMF_ERROR (API,"Unexpected pixel depth");
+			API->err = wmf_E_BadFormat;
+		}
 	}
 
 	if (ERR (API))

@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ==============================
 Contributing to GraphicsMagick
@@ -43,8 +43,8 @@ increased significantly if you have a proven track-record of success
 on other open source projects, are a recognized expert in the field,
 or have already demonstrated your capabilities and commitment by
 contributing to the project in other ways. Please contact Bob
-Friesenhahn <bobjfriesenhahn@gmail.com> in order to be considered for
-group membership.
+Friesenhahn <bobjfriesenhahn@gmail.com> in order to be
+considered for group membership.
 
 Areas To Contribute
 -------------------
@@ -52,7 +52,7 @@ Areas To Contribute
 The following are areas where significant contributions may be made to
 the GraphicsMagick project:
 
-* Create a language interface using SWIG <http://www.swig.org/> to
+* Create a language interface using SWIG <https://www.swig.org/> to
   support scripting in Perl, Python, TCL/TK, Guile, MzScheme, Ruby,
   Java, PHP, and CHICKEN, based on a common implementation.
 
@@ -61,11 +61,11 @@ the GraphicsMagick project:
   replace the existing error-prone command parsers in magick/command.c
 
 * Create a vector encoder for EPS, Postscript, PDF, SVG
-  <http://www.w3.org/Graphics/SVG/>, WebCGM
-  <http://www.w3.org/Graphics/WebCGM/>, or WMF.
+  <https://www.w3.org/Graphics/SVG/>, WebCGM
+  <https://www.w3.org/Graphics/WebCGM/>, or WMF.
 
 * Create an OpenEXR coder based on the OpenEXR
-  <http://www.openexr.com/> library from Industrial Light & Magic.
+  <https://www.openexr.com/> library from Industrial Light & Magic.
 
 * Create a *pstoedit* module to import Postscript, EPS, and PDF
   files as vector data using pstoedit <http://www.pstoedit.net/> which
@@ -74,20 +74,20 @@ the GraphicsMagick project:
   formats using pstoedit's output drivers.
 
 * Add integrated Adobe XMP
-  <http://www.adobe.com/products/xmp/index.html> profile support for
+  <https://www.adobe.com/products/xmp/index.html> profile support for
   TIFF, JPEG, PNG, PDF, EPS, and Postscript.
 
 * Port Erik Reinhard's super-cool Parameter Estimation For
   Photographic Tone Reproduction
-  <http://www.cs.ucf.edu/~reinhard/Reinhard02/> algorithm to
+  <https://doi.org/10.1080/10867651.2002.10487554> algorithm to
   GraphicsMagick.
 
 * Create portable GUI which can work under Microsoft Windows, OS-X,
   X11, and Wayland (via a portable widget toolkit), to replace the
   outdated X11 GUI implmentation.
 
-* Create an interface between GraphicsMagick and OpenOffice.org.
-  <http://www.openoffice.org/> so that OpenOffice may load and save
-  any format supported by GraphicsMagick. OpenOffice.org offers a
-  separate SDK so there may be a number of other opportunities to
-  explore.
+* Create an interface between GraphicsMagick and Apache OpenOffice
+  <https://www.openoffice.org/> or LibreOffice
+  <https://www.libreoffice.org/ so that Apache OpenOffice and/or
+  LibreOffice may load and save any format supported by
+  GraphicsMagick.

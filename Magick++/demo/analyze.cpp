@@ -2,12 +2,13 @@
 // Demonstrate using the 'analyze' process module to compute
 // image statistics.
 //
-// Copyright Bob Friesenhahn, 2003, 2004
+// Copyright Bob Friesenhahn, 2003-2024
 //
 // Usage: analyze file...
 //
 
 #include <Magick++.h>
+#include <cstdlib>
 #include <iostream>
 #include <iomanip>
 #include <list>
@@ -18,11 +19,11 @@ int main(int argc,char **argv)
   if ( argc < 2 )
     {
       cout << "Usage: " << argv[0] << " file..." << endl;
-      exit( 1 );
+      return EXIT_FAILURE;
     }
 
-  // Initialize ImageMagick install location for Windows
-  InitializeMagick(*argv);
+  // Initialize/Deinitialize GraphicsMagick (scope based)
+  InitializeMagickSentinel sentinel(*argv);
 
   {
     std::list<std::string> attributes;
@@ -45,7 +46,7 @@ int main(int argc,char **argv)
           Image image( fname );
 
           /* Analyze module does not require an argument list */
-          image.process("analyze",0,0);
+          image.process("Analyze",0,0);
 
           list<std::string>::iterator pos = attributes.begin();
           while(pos != attributes.end())
@@ -58,10 +59,11 @@ int main(int argc,char **argv)
         catch( Exception &error_ )
           {
             cout << error_.what() << endl;
+            return EXIT_FAILURE;
           }
         ++arg;
       }
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

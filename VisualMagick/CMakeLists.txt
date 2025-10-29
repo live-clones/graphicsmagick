@@ -9,7 +9,7 @@ if(MSVC)
   add_compile_options(/W4)
 endif()
 
-add_compile_definitions(_AFXDLL WINVER=0x500 _CRT_SECURE_NO_WARNINGS)
+add_compile_definitions(_AFXDLL WINVER=0x501 _CRT_SECURE_NO_WARNINGS)
 
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

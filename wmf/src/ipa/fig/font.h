@@ -63,9 +63,8 @@ static void wmf_fig_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 
 	figPoint pt;
 
-	char* ps_name = 0;
+	const char* ps_name = 0;
 
-	float ratio;
 	float theta;
 
 	int i;
@@ -78,24 +77,15 @@ static void wmf_fig_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 	unsigned int font_flags;
 
 	unsigned long pen_color;
-	unsigned long bg_color;
 	unsigned long height;
 
 	WMF_DEBUG (API,"~~~~~~~~wmf_[fig_]draw_text");
 
 	if (out == 0) return;
 
-	if (WMF_DC_OPAQUE (draw_text->dc))
-	{	bg_color = wmf_ipa_color_index (API,WMF_DC_BACKGROUND (draw_text->dc));
-
-		/* TODO */
-	}
-
 	font = WMF_DC_FONT (draw_text->dc);
 
 	height = draw_text->font_height;
-
-	ratio = (float) draw_text->font_ratio;
 
 	/* In radians: */
 	theta = (float) (WMF_TEXT_ANGLE (font));
@@ -115,9 +105,12 @@ static void wmf_fig_draw_text (wmfAPI* API,wmfDrawText_t* draw_text)
 	
 	fig_font = -1; /* Default. */
 	ps_name = WMF_FONT_PSNAME (font);
-	for (i = 0; i < 35; i++)
-	{	if (strcmp (ps_name,PSFontNo[i].PS_FontName) == 0)
-		{	fig_font = PSFontNo[i].FIG_FontNumber;
+	if (ps_name)
+	{
+		for (i = 0; i < 35; i++)
+		{	if (strcmp (ps_name,PSFontNo[i].PS_FontName) == 0)
+			{	fig_font = PSFontNo[i].FIG_FontNumber;
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -406,6 +406,38 @@ MagickExport MagickPassFail RGBTransformImage(Image *image,
       (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                             "Log Transform: ReferenceWhite=%g ReferenceBlack=%g DisplayGamma=%g FilmGamma=%g",
                             ReferenceWhite,ReferenceBlack,DisplayGamma,NegativeFilmGamma);
+
+      if (ReferenceWhite <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal reference-white value %g!", ReferenceWhite);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                ReferenceWhiteIsOutOfRange);
+        }
+
+      if (ReferenceBlack < 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal reference-black value %g!", ReferenceBlack);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                ReferenceBlackIsOutOfRange);
+        }
+
+      if (DisplayGamma <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal display-gamma value %g!", DisplayGamma);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                DisplayGammaIsOutOfRange);
+        }
+
+      if (NegativeFilmGamma <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal film-gamma value %g!", NegativeFilmGamma);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                FilmGammaIsOutOfRange);
+        }
 
       /*
         FIXME: Math seems to be producing data with gamma 1.0 rather than 1.7.
@@ -1486,6 +1518,45 @@ MagickExport MagickPassFail TransformRGBImage(Image *image,
       (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                             "Log Transform: ReferenceWhite=%g ReferenceBlack=%g DisplayGamma=%g FilmGamma=%g SoftClip=%g",
                             ReferenceWhite,ReferenceBlack,DisplayGamma,NegativeFilmGamma,SoftClip);
+            if (ReferenceWhite <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal reference-white value %g!", ReferenceWhite);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                ReferenceWhiteIsOutOfRange);
+        }
+
+      if (ReferenceBlack < 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal reference-black value %g!", ReferenceBlack);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                ReferenceBlackIsOutOfRange);
+        }
+
+      if (DisplayGamma <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal display-gamma value %g!", DisplayGamma);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                DisplayGammaIsOutOfRange);
+        }
+
+      if (NegativeFilmGamma <= 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal film-gamma value %g!", NegativeFilmGamma);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                FilmGammaIsOutOfRange);
+        }
+
+      if (SoftClip < 0.0)
+        {
+          (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                "Illegal soft-clip-offset value %g!", SoftClip);
+          ThrowBinaryException3(OptionError,UnableToCineonLogRGBTransformColorspace,
+                                SoftClipOffsetIsOutOfRange);
+        }
 
       BreakPoint=ReferenceWhite-SoftClip;
       Gain=MaxLinearValue/(1.0 - pow(pow(10,((ReferenceBlack-ReferenceWhite)

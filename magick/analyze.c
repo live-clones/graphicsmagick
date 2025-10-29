@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -89,6 +89,9 @@ MagickExport RectangleInfo GetImageBoundingBox(const Image *image,
   bounds.height=0;
   bounds.x=(long) image->columns;
   bounds.y=(long) image->rows;
+
+  if ((image->columns == 0) || (image->rows == 0))
+    return(bounds);
 
   (void) AcquireOnePixelByReference(image,&corners[0],0,0,exception);
   (void) AcquireOnePixelByReference(image,&corners[1],(long) image->columns-1,0,exception);

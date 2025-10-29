@@ -48,6 +48,9 @@ static void s_rbox_set (wmfAPI * API, wmfConstruct * construct,
     {
       WMF_ERROR (API, "Hmm. Record out of range...");
       API->err = wmf_E_Glitch;
+      rbox->start = NULL;
+      rbox->end   = NULL;
+      rbox->ptr   = NULL;
       return;
     }
   rbox->start = construct->buffer + construct->rec_offset[n  ];
@@ -403,7 +406,7 @@ int wmf_canvas_set_pen (wmfAPI * API, wmfCanvas * canvas,
       endcap = 0;
     }
   join &= 0xf000;
-  if (endcap > 0x2000)
+  if (join > 0x2000)
     {
       WMF_DEBUG (API, "Attempt to set unsupported join style.");
       join = 0;
@@ -483,7 +486,7 @@ int wmf_canvas_set_font (wmfAPI * API, wmfCanvas * canvas, const char * name,
 			 unsigned short strike, unsigned short uscore, unsigned short encode,
 			 unsigned short pitch)
 {
-  size_t length;
+  int length;
 
   wmfConstruct * construct = (wmfConstruct *) canvas;
 
@@ -595,8 +598,8 @@ static int s_create_pen (wmfAPI * API, wmfConstruct * construct)
 {
   unsigned long Size = 3 + 5;
 
-  unsigned short rg;
-  unsigned short b;
+  unsigned short rg = 0;
+  unsigned short b = 0;
 
   wmfRecordBox rbox;
 
@@ -626,8 +629,8 @@ static int s_create_brush (wmfAPI * API, wmfConstruct * construct)
 {
   unsigned long Size = 3 + 4;
 
-  unsigned short rg;
-  unsigned short b;
+  unsigned short rg = 0;
+  unsigned short b = 0;
 
   wmfRecordBox rbox;
 
@@ -659,7 +662,7 @@ static int s_create_font (wmfAPI * API, wmfConstruct * construct)
 
   unsigned short i;
   unsigned short cc;
-  unsigned short length = (unsigned short)((strlen (construct->font.name) + 1) / 2);
+  unsigned short length = (strlen (construct->font.name) + 1) / 2;
 
   unsigned long Size = 3 + 9 + length;
 
@@ -764,7 +767,7 @@ int wmf_canvas_set_polyfill (wmfAPI * API, wmfCanvas * canvas, unsigned short mo
   if ((mode != ALTERNATE) && (mode != WINDING))
     {
       WMF_ERROR (API, "Unexpected polygon fill mode! Expected one of ALTERNATE or WINDING");
-      return -1;
+      return 0;
     }
   if (construct->polyfill == mode) return 0;
 
@@ -877,8 +880,8 @@ static int s_set_bgcolor (wmfAPI * API, wmfConstruct * construct)
 {
   unsigned long Size = 3 + 2;
 
-  unsigned short rg;
-  unsigned short b;
+  unsigned short rg = 0;
+  unsigned short b = 0;
 
   wmfRecordBox rbox;
 
@@ -932,8 +935,8 @@ static int s_set_textcolor (wmfAPI * API, wmfConstruct * construct)
 {
   unsigned long Size = 3 + 2;
 
-  unsigned short rg;
-  unsigned short b;
+  unsigned short rg = 0;
+  unsigned short b = 0;
 
   wmfRecordBox rbox;
 
@@ -974,9 +977,11 @@ int wmf_canvas_line (wmfAPI * API, wmfCanvas * canvas,
 		     unsigned short x1, unsigned short y1,
 		     unsigned short x2, unsigned short y2)
 {
+#if 0  
   unsigned long Size = 3 + 2;
 
-  /* wmfRecordBox rbox; */
+  wmfRecordBox rbox;
+#endif
 
   wmfConstruct * construct = (wmfConstruct *) canvas;
 
@@ -1576,7 +1581,7 @@ int wmf_canvas_text (wmfAPI * API, wmfCanvas * canvas,
 
   if ((construct == 0) || (str == 0)) return -1;
 
-  length = (unsigned short)((strlen (str) + 1) / 2); /* TODO: do conversion from UTF-8 to... ?? */
+  length = (strlen (str) + 1) / 2; /* TODO: do conversion from UTF-8 to... ?? */
   if (length == 0) return 0;
 
   Size += length;
@@ -1663,7 +1668,7 @@ int wmf_canvas_bitmap (wmfAPI * API, wmfCanvas * canvas,
       WMF_ERROR (API, "Coordinate out of range! (y > 0x7fff)");
       return -1;
     }
-  if ((bmp_size = s_bmp_query (API, buffer, length, &bmp_width, &bmp_height)) == 0)
+  if ((bmp_size = s_bmp_query ()) == 0)
     {
       WMF_ERROR (API, "Bad bitmap!");
       return -1;
@@ -1698,9 +1703,7 @@ int wmf_canvas_bitmap (wmfAPI * API, wmfCanvas * canvas,
   return 0;
 }
 
-static unsigned long s_bmp_query (wmfAPI * API,
-				  const unsigned char * buffer, unsigned long length,
-				  unsigned short * bmp_width, unsigned short * bmp_height)
+static unsigned long s_bmp_query (void)
 {
   return 0;
 }

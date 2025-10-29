@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2017 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -176,7 +176,8 @@ MagickExport MagickPassFail DescribeImage(Image *image,FILE *file,
         least six times the timer's resolution (typically 0.01 on
         Unix).
       */
-      if (!(image->ping) && (elapsed_time >= GetTimerResolution()*6))
+      if (!(image->ping) && (elapsed_time > 0.001) &&
+          (elapsed_time >= GetTimerResolution()*6))
         {
           pixels_per_second=(magick_int64_t) ((double) rows*columns/
                                               elapsed_time);

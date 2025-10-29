@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (c) 2000 Markus Friedl.  All rights reserved.
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
@@ -1625,7 +1625,8 @@ MagickExport MagickPassFail GetExecutionPathUsingName(char *path)
 %      string.
 %
 %    o image_geometry:  Specifies a character string representing the geometry
-%      specification.
+%      specification in the form
+%      <width>x<height>{+-}<x>{+-}<y>{%}{@}{!}{^}{<}{>}.
 %
 %    o x,y:  The x and y offset as determined by the geometry specification is
 %      returned here.
@@ -2146,10 +2147,10 @@ MagickExport int GetMagickGeometry(const char *geometry,long *x,long *y,
     return(flags);
 
 #if 0
-      fprintf(stderr,"WidthValue=%u, HeightValue=%u width=%lu, height=%lu\n",
-              flags & WidthValue ? 1 : 0,
-              flags & HeightValue ? 1 : 0,
-              *width,*height);
+  fprintf(stderr,"WidthValue=%u, HeightValue=%u width=%lu, height=%lu\n",
+          flags & WidthValue ? 1 : 0,
+          flags & HeightValue ? 1 : 0,
+          *width,*height);
 #endif
 
   if (flags & AreaValue) /* @  */
@@ -2170,36 +2171,40 @@ MagickExport int GetMagickGeometry(const char *geometry,long *x,long *y,
         target_area=(double) (*width);
       if (flags & HeightValue)
         target_area *= (double) (*height);
-      original_area=(double) former_width*former_height;
-      resize=MagickFalse;
-      if (flags & GreaterValue)
-        {
-          /* Resize if image area greater than target */
-          if (original_area > target_area)
-            resize=MagickTrue;
-        }
-      else if (flags & LessValue)
-        {
-          /* Resize if image area less than target */
-          if (original_area < target_area)
-            resize=MagickTrue;
-        }
-      else
-        {
-          /* Always resize */
-          resize=MagickTrue;
-        }
 
-      if (resize)
+      if (target_area > 0.25)
         {
-          scale_factor=1.0/sqrt(original_area/target_area);
-          *width=(unsigned long) floor(former_width*scale_factor+0.25);
-          *height=(unsigned long) floor(former_height*scale_factor+0.25);
-        }
-      else
-        {
-          *width=former_width;
-          *height=former_height;
+          original_area=(double) former_width*former_height;
+          resize=MagickFalse;
+          if (flags & GreaterValue)
+            {
+              /* Resize if image area greater than target */
+              if (original_area > target_area)
+                resize=MagickTrue;
+            }
+          else if (flags & LessValue)
+            {
+              /* Resize if image area less than target */
+              if (original_area < target_area)
+                resize=MagickTrue;
+            }
+          else
+            {
+              /* Always resize */
+              resize=MagickTrue;
+            }
+
+          if (resize)
+            {
+              scale_factor=1.0/sqrt(original_area/target_area);
+              *width=(unsigned long) floor(former_width*scale_factor+0.25);
+              *height=(unsigned long) floor(former_height*scale_factor+0.25);
+            }
+          else
+            {
+              *width=former_width;
+              *height=former_height;
+            }
         }
     }
   else
@@ -2332,7 +2337,7 @@ MagickExport char *GetPageGeometry(const char *page_geometry)
   static const struct
   {
     char
-      name[11];
+      name[12];
 
     unsigned char
        name_length;
@@ -3723,6 +3728,31 @@ MagickExport MagickPassFail MagickAtoULChk(const char *str, unsigned long *value
 }
 
 /*
+  Access to the 'long long' type is assured by C'99
+*/
+MagickExport MagickPassFail MagickAtoULLChk(const char *str, unsigned long long *value)
+{
+  MagickPassFail status = MagickPass;
+  char *estr=0;
+  long long lvalue;
+  lvalue=strtoll(str,&estr, 10);
+  if (str == estr)
+    {
+      lvalue=0L;
+      status=MagickFail;
+      errno=EINVAL;
+    }
+  else if ((long long) ((unsigned long long) lvalue) != lvalue)
+    {
+      lvalue=0LL;
+      status=MagickFail;
+      errno=ERANGE;
+    }
+  *value=(unsigned long long) lvalue;
+  return status;
+}
+
+/*
   Convert a double to a long, with clipping.
   Someday a warning or an error may be produced here.
 */
@@ -4788,23 +4818,32 @@ MagickExport MagickPassFail MagickCreateDirectoryPath(const char *dir,
   unsigned int
     directory_mode;
 
-#if defined(S_IRWXU)
+#if !defined(MSWINDOWS)
+
+#  if defined(S_IRWXU)
   directory_mode = S_IRWXU;
-#else
+#  else
   directory_mode = 0777;
-#endif
-#if defined(S_IRGRP)
+#  endif /* if defined(S_IRWXU) */
+
+#  if defined(S_IRGRP)
   directory_mode |= S_IRGRP;
-#endif
-#if defined(S_IXGRP)
+#  endif /* if defined(S_IRGRP) */
+#  if defined(S_IXGRP)
   directory_mode |= S_IXGRP;
-#endif
-#if defined(S_IROTH)
+#  endif /*if defined(S_IXGRP) */
+#  if defined(S_IROTH)
   directory_mode |= S_IROTH;
-#endif
-#if defined(S_IXOTH)
+#  endif /* if defined(S_IROTH) */
+#  if defined(S_IXOTH)
   directory_mode |= S_IXOTH;
-#endif
+#  endif /* if defined(S_IXOTH) */
+
+#else
+
+  (void) directory_mode;
+
+#endif /* if !defined(MSWINDOWS) */
 
   dir_len = strlen(dir);
   end = dir + dir_len;
@@ -5735,7 +5774,11 @@ SubstituteString(char **buffer,const char *search,const char *replace)
       if ((p[i] == search[0]) && (strncmp(&p[i],search,search_len) == 0))
         {
           if (0 == replace_len)
-            replace_len=strlen(replace);
+            {
+              replace_len=strlen(replace);
+              if (replace_len == 0)
+                break;
+            }
           if (replace_len > search_len)
             {
               size_t
@@ -5754,7 +5797,7 @@ SubstituteString(char **buffer,const char *search,const char *replace)
             (void) MagickCloneMemory(&p[i+replace_len],&p[i+search_len],
                                      strlen(&p[i+search_len])+1);
           (void) MagickCloneMemory(&p[i],replace,replace_len);
-          i += replace_len;
+          i += (replace_len-1);
           replaced=MagickTrue;
         }
     }

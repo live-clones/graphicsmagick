@@ -530,6 +530,7 @@
 #define MagickAtoLChk GmMagickAtoLChk
 #define MagickAtoUIChk GmMagickAtoUIChk
 #define MagickAtoULChk GmMagickAtoULChk
+#define MagickAtoULLChk GmMagickAtoULLChk
 #define MagickBitStreamInitializeRead GmMagickBitStreamInitializeRead
 #define MagickBitStreamInitializeWrite GmMagickBitStreamInitializeWrite
 #define MagickBitStreamMSBRead GmMagickBitStreamMSBRead

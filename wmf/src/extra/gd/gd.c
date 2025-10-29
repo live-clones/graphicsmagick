@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <limits.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -65,6 +66,18 @@ gdImageCreate (int sx, int sy)
 {
   int i;
   gdImagePtr im;
+
+  if (overflow2(sx, sy)) {
+    return NULL;
+  }
+
+  if (overflow2(sizeof (unsigned char *), sy)) {
+    return NULL;
+  }
+  if (overflow2(sizeof (unsigned char), sx)) {
+    return NULL;
+  }
+
   im = (gdImage *) gdMalloc (sizeof (gdImage));
   memset (im, 0, sizeof (gdImage));
   /* Row-major ever since gd 1.3 */
@@ -105,6 +118,18 @@ gdImageCreateTrueColor (int sx, int sy)
   int i;
   gdImagePtr im;
   unsigned long cpa_size;
+
+  if (overflow2(sx, sy)) {
+    return NULL;
+  }
+
+  if (overflow2(sizeof (int *), sy)) {
+    return NULL;
+  }
+
+  if (overflow2(sizeof(int), sx)) {
+    return NULL;
+  }
 
   im = (gdImage *) gdMalloc (sizeof (gdImage));
   if (im == 0) return 0;
@@ -249,6 +274,7 @@ typedef struct
   }
 HWBType;
 
+#if 0
 static HWBType *
 RGB_to_HWB (RGBType RGB, HWBType * HWB)
 {
@@ -308,7 +334,6 @@ HWB_Diff (int r1, int g1, int b1, int r2, int g2, int b2)
   return diff;
 }
 
-
 /*
  * This is not actually used, but is here for completeness, in case someone wants to
  * use the HWB stuff for anything else...
@@ -353,7 +378,9 @@ HWB_to_RGB (HWBType HWB, RGBType * RGB)
   return RGB;
 
 }
+#endif
 
+#if 0
 int
 gdImageColorClosestHWB (gdImagePtr im, int r, int g, int b)
 {
@@ -383,6 +410,7 @@ gdImageColorClosestHWB (gdImagePtr im, int r, int g, int b)
     }
   return ct;
 }
+#endif
 
 int
 gdImageColorExact (gdImagePtr im, int r, int g, int b)
@@ -676,6 +704,22 @@ gdImageSetPixel (gdImagePtr im, int x, int y, int color)
     }
 }
 
+static int
+gdImageGetTrueColorPixel (gdImagePtr im, int x, int y)
+{
+  int p = gdImageGetPixel (im, x, y);
+  if (!im->trueColor)
+    {
+      return gdTrueColorAlpha (im->red[p], im->green[p], im->blue[p],
+			       (im->transparent == p) ? gdAlphaTransparent :
+			       gdAlphaOpaque);
+    }
+  else
+    {
+      return p;
+    }
+}
+
 static void
 gdImageBrushApply (gdImagePtr im, int x, int y)
 {
@@ -753,7 +797,7 @@ static void
 gdImageTileApply (gdImagePtr im, int x, int y)
 {
   int srcx, srcy;
-  int p;
+  int p=0;
   if (!im->tile)
     {
       return;
@@ -808,22 +852,6 @@ gdImageGetPixel (gdImagePtr im, int x, int y)
   else
     {
       return 0;
-    }
-}
-
-int
-gdImageGetTrueColorPixel (gdImagePtr im, int x, int y)
-{
-  int p = gdImageGetPixel (im, x, y);
-  if (!im->trueColor)
-    {
-      return gdTrueColorAlpha (im->red[p], im->green[p], im->blue[p],
-			       (im->transparent == p) ? gdAlphaTransparent :
-			       gdAlphaOpaque);
-    }
-  else
-    {
-      return p;
     }
 }
 
@@ -986,7 +1014,7 @@ gdImageDashedLine (gdImagePtr im, int x1, int y1, int x2, int y2, int color)
   int dashStep = 0;
   int on = 1;
   int wid;
-  int w, wstart, vert;
+  int vert;
   int thick = im->thick;
 
   dx = abs (x2 - x1);
@@ -1285,11 +1313,11 @@ strlen16 (unsigned short *s)
   return len;
 }
 
-#ifndef HAVE_LSQRT
+#if 0
 /* If you don't have a nice square root function for longs, you can use
    ** this hack
  */
-long
+static long
 lsqrt (long n)
 {
   long result = (long) sqrt ((double) n);
@@ -1316,14 +1344,35 @@ gdImageFilledArc (gdImagePtr im, int cx, int cy, int w, int h, int s, int e, int
   gdPoint pts[3];
   int i;
   int lx = 0, ly = 0;
-  int fx, fy;
+  int fx=0, fy=0;
   int w2, h2;
   w2 = w / 2;
   h2 = h / 2;
-  while (e < s)
-    {
-      e += 360;
-    }
+
+  if ((s % 360)  == (e % 360)) {
+         s = 0; e = 360;
+  } else {
+         if (s > 360) {
+                 s = s % 360;
+         }
+
+         if (e > 360) {
+                 e = e % 360;
+         }
+
+         while (s < 0) {
+                 s += 360;
+         }
+
+         while (e < s) {
+                 e += 360;
+         }
+
+         if (s == e) {
+                 s = 0; e = 360;
+         }
+  }
+
   for (i = s; (i <= e); i++)
     {
       int x, y;
@@ -1898,7 +1947,7 @@ gdImageCopyResized (gdImagePtr dst, gdImagePtr src, int dstX, int dstY, int srcX
 	  tox = dstX;
 	  for (x = srcX; (x < (srcX + srcW)); x++)
 	    {
-	      int nc;
+	      int nc=0;
 	      int mapTo;
 	      if (!stx[x - srcX])
 		{
@@ -1906,7 +1955,6 @@ gdImageCopyResized (gdImagePtr dst, gdImagePtr src, int dstX, int dstY, int srcX
 		}
 	      if (dst->trueColor)
 		{
-		  int d;
 		  mapTo = gdImageGetTrueColorPixel (src, x, y);
 		  /* Added 7/24/95: support transparent copies */
 		  if (gdImageGetTransparent (src) == mapTo)
@@ -1948,7 +1996,7 @@ gdImageCopyResized (gdImagePtr dst, gdImagePtr src, int dstX, int dstY, int srcX
 			  else
 			    {
 			      /* Find or create the best match */
-			      mapTo = gdImageColorResolveAlpha (dst,
+			      nc = gdImageColorResolveAlpha (dst,
 						      gdTrueColorGetRed (c),
 						    gdTrueColorGetGreen (c),
 						     gdTrueColorGetBlue (c),
@@ -1986,7 +2034,6 @@ gdImageCopyResampled (gdImagePtr dst,
 		      int srcW, int srcH)
 {
   int x, y;
-  float sx, sy;
   if (!dst->trueColor)
     {
       gdImageCopyResized (
@@ -1998,7 +2045,6 @@ gdImageCopyResampled (gdImagePtr dst,
     {
       for (x = dstX; (x < dstX + dstW); x++)
 	{
-	  int pd = gdImageGetPixel (dst, x, y);
 	  float sy1, sy2, sx1, sx2;
 	  float sx, sy;
 	  float spixels = 0;
@@ -2164,6 +2210,15 @@ gdImageCreateFromXbm (FILE * fd)
     {
       return 0;
     }
+
+  /* The X protocol request CreatePixmap puts an upper bound
+     of 16 bit to the size.
+     see, e.g. moz#424333, fdo#48961, rhbz#1086714 */
+  if (w < 0 || w > SHRT_MAX || h < 0 || h > SHRT_MAX)
+    {
+        return 0;
+    }
+
   /* Skip declaration line */
   if (!fgets (s, 160, fd))
     {
@@ -2171,6 +2226,10 @@ gdImageCreateFromXbm (FILE * fd)
     }
   bytes = (w * h / 8) + 1;
   im = gdImageCreate (w, h);
+  if (!im) {
+    return 0;
+  }
+
   gdImageColorAllocate (im, 255, 255, 255);
   gdImageColorAllocate (im, 0, 0, 0);
   x = 0;
@@ -2206,7 +2265,10 @@ gdImageCreateFromXbm (FILE * fd)
 	}
       h[1] = ch;
       h[2] = '\0';
-      sscanf (h, "%x", &b);
+      if (sscanf (h, "%x", &b) != 1)
+        {
+	  goto fail;
+        }
       for (bit = 1; (bit <= 128); (bit = bit << 1))
 	{
 	  gdImageSetPixel (im, x++, y, (b & bit) ? 1 : 0);
@@ -2225,7 +2287,6 @@ gdImageCreateFromXbm (FILE * fd)
     }
   /* Shouldn't happen */
   fprintf (stderr, "Error: bug in gdImageCreateFromXbm!\n");
-  return 0;
 fail:
   gdImageDestroy (im);
   return 0;
@@ -2252,7 +2313,7 @@ gdImagePolygon (gdImagePtr im, gdPointPtr p, int n, int c)
     }
 }
 
-int gdCompareInt (const void *a, const void *b);
+static int gdCompareInt (const void *a, const void *b);
 
 /* THANKS to Kirsten Schulz for the polygon fixes! */
 

@@ -165,15 +165,9 @@ wmf_error_t wmf_header_read (wmfAPI* API)
 		API->File->wmfheader->MaxRecordSize = wmf_read_32 (API,0,0);
 		API->File->wmfheader->NumOfParams   = wmf_read_16 (API);
 
-		if (API->bbuf.tell == 0)
-		{	WMF_ERROR (API,"wmf_header_read: Glitch! No tell() function!");
-			API->err = wmf_E_Glitch;
-		}
-		else
-		{	API->File->pos = WMF_TELL (API);
-			header_end = API->File->pos;
-			write_header (API, header_start, header_end);
-		}
+		API->File->pos = WMF_TELL (API);
+		header_end = API->File->pos;
+		write_header (API, header_start, header_end);
 	}
 	else
 	{	WMF_ERROR (API,"wmf_header_read: this isn't a wmf file");
@@ -302,7 +296,7 @@ void wmf_write (wmfAPI * API, unsigned long Size, unsigned int Function, const c
 }
 
 void wmf_write_begin (wmfAPI * API, const char * filename)
-{	size_t length;
+{	int length;
 
 	wmfWriteFileInfo * WFI = (wmfWriteFileInfo *) wmf_malloc (API, sizeof(wmfWriteFileInfo));
 
@@ -447,7 +441,6 @@ static void write_b64 (wmfAPI * API, const unsigned char * buffer, unsigned long
 		b32 = (b32 << 16);
 		*ptr++ = B64[(b32 >> 18)       ];
 		*ptr++ = B64[(b32 >> 12) & 0x3f];
-		remaining -= 1;
 	}
 
 	*ptr++ = '\n';
@@ -563,7 +556,8 @@ const char * wmf_attr_add (wmfAPI * API, wmfAttributes * list,
 }
 
 const char * wmf_attr_query (wmfAPI * API, wmfAttributes * list, const char* name)
-{	unsigned long i;
+{	(void)API;
+	unsigned long i;
 
 	const char * value = 0;
 

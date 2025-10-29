@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 .. This text is in reStucturedText format, so it may look a bit odd.
-.. See http://docutils.sourceforge.net/rst.html for details.
+.. See https://docutils.sourceforge.net/rst.html for details.
 
 ======================================
 GraphicsMagick Image Processing System
@@ -8,27 +8,27 @@ GraphicsMagick Image Processing System
 
 .. meta::
    :description: GraphicsMagick is a robust collection of tools and
-                 libraries to read, write, and manipulate an image in any
-                 of the more popular image formats including GIF, JPEG,
-                 PNG, PDF, and WebP. With GraphicsMagick you can
-                 create GIFs dynamically making it suitable for Web
-                 applications. You can also resize, rotate, sharpen,
-                 color reduce, or add special effects to an image and
-                 save your completed work in the same or differing image
-                 format.
+                 libraries to read, write, and manipulate an image in
+                 any of the more popular image formats including GIF,
+                 JPEG, JPEG-2000, PNG, PDF, and WebP. With
+                 GraphicsMagick you can create GIFs dynamically making
+                 it suitable for Web applications. You can also
+                 resize, rotate, sharpen, color reduce, or add special
+                 effects to an image and save your completed work in
+                 the same or differing image format.
 
-   :keywords: GraphicsMagick, GM, PerlMagick, Perl Magick, Perl Magic,
-              image processing, software development, TclMagick, Magick++
+   :keywords: GraphicsMagick, GM, PerlMagick, image processing,
+              software development, TclMagick, Magick++
 
 
 .. _`download GraphicsMagick release` : https://sourceforge.net/projects/graphicsmagick/files/
 .. _`download development snapshots` : https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick-snapshots/
-.. _`visit Mercurial repository`: https://sourceforge.net/p/graphicsmagick/code/
+.. _`visit Mercurial repository`: https://foss.heptapod.net/graphicsmagick/graphicsmagick
 
 .. _programming : programming.html
 
 ===========================  =========================================================
-Current Release              1.3.45 (Released August 27, 2024) `download release`__
+Current Release              1.3.46 (Released October 29, 2025) `download release`__
 Development Snapshots        (Updated frequently) `download development snapshots`__
 Mercurial Repository         (Updated frequently) `visit Mercurial repository`__
 ===========================  =========================================================
@@ -67,12 +67,12 @@ version of this page.
 .. _`Coverity Analysis Metrics` : https://scan.coverity.com/projects/graphicsmagick
 
 GraphicsMagick is the swiss army knife of image processing. Comprised
-of 284K physical lines (according to David A. Wheeler's `SLOCCount`_)
+of 286K physical lines (according to David A. Wheeler's `SLOCCount`_)
 of source code in the base package, it provides a robust and efficient
 collection of tools and libraries which support reading, writing, and
 manipulating an image in over 92 major formats including important
-formats like DPX, GIF, JPEG, JPEG-2000, JXL, PNG, PDF, PNM, TIFF, and
-WebP.
+formats like AVIF, DPX, GIF, HEIC, JPEG, JPEG-2000, JXL, PNG, PDF,
+PNM, TIFF, and WebP.
 
 Image processing is multi-threaded using OpenMP_ (`read about OpenMP
 in GraphicsMagick`_) so that CPU-bound tasks scale linearly as
@@ -80,11 +80,12 @@ processor cores are added. OpenMP_ support requires compilation with
 GCC 4.2 (or later), or use of any C compiler supporting at least the
 OpenMP_ 2.0 specification.
 
-GraphicsMagick is quite portable, and compiles under almost every general
-purpose operating system that runs on 32-bit or 64-bit CPUs.
-GraphicsMagick is available for virtually any Unix or Unix-like system,
-including Linux. It also runs under `Windows <INSTALL-windows.html>`_
-Vista and later (Vista, 7, 8.X, 10, 11), and MacOS-X.
+GraphicsMagick is quite portable, and compiles under almost every
+modern general purpose operating system that runs on 32-bit or 64-bit
+CPUs and which provides a C'99 compatible compiler (e.g. supports
+`stdint.h`).  GraphicsMagick is available for Unix or Unix-like
+systems, including Linux. It also runs under `Windows
+<INSTALL-windows.html>`_ 8 and later (8.X, 10, 11), and MacOS-X.
 
 GraphicsMagick supports huge images and has been tested with
 gigapixel-size images. GraphicsMagick can create new images on the
@@ -130,6 +131,12 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
+  * GM has 0.00 (zero) defects per 1000 lines of code (377,270 total
+    lines included) according to `Coverity Analysis Metrics`_ on
+    October 11th, 2025.
+
+  * GM has zero issues detected by Clang 15 scan-build.
+
   * GM comes with a comprehensive `manual page`_.
 
   * GM provides API and ABI stability and managed releases that you can
@@ -148,10 +155,6 @@ other popular software:
   * GM source code is managed in Mercurial_, a distributed source
     control management tool which supports management of local
     changes.  The repository history goes back to 1998.
-
-  * GM has 0.00 (zero) defects per 1000 lines of code (352,673 total
-    lines included) according to `Coverity Analysis Metrics`_ on July
-    26th, 2024.
 
   * GM developers contribute to other free projects for the public good.
 
