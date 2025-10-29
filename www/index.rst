@@ -28,7 +28,7 @@ GraphicsMagick Image Processing System
 .. _programming : programming.html
 
 ===========================  =========================================================
-Current Release              1.3.45 (Released August 27, 2024) `download release`__
+Current Release              1.3.46 (Released October 29, 2025) `download release`__
 Development Snapshots        (Updated frequently) `download development snapshots`__
 Mercurial Repository         (Updated frequently) `visit Mercurial repository`__
 ===========================  =========================================================
@@ -71,8 +71,8 @@ of 286K physical lines (according to David A. Wheeler's `SLOCCount`_)
 of source code in the base package, it provides a robust and efficient
 collection of tools and libraries which support reading, writing, and
 manipulating an image in over 92 major formats including important
-formats like DPX, GIF, JPEG, JPEG-2000, JXL, PNG, PDF, PNM, TIFF, and
-WebP.
+formats like AVIF, DPX, GIF, HEIC, JPEG, JPEG-2000, JXL, PNG, PDF,
+PNM, TIFF, and WebP.
 
 Image processing is multi-threaded using OpenMP_ (`read about OpenMP
 in GraphicsMagick`_) so that CPU-bound tasks scale linearly as
@@ -131,9 +131,9 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (377,132 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (377,270 total
     lines included) according to `Coverity Analysis Metrics`_ on
-    September 30th, 2025.
+    October 11th, 2025.
 
   * GM has zero issues detected by Clang 15 scan-build.
 
