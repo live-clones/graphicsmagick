@@ -97,6 +97,7 @@ StaticMagic[] =
   MAGIC("FITS", "Flexible Image Transport System", 0, "SIMPLE"),
   MAGIC("FPX", "FlashPIX", 0, "\320\317\021\340"),
   MAGIC("GIF", "CompuServe graphics interchange format", 0, "GIF8"),
+  /* See libheif/libheif/api/libheif/heif_brands.h and .cc for libheif support */
   MAGIC("HEIC", "HEIF - A regular heif image", 4, "ftypheic"),
   MAGIC("HEIC", "HEIF - Extended range (>8 bit) image", 4, "ftypheix"),
   MAGIC("HEIF", "HEIF - Image sequence", 4, "ftyphevc"),

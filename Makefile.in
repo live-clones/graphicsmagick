@@ -11178,6 +11178,7 @@ magick-install-data-local:
 	$(INSTALL_HEADER) magick/magick_config_api.h $(DESTDIR)$(magickincdir)/magick_config.h
 magick-uninstall-local:
 	rm -f $(DESTDIR)$(magickincdir)/magick_config.h
+# FIXME: Need to install www/images/patterns
 install-data-html:
 	$(mkinstalldirs) $(DESTDIR)$(htmldir)
 	@for dir in $(DOCDIRS) ; do \

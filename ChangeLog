@@ -1,3 +1,11 @@
+2025-10-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (ReadHEIFImage): Check the
+	heif_image_handle_get_preferred_decoding_colorspace() return code
+	for errors. Should fix oss-fuzz 456486373
+	"graphicsmagick:enhance_fuzzer: Use-of-uninitialized-value in
+	ReadHEIFImage". Luckily, the impact from this issue seems benign.
+
 2025-10-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

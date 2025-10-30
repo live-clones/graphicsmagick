@@ -12,6 +12,7 @@ WWWDIR=$(top_srcdir)/www
 # Install HTML files
 DOCDIRS = www www/api www/images www/Magick++ www/wand
 HTML_INSTALL_DATA_TARGETS = install-data-html
+# FIXME: Need to install www/images/patterns
 install-data-html:
 	$(mkinstalldirs) $(DESTDIR)$(htmldir)
 	@for dir in $(DOCDIRS) ; do \

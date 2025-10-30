@@ -854,10 +854,10 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 
   enum heif_colorspace
     heif_colorspace,
-    preferred_colorspace;
+    preferred_colorspace = heif_colorspace_undefined;
 
   enum heif_chroma
-    preferred_chroma;
+    preferred_chroma = heif_chroma_undefined;
 
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
@@ -976,9 +976,17 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Matte: %s", image->matte ? "True" : "False");
-  heif_image_handle_get_preferred_decoding_colorspace(heif_image_handle,
-                                                      &preferred_colorspace,
-                                                      &preferred_chroma);
+  heif_status=heif_image_handle_get_preferred_decoding_colorspace(heif_image_handle,
+                                                                  &preferred_colorspace,
+                                                                  &preferred_chroma);
+  if (heif_status.code != heif_error_Ok)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_image_handle_get_preferred_decoding_colorspace() reports error \"%s\"",
+                              heif_status.message);
+      ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Preferred colorspace: %s, "
