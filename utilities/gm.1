@@ -1,4 +1,4 @@
-.TH gm 1 "2025/10/28" "GraphicsMagick"
+.TH gm 1 "2025/11/03" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -4427,6 +4427,23 @@ offset:
   0.0 0.0 0.0 0.0 1.0
 .fi
 .TP
+.B "-map \fI<filename>"\fP
+\fRchoose a particular set of colors from this image
+
+[\fIconvert\fP or \fImogrify\fP]
+
+By default, color reduction chooses an optimal set of colors that best
+represent the original image. Alternatively, you can choose a particular
+set of colors from an image file with this option.
+
+Use
+\fB+map\fP to reduce
+all images in the image sequence that follows to a single optimal set of colors
+that best represent all the images.  The sequence of images
+is terminated by the appearance of any option.
+If the \fB+map\fP
+option appears after all of the input images, all images are mapped.
+.TP
 .B "-red-primary \fI<x>,<y>"\fP
 \fRred chromaticity primary point
 .TP
@@ -7508,6 +7525,9 @@ Options, above.
 .B "-recolor \fI<matrix>"\fP
 \fRapply a color translation matrix to image channels
 .TP
+.B "-map \fI<filename>"\fP
+\fRchoose a particular set of colors from this image
+.TP
 .B "-red-primary \fI<x>,<y>"\fP
 \fRred chromaticity primary point
 .TP
@@ -10493,6 +10513,9 @@ Options, above.
 .TP
 .B "-recolor \fI<matrix>"\fP
 \fRapply a color translation matrix to image channels
+.TP
+.B "-map \fI<filename>"\fP
+\fRchoose a particular set of colors from this image
 .TP
 .B "-red-primary \fI<x>,<y>"\fP
 \fRred chromaticity primary point

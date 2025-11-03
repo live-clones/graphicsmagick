@@ -5814,6 +5814,16 @@ MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
               }
             break;
           }
+        if (LocaleCompare("remap",option+1) == 0)
+          {
+            if (*option == '-')
+              {
+                i++;
+                if (i == argc)
+                  ThrowConvertException(OptionError,MissingArgument,option);
+              }
+            break;
+          }
         if (LocaleCompare("red-primary",option+1) == 0)
           {
             if (*option == '-')
@@ -6468,6 +6478,7 @@ static void ConvertUsage(void)
   (void) puts("  -recolor matrix      apply a color translation matrix to image channels");
   (void) puts("  -red-primary point   chomaticity red primary point");
   (void) puts("  -region geometry     apply options to a portion of the image");
+  (void) puts("  -remap filename      transform image colors to match this set of colors");
   (void) puts("  -render              render vector graphics");
   (void) puts("  +render              disable rendering vector graphics");
   (void) puts("  -resample geometry   resample to horizontal and vertical resolution");
@@ -10822,6 +10833,27 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
             *image=crop_image;
             continue;
           }
+        if (LocaleCompare("remap",option+1) == 0)
+          {
+            /*
+              Transform image colors to match this set of colors.
+            */
+            if (*option == '+')
+              continue;
+            (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+            {
+              Image
+                *map_image;
+
+              if ((map_image=ReadImage(clone_info,&(*image)->exception)) !=
+                  (Image *) NULL)
+                {
+                  (void) MapImage(*image,map_image,quantize_info.dither);
+                  DestroyImage(map_image);
+                }
+            }
+            continue;
+          }
         if (LocaleCompare("render",option+1) == 0)
           {
             draw_info->render=(*option == '+');
@@ -12140,6 +12172,14 @@ static MagickPassFail* TransmogrifyImage(TransmogrifyOptions *options)
   return (&options->status);
 }
 
+
+/*
+  Given input filename ("foo.bar"), read from filename, cache Image
+  which was read to MPRI store, and replace filename with MPRI:N to
+  retrieve cached image later. Code which used to read file directly
+  will then retreive already decoded image from the persistent image
+  cache via MPRI:N.
+*/
 static MagickPassFail
 LoadAndCacheImageFile(char **filename,long *id,ExceptionInfo *exception)
 {
@@ -12148,7 +12188,7 @@ LoadAndCacheImageFile(char **filename,long *id,ExceptionInfo *exception)
 
   status=MagickFail;
   *id=-1;
-  if (LocaleNCompare(*filename,"MPRI:",5) != 0)
+  if (LocaleNCompare(*filename,"MPRI:",5) != 0) /* Ignore MPRI */
     {
       ImageInfo
         *image_info;
@@ -13511,6 +13551,24 @@ MagickExport MagickPassFail MogrifyImageCommand(ImageInfo *image_info,
               }
             break;
           }
+        if (LocaleCompare("remap",option+1) == 0)
+          {
+            global_colormap=(*option == '+');
+            if (*option == '-')
+              {
+                i++;
+                if (i == argc)
+                  ThrowMogrifyException(OptionError,MissingArgument,
+                    option);
+
+                /*
+                  Cache argument image.
+                */
+                CacheArgumentImage(&argv[i],image_cache,image_cache_entries,
+                                   exception);
+              }
+            break;
+          }
         if (LocaleCompare("render",option+1) == 0)
           break;
         if (LocaleCompare("repage",option+1) == 0)
@@ -14098,6 +14156,7 @@ static void MogrifyUsage(void)
   (void) puts("  -recolor matrix      apply a color translation matrix to image channels");
   (void) puts("  -red-primary point   chomaticity red primary point");
   (void) puts("  -region geometry     apply options to a portion of the image");
+  (void) puts("  -remap filename      transform image colors to match this set of colors");
   (void) puts("  -render              render vector graphics");
   (void) puts("  +render              disable rendering vector graphics");
   (void) puts("  -resample geometry   resample to horizontal and vertical resolution");
