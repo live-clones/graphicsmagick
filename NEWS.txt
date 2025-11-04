@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to October 29, 2025.
+This file was last updated to reflect changes up to November 4, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -18,6 +18,60 @@ release and not attempt to patch older releases.
 
 .. contents::
   :local:
+
+1.3.47 (???? ??, 2025)
+===========================
+
+Special Issues:
+
+* GraphicsMagick needs some additional productive volunteers.  For
+  several years now, the burden has entirely been on me (Bob
+  Friesenhahn).  I have been sheparding the project for 23 years
+  already (and contributed to ImageMagick and GraphicsMagick combined
+  for 29 years already).  Volunteers are needed to add/improve
+  new/existing file format support, and to assure correct operation on
+  all targets.  Donations are requested in order to purchase a new
+  computer to run Windows 11.
+
+Security Fixes:
+
+* None yet.
+
+Bug fixes:
+
+* ModuleAliases: Added a mapping from magick "MPRI" to module
+  "MPR". This missing mapping caused the "MPRI" coder to not work for
+  non-module builds. As a result, the 'mogrify' "hald-clut", "map",
+  "mask", and "tile" subcommands were not working.  Any use of
+  "MPRI:N" syntax to save an image for later (from the command-line or
+  via the APIs) would have failed.
+
+* HEIF: Check the return status of
+  heif_image_handle_get_preferred_decoding_colorspace() in order to
+  avoid consuming uninitialized memory.  While this might appear to be
+  a security issue, it appears to be reasonably benign.
+
+API Updates:
+
+* None yet.
+
+New Features:
+
+* The 'convert' and 'mogrify' subcommands now support -remap, which is
+  equivalent to -map.  This is to improve compatibility with
+  ImageMagick, which changed from -map to -remap after the fork.
+
+Behavior Changes:
+
+* None yet.
+
+Build Changes:
+
+* None yet.
+
+Windows Delegate Updates/Additions:
+
+* None yet.
 
 1.3.46 (October 29, 2025)
 ===========================
