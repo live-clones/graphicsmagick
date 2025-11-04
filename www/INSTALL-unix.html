@@ -522,14 +522,23 @@ symbols, and use the C pre-processor to allow dependent code to still
 compile as before.</p>
 </dd>
 <dt><kbd><span class="option">--enable-magick-compat</span></kbd></dt>
-<dd><p>Normally GraphicsMagick installs only the 'gm' utility from which all
-commands may be accessed. Existing packages may be designed to invoke
-ImageMagick utilities (e.g. &quot;convert&quot;). Specify this option to
-install ImageMagick utility compatibility links to allow
-GraphicsMagick to substitute directly for ImageMagick. Take care when
-selecting this option since if there is an existing ImageMagick
+<dd><p>Normally GraphicsMagick installs only the 'gm' utility from which
+all commands may be accessed. Existing packages may be designed to
+invoke bare ImageMagick utilities (e.g. &quot;convert&quot;). Specify this
+option to install ImageMagick utility compatibility links to allow
+GraphicsMagick to substitute directly for ImageMagick. Take care
+when selecting this option since if there is an existing ImageMagick
 installation installed in the same directory, its utilities will be
 replaced when GraphicsMagick is installed.</p>
+<p>While GraphicsMagick is able to emulate a great many useful
+ImageMagick commands (given its origin from ImageMagick), be aware
+that ImageMagick has diverged considerably from its roots, and
+testing with some version of ImageMagick is not evidence that the
+commands will work with GraphicsMagick (or even with a subsequent
+version of ImageMagick).  It is necessary to verify the intended
+usages before using this option.  Furthermore, ImageMagick 7 has
+removed the individual commands and expects that all commands are
+subordinate to its 'magick' utility.</p>
 </dd>
 <dt><kbd><span class="option">--with-quantum-depth</span></kbd></dt>
 <dd><p>This option allows the user to specify the number of bits to use per

@@ -2,6 +2,14 @@
 
 	* NEWS.txt: Update the news.
 
+	* www/INSTALL-unix.rst (--enable-magick-compat): Add more
+	warnings/admonitions regarding using --enable-magick-compat.
+
+	* magick/enum_strings.c (StringToChannelType): Accept "Alpha" as a
+	synonym for "Opacity".
+	(StringToCompositeOperator): Accept "CopyAlpha" as a synonym for
+	"CopyOpacity".
+
 2025-11-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/command.c: Add comment for LoadAndCacheImageFile().

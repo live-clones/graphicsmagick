@@ -557,14 +557,24 @@ Several configure options require special note:
 
 --enable-magick-compat
 
-  Normally GraphicsMagick installs only the 'gm' utility from which all
-  commands may be accessed. Existing packages may be designed to invoke
-  ImageMagick utilities (e.g. "convert"). Specify this option to
-  install ImageMagick utility compatibility links to allow
-  GraphicsMagick to substitute directly for ImageMagick. Take care when
-  selecting this option since if there is an existing ImageMagick
+  Normally GraphicsMagick installs only the 'gm' utility from which
+  all commands may be accessed. Existing packages may be designed to
+  invoke bare ImageMagick utilities (e.g. "convert"). Specify this
+  option to install ImageMagick utility compatibility links to allow
+  GraphicsMagick to substitute directly for ImageMagick. Take care
+  when selecting this option since if there is an existing ImageMagick
   installation installed in the same directory, its utilities will be
   replaced when GraphicsMagick is installed.
+
+  While GraphicsMagick is able to emulate a great many useful
+  ImageMagick commands (given its origin from ImageMagick), be aware
+  that ImageMagick has diverged considerably from its roots, and
+  testing with some version of ImageMagick is not evidence that the
+  commands will work with GraphicsMagick (or even with a subsequent
+  version of ImageMagick).  It is necessary to verify the intended
+  usages before using this option.  Furthermore, ImageMagick 7 has
+  removed the individual commands and expects that all commands are
+  subordinate to its 'magick' utility.
 
 --with-quantum-depth
 

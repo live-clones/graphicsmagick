@@ -61,6 +61,14 @@ New Features:
   equivalent to -map.  This is to improve compatibility with
   ImageMagick, which changed from -map to -remap after the fork.
 
+* Command arguments which currently accept "Opacity" now accept
+  "Alpha" as a synonym.  This is to improve compatibility with
+  ImageMagick
+
+* Command arguments which currently accept "CopyOpacity" now accept
+  "CopyAlpha" as a synonym.  This is to improve compatibility with
+  ImageMagick
+
 Behavior Changes:
 
 * None yet.

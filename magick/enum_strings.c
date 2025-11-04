@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2008-2022 GraphicsMagick Group
+% Copyright (C) 2008-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -113,6 +113,8 @@ MagickExport ChannelType StringToChannelType(const char *option)
   else if (LocaleCompare("Yellow",option) == 0)
     channel=YellowChannel;
   else if (LocaleCompare("Opacity",option) == 0)
+    channel=OpacityChannel;
+  else if (LocaleCompare("Alpha",option) == 0) /* ImageMagick compatibility */
     channel=OpacityChannel;
   else if (LocaleCompare("Black",option) == 0)
     channel=BlackChannel;
@@ -460,6 +462,7 @@ MagickExport CompositeOperator StringToCompositeOperator(const char *option)
         { CopyGreenCompositeOp, "CopyGreen" },
         { CopyBlueCompositeOp, "CopyBlue" },
         { CopyOpacityCompositeOp, "CopyOpacity" },
+        { CopyOpacityCompositeOp, "CopyAlpha" }, /* ImageMagick compatibility */
         { ClearCompositeOp, "Clear" },
         { DissolveCompositeOp, "Dissolve" },
         { DisplaceCompositeOp, "Displace" },
