@@ -51,6 +51,15 @@ Bug fixes:
   avoid consuming uninitialized memory.  While this might appear to be
   a security issue, it appears to be reasonably benign.
 
+* Apple PICT: Since the implementation originating from ImageMagick,
+  the rowBytes transition from from byte to short while reading
+  byteCount was 200. However, it should have been 250! See
+  "https://github.com/ImageMagick/ImageMagick/issues/7837" for
+  details.  The reader and writer have been changed to use 250.  This
+  means that PICT files written by the fixed GraphicsMagick will not
+  be readable by older GraphicsMagick versions (but the fixed
+  GraphicsMagick can read older existing files).
+
 API Updates:
 
 * None yet.
@@ -71,7 +80,9 @@ New Features:
 
 Behavior Changes:
 
-* None yet.
+* Apple PICT: Older GraphicsMagick will be unable to read the PICT
+  files that newer versions write, but newer GraphicsMagick can still
+  read files which were written in the broken format.
 
 Build Changes:
 

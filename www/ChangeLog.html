@@ -38,9 +38,20 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-11-05  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>NEWS.txt: Update the news.</p></li>
+</ul>
+</blockquote>
 <p>2025-11-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/pict.c: Fix reading/writing PICTs with PixMap
+rowBytes=[201..250]. ImageMagick issue 7837 &quot;Converting some
+images to PICT results in files that will crash a classic Mac
+system&quot; reported by Brian Kendall
+(<a class="reference external" href="https://github.com/ImageMagick/ImageMagick/issues/7837">https://github.com/ImageMagick/ImageMagick/issues/7837</a>)</p></li>
 <li><p>NEWS.txt: Update the news.</p></li>
 <li><p>www/INSTALL-unix.rst (--enable-magick-compat): Add more
 warnings/admonitions regarding using --enable-magick-compat.</p></li>

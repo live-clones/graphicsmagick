@@ -838,7 +838,12 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
     length,
     scanline_length;
 
+  MagickBool
+    logging;
+
   ARG_NOT_USED(image_info);
+
+  logging=IsEventLogged(CoderEvent);
 
   /*
     Determine pixel buffer size.
@@ -860,7 +865,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
   row_bytes=(size_t) (image->columns | 0x8000);
   if (image->storage_class == DirectClass)
     row_bytes=(size_t) ((4*image->columns) | 0x8000);
-  if (IsEventLogged(CoderEvent))
+  if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "DecodeImage: Using %lu bytes per line, %"
                           MAGICK_SIZE_T_F "u bytes per row",
@@ -889,14 +894,14 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
 
           ratio = (((double) image->rows*bytes_per_line)/remaining);
 
-          if (IsEventLogged(CoderEvent))
+          if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Remaining: %" MAGICK_OFF_F "d, Ratio: %g",
                                   remaining, ratio);
 
           if (ratio > (bytes_per_line < 8 ? 1.0 : 255.0))
             {
-              if (IsEventLogged(CoderEvent))
+              if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Unreasonable file size "
                                       "(ratio of pixels to remaining file size %g)",
@@ -922,7 +927,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
   /* Use a worst-case allocation policy (because we can afford to) */
   if (bytes_per_line < 8)
     scanline_alloc = bytes_per_line;
-  else if (bytes_per_line <= 200)
+  else if (bytes_per_line <= 250)
     scanline_alloc = 256U+256U; /* Allocate extra for RLE over-run */
   else
     scanline_alloc = 65536U+256U; /* Allocate extra for RLE over-run */
@@ -962,12 +967,49 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
   for (y=0; y < image->rows; y++)
     {
       q=pixels+(size_t)y*width;
-      if (bytes_per_line > 200)
+      /*
+        From page 119 of Inside Macintosh: Volume V
+        (https://vintageapple.org/inside_o/pdf/Inside_Macintosh_Volume_V_1986.pdf):
+
+        If rowBytes < 8, then data is unpacked
+          data size = rowBytes*(bounds.bottom-bounds.top);
+        if rowBytes >= then data is packed.
+          Image contains (bounds.bottom-boutes.top) packed
+          scanlines.
+          Packed scanlines are produced by the PackBits
+          routine.
+          Each scanline consists of [byteCount] [data].
+          If rowBytes > 250, then byteCount is a word,
+            else it is a byte.
+          end;
+      */
+#if 0
+      /*
+        Brutal implementation which cannot read files written by older
+        IM/GM versions.
+      */
+      if (bytes_per_line > 250) /* Was 200 */
         scanline_length=ReadBlobMSBShort(blob);
       else
         scanline_length=ReadBlobByte(blob);
+#else
+      /* Intuit when byteCount must be a word */
+      if (bytes_per_line > 200)
+        {
+          scanline_length=ReadBlobByte(blob);
+          if (scanline_length == 0)
+            {
+              scanline_length <<= 8;
+              scanline_length |= ReadBlobByte(blob);
+            }
+        }
+      else
+        {
+          scanline_length=ReadBlobByte(blob);
+        }
+#endif
 #if 0
-      if (IsEventLogged(CoderEvent))
+      if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "scanline_length = %u, "
                               "scanline_alloc = %" MAGICK_SIZE_T_F "u",
@@ -975,7 +1017,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
 #endif
       if (scanline_length < 2)
         {
-          if (IsEventLogged(CoderEvent))
+          if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Scanline length %u < 2!",scanline_length);
           ThrowException(&image->exception,CorruptImageError,UnableToUncompressImage,
@@ -984,7 +1026,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
         }
       if (scanline_length > scanline_alloc)
         {
-          if (IsEventLogged(CoderEvent))
+          if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Scanline length %u exceeds allocation %" MAGICK_SIZE_T_F "u",
                                   scanline_length, (MAGICK_SIZE_T)scanline_alloc);
@@ -1106,6 +1148,11 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
   unsigned char
     index;
 
+  MagickBool
+    logging;
+
+   logging=IsEventLogged(CoderEvent);
+
   /*
     Pack scanline.
   */
@@ -1113,8 +1160,8 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
   assert(image->signature == MagickSignature);
   assert(scanline != (unsigned char *) NULL);
   assert(pixels != (unsigned char *) NULL);
-#if 0
-  if (IsEventLogged(CoderEvent))
+#if 1
+  if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "EncodeImage: %lux%lu, matte=%s bytes_per_line=%lu",
                           image->columns, image->rows,
@@ -1197,7 +1244,7 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
     Write the number of and the packed length.
   */
   length=(q-pixels);
-  if (bytes_per_line > 200)
+  if (bytes_per_line > 250)
     {
       (void) WriteBlobMSBShort(image,(const magick_uint16_t) length);
       length+=2;
@@ -1312,6 +1359,11 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
     jpeg,
     status;
 
+  MagickBool
+    logging;
+
+   logging=IsEventLogged(CoderEvent);
+
   /*
     Open image file.
   */
@@ -1357,7 +1409,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
   image->columns=frame.right-frame.left;
   image->rows=frame.bottom-frame.top;
 
-  if (IsEventLogged(CoderEvent))
+  if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Dimensions: %lux%lu",image->columns,image->rows);
 
@@ -1394,7 +1446,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
       code=ReadBlobMSBShort(image); /* returns magick_uint16_t */
     if (code > 0xa1)
       {
-        if (IsEventLogged(CoderEvent))
+        if (logging)
           {
             if (0xff == code)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X %.1024s: %.1024s",code,
@@ -1405,7 +1457,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
       }
     else
       {
-        if (IsEventLogged(CoderEvent))
+        if (logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X %.1024s: %.1024s",code,
                                 lookup_string(code_names,sizeof(code_names),code),
                                 lookup_string(code_descriptions,sizeof(code_descriptions),code));
@@ -1475,7 +1527,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
             image->depth=pixmap.component_size;
             image->x_resolution=1.0*pixmap.horizontal_resolution;
             image->y_resolution=1.0*pixmap.vertical_resolution;
-            if (IsEventLogged(CoderEvent))
+            if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Depth %u, X resolution %g, Y resolution %g",
                                     image->depth,
@@ -1511,7 +1563,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                   {
                     if (EOFBlob(image))
                       break;
-                    if (length > 200)
+                    if (length > 250)
                       {
                         for (j=0; j < ReadBlobMSBShort(image); j++)
                           if (ReadBlobByte(image) == EOF)
@@ -1631,7 +1683,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                   }
                 if (!AllocateImageColormap(tile_image,tile_image->colors))
                   ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                if (IsEventLogged(CoderEvent))
+                if (logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                   "Allocated tile image colormap with %u colors",tile_image->colors);
                 if (bytes_per_line & 0x8000)
@@ -1772,7 +1824,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
               if ((code == 0x9a) || (code == 0x9b) ||
                   (bytes_per_line & 0x8000))
                 {
-                  if (IsEventLogged(CoderEvent))
+                  if (logging)
                       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                             "Composite tile: %lux%lu%+d%+d",
                                             tile_image->columns, tile_image->rows,
@@ -1904,7 +1956,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
               }
             if (blob != blob_alloc)
               {
-                if (IsEventLogged(CoderEvent))
+                if (logging)
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "Tile Zero copy read.");
               }
@@ -1915,11 +1967,11 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
           }
         if (tile_image == (Image *) NULL)
           continue;
-        if (IsEventLogged(CoderEvent))
+        if (logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Tile Dimensions: %lux%lu",
                                 tile_image->columns,tile_image->rows);
-        if (IsEventLogged(CoderEvent))
+        if (logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Tile Resolution: %gx%g %s",
                                 tile_image->x_resolution,
@@ -1931,18 +1983,18 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                                  "pixels"));
         FormatString(geometry,"%lux%lu",Max(image->columns,tile_image->columns),
           Max(image->rows,tile_image->rows));
-        if (IsEventLogged(CoderEvent))
+        if (logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Tile Transform %lux%lu ==> %s",
                                 tile_image->columns,tile_image->rows,
                                 geometry);
         if (TransformImage(&tile_image,(char *) NULL,geometry) != MagickPass)
           {
-            if (IsEventLogged(CoderEvent))
+            if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Tile transform failed!");
           }
-        if (IsEventLogged(CoderEvent))
+        if (logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Tile Composite of %lux%lu on canvas %lux%lu at +%u,+%u",
                                 tile_image->columns,tile_image->rows,
@@ -1950,7 +2002,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
         if (CompositeImage(image,CopyCompositeOp,tile_image,frame.left,
                            frame.right) != MagickPass)
           {
-            if (IsEventLogged(CoderEvent))
+            if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Tile composite failed!");
           }
@@ -2175,6 +2227,11 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
     base_address,
     transfer_mode;
 
+  MagickBool
+    logging;
+
+  logging=IsEventLogged(CoderEvent);
+
   /*
     Open output image file.
   */
@@ -2253,7 +2310,7 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
   bytes_per_line=(size_t) image->columns;
   if (storage_class == DirectClass)
     bytes_per_line = MagickArraySize(bytes_per_line, image->matte ? 4 : 3);
-  if (IsEventLogged(CoderEvent))
+  if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Bytes per line: %" MAGICK_SIZE_T_F "u bytes,"
                           " Row bytes: %" MAGICK_SIZE_T_F "u bytes", bytes_per_line, row_bytes);
