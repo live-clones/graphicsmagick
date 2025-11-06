@@ -1,3 +1,14 @@
+2025-11-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/pnm.c (ReadPNMImage): Support reading PBM raw (P1), PGM
+	raw (P2), and PPM raw (P3) files which lack a newline character at
+	the end of the last line. This is regardless of the fact that the
+	specification says "There is a newline character at the end of
+	each of these lines.", while also saying "Programs that read this
+	format should be as lenient as possible, accepting anything that
+	looks remotely like a ...".  This change supports the lenient
+	clause.
+
 2025-11-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

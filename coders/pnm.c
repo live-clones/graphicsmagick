@@ -126,13 +126,16 @@ static unsigned int IsPNM(const unsigned char *magick,const size_t length)
 %
 */
 
-static unsigned int PNMInteger(Image *image,const unsigned int base)
+static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFail *status)
 {
-  int
-    c;
-
   unsigned long
     value;
+
+  unsigned int
+    count = 0;
+
+  int
+    c;
 
   /*
     Skip any leading whitespace.
@@ -141,8 +144,12 @@ static unsigned int PNMInteger(Image *image,const unsigned int base)
   {
     c=ReadBlobByte(image);
     if (c == EOF)
-      return(0);
+      {
+        *status=MagickFail;
+        return(0);
+      }
   } while (!isdigit(c));
+  count++;
   c &= 0xff;
   if (base == 2)
     return(c-'0');
@@ -157,19 +164,25 @@ static unsigned int PNMInteger(Image *image,const unsigned int base)
     c=ReadBlobByte(image);
     if ((c == EOF) || !(isdigit(c)))
       break;
+    count++;
     c &= 0xff;
   }
+  if (!count)
+    *status=MagickFail;
 
   return(value);
 }
 
-static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base)
+static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,MagickPassFail *status)
 {
-  int
-    c;
-
   unsigned long
     value;
+
+  unsigned int
+    count = 0;
+
+  int
+    c;
 
   static const char P7Comment[] = "END_OF_COMMENTS\n";
 
@@ -261,12 +274,26 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base)
         continue;
       }
   } while (!isdigit(c));
+  count++;
   if (base == 2)
     return(c-'0');
   /*
     Evaluate number.
   */
   value=0;
+  while(1)
+  {
+    value*=10;
+    value+=c-'0';
+    c=ReadBlobByte(image);
+    if ((c == EOF) || !(isdigit(c)))
+      break;
+    count++;
+    c &= 0xff;
+  }
+  if (!count)
+    *status=MagickFail;
+#if 0
   do
   {
     value*=10;
@@ -274,8 +301,8 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base)
     c=ReadBlobByte(image);
     if (c == EOF)
       return(value);
-  }
-  while (isdigit(c));
+  } while (isdigit(c));
+  #endif
   return(value);
 }
 
@@ -406,7 +433,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
   assert(exception->signature == MagickSignature);
   image=AllocateImage(image_info);
   status=OpenBlob(image_info,image,ReadBinaryBlobMode,exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   /*
     Read PNM image.
@@ -445,7 +472,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
         case '7':
           {
             if ((ReadBlobByte(image) == ' ') &&
-                (PNMIntegerOrComment(image,10) == 332))
+                (PNMIntegerOrComment(image,10,&status) == 332))
               format=XV_332_Format;
             else
               format=PAM_Format;
@@ -507,19 +534,19 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 }
               else if (LocaleCompare(keyword,"HEIGHT") == 0)
                 {
-                  image->rows=PNMIntegerOrComment(image,10);
+                  image->rows=PNMIntegerOrComment(image,10,&status);
                 }
               else if (LocaleCompare(keyword,"WIDTH") == 0)
                 {
-                  image->columns=PNMInteger(image,10);
+                  image->columns=PNMInteger(image,10,&status);
                 }
               else if (LocaleCompare(keyword,"DEPTH") == 0)
                 {
-                  samples_per_pixel=PNMInteger(image,10);
+                  samples_per_pixel=PNMInteger(image,10,&status);
                 }
               else if (LocaleCompare(keyword,"MAXVAL") == 0)
                 {
-                  max_value=PNMInteger(image,10);
+                  max_value=PNMInteger(image,10,&status);
                 }
               else if (LocaleCompare(keyword,"TUPLTYPE") == 0)
                 {
@@ -628,13 +655,13 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
             4 4
             15
           */
-          image->columns=PNMIntegerOrComment(image,10);
-          image->rows=PNMInteger(image,10);
+          image->columns=PNMIntegerOrComment(image,10,&status);
+          image->rows=PNMInteger(image,10,&status);
 
           if ((format == PBM_ASCII_Format) || (format == PBM_RAW_Format))
             max_value=1;  /* bitmap */
           else
-            max_value=PNMInteger(image,10);
+            max_value=PNMInteger(image,10,&status);
 
           switch (format)
             {
@@ -746,7 +773,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /*
-        Convert PNM pixels to runlength-encoded MIFF packets.
+        Decode PNM pixels to Image pixel packets.
       */
       switch (format)
         {
@@ -756,7 +783,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               Convert PBM image to pixel packets.
             */
             register unsigned long
-              x;
+              x=0;
 
             register PixelPacket
               *q;
@@ -771,8 +798,8 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 indexes=AccessMutableIndexes(image);
                 for (x=0; x < image->columns; x++)
                   {
-                    index=!PNMInteger(image,2);
-                    if (EOFBlob(image))
+                    index=!PNMInteger(image,2,&status);
+                    if (status == MagickFail)
                       break;
                     VerifyColormapIndex(image,index);
                     indexes[x]=index;
@@ -786,14 +813,18 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                                 LoadImageText,image->filename,
                                                 image->columns,image->rows))
                       break;
-                if (EOFBlob(image))
+                if (status == MagickFail)
                   break;
               }
             image->is_grayscale=MagickTrue;
             image->is_monochrome=MagickTrue;
-            if (EOFBlob(image))
-              ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                             image->filename);
+            if ((status == MagickFail) && EOFBlob(image))
+              {
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "PBM raw (P1) reader EOF at x=%lu, y=%lu", x, y);
+                ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                               image->filename);
+              }
             break;
           }
         case PGM_ASCII_Format:
@@ -802,7 +833,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               Convert PGM image to pixel packets.
             */
             register unsigned long
-              x;
+              x=0;
 
             register PixelPacket
               *q;
@@ -831,10 +862,10 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     indexes=AccessMutableIndexes(image);
                     for (x=0; x < image->columns; x++)
                       {
-                        intensity=PNMInteger(image,10);
-                        ValidateScalingIndex(image, intensity, max_value);
-                        if (EOFBlob(image))
+                        intensity=PNMInteger(image,10,&status);
+                        if (status == MagickFail)
                           break;
+                        ValidateScalingIndex(image, intensity, max_value);
                         index=intensity;
                         VerifyColormapIndex(image,index);
                         indexes[x]=index;
@@ -850,17 +881,17 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     */
                     for (x=0; x < image->columns; x++)
                       {
-                        intensity=PNMInteger(image,10);
-                        ValidateScalingIndex(image, intensity, max_value);
-                        if (EOFBlob(image))
+                        intensity=PNMInteger(image,10,&status);
+                        if (status == MagickFail)
                           break;
+                        ValidateScalingIndex(image, intensity, max_value);
                         intensity=ScaleAnyToQuantum(intensity, max_value);
                         q->red=q->green=q->blue=intensity;
                         is_monochrome &= IsMonochrome(*q);
                         q++;
                       }
                   }
-                if (EOFBlob(image))
+                if (status == MagickFail)
                   break;
                 if (!SyncImagePixels(image))
                   break;
@@ -873,18 +904,22 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
             image->is_monochrome=is_monochrome;
             image->is_grayscale=is_grayscale;
-            if (EOFBlob(image))
-              ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                             image->filename);
+            if ((status == MagickFail) && EOFBlob(image))
+              {
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "PGM raw (P2) reader EOF at x=%lu, y=%lu", x, y);
+                ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                               image->filename);
+              }
             break;
           }
         case PPM_ASCII_Format:
           {
             /*
-              Convert PNM image to pixel packets.
+              Convert PPM image to pixel packets.
             */
             register unsigned long
-              x;
+              x=0;
 
             register PixelPacket
               *q;
@@ -904,10 +939,14 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   break;
                 for (x=0; x < image->columns; x++)
                   {
-                    pixel.red=PNMInteger(image,10);
-                    pixel.green=PNMInteger(image,10);
-                    pixel.blue=PNMInteger(image,10);
-                    if (EOFBlob(image))
+                    pixel.red=PNMInteger(image,10,&status);
+                    if (status == MagickFail)
+                      break;
+                    pixel.green=PNMInteger(image,10,&status);
+                    if (status == MagickFail)
+                      break;
+                    pixel.blue=PNMInteger(image,10,&status);
+                    if (status == MagickFail)
                       break;
                     ValidateScalingPixel(image, pixel, max_value);
                     pixel.red=ScaleAnyToQuantum(pixel.red, max_value);
@@ -920,7 +959,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     is_grayscale &= IsGray(*q);
                     q++;
                   }
-                if (EOFBlob(image))
+                if (status == MagickFail)
                   break;
                 if (!SyncImagePixels(image))
                   break;
@@ -933,9 +972,13 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
             image->is_monochrome=is_monochrome;
             image->is_grayscale=is_grayscale;
-            if (EOFBlob(image))
-              ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                             image->filename);
+            if ((status == MagickFail) && EOFBlob(image))
+              {
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "PNM raw (P3) reader EOF at x=%lu, y=%lu", x, y);
+                ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                               image->filename);
+              }
             break;
           }
         case PBM_RAW_Format:
