@@ -558,11 +558,24 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
     *security_limits;
 
   magick_uintmax_t
+    memory_limit,
     width_limit,
     height_limit,
     pixels_limit;
 
   security_limits=heif_context_get_security_limits(heif_context);
+
+  memory_limit = (magick_uintmax_t) GetMagickResourceLimit(MemoryResource);
+  security_limits->max_memory_block_size = (uint64_t) memory_limit;
+  security_limits->max_total_memory = (uint64_t) memory_limit;
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max-memory-block-size = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_memory_block_size);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max-total-memory = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_total_memory);
 
   width_limit = (magick_uintmax_t) GetMagickResourceLimit(WidthResource);
   if (width_limit > INT_MAX)
@@ -576,10 +589,10 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
     pixels_limit = width_limit*height_limit;
 
   security_limits->max_image_size_pixels = (uint64_t) pixels_limit;
-
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "security limits:"
-                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u", pixels_limit);
+                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_image_size_pixels);
 
   /*
     Version 1 interface has:

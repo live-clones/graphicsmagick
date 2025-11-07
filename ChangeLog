@@ -1,3 +1,10 @@
+2025-11-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (apply_security_limits): Apply default
+	max-memory-block-size and max-total-memory limits based on
+	GraphicsMagick resource limits. These may be overridden
+	explicitly.
+
 2025-11-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/pnm.c (ReadPNMImage): Support reading PBM raw (P1), PGM
