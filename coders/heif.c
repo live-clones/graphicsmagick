@@ -877,13 +877,6 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   assert(exception != (ExceptionInfo *) NULL);
   assert(exception->signature == MagickSignature);
 
-  if (!heif_initialized)
-    {
-      /* heif_init() accepts a 'struct heif_init_params *' argument */
-      heif_init((struct heif_init_params *) NULL);
-      heif_initialized = MagickTrue;
-    }
-
   /*
     Open image file.
   */
@@ -894,6 +887,13 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   if (OpenBlob(image_info,image,ReadBinaryBlobMode,exception) == MagickFail)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
 
+  if (!heif_initialized)
+    {
+      /* heif_init() accepts a 'struct heif_init_params *' argument */
+      heif_init((struct heif_init_params *) NULL);
+      heif_initialized = MagickTrue;
+    }
+
   /*
     Read the whole input file into a memory blob
   */
@@ -902,16 +902,27 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   if (in_buf == (unsigned char *) NULL)
     ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
 
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Reading file into in-memory blob...");
   if (ReadBlob(image,in_len,in_buf) != in_len)
     ThrowHEIFReaderException(CorruptImageError, UnexpectedEndOfFile, image);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "  Done!");
 
   /*
-    Allow the user to ignore transformations
+    Allow the user to enable transformations (e.g. the image might be rotated).
   */
-  ignore_transformations = MagickFalse;
+  ignore_transformations = MagickTrue;
   if ((value=AccessDefinition(image_info,"heif","ignore-transformations")))
-    if (LocaleCompare(value,"TRUE") == 0)
-      ignore_transformations = MagickTrue;
+    if (LocaleCompare(value,"FALSE") == 0)
+      {
+        ignore_transformations = MagickFalse;
+        if (image->logging)
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Enabling transformations");
+      }
 
   /* Init HEIF-Decoder handles */
   heif=heif_context_alloc();
@@ -1022,10 +1033,18 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     }
 
   /*
-    When apply transformations (the default) the whole image has to be
-    read to get the real dimensions.
+    When apply transformations the whole image has to be read to get
+    the real dimensions. We no longer read the whole image because it
+    makes 'identify' extremely slow for large files.
+
+    The user should specify:
+
+    -define heif:ignore-transformations=false
+
+    in order to force reading much of the image to get fully accurate
+    information.
   */
-  if (image_info->ping && ignore_transformations)
+  if (image_info->ping && ignore_transformations) /* ignore_transformations is true by default */
     {
       HEIFReadCleanup();
       CloseBlob(image);

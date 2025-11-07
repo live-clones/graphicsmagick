@@ -4,6 +4,14 @@
 	max-memory-block-size and max-total-memory limits based on
 	GraphicsMagick resource limits. These may be overridden
 	explicitly.
+	(ReadHEIFImage): Invert the sense of ignore_transformations.
+	Default 'ignore_transformations' to true since otherwise
+	'identify' can be very slow due to doing much of the work involved
+	with reading the file.  The user should pass '-define
+	heif:ignore-transformations=false' if a fully accurate report of
+	image dimensions (and some other information) is required.  This
+	is to address the concern raised in issue #75 "Optimize HEIC
+	identify performance by deferring libheif initialization".
 
 2025-11-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

@@ -1552,7 +1552,9 @@ in the writer.
 </dd>
 <dt>heif:ignore-transformations={true|false}</dt>
 <dd>
-Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) applied.
+Return HEIF (e.g. HEIC/AVIF) image without any transformations
+(e.g. rotation) applied.  The default value is true. When
+ignore-transformations is false, identify may be much slower.
 </dd>
 <dt>heif:preserve-colorspace={true|false}</dt>
 <dd> Return HEIF image in its original colorspace.  This allows an
