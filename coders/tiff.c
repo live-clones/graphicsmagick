@@ -3878,6 +3878,16 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Using RGB punt read method with %u bits per sample",
                                     bits_per_sample);
+
+
+            /*
+              TIFFReadRGBAImage() does not handle more than 4 samples per pixel.
+            */
+            if (samples_per_pixel > 4)
+              {
+                ThrowTIFFReaderException(CoderError,UnsupportedSamplesPerPixel,image);
+              }
+
             /*
               Convert TIFF image to DirectClass MIFF image.
             */
@@ -3917,10 +3927,16 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 ThrowTIFFReaderException(ResourceLimitError,MemoryAllocationFailed,
                                          image);
               }
+            if (logging)
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Dispatching to TIFFReadRGBAImage()");
             if (!TIFFReadRGBAImage(tiff,(uint32) image->columns,
                                    (uint32) image->rows,
                                    pixels,0))
               {
+                if (logging)
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "TIFFReadRGBAImage() returns failure!");
                 MagickFreeResourceLimitedMemory(pixels);
                 status=MagickFail;
                 break;

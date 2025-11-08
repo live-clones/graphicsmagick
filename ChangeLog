@@ -1,3 +1,8 @@
+2025-11-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (ReadTIFFImage): Don't expect TIFFReadRGBAImage()
+	to handle more than 4 samples per pixel.
+
 2025-11-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (apply_security_limits): Apply default
