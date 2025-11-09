@@ -2619,9 +2619,19 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   if ((status == MagickPass) && (NeedAllocCount > *p_PIMgr->p_AllocCount))
     {
       PrimitiveInfo *new_primitive_info;
-      new_primitive_info=MagickReallocateResourceLimitedClearedArray(PrimitiveInfo *,*p_PIMgr->pp_PrimitiveInfo,NeedAllocCount,sizeof(PrimitiveInfo));
+      new_primitive_info=MagickReallocateResourceLimitedClearedArray(PrimitiveInfo *,
+                                                                     *p_PIMgr->pp_PrimitiveInfo,
+                                                                     NeedAllocCount,
+                                                                     sizeof(PrimitiveInfo));
       if (new_primitive_info == (PrimitiveInfo *) NULL)
         {
+          /* PrimitiveInfo contains a pointer to "text" which may need to be freed! */
+          PrimitiveInfo *primitive_info;
+          size_t i, AllocCount;
+          primitive_info=*p_PIMgr->pp_PrimitiveInfo;
+          AllocCount=*p_PIMgr->p_AllocCount;
+          for (i = 0; i < AllocCount; i++)
+            MagickFreeMemory(primitive_info[i].text);
           MagickFreeResourceLimitedMemory(*p_PIMgr->pp_PrimitiveInfo);
           ThrowException3(p_PIMgr->p_Exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
           status = MagickFail;

@@ -2,6 +2,8 @@
 
 	* magick/render.c (PrimitiveInfoRealloc): Use the resource-limited
 	memory allocator to allocate/reallocate PrimitiveInfo array.
+	(PrimitiveInfoRealloc): Ensure that PrimitiveInfo text is freed
+	upon a realloc failure.
 
 2025-11-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
