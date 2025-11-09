@@ -167,8 +167,6 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
     count++;
     c &= 0xff;
   }
-  if (!count)
-    *status=MagickFail;
 
   return(value);
 }

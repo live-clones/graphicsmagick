@@ -1,5 +1,8 @@
 2025-11-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/pnm.c (PNMInteger): Fix Coverity 493469 "Logically dead
+	code".
+
 	* magick/render.c (PrimitiveInfoRealloc): Use the resource-limited
 	memory allocator to allocate/reallocate PrimitiveInfo array.
 	(PrimitiveInfoRealloc): Ensure that PrimitiveInfo text is freed
