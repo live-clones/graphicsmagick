@@ -2586,18 +2586,16 @@ char * InsertAttributeIntoInputStream (
 
 
 /*
-  Re-allocate PrimitiveInfo array if needed.  Return MagickFail if
-  allocation has failed.  PrimitiveInfo array pointer is set to NULL
-  if allocation has failed, and any already allocated memory is freed.
+  Re-allocate PrimitiveInfo array if Needed elements are not
+  available.  Return MagickFail if allocation has failed.
+  PrimitiveInfo array pointer is set to NULL if allocation has failed,
+  and any already allocated memory is freed.
 */
 static MagickPassFail
 PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
 {/*PrimitiveInfoRealloc*/
 
   MagickPassFail status = MagickPass;
-  /* grow the PrimitiveInfo array if Needed elements are not available; return true if reallocated */
-
-  /* ANSI C says that SIZE_MAX gives maximum value of size_t */
   size_t NeedAllocCount;
 
 #if 0
@@ -2605,7 +2603,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
 #endif
   /* NeedAllocCount = p_PIMgr->StoreStartingAt + Needed + ((size_t)100 */
   status &= MagickAddSizeT(p_PIMgr->StoreStartingAt, Needed, &NeedAllocCount); /* + Needed */
-  status &= MagickAddSizeT(NeedAllocCount, 100, &NeedAllocCount); /* +100 for headroom */
+  /* status &= MagickAddSizeT(NeedAllocCount, 100, &NeedAllocCount); */ /* +100 for headroom */
 
   if (status != MagickPass)
     ThrowException3(p_PIMgr->p_Exception,DrawError,ArithmeticOverflow,UnableToDrawOnImage);
@@ -2613,55 +2611,26 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   /* Check if we have exceeded primitive info allocation hard limit */
   if (NeedAllocCount > PRIMITIVE_INFO_POINTS_MAX)
     {
+      MagickFreeResourceLimitedMemory(*p_PIMgr->pp_PrimitiveInfo);
       ThrowException3(p_PIMgr->p_Exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
       status = MagickFail;
     }
 
   if ((status == MagickPass) && (NeedAllocCount > *p_PIMgr->p_AllocCount))
     {
-      const size_t have_memory=MagickArraySize(*p_PIMgr->p_AllocCount,sizeof(PrimitiveInfo));
-      const size_t needed_memory=MagickArraySize(NeedAllocCount,sizeof(PrimitiveInfo));
-      const magick_uint64_t added_memory=needed_memory-have_memory;
-
-#if 0
-      fprintf(stderr,
-              "have_memory=%" MAGICK_SIZE_T_F "u (%" MAGICK_SIZE_T_F "u elem),"
-              " needed_memory=%" MAGICK_SIZE_T_F "u (%" MAGICK_SIZE_T_F "u elem),"
-              " added_memory=%" MAGICK_SIZE_T_F "u\n",
-              (MAGICK_SIZE_T) have_memory, (MAGICK_SIZE_T) *p_PIMgr->p_AllocCount,
-              (MAGICK_SIZE_T) needed_memory, (MAGICK_SIZE_T) NeedAllocCount,
-              (MAGICK_SIZE_T) added_memory);
-#endif
-
-      /* Need to realloc */
-      if (((*p_PIMgr->p_AllocCount > 0) && (have_memory == 0)) ||
-          ((NeedAllocCount > 0) && (needed_memory == 0)) ||
-          (status &= AcquireMagickResource(MemoryResource,added_memory)) == MagickFail)
+      PrimitiveInfo *new_primitive_info;
+      new_primitive_info=MagickReallocateResourceLimitedClearedArray(PrimitiveInfo *,*p_PIMgr->pp_PrimitiveInfo,NeedAllocCount,sizeof(PrimitiveInfo));
+      if (new_primitive_info == (PrimitiveInfo *) NULL)
         {
+          MagickFreeResourceLimitedMemory(*p_PIMgr->pp_PrimitiveInfo);
           ThrowException3(p_PIMgr->p_Exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
           status = MagickFail;
         }
       else
         {
-          /* Allocate/reallocate the memory */
-          MagickReallocMemory(PrimitiveInfo *,*p_PIMgr->pp_PrimitiveInfo,needed_memory);
-          if (*p_PIMgr->pp_PrimitiveInfo == (PrimitiveInfo *) NULL)
-            {
-              ThrowException3(p_PIMgr->p_Exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
-              status = MagickFail;
-              /* Record that the memory was unexpectedly released */
-              LiberateMagickResource(MemoryResource,(*p_PIMgr->p_AllocCount)*sizeof(PrimitiveInfo));
-            }
-          else
-            {
-              /* Clear freshly-allocated memory */
-#if 0
-              fprintf(stderr,"memset start_offset=%zu size=%zu\n", *p_PIMgr->p_AllocCount, added_memory);
-#endif
-              (void) memset((unsigned char *)(*p_PIMgr->pp_PrimitiveInfo)+have_memory,0,added_memory);
-              /* Save new allocation count */
-              *p_PIMgr->p_AllocCount = NeedAllocCount;
-            }
+          *p_PIMgr->pp_PrimitiveInfo=new_primitive_info;
+          /* Save new allocation count */
+          *p_PIMgr->p_AllocCount = NeedAllocCount;
         }
     }
 
@@ -5006,9 +4975,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   */
   DrawImageRecurseOut(image);
   MagickFreeResourceLimitedMemory(token);
-  if (primitive_info != (PrimitiveInfo *) NULL)
-    LiberateMagickResource(MemoryResource,(*PIMgr.p_AllocCount)*sizeof(PrimitiveInfo));
-  MagickFreeMemory(primitive_info);
+  MagickFreeResourceLimitedMemory(primitive_info);
   MagickFreeResourceLimitedMemory(primitive);
   for ( ; n >= 0; n--)
     DestroyDrawInfo(graphic_context[n]);
