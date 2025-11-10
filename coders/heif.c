@@ -25,6 +25,9 @@
 * Debian 12 Backports provides 1.19.7 (March 3, 2025)
 * Maybe limit support to version 1.17.6 (Dec 20, 2023) or later?
 * But 1.20.0 (July 1, 2025) introduces support for sequences!
+* Meanwhile, 1.14.0 is required to compile.
+*
+* Nokia technical publication on HEIF: https://nokiatech.github.io/heif/technical.html
 */
 
 #include "magick/studio.h"
@@ -154,6 +157,11 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Testing header for supported HEIF format");
+
+  /*
+    const char* heif_get_file_mime_type(const uint8_t* data, int len)
+    heif_filetype_result heif_check_filetype(const uint8_t* data, int len)
+   */
 
   if (length < 12)
     return(MagickFalse);
@@ -911,6 +919,57 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "  Done!");
 
+  /* Init HEIF-Decoder handles */
+  heif=heif_context_alloc();
+
+  /* Apply security limits */
+  (void) apply_security_limits(image_info,heif);
+
+  /*
+    Trace some information about the file
+  */
+  if (image->logging)
+    {
+      char
+        fourcc[5];
+
+      {
+        /* Log main brand */
+        (void) memset(fourcc,0,sizeof(fourcc));
+        heif_brand_to_fourcc(heif_read_main_brand(in_buf, in_len), fourcc);
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "HEIF Brand: %s", fourcc);
+      }
+      {
+        /* Log compatible brands */
+        heif_brand2* brands = NULL;
+        int nBrands = 0;
+        heif_status = heif_list_compatible_brands(in_buf, in_len, &brands, &nBrands);
+        if (heif_status.code == heif_error_Ok)
+          {
+            int i;
+            char compatible_brands[6*nBrands+1];
+            (void) memset(compatible_brands,0,sizeof(compatible_brands));
+            for (i = 0; i < nBrands; i++)
+              {
+                heif_brand_to_fourcc(brands[i], fourcc);
+                if (i > 0)
+                  (void) strlcat(compatible_brands,", ",sizeof(compatible_brands));
+                strlcat(compatible_brands,fourcc,sizeof(compatible_brands));
+              }
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Compatible HEIF Brands: %s", compatible_brands);
+          }
+      }
+      {
+        /* Log MIME type */
+        const char *mime_type = heif_get_file_mime_type(in_buf, in_len);
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "MIME Type: %s",
+                              mime_type == (const char *) NULL ? "unknown" : mime_type);
+      }
+    } /* if (image->logging) */
+
   /*
     Allow the user to enable transformations (e.g. the image might be rotated).
   */
@@ -923,12 +982,6 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Enabling transformations");
       }
-
-  /* Init HEIF-Decoder handles */
-  heif=heif_context_alloc();
-
-  /* Apply security limits */
-  (void) apply_security_limits(image_info,heif);
 
   heif_status=heif_context_read_from_memory_without_copy(heif, in_buf, in_len, NULL);
   if (heif_status.code == heif_error_Unsupported_filetype
@@ -1104,7 +1157,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     if ((heif_chroma_decode == heif_chroma_420) || (heif_chroma_decode == heif_chroma_422))
       heif_chroma_decode=heif_chroma_444;
 
-        /* FIXME: Add control over whether to return original YBbCr or RGB */
+    /* FIXME: Add control over whether to return original YBbCr or RGB */
 #if 1
     if (heif_colorspace_decode == heif_colorspace_YCbCr)
       {
@@ -1251,43 +1304,43 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
                 line[channel_index]=planes[channel_index]+y*row_stride;
               for (x=0; x < (long)image->columns; x++)
                 {
-                    for (channel_index = 0; channel_index < num_channels; channel_index++)
-                      {
-                        uint16_t
-                          sample;
+                  for (channel_index = 0; channel_index < num_channels; channel_index++)
+                    {
+                      uint16_t
+                        sample;
 
-                        Quantum
-                          quantum;
+                      Quantum
+                        quantum;
 
-                        if (image->depth > 8)
-                          {
-                            sample = *((uint16_t*) line[channel_index]);
-                            line[channel_index] += 2;
-                            quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                          }
-                        else
-                          {
-                            sample = *line[channel_index]++;
-                            quantum=ScaleCharToQuantum(sample);
-                          }
-                        switch (channel_index)
-                          {
-                          case 0:
-                            SetYSample(q,quantum);
-                            if (num_channels != 4)
-                              SetOpacitySample(q,OpaqueOpacity);
-                            break;
-                          case 1:
-                            SetCbSample(q,quantum);
-                            break;
-                          case 2:
-                            SetCrSample(q,quantum);
-                            break;
-                          case 3:
-                            SetOpacitySample(q,MaxRGB-quantum);
-                            break;
-                          }
-                      }
+                      if (image->depth > 8)
+                        {
+                          sample = *((uint16_t*) line[channel_index]);
+                          line[channel_index] += 2;
+                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
+                        }
+                      else
+                        {
+                          sample = *line[channel_index]++;
+                          quantum=ScaleCharToQuantum(sample);
+                        }
+                      switch (channel_index)
+                        {
+                        case 0:
+                          SetYSample(q,quantum);
+                          if (num_channels != 4)
+                            SetOpacitySample(q,OpaqueOpacity);
+                          break;
+                        case 1:
+                          SetCbSample(q,quantum);
+                          break;
+                        case 2:
+                          SetCrSample(q,quantum);
+                          break;
+                        case 3:
+                          SetOpacitySample(q,MaxRGB-quantum);
+                          break;
+                        }
+                    }
                   q++;
                 }
               if (!SyncImagePixels(image))
@@ -1375,9 +1428,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 
                       if (image->depth > 8)
                         {
-                            sample = *((uint16_t*) line[channel_index]);
-                            line[channel_index] += 2;
-                            quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
+                          sample = *((uint16_t*) line[channel_index]);
+                          line[channel_index] += 2;
+                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
                         }
                       else
                         {
@@ -1453,9 +1506,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
                                                                      heif_channel,
                                                                      &row_stride);
               bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
-                                                                   heif_channel);
+                                                             heif_channel);
               bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                      heif_channel);
+                                                                         heif_channel);
               if ((int) image->depth < bits_per_pixel_range)
                 image->depth=(unsigned int) bits_per_pixel_range;
               heif_channel_str = HEIF_channel_to_string(heif_channel);
@@ -1490,9 +1543,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 
                       if (image->depth > 8)
                         {
-                            sample = *((uint16_t*) line[channel_index]);
-                            line[channel_index] += 2;
-                            quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
+                          sample = *((uint16_t*) line[channel_index]);
+                          line[channel_index] += 2;
+                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
                         }
                       else
                         {

@@ -65,8 +65,8 @@ StaticMagic[] =
 {
 #define MAGIC(name,description,offset,magic) {name,(const unsigned char * const)magic,description,sizeof(name)-1,sizeof(description)-1,sizeof(magic)-1,offset}
   MAGIC("WEBP", "WebP Image Format", 8, "WEBP"),
-  MAGIC("AVIF", "HEIF AV1 image", 4, "ftypavif"),
-  MAGIC("AVIF", "HEIF AV1 image sequence", 4, "ftypavis"),
+  MAGIC("AVIF", "AV1 image", 4, "ftypavif"), /* "image/avif" */
+  MAGIC("AVIF", "AV1 image sequence", 4, "ftypavis"), /* "image/avif-sequence" */
   /* MAGIC("AVI", "", 0, "RIFF"), */
   MAGIC("8BIMWTEXT", "Photoshop resource wide text format", 0, "8\000B\000I\000M\000#"),
   MAGIC("8BIMTEXT", "Photoshop resource text format", 0, "8BIM#"),
@@ -98,15 +98,36 @@ StaticMagic[] =
   MAGIC("FPX", "FlashPIX", 0, "\320\317\021\340"),
   MAGIC("GIF", "CompuServe graphics interchange format", 0, "GIF8"),
   /* See libheif/libheif/api/libheif/heif_brands.h and .cc for libheif support */
-  MAGIC("HEIC", "HEIF - A regular heif image", 4, "ftypheic"),
-  MAGIC("HEIC", "HEIF - Extended range (>8 bit) image", 4, "ftypheix"),
-  MAGIC("HEIF", "HEIF - Image sequence", 4, "ftyphevc"),
-  MAGIC("HEIF", "HEIF - Image sequence", 4, "ftypheim"),
-  MAGIC("HEIF", "HEIF - Scalable image", 4, "ftypheis"),
-  MAGIC("HEIF", "HEIF - Multiview sequence", 4, "ftyphevm"),
-  MAGIC("HEIF", "HEIF - Scalable sequence", 4, "ftyphevs"),
-  MAGIC("HEIC", "HEIF - Nokia alpha image", 4, "ftypmif1"),
-  MAGIC("HEIC", "HEIF - Nokia animation image", 4, "ftypmsf1"),
+  /* The mappings of HEIF brand identifiers to magic identifiers is subject to change */
+  /* https://nokiatech.github.io/heif/technical.html */
+  MAGIC("HEIC", "HEVC image - HEVC (H.265) Main or Main Still profile (`heic`)", 4, "ftypheic"), /* MIME "image/heic */
+  MAGIC("HEIC", "HEVC image - HEVC (H.265) Main 10 profile (`heix`)", 4, "ftypheix"), /* MIME "image/heic */
+  MAGIC("HEIC", "HEVC image sequence - HEVC (H.265) Main profile (`hevc`)", 4, "ftyphevc"), /* MIME "image/heic-sequence" */
+  MAGIC("HEIC", "HEVC image sequence - HEVC (H.265) Main 10 profile (`hevx`)", 4, "ftyphevx"), /* MIME "image/heic-sequence" */
+  MAGIC("HEIC", "HEVC layered image - HEVC (H.265) Main or Multiview Main profile (`heim`)", 4, "ftypheim"), /* MIME "image/heic" */
+  MAGIC("HEIC", "HEVC layered image - HEVC (H.265) Main, Main 10, Scalable Main or Scalable Main 10 profile (`heis`)", 4, "ftypheis"), /* MIME "image/heic */
+  MAGIC("HEIC", "HEVC layered image sequence - HEVC (H.265) Main or Multiview Main profile (`hevm`)", 4, "ftyphevm"), /* "MIME image/heic-sequence" */
+  MAGIC("HEIC", "HEVC layered image sequence - HEVC (H.265) Main, Main 10, Scalable Main or Scalable Main 10 profile (`hevs`)", 4, "ftyphevs"), /* MIME "image/heic-sequence" */
+  MAGIC("HEIF", "HEIF image structural brand (`mif1`)", 4, "ftypmif1"), /* MIME "image/heif" */ /* mif1heichevc */
+  MAGIC("HEIF", "HEIF image structural brand (`mif2`)", 4, "ftypmif2"),
+  MAGIC("HEIF", "HEIF image structural brand (`mif3`) - low-overhead (ftyp+mini) structure", 4, "ftypmif3"), /* "mif3avif", "mif3heic" */
+  MAGIC("HEIF", "HEIF image sequence structural brand (`msf1`)", 4, "ftypmsf1"), /* MIME "image/heif-sequence" */
+  MAGIC("HEIF", "VVC image (`vvic`)", 4, "ftypvvic"),
+  MAGIC("HEIF", "VVC image sequence (`vvis`)", 4, "ftypvvis"),
+  MAGIC("HEIF", "EVC baseline image (`evbi`)", 4, "ftypevbi"),
+  MAGIC("HEIF", "EVC main profile image (`evmi`)", 4, "ftypevbi"),
+  MAGIC("HEIF", "EVC baseline image sequence (`evbs`)", 4, "ftypevbs"),
+  MAGIC("HEIF", "EVC main profile image sequence (`evms`)", 4, "ftypevms"),
+  MAGIC("HEIF", "JPEG image (`jpeg`)", 4, "ftypjpeg"),
+  MAGIC("HEIF", "JPEG image sequence (`jpgs`)", 4, "ftypjpgs"),
+  MAGIC("HEIF", "JPEG 2000 image (`j2ki`)", 4, "ftypj2ki"), /* MIME "image/hej2k" */
+  MAGIC("HEIF", "JPEG 2000 image sequence (`j2is`)", 4, "ftypj2is"), /* MIME "image/j2is" */
+  MAGIC("HEIF", "Multi-image application format (`miaf`)", 4, "ftypmiaf"),
+  MAGIC("HEIF", "Single picture file, a single intra-coded picture (`1pic`)", 4, "ftyp1pic"),
+  MAGIC("HEIF", "H.264 AVCI (`avci`)", 4, "ftypavci"),
+  MAGIC("HEIF", "H.264 AVCS (`avcs`)", 4, "ftypavcs"),
+  MAGIC("HEIF", "H.264 ISO8 (`iso8`)", 4, "ftypiso8"),
+  MAGIC("HEIF", "HEIF", 4, "ftyp"), /* Last-ditch catch-all for HEIF files */
   /* MAGIC("HDF", "Heirarchical Data Format", 1, "HDF"), */
   MAGIC("HPGL", "HP Graphics Language", 0, "IN;"),
   MAGIC("HTML", "Hypertext Markup Language", 1, "HTML"),

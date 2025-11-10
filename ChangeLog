@@ -1,3 +1,11 @@
+2025-11-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (ReadHEIFImage): Log more information about the
+	file.
+
+	* magick/magic.c: Add all of the HEIF fourcc identifier values
+	currently known by libheif.
+
 2025-11-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/pnm.c (PNMInteger): Fix Coverity 493469 "Logically dead
