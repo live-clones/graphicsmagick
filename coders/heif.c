@@ -960,6 +960,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Compatible HEIF Brands: %s", compatible_brands);
           }
+        heif_free_list_of_compatible_brands(brands);
       }
       {
         /* Log MIME type */
