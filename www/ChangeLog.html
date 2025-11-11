@@ -41,6 +41,11 @@
 <p>2025-11-11  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>VisualMagick/installer/inc/body.isx (VCRedistNeedsInstall): Do
+not default to VC_2008. This change will hopefully solve the issue
+noted by OELS in the discussion thread
+<a class="reference external" href="https://sourceforge.net/p/graphicsmagick/discussion/250737/thread/8812618fc6/">https://sourceforge.net/p/graphicsmagick/discussion/250737/thread/8812618fc6/</a>
+in that the installer attempts to execute vcredist_x64.exe.</p></li>
 <li><p>magick/render.c (PrimitiveInfoRealloc): Uncomment line
 pertaining to &quot;+100 for headroom&quot; which was commented out on
 2025-11-09. Fixes oss-fuzz issue 459618468

@@ -177,6 +177,15 @@ begin
   Result := MsiQueryProductState(ProductID) = INSTALLSTATE_DEFAULT;
 end;
 
+; FIXME: See https://sourceforge.net/p/graphicsmagick/discussion/250737/thread/8812618fc6/?limit=25#2cac/6ea0
+; This function is/was returning true, and possibly because the default (final unconditioned else) is/was VC_2008
+;
+; This results in this problem:
+; Unable to execute file:
+; C:\Users[UserName]\AppData\Local\Temp\is-2SNJ7.tmp\vcredist_x64.exe
+; CreateProcess failed; code 2.
+; A change has been made, but it still needs to be verified.
+;
 function VCRedistNeedsInstall: Boolean;
 var
   r1, r2, r3: Boolean;
@@ -206,14 +215,16 @@ begin
   #endif
   r3 := r1;
  #else
-  #ifdef WIN64
-   r1 := VCVersionInstalled(VC_2008_REDIST_X64);
-   r2 := VCVersionInstalled(VC_2008_SP1_REDIST_X64);
-   r3 := VCVersionInstalled(VC_2008_SP1_MFC_SEC_UPD_REDIST_X64);
-  #else
-   r1 := VCVersionInstalled(VC_2008_REDIST_X86);
-   r2 := VCVersionInstalled(VC_2008_SP1_REDIST_X86_);
-   r3 := VCVersionInstalled(VC_2008_SP1_MFC_SEC_UPD_REDIST_X86);
+  #ifdef VC_2008
+   #ifdef WIN64
+    r1 := VCVersionInstalled(VC_2008_REDIST_X64);
+    r2 := VCVersionInstalled(VC_2008_SP1_REDIST_X64);
+    r3 := VCVersionInstalled(VC_2008_SP1_MFC_SEC_UPD_REDIST_X64);
+   #else
+    r1 := VCVersionInstalled(VC_2008_REDIST_X86);
+    r2 := VCVersionInstalled(VC_2008_SP1_REDIST_X86_);
+    r3 := VCVersionInstalled(VC_2008_SP1_MFC_SEC_UPD_REDIST_X86);
+   #endif
   #endif
  #endif
 #endif
