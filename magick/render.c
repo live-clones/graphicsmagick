@@ -2603,7 +2603,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
 #endif
   /* NeedAllocCount = p_PIMgr->StoreStartingAt + Needed + ((size_t)100 */
   status &= MagickAddSizeT(p_PIMgr->StoreStartingAt, Needed, &NeedAllocCount); /* + Needed */
-  /* status &= MagickAddSizeT(NeedAllocCount, 100, &NeedAllocCount); */ /* +100 for headroom */
+  status &= MagickAddSizeT(NeedAllocCount, 100, &NeedAllocCount); /* +100 for headroom */
 
   if (status != MagickPass)
     ThrowException3(p_PIMgr->p_Exception,DrawError,ArithmeticOverflow,UnableToDrawOnImage);

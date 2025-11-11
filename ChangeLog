@@ -1,5 +1,10 @@
 2025-11-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/render.c (PrimitiveInfoRealloc): Uncomment line
+	pertaining to "+100 for headroom" which was commented out on
+	2025-11-09. Fixes oss-fuzz issue 459618468
+	"graphicsmagick:coder_MVG_fuzzer: ASSERT: i < number_points".
+
 	* fuzzing/oss-fuzz-build.sh: Disable JBIG support in libtiff
 	because it has been fuzz-tested for quite a few years already and
 	the slow codec leads to false bug reports.
