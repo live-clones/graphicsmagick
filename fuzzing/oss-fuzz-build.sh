@@ -350,6 +350,7 @@ if $enable_tiff
            --disable-contrib \
            --disable-ld-version-script \
            --disable-old-jpeg \
+           --disable-jbig \
            --disable-shared \
            --disable-silent-rules \
            --disable-tests \

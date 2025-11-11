@@ -1,3 +1,9 @@
+2025-11-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Disable JBIG support in libtiff
+	because it has been fuzz-tested for quite a few years already and
+	the slow codec leads to false bug reports.
+
 2025-11-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImage): Log more information about the
