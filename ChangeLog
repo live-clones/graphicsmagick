@@ -1,3 +1,8 @@
+2025-11-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/render.c (DrawImage): Use resource-limited memory
+	allocator when allocating graphic contexts.
+
 2025-11-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* VisualMagick/installer/inc/body.isx (VCRedistNeedsInstall): Do

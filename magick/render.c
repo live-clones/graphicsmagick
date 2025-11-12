@@ -2810,7 +2810,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   /*
     Allocate primitive info memory.
   */
-  graphic_context=MagickAllocateMemory(DrawInfo **,sizeof(DrawInfo *));
+  graphic_context=MagickAllocateResourceLimitedMemory(DrawInfo **,sizeof(DrawInfo *));
   if (graphic_context == (DrawInfo **) NULL)
     {
       MagickFreeResourceLimitedMemory(primitive);
@@ -2827,13 +2827,13 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass)
     {
       MagickFreeResourceLimitedMemory(primitive);
-      MagickFreeMemory(graphic_context);
+      MagickFreeResourceLimitedMemory(graphic_context);
       return MagickFail;
     }
   if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
     {
       MagickFreeResourceLimitedMemory(primitive);
-      MagickFreeMemory(graphic_context);
+      MagickFreeResourceLimitedMemory(graphic_context);
       return MagickFail;
     }
   graphic_context[n]=CloneDrawInfo((ImageInfo *) NULL,draw_info);
@@ -2845,7 +2845,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       DestroyDrawInfo(graphic_context[n]);
       graphic_context[n]=(DrawInfo *) NULL;
       MagickFreeResourceLimitedMemory(primitive);
-      MagickFreeMemory(graphic_context);
+      MagickFreeResourceLimitedMemory(graphic_context);
       return MagickFail;
     }
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
@@ -3873,18 +3873,20 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               }
             if (LocaleCompare("graphic-context",token) == 0)
               {
-                n++;
-                /* FIXME: Change to managed memory. If this allocation
-                   fails (unlikely), then the existing DrawInfo
-                   allocations will be leaked! */
-                MagickReallocMemory(DrawInfo **,graphic_context,
-                                    MagickArraySize(((size_t) n+1),sizeof(DrawInfo *)));
+                DrawInfo** new_graphic_context;
+                n++; /* Yes, this increment before alloc must be here! */
+                new_graphic_context=
+                  MagickReallocateResourceLimitedArray(DrawInfo**,graphic_context,
+                                                       ((size_t) n+1),sizeof(DrawInfo *));
                 if (graphic_context == (DrawInfo **) NULL)
                   {
+                    for ( ; n >= 0; n--)
+                      DestroyDrawInfo(graphic_context[n]);
                     ThrowException3(&image->exception,ResourceLimitError,
                                     MemoryAllocationFailed,UnableToDrawOnImage);
                     break;
                   }
+                graphic_context=new_graphic_context;
                 graphic_context[n]=
                   CloneDrawInfo((ImageInfo *) NULL,graphic_context[n-1]);
                 if (graphic_context[n] == (DrawInfo *) NULL)
@@ -4922,7 +4924,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",(int) (q-p),p);
     if (status == MagickFail)
       break;
-    assert(i < number_points);
+    assert(i < number_points); /* FIXME: This assertion may be hit (oss-fuzz 459618468) if +100 "headroom" not provided */
     primitive_info[i].primitive=UndefinedPrimitive;
     if (i == 0)
       continue;
@@ -4989,7 +4991,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   MagickFreeResourceLimitedMemory(primitive);
   for ( ; n >= 0; n--)
     DestroyDrawInfo(graphic_context[n]);
-  MagickFreeMemory(graphic_context);
+  MagickFreeResourceLimitedMemory(graphic_context);
   if ((status == MagickFail) &&
       (image->exception.severity < ErrorException))
     ThrowBinaryException(DrawError,NonconformingDrawingPrimitiveDefinition,
