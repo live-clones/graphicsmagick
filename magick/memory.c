@@ -633,13 +633,20 @@ MagickExport void MagickFreeAligned(void *memory)
  */
 typedef struct _MagickMemoryResource_T
 {
-  void *memory;                 /* Pointer to memory allocation */
-  size_t alloc_size;            /* Requested allocation size */
-  size_t alloc_size_real;       /* Real/underlying allocation size */
-  size_t num_realloc;           /* Number of actual reallocations performed */
-  size_t num_realloc_moves;     /* Number of reallocations which moved memory */
-  size_t realloc_octets_moved;  /* Number of octets moved by reallocations */
-  size_t signature;             /* Initialized to MagickSignature */
+  void *memory;                     /* Pointer to memory allocation */
+  size_t alloc_size_initial;        /* Initially requested allocation size */
+  size_t alloc_size;                /* Requested allocation size */
+  size_t alloc_size_limit;          /* Limit on maximum alloc_size */
+  size_t alloc_size_real;           /* Real/underlying allocation size */
+  const char *alloc_module;         /* Source file of first allocation */
+  const char *alloc_function;       /* Name of function which made first allocation */
+  unsigned int alloc_line;          /* Source file line of first allocation */
+  size_t num_realloc;               /* Number of actual reallocations performed */
+  size_t num_realloc_limit;         /* Limit on number of reallocations */
+  size_t num_realloc_moves;         /* Number of reallocations which moved memory */
+  size_t num_realloc_moves_limit;   /* Limit on number of reallocations which required move */
+  size_t realloc_octets_moved;      /* Number of octets moved by reallocations */
+  size_t signature;                 /* Initialized to MagickSignature */
 
 } MagickMemoryResource_T;
 
@@ -656,7 +663,7 @@ typedef struct _MagickMemoryResource_T
   ((char *)p+sizeof(MagickMemoryResource_T))
 
 /* Copy (or init) MagickMemoryResource_T based on provided user-land pointer */
-#define MagickCopyMemoryResource_T_From_Pub(memory_resource, p)         \
+#define MagickCopyMemoryResource_T_From_Pub(module,function,line,memory_resource, p)         \
   do {                                                                  \
     if (p != 0)                                                         \
       {                                                                 \
@@ -669,35 +676,52 @@ typedef struct _MagickMemoryResource_T
     else                                                                \
       {                                                                 \
         (memory_resource)->memory = 0;                                  \
+        (memory_resource)->alloc_size_initial = 0;                      \
         (memory_resource)->alloc_size = 0;                              \
+        (memory_resource)->alloc_size_limit = SIZE_MAX;                 \
         (memory_resource)->alloc_size_real = 0;                         \
+        (memory_resource)->alloc_module = module;                       \
+        (memory_resource)->alloc_function = function;                   \
+        (memory_resource)->alloc_line = line;                           \
         (memory_resource)->num_realloc = 0;                             \
+        (memory_resource)->num_realloc_limit = SIZE_MAX;                \
         (memory_resource)->num_realloc_moves = 0;                       \
-        (memory_resource)->realloc_octets_moved = 0;                     \
+        (memory_resource)->num_realloc_moves_limit = SIZE_MAX;          \
+        (memory_resource)->realloc_octets_moved = 0;                    \
         (memory_resource)->signature = MagickSignature;                 \
       }                                                                 \
   } while(0)
 
 /* Trace MemoryResource_T content given a pointer to it */
 #if defined(MAGICK_DEBUG_RL_MEMORY) && MAGICK_DEBUG_RL_MEMORY
-#define TraceMagickAccessMemoryResource_T(operation,memory_resource)    \
-  fprintf(stderr,__FILE__ ":%d - %s memory_resource: memory=%p (user %p)," \
+#define TraceMagickAccessMemoryResource_T(module,function,line,operation,memory_resource) \
+  fprintf(stderr,"%s/%s/%u: - %s memory_resource: memory=%p (user %p)," \
+          " alloc_size_initial=%zu,"                                    \
           " alloc_size=%zu,"                                            \
           " alloc_size_real=%zu,"                                       \
+          " alloc_module=%s,"                                           \
+          " alloc_function=%s,"                                         \
+          " alloc_line=%u,"                                             \
           " num_realloc=%zu,"                                           \
           " num_realloc_moves=%zu,"                                     \
           " realloc_octets_moved=%zu\n",                                \
-          __LINE__,                                                     \
+          module,                                                       \
+          function,                                                     \
+          line,                                                         \
           operation,                                                    \
           (memory_resource)->memory,                                    \
           (memory_resource)->memory ? UserLandPointerGivenBaseAlloc((memory_resource)->memory) : 0, \
+          (memory_resource)->alloc_size_initial,                        \
           (memory_resource)->alloc_size,                                \
           (memory_resource)->alloc_size_real,                           \
+          (memory_resource)->alloc_module,                              \
+          (memory_resource)->alloc_function,                            \
+          (memory_resource)->alloc_line,                                \
           (memory_resource)->num_realloc,                               \
           (memory_resource)->num_realloc_moves,                         \
           (memory_resource)->realloc_octets_moved);
 #else
-#define TraceMagickAccessMemoryResource_T(operation,memory_resource) ;
+#define TraceMagickAccessMemoryResource_T(module,function,line,operation,memory_resource) ;
 #endif
 
 /*
@@ -705,19 +729,45 @@ typedef struct _MagickMemoryResource_T
   resource allocation.  Not safe if embedded in the memory buffer
   being released!
 */
-static void _MagickFreeResourceLimitedMemory_T(MagickMemoryResource_T *memory_resource)
+static void _MagickFreeResourceLimitedMemory_T(const char *module,const char *function,const unsigned int line,
+                                               MagickMemoryResource_T *memory_resource)
 {
-  TraceMagickAccessMemoryResource_T("FREE",memory_resource);
+  TraceMagickAccessMemoryResource_T(module,function,line,"FREE",memory_resource);
+#if !(defined(MAGICK_DEBUG_RL_MEMORY) && MAGICK_DEBUG_RL_MEMORY)
+  (void) module;
+  (void) function;
+  (void) line;
+#endif
 #if defined(MAGICK_MEMORY_LOG_REALLOC_STATS) && MAGICK_MEMORY_LOG_REALLOC_STATS
   if (memory_resource->num_realloc > 0)
     {
+      const char
+        *alloc_module,
+        *modulebase;
+
+      /* fixup module info to just include the filename - and not the
+         whole path to the file. This makes the log huge for no good
+         reason */
+      alloc_module=(memory_resource)->alloc_module;
+      for (modulebase=alloc_module+strlen(alloc_module)-1; modulebase > alloc_module; modulebase--)
+        if (IsBasenameSeparator(*modulebase))
+          {
+            modulebase++;
+            break;
+          }
+
       fprintf(stderr,
-              "FreeResourceLimitedMemory:"
+              "%s/%s/%u FreeResourceLimitedMemory:"
+              " alloc_initial=%zu,"
               " alloc_size=%zu,"
               " alloc_size_real=%zu,"
               " num_realloc=%zu,"
               " num_realloc_moves=%zu,"
               " realloc_octets_moved=%zu\n",
+              modulebase,
+              (memory_resource)->alloc_function,
+              (memory_resource)->alloc_line,
+              (memory_resource)->alloc_size_initial,
               (memory_resource)->alloc_size,
               (memory_resource)->alloc_size_real+sizeof(MagickMemoryResource_T),
               (memory_resource)->num_realloc,
@@ -733,9 +783,13 @@ static void _MagickFreeResourceLimitedMemory_T(MagickMemoryResource_T *memory_re
   if (memory_resource->alloc_size != 0)
     LiberateMagickResource(MemoryResource, memory_resource->alloc_size);
   memory_resource->alloc_size_real = 0;
+  memory_resource->alloc_size_limit = SIZE_MAX;
+  memory_resource->alloc_size_initial = 0;
   memory_resource->alloc_size = 0;
   memory_resource->num_realloc = 0;
+  memory_resource->num_realloc_limit = SIZE_MAX;
   memory_resource->num_realloc_moves = 0;
+  memory_resource->num_realloc_moves_limit = SIZE_MAX;
   memory_resource->realloc_octets_moved = 0;
 }
 
@@ -762,7 +816,10 @@ static void _MagickFreeResourceLimitedMemory_T(MagickMemoryResource_T *memory_re
 MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
                                                           const size_t count,
                                                           const size_t size,
-                                                          const MagickBool clear)
+                                                          const MagickBool clear,
+                                                          const char *module,
+                                                          const char *function,
+                                                          const unsigned int line)
 {
   MagickMemoryResource_T memory_resource;
   size_t size_diff;
@@ -772,17 +829,19 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
     status = MagickPass;
 
 #if defined(MAGICK_DEBUG_RL_MEMORY) && MAGICK_DEBUG_RL_MEMORY
-  fprintf(stderr,"%d: p = %p, count = %zu, size = %zu\n", __LINE__, p, count, size);
+  fprintf(stderr,"%s/%s/%u: p = %p, count = %zu, size = %zu\n", module, function, line, p, count, size);
 #endif
 
   /* Copy (or init) 'memory_resource' based on provided user-land pointer */
-  MagickCopyMemoryResource_T_From_Pub(&memory_resource, p);
-  TraceMagickAccessMemoryResource_T("BEFORE", &memory_resource);
+  MagickCopyMemoryResource_T_From_Pub(module,function,line,&memory_resource, p);
+  TraceMagickAccessMemoryResource_T(module,function,line,"BEFORE",&memory_resource);
 
   do
     {
       if (((new_size == 0) && (count != 0) && (size != 0)) ||
-          (new_size > SIZE_MAX/2) || (SIZE_MAX-new_size <= sizeof(MagickMemoryResource_T)))
+          (new_size > SIZE_MAX/2) ||
+          (SIZE_MAX-new_size <= sizeof(MagickMemoryResource_T)) ||
+          (new_size > memory_resource.alloc_size_limit))
         {
           /* Memory allocation FAILED */
 #if defined(ENOMEM)
@@ -794,7 +853,7 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
       else if (new_size == 0)
         {
           /* Deallocate all allocated memory (if any) */
-          _MagickFreeResourceLimitedMemory_T(&memory_resource);
+          _MagickFreeResourceLimitedMemory_T(module,function,line,&memory_resource);
           break;
         }
       else if (new_size > memory_resource.alloc_size)
@@ -807,26 +866,46 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
                 {
                   void *realloc_memory;
                   size_t realloc_size = new_size+sizeof(MagickMemoryResource_T);
-                  /*
-                    If this is a realloc, then round up underlying
-                    allocation sizes in order to lessen realloc calls
-                    and lessen memory moves.
-                  */
-                  if ((memory_resource.alloc_size_real != 0) /*&& (realloc_size < 131072)*/)
+                  if (memory_resource.alloc_size_real != 0)
                     {
-                      /* realloc_size <<= 1; */
-                      MagickRoundUpStringLength(realloc_size);
+                      /* This is a realloc */
+
+                      /* If number of allocations will exceed reallocation limit */
+                      if (memory_resource.num_realloc+1U > memory_resource.num_realloc_limit)
+                        {
+                          /* Force a de-alloc, resulting in "Memory re-allocation FAILED" */
+                          realloc_size = 0;
+                        }
+                      else
+                        {
+                          /* Round up underlying allocation sizes in
+                             order to lessen realloc calls and lessen
+                             memory moves.
+                          */
+                          /* realloc_size <<= 1; */
+                          MagickRoundUpStringLength(realloc_size);
+                        }
                     }
                   realloc_memory = (ReallocFunc)(memory_resource.memory,
                                                  realloc_size);
-                  if (realloc_memory != 0)
+                  /* If number of realloc moves exceeds num_realloc_moves_limit */
+                  if ((realloc_memory != 0) && (memory_resource.alloc_size_real != 0) &&
+                      (realloc_memory != memory_resource.memory))
+                    {
+                      if (memory_resource.num_realloc_moves+1U > memory_resource.num_realloc_moves_limit)
+                        {
+                          /* Deallocate all allocated memory*/
+                          realloc_memory = (ReallocFunc)(memory_resource.memory,0);
+                        }
+                    }
+                  if ((realloc_memory != 0) && (realloc_size != 0))
                     {
                       if (clear)
                         (void) memset(UserLandPointerGivenBaseAlloc(realloc_memory)+
                                       memory_resource.alloc_size,0,size_diff);
 
                       /* A realloc has pre-existing memory */
-                      if (memory_resource.alloc_size_real != 0) /* FIXME: memory_resource.alloc_size_real ? */
+                      if (memory_resource.alloc_size_real != 0)
                         {
                           /* Tally actual reallocations */
                           memory_resource.num_realloc++;
@@ -839,6 +918,8 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
                             }
                         }
                       memory_resource.memory = realloc_memory;
+                      if (memory_resource.alloc_size == 0)
+                        memory_resource.alloc_size_initial = new_size;
                       memory_resource.alloc_size = new_size;
                       memory_resource.alloc_size_real = realloc_size-sizeof(MagickMemoryResource_T);
                     }
@@ -893,7 +974,7 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
       (void) memcpy((void *) memory_resource.memory,&memory_resource,
                     sizeof(MagickMemoryResource_T));
     }
-  TraceMagickAccessMemoryResource_T("AFTER", &memory_resource);
+  TraceMagickAccessMemoryResource_T(module,function,line,"AFTER",&memory_resource);
 
   res = ((status == MagickPass) && memory_resource.memory) ?
     UserLandPointerGivenBaseAlloc(memory_resource.memory) : 0;
@@ -906,9 +987,12 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
 
   Memory must be released using MagickFreeMemoryResource().
 */
-MagickExport void *_MagickAllocateResourceLimitedMemory(const size_t size)
+MagickExport void *_MagickAllocateResourceLimitedMemory(const size_t size,
+                                                          const char *module,
+                                                          const char *function,
+                                                          const unsigned int line)
 {
-  return _MagickReallocateResourceLimitedMemory(0,1,size,MagickFalse);
+  return _MagickReallocateResourceLimitedMemory(0,1,size,MagickFalse,module,function,line);
 }
 
 /*
@@ -917,9 +1001,10 @@ MagickExport void *_MagickAllocateResourceLimitedMemory(const size_t size)
 
   Similar to MagickFree().
 */
-MagickExport void _MagickFreeResourceLimitedMemory(void *p)
+MagickExport void _MagickFreeResourceLimitedMemory(void *p,
+    const char *module,const char *function,const unsigned int line)
 {
-  _MagickReallocateResourceLimitedMemory(p,0,0,MagickFalse);
+  _MagickReallocateResourceLimitedMemory(p,0,0,MagickFalse,module,function,line);
 }
 
 /*
@@ -932,7 +1017,7 @@ MagickExport size_t _MagickResourceLimitedMemoryGetSizeAttribute(const void *p,
   size_t result = 0;
 
   /* Copy (or init) 'memory_resource' based on provided user-land pointer */
-  MagickCopyMemoryResource_T_From_Pub(&memory_resource, p);
+  MagickCopyMemoryResource_T_From_Pub(__FILE__,GetCurrentFunction(),__LINE__,&memory_resource, p);
 
   switch (attr)
     {
@@ -959,4 +1044,29 @@ MagickExport size_t _MagickResourceLimitedMemoryGetSizeAttribute(const void *p,
     }
 
   return result;
+}
+
+/*
+  Set a per-allocation resource limit given a pointer to an allocation
+*/
+MagickExport void _SetMagickResourceLimitedMemoryLimitP(void *p,
+                                                        MagickResourceLimitedMemoryLimitType type,
+                                                        const size_t limit)
+{
+  MagickMemoryResource_T *memory_resource;
+
+  memory_resource = MagickAccessMemoryResource_T_From_Pub(p);
+
+  switch (type)
+    {
+    case MagickResourceLimitedMemoryAllocSizeLimit:
+      memory_resource->alloc_size_limit=limit;
+      break;
+    case MagickResourceLimitedMemoryNumReallocLimit:
+      memory_resource->num_realloc_limit=limit;
+      break;
+    case MagickResourceLimitedMemoryNumReallocMovesLimit:
+      memory_resource->num_realloc_moves=limit;
+      break;
+    }
 }

@@ -1,3 +1,18 @@
+2025-11-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/jp2.c (alloc_rlm) (free_rlm) (realloc_rlm): Update to
+	pass file and line information to resource-limited memory calls.
+
+	* magick/memory.c (_SetMagickResourceLimitedMemoryLimitP): Add new
+	private function _SetMagickResourceLimitedMemoryLimitP(), which
+	allows specifying additional limits for allocation size, number of
+	re-allocations, and number of re-allocations with a move.
+	(_MagickAllocateResourceLimitedMemory)
+	(_MagickFreeResourceLimitedMemory)
+	(_MagickReallocateResourceLimitedMemory): Added module, function,
+	and line parameters for the purpose of tracing, and to capture the
+	source location where the allocation was made.
+
 2025-11-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* magick/render.c (DrawImage): Use resource-limited memory

@@ -38,6 +38,29 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-11-14  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/jp2.c (alloc_rlm) (free_rlm) (realloc_rlm): Update to
+pass file and line information to resource-limited memory calls.</p></li>
+<li><p>magick/memory.c (_SetMagickResourceLimitedMemoryLimitP): Add new
+private function _SetMagickResourceLimitedMemoryLimitP(), which
+allows specifying additional limits for allocation size, number of
+re-allocations, and number of re-allocations with a move.
+(_MagickAllocateResourceLimitedMemory)
+(_MagickFreeResourceLimitedMemory)
+(_MagickReallocateResourceLimitedMemory): Added module, function,
+and line parameters for the purpose of tracing, and to capture the
+source location where the allocation was made.</p></li>
+</ul>
+</blockquote>
+<p>2025-11-12  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/render.c (DrawImage): Use resource-limited memory
+allocator when allocating graphic contexts.</p></li>
+</ul>
+</blockquote>
 <p>2025-11-11  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

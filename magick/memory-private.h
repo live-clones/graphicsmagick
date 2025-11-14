@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2020 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -16,13 +16,27 @@ extern MagickExport size_t
   MagickArraySize(const size_t count,const size_t size) MAGICK_FUNC_CONST;
 
 extern MagickExport
-  void *_MagickReallocateResourceLimitedMemory(void *p,const size_t count,const size_t size,const MagickBool clear) MAGICK_FUNC_ALLOC_SIZE_2ARG(2,3);
+  void *_MagickReallocateResourceLimitedMemory(void *p,const size_t count,const size_t size,const MagickBool clear,
+    const char *module,const char *function,const unsigned int line) MAGICK_FUNC_ALLOC_SIZE_2ARG(2,3);
 
 extern MagickExport
-  void *_MagickAllocateResourceLimitedMemory(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1);
+  void *_MagickAllocateResourceLimitedMemory(const size_t size,
+    const char *module,const char *function,const unsigned int line) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1);
 
 extern MagickExport
-  void _MagickFreeResourceLimitedMemory(void *p);
+  void _MagickFreeResourceLimitedMemory(void *p,
+    const char *module,const char *function,const unsigned int line);
+
+typedef enum
+  {
+    MagickResourceLimitedMemoryAllocSizeLimit,
+    MagickResourceLimitedMemoryNumReallocLimit,
+    MagickResourceLimitedMemoryNumReallocMovesLimit
+  } MagickResourceLimitedMemoryLimitType;
+
+extern MagickExport void _SetMagickResourceLimitedMemoryLimitP(void *p,
+                                                          MagickResourceLimitedMemoryLimitType type,
+                                                          const size_t limit);
 
 
 /*
@@ -55,31 +69,54 @@ extern MagickExport
   Allocate/Reallocate/Free memory (resource limited)
  */
 
+  /*
+    Obtain the current C function name (if possible)
+  */
+#  if !defined(GetCurrentFunction)
+#    if (((defined(__cplusplus) || defined(c_plusplus)) && defined(HAS_CPP__func__)) || \
+        (!(defined(__cplusplus) || defined(c_plusplus)) && defined(HAS_C__func__)))
+#      define GetCurrentFunction() (__func__)
+#    elif defined(_VISUALC_) && defined(__FUNCTION__)
+#      define GetCurrentFunction() (__FUNCTION__)
+#    else
+#      define GetCurrentFunction() ("unknown")
+#    endif
+#  endif
+
+  /*
+    Obtain current source file, function name, and source file line,
+    in a form acceptable for use with LogMagickEvent.
+  */
+#  if !defined(GetMagickModule)
+#    define GetMagickModule()  __FILE__,GetCurrentFunction(),__LINE__
+#  endif
+
+
 #define MagickAllocateResourceLimitedMemory(type,size)                  \
   ((((size) != ((size_t) (size))) || (size == 0)) ? ((type) 0) :        \
-   ((type) _MagickAllocateResourceLimitedMemory((size_t) (size))))
+   ((type) _MagickAllocateResourceLimitedMemory((size_t) (size),GetMagickModule())))
 
 #define MagickAllocateResourceLimitedClearedMemory(type,size)           \
   ((((size) != ((size_t) (size))) || (size == 0)) ? ((type) 0) :        \
-   ((type) _MagickReallocateResourceLimitedMemory(0,1,(size_t) (size),MagickTrue)))
+   ((type) _MagickReallocateResourceLimitedMemory(0,1,(size_t) (size),MagickTrue,GetMagickModule())))
 
 #define MagickAllocateResourceLimitedArray(type,count,size)             \
-  ((type) _MagickReallocateResourceLimitedMemory(0,(size_t) (count),(size_t) (size),MagickFalse))
+  ((type) _MagickReallocateResourceLimitedMemory(0,(size_t) (count),(size_t) (size),MagickFalse,GetMagickModule()))
 
 #define MagickAllocateResourceLimitedClearedArray(type,count,size)      \
-  ((type) _MagickReallocateResourceLimitedMemory(0,(size_t) (count),(size_t) (size),MagickTrue))
+  ((type) _MagickReallocateResourceLimitedMemory(0,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
 
 #define MagickReallocateResourceLimitedMemory(type,memory,size)         \
-  ((type) _MagickReallocateResourceLimitedMemory(memory,1,(size_t) (size),MagickFalse))
+  ((type) _MagickReallocateResourceLimitedMemory(memory,1,(size_t) (size),MagickFalse,GetMagickModule()))
 
 #define MagickReallocateResourceLimitedArray(type,memory,count,size)    \
-  ((type) _MagickReallocateResourceLimitedMemory(memory,(size_t) (count),(size_t) (size),MagickFalse))
+  ((type) _MagickReallocateResourceLimitedMemory(memory,(size_t) (count),(size_t) (size),MagickFalse,GetMagickModule()))
 
 #define MagickReallocateResourceLimitedClearedArray(type,memory,count,size) \
-  ((type) _MagickReallocateResourceLimitedMemory(memory,(size_t) (count),(size_t) (size),MagickTrue))
+  ((type) _MagickReallocateResourceLimitedMemory(memory,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
 
 #define MagickFreeResourceLimitedMemory(memory) \
-  memory=_MagickReallocateResourceLimitedMemory(memory,0,0,MagickFalse);
+  memory=_MagickReallocateResourceLimitedMemory(memory,0,0,MagickFalse,GetMagickModule());
 
 /*
   Reallocate memory using provided pointer.  If reallocation fails
