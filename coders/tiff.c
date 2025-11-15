@@ -2953,17 +2953,6 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
               {
                 for (y=0; (status != MagickFail) && (y < image->rows); y++)
                   {
-                    if (sample == 0)
-                      q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
-                    else
-                      q=GetImagePixelsEx(image,0,y,image->columns,1,exception);
-                    if (q == (PixelPacket *) NULL)
-                      {
-                        status=MagickFail;
-                        break;
-                      }
-                    if ((sample == 0) && (max_sample > 1))
-                      (void) memset(q,0,image->columns*sizeof(PixelPacket));
                     /*
                       Obtain a scanline
                     */
@@ -3007,6 +2996,17 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     /*
                       Import scanline into image.
                     */
+                    if (sample == 0)
+                      q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
+                    else
+                      q=GetImagePixelsEx(image,0,y,image->columns,1,exception);
+                    if (q == (PixelPacket *) NULL)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    if ((sample == 0) && (max_sample > 1))
+                      (void) memset(q,0,image->columns*sizeof(PixelPacket));
                     if (ImportImagePixelArea(image,quantum_type,bits_per_sample,scanline,
                                              &import_options,0) == MagickFail)
                       {
@@ -3165,20 +3165,6 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   }
                 for (y=0; (status != MagickFail) && (y < image->rows); y++)
                   {
-                    /*
-                      Access Magick pixels.
-                    */
-                    if (sample == 0)
-                      q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
-                    else
-                      q=GetImagePixelsEx(image,0,y,image->columns,1,exception);
-                    if (q == (PixelPacket *) NULL)
-                      {
-                        status=MagickFail;
-                        break;
-                      }
-                    if ((sample == 0) && (max_sample > 1))
-                      (void) memset(q,0,image->columns*sizeof(PixelPacket));
                     if (rows_remaining == 0)
                       {
                         /*
@@ -3207,6 +3193,20 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                         (planar_config == PLANARCONFIG_CONTIG))
                       CompactSamples(image->columns, bits_per_sample,
                                      samples_per_pixel, quantum_samples, p);
+                    /*
+                      Access Magick pixels.
+                    */
+                    if (sample == 0)
+                      q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
+                    else
+                      q=GetImagePixelsEx(image,0,y,image->columns,1,exception);
+                    if (q == (PixelPacket *) NULL)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    if ((sample == 0) && (max_sample > 1))
+                      (void) memset(q,0,image->columns*sizeof(PixelPacket));
                     /*
                       Import strip row into image.
                     */
@@ -3453,6 +3453,13 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                         for (yy=y; (status != MagickFail) && (yy < (long) y+tile_set_rows); yy++)
                           {
                             /*
+                              Compact tile row to only contain raster data.
+                            */
+                            if ((samples_per_pixel > quantum_samples) &&
+                                (planar_config == PLANARCONFIG_CONTIG))
+                              CompactSamples(tile_set_columns, bits_per_sample,
+                                             samples_per_pixel, quantum_samples, p);
+                            /*
                               Obtain pixel region corresponding to tile row.
                             */
                             if (sample == 0)
@@ -3466,13 +3473,6 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                               }
                             if ((sample == 0) && (max_sample > 1))
                               (void) memset(q,0,tile_set_columns*sizeof(PixelPacket));
-                            /*
-                              Compact tile row to only contain raster data.
-                            */
-                            if ((samples_per_pixel > quantum_samples) &&
-                                (planar_config == PLANARCONFIG_CONTIG))
-                              CompactSamples(tile_set_columns, bits_per_sample,
-                                             samples_per_pixel, quantum_samples, p);
                             /*
                               Import tile row
                             */

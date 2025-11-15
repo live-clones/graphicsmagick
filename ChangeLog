@@ -1,3 +1,9 @@
+2025-11-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (ReadTIFFImage): Require that libtiff produce a
+	scanline, strip, or tile, before allocating pixels from pixel
+	cache.
+
 2025-11-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/jp2.c (alloc_rlm) (free_rlm) (realloc_rlm): Update to
