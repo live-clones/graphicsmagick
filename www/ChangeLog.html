@@ -38,6 +38,21 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-11-16  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/memory-private.h: Move declarations of
+MagickCloneMemory(), MagickFreeAligned(), MagickMallocAligned(),
+MagickMallocCleared(), MagickRealloc(), and MagickReallocStd() to
+magick/memory-private.h since they are not intended for general
+consumption.</p></li>
+<li><p>magick/memory.c, magick/memory-private.h, coders/jp2.c: New
+managed-memory functions which have added module, function, and
+line parameters are renamed with &quot;Loc&quot; at end of names.  Restore
+original managed-memory functions, which are a useful replacement
+for malloc, realloc, free.</p></li>
+</ul>
+</blockquote>
 <p>2025-11-15  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

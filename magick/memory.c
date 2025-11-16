@@ -813,13 +813,13 @@ static void _MagickFreeResourceLimitedMemory_T(const char *module,const char *fu
   Linux malloc produces allocations aligned to 16-bytes.
  */
 
-MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
-                                                          const size_t count,
-                                                          const size_t size,
-                                                          const MagickBool clear,
-                                                          const char *module,
-                                                          const char *function,
-                                                          const unsigned int line)
+MagickExport void *_MagickReallocateResourceLimitedMemoryLoc(void *p,
+                                                             const size_t count,
+                                                             const size_t size,
+                                                             const MagickBool clear,
+                                                             const char *module,
+                                                             const char *function,
+                                                             const unsigned int line)
 {
   MagickMemoryResource_T memory_resource;
   size_t size_diff;
@@ -982,17 +982,30 @@ MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
   return res;
 }
 
+MagickExport void *_MagickReallocateResourceLimitedMemory(void *p,
+                                                          const size_t count,
+                                                          const size_t size,
+                                                          const MagickBool clear)
+{
+  return _MagickReallocateResourceLimitedMemoryLoc(p,count,size,clear,GetMagickModule());
+}
+
 /*
   Allocate resource-limited memory.  Similar to MagickMalloc().
 
   Memory must be released using MagickFreeMemoryResource().
 */
-MagickExport void *_MagickAllocateResourceLimitedMemory(const size_t size,
-                                                          const char *module,
-                                                          const char *function,
-                                                          const unsigned int line)
+MagickExport void *_MagickAllocateResourceLimitedMemoryLoc(const size_t size,
+                                                           const char *module,
+                                                           const char *function,
+                                                           const unsigned int line)
 {
-  return _MagickReallocateResourceLimitedMemory(0,1,size,MagickFalse,module,function,line);
+  return _MagickReallocateResourceLimitedMemoryLoc(0,1,size,MagickFalse,module,function,line);
+}
+
+MagickExport void *_MagickAllocateResourceLimitedMemory(const size_t size)
+{
+  return _MagickAllocateResourceLimitedMemoryLoc(size,GetMagickModule());
 }
 
 /*
@@ -1001,10 +1014,15 @@ MagickExport void *_MagickAllocateResourceLimitedMemory(const size_t size,
 
   Similar to MagickFree().
 */
-MagickExport void _MagickFreeResourceLimitedMemory(void *p,
+MagickExport void _MagickFreeResourceLimitedMemoryLoc(void *p,
     const char *module,const char *function,const unsigned int line)
 {
-  _MagickReallocateResourceLimitedMemory(p,0,0,MagickFalse,module,function,line);
+  _MagickReallocateResourceLimitedMemoryLoc(p,0,0,MagickFalse,module,function,line);
+}
+
+MagickExport void _MagickFreeResourceLimitedMemory(void *p)
+{
+  _MagickFreeResourceLimitedMemoryLoc(p,GetMagickModule());
 }
 
 /*

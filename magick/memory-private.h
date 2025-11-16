@@ -9,6 +9,14 @@
 */
 
 extern MagickExport void
+  *MagickCloneMemory(void *destination,const void *source,const size_t size) MAGICK_FUNC_NONNULL,
+   MagickFreeAligned(void *memory),
+  *MagickMallocAligned(const size_t alignment, const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
+  *MagickMallocCleared(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1),
+  *MagickRealloc(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
+  *MagickReallocStd(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2);
+
+extern MagickExport void
   *MagickMallocAlignedArray(const size_t alignment,const size_t count,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_2ARG(2,3),
   *MagickMallocArray(const size_t count,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_2ARG(1,2);
 
@@ -16,16 +24,25 @@ extern MagickExport size_t
   MagickArraySize(const size_t count,const size_t size) MAGICK_FUNC_CONST;
 
 extern MagickExport
-  void *_MagickReallocateResourceLimitedMemory(void *p,const size_t count,const size_t size,const MagickBool clear,
+  void *_MagickReallocateResourceLimitedMemoryLoc(void *p,const size_t count,const size_t size,const MagickBool clear,
     const char *module,const char *function,const unsigned int line) MAGICK_FUNC_ALLOC_SIZE_2ARG(2,3);
 
 extern MagickExport
-  void *_MagickAllocateResourceLimitedMemory(const size_t size,
+  void *_MagickReallocateResourceLimitedMemory(void *p,const size_t count,const size_t size,const MagickBool clear) MAGICK_FUNC_ALLOC_SIZE_2ARG(2,3);
+
+extern MagickExport
+  void *_MagickAllocateResourceLimitedMemoryLoc(const size_t size,
     const char *module,const char *function,const unsigned int line) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1);
 
 extern MagickExport
-  void _MagickFreeResourceLimitedMemory(void *p,
+  void *_MagickAllocateResourceLimitedMemory(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1);
+
+extern MagickExport
+  void _MagickFreeResourceLimitedMemoryLoc(void *p,
     const char *module,const char *function,const unsigned int line);
+
+extern MagickExport
+  void _MagickFreeResourceLimitedMemory(void *p);
 
 typedef enum
   {
@@ -94,29 +111,29 @@ extern MagickExport void _SetMagickResourceLimitedMemoryLimitP(void *p,
 
 #define MagickAllocateResourceLimitedMemory(type,size)                  \
   ((((size) != ((size_t) (size))) || (size == 0)) ? ((type) 0) :        \
-   ((type) _MagickAllocateResourceLimitedMemory((size_t) (size),GetMagickModule())))
+   ((type) _MagickAllocateResourceLimitedMemoryLoc((size_t) (size),GetMagickModule())))
 
 #define MagickAllocateResourceLimitedClearedMemory(type,size)           \
   ((((size) != ((size_t) (size))) || (size == 0)) ? ((type) 0) :        \
-   ((type) _MagickReallocateResourceLimitedMemory(0,1,(size_t) (size),MagickTrue,GetMagickModule())))
+   ((type) _MagickReallocateResourceLimitedMemoryLoc(0,1,(size_t) (size),MagickTrue,GetMagickModule())))
 
 #define MagickAllocateResourceLimitedArray(type,count,size)             \
-  ((type) _MagickReallocateResourceLimitedMemory(0,(size_t) (count),(size_t) (size),MagickFalse,GetMagickModule()))
+  ((type) _MagickReallocateResourceLimitedMemoryLoc(0,(size_t) (count),(size_t) (size),MagickFalse,GetMagickModule()))
 
 #define MagickAllocateResourceLimitedClearedArray(type,count,size)      \
-  ((type) _MagickReallocateResourceLimitedMemory(0,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
+  ((type) _MagickReallocateResourceLimitedMemoryLoc(0,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
 
 #define MagickReallocateResourceLimitedMemory(type,memory,size)         \
-  ((type) _MagickReallocateResourceLimitedMemory(memory,1,(size_t) (size),MagickFalse,GetMagickModule()))
+  ((type) _MagickReallocateResourceLimitedMemoryLoc(memory,1,(size_t) (size),MagickFalse,GetMagickModule()))
 
 #define MagickReallocateResourceLimitedArray(type,memory,count,size)    \
-  ((type) _MagickReallocateResourceLimitedMemory(memory,(size_t) (count),(size_t) (size),MagickFalse,GetMagickModule()))
+  ((type) _MagickReallocateResourceLimitedMemoryLoc(memory,(size_t) (count),(size_t) (size),MagickFalse,GetMagickModule()))
 
 #define MagickReallocateResourceLimitedClearedArray(type,memory,count,size) \
-  ((type) _MagickReallocateResourceLimitedMemory(memory,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
+  ((type) _MagickReallocateResourceLimitedMemoryLoc(memory,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
 
 #define MagickFreeResourceLimitedMemory(memory) \
-  memory=_MagickReallocateResourceLimitedMemory(memory,0,0,MagickFalse,GetMagickModule());
+  memory=_MagickReallocateResourceLimitedMemoryLoc(memory,0,0,MagickFalse,GetMagickModule());
 
 /*
   Reallocate memory using provided pointer.  If reallocation fails

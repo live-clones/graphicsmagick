@@ -482,7 +482,7 @@ static void *alloc_rlm(struct jas_allocator_s *allocator, size_t size)
   char *p;
   (void) allocator;
   /* JasPer expects its allocator to return non-null for zero size */
-  p=_MagickAllocateResourceLimitedMemory((size == 0 ? 1 : size),GetMagickModule());
+  p=_MagickAllocateResourceLimitedMemoryLoc((size == 0 ? 1 : size),GetMagickModule());
   /* fprintf(stderr,"alloc_rlm(%p, %zu) -> %p\n", allocator, size, p); */
   return p;
 }
@@ -490,14 +490,14 @@ static void free_rlm(struct jas_allocator_s *allocator, void *pointer)
 {
   (void) allocator;
   /* fprintf(stderr,"free_rlm(%p, %p\n", allocator, pointer); */
-  _MagickFreeResourceLimitedMemory(pointer,GetMagickModule());
+  _MagickFreeResourceLimitedMemoryLoc(pointer,GetMagickModule());
 }
 static void *realloc_rlm(struct jas_allocator_s *allocator, void *pointer,
                          size_t new_size)
 {
   char *p;
   (void) allocator;
-  p =_MagickReallocateResourceLimitedMemory(pointer, 1,new_size,0,GetMagickModule());
+  p =_MagickReallocateResourceLimitedMemoryLoc(pointer, 1,new_size,0,GetMagickModule());
   /* fprintf(stderr,"realloc_rlm(%p, %p, %zu) -> %p\n", allocator, pointer, new_size, p); */
   return p;
 }

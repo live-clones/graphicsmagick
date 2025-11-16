@@ -1,3 +1,17 @@
+2025-11-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* magick/memory-private.h: Move declarations of
+	MagickCloneMemory(), MagickFreeAligned(), MagickMallocAligned(),
+	MagickMallocCleared(), MagickRealloc(), and MagickReallocStd() to
+	magick/memory-private.h since they are not intended for general
+	consumption.
+
+	* magick/memory.c, magick/memory-private.h, coders/jp2.c: New
+	managed-memory functions which have added module, function, and
+	line parameters are renamed with "Loc" at end of names.  Restore
+	original managed-memory functions, which are a useful replacement
+	for malloc, realloc, free.
+
 2025-11-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/tiff.c (ReadTIFFImage): Require that libtiff produce a
