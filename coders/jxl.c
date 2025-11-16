@@ -1115,10 +1115,11 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
       magick_uint32_t exif_profile_offset;
 
       /* Big-endian offset decoding */
-      exif_profile_offset = p[exif_pad+0] << 24 |
-        p[exif_pad+1] << 16 |
-        p[exif_pad+2] << 8 |
-        p[exif_pad+3];
+      exif_profile_offset =
+        ((magick_uint32_t) p[exif_pad+0]) << 24 |
+        ((magick_uint32_t) p[exif_pad+1]) << 16 |
+        ((magick_uint32_t) p[exif_pad+2]) << 8 |
+        ((magick_uint32_t) p[exif_pad+3]);
 
 #if 0
       fprintf(stderr,
