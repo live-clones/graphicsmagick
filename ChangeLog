@@ -1,5 +1,12 @@
 2025-11-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/memory.c (MagickRealloc): MagickRealloc() now behaves
+	like standard realloc(). The dubious responsibility to free the
+	original memory upon allocation failure has now been delegated to
+	the MagickReallocMemory() macro.
+	* magick/memory.c (MagickReallocStd): This private function has
+	been removed.
+
 	* magick/memory-private.h: Move declarations of
 	MagickCloneMemory(), MagickFreeAligned(), MagickMallocAligned(),
 	MagickMallocCleared(), MagickRealloc(), and MagickReallocStd() to

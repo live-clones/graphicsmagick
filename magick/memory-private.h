@@ -12,9 +12,7 @@ extern MagickExport void
   *MagickCloneMemory(void *destination,const void *source,const size_t size) MAGICK_FUNC_NONNULL,
    MagickFreeAligned(void *memory),
   *MagickMallocAligned(const size_t alignment, const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
-  *MagickMallocCleared(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1),
-  *MagickRealloc(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
-  *MagickReallocStd(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2);
+  *MagickMallocCleared(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1);
 
 extern MagickExport void
   *MagickMallocAlignedArray(const size_t alignment,const size_t count,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_2ARG(2,3),
@@ -141,12 +139,20 @@ extern MagickExport void _SetMagickResourceLimitedMemoryLimitP(void *p,
   is not a null pointer, then free memory.  This interface behaves
   similar to realloc() except that memory is always freed (and pointer
   set to null) if a memory allocation failure occurs.
+
+  If 'memory' contained pointers to allocated memory, then there is a leak!
 */
-#define MagickReallocMemory(type,memory,size)   \
-{ \
-    size_t _new_size = (size_t) (size); \
-    void *_magick_mp = MagickRealloc(memory,_new_size); \
-    memory=(type) _magick_mp; \
+#define MagickReallocMemory(type,memory,size)                \
+  {                                                          \
+    size_t _new_size = (size_t) (size);                      \
+    void *_magick_mp = MagickRealloc(memory,_new_size);      \
+    if ((_magick_mp == 0) && (memory != 0) && ((size != 0))) \
+      {                                                      \
+        _magick_mp=memory;                                   \
+        MagickFree(_magick_mp);                              \
+        _magick_mp=0;                                        \
+      }                                                      \
+    memory=(type) _magick_mp;                                \
 }
 
 /*

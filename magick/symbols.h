@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012-2024 GraphicsMagick Group
+  Copyright (C) 2012-2025 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -598,7 +598,6 @@
 #define MagickRandomReal GmMagickRandomReal
 #define MagickRandReentrant GmMagickRandReentrant
 #define MagickRealloc GmMagickRealloc
-#define MagickReallocStd GmMagickReallocStd
 #define MagickReverseBits GmMagickReverseBits
 #define MagickSceneFileName GmMagickSceneFileName
 #define MagickSetConfirmAccessHandler GmMagickSetConfirmAccessHandler

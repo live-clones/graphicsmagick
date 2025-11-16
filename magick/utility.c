@@ -1016,9 +1016,9 @@ MagickExport MagickPassFail ExpandFilenames(int *argc,char ***argv)
                         {
                           char **new_vector;
                           new_vector=
-                            (char **) MagickReallocStd(vector,
-                                                       MagickArraySize((size_t) *argc+count+prealloc_entries,
-                                                                       sizeof(char *)));
+                            (char **) MagickRealloc(vector,
+                                                    MagickArraySize((size_t) *argc+count+prealloc_entries,
+                                                                    sizeof(char *)));
                           if (new_vector == (char **) NULL)
                             {
                               for (j=0 ; j < count; j++)
@@ -1120,9 +1120,9 @@ MagickExport MagickPassFail ExpandFilenames(int *argc,char ***argv)
       {
          char **new_vector;
          new_vector =
-           (char **) MagickReallocStd(vector,
-                                      MagickArraySize((size_t) *argc+count+number_files+prealloc_entries,
-                                                      sizeof(char *)));
+           (char **) MagickRealloc(vector,
+                                   MagickArraySize((size_t) *argc+count+number_files+prealloc_entries,
+                                                   sizeof(char *)));
          if (new_vector == (char **) NULL)
            {
              for (j=0 ; j < count; j++)
