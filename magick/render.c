@@ -2704,7 +2704,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     x;
 
   SegmentInfo
-    bounds;
+    bounds,
+    viewbox;
 
   size_t
     length,
@@ -2931,10 +2932,12 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             MagickBool affine_args_good = MagickFalse;
             do
               {
+                /* sx */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   break;
                 if (MagickAtoFChk(token,&affine.sx) != MagickPass)
                   break;
+                /* rx */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   break;
                 if (*token == ',')
@@ -2942,6 +2945,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     break;
                 if (MagickAtoFChk(token,&affine.rx) != MagickPass)
                   break;
+                /* ry */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   break;
                 if (*token == ',')
@@ -2949,6 +2953,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     break;
                 if (MagickAtoFChk(token,&affine.ry) != MagickPass)
                   break;
+                /* sy */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   break;
                 if (*token == ',')
@@ -2956,6 +2961,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     break;
                 if (MagickAtoFChk(token,&affine.sy) != MagickPass)
                   break;
+                /* tx */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   break;
                 if (*token == ',')
@@ -2963,6 +2969,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     break;
                 if (MagickAtoFChk(token,&affine.tx) != MagickPass)
                   break;
+                /* ty */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   break;
                 if (*token == ',')
@@ -4379,16 +4386,37 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       {
         if (LocaleCompare("viewbox",keyword) == 0)
           {
+            /* This is not currently used for anything */
+            unsigned long
+              viewbox_columns,
+              viewbox_rows;
             MagickGetToken(q,&q,token,token_max_length);
+            status &= MagickAtoFChk(token,&viewbox.x1);
             MagickGetToken(q,&q,token,token_max_length);
             if (*token == ',')
               MagickGetToken(q,&q,token,token_max_length);
+            status &= MagickAtoFChk(token,&viewbox.y1);
             MagickGetToken(q,&q,token,token_max_length);
             if (*token == ',')
               MagickGetToken(q,&q,token,token_max_length);
+            status &= MagickAtoFChk(token,&viewbox.x2);
             MagickGetToken(q,&q,token,token_max_length);
             if (*token == ',')
               MagickGetToken(q,&q,token,token_max_length);
+            status &= MagickAtoFChk(token,&viewbox.y2);
+            viewbox_columns=(unsigned long) (viewbox.x2-viewbox.x1+0.5);
+            viewbox_rows=(unsigned long) (viewbox.y2-viewbox.y1+0.5);
+#if 0
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                                   "ViewBox: %g %g %g %g, Geometry: %lux%lu",
+                                  viewbox.x1, viewbox.y1, viewbox.x2, viewbox.y2,
+                                  viewbox_columns,viewbox_rows);
+            /* image->columns=viewbox_columns; */
+            /* image->rows=viewbox_rows; */
+#else
+            (void) viewbox_columns;
+            (void) viewbox_rows;
+#endif
             break;
           }
         status=MagickFail;
@@ -6346,7 +6374,7 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
           clone_info->stroke.opacity=TransparentOpacity;
           status&=DrawPolygonPrimitive(image,clone_info,primitive_info);
           DestroyDrawInfo(clone_info);
-          status&=DrawDashPolygon(draw_info,primitive_info,image);
+          status&=DrawDashPolygon(draw_info,primitive_info,image); /* oss-fuzz 455298154 always here while drawing filled 1 pixel circle, due to 'stroke-dasharray 1' */
           break;
         }
 

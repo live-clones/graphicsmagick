@@ -1,5 +1,8 @@
 2025-11-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* magick/render.c (DrawImage): Parse MVG "viewbox". Not used for
+	anything yet.
+
 	* coders/jxl.c (ReadJXLImage): Fix oss-fuzz issue 461122808
 	"graphicsmagick:coder_TIFF_any_fuzzer: Undefined-shift in
 	ReadJXLImage".
