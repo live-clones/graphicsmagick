@@ -130,7 +130,7 @@ then
     ./configure \
         --disable-assembler \
         --disable-doc \
-        --disable-ifunc \
+        --disable-doxygen \
         --disable-lzip-decoder \
         --disable-lzma-links \
         --disable-lzmadec \
@@ -142,6 +142,8 @@ then
         --disable-xz \
         --disable-xzdec \
         --enable-static \
+        --enable-encoders='lzma1,lzma2,delta,x86,ia64' \
+        --enable-threads=no \
         --with-pic=yes \
         --prefix="$WORK"
     make -j$(nproc)

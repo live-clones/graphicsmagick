@@ -1,5 +1,7 @@
 2025-11-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* fuzzing/oss-fuzz-build.sh: Update the xz configure options.
+
 	* coders/heif.c (ReadHEIFImage): Read image frame from heif image
 	handle using the function ReadHEIFImageFrame().
 
