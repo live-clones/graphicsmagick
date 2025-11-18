@@ -107,6 +107,10 @@ development model but without breaking the API or utilities operation.
 Here are some reasons to prefer GraphicsMagick over ImageMagick or
 other popular software:
 
+  * GM provides detailed yet comprehensible `ChangeLog`_ and `NEWS`_
+    files, as part of the source code, and as part of the formatted
+    documentation (ImageMagick does not).
+
   * GM is more efficient than ImageMagick so it gets the job done
     faster using fewer resources.
 
@@ -131,9 +135,9 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (377,270 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (378,192 total
     lines included) according to `Coverity Analysis Metrics`_ on
-    October 11th, 2025.
+    November 18th, 2025.
 
   * GM has zero issues detected by Clang 15 scan-build.
 
@@ -141,9 +145,6 @@ other popular software:
 
   * GM provides API and ABI stability and managed releases that you can
     count on (ImageMagick does not).
-
-  * GM provides detailed yet comprehensible `ChangeLog`_ and `NEWS`_
-    files (ImageMagick does not).
 
   * GM is available for free, and may be used to support both open and
     proprietary applications.

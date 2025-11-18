@@ -225,9 +225,9 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
 /*
   Read metadata (Exif and XMP)
 */
-static Image *ReadMetadata(const ImageInfo *image_info,
-                           struct heif_image_handle *heif_image_handle,
-                           Image *image, ExceptionInfo *exception)
+static MagickPassFail ReadMetadata(const ImageInfo *image_info,
+                                   struct heif_image_handle *heif_image_handle,
+                                   Image *image)
 {
   int
     count,
@@ -243,11 +243,11 @@ static Image *ReadMetadata(const ImageInfo *image_info,
   count=heif_image_handle_get_number_of_metadata_blocks(heif_image_handle,
                                                         /*type_filter*/ NULL);
   if (count==0)
-    return image;
+    return MagickPass;
 
   ids=MagickAllocateResourceLimitedArray(heif_item_id *,count,sizeof(*ids));
   if (ids == (heif_item_id *) NULL)
-    ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+    ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,(char *) NULL);
 
   /* Get list of metadata block ids */
   count=heif_image_handle_get_list_of_metadata_block_IDs(heif_image_handle, NULL,
@@ -295,7 +295,7 @@ static Image *ReadMetadata(const ImageInfo *image_info,
           if (profile == (unsigned char*) NULL)
             {
               MagickFreeResourceLimitedMemory(ids);
-              ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+              ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,(char *) NULL);
             }
 
           /*
@@ -314,8 +314,8 @@ static Image *ReadMetadata(const ImageInfo *image_info,
                                       err.message);
               MagickFreeResourceLimitedMemory(profile);
               MagickFreeResourceLimitedMemory(ids);
-              ThrowReaderException(CorruptImageError,
-                                   AnErrorHasOccurredReadingFromFile,image);
+              ThrowBinaryException(CorruptImageError,
+                                   AnErrorHasOccurredReadingFromFile,image->filename);
             }
 
           if (strncmp(profile_name,"Exif",4) == 0 && profile_size > 4)
@@ -411,15 +411,15 @@ static Image *ReadMetadata(const ImageInfo *image_info,
         }
     }
   MagickFreeResourceLimitedMemory(ids);
-  return image;
+  return MagickPass;
 }
 
 
 /*
   Read Color Profile
 */
-static Image *ReadColorProfile(struct heif_image_handle *heif_image_handle,
-                               Image *image, ExceptionInfo *exception)
+static MagickPassFail ReadColorProfile(struct heif_image_handle *heif_image_handle,
+                                       Image *image)
 {
   struct heif_error
     err;
@@ -433,7 +433,7 @@ static Image *ReadColorProfile(struct heif_image_handle *heif_image_handle,
   profile_type = heif_image_handle_get_color_profile_type(heif_image_handle);
 
   if (heif_color_profile_type_not_present == profile_type)
-    return image;
+    return MagickPass;
 
   if (image->logging && (heif_color_profile_type_not_present !=profile_type))
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -461,7 +461,7 @@ static Image *ReadColorProfile(struct heif_image_handle *heif_image_handle,
                                                      sizeof(*profile));
 
           if (profile == (unsigned char*) NULL)
-            ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+            ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,(char *) NULL);
 
           /* Copy ICC profile to 'profile' buffer */
           err = heif_image_handle_get_raw_color_profile(heif_image_handle,
@@ -473,8 +473,8 @@ static Image *ReadColorProfile(struct heif_image_handle *heif_image_handle,
                                       "heif_image_handle_get_raw_color_profile() reports error \"%s\"",
                                       err.message);
               MagickFreeResourceLimitedMemory(profile);
-              ThrowReaderException(CorruptImageError,
-                                   AnErrorHasOccurredReadingFromFile,image);
+              ThrowBinaryException(CorruptImageError,
+                                   AnErrorHasOccurredReadingFromFile,image->filename);
 
             }
           SetImageProfile(image,"ICM",profile,profile_size);
@@ -484,7 +484,7 @@ static Image *ReadColorProfile(struct heif_image_handle *heif_image_handle,
                               "  done reading ICC profile");
         }
     }
-  return image;
+  return MagickPass;
 }
 
 /*
@@ -823,17 +823,30 @@ static const char *HEIF_channel_to_string(const enum heif_channel c)
   return s;
 }
 
-static Image *ReadHEIFImage(const ImageInfo *image_info,
-                            ExceptionInfo *exception)
+static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
+                                         MagickBool ignore_transformations,
+                                         Image *image,
+                                         const ImageInfo *image_info,
+                                         ExceptionInfo *exception)
 {
-  Image
-    *image;
+#define HEIFReadImageFrameCleanup()                                    \
+  do                                                                   \
+    {                                                                  \
+      if (heif_image)                                                  \
+        heif_image_release(heif_image);                                \
+    } while (0);
 
-  struct heif_context
-    *heif = NULL;
-
-  struct heif_image_handle
-    *heif_image_handle = NULL;
+#define ThrowHEIFThrowReadImageFrameException(code_,reason_,image_)     \
+  do                                                                    \
+    {                                                                   \
+      HEIFReadImageFrameCleanup();                                      \
+      if (code_ > exception->severity)                                  \
+        {                                                               \
+          ThrowException(&(image_)->exception,code_,reason_,(image_)->filename); \
+          CopyException(exception,&(image_)->exception);               \
+        }                                                               \
+      return(MagickFail);                                               \
+    } while (0);
 
   struct heif_image
     *heif_image = NULL;
@@ -841,17 +854,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   struct heif_decoding_options
     *decode_options;
 
-  const char
-    *value;
-
-  unsigned char
-    *in_buf = NULL;
-
   PixelPacket
     *q;
-
-  size_t
-    in_len;
 
   long
     x,
@@ -869,16 +873,643 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     progress_user_data;
 #endif
 
-
-  MagickBool
-    ignore_transformations;
-
   enum heif_colorspace
     heif_colorspace,
     preferred_colorspace = heif_colorspace_undefined;
 
   enum heif_chroma
     preferred_chroma = heif_chroma_undefined;
+
+  /*
+    Note: Those values are preliminary but likely the upper bound
+    The real image values might be rotated or cropped due to transformations
+
+    heif_image_handle APIs are declared in heif_image_handle.h
+  */
+  image->depth=8;
+  /*
+    This function only works for YCbCr-based images.  We only use it
+    in ping mode since otherwise it screws up the depth in the Q8
+    build (due to scaling in libheif).
+  */
+  if (image_info->ping)
+    {
+      bits_per_pixel=heif_image_handle_get_luma_bits_per_pixel(heif_image_handle);
+      if (bits_per_pixel != -1)
+        image->depth=(unsigned int) bits_per_pixel;
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Depth: %u", image->depth);
+    }
+
+  image->columns=heif_image_handle_get_width(heif_image_handle);
+  image->rows=heif_image_handle_get_height(heif_image_handle);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Geometry: %lux%lu", image->columns, image->rows);
+  image->matte=MagickFalse;
+  if (heif_image_handle_has_alpha_channel(heif_image_handle))
+    image->matte=MagickTrue;
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Matte: %s", image->matte ? "True" : "False");
+  heif_status=heif_image_handle_get_preferred_decoding_colorspace(heif_image_handle,
+                                                                  &preferred_colorspace,
+                                                                  &preferred_chroma);
+  if (heif_status.code != heif_error_Ok)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_image_handle_get_preferred_decoding_colorspace() reports error \"%s\"",
+                              heif_status.message);
+      ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Preferred colorspace: %s, "
+                          "Preferred chroma: %s",
+                          HEIF_colorspace_to_string(preferred_colorspace),
+                          HEIF_chroma_to_string(preferred_chroma));
+
+  /* Read EXIF and XMP profile */
+  if (!ReadMetadata(image_info, heif_image_handle, image))
+    {
+      CopyException(exception,&image->exception);
+      HEIFReadImageFrameCleanup();
+      return MagickFail;
+    }
+
+  /* Read ICC profile */
+  if (!ReadColorProfile(heif_image_handle, image))
+    {
+      CopyException(exception,&image->exception);
+      HEIFReadImageFrameCleanup();
+      return MagickFail;
+    }
+
+  /*
+    When apply transformations the whole image has to be read to get
+    the real dimensions. We no longer read the whole image because it
+    makes 'identify' extremely slow for large files.
+
+    The user should specify:
+
+    -define heif:ignore-transformations=false
+
+    in order to force reading much of the image to get fully accurate
+    information.
+  */
+  if (image_info->ping && ignore_transformations) /* ignore_transformations is true by default */
+    {
+      HEIFReadImageFrameCleanup();
+      return MagickPass;
+    }
+
+  if (CheckImagePixelLimits(image, exception) != MagickPass)
+    {
+      HEIFReadImageFrameCleanup();
+      return MagickFail;
+    }
+
+  /* Add decoding options support */
+  decode_options = heif_decoding_options_alloc();
+  if (decode_options == (struct heif_decoding_options*) NULL)
+    ThrowHEIFThrowReadImageFrameException(ResourceLimitError,MemoryAllocationFailed,image);
+
+#if HEIF_ENABLE_PROGRESS_MONITOR
+  progress_user_data.exception = exception;
+  progress_user_data.image = image;
+  progress_user_data.max_progress = 0;
+  progress_user_data.progress = 0;
+#endif
+
+  decode_options->ignore_transformations = (ignore_transformations == MagickTrue) ? 1 : 0;
+
+#if HEIF_ENABLE_PROGRESS_MONITOR
+  decode_options->start_progress = start_progress;
+  decode_options->on_progress = on_progress;
+  decode_options->end_progress = end_progress;
+  decode_options->progress_user_data = &progress_user_data;
+#endif /* if HEIF_ENABLE_PROGRESS_MONITOR */
+
+  /* version 2 decode options */
+
+  /* Let libheif do the scaling from deep images if QuantumDepth == 8 */
+#if QuantumDepth == 8
+  decode_options->convert_hdr_to_8bit = 1;
+#endif /* if QuantumDepth == 8 */
+
+  /* version 3 decode options */
+
+  /* When enabled, an error is returned for invalid input. Otherwise, it will try its best and
+     add decoding warnings to the decoded heif_image. Default is non-strict. */
+  /* uint8_t strict_decoding; */
+
+
+  /*
+    Be prepared to handle images on per-plane basis. Upscale
+    subsampled chroma if necessary.
+  */
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Decoding image...");
+
+  {
+    enum heif_chroma heif_chroma_decode=preferred_chroma;
+    enum heif_colorspace heif_colorspace_decode=preferred_colorspace;
+    /* Upscale chroma if necessary */
+    if ((heif_chroma_decode == heif_chroma_420) || (heif_chroma_decode == heif_chroma_422))
+      heif_chroma_decode=heif_chroma_444;
+
+    /* FIXME: Add control over whether to return original YBbCr or RGB */
+#if 1
+    if (heif_colorspace_decode == heif_colorspace_YCbCr)
+      {
+        const char *string_value;
+        MagickBool preserve_colorspace = MagickFalse;
+        /*
+          Use heif:preserve-colorspace=true or
+          heif:preserve-colorspace=1 to return the image in the
+          original colorspace.  This prevents the conversion of a
+          YCbCr image to RGB.  GraphicsMagick will usually
+          automatically YCbCr image to RGB when necessary but explicit
+          conversion to RGB colorspace may sometimes be
+          necessary. Preserving the original colorspace is useful in
+          case YCbCr is needed, or to avoid quality loss when the
+          output will be in YCbCr.
+        */
+        if ((string_value = AccessDefinition(image_info,"heif","preserve-colorspace")))
+          {
+            if ((LocaleCompare(string_value,"true") == 0) ||
+                (LocaleCompare(string_value,"1") == 0))
+              preserve_colorspace = MagickTrue;
+          }
+        if (preserve_colorspace == MagickFalse)
+          heif_colorspace_decode=heif_colorspace_RGB;
+      }
+#endif
+
+    heif_status=heif_decode_image(heif_image_handle,
+                                  &heif_image,
+                                  heif_colorspace_decode, /* Chose preferred colorspace */
+                                  heif_chroma_decode,
+                                  decode_options);
+  }
+  heif_decoding_options_free(decode_options);
+  if (heif_status.code == heif_error_Memory_allocation_error)
+    ThrowHEIFThrowReadImageFrameException(ResourceLimitError,MemoryAllocationFailed,image);
+  if (heif_status.code != heif_error_Ok)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_decode_image() reports error \"%s\"",
+                              heif_status.message);
+      ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
+
+  /*
+    Update image properties
+  */
+  image->columns=heif_image_get_primary_width(heif_image);
+  image->rows=heif_image_get_primary_height(heif_image);
+  heif_colorspace=heif_image_get_colorspace(heif_image);
+  image->colorspace=HEIF_colorspace_to_ColorspaceType(heif_colorspace);
+
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "HEIF colorspace: %s",
+                          HEIF_colorspace_to_string(heif_colorspace));
+
+  if (image_info->ping)
+    {
+      HEIFReadImageFrameCleanup();
+      return MagickPass;
+    }
+
+  {
+    const char *
+      heif_channel_str;
+
+    const char *
+      heif_chroma_format_str;
+
+    enum heif_chroma
+      heif_chroma_format;
+
+    heif_chroma_format = heif_image_get_chroma_format(heif_image);
+    heif_chroma_format_str = HEIF_chroma_to_string(heif_chroma_format);
+
+    switch (heif_image_get_colorspace(heif_image))
+      {
+      case heif_colorspace_YCbCr:
+        {
+          /*
+            Decode YCbCr(A) pixels
+          */
+
+          static const enum heif_channel channels_YCbCrA[4] =
+            { heif_channel_Y, heif_channel_Cb, heif_channel_Cr, heif_channel_Alpha };
+
+          const uint8_t *
+            planes[4]  = { 0, 0, 0, 0 };
+
+          const uint8_t *
+            line[4] = { 0, 0, 0, 0 };
+
+          size_t
+            row_stride;
+
+          unsigned int
+            channel_index,
+            max_value_given_bits,
+            num_channels;
+
+          enum heif_channel heif_channel;
+
+          num_channels = image->matte ? 4 : 3;
+
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Decoding %u planes for YCbCr colorspace (chroma %s)",
+                                  num_channels, heif_chroma_format_str);
+
+          for (channel_index = 0; channel_index < num_channels; channel_index++)
+            {
+              heif_channel = channels_YCbCrA[channel_index];
+              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
+                                                                     heif_channel,
+                                                                     &row_stride);
+              heif_channel_str = HEIF_channel_to_string(heif_channel);
+              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
+                                                             heif_channel);
+              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
+                                                                         heif_channel);
+              if ((int) image->depth < bits_per_pixel_range)
+                image->depth=(unsigned int) bits_per_pixel_range;
+              assert(planes[channel_index] != (const uint8_t*) NULL);
+              if (image->logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "  channel %s row stride %zu (%d bits in %d bit quantum)",
+                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
+            }
+          max_value_given_bits=MaxValueGivenBits(image->depth);
+
+          /* Transfer pixels to image, using row stride to find start of each row. */
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Transferring pixels to magick image...");
+          for (y=0; y < (long)image->rows; y++)
+            {
+              q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
+              if (q == (PixelPacket *) NULL)
+                {
+                  HEIFReadImageFrameCleanup();
+                  return MagickFail;
+                }
+              for (channel_index = 0; channel_index < num_channels; channel_index++)
+                line[channel_index]=planes[channel_index]+y*row_stride;
+              for (x=0; x < (long)image->columns; x++)
+                {
+                  for (channel_index = 0; channel_index < num_channels; channel_index++)
+                    {
+                      uint16_t
+                        sample;
+
+                      Quantum
+                        quantum;
+
+                      if (image->depth > 8)
+                        {
+                          sample = *((uint16_t*) line[channel_index]);
+                          line[channel_index] += 2;
+                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
+                        }
+                      else
+                        {
+                          sample = *line[channel_index]++;
+                          quantum=ScaleCharToQuantum(sample);
+                        }
+                      switch (channel_index)
+                        {
+                        case 0:
+                          SetYSample(q,quantum);
+                          if (num_channels != 4)
+                            SetOpacitySample(q,OpaqueOpacity);
+                          break;
+                        case 1:
+                          SetCbSample(q,quantum);
+                          break;
+                        case 2:
+                          SetCrSample(q,quantum);
+                          break;
+                        case 3:
+                          SetOpacitySample(q,MaxRGB-quantum);
+                          break;
+                        }
+                    }
+                  q++;
+                }
+              if (!SyncImagePixelsEx(image,exception))
+                {
+                  HEIFReadImageFrameCleanup();
+                  return MagickFail;
+                }
+            }
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "  done!");
+        }
+        break;
+      case heif_colorspace_RGB:
+        {
+          /*
+            Decode RGB(A) pixels
+          */
+          static const enum heif_channel
+            channels_RGBA[4] =
+            { heif_channel_R, heif_channel_G, heif_channel_B, heif_channel_Alpha };
+
+          const uint8_t *
+            planes[4]  = { 0, 0, 0 , 0 };
+
+          const uint8_t *
+            line[4] = { 0, 0, 0 , 0 };
+
+          size_t
+            row_stride;
+
+          unsigned int
+            channel_index,
+            max_value_given_bits,
+            num_channels=0;
+
+          enum heif_channel
+            heif_channel;
+
+          num_channels = image->matte ? 4 : 3;
+
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Decoding %u planes for RGB colorspace (chroma %s)",
+                                  num_channels, heif_chroma_format_str);
+
+          for (channel_index = 0; channel_index < num_channels; channel_index++)
+            {
+              heif_channel = channels_RGBA[channel_index];
+              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
+                                                                     heif_channel,
+                                                                     &row_stride);
+              heif_channel_str = HEIF_channel_to_string(heif_channel);
+              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
+                                                             heif_channel);
+              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
+                                                                         heif_channel);
+              if ((int) image->depth < bits_per_pixel_range)
+                image->depth=(unsigned int) bits_per_pixel_range;
+              assert(planes[channel_index] != (const uint8_t*) NULL);
+              if (image->logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "  channel %s row stride %zu (%d bits in %d bit quantum)",
+                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
+            }
+          max_value_given_bits=MaxValueGivenBits(image->depth);
+
+          /* Transfer pixels to image, using row stride to find start of each row. */
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Transferring pixels to magick image...");
+          for (y=0; y < (long)image->rows; y++)
+            {
+              q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
+              if (q == (PixelPacket *) NULL)
+                {
+                  HEIFReadImageFrameCleanup();
+                  return MagickFail;
+                }
+              for (channel_index = 0; channel_index < num_channels; channel_index++)
+                line[channel_index]=planes[channel_index]+y*row_stride;
+              for (x=0; x < (long)image->columns; x++)
+                {
+                  for (channel_index = 0; channel_index < num_channels; channel_index++)
+                    {
+                      Quantum
+                        quantum;
+
+                      uint16_t
+                        sample;
+
+                      if (image->depth > 8)
+                        {
+                          sample = *((uint16_t*) line[channel_index]);
+                          line[channel_index] += 2;
+                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
+                        }
+                      else
+                        {
+                          sample=*line[channel_index]++;
+                          quantum=ScaleCharToQuantum(sample);
+                        }
+                      switch (channel_index)
+                        {
+                        case 0:
+                          SetRedSample(q,quantum);
+                          if (num_channels != 4)
+                            SetOpacitySample(q,OpaqueOpacity);
+                          break;
+                        case 1:
+                          SetGreenSample(q,quantum);
+                          break;
+                        case 2:
+                          SetBlueSample(q,quantum);
+                          break;
+                        case 3:
+                          SetOpacitySample(q,MaxRGB-quantum);
+                          break;
+                        }
+                    }
+                  q++;
+                }
+              if (!SyncImagePixelsEx(image,exception))
+                {
+                  HEIFReadImageFrameCleanup();
+                  return MagickFail;
+                }
+            }
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "  done!");
+
+        }
+        break;
+      case heif_colorspace_monochrome:
+        {
+          /*
+            Decode Y(A) pixels
+          */
+          static const enum heif_channel channels_YA[4] =
+            { heif_channel_Y, heif_channel_Alpha };
+
+          const uint8_t *
+            planes[2]  = { 0, 0 };
+
+          const uint8_t *
+            line[2] = { 0, 0 };
+
+          size_t
+            row_stride;
+
+          unsigned int
+            channel_index,
+            max_value_given_bits,
+            num_channels;
+
+          enum heif_channel heif_channel;
+
+          num_channels = image->matte ? 2 : 1;
+
+          assert(heif_image_get_chroma_format(heif_image) == heif_chroma_monochrome);
+
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Decoding %u plane%s for monochrome colorspace (chroma %s)",
+                                  num_channels, num_channels > 1 ? "s" : "", heif_chroma_format_str);
+
+          for (channel_index = 0; channel_index < num_channels; channel_index++)
+            {
+              heif_channel = channels_YA[channel_index];
+              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
+                                                                     heif_channel,
+                                                                     &row_stride);
+              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
+                                                             heif_channel);
+              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
+                                                                         heif_channel);
+              if ((int) image->depth < bits_per_pixel_range)
+                image->depth=(unsigned int) bits_per_pixel_range;
+              heif_channel_str = HEIF_channel_to_string(heif_channel);
+              assert(planes[channel_index] != (const uint8_t*) NULL);
+              if (image->logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "  channel %s row stride %zu (%d bits in %d bit quantum)",
+                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
+            }
+          max_value_given_bits=MaxValueGivenBits(image->depth);
+
+          /* Transfer pixels to image, using row stride to find start of each row. */
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Transferring pixels to magick image...");
+          for (y=0; y < (long)image->rows; y++)
+            {
+              q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
+              if (q == (PixelPacket *) NULL)
+                {
+                  HEIFReadImageFrameCleanup();
+                  return MagickFail;
+                }
+              for (channel_index = 0; channel_index < num_channels; channel_index++)
+                line[channel_index]=planes[channel_index]+y*row_stride;
+              for (x=0; x < (long)image->columns; x++)
+                {
+                  for (channel_index = 0; channel_index < num_channels; channel_index++)
+                    {
+                      Quantum
+                        quantum;
+
+                      uint16_t
+                        sample;
+
+                      if (image->depth > 8)
+                        {
+                          sample = *((uint16_t*) line[channel_index]);
+                          line[channel_index] += 2;
+                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
+                        }
+                      else
+                        {
+                          sample=*line[channel_index]++;
+                          quantum=ScaleCharToQuantum(sample);
+                        }
+
+                      switch (channel_index)
+                        {
+                        case 0:
+                          SetGraySample(q,quantum);
+                          if (num_channels != 2)
+                            SetOpacitySample(q,OpaqueOpacity);
+                          break;
+                        case 1:
+                          SetOpacitySample(q,MaxRGB-ScaleCharToQuantum(*line[channel_index]++));
+                          break;
+                        }
+                    }
+                  q++;
+                }
+              if (!SyncImagePixelsEx(image,exception))
+                {
+                  HEIFReadImageFrameCleanup();
+                  return MagickFail;
+                }
+            }
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "  done!");
+        }
+        break;
+      case heif_colorspace_nonvisual:
+        /* No visual channels */
+      default:
+        /* Should never reach here. */
+        break;
+      }
+  }
+
+  HEIFReadImageFrameCleanup();
+
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Image depth: %u", image->depth);
+
+  return MagickPass;
+}
+
+static Image *ReadHEIFImage(const ImageInfo *image_info,
+                            ExceptionInfo *exception)
+{
+  Image
+    *image;
+
+  struct heif_context
+    *heif = NULL;
+
+  struct heif_image_handle
+    *heif_image_handle = NULL;
+
+  struct heif_image
+    *heif_image = NULL;
+
+  const char
+    *value;
+
+  unsigned char
+    *in_buf = NULL;
+
+  size_t
+    in_len;
+
+  struct heif_error
+    heif_status;
+
+#if HEIF_ENABLE_PROGRESS_MONITOR
+  ProgressUserData
+    progress_user_data;
+#endif
+
+  MagickBool
+    ignore_transformations = MagickTrue;
+
+  MagickPassFail
+    status;
 
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
@@ -974,7 +1605,6 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   /*
     Allow the user to enable transformations (e.g. the image might be rotated).
   */
-  ignore_transformations = MagickTrue;
   if ((value=AccessDefinition(image_info,"heif","ignore-transformations")))
     if (LocaleCompare(value,"FALSE") == 0)
       {
@@ -1022,573 +1652,15 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
       }
   }
 
-  /*
-    Note: Those values are preliminary but likely the upper bound
-    The real image values might be rotated or cropped due to transformations
-
-    heif_image_handle APIs are declared in heif_image_handle.h
-  */
-  image->depth=8;
-  /*
-    This function only works for YCbCr-based images.  We only use it
-    in ping mode since otherwise it screws up the depth in the Q8
-    build (due to scaling in libheif).
-  */
-  if (image_info->ping)
-    {
-      bits_per_pixel=heif_image_handle_get_luma_bits_per_pixel(heif_image_handle);
-      if (bits_per_pixel != -1)
-        image->depth=(size_t) bits_per_pixel;
-      if (image->logging)
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Depth: %u", image->depth);
-    }
-
-  image->columns=heif_image_handle_get_width(heif_image_handle);
-  image->rows=heif_image_handle_get_height(heif_image_handle);
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Geometry: %lux%lu", image->columns, image->rows);
-  if (heif_image_handle_has_alpha_channel(heif_image_handle))
-    image->matte=MagickTrue;
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Matte: %s", image->matte ? "True" : "False");
-  heif_status=heif_image_handle_get_preferred_decoding_colorspace(heif_image_handle,
-                                                                  &preferred_colorspace,
-                                                                  &preferred_chroma);
-  if (heif_status.code != heif_error_Ok)
-    {
-      if (image->logging)
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_image_handle_get_preferred_decoding_colorspace() reports error \"%s\"",
-                              heif_status.message);
-      ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
-    }
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Preferred colorspace: %s, "
-                          "Preferred chroma: %s",
-                          HEIF_colorspace_to_string(preferred_colorspace),
-                          HEIF_chroma_to_string(preferred_chroma));
-
-  /* Read EXIF and XMP profile */
-  if (!ReadMetadata(image_info, heif_image_handle, image, exception))
-    {
-      HEIFReadCleanup();
-      return NULL;
-    }
-
-  /* Read ICC profile */
-  if (!ReadColorProfile(heif_image_handle, image, exception))
-    {
-      HEIFReadCleanup();
-      return NULL;
-    }
-
-  /*
-    When apply transformations the whole image has to be read to get
-    the real dimensions. We no longer read the whole image because it
-    makes 'identify' extremely slow for large files.
-
-    The user should specify:
-
-    -define heif:ignore-transformations=false
-
-    in order to force reading much of the image to get fully accurate
-    information.
-  */
-  if (image_info->ping && ignore_transformations) /* ignore_transformations is true by default */
-    {
-      HEIFReadCleanup();
-      CloseBlob(image);
-      return image;
-    }
-
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
-    ThrowHEIFReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
-
-  /* Add decoding options support */
-  decode_options = heif_decoding_options_alloc();
-  if (decode_options == (struct heif_decoding_options*) NULL)
-    ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-
-#if HEIF_ENABLE_PROGRESS_MONITOR
-  progress_user_data.exception = exception;
-  progress_user_data.image = image;
-  progress_user_data.max_progress = 0;
-  progress_user_data.progress = 0;
-#endif
-
-  decode_options->ignore_transformations = (ignore_transformations == MagickTrue) ? 1 : 0;
-
-#if HEIF_ENABLE_PROGRESS_MONITOR
-  decode_options->start_progress = start_progress;
-  decode_options->on_progress = on_progress;
-  decode_options->end_progress = end_progress;
-  decode_options->progress_user_data = &progress_user_data;
-#endif /* if HEIF_ENABLE_PROGRESS_MONITOR */
-
-  /* version 2 decode options */
-
-  /* Let libheif do the scaling from deep images if QuantumDepth == 8 */
-#if QuantumDepth == 8
-  decode_options->convert_hdr_to_8bit = 1;
-#endif /* if QuantumDepth == 8 */
-
-  /* version 3 decode options */
-
-  /* When enabled, an error is returned for invalid input. Otherwise, it will try its best and
-     add decoding warnings to the decoded heif_image. Default is non-strict. */
-  /* uint8_t strict_decoding; */
-
-
-  /*
-    Be prepared to handle images on per-plane basis. Upscale
-    subsampled chroma if necessary.
-  */
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Decoding image...");
-
-  {
-    enum heif_chroma heif_chroma_decode=preferred_chroma;
-    enum heif_colorspace heif_colorspace_decode=preferred_colorspace;
-    /* Upscale chroma if necessary */
-    if ((heif_chroma_decode == heif_chroma_420) || (heif_chroma_decode == heif_chroma_422))
-      heif_chroma_decode=heif_chroma_444;
-
-    /* FIXME: Add control over whether to return original YBbCr or RGB */
-#if 1
-    if (heif_colorspace_decode == heif_colorspace_YCbCr)
-      {
-        const char *string_value;
-        MagickBool preserve_colorspace = MagickFalse;
-        /*
-          Use heif:preserve-colorspace=true or
-          heif:preserve-colorspace=1 to return the image in the
-          original colorspace.  This prevents the conversion of a
-          YCbCr image to RGB.  GraphicsMagick will usually
-          automatically YCbCr image to RGB when necessary but explicit
-          conversion to RGB colorspace may sometimes be
-          necessary. Preserving the original colorspace is useful in
-          case YCbCr is needed, or to avoid quality loss when the
-          output will be in YCbCr.
-        */
-        if ((string_value = AccessDefinition(image_info,"heif","preserve-colorspace")))
-          {
-            if ((LocaleCompare(string_value,"true") == 0) ||
-                (LocaleCompare(string_value,"1") == 0))
-              preserve_colorspace = MagickTrue;
-          }
-        if (preserve_colorspace == MagickFalse)
-          heif_colorspace_decode=heif_colorspace_RGB;
-      }
-#endif
-
-    heif_status=heif_decode_image(heif_image_handle,
-                                  &heif_image,
-                                  heif_colorspace_decode, /* Chose preferred colorspace */
-                                  heif_chroma_decode,
-                                  decode_options);
-  }
-  heif_decoding_options_free(decode_options);
-  if (heif_status.code == heif_error_Memory_allocation_error)
-    ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-  if (heif_status.code != heif_error_Ok)
-    {
-      if (image->logging)
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_decode_image() reports error \"%s\"",
-                              heif_status.message);
-      ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
-    }
-
-  /*
-    Update image properties
-  */
-  image->columns=heif_image_get_primary_width(heif_image);
-  image->rows=heif_image_get_primary_height(heif_image);
-  heif_colorspace=heif_image_get_colorspace(heif_image);
-  image->colorspace=HEIF_colorspace_to_ColorspaceType(heif_colorspace);
-
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "HEIF colorspace: %s",
-                          HEIF_colorspace_to_string(heif_colorspace));
-
-  if (image_info->ping)
-    {
-      HEIFReadCleanup();
-      CloseBlob(image);
-      return image;
-    }
-
-  {
-    const char *
-      heif_channel_str;
-
-    const char *
-      heif_chroma_format_str;
-
-    enum heif_chroma
-      heif_chroma_format;
-
-    heif_chroma_format = heif_image_get_chroma_format(heif_image);
-    heif_chroma_format_str = HEIF_chroma_to_string(heif_chroma_format);
-
-    switch (heif_image_get_colorspace(heif_image))
-      {
-      case heif_colorspace_YCbCr:
-        {
-          /*
-            Decode YCbCr(A) pixels
-          */
-
-          static const enum heif_channel channels_YCbCrA[4] =
-            { heif_channel_Y, heif_channel_Cb, heif_channel_Cr, heif_channel_Alpha };
-
-          const uint8_t *
-            planes[4]  = { 0, 0, 0, 0 };
-
-          const uint8_t *
-            line[4] = { 0, 0, 0, 0 };
-
-          size_t
-            row_stride;
-
-          unsigned int
-            channel_index,
-            max_value_given_bits,
-            num_channels;
-
-          enum heif_channel heif_channel;
-
-          num_channels = image->matte ? 4 : 3;
-
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Decoding %u planes for YCbCr colorspace (chroma %s)",
-                                  num_channels, heif_chroma_format_str);
-
-          for (channel_index = 0; channel_index < num_channels; channel_index++)
-            {
-              heif_channel = channels_YCbCrA[channel_index];
-              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
-                                                                     heif_channel,
-                                                                     &row_stride);
-              heif_channel_str = HEIF_channel_to_string(heif_channel);
-              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
-                                                             heif_channel);
-              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                         heif_channel);
-              if ((int) image->depth < bits_per_pixel_range)
-                image->depth=(unsigned int) bits_per_pixel_range;
-              assert(planes[channel_index] != (const uint8_t*) NULL);
-              if (image->logging)
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "  channel %s row stride %zu (%d bits in %d bit quantum)",
-                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
-            }
-          max_value_given_bits=MaxValueGivenBits(image->depth);
-
-          /* Transfer pixels to image, using row stride to find start of each row. */
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Transferring pixels to magick image...");
-          for (y=0; y < (long)image->rows; y++)
-            {
-              q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
-              if (q == (PixelPacket *) NULL)
-                ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-              for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride;
-              for (x=0; x < (long)image->columns; x++)
-                {
-                  for (channel_index = 0; channel_index < num_channels; channel_index++)
-                    {
-                      uint16_t
-                        sample;
-
-                      Quantum
-                        quantum;
-
-                      if (image->depth > 8)
-                        {
-                          sample = *((uint16_t*) line[channel_index]);
-                          line[channel_index] += 2;
-                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                        }
-                      else
-                        {
-                          sample = *line[channel_index]++;
-                          quantum=ScaleCharToQuantum(sample);
-                        }
-                      switch (channel_index)
-                        {
-                        case 0:
-                          SetYSample(q,quantum);
-                          if (num_channels != 4)
-                            SetOpacitySample(q,OpaqueOpacity);
-                          break;
-                        case 1:
-                          SetCbSample(q,quantum);
-                          break;
-                        case 2:
-                          SetCrSample(q,quantum);
-                          break;
-                        case 3:
-                          SetOpacitySample(q,MaxRGB-quantum);
-                          break;
-                        }
-                    }
-                  q++;
-                }
-              if (!SyncImagePixels(image))
-                ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-            }
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "  done!");
-        }
-        break;
-      case heif_colorspace_RGB:
-        {
-          /*
-            Decode RGB(A) pixels
-          */
-          static const enum heif_channel
-            channels_RGBA[4] =
-            { heif_channel_R, heif_channel_G, heif_channel_B, heif_channel_Alpha };
-
-          const uint8_t *
-            planes[4]  = { 0, 0, 0 , 0 };
-
-          const uint8_t *
-            line[4] = { 0, 0, 0 , 0 };
-
-          size_t
-            row_stride;
-
-          unsigned int
-            channel_index,
-            max_value_given_bits,
-            num_channels=0;
-
-          enum heif_channel
-            heif_channel;
-
-          num_channels = image->matte ? 4 : 3;
-
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Decoding %u planes for RGB colorspace (chroma %s)",
-                                  num_channels, heif_chroma_format_str);
-
-          for (channel_index = 0; channel_index < num_channels; channel_index++)
-            {
-              heif_channel = channels_RGBA[channel_index];
-              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
-                                                                     heif_channel,
-                                                                     &row_stride);
-              heif_channel_str = HEIF_channel_to_string(heif_channel);
-              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
-                                                             heif_channel);
-              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                         heif_channel);
-              if ((int) image->depth < bits_per_pixel_range)
-                image->depth=(unsigned int) bits_per_pixel_range;
-              assert(planes[channel_index] != (const uint8_t*) NULL);
-              if (image->logging)
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "  channel %s row stride %zu (%d bits in %d bit quantum)",
-                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
-            }
-          max_value_given_bits=MaxValueGivenBits(image->depth);
-
-          /* Transfer pixels to image, using row stride to find start of each row. */
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Transferring pixels to magick image...");
-          for (y=0; y < (long)image->rows; y++)
-            {
-              q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
-              if (q == (PixelPacket *) NULL)
-                ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-              for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride;
-              for (x=0; x < (long)image->columns; x++)
-                {
-                  for (channel_index = 0; channel_index < num_channels; channel_index++)
-                    {
-                      Quantum
-                        quantum;
-
-                      uint16_t
-                        sample;
-
-                      if (image->depth > 8)
-                        {
-                          sample = *((uint16_t*) line[channel_index]);
-                          line[channel_index] += 2;
-                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                        }
-                      else
-                        {
-                          sample=*line[channel_index]++;
-                          quantum=ScaleCharToQuantum(sample);
-                        }
-                      switch (channel_index)
-                        {
-                        case 0:
-                          SetRedSample(q,quantum);
-                          if (num_channels != 4)
-                            SetOpacitySample(q,OpaqueOpacity);
-                          break;
-                        case 1:
-                          SetGreenSample(q,quantum);
-                          break;
-                        case 2:
-                          SetBlueSample(q,quantum);
-                          break;
-                        case 3:
-                          SetOpacitySample(q,MaxRGB-quantum);
-                          break;
-                        }
-                    }
-                  q++;
-                }
-              if (!SyncImagePixels(image))
-                ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-            }
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "  done!");
-
-        }
-        break;
-      case heif_colorspace_monochrome:
-        {
-          /*
-            Decode Y(A) pixels
-          */
-          static const enum heif_channel channels_YA[4] =
-            { heif_channel_Y, heif_channel_Alpha };
-
-          const uint8_t *
-            planes[4]  = { 0, 0, 0 , 0 };
-
-          const uint8_t *
-            line[4] = { 0, 0, 0 , 0 };
-
-          size_t
-            row_stride;
-
-          unsigned int
-            channel_index,
-            max_value_given_bits,
-            num_channels;
-
-          enum heif_channel heif_channel;
-
-          num_channels = image->matte ? 2 : 1;
-
-          assert(heif_image_get_chroma_format(heif_image) == heif_chroma_monochrome);
-
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Decoding %u plane%s for monochrome colorspace (chroma %s)",
-                                  num_channels, num_channels ? "s" : "", heif_chroma_format_str);
-
-          for (channel_index = 0; channel_index < num_channels; channel_index++)
-            {
-              heif_channel = channels_YA[channel_index];
-              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
-                                                                     heif_channel,
-                                                                     &row_stride);
-              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
-                                                             heif_channel);
-              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                         heif_channel);
-              if ((int) image->depth < bits_per_pixel_range)
-                image->depth=(unsigned int) bits_per_pixel_range;
-              heif_channel_str = HEIF_channel_to_string(heif_channel);
-              assert(planes[channel_index] != (const uint8_t*) NULL);
-              if (image->logging)
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "  channel %s row stride %zu (%d bits in %d bit quantum)",
-                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
-            }
-          max_value_given_bits=MaxValueGivenBits(image->depth);
-
-          /* Transfer pixels to image, using row stride to find start of each row. */
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Transferring pixels to magick image...");
-          for (y=0; y < (long)image->rows; y++)
-            {
-              q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
-              if (q == (PixelPacket *) NULL)
-                ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-              for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride;
-              for (x=0; x < (long)image->columns; x++)
-                {
-                  for (channel_index = 0; channel_index < num_channels; channel_index++)
-                    {
-                      Quantum
-                        quantum;
-
-                      uint16_t
-                        sample;
-
-                      if (image->depth > 8)
-                        {
-                          sample = *((uint16_t*) line[channel_index]);
-                          line[channel_index] += 2;
-                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                        }
-                      else
-                        {
-                          sample=*line[channel_index]++;
-                          quantum=ScaleCharToQuantum(sample);
-                        }
-
-                      switch (channel_index)
-                        {
-                        case 0:
-                          SetGraySample(q,quantum);
-                          if (num_channels != 2)
-                            SetOpacitySample(q,OpaqueOpacity);
-                          break;
-                        case 1:
-                          SetOpacitySample(q,MaxRGB-ScaleCharToQuantum(*line[channel_index]++));
-                          break;
-                        }
-                    }
-                  q++;
-                }
-              if (!SyncImagePixels(image))
-                ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-            }
-          if (image->logging)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "  done!");
-        }
-        break;
-      case heif_colorspace_nonvisual:
-        /* No visual channels */
-      default:
-        /* Should never reach here. */
-        break;
-      }
-  }
+  status=ReadHEIFImageFrame(heif_image_handle,ignore_transformations,image,image_info,exception);
 
   HEIFReadCleanup();
   CloseBlob(image);
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Image depth: %u", image->depth);
+  if (status == MagickFail)
+    {
+      DestroyImageList(image);
+      image=(Image *) NULL;
+    }
 
   return image;
 }
