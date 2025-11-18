@@ -5449,7 +5449,7 @@ DrawPolygonPrimitive(Image *image,const DrawInfo *draw_info,
 
   /*
     Determine the number of threads to use.
-   */
+  */
   total_pixels = ((magick_uint64_t) image->rows * image->columns);
 
   max_threads=omp_get_max_threads();
