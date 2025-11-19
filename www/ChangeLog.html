@@ -41,6 +41,11 @@
 <p>2025-11-19  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>wand/magick_wand.c (MagickSetBackgroundColor): Add new function
+to support setting the default background color. Completes
+addressing GraphicsMagick discussion thread at
+<a class="reference external" href="https://sourceforge.net/p/graphicsmagick/discussion/250738/thread/542a23c291/">https://sourceforge.net/p/graphicsmagick/discussion/250738/thread/542a23c291/</a>
+&quot;How to load SVG with transparent background in C/Pascal?&quot;.</p></li>
 <li><p>coders/mvg.c (ReadMVGImage): Initialize image canvas with the
 background color (default white), which may be
 transparent. Previously, the image was always set to

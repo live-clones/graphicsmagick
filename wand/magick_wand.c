@@ -7986,6 +7986,43 @@ WandExport unsigned int MagickSetDepth(MagickWand *wand,const size_t depth)
 %                                                                             %
 %                                                                             %
 %                                                                             %
+%   M a g i c k S e t B a c k g r o u n d C o l o r                           %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickSetBackgroundColor() sets the wand default background color used
+%  when creating an image canvas or other places where background color
+%  may be used.
+%
+%  The format of the MagickSetBackgroundColor method is:
+%
+%      unsigned int MagickSetBackgroundColor(MagickWand *wand,
+%                                            const PixelWand *background)
+%
+%  A description of each parameter follows:
+%
+%    o wand: The magick wand.
+%
+%    o background: The pixel wand specifying the background color.
+%
+*/
+WandExport unsigned int MagickSetBackgroundColor(MagickWand *wand,
+                                                 const PixelWand *background)
+{
+  assert(wand != (MagickWand *) NULL);
+  assert(wand->signature == MagickSignature);
+  assert(background != (const PixelWand *) NULL);
+  PixelGetQuantumColor(background,&wand->image_info->background_color);
+  return(True);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
 %   M a g i c k S e t F i l e n a m e                                         %
 %                                                                             %
 %                                                                             %
@@ -8243,6 +8280,7 @@ WandExport unsigned int MagickSetImageBorderColor(MagickWand *wand,
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
+  assert(border != (const PixelWand *) NULL);
   if (wand->images == (Image *) NULL)
     ThrowWandException(WandError,WandContainsNoImages,wand->id);
   PixelGetQuantumColor(border,&wand->image->border_color);
@@ -8274,7 +8312,7 @@ WandExport unsigned int MagickSetImageBorderColor(MagickWand *wand,
 %
 %    o index: The offset into the image colormap.
 %
-%    o color: Return the colormap color in this wand.
+%    o color: Use the colormap color in this wand.
 %
 */
 WandExport unsigned int MagickSetImageColormapColor(MagickWand *wand,
@@ -8282,6 +8320,7 @@ WandExport unsigned int MagickSetImageColormapColor(MagickWand *wand,
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
+  assert(color != (const PixelWand *) NULL);
   if (wand->images == (Image *) NULL)
     ThrowWandException(WandError,WandContainsNoImages,wand->id);
   if ((wand->image->colormap == (PixelPacket *) NULL) ||
