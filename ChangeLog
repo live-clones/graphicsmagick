@@ -1,5 +1,9 @@
 2025-11-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/heif.c (ReadHEIFImage): Fixes for ignore_transformations
+	in 'ping' mode.  Trace decoding warnings. Don't use variable
+	length arrays for "compatible_brands".
+
 	* wand/magick_wand.c (MagickSetBackgroundColor): Add new function
 	to support setting the default background color. Completes
 	addressing GraphicsMagick discussion thread at

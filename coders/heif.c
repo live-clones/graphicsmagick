@@ -225,9 +225,8 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
 /*
   Read metadata (Exif and XMP)
 */
-static MagickPassFail ReadMetadata(const ImageInfo *image_info,
-                                   struct heif_image_handle *heif_image_handle,
-                                   Image *image)
+static MagickPassFail ReadMetadata(struct heif_image_handle *heif_image_handle,
+                                   Image *image, const MagickBool ignore_transformations)
 {
   int
     count,
@@ -391,13 +390,7 @@ static MagickPassFail ReadMetadata(const ImageInfo *image_info,
           */
           if (strncmp(profile_name,"Exif",4) == 0)
             {
-              const char *value;
-              MagickBool ignore_transformations = MagickFalse;
-              if ((value=AccessDefinition(image_info,"heif","ignore-transformations")))
-                if (LocaleCompare(value,"TRUE") == 0)
-                  ignore_transformations = MagickTrue;
-
-              if (!ignore_transformations)
+              if (ignore_transformations)
                 {
                   const ImageAttribute *attribute = GetImageAttribute(image,"EXIF:Orientation");
                   if (attribute && attribute->value)
@@ -932,7 +925,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                           HEIF_chroma_to_string(preferred_chroma));
 
   /* Read EXIF and XMP profile */
-  if (!ReadMetadata(image_info, heif_image_handle, image))
+  if (!ReadMetadata(heif_image_handle, image, ignore_transformations))
     {
       CopyException(exception,&image->exception);
       HEIFReadImageFrameCleanup();
@@ -959,16 +952,13 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     in order to force reading much of the image to get fully accurate
     information.
   */
-  if (image_info->ping && ignore_transformations) /* ignore_transformations is true by default */
+  if (image_info->ping && !ignore_transformations)
     {
       HEIFReadImageFrameCleanup();
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Returning early without pixels due to ping mode...");
       return MagickPass;
-    }
-
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
-    {
-      HEIFReadImageFrameCleanup();
-      return MagickFail;
     }
 
   /* Add decoding options support */
@@ -983,7 +973,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
   progress_user_data.progress = 0;
 #endif
 
-  decode_options->ignore_transformations = (ignore_transformations == MagickTrue) ? 1 : 0;
+  decode_options->ignore_transformations = ignore_transformations;
 
 #if HEIF_ENABLE_PROGRESS_MONITOR
   decode_options->start_progress = start_progress;
@@ -1041,6 +1031,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
         if ((string_value = AccessDefinition(image_info,"heif","preserve-colorspace")))
           {
             if ((LocaleCompare(string_value,"true") == 0) ||
+                (LocaleCompare(string_value,"yes") == 0) ||
                 (LocaleCompare(string_value,"1") == 0))
               preserve_colorspace = MagickTrue;
           }
@@ -1068,13 +1059,34 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     }
 
   /*
+    Trace decoding warnings
+  */
+  if (image->logging)
+    {
+      int i;
+
+      for (i = 0;; i++)
+        {
+          int n;
+          n = heif_image_get_decoding_warnings(heif_image,i,&heif_status, 1);
+          if (n == 0)
+            break;
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Warning: %s", heif_status.message);
+        }
+    }
+
+  /*
     Update image properties
   */
   image->columns=heif_image_get_primary_width(heif_image);
   image->rows=heif_image_get_primary_height(heif_image);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Geometry: %lux%lu",
+                          image->columns,image->rows);
   heif_colorspace=heif_image_get_colorspace(heif_image);
   image->colorspace=HEIF_colorspace_to_ColorspaceType(heif_colorspace);
-
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "HEIF colorspace: %s",
@@ -1083,7 +1095,16 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
   if (image_info->ping)
     {
       HEIFReadImageFrameCleanup();
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Returning without pixels due to ping mode...");
       return MagickPass;
+    }
+
+    if (CheckImagePixelLimits(image, exception) != MagickPass)
+    {
+      HEIFReadImageFrameCleanup();
+      return MagickFail;
     }
 
   {
@@ -1506,7 +1527,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 #endif
 
   MagickBool
-    ignore_transformations = MagickTrue;
+    ignore_transformations = image_info->ping ? MagickTrue : MagickFalse;
 
   MagickPassFail
     status;
@@ -1578,18 +1599,27 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
         heif_status = heif_list_compatible_brands(in_buf, in_len, &brands, &nBrands);
         if (heif_status.code == heif_error_Ok)
           {
-            int i;
-            char compatible_brands[6*nBrands+1];
-            (void) memset(compatible_brands,0,sizeof(compatible_brands));
-            for (i = 0; i < nBrands; i++)
-              {
-                heif_brand_to_fourcc(brands[i], fourcc);
-                if (i > 0)
-                  (void) strlcat(compatible_brands,", ",sizeof(compatible_brands));
-                strlcat(compatible_brands,fourcc,sizeof(compatible_brands));
-              }
+            char
+              *compatible_brands;
+
+            compatible_brands=MagickAllocateClearedArray(char *,6,nBrands+1);
+            if (compatible_brands == (char *) NULL)
+              ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+            {
+              int
+                i;
+
+              for (i = 0; i < nBrands; i++)
+                {
+                  heif_brand_to_fourcc(brands[i], fourcc);
+                  if (i > 0)
+                    (void) strlcat(compatible_brands,", ",sizeof(compatible_brands));
+                  strlcat(compatible_brands,fourcc,sizeof(compatible_brands));
+                }
+            }
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Compatible HEIF Brands: %s", compatible_brands);
+            MagickFreeMemory(compatible_brands);
           }
         heif_free_list_of_compatible_brands(brands);
       }
@@ -1606,13 +1636,16 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     Allow the user to enable transformations (e.g. the image might be rotated).
   */
   if ((value=AccessDefinition(image_info,"heif","ignore-transformations")))
-    if (LocaleCompare(value,"FALSE") == 0)
-      {
+    {
+      if (LocaleCompare(value,"FALSE") == 0)
         ignore_transformations = MagickFalse;
-        if (image->logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Enabling transformations");
-      }
+      else if (LocaleCompare(value,"TRUE") == 0)
+        ignore_transformations = MagickTrue;
+    }
+
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "ignore-transformations: %s", ignore_transformations ? "True" : "False");
 
   heif_status=heif_context_read_from_memory_without_copy(heif, in_buf, in_len, NULL);
   if (heif_status.code == heif_error_Unsupported_filetype
