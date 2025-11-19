@@ -1,3 +1,12 @@
+2025-11-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/mvg.c (ReadMVGImage): Initialize image canvas with the
+	background color (default white), which may be
+	transparent. Previously, the image was always set to
+	opaque. Partially addresses GraphicsMagick discussion thread at
+	https://sourceforge.net/p/graphicsmagick/discussion/250738/thread/542a23c291/
+	"How to load SVG with transparent background in C/Pascal?".
+
 2025-11-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* fuzzing/oss-fuzz-build.sh: Update the xz configure options.
