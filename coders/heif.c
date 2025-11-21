@@ -1057,6 +1057,13 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                               heif_status.message);
       ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
+  if (heif_image == (struct heif_image *) NULL)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_decode_image() reports heif_error_Ok but failed to return an image!");
+          ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
 
   /*
     Trace decoding warnings

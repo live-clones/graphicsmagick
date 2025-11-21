@@ -1,5 +1,10 @@
 2025-11-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/heif.c (ReadHEIFImageFrame): Report an error if libheif
+	returns heif_error_Ok but failed to return an image.  This should
+	avoid oss-fuzz 462673424 "graphicsmagick:coder_HEIF_fuzzer:
+	Null-dereference READ in heif_image_get_decoding_warnings".
+
 	* fuzzing/oss-fuzz-build.sh: Also specify list of decoders when
 	building liblzma.
 

@@ -41,6 +41,10 @@
 <p>2025-11-21  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/heif.c (ReadHEIFImageFrame): Report an error if libheif
+returns heif_error_Ok but failed to return an image.  This should
+avoid oss-fuzz 462673424 &quot;graphicsmagick:coder_HEIF_fuzzer:
+Null-dereference READ in heif_image_get_decoding_warnings&quot;.</p></li>
 <li><p>fuzzing/oss-fuzz-build.sh: Also specify list of decoders when
 building liblzma.</p></li>
 </ul>
