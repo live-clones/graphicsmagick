@@ -1,3 +1,8 @@
+2025-11-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Also specify list of decoders when
+	building liblzma.
+
 2025-11-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImage): Fixes for ignore_transformations

@@ -142,6 +142,7 @@ then
         --disable-xz \
         --disable-xzdec \
         --enable-static \
+        --enable-decoders='lzma1,lzma2,delta,x86,ia64' \
         --enable-encoders='lzma1,lzma2,delta,x86,ia64' \
         --enable-threads=no \
         --with-pic=yes \
