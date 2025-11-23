@@ -1,5 +1,12 @@
 2025-11-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/gif.c (ReadGIFImage): Store image comment in first image
+	frame rather than the last frame. Resolves SourceForge issue 761
+	"Reading multiple GIFs doesn't read the comments correctly.".
+	Also, change memory allocation to use resource-limited memory
+	allocators.
+	(WriteGIFImage): Use resource-limited memory allocators.
+
 	* fuzzing/oss-fuzz-build.sh: Restore default liblzma coders.  This
 	will cause some oss-fuzz reports to re-appear.
 
