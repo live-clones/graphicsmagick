@@ -1,3 +1,8 @@
+2025-11-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Restore default liblzma coders.  This
+	will cause some oss-fuzz reports to re-appear.
+
 2025-11-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImageFrame): Report an error if libheif
