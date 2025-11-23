@@ -1596,6 +1596,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
         /* Log main brand */
         (void) memset(fourcc,0,sizeof(fourcc));
         heif_brand_to_fourcc(heif_read_main_brand(in_buf, in_len), fourcc);
+        fourcc[4]=0;
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "HEIF Brand: %s", fourcc);
       }
@@ -1609,7 +1610,10 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
             char
               *compatible_brands;
 
-            compatible_brands=MagickAllocateClearedArray(char *,6,nBrands+1);
+            const size_t
+              compatible_brands_alloc = 6*(nBrands+1);
+
+            compatible_brands=MagickAllocateClearedMemory(char *,compatible_brands_alloc);
             if (compatible_brands == (char *) NULL)
               ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
             {
@@ -1619,9 +1623,10 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
               for (i = 0; i < nBrands; i++)
                 {
                   heif_brand_to_fourcc(brands[i], fourcc);
+                  fourcc[4]=0;
                   if (i > 0)
-                    (void) strlcat(compatible_brands,", ",sizeof(compatible_brands));
-                  strlcat(compatible_brands,fourcc,sizeof(compatible_brands));
+                    (void) strlcat(compatible_brands,", ",compatible_brands_alloc);
+                  (void) strlcat(compatible_brands,fourcc,compatible_brands_alloc);
                 }
             }
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),

@@ -1,5 +1,8 @@
 2025-11-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/heif.c (ReadHEIFImage): Fix Coverity 500032 "500032 Wrong
+	sizeof argument".
+
 	* coders/gif.c (ReadGIFImage): Store image comment in first image
 	frame rather than the last frame. Resolves SourceForge issue 761
 	"Reading multiple GIFs doesn't read the comments correctly.".
