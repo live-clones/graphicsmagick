@@ -42,7 +42,9 @@
 <blockquote>
 <ul class="simple">
 <li><p>coders/heif.c (ReadHEIFImage): Add additional tracing related to
-heif_list_compatible_brands().</p></li>
+heif_list_compatible_brands().
+(apply_security_limits): Trace all heif_security_limits members we
+know about, not just one ones we explictly set.</p></li>
 <li><p>coders/gif.c (ReadGIFImage): Fix oss-fuzz 463511405
 &quot;graphicsmagick:coder_GIF87_fuzzer: Direct-leak in
 _MagickReallocateResourceLimitedMemoryLoc&quot;.  This was a new issue

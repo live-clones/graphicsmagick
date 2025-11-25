@@ -2,6 +2,8 @@
 
 	* coders/heif.c (ReadHEIFImage): Add additional tracing related to
 	heif_list_compatible_brands().
+	(apply_security_limits): Trace all heif_security_limits members we
+	know about, not just one ones we explictly set.
 
 	* coders/gif.c (ReadGIFImage): Fix oss-fuzz 463511405
 	"graphicsmagick:coder_GIF87_fuzzer: Direct-leak in

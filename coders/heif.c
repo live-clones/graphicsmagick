@@ -571,11 +571,11 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
   security_limits->max_total_memory = (uint64_t) memory_limit;
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "security limits:"
-                        "  max-memory-block-size = %" MAGICK_UINTMAX_F "u",
+                        "  max_memory_block_size = %" MAGICK_UINTMAX_F "u",
                         (magick_uintmax_t) security_limits->max_memory_block_size);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "security limits:"
-                        "  max-total-memory = %" MAGICK_UINTMAX_F "u",
+                        "  max_total_memory = %" MAGICK_UINTMAX_F "u",
                         (magick_uintmax_t) security_limits->max_total_memory);
 
   width_limit = (magick_uintmax_t) GetMagickResourceLimit(WidthResource);
@@ -623,41 +623,99 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
   /* version 1 interface */
   MagickAttributeToU64(image_info,"heif","max-image-size-pixels",
                        security_limits->max_image_size_pixels);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_image_size_pixels);
+
   MagickAttributeToU64(image_info,"heif","max-number-of-tiles",
                        security_limits->max_number_of_tiles);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_number_of_tiles = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_number_of_tiles);
+
   MagickAttributeToU32(image_info,"heif","max-bayer-pattern-pixels",
                        security_limits->max_bayer_pattern_pixels);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_bayer_pattern_pixels = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_bayer_pattern_pixels);
+
   MagickAttributeToU32(image_info,"heif","max-items",
                        security_limits->max_items);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_items = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_items);
+
   MagickAttributeToU32(image_info,"heif","max-color-profile-size",
                        security_limits->max_color_profile_size);
-
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_color_profile_size = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_color_profile_size);
 
   MagickAttributeToU64(image_info,"heif","max-memory-block-size",
                        security_limits->max_memory_block_size);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_memory_block_size = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_memory_block_size);
 
   MagickAttributeToU32(image_info,"heif","max-components",
                        security_limits->max_components);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_components = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_components);
+
   MagickAttributeToU32(image_info,"heif","max-iloc-extents-per-item",
                        security_limits->max_iloc_extents_per_item);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_iloc_extents_per_item = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_iloc_extents_per_item);
+
   MagickAttributeToU32(image_info,"heif","max-size-entity-group",
                        security_limits->max_size_entity_group);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_size_entity_group = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_size_entity_group);
+
   MagickAttributeToU32(image_info,"heif","max-children-per-box",
                        security_limits->max_children_per_box);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_children_per_box = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_children_per_box);
 
   /* version 2 interface */
 
   /* Added in 1.13.0, September 2, 2022 */
   MagickAttributeToU64(image_info,"heif","max-total-memory",
                        security_limits->max_total_memory);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_total_memory = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_total_memory);
 
   /* Added in 1.13.0, September 2, 2022 */
   MagickAttributeToU32(image_info,"heif","max-sample-description-box-entries",
                        security_limits->max_sample_description_box_entries);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_sample_description_box_entries = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_sample_description_box_entries);
 
   /* Added in 1.17.6? ?*/
   MagickAttributeToU32(image_info,"heif","max-sample-group-description-box-entries",
                        security_limits->max_sample_group_description_box_entries);
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "security limits:"
+                        "  max_sample_group_description_box_entries = %" MAGICK_UINTMAX_F "u",
+                        (magick_uintmax_t) security_limits->max_sample_group_description_box_entries);
 #else
   {
     /* DEPRECATED: Add an image size limit based on maximum_width ^ 2 */
