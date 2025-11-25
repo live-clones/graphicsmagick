@@ -1,3 +1,10 @@
+2025-11-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/gif.c (ReadGIFImage): Fix oss-fuzz 463511405
+	"graphicsmagick:coder_GIF87_fuzzer: Direct-leak in
+	_MagickReallocateResourceLimitedMemoryLoc".  This was a new issue
+	introduced by recently updated code.
+
 2025-11-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImage): Fix Coverity 500032 "500032 Wrong

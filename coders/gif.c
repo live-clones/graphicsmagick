@@ -901,7 +901,7 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   image=AllocateImage(image_info);
   status=OpenBlob(image_info,image,ReadBinaryBlobMode,exception);
   if (status == MagickFail)
-    ThrowReaderException(FileOpenError,UnableToOpenFile,image);
+    ThrowGIFReaderException(FileOpenError,UnableToOpenFile,image);
   /*
     Determine if this is a GIF file.
   */
@@ -909,7 +909,7 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   count=ReadBlob(image,6,(char *) magick);
   if ((count != 6) || ((LocaleNCompare((char *) magick,"GIF87",5) != 0) &&
       (LocaleNCompare((char *) magick,"GIF89",5) != 0)))
-    ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+    ThrowGIFReaderException(CorruptImageError,ImproperImageHeader,image);
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Magick: %.6s",magick);
@@ -1170,7 +1170,7 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     status=DecodeImage(image,opacity);
     if (!image_info->ping && (status == False)) {
       GetImageException(image,exception);
-      ThrowReaderException(CorruptImageError,CorruptImage,image);
+      ThrowGIFReaderException(CorruptImageError,CorruptImage,image);
     }
     StopTimer(&image->timer);
     if (image_info->subrange != 0)
