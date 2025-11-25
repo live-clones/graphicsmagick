@@ -1,5 +1,8 @@
 2025-11-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/heif.c (ReadHEIFImage): Add additional tracing related to
+	heif_list_compatible_brands().
+
 	* coders/gif.c (ReadGIFImage): Fix oss-fuzz 463511405
 	"graphicsmagick:coder_GIF87_fuzzer: Direct-leak in
 	_MagickReallocateResourceLimitedMemoryLoc".  This was a new issue

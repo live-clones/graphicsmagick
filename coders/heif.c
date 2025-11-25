@@ -1587,7 +1587,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   /*
     Trace some information about the file
   */
-  if (image->logging)
+  if (image->logging && IsEventLogged(CoderEvent))
     {
       char
         fourcc[5];
@@ -1597,8 +1597,14 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
         (void) memset(fourcc,0,sizeof(fourcc));
         heif_brand_to_fourcc(heif_read_main_brand(in_buf, in_len), fourcc);
         fourcc[4]=0;
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "HEIF Brand: %s", fourcc);
+        if (fourcc[0] == 0)
+          {
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Failed to read main brand!");
+          }
+        else
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "HEIF Brand: \"%s\"", fourcc);
       }
       {
         /* Log compatible brands */
@@ -1630,8 +1636,13 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
                 }
             }
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Compatible HEIF Brands: %s", compatible_brands);
+                                  "Compatible HEIF brands: %s", compatible_brands);
             MagickFreeMemory(compatible_brands);
+          }
+        else
+          {
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Failed to read compatible HEIF brands!");
           }
         heif_free_list_of_compatible_brands(brands);
       }
