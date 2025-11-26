@@ -2079,12 +2079,40 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   client_data.image_info=image_info;
 #if defined(HAVE_TIFFERROREXTR)
   {
+    magick_int64_t
+      memory_consumed,
+      memory_maximum_limit;
+
+    tmsize_t
+      max_single_mem_alloc,
+      max_cumulated_mem_alloc;
+
     TIFFOpenOptions *open_options = TIFFOpenOptionsAlloc();
+    /*
+      TIFFOpenOptionsSetMaxSingleMemAlloc(TIFFOpenOptions *opts,
+                                        tmsize_t max_single_mem_alloc);
+      TIFFOpenOptionsSetMaxCumulatedMemAlloc(TIFFOpenOptions *opts,
+                                           tmsize_t max_cumulated_mem_alloc);
+      TIFFOpenOptionsSetWarnAboutUnknownTags(TIFFOpenOptions *opts,
+                                           int warn_about_unknown_tags);
+      TIFFOpenOptionsSetErrorHandlerExtR(TIFFOpenOptions *opts,
+                                       TIFFErrorHandlerExtR handler,
+                                       void *errorhandler_user_data);
+      TIFFOpenOptionsSetWarningHandlerExtR(TIFFOpenOptions *opts,
+                                         TIFFErrorHandlerExtR handler,
+                                         void *warnhandler_user_data);
+     */
     TIFFOpenOptionsSetErrorHandlerExtR(open_options, TIFFReadErrorsHandlerExtR, (void *) exception);
     TIFFOpenOptionsSetWarningHandlerExtR(open_options,
                                          (CheckThrowWarnings(image_info) ?
                                           TIFFReadWarningHandlerExtRThrowException : TIFFReadWarningHandlerExtRLogOnly),
                                          (void *) exception); /* FIXME */
+    memory_maximum_limit=GetMagickResourceLimit(MemoryResource);
+    memory_consumed=GetMagickResource(MemoryResource);
+    max_single_mem_alloc=((memory_maximum_limit-memory_consumed)/8); /* FIXME: Support configuring ratio? */
+    TIFFOpenOptionsSetMaxSingleMemAlloc(open_options, max_single_mem_alloc);
+    max_cumulated_mem_alloc=((memory_maximum_limit-memory_consumed)/4); /* FIXME: Support configuring ratio? */
+    TIFFOpenOptionsSetMaxCumulatedMemAlloc(open_options, max_cumulated_mem_alloc);
     tiff=TIFFClientOpenExt(image->filename,"rb",(thandle_t) &client_data,
                            TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,TIFFCloseBlob,
                            TIFFGetBlobSize,TIFFMapBlob,TIFFUnmapBlob,

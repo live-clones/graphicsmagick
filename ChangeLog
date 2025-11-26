@@ -1,3 +1,9 @@
+2025-11-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (ReadTIFFImage): Compute possibly reasonable
+	SingleMemAlloc and MaxCumulatedMemAlloc resource limit values and
+	pass these TIFFOpenOptions to TIFFClientOpenExt().
+
 2025-11-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImage): Add additional tracing related to
