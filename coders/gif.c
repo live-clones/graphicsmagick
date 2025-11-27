@@ -20,6 +20,7 @@
 %                                                                             %
 %            Read/Write Compuserv Graphics Interchange Format.                %
 %                                                                             %
+%             https://www.fileformat.info/format/gif/egff.htm                 %
 %                                                                             %
 %                              Software Design                                %
 %                                John Cristy                                  %
@@ -876,7 +877,7 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     *global_colormap = (unsigned char *) NULL,
     *local_colormap = (unsigned char *) NULL,
     header[MaxTextExtent],
-    magick[12];
+    magick[6];
 
   char
     *comments = (char *) NULL;
@@ -890,6 +891,11 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     dispose,
     image_count,
     iterations;
+
+#define GlobalColorTableBits(f) ((unsigned) f & 0x07)
+#define ColorTableSorted(f) ((((unsigned) f >> 3) & 0x01))
+#define ColorResolution(f) (((unsigned) f >> 4) &  0x07)
+#define GlobalColorTablePresent(f) (((unsigned) f >> 7) & 0x07)
 
   /*
     Open image file.
@@ -913,16 +919,34 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Magick: %.6s",magick);
+  /* Width and height of screen in pixels */
   page.width=ReadBlobLSBShort(image);
   page.height=ReadBlobLSBShort(image);
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Canvas Page: %lux%lu", page.width, page.height);
+  /* Screen and Color Map Information */
   flag=ReadBlobByte(image);
+  /* Background Color Index */
   background=ReadBlobByte(image);
+  /* Pixel Aspect Ratio */
   c=ReadBlobByte(image);  /* reserved */
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Global Color Table Entries: %u, "
+                          "Color Table Sort: %s, "
+                          "Color Resolution: %u, "
+                          "Global Color Table Present: %s, "
+                          "Background Color Index: %u, "
+                          "Pixel Aspect Ratio: %u",
+                          (1U << (GlobalColorTableBits(flag)+1)),
+                          ColorTableSorted(flag) ? "Yes" : "No",
+                          ColorResolution(flag)+1,
+                          GlobalColorTablePresent(flag) ? "Yes" : "No",
+                          background,
+                          (unsigned) c ? ((unsigned) c+15U)/64U : 0U);
   global_colors=1 << ((flag & 0x07)+1);
-  global_colormap=MagickAllocateResourceLimitedArray(unsigned char *,Max(global_colors,256U),3U);
+  global_colormap=MagickAllocateResourceLimitedClearedArray(unsigned char *,Max(global_colors,256U),3U);
   if (global_colormap == (unsigned char *) NULL)
     ThrowGIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
   if (image->logging)

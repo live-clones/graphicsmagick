@@ -1,3 +1,10 @@
+2025-11-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/gif.c (ReadGIFImage): Add more GIF header
+	tracing. Eliminate oss-fuzz 464037554
+	"graphicsmagick:coder_GIF_fuzzer: Use-of-uninitialized-value in
+	IsMonochromeImage".
+
 2025-11-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/tiff.c (ReadTIFFImage): Compute possibly reasonable
