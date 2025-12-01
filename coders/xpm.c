@@ -238,7 +238,7 @@ static char *ParseColor(char * restrict data)
           p=r;
           for ( ; ; )
             {
-              if (q-targets[i] >= TargetsDimension)
+              if ((size_t) (q-targets[i]) >= TargetsDimension)
                 return((char *) NULL);
               if (*q == '\0')
                 return(r);
