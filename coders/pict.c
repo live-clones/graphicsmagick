@@ -1163,7 +1163,7 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
 #if 1
   if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "EncodeImage: %lux%lu, matte=%s bytes_per_line=%lu",
+                          "EncodeImage: %lux%lu, matte=%s bytes_per_line=%zu",
                           image->columns, image->rows,
                           image->matte ? "True" : "False",
                           bytes_per_line);

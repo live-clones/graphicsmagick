@@ -1,5 +1,8 @@
 2025-12-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+	* coders/pict.c (EncodeImage): Use correct formatter for
+	bytes_per_line.
+
 	* doc/options.imdoc: integrated SourceForge "Code Merge Request
 	#21: Options Documentation: add jxl coder specific options" by
 	Gabor Bata. Only added two small whitespace fixups and produced
