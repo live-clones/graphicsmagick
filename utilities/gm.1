@@ -1,4 +1,4 @@
-.TH gm 1 "2025/11/19" "GraphicsMagick"
+.TH gm 1 "2025/12/01" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1610,6 +1610,27 @@ also preserved if the input is a JPEG file and the output is a JNG
 file.  If the colorspace of the output file differs from that of the
 input file, the quality setting is preserved but the sampling-factors
 are not.
+
+.in 15
+.in 15
+.B "jxl:effort=<integer>"
+.in 20
+ \fR
+.in 20
+Encoder effort. Higher values allow more computation, generally achieving
+smaller output at same quality. For lossy encoding, higher effort should
+achieve more accurate quality. Please refer to libjxl source code (or
+documentation) for 'JXL_ENC_FRAME_SETTING_EFFORT'.
+
+.in 15
+.in 15
+.B "jxl:decodingspeed=<integer>"
+.in 20
+ \fR
+.in 20
+Decoding speed. Higher values improve decode speed at the expense of
+quality or density. Please refer to libjxl source code (or documentation)
+for 'JXL_ENC_FRAME_SETTING_DECODING_SPEED'.
 
 .in 15
 .in 15

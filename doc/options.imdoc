@@ -1389,6 +1389,19 @@ input file, the quality setting is preserved but the sampling-factors
 are not.
 </dd>
 
+<dt>jxl:effort=<integer></dt>
+<dd>Encoder effort. Higher values allow more computation, generally achieving
+smaller output at same quality. For lossy encoding, higher effort should
+achieve more accurate quality. Please refer to libjxl source code (or
+documentation) for 'JXL_ENC_FRAME_SETTING_EFFORT'.
+</dd>
+
+<dt>jxl:decodingspeed=<integer></dt>
+<dd>Decoding speed. Higher values improve decode speed at the expense of
+quality or density. Please refer to libjxl source code (or documentation)
+for 'JXL_ENC_FRAME_SETTING_DECODING_SPEED'.
+</dd>
+
 <dt>pcl:fit-to-page</dt>
 <dd>If the pcl:fit-to-page flag is defined, then the printer is
 requested to scale the image to fit the page size (width and/or
