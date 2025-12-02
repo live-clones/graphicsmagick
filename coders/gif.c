@@ -1101,9 +1101,16 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     local_colors=!BitSet(flag,0x80) ? global_colors : 0x01U << ((flag & 0x07)+1);
     image->colors=local_colors;
     if (opacity == (long) image->colors) /* Add an extra color for transparent black */
-      image->colors++;
+      {
+        if (image->logging)
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Adding colormap entry for opacity...");
+        image->colors++;
+      }
     else if (opacity >= (long) image->colors)
-      opacity=(-1);
+      {
+        opacity=(-1);
+      }
     image->page.width=page.width;
     image->page.height=page.height;
     image->page.y=page.y;
@@ -1163,7 +1170,7 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
           *new_local_colormap;
 
         /*
-          Read local local_colormap.
+          Read local colormap.
         */
         new_local_colormap=MagickReallocateResourceLimitedArray(unsigned char *,local_colormap,3,image->colors);
         if (new_local_colormap == (unsigned char *) NULL)
@@ -1171,6 +1178,8 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
         local_colormap=new_local_colormap;
         if (ReadBlob(image, (size_t) 3*local_colors,(char *) local_colormap) != (size_t) 3*local_colors)
           ThrowGIFReaderException(CorruptImageError,InsufficientImageDataInFile,image);
+        if (image->colors > local_colors)
+          (void) memset(local_colormap+(size_t) 3*local_colors,0,(size_t) 3*(image->colors-local_colors));
         p=local_colormap;
         for (i=0; i < image->colors; i++)
         {
