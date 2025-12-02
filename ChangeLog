@@ -4,6 +4,8 @@
 	added for opacity. Addresses oss-fuzz 465292618
 	"graphicsmagick:coder_GIF_fuzzer: Use-of-uninitialized-value in
 	WriteGIFImage".
+	(ReadGIFImage): Do not use case-insensitive compare when verifying
+	header magick.
 
 2025-12-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

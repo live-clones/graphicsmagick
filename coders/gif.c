@@ -913,8 +913,8 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   (void) memset(magick,0,sizeof(magick));
   count=ReadBlob(image,6,(char *) magick);
-  if ((count != 6) || ((LocaleNCompare((char *) magick,"GIF87",5) != 0) &&
-      (LocaleNCompare((char *) magick,"GIF89",5) != 0)))
+  if ((count != 6) || ((strncmp((char *) magick,"GIF87",5) != 0) &&
+      (strncmp((char *) magick,"GIF89",5) != 0)))
     ThrowGIFReaderException(CorruptImageError,ImproperImageHeader,image);
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
