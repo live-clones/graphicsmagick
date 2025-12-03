@@ -212,6 +212,8 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
         heif_image_handle_release(heif_image_handle);                  \
       if (heif)                                                        \
         heif_context_free(heif);                                       \
+      if (decode_options)                                              \
+        heif_decoding_options_free(decode_options);                    \
       MagickFreeResourceLimitedMemory(in_buf);                         \
     } while (0);
 
@@ -875,7 +877,7 @@ static const char *HEIF_channel_to_string(const enum heif_channel c)
 }
 
 static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
-                                         MagickBool ignore_transformations,
+                                         struct heif_decoding_options *decode_options,
                                          Image *image,
                                          const ImageInfo *image_info,
                                          ExceptionInfo *exception)
@@ -901,9 +903,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
 
   struct heif_image
     *heif_image = NULL;
-
-  struct heif_decoding_options
-    *decode_options;
 
   PixelPacket
     *q;
@@ -946,7 +945,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
   if (image_info->ping)
     {
       bits_per_pixel=heif_image_handle_get_luma_bits_per_pixel(heif_image_handle);
-      if (bits_per_pixel != -1)
+      if (image->logging)
+        if (bits_per_pixel < 0)
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Image has undefined bit-depth!");
+      if (bits_per_pixel > 0)
         image->depth=(unsigned int) bits_per_pixel;
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -983,7 +986,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                           HEIF_chroma_to_string(preferred_chroma));
 
   /* Read EXIF and XMP profile */
-  if (!ReadMetadata(heif_image_handle, image, ignore_transformations))
+  if (!ReadMetadata(heif_image_handle, image, decode_options->ignore_transformations))
     {
       CopyException(exception,&image->exception);
       HEIFReadImageFrameCleanup();
@@ -1010,7 +1013,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     in order to force reading much of the image to get fully accurate
     information.
   */
-  if (image_info->ping && !ignore_transformations)
+  if (image_info->ping && !decode_options->ignore_transformations)
     {
       HEIFReadImageFrameCleanup();
       if (image->logging)
@@ -1019,40 +1022,20 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       return MagickPass;
     }
 
-  /* Add decoding options support */
-  decode_options = heif_decoding_options_alloc();
-  if (decode_options == (struct heif_decoding_options*) NULL)
-    ThrowHEIFThrowReadImageFrameException(ResourceLimitError,MemoryAllocationFailed,image);
-
-#if HEIF_ENABLE_PROGRESS_MONITOR
-  progress_user_data.exception = exception;
-  progress_user_data.image = image;
-  progress_user_data.max_progress = 0;
-  progress_user_data.progress = 0;
-#endif
-
-  decode_options->ignore_transformations = ignore_transformations;
-
-#if HEIF_ENABLE_PROGRESS_MONITOR
-  decode_options->start_progress = start_progress;
-  decode_options->on_progress = on_progress;
-  decode_options->end_progress = end_progress;
-  decode_options->progress_user_data = &progress_user_data;
-#endif /* if HEIF_ENABLE_PROGRESS_MONITOR */
-
-  /* version 2 decode options */
-
-  /* Let libheif do the scaling from deep images if QuantumDepth == 8 */
-#if QuantumDepth == 8
-  decode_options->convert_hdr_to_8bit = 1;
-#endif /* if QuantumDepth == 8 */
-
-  /* version 3 decode options */
-
-  /* When enabled, an error is returned for invalid input. Otherwise, it will try its best and
-     add decoding warnings to the decoded heif_image. Default is non-strict. */
-  /* uint8_t strict_decoding; */
-
+    if (image->logging)
+    {
+      /* See libheif/api/libheif/heif_tiling.h */
+      heif_image_tiling tiling;
+      heif_image_handle_get_image_tiling(heif_image_handle, !decode_options->ignore_transformations, &tiling);
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Tiling: version %d, num_columns=%u, num_rows=%u,"
+                            " tile_width=%u, tile_height=%u, image_width=%u, image_height=%u,"
+                            " top_offset=%u, left_offset=%u, number_of_extra_dimensions=%u",
+                            tiling.version, tiling.num_columns, tiling.num_rows,
+                            tiling.tile_width, tiling.tile_height, tiling.image_width, tiling.image_height,
+                            tiling.top_offset, tiling.left_offset,
+                            tiling.number_of_extra_dimensions);
+    }
 
   /*
     Be prepared to handle images on per-plane basis. Upscale
@@ -1104,7 +1087,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                   heif_chroma_decode,
                                   decode_options);
   }
-  heif_decoding_options_free(decode_options);
   if (heif_status.code == heif_error_Memory_allocation_error)
     ThrowHEIFThrowReadImageFrameException(ResourceLimitError,MemoryAllocationFailed,image);
   if (heif_status.code != heif_error_Ok)
@@ -1574,6 +1556,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   struct heif_image
     *heif_image = NULL;
 
+  struct heif_decoding_options
+    *decode_options = NULL;
+
   const char
     *value;
 
@@ -1590,9 +1575,6 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   ProgressUserData
     progress_user_data;
 #endif
-
-  MagickBool
-    ignore_transformations = image_info->ping ? MagickTrue : MagickFalse;
 
   MagickPassFail
     status;
@@ -1618,6 +1600,35 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
       heif_init((struct heif_init_params *) NULL);
       heif_initialized = MagickTrue;
     }
+
+
+  /* Add decoding options support */
+  decode_options = heif_decoding_options_alloc();
+  if (decode_options == (struct heif_decoding_options*) NULL)
+    ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+
+  decode_options->ignore_transformations = image_info->ping ? MagickTrue : MagickFalse;
+#if HEIF_ENABLE_PROGRESS_MONITOR
+  progress_user_data.exception = exception;
+  progress_user_data.image = image;
+  progress_user_data.max_progress = 0;
+  progress_user_data.progress = 0;
+#endif
+
+#if HEIF_ENABLE_PROGRESS_MONITOR
+  decode_options->start_progress = start_progress;
+  decode_options->on_progress = on_progress;
+  decode_options->end_progress = end_progress;
+  decode_options->progress_user_data = &progress_user_data;
+#endif /* if HEIF_ENABLE_PROGRESS_MONITOR */
+
+  /* version 2 decode options */
+
+  /* Let libheif do the scaling from deep images if QuantumDepth == 8 */
+#if QuantumDepth == 8
+  decode_options->convert_hdr_to_8bit = 1;
+#endif /* if QuantumDepth == 8 */
+
 
   /*
     Read the whole input file into a memory blob
@@ -1719,14 +1730,15 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   if ((value=AccessDefinition(image_info,"heif","ignore-transformations")))
     {
       if (LocaleCompare(value,"FALSE") == 0)
-        ignore_transformations = MagickFalse;
+        decode_options->ignore_transformations = MagickFalse;
       else if (LocaleCompare(value,"TRUE") == 0)
-        ignore_transformations = MagickTrue;
+        decode_options->ignore_transformations = MagickTrue;
     }
 
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "ignore-transformations: %s", ignore_transformations ? "True" : "False");
+                          "ignore-transformations: %s",
+                          decode_options->ignore_transformations ? "True" : "False");
 
   heif_status=heif_context_read_from_memory_without_copy(heif, in_buf, in_len, NULL);
   if (heif_status.code == heif_error_Unsupported_filetype
@@ -1766,7 +1778,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
       }
   }
 
-  status=ReadHEIFImageFrame(heif_image_handle,ignore_transformations,image,image_info,exception);
+  status=ReadHEIFImageFrame(heif_image_handle,decode_options,image,image_info,exception);
 
   HEIFReadCleanup();
   CloseBlob(image);

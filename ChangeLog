@@ -1,3 +1,9 @@
+2025-12-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (ReadHEIFImage): Allocate/initialize libheif
+	decode_options in ReadHEIFImage() and pass as a parameter to
+	subordinate functions.
+
 2025-12-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/gif.c (ReadGIFImage): Initialize colormap entry which was
