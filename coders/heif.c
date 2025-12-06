@@ -161,7 +161,7 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
   /*
     const char* heif_get_file_mime_type(const uint8_t* data, int len)
     heif_filetype_result heif_check_filetype(const uint8_t* data, int len)
-   */
+  */
 
   if (length < 12)
     return(MagickFalse);
@@ -475,8 +475,8 @@ static MagickPassFail ReadColorProfile(struct heif_image_handle *heif_image_hand
           SetImageProfile(image,"ICM",profile,profile_size);
           MagickFreeResourceLimitedMemory(profile);
           if (image->logging)
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "  done reading ICC profile");
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "  done reading ICC profile");
         }
     }
   return MagickPass;
@@ -882,11 +882,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                          const ImageInfo *image_info,
                                          ExceptionInfo *exception)
 {
-#define HEIFReadImageFrameCleanup()                                    \
-  do                                                                   \
-    {                                                                  \
-      if (heif_image)                                                  \
-        heif_image_release(heif_image);                                \
+#define HEIFReadImageFrameCleanup()             \
+  do                                            \
+    {                                           \
+      if (heif_image)                           \
+        heif_image_release(heif_image);         \
     } while (0);
 
 #define ThrowHEIFThrowReadImageFrameException(code_,reason_,image_)     \
@@ -896,7 +896,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       if (code_ > exception->severity)                                  \
         {                                                               \
           ThrowException(&(image_)->exception,code_,reason_,(image_)->filename); \
-          CopyException(exception,&(image_)->exception);               \
+          CopyException(exception,&(image_)->exception);                \
         }                                                               \
       return(MagickFail);                                               \
     } while (0);
@@ -1022,20 +1022,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       return MagickPass;
     }
 
-    if (image->logging)
-    {
-      /* See libheif/api/libheif/heif_tiling.h */
-      heif_image_tiling tiling;
-      heif_image_handle_get_image_tiling(heif_image_handle, !decode_options->ignore_transformations, &tiling);
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Tiling: version %d, num_columns=%u, num_rows=%u,"
-                            " tile_width=%u, tile_height=%u, image_width=%u, image_height=%u,"
-                            " top_offset=%u, left_offset=%u, number_of_extra_dimensions=%u",
-                            tiling.version, tiling.num_columns, tiling.num_rows,
-                            tiling.tile_width, tiling.tile_height, tiling.image_width, tiling.image_height,
-                            tiling.top_offset, tiling.left_offset,
-                            tiling.number_of_extra_dimensions);
-    }
 
   /*
     Be prepared to handle images on per-plane basis. Upscale
@@ -1081,6 +1067,55 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       }
 #endif
 
+    if (image->logging && IsEventLogged(CoderEvent))
+      {
+        /* See libheif/api/libheif/heif_tiling.h */
+        heif_image_tiling tiling;
+        (void) memset(&tiling,0,sizeof(tiling));
+        heif_status=heif_image_handle_get_image_tiling(heif_image_handle, !decode_options->ignore_transformations, &tiling);
+        if (heif_status.code != heif_error_Ok)
+          {
+            if (image->logging)
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "heif_image_handle_get_image_tiling() reports error \"%s\"",
+                                    heif_status.message);
+            ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+          }
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Tiling: version %d, num_columns=%u, num_rows=%u,"
+                              " tile_width=%u, tile_height=%u, image_width=%u, image_height=%u,"
+                              " top_offset=%u, left_offset=%u, number_of_extra_dimensions=%u",
+                              tiling.version, tiling.num_columns, tiling.num_rows,
+                              tiling.tile_width, tiling.tile_height, tiling.image_width, tiling.image_height,
+                              tiling.top_offset, tiling.left_offset,
+                              tiling.number_of_extra_dimensions);
+        /* From heif_dec.cc decode_image_tiles() */
+        for (uint32_t ty = 0; ty < tiling.num_rows; ty++)
+          for (uint32_t tx = 0; tx < tiling.num_columns; tx++)
+            {
+              /*
+                heif_image* image;
+                heif_error err;
+                err = heif_image_handle_decode_image_tile(handle,
+                &image,
+                encoder->colorspace(has_alpha),
+                encoder->chroma(has_alpha, bit_depth),
+                decode_options, tx, ty);
+                heif_error heif_image_handle_decode_image_tile(const heif_image_handle* in_handle,
+                heif_image** out_img,
+                enum heif_colorspace colorspace,
+                enum heif_chroma chroma,
+                const heif_decoding_options* options,
+                uint32_t tile_x, uint32_t tile_y);
+                heif_image_release(image);
+              */
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "Tile %u,%u: (x1=%u y1=%u x2=%u y2=%u)",
+                                    tx, ty, tx*tiling.tile_width, ty*tiling.tile_height,
+                                    ((tx+1)*tiling.tile_width)-1, ((ty+1)*tiling.tile_height)-1);
+            }
+      }
+
     heif_status=heif_decode_image(heif_image_handle,
                                   &heif_image,
                                   heif_colorspace_decode, /* Chose preferred colorspace */
@@ -1102,13 +1137,13 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "heif_decode_image() reports heif_error_Ok but failed to return an image!");
-          ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+      ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
 
   /*
     Trace decoding warnings
   */
-  if (image->logging)
+  if (image->logging && IsEventLogged(CoderEvent))
     {
       int i;
 
@@ -1148,7 +1183,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       return MagickPass;
     }
 
-    if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) != MagickPass)
     {
       HEIFReadImageFrameCleanup();
       return MagickFail;
@@ -1656,7 +1691,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   /*
     Trace some information about the file
   */
-  if (image->logging && IsEventLogged(CoderEvent))
+  if (image->logging)
     {
       char
         fourcc[5];
