@@ -571,15 +571,6 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
   memory_limit = (magick_uintmax_t) GetMagickResourceLimit(MemoryResource);
   security_limits->max_memory_block_size = (uint64_t) memory_limit;
   security_limits->max_total_memory = (uint64_t) memory_limit;
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_memory_block_size = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_memory_block_size);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_total_memory = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_total_memory);
-
   width_limit = (magick_uintmax_t) GetMagickResourceLimit(WidthResource);
   if (width_limit > INT_MAX)
     width_limit = INT_MAX;
@@ -592,10 +583,6 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
     pixels_limit = width_limit*height_limit;
 
   security_limits->max_image_size_pixels = (uint64_t) pixels_limit;
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_image_size_pixels);
 
   /*
     Version 1 interface has:
@@ -625,99 +612,81 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
   /* version 1 interface */
   MagickAttributeToU64(image_info,"heif","max-image-size-pixels",
                        security_limits->max_image_size_pixels);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_image_size_pixels);
 
   MagickAttributeToU64(image_info,"heif","max-number-of-tiles",
                        security_limits->max_number_of_tiles);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_number_of_tiles = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_number_of_tiles);
 
   MagickAttributeToU32(image_info,"heif","max-bayer-pattern-pixels",
                        security_limits->max_bayer_pattern_pixels);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_bayer_pattern_pixels = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_bayer_pattern_pixels);
 
   MagickAttributeToU32(image_info,"heif","max-items",
                        security_limits->max_items);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_items = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_items);
 
   MagickAttributeToU32(image_info,"heif","max-color-profile-size",
                        security_limits->max_color_profile_size);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_color_profile_size = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_color_profile_size);
 
   MagickAttributeToU64(image_info,"heif","max-memory-block-size",
                        security_limits->max_memory_block_size);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_memory_block_size = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_memory_block_size);
 
   MagickAttributeToU32(image_info,"heif","max-components",
                        security_limits->max_components);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_components = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_components);
 
   MagickAttributeToU32(image_info,"heif","max-iloc-extents-per-item",
                        security_limits->max_iloc_extents_per_item);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_iloc_extents_per_item = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_iloc_extents_per_item);
 
   MagickAttributeToU32(image_info,"heif","max-size-entity-group",
                        security_limits->max_size_entity_group);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_size_entity_group = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_size_entity_group);
 
   MagickAttributeToU32(image_info,"heif","max-children-per-box",
                        security_limits->max_children_per_box);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_children_per_box = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_children_per_box);
 
   /* version 2 interface */
 
   /* Added in 1.13.0, September 2, 2022 */
   MagickAttributeToU64(image_info,"heif","max-total-memory",
                        security_limits->max_total_memory);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_total_memory = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_total_memory);
 
   /* Added in 1.13.0, September 2, 2022 */
   MagickAttributeToU32(image_info,"heif","max-sample-description-box-entries",
                        security_limits->max_sample_description_box_entries);
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "security limits:"
-                        "  max_sample_description_box_entries = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_sample_description_box_entries);
 
   /* Added in 1.17.6? ?*/
   MagickAttributeToU32(image_info,"heif","max-sample-group-description-box-entries",
                        security_limits->max_sample_group_description_box_entries);
+
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "security limits:"
+                        /* version 1 interface */
+                        "  max_image_size_pixels = %" MAGICK_UINTMAX_F "u"","
+                        "  max_number_of_tiles = %" MAGICK_UINTMAX_F "u"","
+                        "  max_bayer_pattern_pixels = %" MAGICK_UINTMAX_F "u"","
+                        "  max_items = %" MAGICK_UINTMAX_F "u"","
+                        "  max_color_profile_size = %" MAGICK_UINTMAX_F "u"","
+                        "  max_memory_block_size = %" MAGICK_UINTMAX_F "u"","
+                        "  max_components = %" MAGICK_UINTMAX_F "u"","
+                        "  max_iloc_extents_per_item = %" MAGICK_UINTMAX_F "u"","
+                        "  max_size_entity_group = %" MAGICK_UINTMAX_F "u"","
+                        "  max_children_per_box = %" MAGICK_UINTMAX_F "u"","
+                        /* version 2 interface */
+                        "  max_total_memory = %" MAGICK_UINTMAX_F "u"","
+                        "  max_sample_description_box_entries = %" MAGICK_UINTMAX_F "u"","
                         "  max_sample_group_description_box_entries = %" MAGICK_UINTMAX_F "u",
-                        (magick_uintmax_t) security_limits->max_sample_group_description_box_entries);
+                        /* version 1 interface */
+                        (magick_uintmax_t) security_limits->max_image_size_pixels,
+                        (magick_uintmax_t) security_limits->max_number_of_tiles,
+                        (magick_uintmax_t) security_limits->max_bayer_pattern_pixels,
+                        (magick_uintmax_t) security_limits->max_items,
+                        (magick_uintmax_t) security_limits->max_color_profile_size,
+                        (magick_uintmax_t) security_limits->max_memory_block_size,
+                        (magick_uintmax_t) security_limits->max_components,
+                        (magick_uintmax_t) security_limits->max_iloc_extents_per_item,
+                        (magick_uintmax_t) security_limits->max_size_entity_group,
+                        (magick_uintmax_t) security_limits->max_children_per_box,
+                        /* version 2 interface */
+                        (magick_uintmax_t) security_limits->max_total_memory,
+                        (magick_uintmax_t) security_limits->max_sample_description_box_entries,
+                        (magick_uintmax_t) security_limits->max_sample_group_description_box_entries
+                        );
 #else
   {
     /* DEPRECATED: Add an image size limit based on maximum_width ^ 2 */
@@ -1002,9 +971,9 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     }
 
   /*
-    When apply transformations the whole image has to be read to get
-    the real dimensions. We no longer read the whole image because it
-    makes 'identify' extremely slow for large files.
+    When applying transformations the whole image has to be read to
+    get the real dimensions. We no longer read the whole image because
+    it makes 'identify' extremely slow for large files.
 
     The user should specify:
 
@@ -1013,7 +982,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     in order to force reading much of the image to get fully accurate
     information.
   */
-  if (image_info->ping && !decode_options->ignore_transformations)
+  if (image_info->ping && decode_options->ignore_transformations)
     {
       HEIFReadImageFrameCleanup();
       if (image->logging)
@@ -1069,10 +1038,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
 
     if (image->logging && IsEventLogged(CoderEvent))
       {
+#if 1
         /* See libheif/api/libheif/heif_tiling.h */
         heif_image_tiling tiling;
         (void) memset(&tiling,0,sizeof(tiling));
-        heif_status=heif_image_handle_get_image_tiling(heif_image_handle, !decode_options->ignore_transformations, &tiling);
+        heif_status=heif_image_handle_get_image_tiling(heif_image_handle, decode_options->ignore_transformations, &tiling);
         if (heif_status.code != heif_error_Ok)
           {
             if (image->logging)
@@ -1089,6 +1059,8 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                               tiling.tile_width, tiling.tile_height, tiling.image_width, tiling.image_height,
                               tiling.top_offset, tiling.left_offset,
                               tiling.number_of_extra_dimensions);
+#endif
+#if 0
         /* From heif_dec.cc decode_image_tiles() */
         for (uint32_t ty = 0; ty < tiling.num_rows; ty++)
           for (uint32_t tx = 0; tx < tiling.num_columns; tx++)
@@ -1114,6 +1086,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                     tx, ty, tx*tiling.tile_width, ty*tiling.tile_height,
                                     ((tx+1)*tiling.tile_width)-1, ((ty+1)*tiling.tile_height)-1);
             }
+#endif
       }
 
     heif_status=heif_decode_image(heif_image_handle,
@@ -1220,7 +1193,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
             line[4] = { 0, 0, 0, 0 };
 
           size_t
-            row_stride;
+            row_stride[4];
 
           unsigned int
             channel_index,
@@ -1241,7 +1214,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               heif_channel = channels_YCbCrA[channel_index];
               planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
                                                                      heif_channel,
-                                                                     &row_stride);
+                                                                     &row_stride[channel_index]);
               heif_channel_str = HEIF_channel_to_string(heif_channel);
               bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
                                                              heif_channel);
@@ -1253,7 +1226,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  channel %s row stride %zu (%d bits in %d bit quantum)",
-                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
+                                      heif_channel_str, row_stride[channel_index], bits_per_pixel_range, bits_per_pixel);
             }
           max_value_given_bits=MaxValueGivenBits(image->depth);
 
@@ -1270,7 +1243,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   return MagickFail;
                 }
               for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride;
+                line[channel_index]=planes[channel_index]+y*row_stride[channel_index];
               for (x=0; x < (long)image->columns; x++)
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
@@ -1339,7 +1312,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
             line[4] = { 0, 0, 0 , 0 };
 
           size_t
-            row_stride;
+            row_stride[4];
 
           unsigned int
             channel_index,
@@ -1361,7 +1334,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               heif_channel = channels_RGBA[channel_index];
               planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
                                                                      heif_channel,
-                                                                     &row_stride);
+                                                                     &row_stride[channel_index]);
               heif_channel_str = HEIF_channel_to_string(heif_channel);
               bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
                                                              heif_channel);
@@ -1373,7 +1346,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  channel %s row stride %zu (%d bits in %d bit quantum)",
-                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
+                                      heif_channel_str, row_stride[channel_index], bits_per_pixel_range, bits_per_pixel);
             }
           max_value_given_bits=MaxValueGivenBits(image->depth);
 
@@ -1390,7 +1363,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   return MagickFail;
                 }
               for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride;
+                line[channel_index]=planes[channel_index]+y*row_stride[channel_index];
               for (x=0; x < (long)image->columns; x++)
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
@@ -1459,7 +1432,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
             line[2] = { 0, 0 };
 
           size_t
-            row_stride;
+            row_stride[2];
 
           unsigned int
             channel_index,
@@ -1482,7 +1455,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               heif_channel = channels_YA[channel_index];
               planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
                                                                      heif_channel,
-                                                                     &row_stride);
+                                                                     &row_stride[channel_index]);
               bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
                                                              heif_channel);
               bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
@@ -1494,7 +1467,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  channel %s row stride %zu (%d bits in %d bit quantum)",
-                                      heif_channel_str, row_stride, bits_per_pixel_range, bits_per_pixel);
+                                      heif_channel_str, row_stride[channel_index], bits_per_pixel_range, bits_per_pixel);
             }
           max_value_given_bits=MaxValueGivenBits(image->depth);
 
@@ -1511,7 +1484,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   return MagickFail;
                 }
               for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride;
+                line[channel_index]=planes[channel_index]+y*row_stride[channel_index];
               for (x=0; x < (long)image->columns; x++)
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
@@ -1643,6 +1616,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
 
   decode_options->ignore_transformations = image_info->ping ? MagickTrue : MagickFalse;
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "Initial ignore_transformations = %s", decode_options->ignore_transformations ? "True" : "False");
 #if HEIF_ENABLE_PROGRESS_MONITOR
   progress_user_data.exception = exception;
   progress_user_data.image = image;
@@ -1768,12 +1743,12 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
         decode_options->ignore_transformations = MagickFalse;
       else if (LocaleCompare(value,"TRUE") == 0)
         decode_options->ignore_transformations = MagickTrue;
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Updated ignore-transformations: %s",
+                              decode_options->ignore_transformations ? "True" : "False");
     }
 
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "ignore-transformations: %s",
-                          decode_options->ignore_transformations ? "True" : "False");
 
   heif_status=heif_context_read_from_memory_without_copy(heif, in_buf, in_len, NULL);
   if (heif_status.code == heif_error_Unsupported_filetype

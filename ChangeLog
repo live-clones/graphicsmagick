@@ -1,3 +1,9 @@
+2025-12-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/heif.c (ReadHEIFImage): Report security limits in one
+	trace message. Fix delay in ping mode which accidentally
+	reappeared.
+
 2025-12-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImageFrame): Check for error from
