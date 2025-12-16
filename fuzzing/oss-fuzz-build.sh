@@ -340,27 +340,47 @@ fi
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libtiff-4 --libs
 #  -L/work/lib -L/usr/local/lib -L/work/lib -ltiff -lwebp -lzstd -llzma -ljpeg -lz -lm -lwebp -lm -lsharpyuv -lm -lzstd -pthread -llzma -pthread -lpthread -ljpeg -lz
 if $enable_tiff
-   then
-       printf "=== Building ${SRC}/libtiff...\n"
-       pushd "$SRC/libtiff"
-       autoreconf -fiv
-       ./configure \
-           CPPFLAGS="-I$WORK/include" \
-           CFLAGS="$CFLAGS -fPIC" \
-           LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
-           --disable-contrib \
-           --disable-ld-version-script \
-           --disable-old-jpeg \
-           --disable-jbig \
-           --disable-shared \
-           --disable-silent-rules \
-           --disable-tests \
-           --enable-static \
-           --enable-tools \
-           --prefix="$WORK"
-       make -j$(nproc)
-       make install
-       popd
+then
+    printf "=== Building ${SRC}/libtiff...\n"
+    if true ; then
+        pushd "$SRC/libtiff"
+        autoreconf -fiv
+        ./configure \
+            CPPFLAGS="-I$WORK/include" \
+            CFLAGS="$CFLAGS -fPIC" \
+            LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
+            --disable-contrib \
+            --disable-ld-version-script \
+            --disable-old-jpeg \
+            --disable-jbig \
+            --disable-shared \
+            --disable-silent-rules \
+            --disable-tests \
+            --enable-static \
+            --enable-tools \
+            --prefix="$WORK"
+        make -j$(nproc)
+        make install
+        popd
+    else
+        LIBTIFF_BUILD=${SRC}/libtiff_build
+        rm -rf "${LIBTIFF_BUILD}"
+        mkdir -p "${LIBTIFF_BUILD}"
+        pushd "${LIBTIFF_BUILD}"
+        cmake \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER=$CXX \
+            -DCMAKE_CXX_FLAGS="${CXXFLAGS} -fPIC" \
+            -DCMAKE_C_COMPILER=$CC \
+            -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+            -DCMAKE_INSTALL_PREFIX=$WORK \
+            -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+            -DBUILD_SHARED_LIBS=OFF \
+            "${SRC}/libtiff"
+        make -j$(nproc)
+        make install
+        popd
+    fi
 fi
 
 # Build liblcms2

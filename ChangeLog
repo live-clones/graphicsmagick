@@ -1,3 +1,8 @@
+2025-12-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Add an optional cmake build recipe
+	for libtiff.
+
 2025-12-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/heif.c (ReadHEIFImage): Report security limits in one
