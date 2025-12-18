@@ -1,3 +1,9 @@
+2025-12-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* fuzzing/oss-fuzz-build.sh: Allow libtiff bootstrap with Autoconf
+	2.69 until https://github.com/google/oss-fuzz/pull/14541 gets
+	merged.
+
 2025-12-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* fuzzing/oss-fuzz-build.sh: Add an optional cmake build recipe

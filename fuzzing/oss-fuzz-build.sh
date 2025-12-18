@@ -344,6 +344,7 @@ then
     printf "=== Building ${SRC}/libtiff...\n"
     if true ; then
         pushd "$SRC/libtiff"
+        sed -i 's/2\.71/2\.69/' configure.ac
         autoreconf -fiv
         ./configure \
             CPPFLAGS="-I$WORK/include" \
