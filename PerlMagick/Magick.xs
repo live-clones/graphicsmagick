@@ -754,6 +754,7 @@ static void DestroyPackageInfo(struct PackageInfo *info)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wclobbered"
+#pragma GCC diagnostic ignored "-Winline"
 #endif
 
 /*
