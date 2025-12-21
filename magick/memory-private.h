@@ -130,8 +130,8 @@ extern MagickExport void _SetMagickResourceLimitedMemoryLimitP(void *p,
 #define MagickReallocateResourceLimitedClearedArray(type,memory,count,size) \
   ((type) _MagickReallocateResourceLimitedMemoryLoc(memory,(size_t) (count),(size_t) (size),MagickTrue,GetMagickModule()))
 
-#define MagickFreeResourceLimitedMemory(memory) \
-  memory=_MagickReallocateResourceLimitedMemoryLoc(memory,0,0,MagickFalse,GetMagickModule());
+#define MagickFreeResourceLimitedMemory(type,memory)                    \
+  memory=(type) _MagickReallocateResourceLimitedMemoryLoc((void *) memory,0,0,MagickFalse,GetMagickModule());
 
 /*
   Reallocate memory using provided pointer.  If reallocation fails

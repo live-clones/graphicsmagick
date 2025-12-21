@@ -3509,7 +3509,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
     {
       (void) fclose(file);
       (void) LiberateTemporaryFile(filename);
-      MagickFreeResourceLimitedMemory(svg_info.text);
+      MagickFreeResourceLimitedMemory(char *,svg_info.text);
       MagickFreeMemory(svg_info.scale);
       ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
     }
@@ -3686,11 +3686,11 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   MagickFreeMemory(svg_info.size); /* char ptr */
   MagickFreeMemory(svg_info.title); /* char ptr */
-  MagickFreeResourceLimitedMemory(svg_info.comment); /* char ptr */
+  MagickFreeResourceLimitedMemory(char *,svg_info.comment); /* char ptr */
   MagickFreeMemory(svg_info.scale); /* double ptr */
   MagickFreeMemory(svg_info.stop_color);  /* char ptr */
   MagickFreeMemory(svg_info.offset); /* char ptr */
-  MagickFreeResourceLimitedMemory(svg_info.text); /* char ptr */
+  MagickFreeResourceLimitedMemory(char *,svg_info.text); /* char ptr */
   MagickFreeMemory(svg_info.vertices); /* char ptr */
   MagickFreeMemory(svg_info.url); /* char ptr */
 

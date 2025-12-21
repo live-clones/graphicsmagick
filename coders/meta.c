@@ -279,7 +279,7 @@ static char *super_fgets(char **b, size_t *blen, Image *file)
         new_p=MagickReallocateResourceLimitedMemory(unsigned char *,p,(len+2));
         if (new_p == (unsigned char *) NULL)
           {
-            MagickFreeResourceLimitedMemory(p);
+            MagickFreeResourceLimitedMemory(unsigned char *,p);
             break;
           }
         p=new_p;
@@ -538,11 +538,11 @@ static long parse8BIM(Image *ifile, Image *ofile)
           }
       state++;
     }
-    MagickFreeResourceLimitedMemory(token);
-    MagickFreeResourceLimitedMemory(newstr);
-    MagickFreeResourceLimitedMemory(name);
+    MagickFreeResourceLimitedMemory(char *,token);
+    MagickFreeResourceLimitedMemory(char *,newstr);
+    MagickFreeResourceLimitedMemory(char *,name);
   }
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,line);
   if (savedolen > 0)
     {
       long diff = outputlen - savedolen;
@@ -562,10 +562,10 @@ static long parse8BIM(Image *ifile, Image *ofile)
   return outputlen;
 
  parse8BIM_failure:
-  MagickFreeResourceLimitedMemory(token);
-  MagickFreeResourceLimitedMemory(newstr);
-  MagickFreeResourceLimitedMemory(name);
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,token);
+  MagickFreeResourceLimitedMemory(char *,newstr);
+  MagickFreeResourceLimitedMemory(char *,name);
+  MagickFreeResourceLimitedMemory(char *,line);
   return 0L;
 }
 
@@ -603,7 +603,7 @@ static char *super_fgets_w(char **b, size_t *blen, Image *file)
         new_p=MagickReallocateResourceLimitedMemory(unsigned char *,p,(len+2));
         if (new_p == (unsigned char *) NULL)
           {
-            MagickFreeResourceLimitedMemory(p);
+            MagickFreeResourceLimitedMemory(unsigned char *,p);
             break;
           }
         p=new_p;
@@ -863,11 +863,11 @@ static long parse8BIMW(Image *ifile, Image *ofile)
           }
       state++;
     }
-    MagickFreeResourceLimitedMemory(token);
-    MagickFreeResourceLimitedMemory(newstr);
-    MagickFreeResourceLimitedMemory(name);
+    MagickFreeResourceLimitedMemory(char *,token);
+    MagickFreeResourceLimitedMemory(char *,newstr);
+    MagickFreeResourceLimitedMemory(char *,name);
   }
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,line);
   if (savedolen > 0)
     {
       long diff = outputlen - savedolen;
@@ -886,10 +886,10 @@ static long parse8BIMW(Image *ifile, Image *ofile)
   return outputlen;
 
  parse8BIMW_failure:
-  MagickFreeResourceLimitedMemory(token);
-  MagickFreeResourceLimitedMemory(newstr);
-  MagickFreeResourceLimitedMemory(name);
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,token);
+  MagickFreeResourceLimitedMemory(char *,newstr);
+  MagickFreeResourceLimitedMemory(char *,name);
+  MagickFreeResourceLimitedMemory(char *,line);
   return 0L;
 }
 
@@ -1373,7 +1373,7 @@ static Image *ReadMETAImage(const ImageInfo *image_info,
               if (i < length)
                 break;
             }
-          MagickFreeResourceLimitedMemory(buffer);
+          MagickFreeResourceLimitedMemory(char *,buffer);
 #endif
         }
       blob=GetBlobStreamData(buff); /* blob may be realloced */
@@ -2069,7 +2069,7 @@ static int formatIPTC(Image *ifile, Image *ofile)
       c=ReadBlobByte(ifile);
       if (c == EOF)
         {
-          MagickFreeResourceLimitedMemory(str);
+          MagickFreeResourceLimitedMemory(unsigned char *,str);
           return -1;
         }
       str[tagindx] = (unsigned char) c;
@@ -2083,11 +2083,11 @@ static int formatIPTC(Image *ifile, Image *ofile)
       FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
     if (WriteBlobString(ofile,temp) == 0)
       {
-        MagickFreeResourceLimitedMemory(str);
+        MagickFreeResourceLimitedMemory(unsigned char *,str);
         return -1;
       }
     formatString( ofile, (char *)str, taglen );
-    MagickFreeResourceLimitedMemory(str);
+    MagickFreeResourceLimitedMemory(unsigned char *,str);
 
     tagsfound++;
 
@@ -2200,7 +2200,7 @@ static int formatIPTCfromBuffer(Image *ofile, char *s, long len)
       c = *s++; len--;
       if (len < 0)
         {
-          MagickFreeResourceLimitedMemory(str);
+          MagickFreeResourceLimitedMemory(unsigned char *,str);
           return -1;
         }
       str[tagindx] = (unsigned char) c;
@@ -2214,18 +2214,18 @@ static int formatIPTCfromBuffer(Image *ofile, char *s, long len)
       FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
     (void) WriteBlobString(ofile,temp);
     formatString( ofile, (char *)str, taglen );
-    MagickFreeResourceLimitedMemory(str);
+    MagickFreeResourceLimitedMemory(unsigned char *,str);
 
     tagsfound++;
   }
   return tagsfound;
 }
 
-#define Format8BIMLiberate()                    \
-  do                                            \
-    {                                           \
-      MagickFreeResourceLimitedMemory(PString);                \
-      MagickFreeResourceLimitedMemory(str);                    \
+#define Format8BIMLiberate()                                   \
+  do                                                           \
+    {                                                          \
+      MagickFreeResourceLimitedMemory(unsigned char *,PString);  \
+      MagickFreeResourceLimitedMemory(unsigned char *,str);      \
     } while(0);
 
 static int format8BIM(Image *ifile, Image *ofile)

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -81,13 +81,13 @@ static unsigned int
 %
 %
 */
-#define ThrowYUVReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(scanline);  \
-  DestroyImage(chroma_image);                 \
-  DestroyImage(resize_image);                 \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowYUVReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);  \
+    DestroyImage(chroma_image);                                 \
+    DestroyImage(resize_image);                                 \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -417,7 +417,7 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if (image->next == (Image *) NULL)
           {
             DestroyImageList(image);
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             return((Image *) NULL);
           }
         image=SyncNextImageInList(image);
@@ -427,7 +427,7 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);

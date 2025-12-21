@@ -1,6 +1,6 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
-% Copyright (C) 2002 - 2022 ImageMagick Studio
+% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2002-2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
 % This program is covered by multiple licenses, which are described in
@@ -1256,7 +1256,7 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
             }
           (void) WriteBlob(image, (size_t)(tga_info.colormap_size/8)*tga_info.colormap_length,
                            (char *) targa_colormap);
-          MagickFreeResourceLimitedMemory(targa_colormap);
+          MagickFreeResourceLimitedMemory(unsigned char *,targa_colormap);
         }
       /*
         Convert MIFF to TGA raster pixels.
@@ -1303,7 +1303,7 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
                                           image->columns,image->rows))
                 break;
         }
-      MagickFreeResourceLimitedMemory(tga_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,tga_pixels);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -499,7 +499,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   image->colormap[i].blue=ScaleCharToQuantum(sun_colormap[i]);
                 break;
               } while (1);
-            MagickFreeResourceLimitedMemory(sun_colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,sun_colormap);
             if (MagickFail == status)
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             if (logging)
@@ -525,7 +525,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
             if (ReadBlob(image,sun_info.maplength,(char *) sun_colormap) !=
                 sun_info.maplength)
               status = MagickFail;
-            MagickFreeResourceLimitedMemory(sun_colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,sun_colormap);
             if (MagickFail == status)
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             if (logging)
@@ -623,7 +623,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if ((count=ReadBlob(image,sun_info.length,(char *) sun_data))
           != sun_info.length)
         {
-          MagickFreeResourceLimitedMemory(sun_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
           ThrowReaderException(CorruptImageError,UnableToReadImageData,image);
         }
       sun_pixels=sun_data;
@@ -636,15 +636,15 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                                          bytes_per_image+image->rows);
           if (sun_pixels == (unsigned char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(sun_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
               ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
                                    image);
             }
           status &= DecodeImage(sun_data,sun_data_length,sun_pixels,bytes_per_image);
-          MagickFreeResourceLimitedMemory(sun_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
           if (status != MagickPass)
             {
-              MagickFreeResourceLimitedMemory(sun_pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,sun_pixels);
               ThrowReaderException(CorruptImageError,UnableToRunlengthDecodeImage,image);
             }
         }
@@ -782,7 +782,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     break;
             }
         }
-      MagickFreeResourceLimitedMemory(sun_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,sun_pixels);
       if (EOFBlob(image))
         {
           ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
@@ -1229,7 +1229,7 @@ static unsigned int WriteSUNImage(const ImageInfo *image_info,Image *image)
                     break;
             }
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

@@ -4222,7 +4222,7 @@ ProcessMSLScript(const ImageInfo *image_info,Image **image,
   MagickFreeMemory(msl_info.draw_info);
   MagickFreeMemory(msl_info.attributes);
   MagickFreeMemory(msl_info.image);
-  MagickFreeResourceLimitedMemory(msl_info.group_info);
+  MagickFreeResourceLimitedMemory(MSLGroupInfo *,msl_info.group_info);
 
   CloseBlob(msl_image);
   /*

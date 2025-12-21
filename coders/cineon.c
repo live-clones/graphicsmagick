@@ -722,13 +722,13 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
           new_user_data=MagickReallocateResourceLimitedMemory(unsigned char *,user_data,user_data_length+read_size);
           if (new_user_data == (unsigned char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(user_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,user_data);
               ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
             }
           user_data=new_user_data;
           if (ReadBlob(image,read_size,user_data+user_data_length) != read_size)
             {
-              MagickFreeResourceLimitedMemory(user_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,user_data);
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             }
           user_data_length += read_size;
@@ -736,10 +736,10 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
         }
       if (!SetImageProfile(image,"CINEONUSERDATA",user_data,user_data_length))
         {
-          MagickFreeResourceLimitedMemory(user_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,user_data);
           ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
         }
-      MagickFreeResourceLimitedMemory(user_data);
+      MagickFreeResourceLimitedMemory(unsigned char *,user_data);
     }
 
   if (image_info->ping)
@@ -843,7 +843,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
                                               image->columns,image->rows))
                     break;
             }
-          MagickFreeResourceLimitedMemory(scandata);
+          MagickFreeResourceLimitedMemory(unsigned char *,scandata);
           break;
         }
       case 3:
@@ -896,7 +896,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
                                               image->columns,image->rows))
                     break;
             }
-          MagickFreeResourceLimitedMemory(scandata);
+          MagickFreeResourceLimitedMemory(unsigned char *,scandata);
           break;
         }
       default:
@@ -1524,7 +1524,7 @@ static unsigned int WriteCINEONImage(const ImageInfo *image_info,Image *image)
                                         image->columns,image->rows))
               break;
       }
-    MagickFreeResourceLimitedMemory(scanline);
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   }
 
   if ((magick_off_t) cin_file_info.file_size != TellBlob(image))

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -533,7 +533,9 @@ static unsigned int WriteJBIGImage(const ImageInfo *image_info,Image *image)
     jbg_enc_init(&jbig_info,image->columns,image->rows,1,&pixels,
       (void (*)(unsigned char *,size_t,void *)) JBIGEncode,image);
     if (image_info->subimage != 0)
-      jbg_enc_layers(&jbig_info,(int) image_info->subimage);
+      {
+        jbg_enc_layers(&jbig_info,(int) image_info->subimage);
+      }
     else
       {
         long
@@ -564,7 +566,7 @@ static unsigned int WriteJBIGImage(const ImageInfo *image_info,Image *image)
     */
     jbg_enc_out(&jbig_info);
     jbg_enc_free(&jbig_info);
-    MagickFreeResourceLimitedMemory(pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

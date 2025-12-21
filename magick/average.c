@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2018 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -140,7 +140,7 @@ MagickExport Image *AverageImages(const Image *image,ExceptionInfo *exception)
       if (thread_status == MagickFail)
         continue;
 
-      pixels_sum=AccessThreadViewData(pixels_sums);
+      pixels_sum=(DoublePixelPacket *) AccessThreadViewData(pixels_sums);
 
       /*
         Compute sum over each pixel color component.

@@ -62,16 +62,16 @@ static unsigned int
 /* Convert signed values to unsigned - and reverse. */
 static void FixSignedValues(unsigned char *data, int size, unsigned step, unsigned endian)
 {
-  if(endian != MSBEndian)
-  {
-    data += step - 1;  /* LSB has most signifficant byte at the end */
-  }                    /* MSB has most signifficant byte first */
+  if (endian != MSBEndian)
+    {
+      data += step - 1;  /* LSB has most signifficant byte at the end */
+    }                    /* MSB has most signifficant byte first */
 
-  while(size-->0)
-  {
-    *data ^= 0x80;
-    data += step;
-  }
+  while (size-->0)
+    {
+      *data ^= 0x80;
+      data += step;
+    }
 }
 
 /*
@@ -146,29 +146,29 @@ static unsigned int IsFITS(const unsigned char *magick,const size_t length)
 %
 %
 */
+typedef struct _FITSInfo
+{
+  char
+    extensions_exist;
+
+  int
+    simple,
+    bits_per_pixel,
+    columns,
+    rows,
+    number_axes,
+    number_scenes;
+
+  double
+    min_data,
+    max_data,
+    zero,
+    scale;
+} FITSInfo;
+
 static Image *ReadFITSImage(const ImageInfo *image_info,
                             ExceptionInfo *exception)
 {
-  typedef struct _FITSInfo
-  {
-    char
-      extensions_exist;
-
-    int
-      simple,
-      bits_per_pixel,
-      columns,
-      rows,
-      number_axes,
-      number_scenes;
-
-    double
-      min_data,
-      max_data,
-      zero,
-      scale;
-  } FITSInfo;
-
   char
     keyword[FITS_ROW_SIZE+1],
     value[FITS_ROW_SIZE+1];
@@ -656,7 +656,7 @@ static Image *ReadFITSImage(const ImageInfo *image_info,
                                             image->columns,image->rows))
                   break;
             }
-          MagickFreeResourceLimitedMemory(fits_pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,fits_pixels);
           if (EOFBlob(image))
             {
               ThrowException(exception,CorruptImageError,UnexpectedEndOfFile, image->filename);
@@ -798,7 +798,7 @@ int InsertRowHDU(char *buffer, const char *data, int offset)
   len = Min(len,80); /* Each card image is 80 bytes max */
 
   if (len > (size_t) (((size_t)FITS_BLOCK_SIZE)-offset))
-        len = ((size_t) FITS_BLOCK_SIZE)-offset;
+    len = ((size_t) FITS_BLOCK_SIZE)-offset;
 
   (void) memcpy(buffer+offset,data,len);
   return offset +80;
@@ -881,115 +881,115 @@ static MagickPassFail WriteFITSImage(const ImageInfo *image_info,Image *image)
   export_options.sample_type = UnsignedQuantumSampleType;
 
   do
-  {
-    if (image->depth <= 8)
     {
-      quantum_size=8;
-    }
-    else if (image->depth <= 16)
-    {
-      quantum_size=16;
-    }
-    else
-    {
-      quantum_size=32;
-    }
-
-  /*
-    Allocate image memory.
-  */
-    packet_size=quantum_size/8;
-    fits_info=MagickAllocateResourceLimitedMemory(char *,FITS_BLOCK_SIZE);
-    if (fits_info == (char *) NULL)
-    {
-      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-    }
-    pixels=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->columns);
-    if(pixels == (unsigned char *) NULL)
-    {
-      MagickFreeResourceLimitedMemory(fits_info);
-      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-    }
-
-  /*
-    Initialize image header.
-  */
-    memset(fits_info,' ',FITS_BLOCK_SIZE);
-    y = 0;
-    y = InsertRowHDU(fits_info, "SIMPLE  =                    T", y);
-   FormatString(buffer,        "BITPIX  =                    %u",quantum_size);
-    y = InsertRowHDU(fits_info, buffer, y);
-    y = InsertRowHDU(fits_info, "NAXIS   =                    2", y);
-    FormatString(buffer,        "NAXIS1  =           %10lu",image->columns);
-    y = InsertRowHDU(fits_info, buffer, y);
-    FormatString(buffer,        "NAXIS2  =           %10lu",image->rows);
-    y = InsertRowHDU(fits_info, buffer, y);
-    FormatString(buffer,        "DATAMIN =           %10u",0);
-    y = InsertRowHDU(fits_info, buffer, y);
-    FormatString(buffer,        "DATAMAX =           %10lu", MaxValueGivenBits(quantum_size));
-    y = InsertRowHDU(fits_info, buffer, y);
-   if (quantum_size>8)
-    {
-      FormatString(buffer,      "BZERO   =           %10u", (quantum_size <= 16) ? 32768U : 2147483648U);
-      y = InsertRowHDU(fits_info, buffer, y);
-    }
-  /* Magick version data can only be 60 bytes. */
-    (void) FormatString(buffer, "HISTORY Created by %.60s.",MagickPackageName " " MagickLibVersionText);
-    y = InsertRowHDU(fits_info, buffer, y);
-    if(image->next!=NULL)
-        y = InsertRowHDU(fits_info, "EXTEND   =                    T", y);
-    y = InsertRowHDU(fits_info, "END", y);
-    (void) WriteBlob(image, FITS_BLOCK_SIZE, (char *)fits_info);
-
-  /*
-    Convert image to fits scale PseudoColor class.
-  */
-    for (y=(long) image->rows-1; y >= 0; y--)
-    {
-      p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-      if (p == (const PixelPacket *) NULL)
-        break;
-      if (ExportImagePixelArea(image,GrayQuantum,quantum_size,pixels,&export_options,0) == MagickFail)
-        break;
-      if (quantum_size == 16)
-        FixSignedValues(pixels, image->columns, 2, export_options.endian);
-      if (quantum_size == 32)
-        FixSignedValues(pixels, image->columns, 4, export_options.endian);
-      if (WriteBlob(image, (size_t) packet_size*image->columns,pixels) != (size_t) packet_size*image->columns)
-        break;
-      if (QuantumTick((size_t) image->rows-y-1,image->rows))
+      if (image->depth <= 8)
         {
-          status=MagickMonitorFormatted((size_t) image->rows-y-1,image->rows,
-                                        &image->exception,SaveImageText,
-                                        image->filename,
-                                        image->columns,image->rows);
-          if (status == False)
-            break;
+          quantum_size=8;
         }
-    }
+      else if (image->depth <= 16)
+        {
+          quantum_size=16;
+        }
+      else
+        {
+          quantum_size=32;
+        }
 
-        /* Calculate of padding */
-    y = FITS_BLOCK_SIZE - (image->columns * image->rows * packet_size) % FITS_BLOCK_SIZE;
-    if(y > 0)
-      {
-        memset(fits_info, 0, y);
-        (void)WriteBlob(image,y,(char *) fits_info);
-      }
-    MagickFreeResourceLimitedMemory(fits_info);
-    MagickFreeResourceLimitedMemory(pixels);
+      /*
+        Allocate image memory.
+      */
+      packet_size=quantum_size/8;
+      fits_info=MagickAllocateResourceLimitedMemory(char *,FITS_BLOCK_SIZE);
+      if (fits_info == (char *) NULL)
+        {
+          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+        }
+      pixels=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->columns);
+      if (pixels == (unsigned char *) NULL)
+        {
+          MagickFreeResourceLimitedMemory(char *,fits_info);
+          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+        }
 
-    if(image->next == (Image *) NULL)
-    {
-      if(image->logging)
+      /*
+        Initialize image header.
+      */
+      memset(fits_info,' ',FITS_BLOCK_SIZE);
+      y = 0;
+      y = InsertRowHDU(fits_info, "SIMPLE  =                    T", y);
+      FormatString(buffer,        "BITPIX  =                    %u",quantum_size);
+      y = InsertRowHDU(fits_info, buffer, y);
+      y = InsertRowHDU(fits_info, "NAXIS   =                    2", y);
+      FormatString(buffer,        "NAXIS1  =           %10lu",image->columns);
+      y = InsertRowHDU(fits_info, buffer, y);
+      FormatString(buffer,        "NAXIS2  =           %10lu",image->rows);
+      y = InsertRowHDU(fits_info, buffer, y);
+      FormatString(buffer,        "DATAMIN =           %10u",0);
+      y = InsertRowHDU(fits_info, buffer, y);
+      FormatString(buffer,        "DATAMAX =           %10lu", MaxValueGivenBits(quantum_size));
+      y = InsertRowHDU(fits_info, buffer, y);
+      if (quantum_size>8)
+        {
+          FormatString(buffer,      "BZERO   =           %10u", (quantum_size <= 16) ? 32768U : 2147483648U);
+          y = InsertRowHDU(fits_info, buffer, y);
+        }
+      /* Magick version data can only be 60 bytes. */
+      (void) FormatString(buffer, "HISTORY Created by %.60s.",MagickPackageName " " MagickLibVersionText);
+      y = InsertRowHDU(fits_info, buffer, y);
+      if (image->next!=NULL)
+        y = InsertRowHDU(fits_info, "EXTEND   =                    T", y);
+      y = InsertRowHDU(fits_info, "END", y);
+      (void) WriteBlob(image, FITS_BLOCK_SIZE, (char *)fits_info);
+
+      /*
+        Convert image to fits scale PseudoColor class.
+      */
+      for (y=(long) image->rows-1; y >= 0; y--)
+        {
+          p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+          if (p == (const PixelPacket *) NULL)
+            break;
+          if (ExportImagePixelArea(image,GrayQuantum,quantum_size,pixels,&export_options,0) == MagickFail)
+            break;
+          if (quantum_size == 16)
+            FixSignedValues(pixels, image->columns, 2, export_options.endian);
+          if (quantum_size == 32)
+            FixSignedValues(pixels, image->columns, 4, export_options.endian);
+          if (WriteBlob(image, (size_t) packet_size*image->columns,pixels) != (size_t) packet_size*image->columns)
+            break;
+          if (QuantumTick((size_t) image->rows-y-1,image->rows))
+            {
+              status=MagickMonitorFormatted((size_t) image->rows-y-1,image->rows,
+                                            &image->exception,SaveImageText,
+                                            image->filename,
+                                            image->columns,image->rows);
+              if (status == False)
+                break;
+            }
+        }
+
+      /* Calculate of padding */
+      y = FITS_BLOCK_SIZE - (image->columns * image->rows * packet_size) % FITS_BLOCK_SIZE;
+      if (y > 0)
+        {
+          memset(fits_info, 0, y);
+          (void)WriteBlob(image,y,(char *) fits_info);
+        }
+      MagickFreeResourceLimitedMemory(char *,fits_info);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+
+      if (image->next == (Image *) NULL)
+        {
+          if (image->logging)
             (void)LogMagickEvent(CoderEvent,GetMagickModule(), "No more image frames in list.");
-      break;
-    }
-    image = SyncNextImageInList(image);
-  } while(1);
+          break;
+        }
+      image = SyncNextImageInList(image);
+    } while (1);
 
-        /* Rewind image list. */
+  /* Rewind image list. */
   while (image->previous != (Image *)NULL)
-      image=image->previous;
+    image=image->previous;
 
   status &= CloseBlob(image);
   return(status);

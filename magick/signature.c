@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2019 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -305,7 +305,7 @@ MagickExport unsigned int SignatureImage(Image *image)
         break;
   }
   FinalizeSignature(&signature_info);
-  MagickFreeResourceLimitedMemory(message);
+  MagickFreeResourceLimitedMemory(unsigned char *,message);
   /*
     Convert digital signature to a 64 character hex string.
   */

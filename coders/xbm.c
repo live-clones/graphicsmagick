@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -346,7 +346,7 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       value=XBMInteger(image,4,hex_digits);
       if (value < 0)
         {
-          MagickFreeResourceLimitedMemory(data);
+          MagickFreeResourceLimitedMemory(unsigned char *,data);
           ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
         }
       *p++=(unsigned char) value;
@@ -359,7 +359,7 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       value=XBMInteger(image,2,hex_digits);
       if (value < 0)
         {
-          MagickFreeResourceLimitedMemory(data);
+          MagickFreeResourceLimitedMemory(unsigned char *,data);
           ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
         }
       *p++=(unsigned char) value;
@@ -394,7 +394,7 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   image->columns,image->rows))
          break;
   }
-  MagickFreeResourceLimitedMemory(data);
+  MagickFreeResourceLimitedMemory(unsigned char *,data);
   (void) SyncImage(image);
   CloseBlob(image);
   StopTimer(&image->timer);

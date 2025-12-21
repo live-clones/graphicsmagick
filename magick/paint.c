@@ -54,8 +54,8 @@
   {                                                                     \
     if (s >= (segment_stack+MaxStacksize))                              \
       {                                                                 \
-        MagickFreeResourceLimitedMemory(floodplane);                    \
-        MagickFreeResourceLimitedMemory(segment_stack);                 \
+        MagickFreeResourceLimitedMemory(unsigned char *,floodplane);    \
+        MagickFreeResourceLimitedMemory(SegmentInfo *,segment_stack);   \
         ThrowBinaryException2(DrawError,"SegmentStackOverflow",         \
                               image->filename);                         \
       }                                                                 \
@@ -191,8 +191,8 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
   if ((floodplane== (unsigned char *) NULL) ||
       (segment_stack == (SegmentInfo *) NULL))
     {
-      MagickFreeResourceLimitedMemory(floodplane);
-      MagickFreeResourceLimitedMemory(segment_stack);
+      MagickFreeResourceLimitedMemory(unsigned char *, floodplane);
+      MagickFreeResourceLimitedMemory(SegmentInfo *, segment_stack);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
                             UnableToFloodfillImage);
     }
@@ -497,8 +497,8 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
             } /* for y ... */
         } /* if status ... */
     }
-  MagickFreeResourceLimitedMemory(segment_stack);
-  MagickFreeResourceLimitedMemory(floodplane);
+  MagickFreeResourceLimitedMemory(SegmentInfo *, segment_stack);
+  MagickFreeResourceLimitedMemory(unsigned char *, floodplane);
   return(status);
 }
 
@@ -726,7 +726,7 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
       start=x;
     } while (x <= x2);
   }
-  MagickFreeResourceLimitedMemory(segment_stack);
+  MagickFreeResourceLimitedMemory(SegmentInfo*, segment_stack);
   return(status);
 }
 

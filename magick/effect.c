@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -971,21 +971,21 @@ BlurImage(const Image *original_image,const double radius,
       while ((long) (MaxRGB*kernel[0]) > 0)
         {
           if (last_kernel != (double *)NULL)
-            MagickFreeResourceLimitedMemory(last_kernel);
+            MagickFreeResourceLimitedMemory(double *,last_kernel);
           last_kernel=kernel;
           kernel=(double *) NULL;
           width=GetBlurKernel(width+2,sigma,&kernel);
         }
       if (last_kernel != (double *) NULL)
         {
-          MagickFreeResourceLimitedMemory(kernel);
+          MagickFreeResourceLimitedMemory(double *,kernel);
           width-=2;
           kernel=last_kernel;
         }
     }
   if (width < 3)
     {
-      MagickFreeResourceLimitedMemory(kernel);
+      MagickFreeResourceLimitedMemory(double *,kernel);
       ThrowImageException3(OptionError,UnableToBlurImage,
                            KernelRadiusIsTooSmall);
     }
@@ -1021,7 +1021,7 @@ BlurImage(const Image *original_image,const double radius,
     status&=BlurImageScanlines(blur_image,kernel,width,BlurImageRowsText,
                                exception);
 
-  MagickFreeResourceLimitedMemory(kernel);
+  MagickFreeResourceLimitedMemory(double *,kernel);
 
   if (blur_image != (Image *) NULL)
     blur_image->is_grayscale=original_image->is_grayscale;

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -202,7 +202,7 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
       Ascii85Encode(image,(unsigned long) buffer[j]);
     Ascii85Flush(image);
   }
-  MagickFreeResourceLimitedMemory(buffer);
+  MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   TIFFClose(tiff);
   (void) LiberateTemporaryFile(filename);
   return(True);
@@ -899,7 +899,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
               status=LZWEncodeImage(image,length,pixels);
             else
               status=PackbitsEncodeImage(image,length,pixels);
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
             if (!status)
               {
                 CloseBlob(image);
@@ -1034,7 +1034,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                   CloseBlob(image);
                   return(False);
                 }
-              MagickFreeResourceLimitedMemory(pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
               break;
             }
             case NoCompression:
@@ -1154,7 +1154,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                 status=LZWEncodeImage(image,length,pixels);
               else
                 status=PackbitsEncodeImage(image,length,pixels);
-              MagickFreeResourceLimitedMemory(pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
               if (!status)
                 {
                   CloseBlob(image);

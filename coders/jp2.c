@@ -455,7 +455,7 @@ static jas_stream_t *JP2StreamManager(jas_stream_ops_t *stream_ops, Image *image
 #define ThrowJP2ReaderException(code_,reason_,image_)                   \
   {                                                                     \
     for (component=0; component < (long) number_components; component++) \
-      MagickFreeResourceLimitedMemory(channel_lut[component]);          \
+      MagickFreeResourceLimitedMemory(Quantum *,channel_lut[component]); \
     if (pixels)                                                         \
       jas_matrix_destroy(pixels);                                       \
     if (jp2_stream)                                                     \
@@ -1211,7 +1211,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
   }
 
   for (component=0; component < (long) number_components; component++)
-    MagickFreeResourceLimitedMemory(channel_lut[component]);
+    MagickFreeResourceLimitedMemory(Quantum *,channel_lut[component]);
   jas_matrix_destroy(pixels);
   (void) jas_stream_close(jp2_stream);
   MagickFreeMemory(options);
@@ -1654,7 +1654,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   jp2_pixels=jas_matrix_create(1,(unsigned int) image->columns);
   if (jp2_pixels == (jas_matrix_t *) NULL)
     {
-      MagickFreeResourceLimitedMemory(lut);
+      MagickFreeResourceLimitedMemory(unsigned short *,lut);
       jas_image_destroy(jp2_image);
       ThrowJP2WriterException(ResourceLimitError,MemoryAllocationFailed,image);
     }
@@ -1759,7 +1759,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   status=jas_image_encode(jp2_image,jp2_stream,format,options);
   (void) jas_stream_close(jp2_stream);
   MagickFreeMemory(options);
-  MagickFreeResourceLimitedMemory(lut);
+  MagickFreeResourceLimitedMemory(unsigned short *,lut);
   jas_matrix_destroy(jp2_pixels);
   jas_image_destroy(jp2_image);
   if (status)

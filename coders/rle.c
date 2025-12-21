@@ -189,12 +189,12 @@ static unsigned int IsRLE(const unsigned char *magick,const size_t length)
 %
 %
 */
-#define ThrowRLEReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(colormap); \
-  MagickFreeResourceLimitedMemory(rle_pixels); \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowRLEReaderException(code_,reason_,image_)                   \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(unsigned char *,colormap);          \
+    MagickFreeResourceLimitedMemory(unsigned char *,rle_pixels);        \
+    ThrowReaderException(code_,reason_,image_);                         \
+  } while (0);
 static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
   RLE_HEADER
@@ -432,7 +432,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
         }
       if (ReadBlob(image,length,comment) != length)
         {
-          MagickFreeResourceLimitedMemory(comment);
+          MagickFreeResourceLimitedMemory(char *,comment);
           ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);
         }
       comment[length]='\0';
@@ -448,7 +448,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
       (void) SetImageAttribute(image,"comment",comment);
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Comment: '%s'", comment);
-      MagickFreeResourceLimitedMemory(comment);
+      MagickFreeResourceLimitedMemory(char *,comment);
       if ((length & 0x01) == 0)
         (void) ReadBlobByte(image);
     }
@@ -458,7 +458,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
   if (image_info->ping)
     {
-      MagickFreeResourceLimitedMemory(colormap);
+      MagickFreeResourceLimitedMemory(unsigned char *,colormap);
       CloseBlob(image);
       StopTimer(&image->timer);
       return(image);
@@ -786,8 +786,8 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
           image->colors=0;
         }
     }
-  MagickFreeResourceLimitedMemory(colormap);
-  MagickFreeResourceLimitedMemory(rle_pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,colormap);
+  MagickFreeResourceLimitedMemory(unsigned char *,rle_pixels);
   if (EOFBlob(image))
     {
       ThrowRLEReaderException(CorruptImageError,UnexpectedEndOfFile,image);

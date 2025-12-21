@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -229,9 +229,9 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   if ((red == (long *) NULL) || (green == (long *) NULL) ||
       (blue == (long *) NULL))
     {
-      MagickFreeResourceLimitedMemory(red);
-      MagickFreeResourceLimitedMemory(green);
-      MagickFreeResourceLimitedMemory(blue);
+      MagickFreeResourceLimitedMemory(long *,red);
+      MagickFreeResourceLimitedMemory(long *,green);
+      MagickFreeResourceLimitedMemory(long *,blue);
       DestroyImage(histogram_image);
       ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
     }
@@ -311,9 +311,9 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   /*
     Free memory resources.
   */
-  MagickFreeResourceLimitedMemory(blue);
-  MagickFreeResourceLimitedMemory(green);
-  MagickFreeResourceLimitedMemory(red);
+  MagickFreeResourceLimitedMemory(long *,blue);
+  MagickFreeResourceLimitedMemory(long *,green);
+  MagickFreeResourceLimitedMemory(long *,red);
   file=AcquireTemporaryFileStream(filename,BinaryFileIOMode);
   if (file == (FILE *) NULL)
     {

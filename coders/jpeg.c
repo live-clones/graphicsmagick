@@ -239,10 +239,10 @@ static MagickClientData *FreeMagickClientData(MagickClientData *client_data)
       for (i=0 ; i < ArraySize(client_data->profiles); i++)
         {
           MagickFreeMemory(client_data->profiles[i].name);
-          MagickFreeResourceLimitedMemory(client_data->profiles[i].info);
+          MagickFreeResourceLimitedMemory(unsigned char *,client_data->profiles[i].info);
         }
       if (client_data->jpeg_pixels != (magick_jpeg_pixels_t *) NULL)
-        MagickFreeResourceLimitedMemory(client_data->jpeg_pixels->t.v);
+        MagickFreeResourceLimitedMemory(void *,client_data->jpeg_pixels->t.v);
 
       MagickFreeMemory(client_data);
     }
@@ -298,7 +298,7 @@ AppendProfile(MagickClientData *client_data,
       if (!profile->name || !profile->info)
         {
           MagickFreeMemory(profile->name);
-          MagickFreeResourceLimitedMemory(profile->info);
+          MagickFreeResourceLimitedMemory(unsigned char *,profile->info);
           break;
         }
       (void) memcpy(profile->info,profile_chunk,chunk_length);
@@ -1839,7 +1839,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Setjmp return from longjmp!");
       /* Error handling code executed if longjmp was invoked */
-      MagickFreeResourceLimitedMemory(jpeg_pixels.t.v);
+      MagickFreeResourceLimitedMemory(void *,jpeg_pixels.t.v);
       jpeg_destroy_decompress(&jpeg_info);
       if (image->exception.severity > exception->severity)
         CopyException(exception,&image->exception);
@@ -2136,7 +2136,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
         }
     }
   jpeg_destroy_decompress(&jpeg_info);
-  MagickFreeResourceLimitedMemory(jpeg_pixels.t.v);
+  MagickFreeResourceLimitedMemory(void *,jpeg_pixels.t.v);
   client_data=FreeMagickClientData(client_data);
   CloseBlob(image);
 
@@ -2422,7 +2422,7 @@ static void WriteICCProfile(j_compress_ptr jpeg_info,
     for (j=0; j < (long) length; j++)
       profile[j+14]=color_profile[i+j];
     jpeg_write_marker(jpeg_info,ICC_MARKER,profile,(unsigned int) alloc_length);
-    MagickFreeResourceLimitedMemory(profile);
+    MagickFreeResourceLimitedMemory(unsigned char *,profile);
   }
 }
 
@@ -2472,7 +2472,7 @@ static void WriteIPTCProfile(j_compress_ptr jpeg_info,
       profile[length+tag_length]=0;
     jpeg_write_marker(jpeg_info,IPTC_MARKER,profile,(unsigned int)
       (length+roundup+tag_length));
-    MagickFreeResourceLimitedMemory(profile);
+    MagickFreeResourceLimitedMemory(unsigned char *,profile);
   }
 }
 

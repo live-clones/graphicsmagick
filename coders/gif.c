@@ -834,12 +834,12 @@ static size_t ReadBlobBlock(Image *image,unsigned char *data)
 */
 #define BitSet(byte,bit)  (((byte) & (bit)) == (bit))
 #define LSBFirstOrder(x,y)  (((y) << 8) | (x))
-#define ReadGIFImageCleanup()                                  \
-  do {                                                         \
-    MagickFreeResourceLimitedMemory(comments);                 \
-    MagickFreeResourceLimitedMemory(local_colormap);           \
-    MagickFreeResourceLimitedMemory(global_colormap);          \
-    MagickFreeResourceLimitedMemory(local_colormap);           \
+#define ReadGIFImageCleanup()                                           \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(char *,comments);                   \
+    MagickFreeResourceLimitedMemory(unsigned char *,local_colormap);    \
+    MagickFreeResourceLimitedMemory(unsigned char *,global_colormap);   \
+    MagickFreeResourceLimitedMemory(unsigned char *,local_colormap);    \
   } while (0);
 #define ThrowGIFReaderException(code_,reason_,image_)          \
   do {                                                         \
@@ -1329,10 +1329,10 @@ ModuleExport void UnregisterGIFImage(void)
 %
 %
 */
-#define WriteGIFImageCleanup()                                 \
-  do {                                                         \
-    MagickFreeResourceLimitedMemory(global_colormap);          \
-    MagickFreeResourceLimitedMemory(colormap);                 \
+#define WriteGIFImageCleanup()                                          \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(unsigned char *,global_colormap);   \
+    MagickFreeResourceLimitedMemory(unsigned char *,colormap);          \
   } while (0);
 #define ThrowGIFWriterException(code_,reason_,image_)           \
   do {                                                          \

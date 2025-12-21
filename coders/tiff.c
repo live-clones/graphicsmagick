@@ -370,7 +370,7 @@ TIFFIgnoreTags(TIFF *tiff)
         p++;
     }
   (void) TIFFMergeFieldInfo(tiff,ignore,(uint32) count);
-  MagickFreeResourceLimitedMemory(ignore);
+  MagickFreeResourceLimitedMemory(TIFFFieldInfo*,ignore);
 }
 
 /*
@@ -3066,7 +3066,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                           break;
                   }
               }
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             break;
           }
         case StrippedMethod:
@@ -3279,7 +3279,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 if (status == MagickFail)
                   break;
               }
-            MagickFreeResourceLimitedMemory(strip);
+            MagickFreeResourceLimitedMemory(unsigned char *,strip);
             break;
           }
         case TiledMethod:
@@ -3550,7 +3550,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   break;
               }
 
-            MagickFreeResourceLimitedMemory(tile);
+            MagickFreeResourceLimitedMemory(unsigned char *,tile);
             break;
           }
         case RGBAStrippedMethod:
@@ -3666,7 +3666,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                         break;
                       }
               }
-            MagickFreeResourceLimitedMemory(strip_pixels);
+            MagickFreeResourceLimitedMemory(uint32 *,strip_pixels);
             break;
           }
         case RGBATiledMethod:
@@ -3886,7 +3886,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     break;
                   }
               }
-            MagickFreeResourceLimitedMemory(tile_pixels);
+            MagickFreeResourceLimitedMemory(uint32 *,tile_pixels);
             break;
           }
         case RGBAPuntMethod:
@@ -3965,7 +3965,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 if (logging)
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "TIFFReadRGBAImage() returns failure!");
-                MagickFreeResourceLimitedMemory(pixels);
+                MagickFreeResourceLimitedMemory(uint32 *,pixels);
                 status=MagickFail;
                 break;
               }
@@ -4025,7 +4025,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 if (status == MagickFail)
                   break;
               }
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(uint32 *,pixels);
             break;
           }
         }
@@ -4461,7 +4461,7 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
   if ((status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception))
       == MagickFail)
     {
-      MagickFreeResourceLimitedMemory(strip);
+      MagickFreeResourceLimitedMemory(unsigned char *,strip);
       TIFFClose(tiff);
       (void) LiberateTemporaryFile(temporary_filename);
       ThrowWriterException(FileOpenError,UnableToOpenFile,image);
@@ -4482,7 +4482,7 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
       status=MagickFail;
   }
 
-  MagickFreeResourceLimitedMemory(strip);
+  MagickFreeResourceLimitedMemory(unsigned char *,strip);
   TIFFClose(tiff);
 
   (void) LiberateTemporaryFile(temporary_filename);
@@ -4771,7 +4771,7 @@ static int CheckAndStoreStr(TIFF *tiff, const magick_uint16_t Tag, const char *S
           memcpy(StringDup,String,StrSize);
           StringDup[StrSize] = 0;
           i = TIFFSetField(tiff, Tag, String);
-          MagickFreeResourceLimitedMemory(StringDup);
+          MagickFreeResourceLimitedMemory(char *,StringDup);
           return i;
         }
     }
@@ -4950,7 +4950,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                           if (TIFFSetField(tiff, Tag, Long2, Array))          /* Argument 3 type uint32_t, argument 4 uint16_t*.. */
                             FieldCount++;
                         }
-                      MagickFreeResourceLimitedMemory(Array);
+                      MagickFreeResourceLimitedMemory(magick_uint16_t *,Array);
                       break;
                     }
                   goto Scalar;
@@ -4987,7 +4987,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                           if (TIFFSetField(tiff, Tag, Long2, Array))           /* Argument 3 type uint32_t, argument 4 uint32_t*. */
                             FieldCount++;
                         }
-                      MagickFreeResourceLimitedMemory(Array);
+                      MagickFreeResourceLimitedMemory(magick_uint32_t *,Array);
                       break;
                     }
                   goto Scalar;
@@ -5077,7 +5077,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                     }
                                   if (TIFFSetField(tiff, Tag, ArrayD))
                                     FieldCount++;
-                                  MagickFreeResourceLimitedMemory(ArrayD);
+                                  MagickFreeResourceLimitedMemory(double *,ArrayD);
                                 }
                                 break;
                               case 4:                /* float array is required in input. */
@@ -5093,7 +5093,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                     }
                                   if (TIFFSetField(tiff, Tag, ArrayF))
                                     FieldCount++;
-                                  MagickFreeResourceLimitedMemory(ArrayF);
+                                  MagickFreeResourceLimitedMemory(float *,ArrayF);
                                 }
                                 break;
                               }
@@ -5276,7 +5276,7 @@ WriteNewsProfile(TIFF *tiff,
       (void) TIFFSetField(tiff,profile_tag,(uint32) length,(void *) profile);
     }
 
-  MagickFreeResourceLimitedMemory(profile);
+  MagickFreeResourceLimitedMemory(unsigned char *,profile);
 }
 
 #define ThrowTIFFWriterException(code_,reason_,image_) \
@@ -6860,9 +6860,9 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
               (green == (unsigned short *) NULL) ||
               (red == (unsigned short *) NULL))
             {
-              MagickFreeResourceLimitedMemory(blue);
-              MagickFreeResourceLimitedMemory(green);
-              MagickFreeResourceLimitedMemory(red);
+              MagickFreeResourceLimitedMemory(unsigned short *,blue);
+              MagickFreeResourceLimitedMemory(unsigned short *,green);
+              MagickFreeResourceLimitedMemory(unsigned short *,red);
               ThrowTIFFWriterException(ResourceLimitError,MemoryAllocationFailed,
                                        image);
             }
@@ -6873,9 +6873,9 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
               blue[i]=ScaleQuantumToShort(image->colormap[i].blue);
             }
           (void) TIFFSetField(tiff,TIFFTAG_COLORMAP,red,green,blue);
-          MagickFreeResourceLimitedMemory(red);
-          MagickFreeResourceLimitedMemory(green);
-          MagickFreeResourceLimitedMemory(blue);
+          MagickFreeResourceLimitedMemory(unsigned short *,red);
+          MagickFreeResourceLimitedMemory(unsigned short *,green);
+          MagickFreeResourceLimitedMemory(unsigned short *,blue);
         }
       /*
         Set extra export options for grayscale.
@@ -7041,7 +7041,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                 if (status == MagickFail)
                   break;
               }
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             break;
           }
         case TiledMethod:
@@ -7288,7 +7288,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                       break;
                   } /* for y */
               } /* for sample */
-            MagickFreeResourceLimitedMemory(tile);
+            MagickFreeResourceLimitedMemory(unsigned char *,tile);
             break;
           }
         }

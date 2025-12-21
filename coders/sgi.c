@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -252,11 +252,11 @@ static int SGIDecode(const size_t bytes_per_pixel,
 
 #define ThrowSGIReaderException(code_,reason_,image_) \
 { \
-  MagickFreeResourceLimitedMemory(iris_pixels) \
-  MagickFreeResourceLimitedMemory(max_packets); \
-  MagickFreeResourceLimitedMemory(offsets); \
-  MagickFreeResourceLimitedMemory(runlength); \
-  MagickFreeResourceLimitedMemory(scanline) \
+  MagickFreeResourceLimitedMemory(unsigned char *,iris_pixels) \
+  MagickFreeResourceLimitedMemory(unsigned char *,max_packets); \
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,offsets);   \
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,runlength); \
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline) \
   ThrowReaderException(code_,reason_,image_); \
 }
 
@@ -595,7 +595,7 @@ static Image *ReadSGIImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (EOFBlob(image))
                 break;
             }
-          MagickFreeResourceLimitedMemory(scanline);
+          MagickFreeResourceLimitedMemory(unsigned char *,scanline);
         }
       else
         {
@@ -764,9 +764,9 @@ static Image *ReadSGIImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     break;
                 }
             }
-          MagickFreeResourceLimitedMemory(runlength);
-          MagickFreeResourceLimitedMemory(max_packets);
-          MagickFreeResourceLimitedMemory(offsets);
+          MagickFreeResourceLimitedMemory(magick_uint32_t *,runlength);
+          MagickFreeResourceLimitedMemory(unsigned char *,max_packets);
+          MagickFreeResourceLimitedMemory(magick_uint32_t *,offsets);
         }
 
       /*
@@ -900,7 +900,7 @@ static Image *ReadSGIImage(const ImageInfo *image_info,ExceptionInfo *exception)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Only transferred %lu rows out of %lu",
                                     y, image->rows);
-              MagickFreeResourceLimitedMemory(iris_pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,iris_pixels);
               /*
                 Not sure what a proper error report is here
                */
@@ -908,7 +908,7 @@ static Image *ReadSGIImage(const ImageInfo *image_info,ExceptionInfo *exception)
             }
           (void) SyncImage(image);
         }
-      MagickFreeResourceLimitedMemory(iris_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,iris_pixels);
       if (EOFBlob(image))
         {
           ThrowSGIReaderException(CorruptImageError,UnexpectedEndOfFile,
@@ -1069,11 +1069,11 @@ static size_t SGIEncode(unsigned char *pixels,size_t count,
 
 #define ThrowSGIWriterException(code_,reason_,image_) \
 { \
-  MagickFreeResourceLimitedMemory(scanline) \
-  MagickFreeResourceLimitedMemory(offsets); \
-  MagickFreeResourceLimitedMemory(packets); \
-  MagickFreeResourceLimitedMemory(runlength); \
-  MagickFreeResourceLimitedMemory(iris_pixels); \
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline) \
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,offsets); \
+  MagickFreeResourceLimitedMemory(unsigned char *,packets); \
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,runlength); \
+  MagickFreeResourceLimitedMemory(unsigned char *,iris_pixels); \
   ThrowWriterException(code_,reason_,image_); \
 }
 
@@ -1096,9 +1096,9 @@ static unsigned int WriteSGIImage(const ImageInfo *image_info,Image *image)
   register unsigned char
     *q;
 
-  unsigned long
-    *offsets = (unsigned long *) NULL,
-    *runlength = (unsigned long *) NULL;
+  magick_uint32_t
+    *offsets = (magick_uint32_t *) NULL,
+    *runlength = (magick_uint32_t *) NULL;
 
   unsigned char
     *iris_pixels = (unsigned char *) NULL,
@@ -1249,11 +1249,11 @@ static unsigned int WriteSGIImage(const ImageInfo *image_info,Image *image)
                   (void) WriteBlob(image,iris_info.xsize,(char *) scanline);
                 }
             }
-          MagickFreeResourceLimitedMemory(scanline);
+          MagickFreeResourceLimitedMemory(unsigned char *,scanline);
         }
       else
         {
-          unsigned long
+          magick_uint32_t
             length,
             number_packets,
             offset;
@@ -1261,18 +1261,18 @@ static unsigned int WriteSGIImage(const ImageInfo *image_info,Image *image)
           /*
             Convert SGI uncompressed pixels.
           */
-          offsets=MagickAllocateResourceLimitedArray(unsigned long *,iris_info.ysize,
+          offsets=MagickAllocateResourceLimitedArray(magick_uint32_t *,iris_info.ysize,
                                       MagickArraySize(iris_info.zsize,
-                                                      sizeof(unsigned long)));
+                                                      sizeof(magick_uint32_t)));
           packets=MagickAllocateResourceLimitedArray(unsigned char *,
                                       4*(2*(size_t) iris_info.xsize+10),
                                       image->rows);
-          runlength=MagickAllocateResourceLimitedArray(unsigned long *,iris_info.ysize,
+          runlength=MagickAllocateResourceLimitedArray(magick_uint32_t *,iris_info.ysize,
                                         MagickArraySize(iris_info.zsize,
-                                                        sizeof(unsigned long)));
-          if ((offsets == (unsigned long *) NULL) ||
+                                                        sizeof(magick_uint32_t)));
+          if ((offsets == (magick_uint32_t *) NULL) ||
               (packets == (unsigned char *) NULL) ||
-              (runlength == (unsigned long *) NULL))
+              (runlength == (magick_uint32_t *) NULL))
             ThrowSGIWriterException(ResourceLimitError,MemoryAllocationFailed,
                                     image);
           offset=512+4*2*((size_t) iris_info.ysize*iris_info.zsize);
@@ -1282,7 +1282,7 @@ static unsigned int WriteSGIImage(const ImageInfo *image_info,Image *image)
             {
               for (z=0; z < (int) iris_info.zsize; z++)
                 {
-                  length=(unsigned long)
+                  length=(magick_uint32_t)
                     SGIEncode(q+z,(int) iris_info.xsize,packets+number_packets);
                   number_packets+=length;
                   offsets[y+z*iris_info.ysize]=offset;
@@ -1302,11 +1302,11 @@ static unsigned int WriteSGIImage(const ImageInfo *image_info,Image *image)
           /*
             Free memory.
           */
-          MagickFreeResourceLimitedMemory(runlength);
-          MagickFreeResourceLimitedMemory(packets);
-          MagickFreeResourceLimitedMemory(offsets);
+          MagickFreeResourceLimitedMemory(magick_uint32_t *,runlength);
+          MagickFreeResourceLimitedMemory(unsigned char *,packets);
+          MagickFreeResourceLimitedMemory(magick_uint32_t *,offsets);
         }
-      MagickFreeResourceLimitedMemory(iris_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,iris_pixels);
     } while (0);
   status &= CloseBlob(image);
   return(status);

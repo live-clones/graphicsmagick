@@ -5533,12 +5533,12 @@ static MagickPassFail DCM_InitDCM(DicomStream *dcm,int verbose)
 
 static void DCM_DestroyDCM(DicomStream *dcm)
 {
-  MagickFreeResourceLimitedMemory(dcm->offset_arr);
-  MagickFreeResourceLimitedMemory(dcm->data);
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,dcm->offset_arr);
+  MagickFreeResourceLimitedMemory(unsigned char *,dcm->data);
 #if defined(USE_GRAYMAP)
-  MagickFreeResourceLimitedMemory(dcm->graymap);
+  MagickFreeResourceLimitedMemory(unsigned short *,dcm->graymap);
 #endif
-  MagickFreeResourceLimitedMemory(dcm->rescale_map);
+  MagickFreeResourceLimitedMemory(Quantum *,dcm->rescale_map);
 }
 
 /*
@@ -7493,7 +7493,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       pfunc=parse_funcs[dicom_info[dcm.index].funce];
       if (pfunc != (DicomElemParseFunc *)NULL)
         status=pfunc(image,&dcm,exception);
-      MagickFreeResourceLimitedMemory(dcm.data);
+      MagickFreeResourceLimitedMemory(unsigned char *,dcm.data);
       dcm.data = NULL;
       dcm.length = 0;
       if (status == MagickPass)

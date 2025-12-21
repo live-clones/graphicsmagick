@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -970,19 +970,19 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
       last_row_compression = PCL_UndefinedCompression;
       if (image_info->compression != NoCompression)
         {
-          MagickFreeResourceLimitedMemory(last_row_pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,last_row_pixels);
           last_row_pixels=MagickAllocateResourceLimitedMemory(unsigned char *,bytes_per_line);
           if (last_row_pixels == (unsigned char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
               ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
             }
-          MagickFreeResourceLimitedMemory(output_row);
+          MagickFreeResourceLimitedMemory(unsigned char *,output_row);
           output_row=MagickAllocateResourceLimitedMemory(unsigned char *,bytes_per_line);
           if (output_row == (unsigned char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(pixels);
-              MagickFreeResourceLimitedMemory(last_row_pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,last_row_pixels);
               ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
             }
             memset(last_row_pixels,0,bytes_per_line);
@@ -1206,9 +1206,9 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
         }
 
       (void) WriteBlobString(image,"\033*rB");  /* end graphics */
-      MagickFreeResourceLimitedMemory(pixels);
-      MagickFreeResourceLimitedMemory(last_row_pixels);
-      MagickFreeResourceLimitedMemory(output_row);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,last_row_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,output_row);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

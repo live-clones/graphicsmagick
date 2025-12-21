@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -537,7 +537,7 @@ static Image *ReadFPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
             (long) tile_height,&fpx_info);
         if (fpx_status == FPX_LOW_MEMORY_ERROR)
           {
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             (void) FPX_CloseImage(flashpix);
             FPX_ClearSystem();
             ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
@@ -583,7 +583,7 @@ static Image *ReadFPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   image->columns,image->rows))
         break;
   }
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   (void) FPX_CloseImage(flashpix);
   FPX_ClearSystem();
   StopTimer(&image->timer);
@@ -1209,7 +1209,7 @@ static unsigned int WriteFPXImage(const ImageInfo *image_info,Image *image)
 #endif /* if DEAD_CODE */
   (void) FPX_CloseImage(flashpix);
   FPX_ClearSystem();
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   return(True);
 }
 #else

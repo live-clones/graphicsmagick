@@ -2540,7 +2540,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
                                                    (size_t) offset);
       if (pixels == (PixelPacket *) NULL)
       {
-        MagickFreeResourceLimitedMemory(cache_info->pixels);
+        MagickFreeResourceLimitedMemory(PixelPacket *, cache_info->pixels);
       }
       else
       {
@@ -3661,7 +3661,7 @@ DestroyCacheInfo(Cache cache_info)
   */
   if (MemoryCache == cache_info->type)
     {
-      MagickFreeResourceLimitedMemory(cache_info->pixels);
+      MagickFreeResourceLimitedMemory(PixelPacket *, cache_info->pixels);
     }
   else if (MapCache == cache_info->type)
     {

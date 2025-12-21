@@ -958,7 +958,7 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
           p=ExpandBuffer(expand_buffer,scanline,&number_pixels,bits_per_pixel);
           (void) memcpy(q,p,number_pixels);
         }
-      MagickFreeResourceLimitedMemory(scanline);
+      MagickFreeResourceLimitedMemory(unsigned char *,scanline);
       return(pixels);
     }
   /*
@@ -1078,13 +1078,13 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
             j+=bytes_per_pixel+1;
           }
     }
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   return (pixels);
 
  decode_error_exit:
 
-  MagickFreeResourceLimitedMemory(scanline);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   return (unsigned char *) NULL;
 }
 
@@ -1817,7 +1817,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                                               image->columns,image->rows))
                     break;
             }
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
             if (tile_image->exception.severity > image->exception.severity)
               CopyException(&image->exception,&tile_image->exception);
             if ((tile_image->exception.severity < ErrorException) && (jpeg == False))
@@ -1872,7 +1872,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                   break;
                 if (SetImageProfile(image,"ICM",info,length) == MagickFail)
                   ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                MagickFreeResourceLimitedMemory(info);
+                MagickFreeResourceLimitedMemory(unsigned char *,info);
                 break;
               }
               case 0x1f2:
@@ -1881,13 +1881,13 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                   break;
                 if (SetImageProfile(image,"IPTC",info,length) == MagickFail)
                   ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                MagickFreeResourceLimitedMemory(info);
+                MagickFreeResourceLimitedMemory(unsigned char *,info);
                 break;
               }
               default:
                 break;
             }
-            MagickFreeResourceLimitedMemory(info);
+            MagickFreeResourceLimitedMemory(unsigned char *,info);
             break;
           }
           default:
@@ -1951,7 +1951,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
             (void) strlcpy(clone_info->filename,"JPEG:",sizeof(clone_info->filename));
             if (ReadBlobZC(image,blob_alloc_size,&blob) != blob_alloc_size)
               {
-                MagickFreeResourceLimitedMemory(blob_alloc);
+                MagickFreeResourceLimitedMemory(void *,blob_alloc);
                 ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
               }
             if (blob != blob_alloc)
@@ -1963,7 +1963,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
             tile_image=BlobToImage(clone_info, blob, blob_alloc_size, &image->exception );
             DestroyImageInfo(clone_info);
             clone_info=(ImageInfo *) NULL;
-            MagickFreeResourceLimitedMemory(blob_alloc);
+            MagickFreeResourceLimitedMemory(void *,blob_alloc);
           }
         if (tile_image == (Image *) NULL)
           continue;
@@ -2147,11 +2147,11 @@ ModuleExport void UnregisterPICTImage(void)
 %
 %
 */
-#define LiberatePICTAllocations()               \
-  {                                             \
-    MagickFreeResourceLimitedMemory(buffer);                   \
-    MagickFreeResourceLimitedMemory(packed_scanline);          \
-    MagickFreeResourceLimitedMemory(scanline);                 \
+#define LiberatePICTAllocations()                                       \
+  {                                                                     \
+    MagickFreeResourceLimitedMemory(unsigned char *,buffer);            \
+    MagickFreeResourceLimitedMemory(unsigned char *,packed_scanline);   \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);          \
   }
 #define ThrowPICTWriterException(code_,reason_,image_)  \
   {                                                     \
@@ -2616,9 +2616,9 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
   offset=TellBlob(image);
   (void) SeekBlob(image,512,SEEK_SET);
   (void) WriteBlobMSBShort(image,(unsigned long) offset);
-  MagickFreeResourceLimitedMemory(scanline);
-  MagickFreeResourceLimitedMemory(packed_scanline);
-  MagickFreeResourceLimitedMemory(buffer);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,packed_scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   status &= CloseBlob(image);
   return(status);
 }

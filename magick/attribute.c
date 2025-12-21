@@ -1466,8 +1466,8 @@ tag_table[] =
 */
 static int IFDTagTableTypeCompare(const void *l, const void *r)
 {
-  const IFDTagTableType * restrict lp = l;
-  const IFDTagTableType * restrict rp = r;
+  const IFDTagTableType * restrict lp = (const IFDTagTableType *) l;
+  const IFDTagTableType * restrict rp = (const IFDTagTableType *) r;
   int sense;
   unsigned int lptag = lp->tag;
   unsigned int rptag = rp->tag;
@@ -1499,12 +1499,12 @@ FindEXIFTableEntryByTag(const unsigned int t,
   const IFDTagTableType *key_p = (IFDTagTableType *) NULL;
 
 #if EXIF_USE_BSEARCH
-  IFDTagTableType key;
+  IFDTagTableType key = TAG_INFO(0x0000, F_NOTYPE, F_NOTYPE, 0, "");
 
   key.tag = t;
 
-  key_p=(void *) bsearch((const void *) &key,(void *) tag_table,tag_table_entries,
-                         sizeof(tag_table[0]),IFDTagTableTypeCompare);
+  key_p=(const IFDTagTableType*) bsearch((const void *) &key,(void *) tag_table,tag_table_entries,
+                                         sizeof(tag_table[0]),IFDTagTableTypeCompare);
 #else
   register unsigned int
     ttt;
@@ -1724,7 +1724,7 @@ typedef enum
 
 static ExifFmtStatus ValidateExifFmtAgainstBitField(const IFDTagTableType *key_p,const unsigned int fmt)
 {
-  MagickPassFail
+  ExifFmtStatus
     status;
 
   if (key_p->format & ExifFmtToFmtBits(fmt))

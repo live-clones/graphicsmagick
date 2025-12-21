@@ -225,7 +225,7 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
   *pixels=MagickAllocateResourceLimitedMemory(unsigned char *,*length);
   if (*pixels == (unsigned char *) NULL)
     {
-      MagickFreeResourceLimitedMemory(buffer);
+      MagickFreeResourceLimitedMemory(unsigned char *,buffer);
       TIFFClose(tiff);
       (void) LiberateTemporaryFile(filename);
       ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
@@ -242,7 +242,7 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
     for (j=0; j < count; j++)
       *p++=buffer[j];
   }
-  MagickFreeResourceLimitedMemory(buffer);
+  MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   TIFFClose(tiff);
   (void) LiberateTemporaryFile(filename);
   return(True);
@@ -276,7 +276,7 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
   for (i=0; i < length; i++)
     Ascii85Encode(image,(unsigned long) pixels[i]);
   Ascii85Flush(image);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   return(True);
 }
 
@@ -482,7 +482,7 @@ static unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
         }
   }
   if (status == False)
-    MagickFreeResourceLimitedMemory(*pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,*pixels);
   return(status);
 }
 
@@ -575,7 +575,7 @@ static unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
         }
   }
   if (status == False)
-    MagickFreeResourceLimitedMemory(*pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,*pixels);
   return(status);
 }
 
@@ -692,7 +692,7 @@ static unsigned int SerializeSingleChannelImage(const ImageInfo *image_info,
         }
   }
   if (status == False)
-    MagickFreeResourceLimitedMemory(*pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,*pixels);
   return(status);
 }
 /*
@@ -868,7 +868,7 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
         for (i=0; i < length; i++)
           Ascii85Encode(image, (unsigned long)pixels[i]);
         Ascii85Flush(image);
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       }
       break;
     case FaxCompression:
@@ -892,7 +892,7 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
           for (i=0; i < length; i++)
             Ascii85Encode(image,(unsigned long) pixels[i]);
           Ascii85Flush(image);
-          MagickFreeResourceLimitedMemory(pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         }
       }
       break;
@@ -904,7 +904,7 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
         status=PackbitsEncode2Image(image,length,pixels,
           Ascii85WriteByteHook,(void *)NULL);
         Ascii85Flush(image);
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       }
       break;
     case LZWCompression:
@@ -914,7 +914,7 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
         Ascii85Initialize(image);
         status=LZWEncode2Image(image,length,pixels,Ascii85WriteByteHook,(void*)NULL);
         Ascii85Flush(image);
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       }
       break;
     case ZipCompression:
@@ -925,7 +925,7 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
         status=ZLIBEncode2Image(image,length,image_info->quality,pixels,
           Ascii85WriteByteHook,(void*)NULL);
         Ascii85Flush(image);
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       }
       break;
   }
@@ -1732,7 +1732,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
                 break;
             }
             Ascii85Flush(image);
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
           }
     }
     else
@@ -1801,7 +1801,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
                   break;
               }
               Ascii85Flush(image);
-              MagickFreeResourceLimitedMemory(pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
             }
         }
       else
@@ -1877,7 +1877,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
               break;
           }
           Ascii85Flush(image);
-          MagickFreeResourceLimitedMemory(pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         }
 
     if (!status)
@@ -2043,7 +2043,7 @@ static unsigned int ZLIBEncode2Image(Image *image,const size_t length,
   else
     for (i=0; i < (long) compressed_packets; i++)
       (void) (*write_byte)(image,(magick_uint8_t)compressed_pixels[i],info);
-  MagickFreeResourceLimitedMemory(compressed_pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,compressed_pixels);
   return(!status);
 }
 #else

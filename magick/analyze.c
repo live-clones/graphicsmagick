@@ -470,7 +470,7 @@ MagickExport unsigned long GetImageDepth(const Image *image,
                                   image->rows,image,exception);
     }
 
-  MagickFreeResourceLimitedMemory(map);
+  MagickFreeResourceLimitedMemory(magick_uint8_t *,map);
 
   return depth;
 }

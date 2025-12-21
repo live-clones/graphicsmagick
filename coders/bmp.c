@@ -600,11 +600,11 @@ static Image *ExtractNestedBlob(Image ** image, const ImageInfo * image_info, in
          }
           DestroyImageInfo(clone_info);
           clone_info = (ImageInfo *) NULL;
-          MagickFreeResourceLimitedMemory(blob);
+          MagickFreeResourceLimitedMemory(unsigned char *,blob);
         }
       else
         {
-          MagickFreeResourceLimitedMemory(blob);
+          MagickFreeResourceLimitedMemory(unsigned char *,blob);
           /* Failed to read enough data from input */
           ThrowException(exception,CorruptImageError,UnexpectedEndOfFile, (*image)->filename);
         }
@@ -651,12 +651,12 @@ static Image *ExtractNestedBlob(Image ** image, const ImageInfo * image_info, in
 %
 %
 */
-#define ThrowBMPReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(bmp_colormap); \
-  MagickFreeResourceLimitedMemory(pixels); \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowBMPReaderException(code_,reason_,image_)                   \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(unsigned char *,bmp_colormap);      \
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);            \
+    ThrowReaderException(code_,reason_,image_);                         \
+  } while (0);
 
 static Image *ReadBMPImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -1323,7 +1323,7 @@ CheckBitSize:
               if (packet_size == 4)
               p++;
             }
-          MagickFreeResourceLimitedMemory(bmp_colormap);
+          MagickFreeResourceLimitedMemory(unsigned char *,bmp_colormap);
         }
 
       if (image_info->ping && (image_info->subrange != 0))
@@ -1864,7 +1864,7 @@ CheckBitSize:
         default:
           ThrowBMPReaderException(CorruptImageError,ImproperImageHeader,image);
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       if (EOFBlob(image))
         {
           ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
@@ -2575,7 +2575,7 @@ static unsigned int WriteBMPImage(const ImageInfo *image_info,Image *image)
             bmp_data=MagickAllocateResourceLimitedMemory(unsigned char *,length);
             if (bmp_data == (unsigned char *) NULL)
               {
-                MagickFreeResourceLimitedMemory(pixels);
+                MagickFreeResourceLimitedMemory(unsigned char *,pixels);
                 ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
                                      image);
               }
@@ -2583,7 +2583,7 @@ static unsigned int WriteBMPImage(const ImageInfo *image_info,Image *image)
             bmp_info.image_size=EncodeImage(image,bytes_per_line,pixels,
                                             bmp_data);
             bmp_info.file_size+=bmp_info.image_size;
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
             pixels=bmp_data;
             bmp_info.compression=BI_RLE8;
           }
@@ -2754,7 +2754,7 @@ static unsigned int WriteBMPImage(const ImageInfo *image_info,Image *image)
                                                            ((size_t)1L << bmp_info.bits_per_pixel));
             if (bmp_colormap == (unsigned char *) NULL)
               {
-                MagickFreeResourceLimitedMemory(pixels);
+                MagickFreeResourceLimitedMemory(unsigned char *,pixels);
                 ThrowWriterException(ResourceLimitError,MemoryAllocationFailed, image);
               }
             q=bmp_colormap;
@@ -2780,14 +2780,14 @@ static unsigned int WriteBMPImage(const ImageInfo *image_info,Image *image)
             else
               (void) WriteBlob(image,4*((size_t)1UL << bmp_info.bits_per_pixel),
                              (char *) bmp_colormap);
-            MagickFreeResourceLimitedMemory(bmp_colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,bmp_colormap);
           }
         if (logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "  Pixels:  %" MAGICK_SIZE_T_F "u bytes",
                               (MAGICK_SIZE_T) bmp_info.image_size);
         (void) WriteBlob(image,bmp_info.image_size,(char *) pixels);
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       }
       if (image->next == (Image *) NULL)
         {

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -515,7 +515,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
         if (ReadBlob(image,viff_colormap_size,(char *) viff_colormap)
             != viff_colormap_size)
           {
-            MagickFreeResourceLimitedMemory(viff_colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,viff_colormap);
             ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
           }
 
@@ -565,7 +565,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
                 image->colormap[i % image->colors].blue=
                   ScaleCharToQuantum((unsigned int) value);
         }
-        MagickFreeResourceLimitedMemory(viff_colormap);
+        MagickFreeResourceLimitedMemory(unsigned char *,viff_colormap);
         break;
       }
       default:
@@ -648,7 +648,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
     if (ReadBlob(image,bytes_per_pixel*max_packets,(char *) viff_pixels)
         != bytes_per_pixel*max_packets)
       {
-        MagickFreeResourceLimitedMemory(viff_pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
         ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
       }
     lsb_first=1;
@@ -857,7 +857,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
                   break;
           }
         }
-    MagickFreeResourceLimitedMemory(viff_pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
     if (image->storage_class == PseudoClass)
       (void) SyncImage(image);
     if (EOFBlob(image))
@@ -1253,7 +1253,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
           for (i=0; i < (long) image->colors; i++)
             *q++=ScaleQuantumToChar(image->colormap[i].blue);
           (void) WriteBlob(image, (size_t)3*image->colors,(char *) viff_colormap);
-          MagickFreeResourceLimitedMemory(viff_colormap);
+          MagickFreeResourceLimitedMemory(unsigned char *,viff_colormap);
           /*
             Convert PseudoClass packet to VIFF colormapped pixels.
           */
@@ -1351,7 +1351,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
             }
           }
     (void) WriteBlob(image,packets,(char *) viff_pixels);
-    MagickFreeResourceLimitedMemory(viff_pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

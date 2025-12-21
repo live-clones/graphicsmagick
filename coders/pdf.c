@@ -598,17 +598,17 @@ static char *EscapeParenthesis(const char *text, char *paren_buffer)
   return(paren_buffer);
 }
 
-#define ThrowPDFWriterException(code_,reason_,image_)                \
-  {                                                                  \
-    MagickFreeMemory(fax_blob);                                      \
-    MagickFreeResourceLimitedMemory(xref);                           \
-    ThrowWriterException(code_,reason_,image_);                      \
+#define ThrowPDFWriterException(code_,reason_,image_)                   \
+  {                                                                     \
+    MagickFreeMemory(fax_blob);                                         \
+    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref); \
+    ThrowWriterException(code_,reason_,image_);                         \
   }
-#define ThrowPDFWriterException2(code_,reason_,image_)                 \
-  {                                                                    \
-    MagickFreeMemory(fax_blob);                                        \
-    MagickFreeResourceLimitedMemory(xref);                             \
-    ThrowWriterException2(code_,reason_,image_);                       \
+#define ThrowPDFWriterException2(code_,reason_,image_)                  \
+  {                                                                     \
+    MagickFreeMemory(fax_blob);                                         \
+    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref); \
+    ThrowWriterException2(code_,reason_,image_);                        \
   }
 static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
 {
@@ -800,7 +800,7 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
                                                     (size_t) count+2048,sizeof(ExtendedSignedIntegralType));
       if (new_xref == (ExtendedSignedIntegralType *) NULL)
         {
-          MagickFreeResourceLimitedMemory(xref);
+          MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref);
           ThrowPDFWriterException(ResourceLimitError,MemoryAllocationFailed,image);
         }
       xref=new_xref;
@@ -1271,11 +1271,11 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
                     status=LZWEncodeImage(image,length,pixels);
                   else
                     status=PackbitsEncodeImage(image,length,pixels);
-                MagickFreeResourceLimitedMemory(pixels);
+                MagickFreeResourceLimitedMemory(unsigned char *,pixels);
                 if (!status)
                   {
                     CloseBlob(image);
-                    MagickFreeResourceLimitedMemory(xref);
+                    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref);
                     return(MagickFail);
                   }
                 break;
@@ -1394,11 +1394,11 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
                     status=LZWEncodeImage(image,length,pixels);
                   else
                     status=PackbitsEncodeImage(image,length,pixels);
-                MagickFreeResourceLimitedMemory(pixels);
+                MagickFreeResourceLimitedMemory(unsigned char *,pixels);
                 if (!status)
                   {
                     CloseBlob(image);
-                    MagickFreeResourceLimitedMemory(xref);
+                    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref);
                     return(False);
                   }
                 break;
@@ -1498,11 +1498,11 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
                       status=LZWEncodeImage(image,length,pixels);
                     else
                       status=PackbitsEncodeImage(image,length,pixels);
-                  MagickFreeResourceLimitedMemory(pixels);
+                  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
                   if (!status)
                     {
                       CloseBlob(image);
-                      MagickFreeResourceLimitedMemory(xref);
+                      MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref);
                       return(False);
                     }
                   break;
@@ -1670,7 +1670,7 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
   FormatString(buffer,"%lu\n",(unsigned long) offset);
   (void) WriteBlobString(image,buffer);
   (void) WriteBlobString(image,"%%EOF\n");
-  MagickFreeResourceLimitedMemory(xref);
+  MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,xref);
   status &= CloseBlob(image);
   MagickFreeMemory(fax_blob);
   return(status);
@@ -1777,7 +1777,7 @@ static unsigned int ZLIBEncodeImage(Image *image,const size_t length,
   else
     for (i=0; i < (long) compressed_packets; i++)
       (void) WriteBlobByte(image,compressed_pixels[i]);
-  MagickFreeResourceLimitedMemory(compressed_pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,compressed_pixels);
   return(!status);
 }
 #endif

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2005-2022 GraphicsMagick Group
+% Copyright (C) 2005-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -1546,16 +1546,16 @@ STATIC void TentUpsampleChroma(PixelPacket *pixels, unsigned long columns)
     }
 }
 
-#define ThrowDPXReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(map_Y); \
-  MagickFreeResourceLimitedMemory(map_CbCr); \
-  if (samples_set) \
-    DestroyThreadViewDataSet(samples_set);    \
-  if (scanline_set) \
-    DestroyThreadViewDataSet(scanline_set);    \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowDPXReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(Quantum *,map_Y);           \
+    MagickFreeResourceLimitedMemory(Quantum *,map_CbCr);        \
+    if (samples_set)                                            \
+      DestroyThreadViewDataSet(samples_set);                    \
+    if (scanline_set)                                           \
+      DestroyThreadViewDataSet(scanline_set);                   \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -1885,13 +1885,13 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               new_user_data=MagickReallocateResourceLimitedMemory(unsigned char *,user_data,user_data_length+read_size);
               if (new_user_data == (unsigned char *) NULL)
                 {
-                  MagickFreeResourceLimitedMemory(user_data);
+                  MagickFreeResourceLimitedMemory(unsigned char *,user_data);
                   ThrowDPXReaderException(ResourceLimitError,MemoryAllocationFailed,image);
                 }
               user_data=new_user_data;
               if (ReadBlob(image,read_size,user_data+user_data_length) != read_size)
                 {
-                  MagickFreeResourceLimitedMemory(user_data);
+                  MagickFreeResourceLimitedMemory(unsigned char *,user_data);
                   ThrowDPXReaderException(CorruptImageError,UnexpectedEndOfFile,image);
                 }
               user_data_length += read_size;
@@ -1902,10 +1902,10 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
           StringToAttribute(image,"DPX:user.data.id",dpx_user_data->user_id);
           if (!SetImageProfile(image,"DPXUSERDATA",user_data,user_data_length))
             {
-              MagickFreeResourceLimitedMemory(user_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,user_data);
               ThrowDPXReaderException(ResourceLimitError,MemoryAllocationFailed,image);
             }
-          MagickFreeResourceLimitedMemory(user_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,user_data);
         }
     }
   /*
@@ -3040,8 +3040,8 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
   image->is_monochrome=is_monochrome;
   image->is_grayscale=is_grayscale;
   image->depth=Min(QuantumDepth,image->depth);
-  MagickFreeResourceLimitedMemory(map_CbCr);
-  MagickFreeResourceLimitedMemory(map_Y);
+  MagickFreeResourceLimitedMemory(Quantum *,map_CbCr);
+  MagickFreeResourceLimitedMemory(Quantum *,map_Y);
   DestroyThreadViewDataSet(scanline_set);
   DestroyThreadViewDataSet(samples_set);
   StopTimer(&image->timer);
@@ -3655,16 +3655,16 @@ STATIC void WriteRowSamples(const sample_t *samples,
 #define RoundUpToBoundary(offset,boundary) \
   (((offset+boundary-1)/boundary)*boundary);
 
-#define ThrowDPXWriterException(code_,reason_,image_)    \
-{ \
-  MagickFreeResourceLimitedMemory(map_CbCr);   \
-  MagickFreeResourceLimitedMemory(map_Y); \
-  MagickFreeResourceLimitedMemory(samples); \
-  MagickFreeResourceLimitedMemory(scanline); \
-  if (chroma_image) \
-    DestroyImage(chroma_image); \
-  ThrowWriterException(code_,reason_,image_); \
-}
+#define ThrowDPXWriterException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(sample_t *,map_CbCr);       \
+    MagickFreeResourceLimitedMemory(sample_t *,map_Y);          \
+    MagickFreeResourceLimitedMemory(sample_t *,samples);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);  \
+    if (chroma_image)                                           \
+      DestroyImage(chroma_image);                               \
+    ThrowWriterException(code_,reason_,image_);                 \
+  }
 
 STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
 {
@@ -4777,10 +4777,10 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
       }
   }
 
-  MagickFreeResourceLimitedMemory(map_CbCr);
-  MagickFreeResourceLimitedMemory(map_Y);
-  MagickFreeResourceLimitedMemory(samples);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(sample_t *,map_CbCr);
+  MagickFreeResourceLimitedMemory(sample_t *,map_Y);
+  MagickFreeResourceLimitedMemory(sample_t *,samples);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   status &= CloseBlob(image);
   if (chroma_image != (Image *) NULL)
     {

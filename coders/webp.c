@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2013-2024 GraphicsMagick Group
+% Copyright (C) 2013-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -194,12 +194,12 @@ static Image *ReadWEBPImage(const ImageInfo *image_info,
   count=(long) ReadBlob(image,length,(char *) stream);
   if (count != (size_t) length)
     {
-      MagickFreeResourceLimitedMemory(stream);
+      MagickFreeResourceLimitedMemory(unsigned char *,stream);
       ThrowReaderException(CorruptImageError,InsufficientImageDataInFile,image);
     }
   if ((webp_status=WebPGetFeatures(stream,length,&stream_features)) != VP8_STATUS_OK)
     {
-      MagickFreeResourceLimitedMemory(stream);
+      MagickFreeResourceLimitedMemory(unsigned char *,stream);
 
       switch (webp_status)
         {
@@ -252,14 +252,14 @@ static Image *ReadWEBPImage(const ImageInfo *image_info,
   image->matte=(stream_features.has_alpha ? MagickTrue : MagickFalse);
   if (image->ping)
     {
-      MagickFreeResourceLimitedMemory(stream);
+      MagickFreeResourceLimitedMemory(unsigned char *,stream);
       CloseBlob(image);
       StopTimer(&image->timer);
       return(image);
     }
   if (CheckImagePixelLimits(image, exception) != MagickPass)
     {
-      MagickFreeResourceLimitedMemory(stream);
+      MagickFreeResourceLimitedMemory(unsigned char *,stream);
       ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
     }
   if (image->matte)
@@ -272,7 +272,7 @@ static Image *ReadWEBPImage(const ImageInfo *image_info,
                                            &stream_features.height);
   if (pixels == (unsigned char *) NULL)
     {
-      MagickFreeResourceLimitedMemory(stream);
+      MagickFreeResourceLimitedMemory(unsigned char *,stream);
       ThrowReaderException(CoderError,NoDataReturned,image);
     }
 
@@ -344,7 +344,7 @@ static Image *ReadWEBPImage(const ImageInfo *image_info,
                             MAGICK_JPEG_APP1_EXIF_HEADER_SIZE);
             (void) memcpy((void *) (profile+header_size),flag_data.bytes,flag_data.size);
             SetImageProfile(image,"EXIF",profile,profile_size);
-            MagickFreeResourceLimitedMemory(profile);
+            MagickFreeResourceLimitedMemory(unsigned char *,profile);
           }
       }
 
@@ -366,7 +366,7 @@ static Image *ReadWEBPImage(const ImageInfo *image_info,
   */
   free(pixels);
   pixels=(unsigned char *) NULL;
-  MagickFreeResourceLimitedMemory(stream);
+  MagickFreeResourceLimitedMemory(unsigned char *,stream);
   CloseBlob(image);
 
   /*
@@ -819,7 +819,7 @@ static unsigned int WriteWEBPImage(const ImageInfo *image_info,Image *image)
         webp_status=WebPPictureImportRGB(&picture,pixels,3*picture.width);
       else
         webp_status=WebPPictureImportRGBA(&picture,pixels,4*picture.width);
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
     }
 
   if (webp_status)

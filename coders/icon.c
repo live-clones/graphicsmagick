@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -288,7 +288,7 @@ static Image *ReadIconImage(const ImageInfo *image_info,
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Failed to seek to offset %u",
                                 icon_file.directory[i].offset);
-        MagickFreeResourceLimitedMemory(data);
+        MagickFreeResourceLimitedMemory(unsigned char *,data);
         ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
       }
     if ((count=ReadBlob(image,icon_file.directory[i].size,data)) != icon_file.directory[i].size)
@@ -299,7 +299,7 @@ static Image *ReadIconImage(const ImageInfo *image_info,
                                   " (expected %" MAGICK_SIZE_T_F  "u bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) icon_file.directory[i].size);
-        MagickFreeResourceLimitedMemory(data);
+        MagickFreeResourceLimitedMemory(unsigned char *,data);
         ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
       }
     format[0]='\0';
@@ -309,7 +309,7 @@ static Image *ReadIconImage(const ImageInfo *image_info,
       (void) strlcpy(format,"PNG",sizeof(format));
     if (format[0] == '\0')
       {
-        MagickFreeResourceLimitedMemory(data);
+        MagickFreeResourceLimitedMemory(unsigned char *,data);
         ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
       }
     if (image->logging)
@@ -335,7 +335,7 @@ static Image *ReadIconImage(const ImageInfo *image_info,
       }
     if (icon_image == (Image *) NULL)
       {
-        MagickFreeResourceLimitedMemory(data);
+        MagickFreeResourceLimitedMemory(unsigned char *,data);
         DestroyImageList(image);
         return((Image *) NULL);
       }
@@ -373,7 +373,7 @@ static Image *ReadIconImage(const ImageInfo *image_info,
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
-  MagickFreeResourceLimitedMemory(data);
+  MagickFreeResourceLimitedMemory(unsigned char *,data);
   return(image);
 }
 

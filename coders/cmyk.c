@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -84,7 +84,7 @@ static unsigned int
 */
 #define ThrowCMYKReaderException(code_,reason_,image_) \
 { \
-  MagickFreeResourceLimitedMemory(scanline);                 \
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);                 \
   ThrowReaderException(code_,reason_,image_); \
 }
 static Image *ReadCMYKImage(const ImageInfo *image_info,
@@ -555,7 +555,7 @@ static Image *ReadCMYKImage(const ImageInfo *image_info,
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -739,7 +739,7 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
                                                     packet_size,image->columns);
     if (new_pixels == (unsigned char *) NULL)
       {
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
       }
     pixels=new_pixels;
@@ -970,7 +970,7 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
     if (status == False)
       break;
   } while (image_info->adjoin);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   if (image_info->adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;

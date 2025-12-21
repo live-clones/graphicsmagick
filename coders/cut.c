@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -595,7 +595,7 @@ static Image *ReadCUTImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
 
  Finish:
-  if (BImgBuff!=NULL) MagickFreeResourceLimitedMemory(BImgBuff);
+  if (BImgBuff!=NULL) MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
   if (palette!=NULL)
     {
       DestroyImage(palette);

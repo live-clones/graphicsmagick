@@ -214,7 +214,7 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
         heif_context_free(heif);                                       \
       if (decode_options)                                              \
         heif_decoding_options_free(decode_options);                    \
-      MagickFreeResourceLimitedMemory(in_buf);                         \
+      MagickFreeResourceLimitedMemory(unsigned char *,in_buf);         \
     } while (0);
 
 #define ThrowHEIFReaderException(code_,reason_,image_) \
@@ -295,7 +295,7 @@ static MagickPassFail ReadMetadata(struct heif_image_handle *heif_image_handle,
                                                      sizeof(*profile));
           if (profile == (unsigned char*) NULL)
             {
-              MagickFreeResourceLimitedMemory(ids);
+              MagickFreeResourceLimitedMemory(heif_item_id *,ids);
               ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,(char *) NULL);
             }
 
@@ -313,8 +313,8 @@ static MagickPassFail ReadMetadata(struct heif_image_handle *heif_image_handle,
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "heif_image_handle_get_metadata() reports error \"%s\"",
                                       err.message);
-              MagickFreeResourceLimitedMemory(profile);
-              MagickFreeResourceLimitedMemory(ids);
+              MagickFreeResourceLimitedMemory(unsigned char *,profile);
+              MagickFreeResourceLimitedMemory(heif_item_id *,ids);
               ThrowBinaryException(CorruptImageError,
                                    AnErrorHasOccurredReadingFromFile,image->filename);
             }
@@ -402,10 +402,10 @@ static MagickPassFail ReadMetadata(struct heif_image_handle *heif_image_handle,
                     }
                 }
             }
-          MagickFreeResourceLimitedMemory(profile);
+          MagickFreeResourceLimitedMemory(unsigned char *,profile);
         }
     }
-  MagickFreeResourceLimitedMemory(ids);
+  MagickFreeResourceLimitedMemory(heif_item_id *,ids);
   return MagickPass;
 }
 
@@ -467,13 +467,13 @@ static MagickPassFail ReadColorProfile(struct heif_image_handle *heif_image_hand
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "heif_image_handle_get_raw_color_profile() reports error \"%s\"",
                                       err.message);
-              MagickFreeResourceLimitedMemory(profile);
+              MagickFreeResourceLimitedMemory(unsigned char *,profile);
               ThrowBinaryException(CorruptImageError,
                                    AnErrorHasOccurredReadingFromFile,image->filename);
 
             }
           SetImageProfile(image,"ICM",profile,profile_size);
-          MagickFreeResourceLimitedMemory(profile);
+          MagickFreeResourceLimitedMemory(unsigned char *,profile);
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "  done reading ICC profile");

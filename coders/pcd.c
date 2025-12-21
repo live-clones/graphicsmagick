@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -420,8 +420,8 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
     Free memory.
   */
   for (i=0; i < (image->columns > 1536 ? 3 : 1); i++)
-    MagickFreeResourceLimitedMemory(pcd_table[i]);
-  MagickFreeResourceLimitedMemory(buffer);
+    MagickFreeResourceLimitedMemory(PCDTable *,pcd_table[i]);
+  MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   return(status);
 }
 
@@ -528,12 +528,12 @@ static Image *OverviewImage(const ImageInfo *image_info,Image *images,
   return(montage_image);
 }
 
-#define ThrowPCDReaderException(code_,reason_,image_) \
-  {                                                   \
-    MagickFreeResourceLimitedMemory(chroma1);                        \
-    MagickFreeResourceLimitedMemory(chroma2);                        \
-    MagickFreeResourceLimitedMemory(luma);                           \
-    ThrowReaderException(code_,reason_,image_);       \
+#define ThrowPCDReaderException(code_,reason_,image_)                \
+  {                                                                  \
+    MagickFreeResourceLimitedMemory(unsigned char *,chroma1);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,chroma2);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,luma);           \
+    ThrowReaderException(code_,reason_,image_);                      \
   }
 
 static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
@@ -768,9 +768,9 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                     image->columns,image->rows))
           break;
       }
-      MagickFreeResourceLimitedMemory(chroma2);
-      MagickFreeResourceLimitedMemory(chroma1);
-      MagickFreeResourceLimitedMemory(luma);
+      MagickFreeResourceLimitedMemory(unsigned char *,chroma2);
+      MagickFreeResourceLimitedMemory(unsigned char *,chroma1);
+      MagickFreeResourceLimitedMemory(unsigned char *,luma);
       while (image->previous != (Image *) NULL)
         image=image->previous;
       CloseBlob(image);
@@ -869,9 +869,9 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   image->columns,image->rows))
         break;
   }
-  MagickFreeResourceLimitedMemory(chroma2);
-  MagickFreeResourceLimitedMemory(chroma1);
-  MagickFreeResourceLimitedMemory(luma);
+  MagickFreeResourceLimitedMemory(unsigned char *,chroma2);
+  MagickFreeResourceLimitedMemory(unsigned char *,chroma1);
+  MagickFreeResourceLimitedMemory(unsigned char *,luma);
   if (LocaleCompare(image_info->magick,"PCDS") == 0)
     image->colorspace=sRGBColorspace;
   else

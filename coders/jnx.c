@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2012-2020 GraphicsMagick Group
+% Copyright (C) 2012-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -178,7 +178,7 @@ ExtractTileJPG(Image * image, const ImageInfo * image_info,
           ThrowException(exception,BlobError,UnableToSeekToOffset,
                          image->filename);
         }
-      MagickFreeResourceLimitedMemory(blob);
+      MagickFreeResourceLimitedMemory(unsigned char *,blob);
     }
   else
     {
@@ -418,7 +418,7 @@ ReadJNXImage(const ImageInfo * image_info, ExceptionInfo * exception)
                PositionList[j].PicSize > file_size))
             {
               (void) SetMagickResourceLimit(MapResource, SaveLimit);
-              MagickFreeResourceLimitedMemory(PositionList);
+              MagickFreeResourceLimitedMemory(TJNXTileInfo *,PositionList);
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             }
         }
@@ -444,7 +444,7 @@ ReadJNXImage(const ImageInfo * image_info, ExceptionInfo * exception)
               break;
         }
 
-      MagickFreeResourceLimitedMemory(PositionList);
+      MagickFreeResourceLimitedMemory(TJNXTileInfo *,PositionList);
     }
 
   CloseBlob(image);

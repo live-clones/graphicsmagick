@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -345,7 +345,7 @@ static Image *ReadGRAYImage(const ImageInfo *image_info,
         AllocateNextImage(image_info,image);
         if (image->next == (Image *) NULL)
           {
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
           }
         image=SyncNextImageInList(image);
@@ -354,7 +354,7 @@ static Image *ReadGRAYImage(const ImageInfo *image_info,
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -685,7 +685,7 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(scanline);
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

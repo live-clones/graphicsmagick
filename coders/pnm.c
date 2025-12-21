@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -128,11 +128,8 @@ static unsigned int IsPNM(const unsigned char *magick,const size_t length)
 
 static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFail *status)
 {
-  unsigned long
-    value;
-
   unsigned int
-    count = 0;
+    value;
 
   int
     c;
@@ -149,10 +146,16 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
         return(0);
       }
   } while (!isdigit(c));
-  count++;
   c &= 0xff;
   if (base == 2)
-    return(c-'0');
+    {
+      if (c > '1')
+        {
+          *status=MagickFail;
+          return(0);
+        }
+      return(c-'0');
+    }
   /*
     Evaluate number.
   */
@@ -164,7 +167,6 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
     c=ReadBlobByte(image);
     if ((c == EOF) || !(isdigit(c)))
       break;
-    count++;
     c &= 0xff;
   }
 
@@ -247,7 +249,7 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,Mag
                 new_comment=MagickReallocateResourceLimitedMemory(char *,comment,length+sizeof(P7Comment));
                 if (new_comment == (char *) NULL)
                   {
-                    MagickFreeResourceLimitedMemory(comment);
+                    MagickFreeResourceLimitedMemory(char *,comment);
                     break;
                   }
                 comment=new_comment;
@@ -268,13 +270,20 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,Mag
           can span multiple lines.
         */
         (void) SetImageAttribute(image,"comment",comment);
-        MagickFreeResourceLimitedMemory(comment);
+        MagickFreeResourceLimitedMemory(char *,comment);
         continue;
       }
   } while (!isdigit(c));
   count++;
   if (base == 2)
-    return(c-'0');
+    {
+      if (c > '1')
+        {
+          *status=MagickFail;
+          return(0);
+        }
+      return(c-'0');
+    }
   /*
     Evaluate number.
   */
@@ -291,16 +300,6 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,Mag
   }
   if (!count)
     *status=MagickFail;
-#if 0
-  do
-  {
-    value*=10;
-    value+=c-'0';
-    c=ReadBlobByte(image);
-    if (c == EOF)
-      return(value);
-  } while (isdigit(c));
-  #endif
   return(value);
 }
 
@@ -2202,7 +2201,7 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                                                 image->columns,image->rows))
                       break;
               }
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
             break;
           }
@@ -2261,9 +2260,9 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                           for (i=0; i < 2; i++)
                             for (j=0; j < 16; j++)
                               {
-                                MagickFreeResourceLimitedMemory(green_map[i][j]);
-                                MagickFreeResourceLimitedMemory(blue_map[i][j]);
-                                MagickFreeResourceLimitedMemory(red_map[i][j]);
+                                MagickFreeResourceLimitedMemory(unsigned short *,green_map[i][j]);
+                                MagickFreeResourceLimitedMemory(unsigned short *,blue_map[i][j]);
+                                MagickFreeResourceLimitedMemory(unsigned short *,red_map[i][j]);
                               }
                           ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
                                                image);
@@ -2340,9 +2339,9 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                 for (i=0; i < 2; i++)
                   for (j=0; j < 16; j++)
                     {
-                      MagickFreeResourceLimitedMemory(green_map[i][j]);
-                      MagickFreeResourceLimitedMemory(blue_map[i][j]);
-                      MagickFreeResourceLimitedMemory(red_map[i][j]);
+                      MagickFreeResourceLimitedMemory(unsigned short *,green_map[i][j]);
+                      MagickFreeResourceLimitedMemory(unsigned short *,blue_map[i][j]);
+                      MagickFreeResourceLimitedMemory(unsigned short *,red_map[i][j]);
                     }
                 break;
           }

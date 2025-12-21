@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -264,14 +264,14 @@ static MagickPassFail BytesPerLine(size_t *bytes_per_line,
 %
 %
 */
-#define ThrowXWDReaderException(code_,reason_,image_) \
-do { \
-  if (ximage) \
-    MagickFreeResourceLimitedMemory(ximage->data); \
-  MagickFreeResourceLimitedMemory(ximage); \
-  MagickFreeResourceLimitedMemory(colors); \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowXWDReaderException(code_,reason_,image_)           \
+  do {                                                          \
+    if (ximage)                                                 \
+      MagickFreeResourceLimitedMemory(char *,ximage->data);     \
+    MagickFreeResourceLimitedMemory(XImage *,ximage);           \
+    MagickFreeResourceLimitedMemory(XColor *,colors);           \
+    ThrowReaderException(code_,reason_,image_);                 \
+  } while (0);
 
 static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -829,9 +829,9 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   /*
     Free image and colormap.
   */
-  MagickFreeResourceLimitedMemory(colors);
-  MagickFreeResourceLimitedMemory(ximage->data);
-  MagickFreeResourceLimitedMemory(ximage);
+  MagickFreeResourceLimitedMemory(XColor *,colors);
+  MagickFreeResourceLimitedMemory(char *,ximage->data);
+  MagickFreeResourceLimitedMemory(XImage *,ximage);
   CloseBlob(image);
   StopTimer(&image->timer);
   return(image);
@@ -1118,7 +1118,7 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
         if (WriteBlob(image,sz_XWDColor,(char *) &color) != sz_XWDColor)
           break;
       }
-      MagickFreeResourceLimitedMemory(colors);
+      MagickFreeResourceLimitedMemory(XColor *,colors);
     }
   /*
     Convert MIFF to XWD raster pixels.
@@ -1161,7 +1161,7 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
                                     image->columns,image->rows))
           break;
   }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   CloseBlob(image);
   return (y < image->rows ? MagickFail :  MagickPass);
 }

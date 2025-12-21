@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -252,7 +252,7 @@ static unsigned int WriteUILImage(const ImageInfo *image_info,Image *image)
           }
         }
       if (matte_image != (unsigned char *) NULL)
-        MagickFreeResourceLimitedMemory(matte_image);
+        MagickFreeResourceLimitedMemory(unsigned char *,matte_image);
     }
   /*
     Compute the character per pixel.

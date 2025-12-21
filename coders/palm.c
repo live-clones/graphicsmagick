@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -849,8 +849,8 @@ GetPalmPaletteGivenBits(const unsigned int bits,
 */
 #define ThrowPALMReaderException(code_,reason_,image_) \
 do { \
-  MagickFreeResourceLimitedMemory(one_row); \
-  MagickFreeResourceLimitedMemory(lastrow); \
+  MagickFreeResourceLimitedMemory(unsigned char *,one_row);     \
+  MagickFreeResourceLimitedMemory(unsigned char *, lastrow);      \
   ThrowReaderException(code_,reason_,image_); \
 } while (0);
 static Image *ReadPALMImage(const ImageInfo *image_info,
@@ -902,8 +902,8 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
   /*
     Open image file.
   */
-  one_row=(unsigned char*) NULL;
-  lastrow=(unsigned char*) NULL;
+  one_row=(unsigned char *) NULL;
+  lastrow=(unsigned char *) NULL;
 
   (void) memset(&palm_header,0,sizeof(palm_header));
   image=AllocateImage(image_info);
@@ -1253,8 +1253,8 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
         }
     }
 
-  MagickFreeResourceLimitedMemory(one_row);
-  MagickFreeResourceLimitedMemory(lastrow);
+  MagickFreeResourceLimitedMemory(unsigned char *,one_row);
+  MagickFreeResourceLimitedMemory(unsigned char *,lastrow);
   CloseBlob(image);
   StopTimer(&image->timer);
   return(image);

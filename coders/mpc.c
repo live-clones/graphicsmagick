@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -126,23 +126,23 @@ static MagickBool IsMPC(const unsigned char *magick,const size_t length)
 %
 */
 
-#define ThrowMPCReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(comment); \
-  MagickFreeResourceLimitedMemory(values); \
-  if (number_of_profiles > 0) \
-    { \
-      unsigned long _index; \
-      for (_index=0; _index < number_of_profiles; _index++) \
-        { \
-          MagickFreeMemory(profiles[_index].name); \
-          MagickFreeResourceLimitedMemory(profiles[_index].info); \
-        } \
-      MagickFreeResourceLimitedMemory(profiles); \
-      number_of_profiles=0; \
-    } \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowMPCReaderException(code_,reason_,image_)                   \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(char *,comment);                    \
+    MagickFreeResourceLimitedMemory(char *,values);                     \
+    if (number_of_profiles > 0)                                         \
+      {                                                                 \
+        unsigned long _index;                                           \
+        for (_index=0; _index < number_of_profiles; _index++)           \
+          {                                                             \
+            MagickFreeMemory(profiles[_index].name);                    \
+            MagickFreeResourceLimitedMemory(unsigned char *,profiles[_index].info); \
+          }                                                             \
+        MagickFreeResourceLimitedMemory(ProfileInfo *,profiles);        \
+        number_of_profiles=0;                                           \
+      }                                                                 \
+    ThrowReaderException(code_,reason_,image_);                         \
+  } while (0);
 
 #define ReadMPCMaxKeyWordCount 256 /* Arbitrary limit on number of keywords in MPC frame */
 
@@ -299,7 +299,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 new_comment=MagickReallocateResourceLimitedMemory(char *,comment,comment_length);
                 if (new_comment == (char *) NULL)
                   {
-                    MagickFreeResourceLimitedMemory(comment);
+                    MagickFreeResourceLimitedMemory(char *,comment);
                     break;
                   }
                 comment=new_comment;
@@ -313,7 +313,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
           *p='\0';
           (void) SetNewImageAttribute(image,"comment",comment);
           comment_count++;
-          MagickFreeResourceLimitedMemory(comment);
+          MagickFreeResourceLimitedMemory(char *,comment);
           c=ReadBlobByte(image);
         }
       else
@@ -382,7 +382,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     new_values=MagickReallocateResourceLimitedMemory(char *,values,values_length);
                     if (new_values == (char *) NULL)
                       {
-                        MagickFreeResourceLimitedMemory(values);
+                        MagickFreeResourceLimitedMemory(char *,values);
                         break;
                       }
                     values=new_values;
@@ -795,7 +795,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 break;
               }
             }
-            MagickFreeResourceLimitedMemory(values);
+            MagickFreeResourceLimitedMemory(char *,values);
           }
         else
           {
@@ -899,9 +899,9 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 }
             }
           MagickFreeMemory(profiles[i].name);
-          MagickFreeResourceLimitedMemory(profiles[i].info);
+          MagickFreeResourceLimitedMemory(unsigned char *,profiles[i].info);
         }
-        MagickFreeResourceLimitedMemory(profiles);
+        MagickFreeResourceLimitedMemory(ProfileInfo *,profiles);
         number_of_profiles=0;
       }
 
@@ -956,7 +956,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 image->colormap[i].blue=(*p++ << 8);
                 image->colormap[i].blue|=(*p++);
               }
-            MagickFreeResourceLimitedMemory(colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,colormap);
           }
       }
     if (EOFBlob(image))
@@ -1468,7 +1468,7 @@ static MagickPassFail WriteMPCImage(const ImageInfo *image_info,Image *image)
 #endif /* QuantumDepth > 8 */
 
         (void) WriteBlob(image, (size_t) packet_size*image->colors,colormap);
-        MagickFreeResourceLimitedMemory(colormap);
+        MagickFreeResourceLimitedMemory(unsigned char *,colormap);
       }
     /*
       Initialize persistent pixel cache.

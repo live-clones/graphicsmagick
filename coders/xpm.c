@@ -250,13 +250,13 @@ static char *ParseColor(char * restrict data)
     }
   return((char *) NULL);
 }
-#define ThrowXPMReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(keys); \
-  MagickFreeResourceLimitedMemory(textlist); \
-  MagickFreeResourceLimitedMemory(xpm_buffer); \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowXPMReaderException(code_,reason_,image_)   \
+  do {                                                  \
+    MagickFreeResourceLimitedMemory(xpmkey_t *,keys);   \
+    MagickFreeResourceLimitedMemory(char **,textlist);  \
+    MagickFreeResourceLimitedMemory(char *,xpm_buffer); \
+    ThrowReaderException(code_,reason_,image_);         \
+  } while (0);
 
 static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -343,7 +343,7 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
           new_xpm_buffer=MagickReallocateResourceLimitedMemory(char *,xpm_buffer,length);
           if (new_xpm_buffer == (char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(xpm_buffer);
+              MagickFreeResourceLimitedMemory(char *,xpm_buffer);
               break;
             }
           if (xpm_buffer != new_xpm_buffer)
@@ -653,9 +653,9 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
   /*
     Free resources.
   */
-  MagickFreeResourceLimitedMemory(keys);
-  MagickFreeResourceLimitedMemory(textlist);
-  MagickFreeResourceLimitedMemory(xpm_buffer);
+  MagickFreeResourceLimitedMemory(xpmkey_t *,keys);
+  MagickFreeResourceLimitedMemory(char **,textlist);
+  MagickFreeResourceLimitedMemory(char *,xpm_buffer);
   if (image->colors > MaxColormapSize)
     {
       /* Release temporary palette. */

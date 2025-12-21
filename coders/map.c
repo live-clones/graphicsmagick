@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -80,12 +80,13 @@ static unsigned int
 %
 %
 */
-#define ThrowMAPReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(colormap); \
-  MagickFreeResourceLimitedMemory(pixels);                   \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowMAPReaderException(code_,reason_,image_)                   \
+  do {                                                                  \
+  MagickFreeResourceLimitedMemory(unsigned char *,colormap);            \
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);              \
+  ThrowReaderException(code_,reason_,image_);                           \
+ } while (0);
+
 static Image *ReadMAPImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
   Image
@@ -167,7 +168,7 @@ static Image *ReadMAPImage(const ImageInfo *image_info,ExceptionInfo *exception)
       image->colormap[i].blue=(*p++ << 8U);
       image->colormap[i].blue|=(*p++);
     }
-  MagickFreeResourceLimitedMemory(colormap);
+  MagickFreeResourceLimitedMemory(unsigned char *,colormap);
   if (image_info->ping)
     {
       CloseBlob(image);
@@ -202,7 +203,7 @@ static Image *ReadMAPImage(const ImageInfo *image_info,ExceptionInfo *exception)
     if (!SyncImagePixelsEx(image,exception))
       break;
   }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   CloseBlob(image);
   return(image);
 }
@@ -301,12 +302,13 @@ ModuleExport void UnregisterMAPImage(void)
 %
 %
 */
-#define ThrowMAPWriterException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(colormap); \
-  MagickFreeResourceLimitedMemory(pixels);                   \
-  ThrowWriterException(code_,reason_,image_); \
-} while (0);
+#define ThrowMAPWriterException(code_,reason_,image_)                   \
+  do {                                                                  \
+  MagickFreeResourceLimitedMemory(unsigned char *,colormap);            \
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);              \
+  ThrowWriterException(code_,reason_,image_);                           \
+ } while (0);
+
 static unsigned int WriteMAPImage(const ImageInfo *image_info,Image *image)
 {
   long
@@ -386,7 +388,7 @@ static unsigned int WriteMAPImage(const ImageInfo *image_info,Image *image)
   if (WriteBlob(image, (size_t) packet_size*image->colors,(char *) colormap) !=
       (size_t) packet_size*image->colors)
     ThrowMAPWriterException(FileOpenError,UnableToWriteFile,image);
-  MagickFreeResourceLimitedMemory(colormap);
+  MagickFreeResourceLimitedMemory(unsigned char *,colormap);
   /*
     Write image pixels to file.
   */
@@ -408,7 +410,7 @@ static unsigned int WriteMAPImage(const ImageInfo *image_info,Image *image)
     if (WriteBlob(image,q-pixels,(char *) pixels) != (size_t) (q-pixels))
       ThrowMAPWriterException(FileOpenError,UnableToWriteFile,image);
   }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   status &= CloseBlob(image);
   return(status);
 }

@@ -730,25 +730,25 @@ static void ZLIBFreeFunc(voidpf opaque, voidpf address)
 }
 #endif /* defined(HasZLIB) */
 
-#define ThrowMIFFReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(comment); \
-  MagickFreeResourceLimitedMemory(values); \
-  if (number_of_profiles > 0) \
-    { \
-      unsigned long _index; \
-      for (_index=0; _index < number_of_profiles; _index++) \
-        { \
-          MagickFreeMemory(profiles[_index].name); \
-          MagickFreeResourceLimitedMemory(profiles[_index].info); \
-        } \
-      MagickFreeResourceLimitedMemory(profiles); \
-      number_of_profiles=0; \
-    } \
-  MagickFreeResourceLimitedMemory(pixels); \
-  MagickFreeResourceLimitedMemory(compress_pixels); \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowMIFFReaderException(code_,reason_,image_)                  \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(char *,comment);                    \
+    MagickFreeResourceLimitedMemory(char *,values);                     \
+    if (number_of_profiles > 0)                                         \
+      {                                                                 \
+        unsigned long _index;                                           \
+        for (_index=0; _index < number_of_profiles; _index++)           \
+          {                                                             \
+            MagickFreeMemory(profiles[_index].name);                    \
+            MagickFreeResourceLimitedMemory(unsigned char *,profiles[_index].info); \
+          }                                                             \
+        MagickFreeResourceLimitedMemory(ProfileInfo *,profiles);        \
+        number_of_profiles=0;                                           \
+      }                                                                 \
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);            \
+    MagickFreeResourceLimitedMemory(unsigned char *,compress_pixels);   \
+    ThrowReaderException(code_,reason_,image_);                         \
+  } while (0);
 
 #define ReadMIFFMaxKeyWordCount 256 /* Arbitrary limit on keywords in one MIFF frame */
 
@@ -932,7 +932,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                 new_comment=MagickReallocateResourceLimitedMemory(char *,comment,comment_length);
                 if (new_comment == (char *) NULL)
                   {
-                    MagickFreeResourceLimitedMemory(comment);
+                    MagickFreeResourceLimitedMemory(char *,comment);
                     break;
                   }
                 comment=new_comment;
@@ -947,7 +947,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Comment: \"%s\"", comment);
           (void) SetNewImageAttribute(image,"comment",comment);
           comment_count++;
-          MagickFreeResourceLimitedMemory(comment);
+          MagickFreeResourceLimitedMemory(char *,comment);
           c=ReadBlobByte(image);
         }
       else
@@ -1015,7 +1015,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                     new_values=MagickReallocateResourceLimitedMemory(char *,values,values_length);
                     if (new_values == (char *) NULL)
                       {
-                        MagickFreeResourceLimitedMemory(values);
+                        MagickFreeResourceLimitedMemory(char *,values);
                         break;
                       }
                     values=new_values;
@@ -1407,7 +1407,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                 break;
               }
             }
-            MagickFreeResourceLimitedMemory(values);
+            MagickFreeResourceLimitedMemory(char *,values);
           }
         else
           {
@@ -1537,9 +1537,9 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                 }
             }
           MagickFreeMemory(profiles[i].name);
-          MagickFreeResourceLimitedMemory(profiles[i].info);
+          MagickFreeResourceLimitedMemory(unsigned char *,profiles[i].info);
         }
-        MagickFreeResourceLimitedMemory(profiles);
+        MagickFreeResourceLimitedMemory(ProfileInfo *,profiles);
         number_of_profiles=0;
       }
 
@@ -1623,7 +1623,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                     }
                 }
               } /* switch (depth) */
-            MagickFreeResourceLimitedMemory(colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,colormap);
           }
       }
     if (image_info->ping && (image_info->subrange != 0))
@@ -1992,8 +1992,8 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
         }
       } /* End switch (image->compression) */
 
-    MagickFreeResourceLimitedMemory(pixels);
-    MagickFreeResourceLimitedMemory(compress_pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,compress_pixels);
 
     if (EOFBlob(image))
       {
@@ -2329,12 +2329,12 @@ static void WriteRunlengthPacket(const Image *image,
   *qp=q;
 }
 
-#define ThrowMIFFWriterException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(compress_pixels) \
-  MagickFreeResourceLimitedMemory(pixels); \
-  ThrowWriterException(code_,reason_,image_); \
-}
+#define ThrowMIFFWriterException(code_,reason_,image_)                  \
+  {                                                                     \
+    MagickFreeResourceLimitedMemory(unsigned char *,compress_pixels)    \
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);          \
+    ThrowWriterException(code_,reason_,image_);                         \
+  }
 
 static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
 {
@@ -2802,7 +2802,7 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
 #endif /* QuantumDepth > 16 */
           } /* switch (depth) */
         (void) WriteBlob(image, (size_t)packet_size*image->colors,colormap);
-        MagickFreeResourceLimitedMemory(colormap);
+        MagickFreeResourceLimitedMemory(unsigned char *,colormap);
       }
     /*
       Write image pixels to file.
@@ -2983,8 +2983,8 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(pixels);
-    MagickFreeResourceLimitedMemory(compress_pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,compress_pixels);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

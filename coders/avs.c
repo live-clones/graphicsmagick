@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -83,10 +83,10 @@ static unsigned int
 */
 #define AVS_WIDTH_LIMIT 65536UL  /* Artificially limit width to 64K pixels */
 #define AVS_HEIGHT_LIMIT 65536UL /* Artificially limit height to 64K pixels */
-#define ThrowAVSReaderException(code_,reason_,image_)   \
-  {                                                     \
-    MagickFreeResourceLimitedMemory(pixels);                           \
-    ThrowReaderException(code_,reason_,image_);         \
+#define ThrowAVSReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);    \
+    ThrowReaderException(code_,reason_,image_);                 \
   }
 static Image *ReadAVSImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -199,7 +199,7 @@ static Image *ReadAVSImage(const ImageInfo *image_info,ExceptionInfo *exception)
               break;
             }
     }
-    MagickFreeResourceLimitedMemory(pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
     if (MagickFail == status)
       break;
@@ -412,7 +412,7 @@ static unsigned int WriteAVSImage(const ImageInfo *image_info,Image *image)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

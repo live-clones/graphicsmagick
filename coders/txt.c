@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -342,10 +342,10 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
   if (txt_subformat != NO_TXT)
     {
-#define ThrowNOTXTReaderException(code_,reason_,image_) \
-      do {                                              \
-        MagickFreeResourceLimitedMemory(BImgBuff);                     \
-        ThrowReaderException(code_,reason_,image_);     \
+#define ThrowNOTXTReaderException(code_,reason_,image_)                 \
+      do {                                                              \
+        MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);      \
+        ThrowReaderException(code_,reason_,image_);                     \
       } while (0);
 
       unsigned
@@ -871,7 +871,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
           }
         /* Note that DImgBuff and WImgBuff point to BImgBuff */
-        MagickFreeResourceLimitedMemory(BImgBuff);
+        MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
       } while(!EOFBlob(image) && NextImagePos>0);
 
       goto FINISH_TXT;

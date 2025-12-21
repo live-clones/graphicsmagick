@@ -407,15 +407,15 @@ static ImageInfo *CheckFName(ImageInfo *clone_info, size_t *i)
 %
 */
 
-#define ThrowTOPOLReaderException(code_,reason_,image_) \
-  {                                                     \
-    if (clone_info)                                     \
-      DestroyImageInfo(clone_info);                     \
-    if (palette)                                        \
-      DestroyImage(palette);                            \
-    MagickFreeResourceLimitedMemory(BImgBuff);          \
-    ThrowReaderException(code_,reason_,image_);         \
-}
+#define ThrowTOPOLReaderException(code_,reason_,image_)         \
+  {                                                             \
+    if (clone_info)                                             \
+      DestroyImageInfo(clone_info);                             \
+    if (palette)                                                \
+      DestroyImage(palette);                                    \
+    MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);  \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * exception)
 {
@@ -758,17 +758,17 @@ static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * excep
         (void)SeekBlob(image, Header.TileOffsets, SEEK_SET);
         if (ReadBlobDwordLSB(image, (size_t) TilesAcross*TilesDown*4, (magick_uint32_t *)Offsets) < 0)
           {
-            MagickFreeResourceLimitedMemory(Offsets);
+            MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
             ThrowTOPOLReaderException(CorruptImageError,InsufficientImageDataInFile, image);
           }
 
         for (TilY=0; TilY<Header.Rows; TilY+=Header.TileHeight)	/* TilY counts per pixel.*/
-          for (TilX=0; TilX<TilesAcross; TilX++)			/* TilX counts per tile.*/
+          for (TilX=0; TilX<TilesAcross; TilX++)		/* TilX counts per tile.*/
             {
               ldblk = Offsets[(TilY/Header.TileHeight)*TilesAcross+TilX];
               if (SeekBlob(image, ldblk, SEEK_SET) != ldblk)
-                {                                                  /* When seek does not reach required place, bail out. */
-                  MagickFreeResourceLimitedMemory(Offsets);
+                {                 /* When seek does not reach required place, bail out. */
+                  MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
                   ThrowTOPOLReaderException(CorruptImageError,InsufficientImageDataInFile, image);
                   break;
                 }
@@ -788,7 +788,7 @@ static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * excep
 
                   if (ReadBlob(image, ldblk, (char *)BImgBuff) != (size_t) ldblk)
                     {
-                      MagickFreeResourceLimitedMemory(Offsets);
+                      MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
                       ThrowTOPOLReaderException(CorruptImageError,InsufficientImageDataInFile, image);
                       break;
                     }
@@ -798,21 +798,21 @@ static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * excep
                   if (InsertRow(depth, BImgBuff, (long)(i+TilY), image, TilX*Header.TileWidth,
                                 (image->columns<Header.TileWidth)?image->columns:Header.TileWidth, &import_options))
                     {
-                      MagickFreeResourceLimitedMemory(Offsets);
+                      MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
                       ThrowTOPOLReaderException(CorruptImageError,TooMuchImageDataInFile, image);
                       break;
                     }
                 }
             }
 
-        MagickFreeResourceLimitedMemory(Offsets);
+        MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
         break;
       }
     }
 
   /* Finish: */
  DONE_READING:
-  MagickFreeResourceLimitedMemory(BImgBuff);
+  MagickFreeResourceLimitedMemory(unsigned char *, BImgBuff);
   if (palette != NULL)
     DestroyImage(palette);
   if (clone_info != NULL)
@@ -973,7 +973,7 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
     }
 
   status &= CloseBlob(image); /* valgrind reports write of uninitialized data */
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
   if (y != (long)image->rows)
     ThrowWriterException(FileOpenError,UnableToWriteFile,image);

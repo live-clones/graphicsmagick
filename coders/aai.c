@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2024-2024 GraphicsMagick Group
+% Copyright (C) 2024-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -39,7 +39,7 @@
 
 #define ThrowAAIReaderException(code_,reason_,image_)                  \
   {                                                                    \
-    MagickFreeResourceLimitedMemory(pixels);                           \
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);           \
     ThrowReaderException(code_,reason_,image_);                        \
   }
 #define AAI_WIDTH_LIMIT 65536UL  /* Artificially limit width to 64K pixels */
@@ -163,7 +163,7 @@ static Image *ReadAAIImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   break;
                 }
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
       if (MagickFail == status)
         break;
@@ -318,7 +318,7 @@ static unsigned int WriteAAIImage(const ImageInfo *image_info,Image *image)
                                           image->columns,image->rows))
                 break;
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

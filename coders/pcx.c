@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -193,13 +193,14 @@ static unsigned int IsPCX(const unsigned char *magick,const size_t length)
 %
 %
 */
-#define ThrowPCXReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(page_table) \
-  MagickFreeResourceLimitedMemory(pcx_pixels); \
-  MagickFreeResourceLimitedMemory(scanline); \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowPCXReaderException(code_,reason_,image_)                   \
+  {                                                                     \
+    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,page_table) \
+    MagickFreeResourceLimitedMemory(unsigned char *,pcx_pixels);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);          \
+    ThrowReaderException(code_,reason_,image_);                         \
+  }
+
 static Image *ReadPCXImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
   Image
@@ -773,8 +774,8 @@ static Image *ReadPCXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(scanline);
-    MagickFreeResourceLimitedMemory(pcx_pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);
+    MagickFreeResourceLimitedMemory(unsigned char *,pcx_pixels);
     if (EOFBlob(image))
       {
         ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
@@ -814,7 +815,7 @@ static Image *ReadPCXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       }
   }
   if (page_table != (ExtendedSignedIntegralType *) NULL)
-    MagickFreeResourceLimitedMemory(page_table);
+    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,page_table);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -983,18 +984,18 @@ static MagickPassFail WritePCXPixels(Image *image,
   return (MagickPass);
 }
 
-#define LiberatePCXAllocations()                \
-  {                                             \
-    MagickFreeResourceLimitedMemory(pcx_colormap);             \
-    MagickFreeResourceLimitedMemory(pcx_pixels);               \
-    MagickFreeResourceLimitedMemory(page_table);               \
+#define LiberatePCXAllocations()                                        \
+  {                                                                     \
+    MagickFreeResourceLimitedMemory(unsigned char *,pcx_colormap);      \
+    MagickFreeResourceLimitedMemory(unsigned char *,pcx_pixels);        \
+    MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,page_table); \
   }
 
 #define ThrowPCXWriterException(code_,reason_,image_) \
-{ \
-  LiberatePCXAllocations();                   \
-  ThrowWriterException(code_,reason_,image_); \
-}
+  {                                                   \
+    LiberatePCXAllocations();                         \
+    ThrowWriterException(code_,reason_,image_);       \
+  }
 static unsigned int WritePCXImage(const ImageInfo *image_info,Image *image)
 {
   long
@@ -1341,8 +1342,8 @@ static unsigned int WritePCXImage(const ImageInfo *image_info,Image *image)
 
     (void) WriteBlobByte(image,pcx_info.colormap_signature);
     (void) WriteBlob(image,3*256,(char *) pcx_colormap);
-    MagickFreeResourceLimitedMemory(pcx_pixels);
-    MagickFreeResourceLimitedMemory(pcx_colormap);
+    MagickFreeResourceLimitedMemory(unsigned char *,pcx_pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pcx_colormap);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);
@@ -1371,7 +1372,7 @@ static unsigned int WritePCXImage(const ImageInfo *image_info,Image *image)
       (void) WriteBlobLSBLong(image,0x3ADE68B1L);
       for (i=0; i <= (long) scene; i++)
         (void) WriteBlobLSBLong(image,(unsigned long) page_table[i]);
-      MagickFreeResourceLimitedMemory(page_table);
+      MagickFreeResourceLimitedMemory(ExtendedSignedIntegralType *,page_table);
     }
   if (status == False)
     ThrowPCXWriterException(FileOpenError,UnableToWriteFile,image);

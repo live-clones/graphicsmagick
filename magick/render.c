@@ -667,7 +667,7 @@ ConvertPathToPolygon(const PathInfo *path_info, ExceptionInfo *exception)
                                                                sizeof(EdgeInfo));
                 if (new_edges == (EdgeInfo *) NULL)
                   {
-                    MagickFreeResourceLimitedMemory(points);
+                    MagickFreeResourceLimitedMemory(PointInfo *, points);
                     DestroyPolygonInfo(polygon_info);
                     ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                                     UnableToDrawOnImage);
@@ -738,7 +738,7 @@ ConvertPathToPolygon(const PathInfo *path_info, ExceptionInfo *exception)
                                                            number_edges,sizeof(EdgeInfo));
             if (new_edges == (EdgeInfo *) NULL)
               {
-                MagickFreeResourceLimitedMemory(points);
+                MagickFreeResourceLimitedMemory(PointInfo *, points);
                 DestroyPolygonInfo(polygon_info);
                 ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                                 UnableToDrawOnImage);
@@ -788,7 +788,7 @@ ConvertPathToPolygon(const PathInfo *path_info, ExceptionInfo *exception)
                                                         number_points,sizeof(PointInfo));
         if (new_points == (PointInfo *) NULL)
           {
-            MagickFreeResourceLimitedMemory(points);
+            MagickFreeResourceLimitedMemory(PointInfo *, points);
             DestroyPolygonInfo(polygon_info);
             ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                             UnableToDrawOnImage);
@@ -808,7 +808,7 @@ ConvertPathToPolygon(const PathInfo *path_info, ExceptionInfo *exception)
     {
       if (n < 2)
         {
-          MagickFreeResourceLimitedMemory(points);
+          MagickFreeResourceLimitedMemory(PointInfo *, points);
         }
       else
         {
@@ -820,7 +820,7 @@ ConvertPathToPolygon(const PathInfo *path_info, ExceptionInfo *exception)
                                                              number_edges,sizeof(EdgeInfo));
               if (new_edges == (EdgeInfo *) NULL)
                 {
-                  MagickFreeResourceLimitedMemory(points);
+                  MagickFreeResourceLimitedMemory(PointInfo *, points);
                   DestroyPolygonInfo(polygon_info);
                   ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                                   UnableToDrawOnImage);
@@ -1112,7 +1112,7 @@ static size_t
 DestroyEdge(PolygonInfo * restrict polygon_info,const size_t edge)
 {
   assert(edge < polygon_info->number_edges);
-  MagickFreeResourceLimitedMemory(polygon_info->edges[edge].points);
+  MagickFreeResourceLimitedMemory(PointInfo *,polygon_info->edges[edge].points);
   polygon_info->number_edges--;
   if (edge < polygon_info->number_edges)
     (void) memmove(polygon_info->edges+edge,polygon_info->edges+edge+1,
@@ -1200,8 +1200,8 @@ DestroyPolygonInfo(void *polygon_info_void)
       if (polygon_info->edges != (EdgeInfo *) NULL)
         {
           for (i=0; i < polygon_info->number_edges; i++)
-            MagickFreeResourceLimitedMemory(polygon_info->edges[i].points);
-          MagickFreeResourceLimitedMemory(polygon_info->edges);
+            MagickFreeResourceLimitedMemory(PointInfo *, polygon_info->edges[i].points);
+          MagickFreeResourceLimitedMemory(EdgeInfo *, polygon_info->edges);
         }
       MagickFreeMemory(polygon_info);
     }
@@ -2207,7 +2207,7 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
       status &= DrawStrokePolygon(image,clone_info,dash_polygon);
     }
  draw_dash_polygon_fail:;
-  MagickFreeResourceLimitedMemory(dash_polygon);
+  MagickFreeResourceLimitedMemory(PrimitiveInfo *, dash_polygon);
   DestroyDrawInfo(clone_info);
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"    end draw-dash");
   return(status);
@@ -2528,9 +2528,9 @@ char * InsertAttributeIntoInputStream (
       (void) memcpy(primitiveNew+AttributeLength,q,RemainingLength); /* Remaining */
       primitiveNew[NeededLength] = '\0';
 
-      MagickFreeResourceLimitedMemory(*pprimitive);
+      MagickFreeResourceLimitedMemory(char *, *pprimitive);
       q = *pprimitive = primitiveNew;
-      MagickFreeResourceLimitedMemory(*ptoken);
+      MagickFreeResourceLimitedMemory(char *, *ptoken);
       tokenNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
       if (tokenNew == (char *) NULL)
         {
@@ -2611,7 +2611,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   /* Check if we have exceeded primitive info allocation hard limit */
   if (NeedAllocCount > PRIMITIVE_INFO_POINTS_MAX)
     {
-      MagickFreeResourceLimitedMemory(*p_PIMgr->pp_PrimitiveInfo);
+      MagickFreeResourceLimitedMemory(PrimitiveInfo *, *p_PIMgr->pp_PrimitiveInfo);
       ThrowException3(p_PIMgr->p_Exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
       status = MagickFail;
     }
@@ -2632,7 +2632,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
           AllocCount=*p_PIMgr->p_AllocCount;
           for (i = 0; i < AllocCount; i++)
             MagickFreeMemory(primitive_info[i].text);
-          MagickFreeResourceLimitedMemory(*p_PIMgr->pp_PrimitiveInfo);
+          MagickFreeResourceLimitedMemory(PrimitiveInfo *, *p_PIMgr->pp_PrimitiveInfo);
           ThrowException3(p_PIMgr->p_Exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
           status = MagickFail;
         }
@@ -2814,7 +2814,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   graphic_context=MagickAllocateResourceLimitedMemory(DrawInfo **,sizeof(DrawInfo *));
   if (graphic_context == (DrawInfo **) NULL)
     {
-      MagickFreeResourceLimitedMemory(primitive);
+      MagickFreeResourceLimitedMemory(char *, primitive);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
         UnableToDrawOnImage)
     }
@@ -2827,14 +2827,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
   if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass)
     {
-      MagickFreeResourceLimitedMemory(primitive);
-      MagickFreeResourceLimitedMemory(graphic_context);
+      MagickFreeResourceLimitedMemory(char *, primitive);
+      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
       return MagickFail;
     }
   if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
     {
-      MagickFreeResourceLimitedMemory(primitive);
-      MagickFreeResourceLimitedMemory(graphic_context);
+      MagickFreeResourceLimitedMemory(char *,primitive);
+      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
       return MagickFail;
     }
   graphic_context[n]=CloneDrawInfo((ImageInfo *) NULL,draw_info);
@@ -2845,8 +2845,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     {
       DestroyDrawInfo(graphic_context[n]);
       graphic_context[n]=(DrawInfo *) NULL;
-      MagickFreeResourceLimitedMemory(primitive);
-      MagickFreeResourceLimitedMemory(graphic_context);
+      MagickFreeResourceLimitedMemory(char *, primitive);
+      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
       return MagickFail;
     }
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
@@ -5014,12 +5014,12 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     Free resources.
   */
   DrawImageRecurseOut(image);
-  MagickFreeResourceLimitedMemory(token);
-  MagickFreeResourceLimitedMemory(primitive_info);
-  MagickFreeResourceLimitedMemory(primitive);
+  MagickFreeResourceLimitedMemory(char *,token);
+  MagickFreeResourceLimitedMemory(PrimitiveInfo *,primitive_info);
+  MagickFreeResourceLimitedMemory(char *,primitive);
   for ( ; n >= 0; n--)
     DestroyDrawInfo(graphic_context[n]);
-  MagickFreeResourceLimitedMemory(graphic_context);
+  MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
   if ((status == MagickFail) &&
       (image->exception.severity < ErrorException))
     ThrowBinaryException(DrawError,NonconformingDrawingPrimitiveDefinition,
@@ -5531,7 +5531,7 @@ DrawPolygonPrimitive(Image *image,const DrawInfo *draw_info,
                 }
           }
 
-        MagickFreeResourceLimitedMemory(path_info);
+        MagickFreeResourceLimitedMemory(PathInfo *,path_info);
       }
     if (polygon_set == (ThreadViewDataSet *) NULL)
       {
@@ -6546,7 +6546,7 @@ DrawStrokePolygon(Image *image,const DrawInfo *draw_info,
         break;
       }
     status&=DrawPolygonPrimitive(image,clone_info,stroke_polygon);
-    MagickFreeResourceLimitedMemory(stroke_polygon);
+    MagickFreeResourceLimitedMemory(PrimitiveInfo *,stroke_polygon);
     if (status == MagickFail)
       break;
     q=p+p->coordinates-1;
@@ -7007,8 +7007,8 @@ TraceBezier(PrimitiveInfoMgr *p_PIMgr,
     p--;
   }
  trace_bezier_done:;
-  MagickFreeResourceLimitedMemory(points);
-  MagickFreeResourceLimitedMemory(coefficients);
+  MagickFreeResourceLimitedMemory(PointInfo *,points);
+  MagickFreeResourceLimitedMemory(double *,coefficients);
   return status;
 }
 
@@ -8096,7 +8096,7 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
               stroke_polygon[0] = polygon_primitive[0];
               stroke_polygon[0].coordinates = 0;
             }
-          MagickFreeResourceLimitedMemory(polygon_primitive);
+          MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
           return(stroke_polygon);
         }/*skip stroking*/
       n=number_vertices-1;
@@ -8112,7 +8112,7 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
                                             sizeof(PointInfo));
   if (path_p == (PointInfo *) NULL)
     {
-      MagickFreeResourceLimitedMemory(polygon_primitive);
+      MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
       ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                       UnableToDrawOnImage);
       return((PrimitiveInfo *) NULL);
@@ -8122,8 +8122,8 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
                                             sizeof(PointInfo));
   if (path_q == (PointInfo *) NULL)
     {
-      MagickFreeResourceLimitedMemory(path_p);
-      MagickFreeResourceLimitedMemory(polygon_primitive);
+      MagickFreeResourceLimitedMemory(PointInfo *,path_p);
+      MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
       ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                       UnableToDrawOnImage);
       return((PrimitiveInfo *) NULL);
@@ -8276,9 +8276,9 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
                                                          sizeof(PointInfo));
          if (new_path_p == (PointInfo *) NULL)
            {
-             MagickFreeResourceLimitedMemory(path_p);
-             MagickFreeResourceLimitedMemory(path_q);
-             MagickFreeResourceLimitedMemory(polygon_primitive);
+             MagickFreeResourceLimitedMemory(PointInfo *,path_p);
+             MagickFreeResourceLimitedMemory(PointInfo *,path_q);
+             MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
              ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                              UnableToDrawOnImage);
              return((PrimitiveInfo *) NULL);
@@ -8294,9 +8294,9 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
                                               sizeof(PointInfo));
          if (new_path_q == (PointInfo *) NULL)
            {
-             MagickFreeResourceLimitedMemory(path_p);
-             MagickFreeResourceLimitedMemory(path_q);
-             MagickFreeResourceLimitedMemory(polygon_primitive);
+             MagickFreeResourceLimitedMemory(PointInfo *,path_p);
+             MagickFreeResourceLimitedMemory(PointInfo *,path_q);
+             MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
              ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                              UnableToDrawOnImage);
              return((PrimitiveInfo *) NULL);
@@ -8367,9 +8367,9 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
                                                    sizeof(PointInfo));
               if (new_path_q == (PointInfo *) NULL)
                 {
-                  MagickFreeResourceLimitedMemory(path_p);
-                  MagickFreeResourceLimitedMemory(path_q);
-                  MagickFreeResourceLimitedMemory(polygon_primitive);
+                  MagickFreeResourceLimitedMemory(PointInfo *,path_p);
+                  MagickFreeResourceLimitedMemory(PointInfo *,path_q);
+                  MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
                   ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                                   UnableToDrawOnImage);
                   return((PrimitiveInfo *) NULL);
@@ -8457,9 +8457,9 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
                                                    sizeof(PointInfo));
               if (new_path_p == (PointInfo *) NULL)
                 {
-                  MagickFreeResourceLimitedMemory(path_p);
-                  MagickFreeResourceLimitedMemory(path_q);
-                  MagickFreeResourceLimitedMemory(polygon_primitive);
+                  MagickFreeResourceLimitedMemory(PointInfo *,path_p);
+                  MagickFreeResourceLimitedMemory(PointInfo *,path_q);
+                  MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
                   ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
                                   UnableToDrawOnImage);
                   return((PrimitiveInfo *) NULL);
@@ -8538,9 +8538,9 @@ TraceStrokePolygon(const Image *image,  /* added Image* param so DrawInfo::strok
 
  trace_stroke_polygon_done:;
 
-  MagickFreeResourceLimitedMemory(path_p);
-  MagickFreeResourceLimitedMemory(path_q);
-  MagickFreeResourceLimitedMemory(polygon_primitive);
+  MagickFreeResourceLimitedMemory(PointInfo *,path_p);
+  MagickFreeResourceLimitedMemory(PointInfo *,path_q);
+  MagickFreeResourceLimitedMemory(PrimitiveInfo *,polygon_primitive);
   return(stroke_polygon);
 }
 
