@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -158,7 +158,7 @@ static HENHMETAFILE ReadEnhMetaFile(const char *szFileName,long *width,
         }
       if (GetMetaFileBitsEx(hOld,dwSize,pBits) == 0)
         {
-          MagickFreeResourceLimitedMemory(pBits);
+          MagickFreeResourceLimitedMemory(LPBYTE,pBits);
           DeleteMetaFile(hOld);
           return((HENHMETAFILE) NULL);
         }
@@ -173,7 +173,7 @@ static HENHMETAFILE ReadEnhMetaFile(const char *szFileName,long *width,
       hTemp=SetWinMetaFileBits(dwSize,pBits,hDC,&mp);
       ReleaseDC(NULL,hDC);
       DeleteMetaFile(hOld);
-      MagickFreeResourceLimitedMemory(pBits);
+      MagickFreeResourceLimitedMemory(LPBYTE,pBits);
       GetEnhMetaFileHeader(hTemp,sizeof(ENHMETAHEADER),&emfh);
       *width=emfh.rclFrame.right-emfh.rclFrame.left;
       *height=emfh.rclFrame.bottom-emfh.rclFrame.top;
@@ -197,7 +197,7 @@ static HENHMETAFILE ReadEnhMetaFile(const char *szFileName,long *width,
   CloseHandle(hFile);
   if (((PAPMHEADER) pBits)->dwKey != 0x9ac6cdd7l)
     {
-      MagickFreeResourceLimitedMemory(pBits);
+      MagickFreeResourceLimitedMemory(LPBYTE,pBits);
       return((HENHMETAFILE) NULL);
     }
   /*
@@ -214,7 +214,7 @@ static HENHMETAFILE ReadEnhMetaFile(const char *szFileName,long *width,
   hDC=GetDC(NULL);
   hTemp=SetWinMetaFileBits(dwSize,&(pBits[sizeof(APMHEADER)]),hDC,&mp);
   ReleaseDC(NULL,hDC);
-  MagickFreeResourceLimitedMemory(pBits);
+  MagickFreeResourceLimitedMemory(LPBYTE,pBits);
   return(hTemp);
 }
 
