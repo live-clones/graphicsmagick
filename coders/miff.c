@@ -51,6 +51,7 @@
 #include "magick/profile.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 #if defined(HasZLIB)
 #  include "zlib.h"
 #endif
@@ -2866,7 +2867,7 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
             length=zip_info.next_out-compress_pixels;
             if (length != 0)
               {
-                (void) WriteBlobMSBLong(image,(const magick_uint32_t) length);
+                (void) WriteBlobMSBLong(image,(magick_uint32_t) length);
                 (void) WriteBlob(image,length,compress_pixels);
               }
           } while (zip_info.avail_in != 0);
@@ -2881,7 +2882,7 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
                 length=zip_info.next_out-compress_pixels;
                 if (length == 0)
                   break;
-                (void) WriteBlobMSBLong(image,(const magick_uint32_t) length);
+                (void) WriteBlobMSBLong(image,(magick_uint32_t) length);
                 (void) WriteBlob(image,length,compress_pixels);
               }
               status=!deflateEnd(&zip_info);
@@ -2917,7 +2918,7 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
             length=bzip_info.next_out-(char *) compress_pixels;
             if (length != 0)
               {
-                (void) WriteBlobMSBLong(image,(const magick_uint32_t) length);
+                (void) WriteBlobMSBLong(image,(magick_uint32_t) length);
                 (void) WriteBlob(image,length,compress_pixels);
               }
           } while (bzip_info.avail_in != 0);
@@ -2933,7 +2934,7 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
                 length=bzip_info.next_out-(char *) compress_pixels;
                 if (length == 0)
                   break;
-                (void) WriteBlobMSBLong(image,(const magick_uint32_t) length);
+                (void) WriteBlobMSBLong(image,(magick_uint32_t) length);
                 (void) WriteBlob(image,length,compress_pixels);
               }
               status=!BZ2_bzCompressEnd(&bzip_info);

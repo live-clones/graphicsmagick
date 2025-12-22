@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -44,6 +44,7 @@
 #include "magick/plasma.h"
 #include "magick/random.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -123,7 +124,7 @@ static Image *ReadPlasmaImage(const ImageInfo *image_info,
     Recursively apply plasma to the image.
   */
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   (void) FormatString(clone_info->filename,"gradient:%.1024s",
     image_info->filename);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -51,6 +51,7 @@
 #include "magick/transform.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 
 #if defined(MSWINDOWS)
 /* The need for this under Visual C++ is a mystery to me */

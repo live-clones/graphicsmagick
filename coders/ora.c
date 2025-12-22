@@ -46,7 +46,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
-
+#include "magick/static.h"
 
 #if defined(HasPNG) && defined(HasZLIB) && (defined(HasUNZIP) || defined(HasLIBZIP))
 

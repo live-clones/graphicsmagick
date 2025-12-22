@@ -49,6 +49,7 @@
 #include "magick/shear.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.

@@ -40,6 +40,7 @@
 #include "magick/resize.h"
 #include "magick/utility.h"
 #include "magick/constitute.h"
+#include "magick/static.h"
 
 
 /*

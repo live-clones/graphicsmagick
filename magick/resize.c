@@ -928,7 +928,7 @@ HorizontalFilter(const Image * restrict source,Image * restrict destination,
       if (thread_status == MagickFail)
         continue;
 
-      contribution=AccessThreadViewData(view_data_set);
+      contribution=(ContributionInfo *) AccessThreadViewData(view_data_set);
       /* fprintf(stderr,"Thread %d contribution %p\n",omp_get_thread_num(),contribution); */
       center=(double) (x+0.5)/x_factor;
       start=(long) Max(center-support+0.5,0);
@@ -1208,7 +1208,7 @@ VerticalFilter(const Image * restrict source,Image * restrict destination,
       if (thread_status == MagickFail)
         continue;
 
-      contribution=AccessThreadViewData(view_data_set);
+      contribution=(ContributionInfo *) AccessThreadViewData(view_data_set);
       center=(double) (y+0.5)/y_factor;
       start=(long) Max(center-support+0.5,0);
       stop=(long) Min(center+support+0.5,source->rows);

@@ -1079,7 +1079,7 @@ MagickExport InterlaceType StringToInterlaceType(const char *option)
 */
 MagickExport const char *MapModeToString(MapMode map_mode)
 {
-  char
+  const char
     *mode_string="?";
 
   switch (map_mode)
@@ -1102,7 +1102,7 @@ MagickExport const char *MapModeToString(MapMode map_mode)
 */
 MagickExport const char *MetricTypeToString(MetricType metric)
 {
-  char
+  const char
     *metric_string="Undefined";
 
   switch (metric)
@@ -1158,7 +1158,7 @@ MagickExport MetricType StringToMetricType(const char *option)
 */
 MagickExport const char *NoiseTypeToString(NoiseType noise_type)
 {
-  char
+  const char
     *noise_string="Undefined";
 
   switch (noise_type)

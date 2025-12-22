@@ -48,6 +48,7 @@
 #include "magick/transform.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 
 typedef struct
@@ -925,7 +926,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "ExtractPostscript(): Failed to seek to PS_Offset=%"MAGICK_OFF_F"d",
+                              "ExtractPostscript(): Failed to seek to PS_Offset=%" MAGICK_OFF_F "d",
                               (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
@@ -957,7 +958,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "ExtractPostscript(): Failed to read %" MAGICK_SIZE_T_F "u bytes of data at"
-                              " offset=%"MAGICK_OFF_F"d",
+                              " offset=%" MAGICK_OFF_F "d",
                               (MAGICK_SIZE_T) PS_Size, (magick_off_t) PS_Offset);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image; /* return (Image *) NULL; */
@@ -996,7 +997,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       return(image);
     }
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   /* clone_info->length=0; */
   (void) strlcpy(clone_info->magick, format, sizeof(clone_info->magick));
   (void) strlcpy(clone_info->filename, "", sizeof(clone_info->filename));

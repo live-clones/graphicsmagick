@@ -51,6 +51,7 @@
 #include "magick/tempfile.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasZLIB)
 #  include "zlib.h"
 #endif

@@ -48,6 +48,7 @@
 #include "magick/omp_data_view.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -1129,7 +1130,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               {
                 check_pixels=MagickFalse;
               }
-            if (GrayQuantum)
+            if (GrayQuantum == quantum_type)
               {
                 if (1 == bits_per_sample)
                   {
@@ -1243,7 +1244,8 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     thread_status=MagickFail;
 
                 if (thread_status != MagickFail)
-                  if (!ImportImagePixelArea(image,quantum_type,bits_per_sample,pixels,
+                  if (!ImportImagePixelArea(image,quantum_type,bits_per_sample,
+                                            (const unsigned char*) pixels,
                                             &import_options,&import_info))
                     thread_status=MagickFail;
                 /*

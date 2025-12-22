@@ -39,6 +39,7 @@
 #include "magick/magick.h"
 #include "magick/render.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,7 +136,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
         Read caption from file.
       */
       (void) strlcpy(image->filename,image_info->filename+1,MaxTextExtent);
-      caption=FileToBlob(image->filename,&length,exception);
+      caption=(char *) FileToBlob(image->filename,&length,exception);
       if (caption == (char *) NULL)
         ThrowCAPTIONException(FileOpenError,UnableToOpenFile,image);
     }

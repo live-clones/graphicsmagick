@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2009 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -17,6 +17,7 @@
 #include "magick/studio.h"
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
+#include "magick/plasma.h"
 #include "magick/random.h"
 #include "magick/utility.h"
 

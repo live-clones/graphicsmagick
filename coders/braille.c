@@ -34,12 +34,14 @@
 #include "magick/magick.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
 */
 static unsigned int
   WriteBRAILLEImage(const ImageInfo *,Image *);
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

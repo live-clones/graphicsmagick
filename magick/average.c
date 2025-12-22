@@ -15,6 +15,7 @@
   Include declarations.
 */
 #include "magick/studio.h"
+#include "magick/average.h"
 #include "magick/monitor.h"
 #include "magick/omp_data_view.h"
 #include "magick/pixel_cache.h"

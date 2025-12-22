@@ -40,6 +40,7 @@
 #include "magick/magick.h"
 #include "magick/profile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -486,7 +487,7 @@ static long parse8BIM(Image *ifile, Image *ofile)
                   }
                 if (recnum != IPTC_ID)
                   {
-                    if (WriteBlobMSBLong(ofile, (const magick_uint32_t) len) < 4)
+                    if (WriteBlobMSBLong(ofile, (magick_uint32_t) len) < 4)
                       goto parse8BIM_failure;
                     outputlen += 4;
 
@@ -525,7 +526,7 @@ static long parse8BIM(Image *ifile, Image *ofile)
                       goto parse8BIM_failure;
                     if (WriteBlobByte(ofile,recnum & 255) < 1)
                       goto parse8BIM_failure;
-                    if (WriteBlobMSBShort(ofile,(const magick_uint16_t) len) < 2)
+                    if (WriteBlobMSBShort(ofile,(magick_uint16_t) len) < 2)
                       goto parse8BIM_failure;
                     outputlen += 5;
                     next=0;
@@ -811,7 +812,7 @@ static long parse8BIMW(Image *ifile, Image *ofile)
                   }
                 if (recnum != IPTC_ID)
                   {
-                    if (WriteBlobMSBLong(ofile, (const magick_uint32_t) len) != 4)
+                    if (WriteBlobMSBLong(ofile, (magick_uint32_t) len) != 4)
                       goto parse8BIMW_failure;
                     outputlen += 4;
 
@@ -850,7 +851,7 @@ static long parse8BIMW(Image *ifile, Image *ofile)
                       goto parse8BIMW_failure;
                     if (WriteBlobByte(ofile,recnum & 255) != 1)
                       goto parse8BIMW_failure;
-                    if (WriteBlobMSBShort(ofile,(const magick_uint16_t) len) != 2)
+                    if (WriteBlobMSBShort(ofile,(magick_uint16_t) len) != 2)
                       goto parse8BIMW_failure;
                     outputlen += 5;
                     next=0;

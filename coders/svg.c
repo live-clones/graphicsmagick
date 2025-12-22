@@ -46,6 +46,7 @@
 #include "magick/render.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasXML)
 #  if defined(MSWINDOWS)
 #    if defined(__MINGW32__)
@@ -3555,7 +3556,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   parser=xmlCreatePushParserCtxt(SAXHandler, /* a SAX handler (optional) */
                                  (void *) NULL, /* user data for SAX callbacks (optional)  */
-                                 (void *) NULL, /* initial chunk (optional, deprecated)  */
+                                 (const char *) NULL, /* initial chunk (optional, deprecated)  */
                                  0, /* size of initial chunk in bytes  */
                                  image->filename /* file name or URI (optional)  */
                                  );

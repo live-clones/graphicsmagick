@@ -47,6 +47,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.

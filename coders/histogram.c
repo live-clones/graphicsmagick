@@ -47,6 +47,7 @@
 #include "magick/tempfile.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -332,7 +333,7 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
     */
     (void) GetNumberColors(image,file,&image->exception);
     (void) fclose(file);
-    histogram=FileToBlob(filename,&histogram_length,&histogram_image->exception);
+    histogram=(char *) FileToBlob(filename,&histogram_length,&histogram_image->exception);
     (void) StripImage(histogram_image);
     (void) SetImageAttribute(histogram_image,"comment",NULL);
     if (histogram && histogram_length > 0)

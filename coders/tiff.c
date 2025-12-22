@@ -59,6 +59,7 @@
 #include "magick/tsd.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 #if defined(HasTIFF)
 #  if defined(HAVE_TIFFCONF_H)
 #    include "tiffconf.h"
@@ -160,6 +161,10 @@ typedef struct _Magick_TIFF_ClientData
 /*
   Forward declarations.
 */
+#if defined(__cplusplus) || defined(c_plusplus)
+extern "C" {
+#endif
+
 static tsize_t
   TIFFReadBlob(thandle_t,tdata_t,tsize_t);
 
@@ -167,6 +172,10 @@ static MagickPassFail
   WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image),
   WritePTIFImage(const ImageInfo *,Image *),
   WriteTIFFImage(const ImageInfo *,Image *);
+
+#if defined(__cplusplus) || defined(c_plusplus)
+}
+#endif
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1323,7 +1332,7 @@ SwabDataToBigEndian(const uint16 bits_per_sample, tdata_t data,
   /* New libtiff function to swap 24 bit values.  Grumble ... */
   else if (bits_per_sample == 24U)
     {
-      TIFFSwabArrayOfTriples(data,
+      TIFFSwabArrayOfTriples((uint8_t*) data,
                              NumberOfObjectsInArray(size,3));
     }
 #endif
@@ -1357,7 +1366,7 @@ SwabDataToNativeEndian(const uint16 bits_per_sample, tdata_t data,
   /* New libtiff function to swap 24 bit values.  Grumble ... */
   else if (bits_per_sample == 24U)
     {
-      TIFFSwabArrayOfTriples(data,
+      TIFFSwabArrayOfTriples((uint8_t*) data,
                              NumberOfObjectsInArray(size,3));
     }
 #endif
@@ -2184,7 +2193,8 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
           */
           if ((exception->severity > WarningException) &&
               (exception->severity < ErrorException))
-            exception->severity += (ErrorException - WarningException);
+            exception->severity = (ExceptionType) ((int) exception->severity +
+                                                   ((int) ErrorException - (int)WarningException));
           ThrowTIFFReaderException(CorruptImageError,ImproperImageHeader,
                                    image);
         }
@@ -4826,7 +4836,8 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
           if (logging && (Flags & FLAG_BASE) != 0)
             (void)LogMagickEvent(CoderEvent,GetMagickModule(),
                                  "Extracted tag from EXIF %xh.H (%u), Field %u (%s), Long2 %u, val %u %s",
-                                 (unsigned) Tag, (unsigned) Tag, (unsigned) Field, FipFieldTypeToStr(Field),
+                                 (unsigned) Tag, (unsigned) Tag, (unsigned) Field,
+                                 FipFieldTypeToStr((TIFFDataType) Field),
                                  (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
 
           if (Tag == TIFFTAG_COLORMAP ||
@@ -4929,7 +4940,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                         {
                           if (logging && (Flags & FLAG_BASE) != 0)
                             (void)LogMagickEvent(CoderEvent,GetMagickModule(),"%s fixed size arrays are not supported yet.",
-                                                 FipFieldTypeToStr(Field));
+                                                 FipFieldTypeToStr((TIFFDataType) Field));
                           break;                      /* Fixed size arrays not handled. */
                         }
                       if ((Value > (Value+2U*Long2)) || (Value+2U*Long2 >= profile_length-1))
@@ -4966,7 +4977,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                         {
                           if (logging && (Flags & FLAG_BASE) != 0)
                             (void)LogMagickEvent(CoderEvent,GetMagickModule(),"%s fixed size arrays are not supported yet.",
-                                                 FipFieldTypeToStr(Field));
+                                                 FipFieldTypeToStr((TIFFDataType) Field));
                           break;                      /* Fixed size arrays not handled. */
                         }
                       if ((Value > (Value+4U*Long2)) || (Value+4U*Long2 >= profile_length-1))

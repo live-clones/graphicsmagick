@@ -43,6 +43,7 @@
 #include "magick/tempfile.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -315,7 +316,7 @@ static Image *ReadSFWImage(const ImageInfo *image_info,ExceptionInfo *exception)
     Write JFIF file.
   */
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   file=AcquireTemporaryFileStream(temporary_filename,BinaryFileIOMode);
   if (file == (FILE *) NULL)

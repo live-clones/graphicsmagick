@@ -60,6 +60,7 @@
 #include "magick/texture.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)
@@ -2128,13 +2129,14 @@ MSLStartElement(void *context,const xmlChar *name,
                       FIXME: Next three lines replace:
                        clone_info->client_data=(void *) &(msl_info->image[n]->iptc_profile);
                     */
-                    profile_info.name="IPTC";
+                    profile_info.name=AcquireString("IPTC"); /* FIXME: Is this okay? */
                     profile_info.info=(unsigned char *) GetImageProfile(msl_info->image[n],profile_info.name,
                                                                       &profile_info.length);
                     clone_info->client_data=&profile_info;
 
                     (void) strlcpy(clone_info->filename,value,MaxTextExtent);
                     profile_image=ReadImage(clone_info,&(msl_info->image[n]->exception));
+                    MagickFreeMemory(profile_info.name);
                     if (profile_image == (Image *) NULL)
                       {
                         (void) LogMagickEvent(TransformEvent,GetMagickModule(),

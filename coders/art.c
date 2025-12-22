@@ -42,8 +42,8 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
-
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %

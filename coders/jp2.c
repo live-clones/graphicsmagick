@@ -46,6 +46,7 @@
 #include "magick/profile.h"
 #include "magick/resource.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasJP2)
 #  if !defined(uchar)
 #    define uchar  unsigned char
@@ -482,7 +483,7 @@ static void *alloc_rlm(struct jas_allocator_s *allocator, size_t size)
   char *p;
   (void) allocator;
   /* JasPer expects its allocator to return non-null for zero size */
-  p=_MagickAllocateResourceLimitedMemoryLoc((size == 0 ? 1 : size),GetMagickModule());
+  p=(char *) _MagickAllocateResourceLimitedMemoryLoc((size == 0 ? 1 : size),GetMagickModule());
   /* fprintf(stderr,"alloc_rlm(%p, %zu) -> %p\n", allocator, size, p); */
   return p;
 }
@@ -497,7 +498,7 @@ static void *realloc_rlm(struct jas_allocator_s *allocator, void *pointer,
 {
   char *p;
   (void) allocator;
-  p =_MagickReallocateResourceLimitedMemoryLoc(pointer, 1,new_size,0,GetMagickModule());
+  p =(char *) _MagickReallocateResourceLimitedMemoryLoc(pointer, 1,new_size,0,GetMagickModule());
   /* fprintf(stderr,"realloc_rlm(%p, %p, %zu) -> %p\n", allocator, pointer, new_size, p); */
   return p;
 }

@@ -45,6 +45,7 @@
 #include "magick/magic.h"
 #include "magick/resource.h"
 #include "magick/attribute.h"
+#include "magick/static.h"
 
 typedef struct
 {

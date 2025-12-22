@@ -47,6 +47,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 #define USE_GRAYMAP
@@ -5993,7 +5994,7 @@ static MagickPassFail funcDCM_Palette(Image *image,DicomStream *dcm,ExceptionInf
       /*
         Allocate color map first time in
       */
-      if (!AllocateImageColormap(image,(const unsigned long) dcm->length))
+      if (!AllocateImageColormap(image,(unsigned long) dcm->length))
         {
           ThrowException(exception,ResourceLimitError,UnableToCreateColormap,image->filename);
           return MagickFail;
@@ -7316,7 +7317,7 @@ static MagickPassFail DCM_ReadNonNativeImages(Image **image,const ImageInfo *ima
       if (status == MagickPass)
         {
           clone_info=CloneImageInfo(image_info);
-          clone_info->blob=(void *) NULL;
+          clone_info->blob=(_BlobInfoPtr_) NULL;
           clone_info->length=0;
           if (dcm->transfer_syntax == DCM_TS_JPEG_2000)
             FormatString(clone_info->filename,"jp2:%.1024s",filename);

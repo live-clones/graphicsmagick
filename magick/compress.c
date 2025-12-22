@@ -977,7 +977,7 @@ ImageToHuffman2DBlob(const Image *image,const ImageInfo *image_info,
         {
           (void) strlcpy(huffman_image->magick,"GROUP4RAW",sizeof(huffman_image->magick));
           (void) strlcpy(huffman_image->filename,"",sizeof(huffman_image->filename));
-          blob=ImageToBlob(huffman_info, huffman_image, blob_length, exception);
+          blob=(unsigned char *) ImageToBlob(huffman_info, huffman_image, blob_length, exception);
           DestroyImage(huffman_image);
         }
       DestroyImageInfo(huffman_info);

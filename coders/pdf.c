@@ -52,6 +52,7 @@
 #include "magick/tempfile.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -418,7 +419,7 @@ static Image *ReadPDFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       /*
         Read Ghostscript output.
       */
-      clone_info->blob=(void *) NULL;
+      clone_info->blob=(_BlobInfoPtr_) NULL;
       clone_info->length=0;
       clone_info->magick[0]='\0';
       clone_info->subimage=0;

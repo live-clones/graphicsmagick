@@ -42,6 +42,7 @@
 #include "magick/monitor.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 /*
    Write an unsigned long to file with Intel/LSB ordering
 */

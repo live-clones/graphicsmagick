@@ -333,7 +333,9 @@ static void MvgAppendColor(DrawingWand *drawing_wand, const PixelPacket *color)
 }
 
 static void MvgAppendPointsCommand(DrawingWand *drawing_wand,
-  char *command,const unsigned long number_coordinates,const PointInfo *coordinates)
+                                   const char *command,
+                                   const unsigned long number_coordinates,
+                                   const PointInfo *coordinates)
 {
   const PointInfo
     *coordinate;

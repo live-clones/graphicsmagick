@@ -43,6 +43,7 @@
 #include "magick/resource.h"
 #include "magick/utility.h"
 #include "magick/resource.h"
+#include "magick/static.h"
 
 #if defined(HasHEIF)
 

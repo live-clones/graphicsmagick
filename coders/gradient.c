@@ -45,6 +45,7 @@
 #include "magick/magick.h"
 #include "magick/utility.h"
 #include "magick/studio.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

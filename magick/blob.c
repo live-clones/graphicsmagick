@@ -745,7 +745,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
       return((Image *) NULL);
     }
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) blob;
+  clone_info->blob=(_BlobInfoPtr_) blob;
   clone_info->length=length;
   /*
     Set file magick based on file name or file header if magick was
@@ -802,7 +802,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
 
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Using temporary file");
-    clone_info->blob=(void *) NULL;
+    clone_info->blob=(_BlobInfoPtr_) NULL;
     clone_info->length=0;
 
     if (!AcquireTemporaryFileName(temporary_file))
@@ -2341,8 +2341,8 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
         Native blob support for this image format.
         FIXME: This results in a memory leak if the blob is not opened.
       */
-      clone_info->blob=MagickAllocateMemory(void *,65535L);
-      if (clone_info->blob == (void *) NULL)
+      clone_info->blob=MagickAllocateMemory(_BlobInfoPtr_,65535L);
+      if (clone_info->blob == (_BlobInfoPtr_) NULL)
         {
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,
                          MagickMsg(BlobError,UnableToCreateBlob));
@@ -3422,14 +3422,14 @@ MagickExport size_t ReadBlob(Image *image,const size_t req_length,void *data)
       }
     case BlobStream:
       {
-        void
-          *source_void = 0;
+        void *
+          source_void = 0;
 
         const unsigned char
           *source;
 
-        count=ReadBlobStream(image,length,&source_void);
-        source=source_void;
+        count=ReadBlobStream(image,length,(void **) &source_void);
+        source=(const unsigned char*) source_void;
         if (count <= 10)
           {
             register size_t

@@ -719,8 +719,8 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
         }
     }
   if (resources.map_type == (char *) NULL)
-    if ((visual_info->class != TrueColor) &&
-        (visual_info->class != DirectColor))
+    if ((visual_info->klass != TrueColor) &&
+        (visual_info->klass != DirectColor))
       {
         Image
           *next;
@@ -767,16 +767,16 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
   for (scene=0; scene < (int) number_scenes; scene++)
   {
     if ((resource_info->map_type != (char *) NULL) ||
-        (visual_info->class == TrueColor) ||
-        (visual_info->class == DirectColor))
+        (visual_info->klass == TrueColor) ||
+        (visual_info->klass == DirectColor))
       (void) SetImageType(image_list[scene],TrueColorType);
     if ((display_image->columns < image_list[scene]->columns) &&
         (display_image->rows < image_list[scene]->rows))
       display_image=image_list[scene];
   }
   if ((resource_info->map_type != (char *) NULL) ||
-      (visual_info->class == TrueColor) ||
-      (visual_info->class == DirectColor))
+      (visual_info->klass == TrueColor) ||
+      (visual_info->klass == DirectColor))
     (void) SetImageType(display_image,TrueColorType);
   MagickXMakeStandardColormap(display,visual_info,&resources,display_image,map_info,
     &pixel);
@@ -925,8 +925,8 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
     window_info.pixmap=(Pixmap) NULL;
     window_info.matte_pixmap=(Pixmap) NULL;
     if ((resources.map_type != (char *) NULL) ||
-        (visual_info->class == TrueColor) ||
-        (visual_info->class == DirectColor))
+        (visual_info->klass == TrueColor) ||
+        (visual_info->klass == DirectColor))
       if (image_list[scene]->storage_class == PseudoClass)
         {
           /*
@@ -1365,8 +1365,8 @@ MagickXAnimateImages(Display *display,
         }
     }
   if (resource_info->map_type == (char *) NULL)
-    if ((visual_info->class != TrueColor) &&
-        (visual_info->class != DirectColor))
+    if ((visual_info->klass != TrueColor) &&
+        (visual_info->klass != DirectColor))
       {
         Image
           *next;
@@ -1414,8 +1414,8 @@ MagickXAnimateImages(Display *display,
   for (scene=0; scene < (long) number_scenes; scene++)
   {
     if ((resource_info->map_type != (char *) NULL) ||
-        (visual_info->class == TrueColor) ||
-        (visual_info->class == DirectColor))
+        (visual_info->klass == TrueColor) ||
+        (visual_info->klass == DirectColor))
       (void) SetImageType(image_list[scene],TrueColorType);
     if ((display_image->columns < image_list[scene]->columns) &&
         (display_image->rows < image_list[scene]->rows))
@@ -1818,8 +1818,8 @@ MagickXAnimateImages(Display *display,
     windows->image.pixmap=(Pixmap) NULL;
     windows->image.matte_pixmap=(Pixmap) NULL;
     if ((resource_info->map_type != (char *) NULL) ||
-        (visual_info->class == TrueColor) ||
-        (visual_info->class == DirectColor))
+        (visual_info->klass == TrueColor) ||
+        (visual_info->klass == DirectColor))
       if (image_list[scene]->storage_class == PseudoClass)
         {
           /*
@@ -2637,9 +2637,9 @@ MagickXAnimateImages(Display *display,
       DestroyImageList(images);
       images=(Image *) NULL;
     }
-  if ((windows->visual_info->class == GrayScale) ||
-      (windows->visual_info->class == PseudoColor) ||
-      (windows->visual_info->class == DirectColor))
+  if ((windows->visual_info->klass == GrayScale) ||
+      (windows->visual_info->klass == PseudoColor) ||
+      (windows->visual_info->klass == DirectColor))
     {
       /*
         Withdraw windows.

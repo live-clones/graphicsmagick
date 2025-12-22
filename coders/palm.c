@@ -68,6 +68,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Define declarations.

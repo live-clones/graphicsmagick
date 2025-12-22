@@ -45,6 +45,7 @@
 #include "magick/magick.h"
 #include "magick/texture.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 
 /*

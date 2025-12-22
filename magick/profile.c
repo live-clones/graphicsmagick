@@ -94,7 +94,7 @@ AllocateImageProfileIterator(const Image *image)
   if (!image->profiles)
     return 0;
 
-  return (ImageProfileIterator) MagickMapAllocateIterator(image->profiles);
+  return (ImageProfileIterator) MagickMapAllocateIterator((MagickMap) image->profiles);
 }
 
 /*
@@ -298,7 +298,7 @@ GetImageProfile(const Image* image, const char *name, size_t *length)
   if (!image->profiles)
     return 0;
 
-  profile=MagickMapAccessEntry(image->profiles,name,&profile_length);
+  profile=(const unsigned char *) MagickMapAccessEntry((MagickMap) image->profiles,name,&profile_length);
 
   if (!profile)
     {
@@ -306,13 +306,13 @@ GetImageProfile(const Image* image, const char *name, size_t *length)
         Support common alias names and work-alikes.
       */
       if (LocaleCompare("ICC",name) == 0)
-        profile=MagickMapAccessEntry(image->profiles,"ICM",&profile_length);
+        profile=(const unsigned char *) MagickMapAccessEntry((MagickMap) image->profiles,"ICM",&profile_length);
       else if (LocaleCompare("ICM",name) == 0)
-        profile=MagickMapAccessEntry(image->profiles,"ICC",&profile_length);
+        profile=(const unsigned char *) MagickMapAccessEntry((MagickMap) image->profiles,"ICC",&profile_length);
       else if (LocaleCompare("IPTC",name) == 0)
-        profile=MagickMapAccessEntry(image->profiles,"8BIM",&profile_length);
+        profile=(const unsigned char *) MagickMapAccessEntry((MagickMap) image->profiles,"8BIM",&profile_length);
       else if (LocaleCompare("8BIM",name) == 0)
-        profile=MagickMapAccessEntry(image->profiles,"IPTC",&profile_length);
+        profile=(const unsigned char *) MagickMapAccessEntry((MagickMap) image->profiles,"IPTC",&profile_length);
     }
 
   if (length)
@@ -374,7 +374,7 @@ NextImageProfile(ImageProfileIterator profile_iterator,
   map_iterator=(MagickMapIterator) profile_iterator;
   status=MagickMapIterateNext(map_iterator,name);
   if (status != MagickFail)
-    *profile=MagickMapDereferenceIterator(map_iterator,length);
+    *profile=(const unsigned char *) MagickMapDereferenceIterator(map_iterator,length);
   return (status);
 }
 
@@ -1240,7 +1240,7 @@ SetImageProfile(Image *image,const char *name, const unsigned char *profile,
       */
       (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                             "Removing %s profile",name);
-      status &= MagickMapRemoveEntry(image->profiles,name);
+      status &= MagickMapRemoveEntry((MagickMap) image->profiles,name);
     }
   else
     {
@@ -1260,7 +1260,7 @@ SetImageProfile(Image *image,const char *name, const unsigned char *profile,
                             (unsigned long) length);
       if ((profile != 0) && (length != 0))
         {
-          status &= MagickMapAddEntry(image->profiles,name,profile,length,
+          status &= MagickMapAddEntry((MagickMap) image->profiles,name,profile,length,
                                       &image->exception);
         }
     }

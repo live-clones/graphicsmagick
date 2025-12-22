@@ -1220,7 +1220,7 @@ MagickXBestPixel(Display *display,const Colormap colormap,
 */
 #define MaxStandardColormaps  7
 #define MagickXVisualColormapSize(visual_info) Min( (int) (\
-  ((visual_info->class == TrueColor) || (visual_info->class == DirectColor)) ? \
+  ((visual_info->klass == TrueColor) || (visual_info->klass == DirectColor)) ? \
     (int) (visual_info->red_mask | visual_info->green_mask | visual_info->blue_mask) : \
     visual_info->colormap_size),(1L << visual_info->depth))
 
@@ -1271,37 +1271,37 @@ MagickXBestVisualInfo(Display *display,
       if (LocaleCompare("staticgray",visual_type) == 0)
         {
           visual_mask|=VisualClassMask;
-          visual_template.class=StaticGray;
+          visual_template.klass=StaticGray;
         }
       else
         if (LocaleCompare("grayscale",visual_type) == 0)
           {
             visual_mask|=VisualClassMask;
-            visual_template.class=GrayScale;
+            visual_template.klass=GrayScale;
           }
         else
           if (LocaleCompare("staticcolor",visual_type) == 0)
             {
               visual_mask|=VisualClassMask;
-              visual_template.class=StaticColor;
+              visual_template.klass=StaticColor;
             }
           else
             if (LocaleCompare("pseudocolor",visual_type) == 0)
               {
                 visual_mask|=VisualClassMask;
-                visual_template.class=PseudoColor;
+                visual_template.klass=PseudoColor;
               }
             else
               if (LocaleCompare("truecolor",visual_type) == 0)
                 {
                   visual_mask|=VisualClassMask;
-                  visual_template.class=TrueColor;
+                  visual_template.klass=TrueColor;
                 }
               else
                 if (LocaleCompare("directcolor",visual_type) == 0)
                   {
                     visual_mask|=VisualClassMask;
-                    visual_template.class=DirectColor;
+                    visual_template.klass=DirectColor;
                   }
                 else
                   if (LocaleCompare("default",visual_type) == 0)
@@ -1341,7 +1341,7 @@ MagickXBestVisualInfo(Display *display,
       if ((number_visuals == 0) || (visual_list == (XVisualInfo *) NULL))
         return((XVisualInfo *) NULL);
       MagickWarning(XServerWarning,UsingDefaultVisual,
-        MagickXVisualClassName(visual_list->class));
+        MagickXVisualClassName(visual_list->klass));
     }
   resource_info->color_recovery=False;
   if ((map_info != (XStandardColormap *) NULL) && (map_type != (char *) NULL))
@@ -1472,7 +1472,7 @@ MagickXBestVisualInfo(Display *display,
           visual_info=p;
         else
           if (MagickXVisualColormapSize(p) == MagickXVisualColormapSize(visual_info))
-            if (rank[p->class] > rank[visual_info->class])
+            if (rank[p->klass] > rank[visual_info->klass])
               visual_info=p;
       }
       visual_template.visualid=XVisualIDFromVisual(visual_info->visual);
@@ -2847,8 +2847,8 @@ MagickXFreeStandardColormap(Display *display,
         (void) XFreeColormap(display,map_info->colormap);
       else
         if (pixel != (MagickXPixelInfo *) NULL)
-          if ((visual_info->class != TrueColor) &&
-              (visual_info->class != DirectColor))
+          if ((visual_info->klass != TrueColor) &&
+              (visual_info->klass != DirectColor))
             (void) XFreeColors(display,map_info->colormap,pixel->pixels,
               (int) pixel->colors,0);
     }
@@ -4325,8 +4325,8 @@ MagickXGetWindowImage(Display *display,const Window window,
                     ximage=(XImage *) NULL;
                     return((Image *) NULL);
                   }
-                if ((window_info[id].visual->class != DirectColor) &&
-                    (window_info[id].visual->class != TrueColor))
+                if ((window_info[id].visual->klass != DirectColor) &&
+                    (window_info[id].visual->klass != TrueColor))
                   for (i=0; i < (int) number_colors; i++)
                   {
                     colors[i].pixel=i;
@@ -4397,8 +4397,8 @@ MagickXGetWindowImage(Display *display,const Window window,
         /*
           Convert X image to MIFF format.
         */
-        if ((window_info[id].visual->class != TrueColor) &&
-            (window_info[id].visual->class != DirectColor))
+        if ((window_info[id].visual->klass != TrueColor) &&
+            (window_info[id].visual->klass != DirectColor))
           composite_image->storage_class=PseudoClass;
         composite_image->columns=ximage->width;
         composite_image->rows=ximage->height;
@@ -4447,7 +4447,7 @@ MagickXGetWindowImage(Display *display,const Window window,
               Convert X image to DirectClass packets.
             */
             if ((number_colors != 0) &&
-                (window_info[id].visual->class == DirectColor))
+                (window_info[id].visual->klass == DirectColor))
               for (y=0; y < (long) composite_image->rows; y++)
               {
                 q=SetImagePixels(composite_image,0,y,
@@ -4699,7 +4699,7 @@ MagickXGetWindowInfo(Display *display,
   window->screen=visual_info->screen;
   window->root=XRootWindow(display,visual_info->screen);
   window->visual=visual_info->visual;
-  window->storage_class=visual_info->class;
+  window->storage_class=visual_info->klass;
   window->depth=visual_info->depth;
   window->visual_info=visual_info;
   window->map_info=map_info;
@@ -5317,7 +5317,7 @@ MagickXInitializeWindows(Display *display,
       (void) LogMagickEvent(X11Event,GetMagickModule(),"  visual id: 0x%lx",
         windows->visual_info->visualid);
       (void) LogMagickEvent(X11Event,GetMagickModule(),"  class: %.1024s",
-        MagickXVisualClassName(windows->visual_info->class));
+        MagickXVisualClassName(windows->visual_info->klass));
       (void) LogMagickEvent(X11Event,GetMagickModule(),"  depth: %d planes",
         windows->visual_info->depth);
       (void) LogMagickEvent(X11Event,GetMagickModule(),
@@ -7848,8 +7848,8 @@ MagickXMakeStandardColormap(Display *display,
         }
       return;
     }
-  if ((visual_info->class != DirectColor) &&
-      (visual_info->class != TrueColor))
+  if ((visual_info->klass != DirectColor) &&
+      (visual_info->klass != TrueColor))
     if ((image->storage_class == DirectClass) ||
         ((int) image->colors > visual_info->colormap_size))
       {
@@ -7870,7 +7870,7 @@ MagickXMakeStandardColormap(Display *display,
   colormap=XDefaultColormap(display,visual_info->screen);
   if (visual_info->visual != XDefaultVisual(display,visual_info->screen))
     colormap=XCreateColormap(display,XRootWindow(display,visual_info->screen),
-      visual_info->visual,visual_info->class == DirectColor ?
+      visual_info->visual,visual_info->klass == DirectColor ?
       AllocAll : AllocNone);
   if (colormap == (Colormap) NULL)
     MagickFatalError3(ResourceLimitError,MemoryAllocationFailed,
@@ -7883,7 +7883,7 @@ MagickXMakeStandardColormap(Display *display,
   /*
     Allocating colors in server colormap is based on visual class.
   */
-  switch (visual_info->class)
+  switch (visual_info->klass)
   {
     case StaticGray:
     case StaticColor:
@@ -7904,7 +7904,7 @@ MagickXMakeStandardColormap(Display *display,
         color.red=ScaleQuantumToShort(MagickXRedGamma(image->colormap[i].red));
         color.green=ScaleQuantumToShort(MagickXGreenGamma(image->colormap[i].green));
         color.blue=ScaleQuantumToShort(MagickXBlueGamma(image->colormap[i].blue));
-        if (visual_info->class != StaticColor)
+        if (visual_info->klass != StaticColor)
           {
             gray_value=(unsigned short) PixelIntensity(&color);
             color.red=gray_value;
@@ -8024,7 +8024,7 @@ MagickXMakeStandardColormap(Display *display,
               ScaleQuantumToShort(MagickXGreenGamma(image->colormap[colormap_index].green));
             color.blue=
               ScaleQuantumToShort(MagickXBlueGamma(image->colormap[colormap_index].blue));
-            if (visual_info->class != PseudoColor)
+            if (visual_info->klass != PseudoColor)
               {
                 gray_value=(unsigned short) PixelIntensity(&color);
                 color.red=gray_value;
@@ -8062,7 +8062,7 @@ MagickXMakeStandardColormap(Display *display,
               ScaleQuantumToShort(MagickXGreenGamma(image->colormap[colormap_index].green));
             color.blue=
               ScaleQuantumToShort(MagickXBlueGamma(image->colormap[colormap_index].blue));
-            if (visual_info->class != PseudoColor)
+            if (visual_info->klass != PseudoColor)
               {
                 gray_value=(unsigned short) PixelIntensity(&color);
                 color.red=gray_value;
@@ -8147,7 +8147,7 @@ MagickXMakeStandardColormap(Display *display,
         color.red=ScaleQuantumToShort(MagickXRedGamma(image->colormap[i].red));
         color.green=ScaleQuantumToShort(MagickXGreenGamma(image->colormap[i].green));
         color.blue=ScaleQuantumToShort(MagickXBlueGamma(image->colormap[i].blue));
-        if (visual_info->class != PseudoColor)
+        if (visual_info->klass != PseudoColor)
           {
             gray_value=(unsigned short) PixelIntensity(&color);
             color.red=gray_value;
@@ -8222,7 +8222,7 @@ MagickXMakeStandardColormap(Display *display,
           color.pixel=MagickXStandardPixel(map_info,&color);
           *p++=color;
         }
-      if ((visual_info->class == DirectColor) &&
+      if ((visual_info->klass == DirectColor) &&
           (colormap != XDefaultColormap(display,visual_info->screen)))
         (void) XStoreColors(display,colormap,colors,(int) number_colors);
       else
@@ -8231,8 +8231,8 @@ MagickXMakeStandardColormap(Display *display,
       break;
     }
   }
-  if ((visual_info->class != DirectColor) &&
-      (visual_info->class != TrueColor))
+  if ((visual_info->klass != DirectColor) &&
+      (visual_info->klass != TrueColor))
     {
       /*
         Set foreground, background, border, etc. pixels.

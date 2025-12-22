@@ -77,6 +77,7 @@
 #include "magick/transform.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 #if defined(HasPNG)
 
 /* Suppress libpng pedantic warnings */
@@ -1452,9 +1453,9 @@ static int read_user_chunk_callback(png_struct *ping, png_unknown_chunkp chunk)
 
      image=(Image *) png_get_user_chunk_ptr(ping);
      if (chunk->data[0] < 9)
-       image->orientation = chunk->data[0];
+       image->orientation = (OrientationType) chunk->data[0];
      else
-       image->orientation = 0;
+       image->orientation = UndefinedOrientation;
      return(1);
     }
 
@@ -8601,7 +8602,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
 
   {
     ImageProfileIterator
-      *profile_iterator;
+      profile_iterator;
 
     profile_iterator=AllocateImageProfileIterator(image);
     if (profile_iterator)
@@ -9141,7 +9142,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
   /* write eXIf profile */
   {
     ImageProfileIterator
-      *profile_iterator;
+      profile_iterator;
 
     profile_iterator=AllocateImageProfileIterator(image);
     if (profile_iterator)
@@ -10554,7 +10555,7 @@ static unsigned int WriteMNGImage(const ImageInfo *image_info,Image *image)
           */
           PNGType(chunk,mng_nEED);
           chunk_length = (strlcpy((char *) chunk+4, "CACHEOFF",20));
-          (void) WriteBlobMSBULong(image,(const unsigned long) chunk_length);
+          (void) WriteBlobMSBULong(image,(unsigned long) chunk_length);
           LogPNGChunk(logging,mng_nEED,(unsigned long) chunk_length);
           chunk_length += 4;
           (void) WriteBlob(image,chunk_length,(char *) chunk);

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/monitor.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -165,7 +166,7 @@ static Image *ReadPWPImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if ((count != 5) || (LocaleNCompare((char *) magick,"SFW95",5) != 0))
     ThrowReaderException(CorruptImageError,ImproperImageHeader,pwp_image);
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   for ( ; ; )
   {

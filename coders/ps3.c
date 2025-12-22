@@ -51,6 +51,7 @@
 #include "magick/tempfile.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 #if defined(HasTIFF)
 #define CCITTParam  "-1"
 #else
@@ -816,28 +817,28 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
   {
     case NoCompression:
       FormatString(buffer,
-        "currentfile %lu %lu "PS3_NoCompression" ByteStreamDecodeFilter\n",
+        "currentfile %lu %lu " PS3_NoCompression " ByteStreamDecodeFilter\n",
         image->columns, image->rows);
       break;
     case FaxCompression:
     default:
       FormatString(buffer,
-        "currentfile %lu %lu "PS3_FaxCompression" ByteStreamDecodeFilter\n",
+        "currentfile %lu %lu " PS3_FaxCompression " ByteStreamDecodeFilter\n",
         image->columns, image->rows);
       break;
     case RLECompression:
       FormatString(buffer,
-        "currentfile %lu %lu "PS3_RLECompression" ByteStreamDecodeFilter\n",
+        "currentfile %lu %lu " PS3_RLECompression " ByteStreamDecodeFilter\n",
         image->columns, image->rows);
       break;
     case LZWCompression:
       FormatString(buffer,
-        "currentfile %lu %lu "PS3_LZWCompression" ByteStreamDecodeFilter\n",
+        "currentfile %lu %lu " PS3_LZWCompression " ByteStreamDecodeFilter\n",
         image->columns, image->rows);
       break;
     case ZipCompression:
       FormatString(buffer,
-        "currentfile %lu %lu "PS3_ZipCompression" ByteStreamDecodeFilter\n",
+        "currentfile %lu %lu " PS3_ZipCompression " ByteStreamDecodeFilter\n",
         image->columns, image->rows);
       break;
   }
@@ -989,24 +990,24 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
     "  /r exch def\n"
     "  /c exch def\n"
     "  /ASCII85Decode filter\n"
-    "  z "PS3_FaxCompression" eq\n"
+    "  z " PS3_FaxCompression " eq\n"
     "  {\n"
     "    <<\n"
-    "      /K "CCITTParam"\n"
+    "      /K " CCITTParam "\n"
     "      /Columns c\n"
     "      /Rows r\n"
     "    >>\n"
     "    /CCITTFaxDecode filter\n"
     "  } if\n"
-    "  z "PS3_RLECompression" eq {/RunLengthDecode filter} if\n"
-    "  z "PS3_LZWCompression" eq {/LZWDecode filter} if\n"
-    "  z "PS3_ZipCompression" eq {/FlateDecode filter} if\n"
-    "  z "PS3_JPEGCompression" eq {/DCTDecode filter} if\n"
+    "  z " PS3_RLECompression " eq {/RunLengthDecode filter} if\n"
+    "  z " PS3_LZWCompression " eq {/LZWDecode filter} if\n"
+    "  z " PS3_ZipCompression " eq {/FlateDecode filter} if\n"
+    "  z " PS3_JPEGCompression " eq {/DCTDecode filter} if\n"
     "} bind def\n"
     "\n"
     "/DirectClassImageDict\n"
     "{\n"
-    "  colorspace "PS3_RGBColorspace" eq\n"
+    "  colorspace " PS3_RGBColorspace " eq\n"
     "  {\n"
     "    /DeviceRGB setcolorspace\n"
     "    <<\n"
@@ -1036,7 +1037,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
       for inverted CMYK, so use an inverted decode matrix for
       JPEG compressed CMYK images.
     */
-    "        compression "PS3_JPEGCompression" eq\n"
+    "        compression " PS3_JPEGCompression " eq\n"
     "        {[1 0 1 0 1 0 1 0]}\n"
     "        {[0 1 0 1 0 1 0 1]}\n"
     "        ifelse\n"
@@ -1087,7 +1088,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
     "\n"
     "/NonMaskedImageDict\n"
     "{\n"
-    "  class "PS3_PseudoClass" eq\n"
+    "  class " PS3_PseudoClass " eq\n"
     "  { PseudoClassImageDict }\n"
     "  { DirectClassImageDict }\n"
     "  ifelse\n"

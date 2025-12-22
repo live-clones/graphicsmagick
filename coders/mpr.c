@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -39,6 +39,7 @@
 #include "magick/magick.h"
 #include "magick/registry.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.

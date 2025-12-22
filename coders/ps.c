@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -48,6 +48,7 @@
 #include "magick/monitor.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -377,7 +378,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
         *clone_info;
 
       clone_info=CloneImageInfo(image_info);
-      clone_info->blob=(void *) NULL;
+      clone_info->blob=(_BlobInfoPtr_) NULL;
       clone_info->length=0;
       clone_info->magick[0]='\0';
       clone_info->subimage=0;

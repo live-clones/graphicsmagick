@@ -1171,7 +1171,7 @@ MagickExport Image *CloneImage(const Image *image,const unsigned long columns,
   */
   if (image->profiles)
     {
-      clone_image->profiles=MagickMapCloneMap(image->profiles,exception);
+      clone_image->profiles=MagickMapCloneMap((MagickMap) image->profiles,exception);
       if (clone_image->profiles == (void *) NULL)
         {
           DestroyImage(clone_image);
@@ -1488,7 +1488,7 @@ MagickExport void DestroyImage(Image *image)
   MagickFreeMemory(image->colormap);
   if (image->profiles)
     {
-      MagickMapDeallocateMap(image->profiles);
+      MagickMapDeallocateMap((MagickMap) image->profiles);
       image->profiles=0;
     }
   DestroyImageAttributes(image);

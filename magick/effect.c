@@ -871,7 +871,7 @@ static MagickPassFail BlurImageScanlines(Image *image,const double *kernel,
           if (thread_status == MagickFail)
             continue;
 
-          scanline=AccessThreadViewData(data_set);
+          scanline=(PixelPacket *) AccessThreadViewData(data_set);
           q=GetImagePixelsEx(image,0,y,image->columns,1,exception);
           if (q == (PixelPacket *) NULL)
             thread_status=MagickFail;
@@ -2775,7 +2775,7 @@ MagickExport Image *MedianFilterImage(const Image *image,const double radius,
         if (thread_status == MagickFail)
           continue;
 
-        skiplist=AccessThreadViewData(data_set);
+        skiplist=(MedianPixelList *) AccessThreadViewData(data_set);
         p=AcquireImagePixels(image,-width/2,y-width/2,
                              image->columns+width,width,exception);
         q=SetImagePixelsEx(median_image,0,y,median_image->columns,1,exception);
@@ -3813,7 +3813,7 @@ MagickExport Image *ReduceNoiseImage(const Image *image,const double radius,
       if (thread_status == MagickFail)
         continue;
 
-      skiplist=AccessThreadViewData(data_set);
+      skiplist=(MedianPixelList*) AccessThreadViewData(data_set);
       p=AcquireImagePixels(image,-width/2,y-width/2,
                            image->columns+width,width,exception);
       q=SetImagePixelsEx(noise_image,0,y,noise_image->columns,1,exception);

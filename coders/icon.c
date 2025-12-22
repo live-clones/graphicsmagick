@@ -47,6 +47,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /* http://msdn.microsoft.com/en-us/library/ms997538.aspx */
 

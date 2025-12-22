@@ -56,6 +56,7 @@
 #include "magick/profile.h"
 #include "magick/utility.h"
 #include "magick/resource.h"
+#include "magick/static.h"
 
 #if defined(HasJXL)
 #include <jxl/decode.h>
@@ -475,7 +476,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "JxlThreadParallelRunnerCreate() failed (%"MAGICK_SIZE_T_F"u threads)",
+                                  "JxlThreadParallelRunnerCreate() failed (%" MAGICK_SIZE_T_F "u threads)",
                                   num_worker_threads);
           ThrowJXLReaderException(CoderError,JXLDecoderAPIFailure,image);
         }
@@ -484,7 +485,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "JxlDecoderSetParallelRunner() failed (%"MAGICK_SIZE_T_F"u) threads",
+                                  "JxlDecoderSetParallelRunner() failed (%" MAGICK_SIZE_T_F "u) threads",
                                   num_worker_threads);
           ThrowJXLReaderException(CoderError,JXLDecoderAPIFailure,image);
         }
@@ -812,7 +813,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 
                   if (image->logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                          "ICC profile size %"MAGICK_SIZE_T_F"u",
+                                          "ICC profile size %" MAGICK_SIZE_T_F"u",
                                           profile_size);
 
                   if ((profile=MagickAllocateResourceLimitedMemory(unsigned char *,profile_size))
@@ -1326,7 +1327,7 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
       {
         if (image->logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "JxlThreadParallelRunnerCreate() failed (%"MAGICK_SIZE_T_F"u) threads",
+                                "JxlThreadParallelRunnerCreate() failed (%" MAGICK_SIZE_T_F "u) threads",
                                 num_worker_threads);
         ThrowJXLWriterException(CoderError,JXLEncoderAPIFailure,image);
       }
@@ -1335,7 +1336,7 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
       {
         if (image->logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "JxlDecoderSetParallelRunner() failed (%"MAGICK_SIZE_T_F"u) threads",
+                                "JxlDecoderSetParallelRunner() failed (%" MAGICK_SIZE_T_F "u) threads",
                                 num_worker_threads);
         ThrowJXLWriterException(CoderError,JXLEncoderAPIFailure,image);
       }

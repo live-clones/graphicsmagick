@@ -601,7 +601,7 @@ FindMagickModule(const char *filename,MagickModuleType module_type,
         {
           if (search_path)
             (void) ConcatenateString(&search_path,list_seperator);
-          (void) ConcatenateString(&search_path,
+          (void) ConcatenateString(&search_path,(const char* )
                                    MagickMapDereferenceIterator(path_map_iterator,0));
         }
 
@@ -1042,7 +1042,7 @@ InitializeModuleSearchPath(MagickModuleType module_type,
     /*
       Search hard coded paths.
     */
-    char
+    const char
       *module_directory=NULL;
 
     switch (module_type)

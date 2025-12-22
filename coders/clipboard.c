@@ -36,6 +36,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/magick.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasWINGDI32)
 #  if defined(__CYGWIN__)
 #    include <windows.h>

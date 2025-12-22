@@ -12987,8 +12987,8 @@ static Image *MagickXVisualDirectoryImage(Display *display,
   /*
     Read each image and convert them to a tile.
   */
-  backdrop=(windows->visual_info->class == TrueColor) ||
-   (windows->visual_info->class == DirectColor);
+  backdrop=(windows->visual_info->klass == TrueColor) ||
+   (windows->visual_info->klass == DirectColor);
   clone_info=CloneImageInfo(resource_info->image_info);
   if (clone_info == (ImageInfo *) NULL)
     return((Image *) NULL);
@@ -15382,9 +15382,9 @@ MagickXDisplayImage(Display *display,MagickXResourceInfo *resource_info,
                 &display_image);
         }
     }
-  if ((windows->visual_info->class == GrayScale) ||
-      (windows->visual_info->class == PseudoColor) ||
-      (windows->visual_info->class == DirectColor))
+  if ((windows->visual_info->klass == GrayScale) ||
+      (windows->visual_info->klass == PseudoColor) ||
+      (windows->visual_info->klass == DirectColor))
     {
       /*
         Withdraw pan and Magnify window.

@@ -1,3 +1,8 @@
+2025-12-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* Added type casts, prototypes, and tweaks needed in order to
+	compile the C code using C++.
+
 2025-12-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* PerlMagick/Magick.xs: Ignore inlining warnings.

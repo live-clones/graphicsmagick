@@ -17,6 +17,7 @@
 #include "magick/magick.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declaractions.

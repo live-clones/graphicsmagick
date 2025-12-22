@@ -56,6 +56,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasFPX)
 #  if defined(POSIX)
 #    include <fpxlib.h>

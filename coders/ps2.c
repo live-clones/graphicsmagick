@@ -48,6 +48,7 @@
 #include "magick/monitor.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasTIFF)
 #define CCITTParam  "-1"
 #else
@@ -665,7 +666,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                        "      {\n"
                        "        /DataSource pixel_stream /%.1024s filter\n"
                        "        <<\n"
-                       "           /K "CCITTParam"\n"
+                       "           /K " CCITTParam "\n"
                        "           /Columns columns\n"
                        "           /Rows rows\n"
                        "        >> /CCITTFaxDecode filter\n"

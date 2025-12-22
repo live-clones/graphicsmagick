@@ -198,7 +198,7 @@ static const struct
   CommandVectorHandler  command_vector;
   UsageVectorHandler    usage_vector;
   int                   pass_metadata;
-  RunMode               support_mode;
+  unsigned int          support_mode; /* RunMode flags */
 } commands[] =
   {
 #if defined(HasX11)
@@ -4451,9 +4451,11 @@ static MagickPassFail ConcatenateImages(const int argc,char **argv,
 MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
   int argc,char **argv,char **metadata,ExceptionInfo *exception)
 {
+  const char
+    *format;
+
   char
     *filename,
-    *format,
     *option;
 
   double
@@ -5101,7 +5103,7 @@ MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
                   {
                     char *text;
                     size_t length;
-                    text = FileToBlob(format+1,&length,exception);
+                    text = (char *) FileToBlob(format+1,&length,exception);
                     if (text != (char *) NULL)
                       {
                         TrimStringNewLine(text,length);
@@ -8540,7 +8542,7 @@ MagickExport MagickPassFail IdentifyImageCommand(ImageInfo *image_info,
         if ((*argv[i] == '@') && IsAccessible(argv[i]+1))
           {
             MagickFreeMemory(format);
-            format=FileToBlob(argv[i]+1,&length,exception);
+            format=(char *) FileToBlob(argv[i]+1,&length,exception);
             TrimStringNewLine(format,length);
           }
         else
@@ -10632,7 +10634,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
                  FIXME: Next three lines replace:
                   clone_info->client_data=(void *) &(*image)->iptc_profile;
               */
-              profile_info.name="IPTC";
+              profile_info.name=AcquireString("IPTC"); /* FIXME: Is this okay? */
               profile_info.info=
                 (unsigned char *) GetImageProfile(*image,profile_info.name,
                                                   &profile_info.length);
@@ -10640,6 +10642,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
 
               (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
               profile_image=ReadImage(clone_info,&(*image)->exception);
+              MagickFreeMemory(profile_info.name);
               if (profile_image == (Image *) NULL)
                 {
                   (void) LogMagickEvent(TransformEvent,GetMagickModule(),
@@ -16815,7 +16818,7 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
   int i;
   for (i = 1; i < argc; i++ )
     {
-      char *option;
+      const char *option;
       char *p = argv[i];
       OptionStatus status = OptionUnknown;
 
@@ -16834,24 +16837,32 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
 
         case 'e':
         case 'E':
-          if (LocaleCompare(option = "-escape", p) == 0)
+          if (LocaleCompare("-escape", p) == 0)
             {
               int index;
+              option = "-escape";
               status = GetOptionValueRestricted(option, escape_option_values, argv[++i], &index);
               if (status == OptionSuccess)
                 options->command_line_parser = index ? ParseWindowsCommandLine : ParseUnixCommandLine;
             }
-          else if (LocaleCompare(option = "-echo", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->is_echo_enabled);
+          else if (LocaleCompare("-echo", p) == 0)
+            {
+              option = "-echo";
+              status = GetOnOffOptionValue(option, argv[++i], &options->is_echo_enabled);
+            }
           break;
 
         case 'f':
         case 'F':
-          if (LocaleCompare(option = "-feedback", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->is_feedback_enabled);
-          else if (LocaleCompare(option = "-fail", p) == 0)
+          if (LocaleCompare("-feedback", p) == 0)
+            {
+              option = "-feedback";
+              status = GetOnOffOptionValue(option, argv[++i], &options->is_feedback_enabled);
+            }
+          else if (LocaleCompare("-fail", p) == 0)
             {
               char *value = NULL;
+              option = "-fail";
               status = GetOptionValue(option, argv[++i], &value);
               if (OptionSuccess == status)
                 strlcpy(options->fail, value, sizeof(options->fail));
@@ -16871,15 +16882,17 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
 
         case 'p':
         case 'P':
-          if (LocaleCompare(option = "-pass", p) == 0)
+          if (LocaleCompare("-pass", p) == 0)
             {
               char *value = NULL;
+              option = "-pass";
               status = GetOptionValue(option, argv[++i], &value);
               if (OptionSuccess == status)
                 strlcpy(options->pass, value, sizeof(options->pass));
             }
-          else if (LocaleCompare(option = "-prompt", p) == 0) {
+          else if (LocaleCompare("-prompt", p) == 0) {
               char *value = NULL;
+              option = "-prompt";
               status = GetOptionValue(option, argv[++i], &value);
               if (OptionSuccess == status)
                 strlcpy(options->prompt,
@@ -16890,12 +16903,18 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
 
         case 's':
         case 'S':
-          if (LocaleCompare(option = "-stop-on-error", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->stop_on_error);
+          if (LocaleCompare("-stop-on-error", p) == 0)
+            {
+              option = "-stop-on-error";
+              status = GetOnOffOptionValue(option, argv[++i], &options->stop_on_error);
+            }
           break;
         case 't':
-          if (LocaleCompare(option = "-tap-mode", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->is_tap_mode);
+          if (LocaleCompare("-tap-mode", p) == 0)
+            {
+              option = "-tap-mode";
+              status = GetOnOffOptionValue(option, argv[++i], &options->is_tap_mode);
+            }
           break;
         }
       if (status == OptionSuccess)

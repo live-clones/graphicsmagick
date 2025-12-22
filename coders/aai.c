@@ -35,8 +35,8 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
-
 #define ThrowAAIReaderException(code_,reason_,image_)                  \
   {                                                                    \
     MagickFreeResourceLimitedMemory(unsigned char *,pixels);           \
@@ -44,7 +44,6 @@
   }
 #define AAI_WIDTH_LIMIT 65536UL  /* Artificially limit width to 64K pixels */
 #define AAI_HEIGHT_LIMIT 65536UL /* Artificially limit height to 64K pixels */
-
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

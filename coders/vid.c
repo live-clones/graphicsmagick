@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -45,6 +45,7 @@
 #include "magick/montage.h"
 #include "magick/resize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -174,7 +175,7 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   image=(Image *) NULL;
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   if (clone_info->size == (char *) NULL)
     (void) CloneString(&clone_info->size,DefaultTileGeometry);

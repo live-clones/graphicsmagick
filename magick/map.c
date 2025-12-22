@@ -1087,7 +1087,7 @@ MagickMapCopyString(const void *string, const size_t size)
   ARG_NOT_USED(size);
   if (string)
     {
-      size_t length = strlen(string);
+      size_t length = strlen((const char *) string);
       char *dstring=MagickAllocateMemory(char *,length+1);
       if (dstring != (char *) NULL)
         {
@@ -1234,7 +1234,7 @@ MagickMapCopyResourceLimitedString(const void *string, const size_t size)
   ARG_NOT_USED(size);
   if (string)
     {
-      size_t length = strlen(string);
+      size_t length = strlen((const char *) string);
       char *dstring=MagickAllocateResourceLimitedMemory(char *,length+1);
       if (dstring != (char *) NULL)
         {

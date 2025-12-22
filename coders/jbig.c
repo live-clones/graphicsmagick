@@ -45,6 +45,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/resource.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -55,7 +56,13 @@ static unsigned int
 #endif
 
 #if defined(HasJBIG)
+#if defined(__cplusplus) || defined(c_plusplus)
+extern "C" {
+#endif
 #include "jbig.h"
+#if defined(__cplusplus) || defined(c_plusplus)
+}
+#endif
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %

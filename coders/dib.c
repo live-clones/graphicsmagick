@@ -45,6 +45,7 @@
 #include "magick/render.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Macro definitions (from Windows wingdi.h).

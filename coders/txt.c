@@ -52,6 +52,7 @@
 #include "magick/render.h"
 #include "magick/texture.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 typedef enum
 {
@@ -954,7 +955,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
           *clone_info;
 
         clone_info=CloneImageInfo(image_info);
-        clone_info->blob=(void *) NULL;
+        clone_info->blob=(_BlobInfoPtr_) NULL;
         clone_info->length=0;
         (void) strlcpy(clone_info->filename,image_info->texture,MaxTextExtent);
         texture=ReadImage(clone_info,exception);

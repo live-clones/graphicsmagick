@@ -487,7 +487,7 @@ DestroyThreadViewSet(ThreadViewSet *view_set)
             {
               if (view_set->views[i] != (ViewInfo *) NULL)
                 {
-                  CloseCacheView(view_set->views[i]);
+                  CloseCacheView((ViewInfo *) view_set->views[i]);
                   view_set->views[i]=(ViewInfo *) NULL;
                 }
             }
@@ -1962,7 +1962,7 @@ AcquireCacheNexus(const Image *image,const long x,const long y,
           /*
             Transfer a run of pixels.
           */
-          p=AcquireCacheNexus(image,x+u,y+v,(const unsigned long) length,1,nexus_info->image_nexus,exception);
+          p=AcquireCacheNexus(image,x+u,y+v,(unsigned long) length,1,nexus_info->image_nexus,exception);
           if (p == (const PixelPacket *) NULL)
             break;
           (void) memcpy(q,p,length*sizeof(PixelPacket));

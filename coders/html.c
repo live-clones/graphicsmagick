@@ -44,6 +44,7 @@
 #include "magick/magick.h"
 #include "magick/paint.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.

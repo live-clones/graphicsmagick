@@ -52,6 +52,7 @@
 #include "magick/profile.h"
 #include "magick/resource.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.

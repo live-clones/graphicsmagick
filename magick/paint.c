@@ -38,6 +38,7 @@
 #include "magick/alpha_composite.h"
 #include "magick/color.h"
 #include "magick/monitor.h"
+#include "magick/paint.h"
 #include "magick/pixel_cache.h"
 #include "magick/pixel_iterator.h"
 #include "magick/render.h"

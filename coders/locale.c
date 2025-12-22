@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -41,12 +41,14 @@
 #include "magick/log.h"
 #include "magick/magick.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
 */
 static unsigned int
-  WriteLOCALEImage(const ImageInfo *,Image *);
+WriteLOCALEImage(const ImageInfo *,Image *);
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -820,7 +822,8 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
         char
           *fields[4],
           text[MaxTextExtent],
-          path[MaxTextExtent];
+          path[MaxTextExtent],
+          emptystr[1];
 
         unsigned int
           index;
@@ -829,13 +832,14 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
           *p;
 
         (void) strlcpy(path,locale[i],sizeof(path));
+        emptystr[0]='\0';
         if (*path != '\0')
           {
             p=path+strlen(path)-1;
             if (*p == '/')
               *p='\0';
             for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
+              fields[index]=emptystr;
             for (index=0; (index < 4) && (p > path); p--)
             {
               if (*p == '/')

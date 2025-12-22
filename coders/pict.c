@@ -48,6 +48,7 @@
 #include "magick/tempfile.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   GraphicsMagick Macintosh PICT Methods.
@@ -1246,12 +1247,12 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
   length=(q-pixels);
   if (bytes_per_line > 250)
     {
-      (void) WriteBlobMSBShort(image,(const magick_uint16_t) length);
+      (void) WriteBlobMSBShort(image,(magick_uint16_t) length);
       length+=2;
     }
   else
     {
-      (void) WriteBlobByte(image,(const magick_uint8_t) length);
+      (void) WriteBlobByte(image,(magick_uint8_t) length);
       length++;
     }
   while (q != pixels)
@@ -1946,7 +1947,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
               ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
             blob=blob_alloc;
             clone_info=CloneImageInfo(image_info);
-            clone_info->blob=(void *) NULL;
+            clone_info->blob=(_BlobInfoPtr_) NULL;
             clone_info->length=0;
             (void) strlcpy(clone_info->filename,"JPEG:",sizeof(clone_info->filename));
             if (ReadBlobZC(image,blob_alloc_size,&blob) != blob_alloc_size)
@@ -2360,7 +2361,7 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
     {
       (void) WriteBlobMSBShort(image,0xa1);
       (void) WriteBlobMSBShort(image,0x1f2);
-      (void) WriteBlobMSBShort(image,(const magick_uint16_t) profile_length+4);
+      (void) WriteBlobMSBShort(image,(magick_uint16_t) profile_length+4);
       (void) WriteBlobString(image,"8BIM");
       (void) WriteBlob(image,profile_length,
                        profile_info);
@@ -2373,7 +2374,7 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
     {
       (void) WriteBlobMSBShort(image,0xa1);
       (void) WriteBlobMSBShort(image,0xe0);
-      (void) WriteBlobMSBShort(image,(const magick_uint16_t) profile_length+4);
+      (void) WriteBlobMSBShort(image,(magick_uint16_t) profile_length+4);
       (void) WriteBlobMSBLong(image,0x00000000UL);
       (void) WriteBlob(image,profile_length,
                        profile_info);
@@ -2422,7 +2423,7 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
           return(False);
         }
       (void) WriteBlobMSBShort(image,PictJPEGOp);
-      (void) WriteBlobMSBLong(image,(const magick_uint16_t) length+154);
+      (void) WriteBlobMSBLong(image,(magick_uint16_t) length+154);
       (void) WriteBlobMSBShort(image,0x0000);
       (void) WriteBlobMSBLong(image,0x00010000UL);
       (void) WriteBlobMSBLong(image,0x00000000UL);

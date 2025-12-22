@@ -52,6 +52,7 @@
 #include "magick/monitor.h"
 #include "magick/profile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declaractions.
@@ -805,7 +806,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
           if (scandata == (unsigned char *) NULL)
             ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
           scanline=scandata;
-          MagickBitStreamInitializeRead(&bit_stream,scanline);
+          MagickBitStreamInitializeRead(&bit_stream,(const unsigned char*) scanline);
           for (y=0; y < image->rows; y++)
             {
               q=SetImagePixels(image,0,y,image->columns,1);
@@ -824,7 +825,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
                       if (ReadBlobZC(image,scandata_bytes,&scanline) !=
                           scandata_bytes)
                         break;
-                      MagickBitStreamInitializeRead(&bit_stream,scanline);
+                      MagickBitStreamInitializeRead(&bit_stream,(const unsigned char *) scanline);
                       i=0;
                     }
                   q->red=q->green=q->blue=
@@ -865,7 +866,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
               scanline=scandata;
               if (ReadBlobZC(image,scandata_bytes,&scanline) != scandata_bytes)
                 break;
-              MagickBitStreamInitializeRead(&bit_stream,scanline);
+              MagickBitStreamInitializeRead(&bit_stream,(const unsigned char*) scanline);
               for (x=0 ; x < image->columns; x++)
                 {
                   /*

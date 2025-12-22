@@ -63,7 +63,7 @@ static const struct
 }
 StaticMagic[] =
 {
-#define MAGIC(name,description,offset,magic) {name,(const unsigned char * const)magic,description,sizeof(name)-1,sizeof(description)-1,sizeof(magic)-1,offset}
+#define MAGIC(name,description,offset,magic) {name,(const unsigned char *)magic,description,sizeof(name)-1,sizeof(description)-1,sizeof(magic)-1,offset}
   MAGIC("WEBP", "WebP Image Format", 8, "WEBP"),
   MAGIC("AVIF", "AV1 image", 4, "ftypavif"), /* "image/avif" */
   MAGIC("AVIF", "AV1 image sequence", 4, "ftypavis"), /* "image/avif-sequence" */

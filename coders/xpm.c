@@ -48,6 +48,7 @@
 #include "magick/quantize.h"
 #include "magick/resize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 
 #define MAX_XPM_SUPPORTED_COLORS        Max(0x20000,MaxColormapSize)
@@ -70,8 +71,8 @@ typedef struct xpmkey
 
 static int XPMKeyCompare(const void *l, const void *r)
 {
-  const xpmkey_t * restrict lp = l;
-  const xpmkey_t * restrict rp = r;
+  const xpmkey_t * restrict lp = (const xpmkey_t *) l;
+  const xpmkey_t * restrict rp = (const xpmkey_t *) r;
   int sense;
 
   if (lp->keyval > rp->keyval)
@@ -618,9 +619,9 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (keyval != key.keyval)
                 {
                   key.keyval = keyval;
-                  keyp=(void *) bsearch((const void *) &key,(void *) keys,image->colors,
+                  keyp=(xpmkey_t *) bsearch((const void *) &key,(void *) keys,image->colors,
                                         sizeof(keys[0]),XPMKeyCompare);
-                  if (keyp != (void *) NULL)
+                  if (keyp != (xpmkey_t *) NULL)
                     {
                       key.index = keyp->index;
                     }

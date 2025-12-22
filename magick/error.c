@@ -712,7 +712,7 @@ MagickExport void MagickError(const ExceptionType error,const char *reason,
 MagickExport void _MagickFatalError(const ExceptionType error,const char *reason,
   const char *description)
 {
-  if (fatal_error_handler != (ErrorHandler) NULL)
+  if (fatal_error_handler != (FatalErrorHandler) NULL)
     (*fatal_error_handler)(error,GetLocaleExceptionMessage(error,reason),
       GetLocaleExceptionMessage(error,description));
   errno=0;
@@ -724,7 +724,7 @@ MagickExport void _MagickFatalError(const ExceptionType error,const char *reason
 MagickExport void MagickFatalError(const ExceptionType error,const char *reason,
   const char *description)
 {
-  if (fatal_error_handler != (ErrorHandler) NULL)
+  if (fatal_error_handler != (FatalErrorHandler) NULL)
     (*fatal_error_handler)(error,GetLocaleExceptionMessage(error,reason),
       GetLocaleExceptionMessage(error,description));
   errno=0;

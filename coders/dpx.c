@@ -136,6 +136,7 @@
 #include "magick/resize.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 
 /*
   Define STATIC to nothing so that normally static functions are
@@ -2670,8 +2671,8 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (thread_status == MagickFail)
                 continue;
 
-              samples=AccessThreadViewData(samples_set);
-              scanline=AccessThreadViewData(scanline_set);
+              samples=(sample_t *) AccessThreadViewData(samples_set);
+              scanline=(unsigned char *) AccessThreadViewData(scanline_set);
 
               /*
                 Obtain a row's worth of samples.
