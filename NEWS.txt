@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to November 4, 2025.
+This file was last updated to reflect changes up to December 22, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -60,11 +60,36 @@ Bug fixes:
   be readable by older GraphicsMagick versions (but the fixed
   GraphicsMagick can read older existing files).
 
+* PNM: Support reading PBM raw (P1), PGM raw (P2), and PPM raw (P3)
+  files which lack a newline character at the end of the last line.
+
+* HEIF (HEIC, AVIF, etc.): The identify command was very slow with
+  HEIF, although it always reported accurate information. Now identify
+  is fast but may return wrong results if the image is rotated.  Use
+  '-define heif:ignore-transformations=false' to assure that the
+  values returned are accurate.
+
+* TIFF: Be more pessimistic about claims from libtiff and require that
+  it produce a scanline, strip, or tile, before allocating pixels from
+  the pixel cache. This helps prevent small files from using excessive
+  resources.
+
+* Rendering (-draw/MVG): use the resource-limited memory allocator to
+  provide more resource limit control (for primitive info and graphic
+  contexts).
+
+* GIF: Store image comment in first image frame rather than the last
+  frame.
+
 API Updates:
 
-* None yet.
+* Wand API: Added the MagickSetBackgroundColor() function to support
+  setting the default background color.
 
 New Features:
+
+* HEIF (HEIC, AVIF, etc.): Memory limits and many more libheif
+  resource limits are now applied/available.
 
 * The 'convert' and 'mogrify' subcommands now support -remap, which is
   equivalent to -map.  This is to improve compatibility with
@@ -76,7 +101,11 @@ New Features:
 
 * Command arguments which currently accept "CopyOpacity" now accept
   "CopyAlpha" as a synonym.  This is to improve compatibility with
-  ImageMagick
+  ImageMagick.
+
+* Resource Limited Memory: Added module, function, and line parameters
+  for the purpose of tracing, and to capture the source location where
+  the allocation was made.
 
 Behavior Changes:
 
@@ -84,13 +113,21 @@ Behavior Changes:
   files that newer versions write, but newer GraphicsMagick can still
   read files which were written in the broken format.
 
+* C API: MagickRealloc() now behaves like standard realloc() and the
+  MagickReallocMemory() macro takes responsibility for freeing the
+  original memory upon a reallocation failure.
+
+* Rendering (-draw/MVG): The default image canvas color is now the
+  background color (default white), which may be
+  transparent. Previously, the image was always set to opaque.
+
 Build Changes:
 
-* None yet.
+* It is now supported to build the C code using C++.
 
 Windows Delegate Updates/Additions:
 
-* None yet.
+* Installer: Do not attempt to execute vcredist_x64.exe.
 
 1.3.46 (October 29, 2025)
 ===========================
