@@ -313,7 +313,7 @@ extern ModuleExport void
   UnregisterXWDImage(void),
   UnregisterYUVImage(void);
 
-extern unsigned int
+extern ModuleExport MagickPassFail
   AnalyzeImage(Image **,const int,char**);
 
 #if defined(__cplusplus) || defined(c_plusplus)
