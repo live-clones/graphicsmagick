@@ -1,3 +1,16 @@
+2025-12-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* PerlMagick/MANIFEST: Update the PerlMagick manifest
+
+	* coders/pnm.c (ReadPNMImage): Improve PNM ASCII formats reader
+	error checking.  Addresses oss-fuzz 471328914
+	"graphicsmagick:coder_PNM_fuzzer: Use-of-uninitialized-value in
+	ExportViewPixelArea".
+
+	* PerlMagick/t/input_p1t.pbm, PerlMagick/t/input_p2t.pgm:
+	* PerlMagick/t/input_p3t.ppm add PNM ASCII test files which lack a
+	terminating new-line character.
+
 2025-12-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* NEWS.txt: Update the news.

@@ -132,6 +132,9 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
   unsigned int
     value;
 
+  unsigned int
+    count = 0;
+
   int
     c;
 
@@ -139,19 +142,23 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
     Skip any leading whitespace.
   */
   do
-  {
-    c=ReadBlobByte(image);
-    if (c == EOF)
-      {
-        *status=MagickFail;
-        return(0);
-      }
-  } while (!isdigit(c));
+    {
+      c=ReadBlobByte(image);
+      if (c == EOF)
+        {
+          *status=MagickFail;
+          return(0);
+        }
+    } while (!isdigit(c));
+  count++;
   c &= 0xff;
   if (base == 2)
     {
       if (c > '1')
         {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "ERROR: Unexpected character '%c' @%"
+                                MAGICK_OFF_F "d", c, TellBlob(image));
           *status=MagickFail;
           return(0);
         }
@@ -162,21 +169,35 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
   */
   value=0;
   while(1)
-  {
-    value*=10;
-    value+=c-'0';
-    c=ReadBlobByte(image);
-    if ((c == EOF) || !(isdigit(c)))
-      break;
-    c &= 0xff;
-  }
+    {
+      unsigned int
+        old_value = value;
+
+      old_value=value;
+      value*=10;
+      value+=c-'0';
+      if (value < old_value)
+        {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "ERROR: integer overflow (%u > %u) @%"
+                                MAGICK_OFF_F "d", old_value, value,
+                                TellBlob(image));
+          *status=MagickFail;
+          return(0);
+        }
+      c=ReadBlobByte(image);
+      if ((c == EOF) || !(isdigit(c)))
+        break;
+      count++;
+      c &= 0xff;
+    }
 
   return(value);
 }
 
 static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,MagickPassFail *status)
 {
-  unsigned long
+  unsigned int
     value;
 
   unsigned int
@@ -191,95 +212,98 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,Mag
     Skip any leading whitespace.
   */
   do
-  {
-    c=ReadBlobByte(image);
-    if (c == EOF)
-      return(0);
-    c &= 0xff;
-    if (c == '#')
-      {
-        char
-          *comment;
+    {
+      c=ReadBlobByte(image);
+      if (c == EOF)
+        return(0);
+      c &= 0xff;
+      if (c == '#')
+        {
+          char
+            *comment;
 
-        const ImageAttribute
-          *comment_attr;
+          const ImageAttribute
+            *comment_attr;
 
-        ExtendedSignedIntegralType
-          offset;
+          ExtendedSignedIntegralType
+            offset;
 
-        register char
-          *p,
-          *q;
+          register char
+            *p,
+            *q;
 
-        size_t
-          length;
+          size_t
+            length;
 
-        /*
-          Read comment.
-        */
-        if ((comment_attr=GetImageAttribute(image,"comment")) != (const ImageAttribute *) NULL)
-          {
-            /*
-              If existing comment text length exceeds arbitrary limit,
-              then do no further comment processing for this file.
-            */
-            if (comment_attr->length > MaxTextExtent*2)
+          /*
+            Read comment.
+          */
+          if ((comment_attr=GetImageAttribute(image,"comment")) != (const ImageAttribute *) NULL)
+            {
+              /*
+                If existing comment text length exceeds arbitrary limit,
+                then do no further comment processing for this file.
+              */
+              if (comment_attr->length > MaxTextExtent*2)
+                {
+                  for ( ; (c != EOF) && (c != '\n'); )
+                    c=ReadBlobByte(image);
+                  return 0;
+                }
+            }
+          length=MaxTextExtent;
+          comment=MagickAllocateResourceLimitedMemory(char *,length+sizeof(P7Comment));
+          p=comment;
+          offset=p-comment;
+          if (comment != (char *) NULL)
+            for ( ; (c != EOF) && (c != '\n'); p++)
               {
-                for ( ; (c != EOF) && (c != '\n'); )
-                  c=ReadBlobByte(image);
-                return 0;
-              }
-          }
-        length=MaxTextExtent;
-        comment=MagickAllocateResourceLimitedMemory(char *,length+sizeof(P7Comment));
-        p=comment;
-        offset=p-comment;
-        if (comment != (char *) NULL)
-          for ( ; (c != EOF) && (c != '\n'); p++)
-          {
-            if ((size_t) (p-comment) >= length)
-              {
-                size_t
-                  text_length;
-
-                char
-                  *new_comment;
-
-                text_length=(size_t) (p-comment);
-                length+=MaxTextExtent;
-                new_comment=MagickReallocateResourceLimitedMemory(char *,comment,length+sizeof(P7Comment));
-                if (new_comment == (char *) NULL)
+                if ((size_t) (p-comment) >= length)
                   {
-                    MagickFreeResourceLimitedMemory(char *,comment);
-                    break;
+                    size_t
+                      text_length;
+
+                    char
+                      *new_comment;
+
+                    text_length=(size_t) (p-comment);
+                    length+=MaxTextExtent;
+                    new_comment=MagickReallocateResourceLimitedMemory(char *,comment,length+sizeof(P7Comment));
+                    if (new_comment == (char *) NULL)
+                      {
+                        MagickFreeResourceLimitedMemory(char *,comment);
+                        break;
+                      }
+                    comment=new_comment;
+                    p=comment+text_length;
                   }
-                comment=new_comment;
-                p=comment+text_length;
+                c=ReadBlobByte(image);
+                *p=c;
+                *(p+1)='\0';
               }
-            c=ReadBlobByte(image);
-            *p=c;
-            *(p+1)='\0';
-          }
-        if (comment == (char *) NULL)
-          return(0);
-        q=comment+offset;
-        if (LocaleCompare(q,P7Comment) == 0)
-          *q='\0';
-        /*
-          FIXME:
-          Implicitly extend existing comment attribute since comments
-          can span multiple lines.
-        */
-        (void) SetImageAttribute(image,"comment",comment);
-        MagickFreeResourceLimitedMemory(char *,comment);
-        continue;
-      }
-  } while (!isdigit(c));
+          if (comment == (char *) NULL)
+            return(0);
+          q=comment+offset;
+          if (LocaleCompare(q,P7Comment) == 0)
+            *q='\0';
+          /*
+            FIXME:
+            Implicitly extend existing comment attribute since comments
+            can span multiple lines.
+          */
+          (void) SetImageAttribute(image,"comment",comment);
+          MagickFreeResourceLimitedMemory(char *,comment);
+          continue;
+        }
+    } while (!isdigit(c));
   count++;
   if (base == 2)
     {
       if (c > '1')
         {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "ERROR: Unexpected character '%c' @%"
+                                MAGICK_OFF_F "d", c, TellBlob(image));
           *status=MagickFail;
           return(0);
         }
@@ -290,17 +314,45 @@ static unsigned int PNMIntegerOrComment(Image *image,const unsigned int base,Mag
   */
   value=0;
   while(1)
-  {
-    value*=10;
-    value+=c-'0';
-    c=ReadBlobByte(image);
-    if ((c == EOF) || !(isdigit(c)))
-      break;
-    count++;
-    c &= 0xff;
-  }
+    {
+      unsigned int
+        old_value = value;
+
+      old_value=value;
+      value*=10;
+      value+=c-'0';
+      if (value < old_value)
+        {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "ERROR: integer overflow (%u > %u) @%"
+                                MAGICK_OFF_F "d", old_value, value,
+                                TellBlob(image));
+          *status=MagickFail;
+          return(0);
+        }
+      c=ReadBlobByte(image);
+      if ((c == EOF) || !(isdigit(c)))
+        break;
+      count++;
+      c &= 0xff;
+    }
   if (!count)
-    *status=MagickFail;
+    {
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "ERROR: did not read any digits! @%"
+                            MAGICK_OFF_F "d", TellBlob(image));
+      *status=MagickFail;
+    }
+#if 0
+  do
+    {
+      value*=10;
+      value+=c-'0';
+      c=ReadBlobByte(image);
+      if (c == EOF)
+        return(value);
+    } while (isdigit(c));
+#endif
   return(value);
 }
 
@@ -482,6 +534,9 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
           }
         }
 
+      if (status == MagickFail)
+        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+
       if (PAM_Format == format)
         {
           /*
@@ -533,18 +588,26 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               else if (LocaleCompare(keyword,"HEIGHT") == 0)
                 {
                   image->rows=PNMIntegerOrComment(image,10,&status);
+                  if (status == MagickFail)
+                    ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
                 }
               else if (LocaleCompare(keyword,"WIDTH") == 0)
                 {
                   image->columns=PNMInteger(image,10,&status);
+                  if (status == MagickFail)
+                    ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
                 }
               else if (LocaleCompare(keyword,"DEPTH") == 0)
                 {
                   samples_per_pixel=PNMInteger(image,10,&status);
+                  if (status == MagickFail)
+                    ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
                 }
               else if (LocaleCompare(keyword,"MAXVAL") == 0)
                 {
                   max_value=PNMInteger(image,10,&status);
+                  if (status == MagickFail)
+                    ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
                 }
               else if (LocaleCompare(keyword,"TUPLTYPE") == 0)
                 {
@@ -660,6 +723,9 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
             max_value=1;  /* bitmap */
           else
             max_value=PNMInteger(image,10,&status);
+
+          if (status == MagickFail)
+            ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
 
           switch (format)
             {
@@ -816,12 +882,23 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
             image->is_grayscale=MagickTrue;
             image->is_monochrome=MagickTrue;
-            if ((status == MagickFail) && EOFBlob(image))
+
+
+            if (status == MagickFail)
               {
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "PBM raw (P1) reader EOF at x=%lu, y=%lu", x, y);
-                ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                               image->filename);
+                if (EOFBlob(image))
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "PBM raw (P1) reader EOF at x=%lu, y=%lu", x, y);
+                    ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                                   image->filename);
+                  }
+                else
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "PBM raw (P1) corrupt data at x=%lu, y=%lu", x, y);
+                    ThrowException(exception,CorruptImageError,CorruptImage,image->filename);
+                  }
               }
             break;
           }
@@ -902,12 +979,21 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
             image->is_monochrome=is_monochrome;
             image->is_grayscale=is_grayscale;
-            if ((status == MagickFail) && EOFBlob(image))
+            if (status == MagickFail)
               {
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "PGM raw (P2) reader EOF at x=%lu, y=%lu", x, y);
-                ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                               image->filename);
+                if (EOFBlob(image))
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "PGM raw (P2) reader EOF at x=%lu, y=%lu", x, y);
+                    ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                                   image->filename);
+                  }
+                else
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "PGM raw (P2) corrupt data at x=%lu, y=%lu", x, y);
+                    ThrowException(exception,CorruptImageError,CorruptImage,image->filename);
+                  }
               }
             break;
           }
@@ -970,12 +1056,21 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
             image->is_monochrome=is_monochrome;
             image->is_grayscale=is_grayscale;
-            if ((status == MagickFail) && EOFBlob(image))
+            if (status == MagickFail)
               {
-                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "PNM raw (P3) reader EOF at x=%lu, y=%lu", x, y);
-                ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                               image->filename);
+                if (EOFBlob(image))
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "PNM raw (P3) reader EOF at x=%lu, y=%lu", x, y);
+                    ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                                   image->filename);
+                  }
+                else
+                  {
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "PNM raw (P3) corrupt data at x=%lu, y=%lu", x, y);
+                    ThrowException(exception,CorruptImageError,CorruptImage,image->filename);
+                  }
               }
             break;
           }

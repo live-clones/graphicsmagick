@@ -38,6 +38,19 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-12-24  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>PerlMagick/MANIFEST: Update the PerlMagick manifest</p></li>
+<li><p>coders/pnm.c (ReadPNMImage): Improve PNM ASCII formats reader
+error checking.  Addresses oss-fuzz 471328914
+&quot;graphicsmagick:coder_PNM_fuzzer: Use-of-uninitialized-value in
+ExportViewPixelArea&quot;.</p></li>
+<li><p>PerlMagick/t/input_p1t.pbm, PerlMagick/t/input_p2t.pgm:</p></li>
+<li><p>PerlMagick/t/input_p3t.ppm add PNM ASCII test files which lack a
+terminating new-line character.</p></li>
+</ul>
+</blockquote>
 <p>2025-12-22  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

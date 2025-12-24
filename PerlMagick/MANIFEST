@@ -39,6 +39,7 @@ t/bzlib/write.t
 t/cgm/input.cgm
 t/cgm/read.t
 t/composite.t
+t/definitions.t
 t/features.pl.in
 t/filter.t
 t/fpx/input_256.fpx
@@ -55,6 +56,7 @@ t/hdf/read.t
 t/hdf/write.t
 t/hpgl/input.hpgl
 t/hpgl/read.t
+t/input.aai
 t/input.art
 t/input.avs
 t/input.bie
@@ -72,6 +74,7 @@ t/input.im8
 t/input.mac
 t/input.miff
 t/input.mtv
+t/input.ora
 t/input.p7
 t/input.pam
 t/input.pcx
@@ -90,8 +93,10 @@ t/input.xwd
 t/input1_1.wpg
 t/input1_4.wpg
 t/input1_8_1.wpg
+t/input1_PS.wpg
 t/input2_4.wpg
 t/input2_8.wpg
+t/input2_PS.wpg
 t/input2_TC1.wpg
 t/input_1555.bmp
 t/input_16.miff
@@ -155,8 +160,11 @@ t/input_logical_lsb_08bit.mat
 t/input_matte.miff
 t/input_mono.tga
 t/input_p1.pbm
+t/input_p1t.pbm
 t/input_p2.pgm
+t/input_p2t.pgm
 t/input_p3.ppm
+t/input_p3t.ppm
 t/input_p4.pbm
 t/input_p5.pgm
 t/input_p6.ppm
@@ -199,6 +207,7 @@ t/jp2/read.t
 t/jpeg/input.jnx
 t/jpeg/input.jpg
 t/jpeg/input.sfw
+t/jpeg/input_JPEG.bmp
 t/jpeg/input_plane.jpg
 t/jpeg/read.t
 t/jpeg/write.t
@@ -222,6 +231,7 @@ t/png/input_16.png
 t/png/input_256.png
 t/png/input_bw.png
 t/png/input_mono.png
+t/png/input_PNG.bmp
 t/png/input_truecolor.png
 t/png/read-16.t
 t/png/read.t
@@ -331,6 +341,7 @@ t/reference/jng/write_prog_jdaa.miff
 t/reference/jp2/read_jp2.miff
 t/reference/jp2/read_jpc.miff
 t/reference/jp2/read_pgx.miff
+t/reference/jpeg/input_JPEG.bmp.miff
 t/reference/jpeg/read_jnx.miff
 t/reference/jpeg/read_non_interlaced.miff
 t/reference/jpeg/read_plane_interlaced.miff
