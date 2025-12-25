@@ -4801,6 +4801,8 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
   magick_uint16_t EntryNum;
   magick_uint16_t Tag, Field;
   magick_uint32_t Long2, Value;
+  const size_t Max_IFD_data_Loops = 4096;
+  size_t IFD_data_Loops = 0;
   int FieldCount = 0;
 
   if (*profile_data == 'M')
@@ -4820,17 +4822,21 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
     {
       if (profile_length < (size_t)(IFD_data-profile_data)+2)
         return 0;
-      EntryNum = LD_UINT16(IFD_data);
+      EntryNum = LD_UINT16(IFD_data); /* Number of IFD directory entries */
+      if (logging && (Flags & FLAG_BASE) != 0)
+        (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                             "IFD EntryNum %u", (unsigned) EntryNum);
       if (profile_length < (size_t)(IFD_data-profile_data)+(EntryNum*12))
         return 0;
       IFD_data += 2;
 
-      while (EntryNum>0)
+      while (EntryNum > 0)
         {
-          Tag = LD_UINT16(IFD_data);
-          Field = LD_UINT16(IFD_data+2);
-          Long2 = LD_UINT32(IFD_data+4);
-          Value = LD_UINT32(IFD_data+8);
+          /* Directory Entry */
+          Tag = LD_UINT16(IFD_data);     /* Tag */
+          Field = LD_UINT16(IFD_data+2); /* Tag Type Code */
+          Long2 = LD_UINT32(IFD_data+4); /* Count */
+          Value = LD_UINT32(IFD_data+8); /* Value or Offset */
 
           fip = TIFFFindField(tiff, Tag, TIFF_ANY);
           if (logging && (Flags & FLAG_BASE) != 0)
@@ -4840,7 +4846,8 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                  FipFieldTypeToStr((TIFFDataType) Field),
                                  (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
 
-          if (Tag == TIFFTAG_COLORMAP ||
+          if (Tag == 0 ||
+              Tag == TIFFTAG_COLORMAP ||
               Tag == TIFFTAG_COMPRESSION ||
               Tag == TIFFTAG_IMAGELENGTH ||
               Tag == TIFFTAG_IMAGEWIDTH ||
@@ -4906,7 +4913,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
               goto NextItem;
             }
 
-          if (fip!=NULL && (Flags & FLAG_BASE)!=0)           /* libtiff doesn't understand these */
+          if (fip != NULL && (Flags & FLAG_BASE)!=0)           /* libtiff doesn't understand these */
             {
               const TIFFDataType FDT = TIFFFieldDataType(fip);
               const int WriteCount = TIFFFieldWriteCount(fip);
@@ -4967,11 +4974,11 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                   goto Scalar;
 
                 case TIFF_LONG:
-                  if (WriteCount!=1)
+                  if (WriteCount != 1)
                     {
                       magick_uint32_t *Array;
                       magick_uint32_t i;
-                      if (FDT!=Field)
+                      if (FDT != Field)
                         break;                        /* Incompatible array type, might be converted in future. */
                       if (WriteCount != TIFF_VARIABLE && WriteCount != TIFF_VARIABLE2)
                         {
@@ -5150,7 +5157,17 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
       if (Value >= profile_length)
         break;
       IFD_data = profile_data+Value;
-    } while (Value>8);
+      /*
+        It is possible for the calculated IFD_data to create a
+        non-terminal loop by computing the same IFD or one earlier in
+        IFD list.  Defend against this by placing a limit on loops.
+      */
+      IFD_data_Loops++;
+    } while ((IFD_data_Loops < Max_IFD_data_Loops) && (Value > 8));
+
+  if ((logging && (Flags & FLAG_BASE) != 0) && (IFD_data_Loops == Max_IFD_data_Loops))
+    (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                         "IFD looping detected!");
 
   return FieldCount;
 }

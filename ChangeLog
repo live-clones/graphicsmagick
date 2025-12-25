@@ -1,3 +1,10 @@
+2025-12-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (AddIFDExifFields): Defend against computed IFD
+	looping which results in non-terminal behavior. Addresses oss-fuzz
+	471415255 "graphicsmagick:coder_TIFF_any_fuzzer: Timeout in
+	coder_TIFF_any_fuzzer".
+
 2025-12-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* PerlMagick/MANIFEST: Update the PerlMagick manifest
