@@ -1,3 +1,9 @@
+2025-12-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* coders/tiff.c (AddIFDExifFields): Detect and report the
+	immediate IFD looping case (as occured with oss-fuzz 471415255)
+	and quit looping immediately.
+
 2025-12-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/tiff.c (AddIFDExifFields): Defend against computed IFD

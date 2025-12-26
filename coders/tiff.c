@@ -4803,6 +4803,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
   magick_uint32_t Long2, Value;
   const size_t Max_IFD_data_Loops = 4096;
   size_t IFD_data_Loops = 0;
+  MagickBool continue_looping = MagickTrue;
   int FieldCount = 0;
 
   if (*profile_data == 'M')
@@ -4820,6 +4821,9 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
 
   do
     {
+      const unsigned char *Orig_IFD_data
+        = IFD_data;
+
       if (profile_length < (size_t)(IFD_data-profile_data)+2)
         return 0;
       EntryNum = LD_UINT16(IFD_data); /* Number of IFD directory entries */
@@ -5160,14 +5164,23 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
       /*
         It is possible for the calculated IFD_data to create a
         non-terminal loop by computing the same IFD or one earlier in
-        IFD list.  Defend against this by placing a limit on loops.
+        IFD list.  Defend against this by placing a limit on loops, as
+        well as detecting the immediate looping case.
       */
       IFD_data_Loops++;
-    } while ((IFD_data_Loops < Max_IFD_data_Loops) && (Value > 8));
+      if (Orig_IFD_data == IFD_data)
+        {
+          (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                               "IFD direct loop detected!");
+          continue_looping = MagickFalse; /* Break looping */
+        }
+      if (IFD_data_Loops == Max_IFD_data_Loops)
+        continue_looping = MagickFalse;
+    } while ((continue_looping) && (Value > 8));
 
-  if ((logging && (Flags & FLAG_BASE) != 0) && (IFD_data_Loops == Max_IFD_data_Loops))
+  if ((logging && (Flags & FLAG_BASE) != 0) && (!continue_looping))
     (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                         "IFD looping detected!");
+                         "IFD looping detected (%zu loops)!", IFD_data_Loops);
 
   return FieldCount;
 }
