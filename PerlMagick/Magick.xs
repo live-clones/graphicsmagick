@@ -77,19 +77,19 @@ extern "C" {
 /*
   Define declarations.
 */
-#define ArrayReference  (char **) 4
+#define ArrayReference  (const char **) 4
 #ifndef aTHX_
 #define aTHX_
 #define pTHX_
 #define dTHX
 #endif
 #define DegreesToRadians(x) ((x)*3.14159265358979323846/180.0)
-#define DoubleReference  (char **) 2
+#define DoubleReference  (const char **) 2
 #define EndOf(array)  (&array[NumberOf(array)])
 #define False  0
-#define NullReference  (char **) 0
-#define ImageReference  (char **) 3
-#define IntegerReference  (char **) 1
+#define NullReference  (const char **) 0
+#define ImageReference  (const char **) 3
+#define IntegerReference  (const char **) 1
 #define MaxArguments  28
 #define MY_CXT_KEY  PackageName "::ContextKey_" XS_VERSION
 #ifndef START_MY_CXT
@@ -105,7 +105,7 @@ extern "C" {
 #ifndef PerlIO_findFILE
 #define PerlIO_findFILE(f)  (FILE *) (f)
 #endif
-#define StringReference  (char **) 0
+#define StringReference  (const char **) 0
 #ifndef sv_undef
 #define sv_undef  PL_sv_undef
 #endif
@@ -116,7 +116,7 @@ extern "C" {
 */
 typedef struct _Arguments
 {
-  char
+  const char
     *method,
     **type;
 } Arguments;
@@ -129,7 +129,7 @@ struct ArgumentList
   double
     double_reference;
 
-  char
+  const char
     *string_reference;
 
   Image
@@ -170,29 +170,29 @@ typedef void
   Static declarations.  The strings in this list must be expressed
   in the exact same order as the equivalent enumeration.
 */
-static char
+static const char
   *AlignTypes[] =
   {
-    "Undefined", "Left", "Center", "Right", (char *) NULL
+    "Undefined", "Left", "Center", "Right", (const char *) NULL
   },
   *BooleanTypes[] =
   {
-    "False", "True", (char *) NULL
+    "False", "True", (const char *) NULL
   },
   *ChannelTypes[] =
   {
     "Undefined", "Red", "Cyan", "Green", "Magenta", "Blue", "Yellow",
-    "Opacity", "Black", "Matte", "All", "Gray", (char *) NULL
+    "Opacity", "Black", "Matte", "All", "Gray", (const char *) NULL
   },
   *ClassTypes[] =
   {
-    "Undefined", "DirectClass", "PseudoClass", (char *) NULL
+    "Undefined", "DirectClass", "PseudoClass", (const char *) NULL
   },
   *ColorspaceTypes[] =
   {
     "Undefined", "RGB", "Gray", "Transparent", "OHTA", "XYZ", "YCC",
     "YIQ", "YPbPr", "YUV", "CMYK", "sRGB", "HSL", "HWB", "LAB",  "CineonLog",
-    "Rec601Luma", "Rec601YCbCr", "Rec709Luma", "Rec709YCbCr", (char *) NULL
+    "Rec601Luma", "Rec601YCbCr", "Rec709Luma", "Rec709YCbCr", (const char *) NULL
   },
   *CompositeTypes[] =
   {
@@ -205,74 +205,74 @@ static char
     "HardLight", "Exclusion", "ColorDodge", "ColorBurn", "SoftLight",
     "LinearBurn", "LinearDodge", "LinearLight", "VividLight", "PinLight",
     "HardMix",
-    (char *) NULL
+    (const char *) NULL
   },
   *CompressionTypes[] =
   {
     "Undefined", "None", "BZip", "Fax", "Group4", "JPEG", "LosslessJPEG",
     "LZW", "RLE", "Zip", "LZMA", "JPEG2000", "JBIG1", "JBIG2", "ZSTD",
     "WebP",
-    (char *) NULL
+    (const char *) NULL
   },
   *DecorationTypes[] =
   {
     "None", "Underline", "Overline", "LineThrough",
-    (char *) NULL
+    (const char *) NULL
   },
   *DisposeTypes[] =
   {
-    "Undefined", "None", "Background", "Previous", (char *) NULL
+    "Undefined", "None", "Background", "Previous", (const char *) NULL
   },
   *EndianTypes[] =
   {
-    "Undefined", "LSB", "MSB", "Native", (char *) NULL
+    "Undefined", "LSB", "MSB", "Native", (const char *) NULL
   },
   *FilterTypess[] =
   {
     "Undefined", "Point", "Box", "Triangle", "Hermite", "Hanning",
     "Hamming", "Blackman", "Gaussian", "Quadratic", "Cubic", "Catrom",
-    "Mitchell", "Lanczos", "Bessel", "Sinc", (char *) NULL
+    "Mitchell", "Lanczos", "Bessel", "Sinc", (const char *) NULL
   },
   *GravityTypes[] =
   {
     "Forget", "NorthWest", "North", "NorthEast", "West", "Center",
-    "East", "SouthWest", "South", "SouthEast", "Static", (char *) NULL
+    "East", "SouthWest", "South", "SouthEast", "Static", (const char *) NULL
   },
   *ImageTypes[] =
   {
     "Undefined", "Bilevel", "Grayscale", "GrayscaleMatte", "Palette",
     "PaletteMatte", "TrueColor", "TrueColorMatte", "ColorSeparation",
-    "ColorSeparationMatte", "Optimize", (char *) NULL
+    "ColorSeparationMatte", "Optimize", (const char *) NULL
   },
   *IntentTypes[] =
   {
     "Undefined", "Saturation", "Perceptual", "Absolute", "Relative",
-    (char *) NULL
+    (const char *) NULL
   },
   *InterlaceTypes[] =
   {
-    "Undefined", "None", "Line", "Plane", "Partition", (char *) NULL
+    "Undefined", "None", "Line", "Plane", "Partition", (const char *) NULL
   },
 /*
   *LogEventTypes[] =
   {
     "No", "Configure", "Annotate", "Render", "Transform", "Locale",
     "Coder", "X11", "Cache", "Blob", "Deprecate", "User", "Resource",
-    "TemporaryFile", "Exception", "All", (char *) NULL
+    "TemporaryFile", "Exception", "All", (const char *) NULL
   },
 */
   *MethodTypes[] =
   {
-    "Point", "Replace", "Floodfill", "FillToBorder", "Reset", (char *) NULL
+    "Point", "Replace", "Floodfill", "FillToBorder", "Reset", (const char *) NULL
   },
   *ModeTypes[] =
   {
-    "Undefined", "Frame", "Unframe", "Concatenate", (char *) NULL
+    "Undefined", "Frame", "Unframe", "Concatenate", (const char *) NULL
   },
   *NoiseTypes[] =
   {
     "Uniform", "Gaussian", "Multiplicative", "Impulse", "Laplacian",
-    "Poisson", "Random", (char *) NULL
+    "Poisson", "Random", (const char *) NULL
   },
   *PreviewTypes[] =
   {
@@ -281,38 +281,38 @@ static char
     "Despeckle", "ReduceNoise", "AddNoise", "Sharpen", "Blur",
     "Threshold", "EdgeDetect", "Spread", "Solarize", "Shade", "Raise",
     "Segment", "Swirl", "Implode", "Wave", "OilPaint", "Charcoal",
-    "JPEG", (char *) NULL
+    "JPEG", (const char *) NULL
   },
   *PrimitiveTypes[] =
   {
     "Undefined", "point", "line", "rectangle", "roundRectangle", "arc",
     "ellipse", "circle", "polyline", "polygon", "bezier", "path", "color",
-    "matte", "text", "image", (char *) NULL
+    "matte", "text", "image", (const char *) NULL
   },
   *ResolutionTypes[] =
   {
-    "Undefined", "PixelsPerInch", "PixelsPerCentimeter", (char *) NULL
+    "Undefined", "PixelsPerInch", "PixelsPerCentimeter", (const char *) NULL
   },
   *StretchTypes[] =
   {
     "Normal", "UltraCondensed", "ExtraCondensed", "Condensed",
     "SemiCondensed", "SemiExpanded", "Expanded", "ExtraExpanded",
-    "UltraExpanded", "Any", (char *) NULL
+    "UltraExpanded", "Any", (const char *) NULL
   },
   *StyleTypes[] =
   {
-    "Normal", "Italic", "Oblique", "Any", (char *) NULL
+    "Normal", "Italic", "Oblique", "Any", (const char *) NULL
   },
   *VirtualPixelMethods[] =
   {
     "Undefined", "", "Constant", "Edge", "Mirror", "Tile",
-    (char *) NULL
+    (const char *) NULL
   };
 
 static struct
   Methods
   {
-    char
+    const char
       *name;
 
     Arguments
@@ -972,13 +972,13 @@ static struct PackageInfo *GetPackageInfo(pTHX_ void *reference,
 %
 %
 */
-static int LookupStr(char **list,const char *string)
+static int LookupStr(const char **list,const char *string)
 {
   int
     longest,
     offset;
 
-  register char
+  register const char
     **p;
 
   offset=(-1);
@@ -1150,7 +1150,7 @@ static void MagickWarningHandler(const ExceptionType severity,
 %
 */
 static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
-  char *attribute,SV *sval)
+  const char *attribute,SV *sval)
 {
   DoublePixelPacket
     pixel;
@@ -4704,12 +4704,14 @@ Mogrify(ref,...)
       affine,
       current;
 
-    char
+    const char
       *attribute,
+      *value;
+
+    char
       /* absolute_geometry[MaxTextExtent], */
       attribute_flag[MaxArguments],
-      message[MaxTextExtent],
-      *value;
+      message[MaxTextExtent];
 
     double
       angle;
@@ -4934,8 +4936,8 @@ Mogrify(ref,...)
         {
           char *translated_text;
           if (!attribute_flag[0])
-            argument_list[0].string_reference=(char *) NULL;
-          (void) SetImageAttribute(image,"comment",(char *) NULL);
+            argument_list[0].string_reference=(const char *) NULL;
+          (void) SetImageAttribute(image,"comment",(const char *) NULL);
           translated_text=TranslateText(info->image_info,image,argument_list[0].string_reference);
           if (translated_text != (char *) NULL)
             {
@@ -4948,8 +4950,8 @@ Mogrify(ref,...)
         {
           char *translated_text;
           if (!attribute_flag[0])
-            argument_list[0].string_reference=(char *) NULL;
-          (void) SetImageAttribute(image,"label",(char *) NULL);
+            argument_list[0].string_reference=(const char *) NULL;
+          (void) SetImageAttribute(image,"label",(const char *) NULL);
           translated_text=TranslateText(info->image_info,image,argument_list[0].string_reference);
           if (translated_text != (char *) NULL)
             {
@@ -6064,7 +6066,7 @@ Mogrify(ref,...)
           count=sscanf(argument_list[0].string_reference,"%lf",&threshold);
           if (count > 0)
             {
-              if (strchr(argument_list[0].string_reference,'%') != (char *) NULL)
+              if (strchr(argument_list[0].string_reference,'%') != (const char *) NULL)
                   threshold *=  MaxRGB/100.0;
                 (void) ThresholdImage(image,threshold);
             }
@@ -6197,7 +6199,7 @@ Mogrify(ref,...)
           if (!attribute_flag[0])
             argument_list[0].string_reference="*";
           if (!attribute_flag[1])
-            argument_list[1].string_reference=(char *) NULL;
+            argument_list[1].string_reference=(const char *) NULL;
           (void) ProfileImage(image,argument_list[0].string_reference,
             (unsigned char *) argument_list[1].string_reference,
             argument_list[1].length,True);
@@ -6424,7 +6426,7 @@ Mogrify(ref,...)
             {
               (void) sscanf(argument_list[0].string_reference,"%lux%lu%lf",
                 &width,&height,&offset);
-               if (strchr(argument_list[0].string_reference,'%') != (char *) NULL)
+               if (strchr(argument_list[0].string_reference,'%') != (const char *) NULL)
                  offset*=(double) MaxRGB/100.0;
             }
           image=AdaptiveThresholdImage(image,width,height,offset,&exception);

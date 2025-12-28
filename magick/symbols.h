@@ -480,7 +480,6 @@
 #define InitializeTemporaryFiles GmInitializeTemporaryFiles
 #define InitializeTypeInfo GmInitializeTypeInfo
 #define InsertImageInList GmInsertImageInList
-#define InsertRowHDU GmInsertRowHDU
 #define InterlaceTypeToString GmInterlaceTypeToString
 #define InterpolateColor GmInterpolateColor
 #define InterpolateViewColor GmInterpolateViewColor
@@ -1154,9 +1153,7 @@
 #define WriteBlobMSBShort GmWriteBlobMSBShort
 #define WriteBlobMSBSignedLong GmWriteBlobMSBSignedLong
 #define WriteBlobMSBSignedShort GmWriteBlobMSBSignedShort
-#define WriteBlobStringEOL GmWriteBlobStringEOL
 #define WriteBlobString GmWriteBlobString
-#define WriteBlobStringWithEOL GmWriteBlobStringWithEOL
 #define WriteImage GmWriteImage
 #define WriteImagesFile GmWriteImagesFile
 #define WriteImages GmWriteImages

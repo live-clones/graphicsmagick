@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2009-2015 GraphicsMagick Group
+% Copyright (C) 2009-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -43,7 +43,7 @@ static MagickTsdKey_t kernel_key = (MagickTsdKey_t) 0;
   Acquire the default random number kernel.  Memory is owned by
   library and should not be freed.
 */
-MagickExport MagickRandomKernel* AcquireMagickRandomKernel()
+MagickExport MagickRandomKernel* AcquireMagickRandomKernel(void)
 {
   MagickRandomKernel
     *kernel;

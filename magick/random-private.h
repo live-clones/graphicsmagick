@@ -20,17 +20,17 @@ MagickExport void InitializeMagickRandomKernel(MagickRandomKernel *kernel);
   Acquire the default random number kernel.  Memory is owned by
   library and should not be freed.
 */
-MagickExport MagickRandomKernel* AcquireMagickRandomKernel();
+MagickExport MagickRandomKernel* AcquireMagickRandomKernel(void);
 
 /*
   Initialize the random number generator system.
 */
-extern void InitializeMagickRandomGenerator();
+extern void InitializeMagickRandomGenerator(void);
 
 /*
   Destroy the random number generator system.
 */
-extern void DestroyMagickRandomGenerator();
+extern void DestroyMagickRandomGenerator(void);
 
 /*
   You may replace the following two constants MAGICK_RANDOM_ZC and

@@ -261,6 +261,8 @@ static DicomElemParseFunc funcDCM_TriggerTime;
 static DicomElemParseFunc funcDCM_WindowCenter;
 static DicomElemParseFunc funcDCM_WindowWidth;
 
+static void DCM_SetRescaling(DicomStream *dcm,int avoid_scaling);
+
 /*
   Function vectors for supported DICOM element parsing functions.
 
@@ -6541,7 +6543,7 @@ static MagickPassFail DCM_SetupRescaleMap(Image *image,DicomStream *dcm,Exceptio
   return MagickPass;
 }
 
-void DCM_SetRescaling(DicomStream *dcm,int avoid_scaling)
+static void DCM_SetRescaling(DicomStream *dcm,int avoid_scaling)
 {
   /*
     If avoid_scaling is True then scaling will only be applied where necessary ie

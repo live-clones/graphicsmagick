@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012-2024 GraphicsMagick Group
+  Copyright (C) 2012-2025 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -299,6 +299,7 @@
 #define MagickSampleImage GmMagickSampleImage
 #define MagickScaleImage GmMagickScaleImage
 #define MagickSeparateImageChannel GmMagickSeparateImageChannel
+#define MagickSetBackgroundColor GmMagickSetBackgroundColor
 #define MagickSetCompressionQuality GmMagickSetCompressionQuality
 #define MagickSetDepth GmMagickSetDepth
 #define MagickSetFilename GmMagickSetFilename

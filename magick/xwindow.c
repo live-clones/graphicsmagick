@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -5757,6 +5757,8 @@ MagickXMakeImage(Display *display,
       (void) XSync(display,False);
       xerror_alert=False;
       segment_info=(XShmSegmentInfo *) window->segment_info;
+      if (segment_info == (XShmSegmentInfo *) NULL)
+        return(False);
       ximage->data=segment_info[1].shmaddr;
       segment_info[1].readOnly=False;
       shm_attached=XShmAttach(display,&segment_info[1]);

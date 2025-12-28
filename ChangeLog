@@ -1,3 +1,39 @@
+2025-12-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* PerlMagick/Magick.xs: Make code const-correct.
+
+	* wand/wand_symbols.h: Add GmMagickSetBackgroundColor().
+
+	* magick/symbols.h: Remove GmInsertRowHDU(),
+	GmWriteBlobStringEOL(), and GmWriteBlobStringWithEOL().
+
+	* magick/render.h: Add missing prototype for DrawCompositeMask().
+
+	* magick/random.c (AcquireMagickRandomKernel): Provide
+	AcquireMagickRandomKernel() with a proper prototype.
+
+	* magick/random-private.h: Provide AcquireMagickRandomKernel(),
+	InitializeMagickRandomGenerator(), DestroyMagickRandomGenerator()
+	with proper prototypes.
+
+	* coders/locale.c: Add missing prototypes for WriteBlobStringEOL()
+	and WriteBlobStringWithEOL() and declare them to be static.
+
+	* coders/fits.c: Add missing prototype for InsertRowHDU() and
+	declare it static.
+
+	* coders/dcm.c: Add missing prototype for DCM_SetRescaling() and
+	declare it static.
+
+	* wand/pixel_wand.h: Add missing prototype for
+	PixelGetException().
+
+	* wand/magick_wand.h: Add missing prototypes for
+	MagickSetBackgroundColor() and MagickSetDepth().
+
+	* magick/xwindow.c (MagickXMakeImage): Defend against
+	window->segment_info unexpectedly being NULL.
+
 2025-12-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* coders/tiff.c (AddIFDExifFields): Detect and report the

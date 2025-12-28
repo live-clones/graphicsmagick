@@ -49,6 +49,12 @@
 static unsigned int
 WriteLOCALEImage(const ImageInfo *,Image *);
 
+static void
+WriteBlobStringEOL(Image *image);
+
+static void
+WriteBlobStringWithEOL(Image *image,const char *s);
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -735,7 +741,7 @@ static void output_switches(Image *image,struct locale_str *locstr, int indent, 
     (void) WriteBlobString(image,message);
 }
 
-void WriteBlobStringEOL(Image *image)
+static void WriteBlobStringEOL(Image *image)
 {
 #if defined(MSWINDOWS)
   (void) WriteBlobString(image,"\r\n");
@@ -744,7 +750,7 @@ void WriteBlobStringEOL(Image *image)
 #endif
 }
 
-void WriteBlobStringWithEOL(Image *image,const char *s)
+static void WriteBlobStringWithEOL(Image *image,const char *s)
 {
   (void) WriteBlobString(image,s);
 #if defined(MSWINDOWS)

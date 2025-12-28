@@ -54,6 +54,9 @@
 */
 static unsigned int
   WriteFITSImage(const ImageInfo *,Image *);
+
+static int
+InsertRowHDU(char *buffer, const char *data, int offset);
 
 
 #define FITS_BLOCK_SIZE 2880
@@ -788,7 +791,7 @@ ModuleExport void UnregisterFITSImage(void)
   data   - string data to append at offset
   offset - offset into FITS record to write the data.
 */
-int InsertRowHDU(char *buffer, const char *data, int offset)
+static int InsertRowHDU(char *buffer, const char *data, int offset)
 {
   size_t
     len;

@@ -38,6 +38,33 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-12-28  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>PerlMagick/Magick.xs: Make code const-correct.</p></li>
+<li><p>wand/wand_symbols.h: Add GmMagickSetBackgroundColor().</p></li>
+<li><p>magick/symbols.h: Remove GmInsertRowHDU(),
+GmWriteBlobStringEOL(), and GmWriteBlobStringWithEOL().</p></li>
+<li><p>magick/render.h: Add missing prototype for DrawCompositeMask().</p></li>
+<li><p>magick/random.c (AcquireMagickRandomKernel): Provide
+AcquireMagickRandomKernel() with a proper prototype.</p></li>
+<li><p>magick/random-private.h: Provide AcquireMagickRandomKernel(),
+InitializeMagickRandomGenerator(), DestroyMagickRandomGenerator()
+with proper prototypes.</p></li>
+<li><p>coders/locale.c: Add missing prototypes for WriteBlobStringEOL()
+and WriteBlobStringWithEOL() and declare them to be static.</p></li>
+<li><p>coders/fits.c: Add missing prototype for InsertRowHDU() and
+declare it static.</p></li>
+<li><p>coders/dcm.c: Add missing prototype for DCM_SetRescaling() and
+declare it static.</p></li>
+<li><p>wand/pixel_wand.h: Add missing prototype for
+PixelGetException().</p></li>
+<li><p>wand/magick_wand.h: Add missing prototypes for
+MagickSetBackgroundColor() and MagickSetDepth().</p></li>
+<li><p>magick/xwindow.c (MagickXMakeImage): Defend against
+window-&gt;segment_info unexpectedly being NULL.</p></li>
+</ul>
+</blockquote>
 <p>2025-12-26  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
