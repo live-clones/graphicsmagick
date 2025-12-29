@@ -488,11 +488,17 @@ static struct
 /*
   Forward declarations.
 */
+#if !defined(MAGICK_FUNC_PURE)
+#  define MAGICK_FUNC_PURE
+#endif
 static Image
   *SetupList(pTHX_ SV *,struct PackageInfo **,SV ***);
 
 static int
-  strEQcase(const char *,const char *);
+  strEQcase(const char *,const char *) MAGICK_FUNC_PURE;
+
+static int
+  LookupStr(const char **list,const char *string) MAGICK_FUNC_PURE;
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

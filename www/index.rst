@@ -64,6 +64,7 @@ version of this page.
 .. _`ASan` : https://github.com/google/sanitizers/wiki/AddressSanitizer
 .. _`UBSan` : https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
 .. _`oss-fuzz` : https://github.com/google/oss-fuzz
+.. _`oss-fuzz open issues` : https://issues.oss-fuzz.com/issues?q=status:open%20graphicsmagick
 .. _`Coverity Analysis Metrics` : https://scan.coverity.com/projects/graphicsmagick
 
 GraphicsMagick is the swiss army knife of image processing. Comprised
@@ -127,7 +128,7 @@ other popular software:
 
   * GM suffers from fewer security issues and exploits than ImageMagick.
 
-  * GM participates in Google's `oss-fuzz`_ project (since February, 2018).
+  * GM participates in Google's `oss-fuzz`_ project since 2018 (see `oss-fuzz open issues`).
 
   * GM `valgrind`_'s 100% clean (memcheck and helgrind).
 

@@ -1,3 +1,11 @@
+2025-12-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+	* PerlMagick/Magick.xs: Declare LookupStr() and strEQcase() to be
+	pure functions.
+
+	* www/index.rst: Provide a link to view oss-fuzz open
+	issues pertaining to GraphicsMagick.
+
 2025-12-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
 	* PerlMagick/Magick.xs: Make code const-correct.
