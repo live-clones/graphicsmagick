@@ -1078,7 +1078,7 @@ MagickExport MagickPassFail CloseBlob(Image *image)
         case PipeStream:
           {
 #if defined(HAVE_PCLOSE)
-            if (pclose(blob->handle.std) != 0)
+            if (pclose(blob->handle.std) == -1)
               {
                 if (!status)
                   {

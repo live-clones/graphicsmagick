@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -124,6 +124,19 @@ static unsigned int IsEPT(const unsigned char *magick,const size_t length)
 %
 */
 #if defined(HasGS)
+#define ThrowReaderExceptionOnFOpFailure(Op,DoClose)                    \
+  {                                                                     \
+    if (Op)                                                             \
+      {                                                                 \
+        if ((DoClose) != 0)                                             \
+          (void) fclose(file);                                          \
+        (void) LiberateTemporaryFile(postscript_filename);              \
+        ThrowReaderException(CorruptImageError,                         \
+                             AnErrorHasOccurredWritingToFile,           \
+                             image);                                    \
+      }                                                                 \
+  }
+
 static Image *ReadEPTImage(const ImageInfo *image_info,
   ExceptionInfo *exception)
 {
@@ -248,7 +261,7 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
   if (file == (FILE *) NULL)
       ThrowReaderTemporaryFileException(postscript_filename);
   FormatString(translate_geometry,"%g %g translate\n              ",0.0,0.0);
-  (void) fputs(translate_geometry,file);
+  ThrowReaderExceptionOnFOpFailure(fputs(translate_geometry,file) == EOF,1);
   /*
     Copy Postscript to temporary file.
   */
@@ -267,7 +280,7 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
   {
     if ((c=ReadBlobByte(image)) == EOF)
       break;
-    (void) fputc(c,file);
+    ThrowReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
     *p++=c;
     if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
       continue;
@@ -315,17 +328,12 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Page geometry: %s",geometry);
-  if (ferror(file))
-    {
-      (void) fclose(file);
-      (void) LiberateTemporaryFile(postscript_filename);
-      ThrowReaderException(CorruptImageError,AnErrorHasOccurredWritingToFile,
-        image)
-    }
-  (void) rewind(file);
-  (void) fputs(translate_geometry,file);
-  (void) fclose(file);
-  CloseBlob(image);
+  ThrowReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
+  ThrowReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
+  ThrowReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowReaderExceptionOnFOpFailure(fclose(file),0);
+  ThrowReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
   filesize=GetBlobSize(image);
   DestroyImage(image);
   image=(Image *) NULL;

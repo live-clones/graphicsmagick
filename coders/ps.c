@@ -128,6 +128,19 @@ static unsigned int IsPS(const unsigned char *magick,const size_t length)
 %
 */
 #if defined(HasGS)
+#define ThrowReaderExceptionOnFOpFailure(Op,DoClose)                    \
+  {                                                                     \
+    if (Op)                                                             \
+      {                                                                 \
+        if ((DoClose) != 0)                                             \
+          (void) fclose(file);                                          \
+        (void) LiberateTemporaryFile(postscript_filename);              \
+        ThrowReaderException(CorruptImageError,                         \
+                             AnErrorHasOccurredWritingToFile,           \
+                             image);                                    \
+      }                                                                 \
+  }
+
 static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
 #define BoundingBox  "%%BoundingBox:"
@@ -253,7 +266,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
     c=ReadBlobByte(image);
     if (c == EOF)
       break;
-    (void) fputc(c,file);
+    ThrowReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
     *p++=c;
     if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
       continue;
@@ -299,17 +312,15 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   FormatString(geometry,"%lux%lu",
     (unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5),
     (unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5));
-  if (ferror(file))
-    {
-      (void) fclose(file);
-      (void) LiberateTemporaryFile(postscript_filename);
-      ThrowReaderException(CorruptImageError,AnErrorHasOccurredWritingToFile,
-        image)
-    }
-  (void) rewind(file);
-  (void) fputs(translate_geometry,file);
-  (void) fclose(file);
-  CloseBlob(image);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Page geometry: %s",geometry);
+  ThrowReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
+  ThrowReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
+  ThrowReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowReaderExceptionOnFOpFailure(fclose(file),0);
+  ThrowReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
   filesize=GetBlobSize(image);
   DestroyImage(image);
   image=(Image *) NULL;

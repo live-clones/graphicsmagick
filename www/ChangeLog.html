@@ -38,6 +38,22 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2025-12-30  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/ept.c (ReadEPTImage): Improve error handling pertaining
+to writing temporary file.</p></li>
+<li><p>coders/info.c (WriteINFOImage): Ensure that temporary file
+descriptor gets closed.</p></li>
+<li><p>coders/pnm.c (PNMInteger): Remove unused variable 'count'.</p></li>
+<li><p>coders/ps.c (RenderPostscriptText): Improve error handling
+pertaining to writing temporary file.</p></li>
+<li><p>magick/blob.c (CloseBlob): Use correct value when checking for
+pclose() error status.</p></li>
+<li><p>tests/rwfile.c: Assure that imageInfo-&gt;file is not NULL before
+attempting to close it.</p></li>
+</ul>
+</blockquote>
 <p>2025-12-29  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

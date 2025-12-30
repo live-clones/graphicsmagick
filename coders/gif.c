@@ -146,7 +146,7 @@ static MagickPassFail DecodeImage(Image *image,const long opacity)
   assert(image != (Image *) NULL);
 
   data_size=ReadBlobByte(image);
-  if (data_size > 8U) /* 256 */
+  if (data_size > 8U) /* IM uses 12 here */
     ThrowBinaryException(CorruptImageError,CorruptImage,image->filename);
   /*
     Allocate decoder tables.

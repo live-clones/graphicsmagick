@@ -132,9 +132,6 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
   unsigned int
     value;
 
-  unsigned int
-    count = 0;
-
   int
     c;
 
@@ -150,7 +147,6 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
           return(0);
         }
     } while (!isdigit(c));
-  count++;
   c &= 0xff;
   if (base == 2)
     {
@@ -188,7 +184,6 @@ static unsigned int PNMInteger(Image *image,const unsigned int base,MagickPassFa
       c=ReadBlobByte(image);
       if ((c == EOF) || !(isdigit(c)))
         break;
-      count++;
       c &= 0xff;
     }
 

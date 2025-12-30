@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2010 - 2012 GraphicsMagick Group
+% Copyright (C) 2010-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -128,6 +128,9 @@ WriteINFOImage(const ImageInfo *image_info,Image *image)
   const char
     *format;
 
+  MagickBool
+    close_file=MagickFalse;
+
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
@@ -154,14 +157,14 @@ WriteINFOImage(const ImageInfo *image_info,Image *image)
   temporary_filename[0]='\0';
   if ((file=GetBlobFileHandle(image)) == (FILE *) NULL)
     {
-      if(!AcquireTemporaryFileName(temporary_filename))
+      if (!AcquireTemporaryFileName(temporary_filename))
         ThrowWriterException(FileOpenError,UnableToCreateTemporaryFile,image);
       if ((file=fopen(temporary_filename,"w")) == (FILE *) NULL)
         {
           (void) LiberateTemporaryFile(temporary_filename);
           ThrowWriterException(FileOpenError,UnableToCreateTemporaryFile,image);
         }
-
+      close_file=MagickTrue;
     }
   list_entry=image;
 
@@ -199,13 +202,17 @@ WriteINFOImage(const ImageInfo *image_info,Image *image)
       list_entry=GetNextImageInList(list_entry);
     }
 
-  if ('\0' != temporary_filename[0])
+  if (close_file)
     {
       /*
         Close temporary file.
       */
       (void) fclose(file);
+      file=(FILE *) NULL;
+    }
 
+  if ('\0' != temporary_filename[0])
+    {
       /*
         Send content of temporary file to blob stream.
       */

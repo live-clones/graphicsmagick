@@ -268,6 +268,14 @@ int main ( int argc, char **argv )
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Reading stdio image %s", infile);
       imageInfo->file=fopen(infile,"rb");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -357,6 +365,14 @@ int main ( int argc, char **argv )
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Writing stdio image %s", filename);
       imageInfo->file=fopen(filename,"wb+");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for writing %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -399,6 +415,14 @@ int main ( int argc, char **argv )
     if (use_stdio)
       {
         imageInfo->file=fopen(filename,"rb");
+        if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
       }
     else
       {
@@ -451,6 +475,14 @@ int main ( int argc, char **argv )
   if (use_stdio)
     {
       imageInfo->file=fopen(filename,"rb");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -498,6 +530,14 @@ int main ( int argc, char **argv )
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Writing stdio image %s", filename);
       imageInfo->file=fopen(filename,"wb+");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for writing %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -531,6 +571,14 @@ int main ( int argc, char **argv )
   if (use_stdio)
     {
       imageInfo->file=fopen(filename,"rb");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
