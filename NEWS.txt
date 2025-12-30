@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to December 22, 2025.
+This file was last updated to reflect changes up to December 30, 2025.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -19,7 +19,7 @@ release and not attempt to patch older releases.
 .. contents::
   :local:
 
-1.3.47 (???? ??, 2025)
+1.3.47 (???? ??, 2026)
 ===========================
 
 Special Issues:
@@ -35,7 +35,9 @@ Special Issues:
 
 Security Fixes:
 
-* None yet.
+* TIFF: Detect and prevent infinite looping in the EXIF IFD writer
+  (EXIF IFD writer code may be excluded by the
+  -DEXPERIMENTAL_EXIF_TAGS=0 define).
 
 Bug fixes:
 
@@ -60,8 +62,7 @@ Bug fixes:
   be readable by older GraphicsMagick versions (but the fixed
   GraphicsMagick can read older existing files).
 
-* PNM: Support reading PBM raw (P1), PGM raw (P2), and PPM raw (P3)
-  files which lack a newline character at the end of the last line.
+* PNM: Improve ASCII formats error checking.
 
 * HEIF (HEIC, AVIF, etc.): The identify command was very slow with
   HEIF, although it always reported accurate information. Now identify
@@ -81,12 +82,22 @@ Bug fixes:
 * GIF: Store image comment in first image frame rather than the last
   frame.
 
+* Add missing prototypes for some functions and declare some functions
+  as 'static' which were accidentally left visible.
+
+* PerlMagick: PerlMagick is now "const correct" and data which could
+  be const is now declared as such.
+
 API Updates:
 
 * Wand API: Added the MagickSetBackgroundColor() function to support
   setting the default background color.
 
 New Features:
+
+* PNM: Support reading PBM raw (P1), PGM raw (P2), and PPM raw (P3)
+  files which lack a newline character at the end of the last
+  line.
 
 * HEIF (HEIC, AVIF, etc.): Memory limits and many more libheif
   resource limits are now applied/available.
