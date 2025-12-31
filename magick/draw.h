@@ -1,12 +1,12 @@
 /*
-  Copyright (C) 2003-2018 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
   package; otherwise see http://www.graphicsmagick.org/www/Copyright.html.
 
-  ImageMagick Drawing API.
+  GraphicsMagick Drawing API.
 
   Usage synopsis:
 
@@ -43,6 +43,7 @@ extern MagickExport DecorationType
   DrawGetTextDecoration(DrawContext context) MAGICK_FUNC_PURE;
 
 extern MagickExport DrawContext
+  DrawNewContext(void),
   DrawAllocateContext(const DrawInfo *draw_info, Image *image);
 
 extern MagickExport FillRule

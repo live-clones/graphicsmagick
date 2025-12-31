@@ -461,7 +461,7 @@ WandExport unsigned int MagickAffineTransformImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  draw_info=DrawPeekGraphicContext(drawing_wand);
+  draw_info=MagickDrawPeekGraphicContext(drawing_wand);
   if (draw_info == (DrawInfo *) NULL)
     return(False);
   affine_image=AffineTransformImage(wand->image,&draw_info->affine,
@@ -525,7 +525,7 @@ WandExport unsigned int MagickAnnotateImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  draw_info=DrawPeekGraphicContext(drawing_wand);
+  draw_info=MagickDrawPeekGraphicContext(drawing_wand);
   if (draw_info == (DrawInfo *) NULL)
     return(False);
   (void) CloneString(&draw_info->text,text);
@@ -2014,7 +2014,7 @@ WandExport unsigned int MagickDrawImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  draw_info=DrawPeekGraphicContext(drawing_wand);
+  draw_info=MagickDrawPeekGraphicContext(drawing_wand);
   if ((draw_info == (DrawInfo *) NULL) ||
       (draw_info->primitive == (char *) NULL))
     {
@@ -5952,7 +5952,7 @@ WandExport MagickWand *MagickMontageImage(MagickWand *wand,
     default:
       break;
   }
-  font=DrawGetFont(drawing_wand);
+  font=MagickDrawGetFont(drawing_wand);
   if (font != (char *) NULL)
     {
       (void) CloneString(&montage_info->font,font);
@@ -5960,11 +5960,11 @@ WandExport MagickWand *MagickMontageImage(MagickWand *wand,
     }
   if (frame != (char *) NULL)
     (void) CloneString(&montage_info->frame,frame);
-  montage_info->pointsize=DrawGetFontSize(drawing_wand);
+  montage_info->pointsize=MagickDrawGetFontSize(drawing_wand);
   pixel_wand=NewPixelWand();
-  DrawGetFillColor(drawing_wand,pixel_wand);
+  MagickDrawGetFillColor(drawing_wand,pixel_wand);
   PixelGetQuantumColor(pixel_wand,&montage_info->fill);
-  DrawGetStrokeColor(drawing_wand,pixel_wand);
+  MagickDrawGetStrokeColor(drawing_wand,pixel_wand);
   PixelGetQuantumColor(pixel_wand,&montage_info->stroke);
   DestroyPixelWand(pixel_wand);
   if (thumbnail_geometry != (char *) NULL)
@@ -6866,7 +6866,7 @@ WandExport double *MagickQueryFontMetrics(MagickWand *wand,
   font_metrics=MagickAllocateMemory(double *,7*sizeof(double));
   if (font_metrics == (double *) NULL)
     return((double *) NULL);
-  draw_info=DrawPeekGraphicContext(drawing_wand);
+  draw_info=MagickDrawPeekGraphicContext(drawing_wand);
   if (draw_info == (DrawInfo *) NULL)
     {
       MagickFreeMemory(font_metrics);

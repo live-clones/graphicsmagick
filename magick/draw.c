@@ -99,8 +99,14 @@ typedef enum
 struct _DrawContext
 {
   /* Support structures */
+  ExceptionInfo
+    exception;
+
   Image
     *image;
+
+  MagickBool
+    own_image;          /* If true, then we own the image. */
 
   /* MVG output string and housekeeping */
   char
@@ -695,7 +701,17 @@ MagickExport DrawContext DrawAllocateContext(const DrawInfo *draw_info,
       UnableToAllocateDrawContext);
 
   /* Support structures */
-  context->image = image;
+  GetExceptionInfo(&context->exception);
+  if (image == (Image *) NULL)
+    {
+      context->image=AllocateImage((const ImageInfo *) NULL);
+      context->own_image=MagickTrue;
+    }
+  else
+    {
+      context->image=image;
+      context->own_image=MagickFalse;
+    }
 
   /* MVG output string and housekeeping */
   context->mvg = NULL;
@@ -1274,6 +1290,13 @@ MagickExport void DrawDestroyContext(DrawContext context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
+
+  DestroyExceptionInfo(&context->exception);
+
+  if ((context->image != (Image*) NULL) &&
+      (context->own_image == MagickTrue))
+    DestroyImage(context->image);
+  context->image=(Image *) NULL;
 
   /* Path operation support */
   context->path_operation = PathDefaultOperation;
@@ -2552,6 +2575,33 @@ MagickExport void DrawMatte(DrawContext context,
 
   if (p != NULL)
     (void) MvgPrintf(context, "matte %g,%g %s\n", x, y, p);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   D r a w N e w C o n t e x t                                               %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  DrawNewContext() allocates an initial drawing context which is an
+%  opaque handle required by the remaining drawing methods. This is
+%  is similar to DrawAllocateContext() except that a default image and
+%  draw_info are provided.
+%
+%  The format of the DrawNewContext method is:
+%
+%      DrawContext DrawNewContext(void)
+%
+*/
+MagickExport DrawContext DrawNewContext(void)
+{
+  return DrawAllocateContext((const DrawInfo *) NULL,
+                             (Image *) NULL);
 }
 
 /*
