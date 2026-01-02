@@ -4507,6 +4507,7 @@ RST2HTML_TARGETS = \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
 	$(WWWDIR)/ChangeLog-2024.html \
+	$(WWWDIR)/ChangeLog-2025.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -4631,6 +4632,7 @@ WWW_HTML_FILES = \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
 	$(WWWDIR)/ChangeLog-2024.html \
+	$(WWWDIR)/ChangeLog-2025.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -11217,6 +11219,10 @@ uninstall-data-html:
 @MAINTAINER_MODE_TRUE@$(top_srcdir)/www/ChangeLog.rst: $(top_srcdir)/ChangeLog
 @MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
 @MAINTAINER_MODE_TRUE@	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog' < $^ > $@
+
+@MAINTAINER_MODE_TRUE@$(top_srcdir)/www/ChangeLog-2025.rst: $(top_srcdir)/ChangeLog.2025
+@MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
+@MAINTAINER_MODE_TRUE@	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog - 2025' < $^ > $@
 
 @MAINTAINER_MODE_TRUE@$(top_srcdir)/www/ChangeLog-2024.rst: $(top_srcdir)/ChangeLog.2024
 @MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"

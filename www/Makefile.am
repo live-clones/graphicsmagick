@@ -61,6 +61,7 @@ RST2HTML_TARGETS = \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
 	$(WWWDIR)/ChangeLog-2024.html \
+	$(WWWDIR)/ChangeLog-2025.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -183,6 +184,7 @@ WWW_HTML_FILES = \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
 	$(WWWDIR)/ChangeLog-2024.html \
+	$(WWWDIR)/ChangeLog-2025.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -285,6 +287,10 @@ CHANGELOG2RST=$(top_srcdir)/scripts/changelog2rst.sh
 $(top_srcdir)/www/ChangeLog.rst: $(top_srcdir)/ChangeLog
 	@printf "Updating $@ ...\n"
 	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog' < $^ > $@
+
+$(top_srcdir)/www/ChangeLog-2025.rst: $(top_srcdir)/ChangeLog.2025
+	@printf "Updating $@ ...\n"
+	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog - 2025' < $^ > $@
 
 $(top_srcdir)/www/ChangeLog-2024.rst: $(top_srcdir)/ChangeLog.2024
 	@printf "Updating $@ ...\n"
