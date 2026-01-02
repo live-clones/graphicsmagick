@@ -1890,7 +1890,9 @@ function by themselves.</p>
 </section>
 <section id="description-64">
 <h2>Description</h2>
-<p>DrawPeekGraphicContext() returns the current graphic drawing_wand.</p>
+<p>DrawPeekGraphicContext() returns a copy of the the DrawInfo structure at
+the head of the drawing context stack. The user is responsible for
+deallocating the returned object using DestroyDrawInfo.</p>
 <p>The format of the DrawPeekGraphicContext method is:</p>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *DrawPeekGraphicContext( const DrawingWand *drawing_wand );</pre>
 <p>A description of each parameter follows:</p>

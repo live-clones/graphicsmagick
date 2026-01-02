@@ -15,8 +15,8 @@ The GraphicsMagick Wand C library provides a mid-level abstract C
 language programming interface for GraphicsMagick.  It is originally
 based on the Wand API provided in ImageMagick as of August 2003.
 After August 2003, ImageMagick changed its license to one unusable by
-GraphicsMagick so this version of the Wand library is not completely
-in sync with the current ImageMagick version.
+GraphicsMagick so this version of the Wand library is independently
+developed from the ImageMagick version and contains fewer functions.
 
 The API is divided into a number of categories. While reading this
 documentation, please reference the types_ documentation as required:

@@ -1435,8 +1435,8 @@
         <Message name="UnableToAverageImageSequence">
           unable to average image sequence
         </Message>
-        <Message name="UnableToCloneDrawingWand">
-          unable to clone drawing wand
+        <Message name="UnableToCloneDrawingContext">
+          unable to clone drawing context
         </Message>
         <Message name="UnableToCloneImage">
           unable to clone image

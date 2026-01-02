@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2025 GraphicsMagick Group */
+/* Copyright (C) 2003-2026 GraphicsMagick Group */
 /*
   GraphicsMagick Drawing Wand API.
 
@@ -254,7 +254,7 @@ extern "C" {
 
 #endif /* if !defined(MAGICK_EXCLUDE_DRAWING_WAND_MACROS) */
 
-typedef struct _DrawingWand
+typedef struct _DrawContext
   DrawingWand;
 
 extern WandExport char

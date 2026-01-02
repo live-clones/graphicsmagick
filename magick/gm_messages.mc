@@ -2639,9 +2639,9 @@ unable to average image sequence
 .
 
 MessageId       = +1
-SymbolicName    = LimitErrorUnableToCloneDrawingWand
+SymbolicName    = LimitErrorUnableToCloneDrawingContext
 Language        = English
-unable to clone drawing wand
+unable to clone drawing context
 .
 
 MessageId       = +1
@@ -3029,7 +3029,7 @@ unable to allocate draw info
 .
 
 MessageId       = +1
-SymbolicName    = LimitFatalErrorUnableToAllocateDrawingWand
+SymbolicName    = LimitFatalErrorUnableToAllocateDrawingContext
 Language        = English
 unable to allocate drawing wand
 .
