@@ -1528,11 +1528,11 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
                 */
                 const double rate=atof(value);
 
+                rate_specified=MagickTrue;
                 if (rate < 1.0-MagickEpsilon)
                   {
                     FormatString(option_keyval,"%s=%.1024s ",option,value);
                     ConcatenateString(&options,option_keyval);
-                    rate_specified=MagickTrue;
                   }
               }
             else

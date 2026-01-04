@@ -1,3 +1,10 @@
+2026-01-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/jp2.c (WriteJP2Image): Specifying '-define jp2:rate=1.0'
+        is documented to use lossless compression (by removing the rate
+        specification entirely), but this was not working properly.  Fixed
+        now.
+
 2026-01-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * Copyright.txt: Updated copyright year. Rotated ChangeLog to
