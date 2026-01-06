@@ -1712,6 +1712,18 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
             jpeg_destroy_decompress(&jpeg_info);
             ThrowJPEGReaderException(ResourceLimitError,MemoryAllocationFailed,image);
           }
+      if (image_info->ping)
+        {
+          image->is_grayscale=MagickTrue;
+        }
+    }
+  else
+    {
+      if (image_info->ping)
+        {
+          image->is_grayscale=MagickFalse;
+          image->is_monochrome=MagickFalse;
+        }
     }
 
   /*

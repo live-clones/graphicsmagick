@@ -961,7 +961,8 @@ static struct PackageInfo *GetPackageInfo(pTHX_ void *reference,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  Method LookupStr searches through a list of strings matching it to string
-%  and return its index in the list, or -1 for not found .
+%  and return its index in the list, or -1 for not found. The caller of this
+%  method casts the return index into the enumeration value.
 %
 %  The format of the LookupStr routine is:
 %

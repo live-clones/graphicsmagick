@@ -38,6 +38,17 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-01-06  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/jpeg.c (ReadJPEGImage): While in ping mode, set
+is_grayscale true for JCS_GRAYSCALE images, and otherwise set
+is_grayscale and is_monochrome to false.  This should help
+GetImageCharacteristics() report something useful while in ping
+mode. Resolves SourceForge issue &quot;#614 ping(blob) reports JPG and
+JNX files as monochrome BilevelType&quot;.</p></li>
+</ul>
+</blockquote>
 <p>2026-01-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

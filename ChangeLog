@@ -1,3 +1,12 @@
+2026-01-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/jpeg.c (ReadJPEGImage): While in ping mode, set
+        is_grayscale true for JCS_GRAYSCALE images, and otherwise set
+        is_grayscale and is_monochrome to false.  This should help
+        GetImageCharacteristics() report something useful while in ping
+        mode. Resolves SourceForge issue "#614 ping(blob) reports JPG and
+        JNX files as monochrome BilevelType".
+
 2026-01-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/jp2.c (WriteJP2Image): Specifying '-define jp2:rate=1.0'
