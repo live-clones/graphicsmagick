@@ -1328,6 +1328,9 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
       */
       dib_info.number_colors=0;
       dib_info.bits_per_pixel=image->matte ? 32 : 24;
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Writing full color DIB raster with %u bits per pixel...",
+                            dib_info.bits_per_pixel);
     }
   else
     {
@@ -1338,6 +1341,11 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
       if (characteristics.monochrome)
         dib_info.bits_per_pixel=1;
       dib_info.number_colors=1 << dib_info.bits_per_pixel;
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Writing colormapped DIB with %u colors and %u "
+                            "bit%s per colormap index...",
+                            dib_info.number_colors, dib_info.bits_per_pixel,
+                            dib_info.bits_per_pixel ? "s" : "");
     }
   /*
      Below emulates:

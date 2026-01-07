@@ -1,5 +1,8 @@
 2026-01-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/dib.c (WriteDIBImage): Add tracing to reveal the image
+        storage representation.
+
         * NEWS.txt: Update the news.
 
         * Magick++/lib/Magick++/Thread.h, Magick++/lib/Thread.cpp: Change
