@@ -41,6 +41,12 @@ Security Fixes:
 
 Bug fixes:
 
+* Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
+  been present since 2003!
+
+* JP2: Fix a bug which caused lossless compression to not be engaged
+  by '-define jp2:rate=1.0'.
+
 * ModuleAliases: Added a mapping from magick "MPRI" to module
   "MPR". This missing mapping caused the "MPRI" coder to not work for
   non-module builds. As a result, the 'mogrify' "hald-clut", "map",
@@ -93,6 +99,11 @@ API Updates:
 * Wand API: Added the MagickSetBackgroundColor() function to support
   setting the default background color.
 
+* Drawing API: DrawNewContext(), is a new function to allocate an
+  empty drawing context.
+
+* Wand API: The wand/drawing_wand.c functions which duplicate code in magick/draw.c are gutted and replaced with calls into magick/draw.c.
+
 New Features:
 
 * PNM: Support reading PBM raw (P1), PGM raw (P2), and PPM raw (P3)
@@ -117,6 +128,8 @@ New Features:
 * Resource Limited Memory: Added module, function, and line parameters
   for the purpose of tracing, and to capture the source location where
   the allocation was made.
+
+* WBMP: Support alternate file extensions "WBM" and "WBP".
 
 Behavior Changes:
 

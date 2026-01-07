@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999, 2000, 2001, 2003
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Definition of types and classes to support threads
 //
@@ -24,9 +24,9 @@ struct win32_mutex {
 #endif // defined(_MT)
 #endif // defined(_VISUALC_)
 
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
 # include <pthread.h>
-#endif // defined(HasPTHREADS)
+#endif // defined(HAVE_PTHREAD)
 
 namespace Magick
 {
@@ -54,7 +54,7 @@ namespace Magick
     // Don't support assignment
     MutexLock& operator = ( const MutexLock& original_ );
 
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
     pthread_mutex_t  _mutex;
 #endif
 #if defined(_MT) && defined(_VISUALC_)

@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999, 2000, 2001, 2002
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Implementation of thread support
 //
@@ -15,7 +15,7 @@
 
 // Default constructor
 Magick::MutexLock::MutexLock(void)
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   // POSIX threads
   : _mutex()
 {
@@ -58,7 +58,7 @@ Magick::MutexLock::MutexLock(void)
 // Destructor
 Magick::MutexLock::~MutexLock(void)
 {
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   int sysError;
   if ( (sysError = ::pthread_mutex_destroy( &_mutex )) == 0 )
     return;
@@ -75,7 +75,7 @@ Magick::MutexLock::~MutexLock(void)
 // Lock mutex
 void Magick::MutexLock::lock(void)
 {
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   int sysError;
   if ( (sysError = ::pthread_mutex_lock( &_mutex )) == 0)
     return;
@@ -109,7 +109,7 @@ void Magick::MutexLock::lock(void)
 // Unlock mutex
 void Magick::MutexLock::unlock(void)
 {
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   int sysError;
   if ( (sysError = ::pthread_mutex_unlock( &_mutex )) == 0)
     return;

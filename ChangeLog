@@ -1,5 +1,13 @@
 2026-01-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
+        * Magick++/lib/Magick++/Thread.h, Magick++/lib/Thread.cpp: Change
+        definition used to enable pthreads support from HasPTHREADS to
+        HAVE_PTHREAD.  Magick++ code relying on this has not been
+        thread-safe since 2003! Much thanks to Michael Stephan for making
+        me aware of this.
+
         * coders/wbmp.c (RegisterWBMPImage): Support "WBM" and "WBP" as
         extensions for WBMP format.  Resolves SourceForge issue #192 "can
         not open *.wbm".

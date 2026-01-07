@@ -124,6 +124,10 @@ computer to run Windows 11.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
+<li><p>Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
+been present since 2003!</p></li>
+<li><p>JP2: Fix a bug which caused lossless compression to not be engaged
+by '-define jp2:rate=1.0'.</p></li>
 <li><p>ModuleAliases: Added a mapping from magick &quot;MPRI&quot; to module
 &quot;MPR&quot;. This missing mapping caused the &quot;MPRI&quot; coder to not work for
 non-module builds. As a result, the 'mogrify' &quot;hald-clut&quot;, &quot;map&quot;,
@@ -166,6 +170,9 @@ be const is now declared as such.</p></li>
 <ul class="simple">
 <li><p>Wand API: Added the MagickSetBackgroundColor() function to support
 setting the default background color.</p></li>
+<li><p>Drawing API: DrawNewContext(), is a new function to allocate an
+empty drawing context.</p></li>
+<li><p>Wand API: The wand/drawing_wand.c functions which duplicate code in magick/draw.c are gutted and replaced with calls into magick/draw.c.</p></li>
 </ul>
 <p>New Features:</p>
 <ul class="simple">
@@ -186,6 +193,7 @@ ImageMagick.</p></li>
 <li><p>Resource Limited Memory: Added module, function, and line parameters
 for the purpose of tracing, and to capture the source location where
 the allocation was made.</p></li>
+<li><p>WBMP: Support alternate file extensions &quot;WBM&quot; and &quot;WBP&quot;.</p></li>
 </ul>
 <p>Behavior Changes:</p>
 <ul class="simple">
