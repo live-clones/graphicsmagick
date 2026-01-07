@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2025 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -184,6 +184,8 @@ static const struct
     MODULEALIAS("UBRL6","BRAILLE"),
     MODULEALIAS("VDA","TGA"),
     MODULEALIAS("VST","TGA"),
+    MODULEALIAS("WBM", "WBMP"),
+    MODULEALIAS("WBP", "WBMP"),
     MODULEALIAS("X3F","DCRAW"),
     MODULEALIAS("XMP","META"),
     MODULEALIAS("XTRNARRAY","XTRN"),

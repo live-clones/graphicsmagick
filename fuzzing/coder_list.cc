@@ -35,6 +35,8 @@ int main() {
     excludedCoders.push_back("ICO");    // Same as ICON
     excludedCoders.push_back("JBG");    // Same as JBIG
     excludedCoders.push_back("JPG");    // Same as JPEG
+    excludedCoders.push_back("WBM");    // Same as WBMP
+    excludedCoders.push_back("WBP");    // Same as WBMP
 
     // Format names depending on an external 'dcraw' program.
     // See dcraw_formats in coders/dcraw.c

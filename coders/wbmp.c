@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -241,12 +241,33 @@ ModuleExport void RegisterWBMPImage(void)
   MagickInfo
     *entry;
 
+  /* WBMP is the most common extension */
   entry=SetMagickInfo("WBMP");
   entry->decoder=(DecoderHandler) ReadWBMPImage;
   entry->encoder=(EncoderHandler) WriteWBMPImage;
   entry->adjoin=False;
   entry->description="Wireless Bitmap (level 0) image";
   entry->module="WBMP";
+  (void) RegisterMagickInfo(entry);
+
+  /* WBM is a less common extension */
+  entry=SetMagickInfo("WBM");
+  entry->decoder=(DecoderHandler) ReadWBMPImage;
+  entry->encoder=(EncoderHandler) WriteWBMPImage;
+  entry->adjoin=False;
+  entry->description="Wireless Bitmap (level 0) image";
+  entry->module="WBMP";
+  entry->stealth=MagickTrue; /* Don't list in '-list format' output */
+  (void) RegisterMagickInfo(entry);
+
+  /* WBP is the least common extension */
+  entry=SetMagickInfo("WBP");
+  entry->decoder=(DecoderHandler) ReadWBMPImage;
+  entry->encoder=(EncoderHandler) WriteWBMPImage;
+  entry->adjoin=False;
+  entry->description="Wireless Bitmap (level 0) image";
+  entry->module="WBMP";
+  entry->stealth=MagickTrue; /* Don't list in '-list format' output */
   (void) RegisterMagickInfo(entry);
 }
 
@@ -272,6 +293,8 @@ ModuleExport void RegisterWBMPImage(void)
 ModuleExport void UnregisterWBMPImage(void)
 {
   (void) UnregisterMagickInfo("WBMP");
+  (void) UnregisterMagickInfo("WBM");
+  (void) UnregisterMagickInfo("WBP");
 }
 
 /*
