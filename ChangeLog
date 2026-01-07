@@ -1,5 +1,10 @@
 2026-01-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * Magick++/lib/Image.cpp (Magick::Image::monochrome): If
+        monochrome is disabled, then clear the image is_monochrome flag if
+        it is set. This may help for issues such as SourceForge issue #397
+        "DIB: Unable to write a monochrome DIB as 8bit depth.".
+
         * coders/dib.c (WriteDIBImage): Add tracing to reveal the image
         storage representation.
 

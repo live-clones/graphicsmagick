@@ -3251,6 +3251,8 @@ void Magick::Image::monochrome ( const bool monochromeFlag_ )
 {
   modifyImage();
   options()->monochrome( monochromeFlag_ );
+  if (! monochromeFlag_ && constImage()->is_monochrome)
+    image()->is_monochrome=MagickFalse;
 }
 bool Magick::Image::monochrome ( void ) const
 {

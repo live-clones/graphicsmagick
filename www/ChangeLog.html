@@ -41,6 +41,10 @@
 <p>2026-01-07  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>Magick++/lib/Image.cpp (Magick::Image::monochrome): If
+monochrome is disabled, then clear the image is_monochrome flag if
+it is set. This may help for issues such as SourceForge issue #397
+&quot;DIB: Unable to write a monochrome DIB as 8bit depth.&quot;.</p></li>
 <li><p>coders/dib.c (WriteDIBImage): Add tracing to reveal the image
 storage representation.</p></li>
 <li><p>NEWS.txt: Update the news.</p></li>
