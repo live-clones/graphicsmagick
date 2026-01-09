@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2023-2025 GraphicsMagick Group
+% Copyright (C) 2023-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -28,6 +28,18 @@
 * Meanwhile, 1.14.0 is required to compile.
 *
 * Nokia technical publication on HEIF: https://nokiatech.github.io/heif/technical.html
+*
+* Yet to be done:
+*
+*   o Read/render HEIF tiles directly.
+*   o Possibly support reading directly from file (heif_context_read_from_file())
+*     rather than an in-memory BLOB.
+*   o Support selecting to read HEIF depth image.
+*   o Use HEIF transform properties to evaluate image orientation (requires 1.17).
+*   o Provide user control over chroma upsampling options.
+*   o Support reading sequences (requires 1.20).
+*
+*   o Write HEIF (HEIC, AVIF, more?)
 */
 
 #include "magick/studio.h"
@@ -207,6 +219,7 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
 #define HEIFReadCleanup()                                              \
   do                                                                   \
     {                                                                  \
+      MagickFreeResourceLimitedMemory(heif_item_id *,item_ids);        \
       if (heif_image)                                                  \
         heif_image_release(heif_image);                                \
       if (heif_image_handle)                                           \
@@ -1574,11 +1587,23 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   unsigned char
     *in_buf = NULL;
 
+  heif_item_id
+    *item_ids = NULL;
+
+  const char *
+    magick;
+
   size_t
     in_len;
 
   struct heif_error
     heif_status;
+
+  int
+    number_of_top_level_images;
+
+  heif_item_id
+    primary_image_id;
 
 #if HEIF_ENABLE_PROGRESS_MONITOR
   ProgressUserData
@@ -1663,6 +1688,14 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 
   /* Apply security limits */
   (void) apply_security_limits(image_info,heif);
+
+  /* Test file header for format, and update image magick string */
+  magick="HEIF";
+  if (heif_has_compatible_brand(in_buf, in_len, "avif") == 1)
+    magick="AVIF";
+  else if (heif_has_compatible_brand(in_buf, in_len, "heic") == 1)
+    magick="HEIC";
+  (void) strcpy(image->magick,magick);
 
   /*
     Trace some information about the file
@@ -1764,32 +1797,122 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
 
-  /* FIXME: no support for reading multiple images but should be
-     added, if multiple images will use primary image */
-  {
-    int number_of_top_level_images;
-    number_of_top_level_images=heif_context_get_number_of_top_level_images(heif);
-    if (image->logging)
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Number of top level images: %d (reading primary image only)",
-                            number_of_top_level_images);
-    if (number_of_top_level_images == 0)
+  /* Get the number of top level images */
+  number_of_top_level_images=heif_context_get_number_of_top_level_images(heif);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Number of top level images: %d",
+                          number_of_top_level_images);
+  if (number_of_top_level_images <= 0)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_context_get_number_of_top_level_images() reports %d \"%s\"",
+                              number_of_top_level_images, heif_status.message);
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
 
-    heif_status=heif_context_get_primary_image_handle(heif, &heif_image_handle);
-    if (heif_status.code == heif_error_Memory_allocation_error)
-      ThrowHEIFReaderException(ResourceLimitError, MemoryAllocationFailed, image);
-    if (heif_status.code != heif_error_Ok)
-      {
-        if (image->logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "heif_context_get_primary_image_handle() reports error \"%s\"",
-                                heif_status.message);
-        ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
-      }
-  }
+  /* Get the primary image id */
+  heif_status=heif_context_get_primary_image_ID(heif,&primary_image_id);
+  if (heif_status.code != heif_error_Ok)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_context_get_primary_image_ID() reports error \"%s\"",
+                              heif_status.message);
+      ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Primary image id: %d", primary_image_id);
+
+  /* Get a handle for the primary image id */
+  heif_status=heif_context_get_image_handle(heif, primary_image_id, &heif_image_handle);
+  if (heif_status.code == heif_error_Memory_allocation_error)
+    ThrowHEIFReaderException(ResourceLimitError, MemoryAllocationFailed, image);
+  if (heif_status.code != heif_error_Ok)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "heif_context_get_image_handle() reports error \"%s\"",
+                              heif_status.message);
+      ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+    }
 
   status=ReadHEIFImageFrame(heif_image_handle,decode_options,image,image_info,exception);
+
+  heif_image_handle_release(heif_image_handle);
+  heif_image_handle=(struct heif_image_handle *) NULL;
+
+  /*
+    Read any additional top-level images
+  */
+  if ((status != MagickFail) && (number_of_top_level_images > 1))
+    {
+      int
+        item_num;
+
+      item_ids=MagickAllocateResourceLimitedArray(heif_item_id *,number_of_top_level_images,sizeof(*item_ids));
+      if (item_ids == (heif_item_id *) NULL)
+        ThrowHEIFReaderException(ResourceLimitError, MemoryAllocationFailed, image);
+
+      heif_context_get_list_of_top_level_image_IDs(heif,item_ids,number_of_top_level_images);
+
+      for (item_num=0; item_num < number_of_top_level_images; item_num++)
+        {
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Image index %d: image id %d",
+                                  item_num, item_ids[item_num]);
+
+          /* Skip the primary image we already read. Hopefully this
+             was also the first image in the top level image list. */
+          if (item_ids[item_num] == primary_image_id)
+            {
+              if (image->logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "Item %d matches primary image id %d (skipping)",
+                                      item_num, primary_image_id);
+              continue;
+            }
+
+          /*
+            Allocate next image structure.
+          */
+          AllocateNextImage(image_info,image);
+          image=SyncNextImageInList(image);
+          (void) strlcpy(image->magick,magick,sizeof(image->magick));
+
+          /* Get HEIF image handle */
+          heif_status=heif_context_get_image_handle(heif, item_ids[item_num],&heif_image_handle);
+          if (heif_status.code == heif_error_Memory_allocation_error)
+            ThrowHEIFReaderException(ResourceLimitError, MemoryAllocationFailed, image);
+          if (heif_status.code != heif_error_Ok)
+            {
+              if (image->logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "heif_context_get_image_handle() reports error \"%s\"",
+                                      heif_status.message);
+              ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
+            }
+
+          /* Read the HEIF frame */
+          status=ReadHEIFImageFrame(heif_image_handle,decode_options,image,image_info,exception);
+
+          /* Release the HEIF image handle */
+          heif_image_handle_release(heif_image_handle);
+          heif_image_handle=(struct heif_image_handle *) NULL;
+
+          if (status == MagickFail)
+            break;
+
+          /* Quit if no more scenes requested */
+          if (image_info->subrange != 0)
+            if (image->scene >= (image_info->subimage+image_info->subrange-1))
+              break;
+        }
+      MagickFreeResourceLimitedMemory(heif_item_id *,item_ids);
+    }
 
   HEIFReadCleanup();
   CloseBlob(image);
