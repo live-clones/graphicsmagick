@@ -228,7 +228,8 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
         heif_context_free(heif);                                       \
       if (decode_options)                                              \
         heif_decoding_options_free(decode_options);                    \
-      MagickFreeResourceLimitedMemory(unsigned char *,in_buf);         \
+      if (in_buf_allocated)                                            \
+        MagickFreeResourceLimitedMemory(unsigned char *,in_buf);       \
     } while (0);
 
 #define ThrowHEIFReaderException(code_,reason_,image_) \
@@ -1594,13 +1595,16 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     magick;
 
   size_t
-    in_len;
+    in_len = 0;
 
   struct heif_error
     heif_status;
 
   int
     number_of_top_level_images;
+
+  char
+    fourcc[5];
 
   heif_item_id
     primary_image_id;
@@ -1609,6 +1613,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   ProgressUserData
     progress_user_data;
 #endif
+
+  MagickBool
+    in_buf_allocated=MagickFalse;
 
   MagickPassFail
     status;
@@ -1670,24 +1677,40 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     Read the whole input file into a memory blob
   */
   in_len=GetBlobSize(image);
-  in_buf=MagickAllocateResourceLimitedArray(unsigned char *,in_len,sizeof(*in_buf));
+  in_buf=GetBlobStreamData(image);
   if (in_buf == (unsigned char *) NULL)
-    ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+    {
+      in_buf=MagickAllocateResourceLimitedArray(unsigned char *,in_len,sizeof(*in_buf));
+      if (in_buf == (unsigned char *) NULL)
+        ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+      in_buf_allocated=MagickTrue;
 
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Reading file into in-memory blob...");
-  if (ReadBlob(image,in_len,in_buf) != in_len)
-    ThrowHEIFReaderException(CorruptImageError, UnexpectedEndOfFile, image);
-  if (image->logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "  Done!");
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Reading file into in-memory blob...");
+      if (ReadBlob(image,in_len,in_buf) != in_len)
+        ThrowHEIFReaderException(CorruptImageError, UnexpectedEndOfFile, image);
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "  Done!");
+    }
+  else
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Input accessed as in-memory blob");
+    }
 
   /* Init HEIF-Decoder handles */
   heif=heif_context_alloc();
 
   /* Apply security limits */
   (void) apply_security_limits(image_info,heif);
+
+  /* Header sanity check */
+  (void) memset(fourcc,0,sizeof(fourcc));
+  heif_brand_to_fourcc(heif_read_main_brand(in_buf, in_len), fourcc);
+  if (fourcc[0] == 0)
+    ThrowHEIFReaderException(CorruptImageError, ImproperImageHeader, image);
 
   /* Test file header for format, and update image magick string */
   magick="HEIF";
@@ -1702,9 +1725,6 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   */
   if (image->logging)
     {
-      char
-        fourcc[5];
-
       {
         /* Log main brand */
         (void) memset(fourcc,0,sizeof(fourcc));

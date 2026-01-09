@@ -1,3 +1,14 @@
+2026-01-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImage): Support accessing file data
+        directly from in-memory blob.  Add a simple header sanity check.
+
+        * magick/blob.c (OpenBlob): Have setvbuf() allocate the buffer
+        rather than managing it independently.
+
+        * coders/heif.c (ReadHEIFImage): Support reading multiple image
+        frames.  Deduce image magick string by asking libheif what it is.
+
 2026-01-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * Magick++/lib/Image.cpp (Magick::Image::monochrome): If
