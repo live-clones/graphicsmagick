@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -151,9 +151,6 @@ struct _BlobInfo
 
   long
     reference_count;    /* Number of times this blob is referenced. */
-
-  char
-    *vbuf;              /* Buffer for setvbuf() */
 
   unsigned long
     signature;          /* Numeric value used to evaluate structure integrity. */
@@ -1072,7 +1069,6 @@ MagickExport MagickPassFail CloseBlob(Image *image)
                       blob->first_errno=errno;
                   }
               }
-            MagickFreeMemory(image->blob->vbuf);
             break;
           }
         case PipeStream:
@@ -2986,10 +2982,9 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                     vbuf_size;
 
                   vbuf_size=image->blob->block_size;
-                  image->blob->vbuf=MagickAllocateClearedMemory(char *, vbuf_size);
-                  if ((0 != vbuf_size) && (image->blob->vbuf != (char *) NULL))
+                  if (0 != vbuf_size)
                     {
-                      if (setvbuf(image->blob->handle.std,image->blob->vbuf,_IOFBF,vbuf_size) != 0)
+                      if (setvbuf(image->blob->handle.std,NULL,_IOFBF,vbuf_size) != 0)
                         {
                           if (image->blob->logging)
                             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
@@ -3072,7 +3067,9 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                       if (strncmp((char *) magick,"BZh",3) == 0)
                         {
                           if (image->blob->handle.std)
-                            (void) fclose(image->blob->handle.std);
+                            {
+                              (void) fclose(image->blob->handle.std);
+                            }
                           image->blob->handle.bz=BZ2_bzopen(filename,type);
                           if (image->blob->handle.bz != (BZFILE *) NULL)
                             {
