@@ -1646,6 +1646,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   assert(exception != (ExceptionInfo *) NULL);
   assert(exception->signature == MagickSignature);
 
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "ImageInfo magick = %s", image_info->magick);
   /*
     Open image file.
   */
@@ -1738,6 +1740,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   else if (heif_has_compatible_brand(in_buf, in_len, "heic") == 1)
     magick="HEIC";
   (void) strcpy(image->magick,magick);
+   if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Assigned magick: %s", magick);
 
   /*
     Trace some information about the file

@@ -1,5 +1,10 @@
 2026-01-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/heif.c (ReadHEIFImage): Log the 'magick' string
+        assignment.
+
+        * magick/magick.c (MagickToMime): Add more MIME mappings.
+
         * coders/heif.c (IsHEIF): Use heif_check_filetype() to verify that
         the input appears to be HEIF.
 
