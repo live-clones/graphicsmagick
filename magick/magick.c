@@ -1565,9 +1565,10 @@ ListModuleMap(FILE *file,ExceptionInfo *exception)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  Method MagickToMime returns the officially registered (or de facto) MIME
-%  media-type corresponding to a magick string.  If there is no registered
-%  media-type, then the string "image/x-magick" (all lower case) is returned.
-%  The returned string must be deallocated by the user.
+%  media-type (see https://www.iana.org/assignments/media-types/media-types.xhtml)
+%  corresponding to a magick string.  If there is no registered media-type,
+%  then the string "image/x-magick" (all lower case) is returned.  The returned
+%  string must be deallocated by the user.
 %
 %  The format of the MagickToMime method is:
 %
@@ -1591,17 +1592,20 @@ MagickToMime(const char *magick)
   static const struct
   {
     const char
-      magick[6],
+      magick[14],
       *media;
   }
   MediaTypes[] =
     {
-      { "avi",   "video/avi" },
       { "apng",  "image/apng" },
+      { "avc",   "image/avci" },
+      { "avi",   "video/avi" },
       { "avif",  "image/avif" },
       { "bmp",   "image/bmp" },
       { "cgm",   "image/cgm;Version=4;ProfileId=WebCGM" }, /* W3 WebCGM */
       { "dcm",   "application/dicom" }, /* Incomplete.  See RFC 3240 */
+      { "dpx",   "image/dpx" },
+      { "emf",   "image/emf" },
       { "epdf",  "application/pdf" },
       { "epi",   "application/postscript" },
       { "eps",   "application/postscript" },
@@ -1610,17 +1614,24 @@ MagickToMime(const char *magick)
       { "epsf",  "application/postscript" },
       { "ept",   "application/postscript" },
       { "fax",   "image/g3fax" },
+      { "fits",  "image/fits" },
       { "fpx",   "image/vnd.fpx" },
       { "g3",    "image/g3fax" },
       { "gif",   "image/gif" },
       { "gif87", "image/gif" },
+      { "heic",  "image/heic" },
+      { "heic-sequence", "image/heic-sequence" },
+      { "heif",  "image/heif" },
+      { "heif-sequence", "image/heif-sequence" },
       { "ico",   "image/x-icon" },
+      { "j2c",   "image/j2c" },
       { "jpeg",  "image/jpeg" },
       { "jpg",   "image/jpeg" },
+      { "jxl",   "image/jxl" },
       { "mng",   "video/x-mng" },
       { "mpeg",  "video/mpeg" },
-      { "png",   "image/png" },
       { "pdf",   "application/pdf" },
+      { "png",   "image/png" },
       { "ps",    "application/postscript" },
       { "ps2",   "application/postscript" },
       { "ps3",   "application/postscript" },
@@ -1628,7 +1639,8 @@ MagickToMime(const char *magick)
       { "tif",   "image/tiff" },
       { "tiff",  "image/tiff" },
       { "wbmp",  "image/vnd.wap.wbmp" },
-      { "webp",  "image/image/webp" }
+      { "webp",  "image/webp" },
+      { "wmf",   "image/wmf" }
     };
 
   for (i=0; i < ArraySize(MediaTypes); i++)
