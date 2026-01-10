@@ -1,5 +1,7 @@
 2026-01-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * PerlMagick/Magick.xs: Fixes so PerlMagick can build with C++.
+
         * coders/heif.c (ReadHEIFImage): Log the 'magick' string
         assignment.
 

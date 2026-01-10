@@ -484,7 +484,7 @@ extern "C" {
     Release memory mapping for a region.
   */
   extern MagickExport MagickPassFail UnmapBlob(void *map,
-                                               const size_t length);
+                                               const size_t length) MAGICK_FUNC_CONST;
 
   /*
     Perform a requested memory mapping of a file descriptor.
@@ -492,7 +492,7 @@ extern "C" {
   extern MagickExport void *MapBlob(int file,
                                     const MapMode mode,
                                     magick_off_t offset,
-                                    size_t length);
+                                    size_t length) MAGICK_FUNC_CONST;
 
   /*
    *

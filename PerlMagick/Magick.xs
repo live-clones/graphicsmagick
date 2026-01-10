@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright (C) 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -51,7 +51,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* ifdef __cplusplus */
 #define MAGICK_COMMA_DELIM_COLORS 1 /* set to 0 to report color names */
 #define PERL_NO_GET_CONTEXT  /* faster */
 #include "EXTERN.h"
@@ -71,6 +71,7 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
+  #define register
 }
 #endif
 
@@ -3535,11 +3536,7 @@ Get(ref,...)
             {
               if (!image)
                 break;
-#if defined(__cplusplus) || defined(c_plusplus)
-              j=image->c_class;
-#else
               j=image->storage_class;
-#endif
               s=newSViv(j);
               if ((j >= 0) && (j < (long) NumberOf(ClassTypes)-1))
                 {
@@ -7206,7 +7203,7 @@ Ping(ref,...)
         list[n]=(char *) SvPV(ST(i+1),length);
         if ((items >= 3) && strEQcase(list[n],"blob"))
           {
-            package_info->image_info->blob=(void *) (SvPV(ST(i+2),length));
+            package_info->image_info->blob=(_BlobInfoPtr_) (SvPV(ST(i+2),length));
             package_info->image_info->length=(size_t) length;
             continue;
           }
@@ -7985,7 +7982,7 @@ Read(ref,...)
               length;
 
             i++;
-            package_info->image_info->blob=(void *) (SvPV(ST(i),length));
+            package_info->image_info->blob=(_BlobInfoPtr_) (SvPV(ST(i),length));
             package_info->image_info->length=length;
           }
         if ((items >= 3) && strEQcase(list[n],"filename"))
