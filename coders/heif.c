@@ -168,25 +168,46 @@ static MagickBool IsHEIF(const unsigned char *magick,const size_t length)
   enum heif_filetype_result
     heif_filetype;
 
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "Testing header for supported HEIF format");
+  MagickBool
+    status = MagickFalse;
 
-  /*
-    const char* heif_get_file_mime_type(const uint8_t* data, int len)
-    heif_filetype_result heif_check_filetype(const uint8_t* data, int len)
-  */
-
-  if (length < 12)
-    return(MagickFalse);
+  if ((length < 12) || (length > (size_t) INT_MAX))
+    {
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Data is too short (%zu bytes)", length);
+      return status;
+    }
 
   heif_filetype = heif_check_filetype(magick, (int) length);
-  if (heif_filetype == heif_filetype_yes_supported)
-    return MagickTrue;
-
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                        "Not a supported HEIF format");
-
-  return(MagickFalse);
+  switch (heif_filetype)
+    {
+    case heif_filetype_yes_supported:
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Data is HEIF (supported by libheif)");
+      status = MagickTrue;
+      break;
+    case heif_filetype_yes_unsupported:
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Data is HEIF (unsupported by libheif)");
+      status = MagickTrue;
+      break;
+    case heif_filetype_maybe:
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Data may be HEIF");
+      status = MagickTrue;
+      break;
+    case heif_filetype_no:
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Data not HEIF");
+      status = MagickFalse;
+      break;
+    default:
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Unexpected enum value %d",
+                            (int) heif_filetype);
+      status = MagickFalse;
+    }
+  return status;
 }
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1707,9 +1728,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
   (void) apply_security_limits(image_info,heif);
 
   /* Header sanity check */
-  (void) memset(fourcc,0,sizeof(fourcc));
-  heif_brand_to_fourcc(heif_read_main_brand(in_buf, in_len), fourcc);
-  if (fourcc[0] == 0)
+  if (!IsHEIF(in_buf, in_len))
     ThrowHEIFReaderException(CorruptImageError, ImproperImageHeader, image);
 
   /* Test file header for format, and update image magick string */
