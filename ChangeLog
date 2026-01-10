@@ -1,5 +1,9 @@
 2026-01-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * Magick++/lib/Thread.cpp (Magick::MutexLock::~MutexLock): Fix
+        Coverity "CID 501168: Error handling issues (UNCAUGHT_EXCEPT)".
+        C++ destructors should not throw exceptions.
+
         * PerlMagick/Magick.xs: Fixes so PerlMagick can build with C++.
 
         * coders/heif.c (ReadHEIFImage): Log the 'magick' string

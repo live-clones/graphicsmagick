@@ -11,6 +11,7 @@
 #include "Magick++/Thread.h"
 #include "Magick++/Exception.h"
 
+#include <iostream>
 #include <string.h>
 
 // Default constructor
@@ -62,13 +63,14 @@ Magick::MutexLock::~MutexLock(void)
   int sysError;
   if ( (sysError = ::pthread_mutex_destroy( &_mutex )) == 0 )
     return;
-  throwExceptionExplicit( OptionError, "mutex destruction failed",
-                          strerror(sysError) );
+  std::cerr << "Magick::MutexLock::~MutexLock: mutex destruction failed! "
+    "(" << strerror(sysError) << ")." << std::endl;
 #endif
 #if defined(_MT) && defined(_VISUALC_)
   if ( ::CloseHandle(_mutex.id) != 0 )
     return;
-  throwExceptionExplicit( OptionError, "mutex destruction failed" );
+  std::cerr << "Magick::MutexLock::~MutexLock: mutex destruction failed!"
+            < std::endl;
 #endif
 }
 

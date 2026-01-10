@@ -41,6 +41,9 @@
 <p>2026-01-10  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>Magick++/lib/Thread.cpp (Magick::MutexLock::~MutexLock): Fix
+Coverity &quot;CID 501168: Error handling issues (UNCAUGHT_EXCEPT)&quot;.
+C++ destructors should not throw exceptions.</p></li>
 <li><p>PerlMagick/Magick.xs: Fixes so PerlMagick can build with C++.</p></li>
 <li><p>coders/heif.c (ReadHEIFImage): Log the 'magick' string
 assignment.</p></li>
