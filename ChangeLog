@@ -1,3 +1,12 @@
+2026-01-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * PerlMagick/t/heif: Add some sample images for AVCI, AVIF, and
+        HEIC.
+
+        * coders/heif.c (ReadHEIFImageFrame): Throw exception rather than
+        abort if heif_image_get_plane_readonly2() returns NULL.
+        (RegisterHEIFImage): Add coder registrations for "AVCI" and "AVIF".
+
 2026-01-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * Magick++/lib/Thread.cpp (Magick::MutexLock::~MutexLock): Fix

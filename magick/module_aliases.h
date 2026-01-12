@@ -41,6 +41,7 @@ static const struct
     MODULEALIAS("APP1JPEG","META"),
     MODULEALIAS("ARW","DCRAW"),
 #if defined(HasHEIF)
+    MODULEALIAS("AVCI","HEIF"),
     MODULEALIAS("AVIF","HEIF"),
 #endif /* if defined(HasHEIF) */
     MODULEALIAS("B","GRAY"),
