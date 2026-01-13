@@ -1,3 +1,11 @@
+2026-01-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/blob.c: Restore use of externally allocated stdio
+        vbuf. It appears that some versions of GNU libc (e.g. 2.31) may
+        attempt to access bytes in a self-allocated vbuf which were not
+        initialized.  Should close oss-fuzz issues 475333713, 475305110,
+        and 475335803.
+
 2026-01-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * PerlMagick/t/heif: Add some sample images for AVCI, AVIF, and

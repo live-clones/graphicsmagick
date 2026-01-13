@@ -152,6 +152,9 @@ struct _BlobInfo
   long
     reference_count;    /* Number of times this blob is referenced. */
 
+  char
+    *vbuf;              /* Buffer for setvbuf() */
+
   unsigned long
     signature;          /* Numeric value used to evaluate structure integrity. */
 };
@@ -887,7 +890,7 @@ MagickExport BlobInfo *CloneBlobInfo(const BlobInfo *blob_info)
   if (clone_info == (BlobInfo *) NULL)
     MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
       UnableToCloneBlobInfo);
-  GetBlobInfo(clone_info);
+  GetBlobInfo(clone_info); /* Also clears memory */
   if (blob_info == (BlobInfo *) NULL)
     return(clone_info);
   semaphore=clone_info->semaphore;
@@ -1069,6 +1072,7 @@ MagickExport MagickPassFail CloseBlob(Image *image)
                       blob->first_errno=errno;
                   }
               }
+            MagickFreeMemory(image->blob->vbuf);
             break;
           }
         case PipeStream:
@@ -1332,6 +1336,7 @@ MagickExport void DetachBlob(BlobInfo *blob_info)
         (void) UnmapBlob(blob_info->data,blob_info->length);
       LiberateMagickResource(MapResource,blob_info->length);
     }
+  MagickFreeMemory(blob_info->vbuf);
   blob_info->mapped=MagickFalse;
   blob_info->length=0;
   blob_info->offset=0;
@@ -2982,9 +2987,11 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                     vbuf_size;
 
                   vbuf_size=image->blob->block_size;
-                  if (0 != vbuf_size)
+                  MagickFreeMemory(image->blob->vbuf);
+                  image->blob->vbuf=MagickAllocateClearedMemory(char *, vbuf_size);
+                  if ((0 != vbuf_size) && (image->blob->vbuf != (char *) NULL))
                     {
-                      if (setvbuf(image->blob->handle.std,NULL,_IOFBF,vbuf_size) != 0)
+                      if (setvbuf(image->blob->handle.std,image->blob->vbuf,_IOFBF,vbuf_size) != 0)
                         {
                           if (image->blob->logging)
                             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
@@ -3067,9 +3074,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                       if (strncmp((char *) magick,"BZh",3) == 0)
                         {
                           if (image->blob->handle.std)
-                            {
-                              (void) fclose(image->blob->handle.std);
-                            }
+                            (void) fclose(image->blob->handle.std);
                           image->blob->handle.bz=BZ2_bzopen(filename,type);
                           if (image->blob->handle.bz != (BZFILE *) NULL)
                             {

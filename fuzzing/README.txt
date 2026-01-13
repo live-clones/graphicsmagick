@@ -108,9 +108,12 @@ Sources come from https://github.com/strukturag/libde265.
 
 With sources under ~/src/libde265::
 
+  rm -rf ~/build/libde265
   mkdir ~/build/libde265
   cd ~/build/libde265
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=ON ~/src/libde265
+  make -j 8
+  make install
 
 x265
 ++++
@@ -121,6 +124,7 @@ With sources under ~/src/x265-stable::
 
   [ May need to do 'mv .git .git-mv' ]
 
+  rm -rf ~/build/x265-stable
   mkdir ~/build/x265-stable
   cd ~/build/x265-stable
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DENABLE_ASSEMBLY:BOOL=ON -DX265_LATEST_TAG=TRUE ~/src/x265-stable/source
@@ -279,7 +283,7 @@ Sources come from https://github.com/strukturag/libheif.git
   rm -rf ~/build/libheif
   mkdir -p ~/build/libheif
   cd ~/build/libheif
-  cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER=on -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC_DECODER=on -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off ~/src/libheif
+  cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER=on -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off ~/src/libheif
   make -j 8
   make install
 
