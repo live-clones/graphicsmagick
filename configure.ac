@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2025 GraphicsMagick Group
+# Copyright (C) 2003-2026 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1998, 1999 E. I. du Pont de Nemours and Company
 #
@@ -3131,6 +3131,7 @@ if test "$with_heif" != 'no' ; then
       failed=0
     fi
     AC_CHECK_HEADER([libheif/heif.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`])
+    AC_CHECK_HEADERS([libheif/heif_sequences.h])dnl Optional headers
     # Libheif 1.14.0 (November 17, 2022) added heif_init(), so it is a good way to enforce at least that version.
     AC_CHECK_LIB([heif],[heif_init],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[${HEIF_LIBS}])
     AC_MSG_CHECKING([if HEIF package is complete])

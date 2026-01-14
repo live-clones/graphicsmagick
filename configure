@@ -32726,6 +32726,12 @@ else case e in #(
 esac
 fi
 
+    ac_fn_c_check_header_compile "$LINENO" "libheif/heif_sequences.h" "ac_cv_header_libheif_heif_sequences_h" "$ac_includes_default"
+if test "x$ac_cv_header_libheif_heif_sequences_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_LIBHEIF_HEIF_SEQUENCES_H 1" >>confdefs.h
+
+fi
     # Libheif 1.14.0 (November 17, 2022) added heif_init(), so it is a good way to enforce at least that version.
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for heif_init in -lheif" >&5
 printf %s "checking for heif_init in -lheif... " >&6; }

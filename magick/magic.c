@@ -127,6 +127,8 @@ StaticMagic[] =
   MAGIC("HEIF", "H.264 AVCI (`avci`)", 4, "ftypavci"),
   MAGIC("HEIF", "H.264 AVCS (`avcs`)", 4, "ftypavcs"),
   MAGIC("HEIF", "H.264 ISO8 (`iso8`)", 4, "ftypiso8"),
+  MAGIC("MP4",  "MP4 sequence", 4, "ftypmp41"),
+  MAGIC("MP4",  "MP4 sequence", 4, "ftypmp42"),
   MAGIC("HEIF", "HEIF", 4, "ftyp"), /* Last-ditch catch-all for HEIF files */
   /* MAGIC("HDF", "Heirarchical Data Format", 1, "HDF"), */
   MAGIC("HPGL", "HP Graphics Language", 0, "IN;"),

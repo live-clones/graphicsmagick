@@ -133,6 +133,7 @@ static const struct
 #if defined(HasPNG)
     MODULEALIAS("MNG","PNG"),
 #endif /* if defined(HasPNG) */
+    MODULEALIAS("MP4", "HEIF"),
     MODULEALIAS("MPG","MPEG"),
     MODULEALIAS("MPRI","MPR"),
     MODULEALIAS("MRW","DCRAW"),

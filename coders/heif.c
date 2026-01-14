@@ -62,6 +62,9 @@
 /* Set to 1 to enable the currently non-functional progress monitor callbacks */
 #define HEIF_ENABLE_PROGRESS_MONITOR 0
 
+/* Set to 1 to enable use of <libheif/heif_sequences.h> APIs */
+#define HEIF_SUPPORT_SEQUENCES 0
+
 /*
   Libheif added LIBHEIF_MAKE_VERSION in 1.14.0 (October 31, 2021).
   Duplicate its definition so we can detect versions lower than
@@ -132,6 +135,9 @@
   }
 
 #include <libheif/heif.h>
+#if defined(HEIF_SUPPORT_SEQUENCES) && HEIF_SUPPORT_SEQUENCES
+#include <libheif/heif_sequences.h>
+#endif /* if defined(HEIF_SUPPORT_SEQUENCES) */
 static MagickBool heif_initialized = MagickFalse;
 
 /*
@@ -1656,6 +1662,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     heif_status;
 
   int
+#if defined(HEIF_SUPPORT_SEQUENCES) && HEIF_SUPPORT_SEQUENCES
+    has_sequence,
+#endif /* if defined(HEIF_SUPPORT_SEQUENCES) && HEIF_SUPPORT_SEQUENCES */
     number_of_top_level_images;
 
   char
@@ -1731,14 +1740,14 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 #endif /* if QuantumDepth == 8 */
 
 
-  /*
-    Read the whole input file into a memory blob
-  */
   in_len=GetBlobSize(image);
   in_buf=GetBlobStreamData(image);
   if (in_buf == (unsigned char *) NULL)
     {
-      in_buf=MagickAllocateResourceLimitedArray(unsigned char *,in_len,sizeof(*in_buf));
+      /*
+        Read the whole input file into a memory blob
+      */
+     in_buf=MagickAllocateResourceLimitedArray(unsigned char *,in_len,sizeof(*in_buf));
       if (in_buf == (unsigned char *) NULL)
         ThrowHEIFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
       in_buf_allocated=MagickTrue;
@@ -1753,6 +1762,9 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     }
   else
     {
+      /*
+        Accessing memory-mapped input file or blob memory directly.
+      */
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Input accessed as in-memory blob");
@@ -1778,6 +1790,10 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     magick="HEIC";
   else if (heif_has_compatible_brand(in_buf, in_len, "heic") == 1)
     magick="HEIC";
+  else if (heif_has_compatible_brand(in_buf, in_len, "mp41") == 1)
+    magick="MP4";
+  else if (heif_has_compatible_brand(in_buf, in_len, "mp42") == 1)
+    magick="MP4";
   (void) strcpy(image->magick,magick);
    if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1879,6 +1895,13 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
                               heif_status.message);
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
+
+#if defined(HEIF_SUPPORT_SEQUENCES) && HEIF_SUPPORT_SEQUENCES
+  has_sequence = heif_context_has_sequence(heif);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Has sequence: %c", has_sequence ? 'Y' : 'N');
+#endif /* if defined(HEIF_SUPPORT_SEQUENCES) && HEIF_SUPPORT_SEQUENCES */
 
   /* Get the number of top level images */
   number_of_top_level_images=heif_context_get_number_of_top_level_images(heif);
@@ -2072,6 +2095,7 @@ ModuleExport void RegisterHEIFImage(void)
         entry->version=version;
       entry->module="HEIF";
       entry->coder_class=PrimaryCoderClass;
+      entry->extension_treatment=ObeyExtensionTreatment;
       (void) RegisterMagickInfo(entry);
     }
 
@@ -2089,6 +2113,7 @@ ModuleExport void RegisterHEIFImage(void)
         entry->version=version;
       entry->module="HEIF";
       entry->coder_class=PrimaryCoderClass;
+      entry->extension_treatment=ObeyExtensionTreatment;
       (void) RegisterMagickInfo(entry);
     }
 
@@ -2102,13 +2127,14 @@ ModuleExport void RegisterHEIFImage(void)
     entry->version=version;
   entry->module="HEIF";
   entry->coder_class=PrimaryCoderClass;
+  entry->extension_treatment=ObeyExtensionTreatment;
   (void) RegisterMagickInfo(entry);
 
   /* HEIC (H.265) / heif_compression_HEVC */
   if (heif_have_decoder_for_format(heif_compression_HEVC) /* || */
       /* heif_have_encoder_for_format(heif_compression_HEVC) */)
     {
-      entry=SetMagickInfo("HEIC");
+      entry=SetMagickInfo("MP4");
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
       entry->description="High Efficiency Image Format";
@@ -2118,8 +2144,44 @@ ModuleExport void RegisterHEIFImage(void)
         entry->version=version;
       entry->module="HEIF";
       entry->coder_class=PrimaryCoderClass;
+      entry->extension_treatment=ObeyExtensionTreatment;
       (void) RegisterMagickInfo(entry);
     }
+
+  /* MP4 (H.264, H.265) / heif_compression_HEVC */
+  /*
+    Since HEIF image sequences are very similar to MP4 video, libheif
+    can also read and write MP4 video (without audio) with all
+    supported codecs.
+
+    heif_context_has_sequence() will return if input is a sequence.
+    Note that a file can contain still images and a sequence at the
+    same time.
+
+    heif_compression_HEVC is H.265, heif_compression_AVC is H.264, and
+    heif_compression_AV1 is AV1
+
+    video/mp4 or application/mp4
+  */
+#if 0
+  if (heif_have_decoder_for_format(heif_compression_HEVC) ||
+      heif_have_decoder_for_format(heif_compression_AVC) ||
+      heif_have_decoder_for_format(heif_compression_AV1))
+    {
+      entry=SetMagickInfo("MP4");
+      entry->decoder=(DecoderHandler) ReadHEIFImage;
+      entry->magick=(MagickHandler) IsHEIF;
+      entry->description="MP4 video container (HVEC, AVC, or AV1 compression)";
+      entry->adjoin=MagickFalse;
+      entry->seekable_stream=need_seekable_stream;
+      if (*version != '\0')
+        entry->version=version;
+      entry->module="HEIF";
+      entry->coder_class=UnstableCoderClass;
+      entry->extension_treatment=HintExtensionTreatment;
+      (void) RegisterMagickInfo(entry);
+    }
+#endif
 
 #endif /* HasHEIF */
 }
@@ -2150,6 +2212,7 @@ ModuleExport void UnregisterHEIFImage(void)
   (void) UnregisterMagickInfo("AVIF");
   (void) UnregisterMagickInfo("HEIC");
   (void) UnregisterMagickInfo("HEIF");
+  (void) UnregisterMagickInfo("MP4");
   if (heif_initialized)
     heif_deinit();
 #endif /* HasHEIF */
