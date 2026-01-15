@@ -1,3 +1,8 @@
+2026-01-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImageFrame): Fix opacity code for
+        monochrome HEIF image. Use union for plane pointer access.
+
 2026-01-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c: Add preliminary support for a "MP4" coder.

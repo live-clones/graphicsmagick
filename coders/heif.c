@@ -1205,6 +1205,13 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     }
 
   {
+
+    typedef union
+    {
+      const uint8_t *u8;
+      const uint16_t *u16;
+    } magick_plane_t;
+
     const char *
       heif_channel_str;
 
@@ -1228,11 +1235,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           static const enum heif_channel channels_YCbCrA[4] =
             { heif_channel_Y, heif_channel_Cb, heif_channel_Cr, heif_channel_Alpha };
 
-          const uint8_t *
-            planes[4]  = { 0, 0, 0, 0 };
+          magick_plane_t
+            planes[4];
 
-          const uint8_t *
-            line[4] = { 0, 0, 0, 0 };
+          magick_plane_t
+            line[4];
 
           size_t
             row_stride[4];
@@ -1254,18 +1261,17 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           for (channel_index = 0; channel_index < num_channels; channel_index++)
             {
               heif_channel = channels_YCbCrA[channel_index];
-              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
-                                                                     heif_channel,
-                                                                     &row_stride[channel_index]);
               heif_channel_str = HEIF_channel_to_string(heif_channel);
-              if (planes[channel_index] == (const uint8_t*) NULL)
+              planes[channel_index].u8 = heif_image_get_plane_readonly2(heif_image,
+                                                                        heif_channel,
+                                                                        &row_stride[channel_index]);
+              if (planes[channel_index].u8 == (const uint8_t*) NULL)
                 {
                   if (image->logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                           "heif_image_get_plane_readonly2() returned NULL"
                                           " for channel index %u (channel %s)!",
-                                          channel_index,
-                                          heif_channel_str ? heif_channel_str : "(null)");
+                                          channel_index,heif_channel_str);
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
@@ -1296,7 +1302,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   return MagickFail;
                 }
               for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride[channel_index];
+                line[channel_index].u8=planes[channel_index].u8+y*row_stride[channel_index];
               for (x=0; x < (long)image->columns; x++)
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
@@ -1309,13 +1315,14 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
 
                       if (image->depth > 8)
                         {
-                          sample = *((uint16_t*) line[channel_index]);
-                          line[channel_index] += 2;
+                          sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
                           quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
                         }
                       else
                         {
-                          sample = *line[channel_index]++;
+                          sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
                       switch (channel_index)
@@ -1358,11 +1365,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
             channels_RGBA[4] =
             { heif_channel_R, heif_channel_G, heif_channel_B, heif_channel_Alpha };
 
-          const uint8_t *
-            planes[4]  = { 0, 0, 0 , 0 };
+          magick_plane_t
+            planes[4];
 
-          const uint8_t *
-            line[4] = { 0, 0, 0 , 0 };
+          magick_plane_t
+            line[4];
 
           size_t
             row_stride[4];
@@ -1385,18 +1392,17 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           for (channel_index = 0; channel_index < num_channels; channel_index++)
             {
               heif_channel = channels_RGBA[channel_index];
-              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
-                                                                     heif_channel,
-                                                                     &row_stride[channel_index]);
               heif_channel_str = HEIF_channel_to_string(heif_channel);
-              if (planes[channel_index] == (const uint8_t*) NULL)
+              planes[channel_index].u8 = heif_image_get_plane_readonly2(heif_image,
+                                                                        heif_channel,
+                                                                        &row_stride[channel_index]);
+              if (planes[channel_index].u8 == (const uint8_t*) NULL)
                 {
                   if (image->logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                           "heif_image_get_plane_readonly2() returned NULL"
                                           " for channel index %u (channel %s)!",
-                                          channel_index,
-                                          heif_channel_str ? heif_channel_str : "(null)");
+                                          channel_index,heif_channel_str);
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
@@ -1427,7 +1433,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   return MagickFail;
                 }
               for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride[channel_index];
+                line[channel_index].u8=planes[channel_index].u8+y*row_stride[channel_index];
               for (x=0; x < (long)image->columns; x++)
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
@@ -1440,13 +1446,14 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
 
                       if (image->depth > 8)
                         {
-                          sample = *((uint16_t*) line[channel_index]);
-                          line[channel_index] += 2;
+                          sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
                           quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
                         }
                       else
                         {
-                          sample=*line[channel_index]++;
+                          sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
                       switch (channel_index)
@@ -1489,11 +1496,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           static const enum heif_channel channels_YA[4] =
             { heif_channel_Y, heif_channel_Alpha };
 
-          const uint8_t *
-            planes[2]  = { 0, 0 };
+          magick_plane_t
+            planes[2];
 
-          const uint8_t *
-            line[2] = { 0, 0 };
+          magick_plane_t
+            line[2];
 
           size_t
             row_stride[2];
@@ -1517,18 +1524,17 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           for (channel_index = 0; channel_index < num_channels; channel_index++)
             {
               heif_channel = channels_YA[channel_index];
-              planes[channel_index] = heif_image_get_plane_readonly2(heif_image,
-                                                                     heif_channel,
-                                                                     &row_stride[channel_index]);
               heif_channel_str = HEIF_channel_to_string(heif_channel);
-              if (planes[channel_index] == (const uint8_t*) NULL)
+              planes[channel_index].u8 = heif_image_get_plane_readonly2(heif_image,
+                                                                        heif_channel,
+                                                                        &row_stride[channel_index]);
+              if (planes[channel_index].u8 == (const uint8_t*) NULL)
                 {
                   if (image->logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                           "heif_image_get_plane_readonly2() returned NULL"
                                           " for channel index %u (channel %s)!",
-                                          channel_index,
-                                          heif_channel_str ? heif_channel_str : "(null)");
+                                          channel_index,heif_channel_str);
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
@@ -1560,7 +1566,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   return MagickFail;
                 }
               for (channel_index = 0; channel_index < num_channels; channel_index++)
-                line[channel_index]=planes[channel_index]+y*row_stride[channel_index];
+                line[channel_index].u8=planes[channel_index].u8+y*row_stride[channel_index];
               for (x=0; x < (long)image->columns; x++)
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
@@ -1573,13 +1579,14 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
 
                       if (image->depth > 8)
                         {
-                          sample = *((uint16_t*) line[channel_index]);
-                          line[channel_index] += 2;
+                          sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
                           quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
                         }
                       else
                         {
-                          sample=*line[channel_index]++;
+                          sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
 
@@ -1591,7 +1598,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                             SetOpacitySample(q,OpaqueOpacity);
                           break;
                         case 1:
-                          SetOpacitySample(q,MaxRGB-ScaleCharToQuantum(*line[channel_index]++));
+                          SetOpacitySample(q,MaxRGB-quantum);
                           break;
                         }
                     }
