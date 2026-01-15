@@ -41,6 +41,10 @@
 <p>2026-01-15  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>Magick++/lib/Thread.cpp (Magick::MutexLock::unlock): Do not
+throw C++ exception since this method is used by the destructor
+and C++ exceptions should not be thrown from destructors. Another
+case of Coverity 501168 &quot;Uncaught exception&quot;.</p></li>
 <li><p>coders/heif.c (ReadHEIFImageFrame): Fix opacity code for
 monochrome HEIF image. Use union for plane pointer access.</p></li>
 </ul>

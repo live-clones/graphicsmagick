@@ -1,5 +1,10 @@
 2026-01-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * Magick++/lib/Thread.cpp (Magick::MutexLock::unlock): Do not
+        throw C++ exception since this method is used by the destructor
+        and C++ exceptions should not be thrown from destructors. Another
+        case of Coverity 501168 "Uncaught exception".
+
         * coders/heif.c (ReadHEIFImageFrame): Fix opacity code for
         monochrome HEIF image. Use union for plane pointer access.
 

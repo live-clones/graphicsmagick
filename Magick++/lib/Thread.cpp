@@ -115,12 +115,13 @@ void Magick::MutexLock::unlock(void)
   int sysError;
   if ( (sysError = ::pthread_mutex_unlock( &_mutex )) == 0)
     return;
-  throwExceptionExplicit( OptionError, "mutex unlock failed",
-                          strerror(sysError) );
+  std::cerr << "Magick::MutexLock::unlock: mutex unlock failed! "
+    "(" << strerror(sysError) << ")." << std::endl;
 #endif
 #if defined(_MT) && defined(_VISUALC_)
   if ( ReleaseSemaphore(_mutex.id, 1, NULL) == TRUE )
     return;
-  throwExceptionExplicit( OptionError, "mutex unlock failed" );
+  std::cerr << "Magick::MutexLock::unlock: mutex unlock failed! "
+    "(" << strerror(sysError) << ")." << std::endl;
 #endif
 }
