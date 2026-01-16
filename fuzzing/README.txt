@@ -109,7 +109,7 @@ Sources come from https://github.com/strukturag/libde265.
 With sources under ~/src/libde265::
 
   rm -rf ~/build/libde265
-  mkdir ~/build/libde265
+  mkdir -p ~/build/libde265
   cd ~/build/libde265
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=ON ~/src/libde265
   make -j 8
@@ -125,7 +125,7 @@ With sources under ~/src/x265-stable::
   [ May need to do 'mv .git .git-mv' ]
 
   rm -rf ~/build/x265-stable
-  mkdir ~/build/x265-stable
+  mkdir -p ~/build/x265-stable
   cd ~/build/x265-stable
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DENABLE_ASSEMBLY:BOOL=ON -DX265_LATEST_TAG=TRUE ~/src/x265-stable/source
   make -j 8
@@ -142,7 +142,7 @@ The openh264 build is based on a well-designed pure GNU Makefile.
 
 With sources under ~/src/openh264::
 
-  mkdir ~/build/openh264
+  mkdir -p ~/build/openh264
   cd ~/build/openh264
   make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local clean
   make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local
@@ -153,26 +153,16 @@ aom
 
 Sources come from https://aomedia.googlesource.com/aom.
 
-  git clone https://aomedia.googlesource.com/aom ~/src/aom
+  git clone --depth 1 --branch main https://aomedia.googlesource.com/aom ~/src/aom
 
 With sources under ~/src/aom::
 
-  cmake -G "Unix Makefiles" -DAOM_TARGET_CPU=generic -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE  ~/aom
-  make -j 8
-  make install
-
-openjpeg
-++++++++
-
-Sources come from https://github.com/uclouvain/openjpeg.
-
-  git clone https://github.com/uclouvain/openjpeg ~/src/openjpeg
-
-With sources under ~/src/openjpeg::
-
-  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ~/src/openjpeg
-  make -j 8
-  make install
+  rm -rf ~/build/aom
+  mkdir -p ~/build/aom
+  cd ~/build/aom
+  cmake -DAOM_TARGET_CPU=generic -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/aom
+  cmake --build . -- -j$(nproc)
+  cmake --install .
 
 jpeg
 ++++
@@ -184,11 +174,27 @@ Sources come from https://github.com/libjpeg-turbo/libjpeg-turbo.
 With sources under ~/src/libjpeg-turbo::
 
   rm -rf  ~/build/libjpeg-turbo
-  mkdir ~/build/libjpeg-turbo
+  mkdir -p ~/build/libjpeg-turbo
   cd ~/build/libjpeg-turbo
-  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DWITH_JPEG8=1 ~/src/libjpeg-turbo
-  make -j 8
-  make install
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DWITH_JPEG8=1 ~/src/libjpeg-turbo
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+openjpeg
+++++++++
+
+Sources come from https://github.com/uclouvain/openjpeg.
+
+  git clone https://github.com/uclouvain/openjpeg ~/src/openjpeg
+
+With sources under ~/src/openjpeg::
+
+  rm -rf ~/build/openjpeg
+  mkdir -p ~/build/openjpeg
+  cd ~/build/openjpeg
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ~/src/openjpeg
+  cmake --build . -- -j$(nproc)
+  cmake --install .
 
 libjxl
 +++++++
@@ -204,7 +210,7 @@ After the initial checkout, 'git pull' will automatically take care of submodule
 Then see procedure in libjxl/BUILDING.md.  Based on that, do this::
 
   rm -rf ~/build/libjxl
-  mkdir ~/build/libjxl
+  mkdir -p ~/build/libjxl
   cd ~/build/libjxl
   cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE ~/src/libjxl
   cmake --build . -- -j$(nproc)
@@ -264,7 +270,7 @@ OpenJPH
 
 Project is at https://github.com/aous72/OpenJPH
 
-  git clone https://github.com/aous72/OpenJPH ~/src/OpenJPH
+  git clone https://github.com/aous72/OpenJPH.git ~/src/OpenJPH
 
   rm -rf ~/build/OpenJPH
   mkdir -p ~/build/OpenJPH
@@ -284,8 +290,8 @@ Sources come from https://github.com/strukturag/libheif.git
   mkdir -p ~/build/libheif
   cd ~/build/libheif
   cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER=on -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off ~/src/libheif
-  make -j 8
-  make install
+  cmake --build . -- -j$(nproc)
+  cmake --install .
 
 === Supported formats ===
 format        decoding   encoding

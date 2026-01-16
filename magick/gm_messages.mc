@@ -2531,6 +2531,12 @@ Image pixel width limit exceeded (see -limit Width)
 .
 
 MessageId       = +1
+SymbolicName    = LimitErrorImagesLimitExceeded
+Language        = English
+Images limit exceeded (see -limit Images)
+.
+
+MessageId       = +1
 SymbolicName    = LimitErrorMemoryAllocationFailed
 Language        = English
 Memory allocation failed
@@ -3029,7 +3035,7 @@ unable to allocate draw info
 .
 
 MessageId       = +1
-SymbolicName    = LimitFatalErrorUnableToAllocateDrawingContext
+SymbolicName    = LimitFatalErrorUnableToAllocateDrawingWand
 Language        = English
 unable to allocate drawing wand
 .

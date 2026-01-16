@@ -62,8 +62,10 @@
 /* Set to 1 to enable the currently non-functional progress monitor callbacks */
 #define HEIF_ENABLE_PROGRESS_MONITOR 0
 
+#if defined(HAVE_LIBHEIF_HEIF_SEQUENCES_H)
 /* Set to 1 to enable use of <libheif/heif_sequences.h> APIs */
-#define HEIF_SUPPORT_SEQUENCES 0
+#define HEIF_SUPPORT_SEQUENCES 1
+#endif /* if defined(HAVE_LIBHEIF_HEIF_SEQUENCES_H) */
 
 /*
   Libheif added LIBHEIF_MAKE_VERSION in 1.14.0 (October 31, 2021).

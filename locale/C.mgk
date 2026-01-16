@@ -1600,6 +1600,9 @@
         <Message name="WriteLimitExceeded">
           Write limit exceeded (see -limit Write)
         </Message>
+        <Message name="ImagesLimitExceeded">
+          Images limit exceeded (see -limit Images)
+        </Message>
       </Error>
       <FatalError>
         <Message name="UnableToAllocateAscii85Info">

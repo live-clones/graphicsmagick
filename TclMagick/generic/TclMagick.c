@@ -317,14 +317,16 @@ static int magickCmd(
         "undefined", "area", "disk",
         "file",      "map",  "memory",
         "pixels", "threads", "width",
-        "height",
+        "height", "read", "write",
+        "images",
         (char *) NULL
     };
     static ResourceType resourceTypes[] = {
         UndefinedResource, AreaResource, DiskResource,
         FileResource,      MapResource,  MemoryResource,
         PixelsResource,    ThreadsResource, WidthResource,
-        HeightResource
+        HeightResource,    ReadResource, WriteResource,
+        ImagesResource
     };
 
     (void) clientData; /* Unused */

@@ -1,4 +1,4 @@
-.TH gm 1 "2026/01/02" "GraphicsMagick"
+.TH gm 1 "2026/01/16" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -3242,20 +3242,21 @@ interface works similar to Photoshop's "Image->Adjustments->Levels..."
 "Input Levels" interface.
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 
 By default, resource limits are estimated based on the available
 resources and capabilities of the system. The resource limits are
 \fBDisk\fP, maximum total disk space consumed; \fBFile\fP, maximum
-number of file descriptors allowed to be open at once; \fBMap\fP,
-maximum total number of file bytes which may be memory mapped;
-\fBMemory\fP, maximum total number of bytes of heap memory used for
-image storage; \fBPixels\fP, maximum absolute image size (per image);
-\fBWidth\fP, maximum image pixels width; \fBHeight\fP, maximum image
-pixels height; \fBRead\fP, maximum number of uncompressed bytes to
-read; \fBWrite\fP maximum number of uncompressed bytes to write; and
-\fBThreads\fP, the maximum number of worker threads to use per OpenMP
-thread team.
+number of file descriptors allowed to be open at once; \fBImages\fP,
+maximum images allowed to be handled by the whole program at one time;
+\fBMap\fP, maximum total number of file bytes which may be memory
+mapped; \fBMemory\fP, maximum total number of bytes of heap memory
+used for image storage; \fBPixels\fP, maximum absolute image size
+(per image); \fBWidth\fP, maximum image pixels width; \fBHeight\fP,
+maximum image pixels height; \fBRead\fP, maximum number of
+uncompressed bytes to read; \fBWrite\fP maximum number of
+uncompressed bytes to write; and \fBThreads\fP, the maximum number of
+worker threads to use per OpenMP thread team.
 
 The \fBDisk\fP and \fBMap\fP resource limits are used to decide if
 (for a given image) the decoded image ("pixel cache") should be stored
@@ -5618,7 +5619,7 @@ Options, above.
 \fRthe type of interlacing scheme
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -6230,7 +6231,7 @@ Options, above.
 \fRthe type of interlacing scheme
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -6414,7 +6415,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -7439,7 +7440,7 @@ Options, above.
 \fRadjust the level of image contrast
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-list \fI<type>"\fP
 \fRthe type of list
@@ -7960,7 +7961,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -9973,7 +9974,7 @@ Options, above.
 \fRthe type of interlacing scheme
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -10123,7 +10124,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -10434,7 +10435,7 @@ Options, above.
 \fRadjust the level of image contrast
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-linewidth"
 \fRthe line width for subsequent draw operations
@@ -10907,7 +10908,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log

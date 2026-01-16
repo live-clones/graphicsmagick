@@ -65,9 +65,10 @@
 <li><p><a class="reference internal" href="#quantumtypes" id="toc-entry-19">QuantumTypes</a></p></li>
 <li><p><a class="reference internal" href="#renderingintent" id="toc-entry-20">RenderingIntent</a></p></li>
 <li><p><a class="reference internal" href="#resolutiontype" id="toc-entry-21">ResolutionType</a></p></li>
-<li><p><a class="reference internal" href="#storagetype" id="toc-entry-22">StorageType</a></p></li>
-<li><p><a class="reference internal" href="#stretchtype" id="toc-entry-23">StretchType</a></p></li>
-<li><p><a class="reference internal" href="#styletype" id="toc-entry-24">StyleType</a></p></li>
+<li><p><a class="reference internal" href="#resourcelimit" id="toc-entry-22">ResourceLimit</a></p></li>
+<li><p><a class="reference internal" href="#storagetype" id="toc-entry-23">StorageType</a></p></li>
+<li><p><a class="reference internal" href="#stretchtype" id="toc-entry-24">StretchType</a></p></li>
+<li><p><a class="reference internal" href="#styletype" id="toc-entry-25">StyleType</a></p></li>
 </ul>
 </nav>
 <section id="channeltype">
@@ -75,7 +76,7 @@
 <p><em>ChannelType</em> is used as an argument when doing color separations. Use
 <em>ChannelType</em> when extracting a layer from an image. <em>MatteChannel</em> is
 useful for extracting the opacity values from an image. Note that an
-image may be represented in RGB, RGBA, CMYK, or CMYKA, pixel formats
+image may be represented in RGB, RGBA, CMYK, or CMYKA pixel formats
 and a channel may only be extracted if it is valid for the current
 pixel format.</p>
 <table>
@@ -1104,8 +1105,60 @@ of pixels per centimeter (metric units).</p></td>
 </tbody>
 </table>
 </section>
+<section id="resourcelimit">
+<h1><a class="toc-backref" href="#toc-entry-22" role="doc-backlink">ResourceLimit</a></h1>
+<p>GraphicsMagick provides various resource limits which provide
+guardrails on what is allowed. <em>ResourceType</em> provides a means to set
+these limits within the program.</p>
+<table>
+<caption>ResourceLimit</caption>
+<thead>
+<tr><th class="head"><p>Enumeration</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><p>UndefinedResource</p></td>
+<td><p>Undefined value</p></td>
+</tr>
+<tr><td><p>DiskResource</p></td>
+<td><p>Pixel cache total disk space (Gigabytes)</p></td>
+</tr>
+<tr><td><p>FileResource</p></td>
+<td><p>Pixel cache number of open files (Files)</p></td>
+</tr>
+<tr><td><p>MapResource</p></td>
+<td><p>Pixel cache total file memory-mapping (MB)</p></td>
+</tr>
+<tr><td><p>MemoryResource</p></td>
+<td><p>Maximum heap memory allocations (MB)</p></td>
+</tr>
+<tr><td><p>PixelsResource</p></td>
+<td><p>Maximum number of pixels in image (Pixels)</p></td>
+</tr>
+<tr><td><p>ThreadsResource</p></td>
+<td><p>Maximum number of worker threads</p></td>
+</tr>
+<tr><td><p>WidthResource</p></td>
+<td><p>Maximum pixel width of an image (Pixels)</p></td>
+</tr>
+<tr><td><p>HeightResource</p></td>
+<td><p>Maximum pixel height of an image (Pixels)</p></td>
+</tr>
+<tr><td><p>ReadResource</p></td>
+<td><p>Maximum uncompressed data read from a file</p></td>
+</tr>
+<tr><td><p>WriteResource</p></td>
+<td><p>Maximum uncompressed data written to file</p></td>
+</tr>
+<tr><td><p>ImagesResource</p></td>
+<td><p>Maximum number of discrete images</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="storagetype">
-<h1><a class="toc-backref" href="#toc-entry-22" role="doc-backlink">StorageType</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-23" role="doc-backlink">StorageType</a></h1>
 <p>The <em>StorageType</em> enumerations are used to specify the storage format
 of pixels in the source or destination pixel array.</p>
 <table>
@@ -1135,7 +1188,7 @@ of pixels in the source or destination pixel array.</p>
 </table>
 </section>
 <section id="stretchtype">
-<h1><a class="toc-backref" href="#toc-entry-23" role="doc-backlink">StretchType</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-24" role="doc-backlink">StretchType</a></h1>
 <p>The <em>StretchType</em> enumerations are used to specify the relative width
 of a font to the regular width for the font family. If the width is
 not important, the <em>AnyStretch</em> enumeration may be specified for a
@@ -1182,7 +1235,7 @@ wildcard match.</p>
 </table>
 </section>
 <section id="styletype">
-<h1><a class="toc-backref" href="#toc-entry-24" role="doc-backlink">StyleType</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-25" role="doc-backlink">StyleType</a></h1>
 <p>The <em>StyleType</em> enumerations are used to specify the style
 (e.g. Italic) of a font. If the style is not important, the <em>AnyStyle</em>
 enumeration may be specified for a wildcard match.</p>
@@ -1208,7 +1261,7 @@ enumeration may be specified for a wildcard match.</p>
 </tr>
 </tbody>
 </table>
-<p>Copyright © Bob Friesenhahn 1999 - 2022</p>
+<p>Copyright © Bob Friesenhahn 1999 - 2026</p>
 </section>
 </main>
 

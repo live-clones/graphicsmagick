@@ -3376,22 +3376,23 @@ interface works similar to Photoshop's "Image->Adjustments->Levels..."
 <utils apps=animate,compare,composite,convert,display,identify,import,mogrify,montage>
 <dopt>-limit <type> <value></opt>
 
-<abs>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</abs>
+<abs>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</abs>
 
 <pp>
 
 By default, resource limits are estimated based on the available
 resources and capabilities of the system. The resource limits are
 <s>Disk</s>, maximum total disk space consumed; <s>File</s>, maximum
-number of file descriptors allowed to be open at once; <s>Map</s>,
-maximum total number of file bytes which may be memory mapped;
-<s>Memory</s>, maximum total number of bytes of heap memory used for
-image storage; <s>Pixels</s>, maximum absolute image size (per image);
-<s>Width</s>, maximum image pixels width; <s>Height</s>, maximum image
-pixels height; <s>Read</s>, maximum number of uncompressed bytes to
-read; <s>Write</s> maximum number of uncompressed bytes to write; and
-<s>Threads</s>, the maximum number of worker threads to use per OpenMP
-thread team.</pp>
+number of file descriptors allowed to be open at once; <s>Images</s>,
+maximum images allowed to be handled by the whole program at one time;
+<s>Map</s>, maximum total number of file bytes which may be memory
+mapped; <s>Memory</s>, maximum total number of bytes of heap memory
+used for image storage; <s>Pixels</s>, maximum absolute image size
+(per image); <s>Width</s>, maximum image pixels width; <s>Height</s>,
+maximum image pixels height; <s>Read</s>, maximum number of
+uncompressed bytes to read; <s>Write</s> maximum number of
+uncompressed bytes to write; and <s>Threads</s>, the maximum number of
+worker threads to use per OpenMP thread team.</pp>
 
 <pp>
 The <s>Disk</s> and <s>Map</s> resource limits are used to decide if

@@ -3458,20 +3458,21 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a name="details-limit"></a>-limit <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 By default, resource limits are estimated based on the available
 resources and capabilities of the system. The resource limits are
 <strong>Disk</strong>, maximum total disk space consumed; <strong>File</strong>, maximum
-number of file descriptors allowed to be open at once; <strong>Map</strong>,
-maximum total number of file bytes which may be memory mapped;
-<strong>Memory</strong>, maximum total number of bytes of heap memory used for
-image storage; <strong>Pixels</strong>, maximum absolute image size (per image);
-<strong>Width</strong>, maximum image pixels width; <strong>Height</strong>, maximum image
-pixels height; <strong>Read</strong>, maximum number of uncompressed bytes to
-read; <strong>Write</strong> maximum number of uncompressed bytes to write; and
-<strong>Threads</strong>, the maximum number of worker threads to use per OpenMP
-thread team.</font></td></tr></table>
+number of file descriptors allowed to be open at once; <strong>Images</strong>,
+maximum images allowed to be handled by the whole program at one time;
+<strong>Map</strong>, maximum total number of file bytes which may be memory
+mapped; <strong>Memory</strong>, maximum total number of bytes of heap memory
+used for image storage; <strong>Pixels</strong>, maximum absolute image size
+(per image); <strong>Width</strong>, maximum image pixels width; <strong>Height</strong>,
+maximum image pixels height; <strong>Read</strong>, maximum number of
+uncompressed bytes to read; <strong>Write</strong> maximum number of
+uncompressed bytes to write; and <strong>Threads</strong>, the maximum number of
+worker threads to use per OpenMP thread team.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 The <strong>Disk</strong> and <strong>Map</strong> resource limits are used to decide if
 (for a given image) the decoded image ("pixel cache") should be stored

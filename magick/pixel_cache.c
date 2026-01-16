@@ -2402,15 +2402,34 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
   size_t
     packet_size;
 
+  MagickPassFail
+    status = MagickPass;
+
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(image->cache != (void *) NULL);
+
+  /* FIXME: Resource check here */
+  if (!AcquireMagickResource(ImagesResource,1))
+    {
+      (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
+                            "Images resource %" MAGICK_INTMAX_F "d"
+                            " reached limit %" MAGICK_INTMAX_F "d",
+                            GetMagickResource(ImagesResource),
+                            GetMagickResourceLimit(ImagesResource));
+      ThrowException(exception,ResourceLimitError,ImagesLimitExceeded,
+                     image->filename);
+      status=MagickFail;
+      goto open_cache_done;
+    }
+
   if ((image->columns == 0) || (image->rows == 0))
     {
       if (image->exception.severity < ResourceLimitError)
         ThrowException(exception,ResourceLimitError,NoPixelsDefinedInCache,
                        image->filename);
-      return MagickFail;
+      status=MagickFail;
+      goto open_cache_done;
     }
 
   cache_info=(CacheInfo *) image->cache;
@@ -2422,7 +2441,8 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     {
       ThrowException(exception,ResourceLimitError,PixelCacheAllocationFailed,
                      image->filename);
-      return MagickFail;
+      status=MagickFail;
+      goto open_cache_done;
     }
   cache_info->rows=image->rows;
   cache_info->columns=image->columns;
@@ -2500,14 +2520,17 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
       cache_info->pixels=(PixelPacket *) NULL;
       cache_info->indexes=(IndexPacket *) NULL;
       cache_info->length=0;
-      return(MagickPass);
+      goto open_cache_done;
     }
 
   /*
     Ensure that image dimensions are within limits.
   */
   if (CheckImagePixelLimits(image,exception) == MagickFail)
-    return MagickFail;
+    {
+      status=MagickFail;
+      goto open_cache_done;
+    }
 
   /*
     Compute storage sizes.  Make sure that sizes fit within our
@@ -2522,7 +2545,8 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     {
       ThrowException(exception,ResourceLimitError,PixelCacheAllocationFailed,
                      image->filename);
-      return MagickFail;
+      status=MagickFail;
+      goto open_cache_done;
     }
   cache_info->length=offset;
   /*
@@ -2567,7 +2591,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
                                   format,
                                   ClassTypeToString(cache_info->storage_class),
                                   ColorspaceTypeToString(cache_info->colorspace));
-          return(MagickPass);
+          goto open_cache_done;
         }
     }
   /*
@@ -2577,15 +2601,18 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     {
       ThrowException(exception,ResourceLimitError,CacheResourcesExhausted,
                      image->filename);
-      return MagickFail;
+      status=MagickFail;
+      goto open_cache_done;
     }
   if (*cache_info->cache_filename == '\0')
     if(!AcquireTemporaryFileName(cache_info->cache_filename))
       {
+        LiberateMagickResource(ImagesResource,1);
         LiberateMagickResource(DiskResource,cache_info->length);
         ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,
                        cache_info->cache_filename);
-        return MagickFail;
+        status=MagickFail;
+        goto open_cache_done;
       }
   switch (mode)
     {
@@ -2620,7 +2647,8 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     {
       LiberateMagickResource(DiskResource,cache_info->length);
       ThrowException(exception,CacheError,UnableToOpenCache,image->filename);
-      return MagickFail;
+      status=MagickFail;
+      goto open_cache_done;
     }
   if (!ExtendCache(file,(magick_off_t) cache_info->length+cache_info->offset))
     {
@@ -2639,7 +2667,8 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
                             cache_info->cache_filename);
       LiberateMagickResource(DiskResource,cache_info->length);
       ThrowException(exception,CacheError,UnableToExtendCache,image->filename);
-      return MagickFail;
+      status=MagickFail;
+      goto open_cache_done;
     }
   cache_info->storage_class=image->storage_class;
   cache_info->colorspace=image->colorspace;
@@ -2675,6 +2704,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
 #if defined(SIGBUS)
   /*   (void) signal(SIGBUS,CacheSignalHandler); */
 #endif
+
   FormatSize(cache_info->length,format);
   if (cache_info->logging)
     (void) LogMagickEvent(CacheEvent,GetMagickModule(),
@@ -2686,7 +2716,8 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
                           format,
                           ClassTypeToString(cache_info->storage_class),
                           ColorspaceTypeToString(cache_info->colorspace));
-  return(MagickPass);
+ open_cache_done:;
+  return(status);
 }
 
 /*
@@ -3687,6 +3718,12 @@ DestroyCacheInfo(Cache cache_info)
                             cache_info->cache_filename);
       LiberateMagickResource(DiskResource,cache_info->length);
     }
+
+  /*
+    Release Image Resource
+  */
+  if (UndefinedCache != cache_info->type)
+    LiberateMagickResource(ImagesResource,1);
 
   DestroySemaphoreInfo(&cache_info->file_semaphore);
   DestroySemaphoreInfo(&cache_info->reference_semaphore);

@@ -15,7 +15,7 @@ ChannelType
 *ChannelType* is used as an argument when doing color separations. Use
 *ChannelType* when extracting a layer from an image. *MatteChannel* is
 useful for extracting the opacity values from an image. Note that an
-image may be represented in RGB, RGBA, CMYK, or CMYKA, pixel formats
+image may be represented in RGB, RGBA, CMYK, or CMYKA pixel formats
 and a channel may only be extracted if it is valid for the current
 pixel format.
 
@@ -616,6 +616,32 @@ inch. *ResolutionType* provides a means to adjust this.
                                   of pixels per centimeter (metric units).
    =============================  ============================================
 
+ResourceLimit
+-------------
+
+GraphicsMagick provides various resource limits which provide
+guardrails on what is allowed. *ResourceType* provides a means to set
+these limits within the program.
+
+.. table:: ResourceLimit
+
+   =============================  ============================================
+   Enumeration                    Description
+   =============================  ============================================
+   UndefinedResource              Undefined value
+   DiskResource                   Pixel cache total disk space (Gigabytes)
+   FileResource                   Pixel cache number of open files (Files)
+   MapResource                    Pixel cache total file memory-mapping (MB)
+   MemoryResource                 Maximum heap memory allocations (MB)
+   PixelsResource                 Maximum number of pixels in image (Pixels)
+   ThreadsResource                Maximum number of worker threads
+   WidthResource                  Maximum pixel width of an image (Pixels)
+   HeightResource                 Maximum pixel height of an image (Pixels)
+   ReadResource                   Maximum uncompressed data read from a file
+   WriteResource                  Maximum uncompressed data written to file
+   ImagesResource                 Maximum number of discrete images
+   =============================  ============================================
+
 StorageType
 -----------
 
@@ -679,4 +705,4 @@ enumeration may be specified for a wildcard match.
 
 .. |copy|   unicode:: U+000A9 .. COPYRIGHT SIGN
 
-Copyright |copy| Bob Friesenhahn 1999 - 2022
+Copyright |copy| Bob Friesenhahn 1999 - 2026

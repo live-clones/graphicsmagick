@@ -1669,6 +1669,8 @@ MagickExport ResourceType StringToResourceType(const char *option)
     resource_type=ReadResource;
   else if (LocaleCompare("Write",option) == 0)
     resource_type=WriteResource;
+  else if (LocaleCompare("Images",option) == 0)
+    resource_type=ImagesResource;
   return resource_type;
 }
 
