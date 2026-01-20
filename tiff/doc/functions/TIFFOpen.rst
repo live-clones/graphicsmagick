@@ -28,12 +28,12 @@ Synopsis
 
 .. c:function:: int TIFFSetMode(TIFF* tif, int mode)
 
-.. c:type:: tsize_t (*TIFFReadWriteProc)(thandle_t, tdata_t, tsize_t)
+.. c:type:: tmsize_t (*TIFFReadWriteProc)(thandle_t, void *, tmsize_t)
 .. c:type:: toff_t (*TIFFSeekProc)(thandle_t, toff_t, int)
 .. c:type:: int (*TIFFCloseProc)(thandle_t)
 .. c:type:: toff_t (*TIFFSizeProc)(thandle_t)
-.. c:type:: int (*TIFFMapFileProc)(thandle_t, tdata_t*, toff_t*)
-.. c:type:: void (*TIFFUnmapFileProc)(thandle_t, tdata_t, toff_t)
+.. c:type:: int (*TIFFMapFileProc)(thandle_t, void **base, toff_t *size)
+.. c:type:: void (*TIFFUnmapFileProc)(thandle_t, void *base, toff_t size)
 
 .. c:function:: TIFF* TIFFClientOpen(const char* filename, const char* mode, thandle_t clientdata, TIFFReadWriteProc readproc, TIFFReadWriteProc writeproc, TIFFSeekProc seekproc, TIFFCloseProc closeproc, TIFFSizeProc sizeproc, TIFFMapFileProc mapproc, TIFFUnmapFileProc unmapproc)
 
@@ -62,7 +62,7 @@ If an existing file is opened for writing, all previous data is
 overwritten.
 
 If a file is opened for reading, the first TIFF directory in the file
-is automatically read. 
+is automatically read.
 If a file is opened for writing or appending, a default directory
 is automatically created for writing subsequent data.
 This directory has all the default values specified in TIFF Revision 6.0:
@@ -94,8 +94,9 @@ TIFF structure without closing the file handle and afterwards the
 file should be closed using its file descriptor *fd*.
 
 :c:func:`TIFFOpenExt` (added in libtiff 4.5) is like :c:func:`TIFFOpen`,
-but options, such as re-entrant error and warning handlers may be passed
-with the *opts* argument. The *opts* argument may be NULL. 
+but options, such as re-entrant error and warning handlers and a limit in byte
+that libtiff internal memory allocation functions are allowed to request per call
+may be passed with the *opts* argument. The *opts* argument may be NULL.
 Refer to :doc:`TIFFOpenOptions` for allocating and filling the *opts* argument
 parameters. The allocated memory for :c:type:`TIFFOpenOptions`
 can be released straight after successful execution of the related
@@ -105,9 +106,7 @@ can be released straight after successful execution of the related
 but opens a TIFF file with a Unicode filename.
 
 :c:func:`TIFFFdOpenExt` (added in libtiff 4.5) is like :c:func:`TIFFFdOpen`,
-but options, such as re-entrant error and warning handlers may be passed
-with the *opts* argument. The *opts* argument may be NULL. 
-Refer to :doc:`TIFFOpenOptions` for filling the *opts* argument.
+but options argument *opts* like for :c:func:`TIFFOpenExt` can be passed.
 
 :c:func:`TIFFSetFileName` sets the file name in the tif-structure
 and returns the old file name.
@@ -130,6 +129,13 @@ and write data at the current file position.
 memory; c.f. :c:func:`mmap` (2) and :c:func:`munmap` (2).
 The *clientdata* parameter is an opaque "handle" passed to the client-specified
 routines passed as parameters to :c:func:`TIFFClientOpen`.
+
+.. note::
+  In contrast to the return values of :c:func:`mmap` (2) and :c:func:`munmap` (2),
+  the return values of *mapproc* and *unmapproc* must be:
+  TRUE for success and FALSE to indicate an error.
+  ``libtiff`` built in functions :c:func:`_tiffMapProc` and :c:func:`_tiffUnmapProc`
+  can be found in tif_unix.c as well as in tif_win32.c.
 
 :c:func:`TIFFClientOpenExt` (added in libtiff 4.5) is like :c:func:`TIFFClientOpen`,
 but options argument *opts* like for :c:func:`TIFFOpenExt` can be passed.
@@ -326,5 +332,5 @@ See also
 
 :doc:`libtiff` (3tiff),
 :doc:`TIFFClose` (3tiff),
-:doc:`TIFFStrileQuery`,
+:doc:`TIFFStrileQuery` (3tiff),
 :doc:`TIFFOpenOptions`

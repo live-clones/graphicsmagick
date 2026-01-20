@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>TIFFReadDirectory &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>TIFFReadDirectory &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="TIFFReadEncodedStrip" href="TIFFReadEncodedStrip.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="TIFFquery.html" title="TIFFquery"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../functions.html" accesskey="U">TIFF Functions Overview</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">TIFFReadDirectory</a></li> 
       </ul>
@@ -65,8 +65,8 @@ in a file is automatically read when <a class="reference internal" href="TIFFOpe
 images that have a single uncompressed strip or tile of data are
 automatically treated as if they were made up of multiple strips or tiles of
 approximately 8 kilobytes each. This operation is done only in-memory; it does
-not alter the contents of the file. However, the construction of the “chopped
-strips” is visible to the application through the number of strips [tiles]
+not alter the contents of the file. However, the construction of the &quot;chopped
+strips&quot; is visible to the application through the number of strips [tiles]
 returned by <a class="reference internal" href="TIFFstrip.html#c.TIFFNumberOfStrips" title="TIFFNumberOfStrips"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFNumberOfStrips()</span></code></a> [<a class="reference internal" href="TIFFtile.html#c.TIFFNumberOfTiles" title="TIFFNumberOfTiles"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFNumberOfTiles()</span></code></a>].</p>
 </section>
 <section id="return-values">
@@ -102,7 +102,7 @@ The directory is (usually) unusable.</p>
 </div></blockquote>
 <p><code class="docutils literal notranslate"><span class="pre">Incorrect</span> <span class="pre">count</span> <span class="pre">%d</span> <span class="pre">for</span> <span class="pre">field</span> <span class="pre">&quot;%s&quot;</span> <span class="pre">(%lu,</span> <span class="pre">expecting</span> <span class="pre">%lu);</span> <span class="pre">tag</span> <span class="pre">ignored</span></code>:</p>
 <blockquote>
-<div><p>The specified tag’s count field is bad.
+<div><p>The specified tag's count field is bad.
 For example, a count other than 1 for a <code class="docutils literal notranslate"><span class="pre">SubFileType</span></code> tag.</p>
 </div></blockquote>
 <p><code class="docutils literal notranslate"><span class="pre">Cannot</span> <span class="pre">handle</span> <span class="pre">different</span> <span class="pre">per-sample</span> <span class="pre">values</span> <span class="pre">for</span> <span class="pre">field</span> <span class="pre">&quot;%s&quot;</span></code>:</p>
@@ -247,14 +247,14 @@ the missing value based on the file size.</p>
         <li class="right" >
           <a href="TIFFquery.html" title="TIFFquery"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../functions.html" >TIFF Functions Overview</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">TIFFReadDirectory</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

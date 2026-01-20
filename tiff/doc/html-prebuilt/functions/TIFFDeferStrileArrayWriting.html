@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>TIFFDeferStrileArrayWriting &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>TIFFDeferStrileArrayWriting &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="TIFFError" href="TIFFError.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="TIFFDataWidth.html" title="TIFFDataWidth"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../functions.html" accesskey="U">TIFF Functions Overview</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">TIFFDeferStrileArrayWriting</a></li> 
       </ul>
@@ -65,7 +65,7 @@ with  <a class="reference internal" href="#c.TIFFForceStrileArrayWriting" title=
 effect. Their aim is to control when and where the
 <code class="docutils literal notranslate"><span class="pre">StripOffsets</span></code> / <code class="docutils literal notranslate"><span class="pre">StripByteCounts</span></code> or <code class="docutils literal notranslate"><span class="pre">TileOffsets</span></code> / <code class="docutils literal notranslate"><span class="pre">TileByteCounts</span></code>
 arrays are written into the file.</p>
-<p>The purpose of this is to generate ‘cloud-optimized geotiff’ files where
+<p>The purpose of this is to generate 'cloud-optimized geotiff' files where
 the first KB of the file only contain the IFD entries without the potentially
 large strile arrays. Those are written afterwards.</p>
 <p>More precisely, when <a class="reference internal" href="TIFFWriteDirectory.html#c.TIFFWriteCheck" title="TIFFWriteCheck"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFWriteCheck()</span></code></a> is called, the tag entries for
@@ -94,6 +94,10 @@ when changing directory.</p>
 <p>All error messages are directed to the <a class="reference internal" href="TIFFError.html#c.TIFFErrorExtR" title="TIFFErrorExtR"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFErrorExtR()</span></code></a> routine.
 Likewise, warning messages are directed to the <a class="reference internal" href="TIFFWarning.html#c.TIFFWarningExtR" title="TIFFWarningExtR"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFWarningExtR()</span></code></a> routine.</p>
 </section>
+<section id="note">
+<h2>Note<a class="headerlink" href="#note" title="Permalink to this heading">¶</a></h2>
+<p>This functionality was introduced with libtiff 4.1.</p>
+</section>
 <section id="see-also">
 <h2>See also<a class="headerlink" href="#see-also" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="libtiff.html"><span class="doc">libtiff</span></a> (3tiff)</p>
@@ -115,6 +119,7 @@ Likewise, warning messages are directed to the <a class="reference internal" hre
 <li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#returns">Returns</a></li>
 <li><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
+<li><a class="reference internal" href="#note">Note</a></li>
 <li><a class="reference internal" href="#see-also">See also</a></li>
 </ul>
 </li>
@@ -164,14 +169,14 @@ Likewise, warning messages are directed to the <a class="reference internal" hre
         <li class="right" >
           <a href="TIFFDataWidth.html" title="TIFFDataWidth"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../functions.html" >TIFF Functions Overview</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">TIFFDeferStrileArrayWriting</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

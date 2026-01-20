@@ -70,7 +70,7 @@ Magick::MutexLock::~MutexLock(void)
   if ( ::CloseHandle(_mutex.id) != 0 )
     return;
   std::cerr << "Magick::MutexLock::~MutexLock: mutex destruction failed!"
-            < std::endl;
+            << std::endl;
 #endif
 }
 

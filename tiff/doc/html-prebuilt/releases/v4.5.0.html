@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v4.5.0 &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v4.5.0 &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changes in TIFF v4.4.0" href="v4.4.0.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v4.5.1.html" title="Changes in TIFF v4.5.1"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.5.0</a></li> 
       </ul>
@@ -84,7 +84,7 @@ included in the release package and by the Git commit history:</p>
 its capability of handling both 8-bit JPEG and 12-bit JPEG in a single build.</p></li>
 <li><p>autoconf/cmake: detect sphinx-build to build HTML and man pages</p></li>
 <li><p>CMakeLists.txt: fix warning with -Wdev</p></li>
-<li><p>CMake: correctly set default value of ‘lzma’ option when liblzma is detected
+<li><p>CMake: correctly set default value of 'lzma' option when liblzma is detected
 (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/482">issue #482</a>)</p></li>
 <li><p>CMake: Moved linking of CMath::CMath into CMath_LIBRARY check.</p></li>
 <li><p>Fix CMake build to be compatible with FetchContent.</p></li>
@@ -115,8 +115,8 @@ with <a class="reference internal" href="../functions/TIFFOpenOptions.html#c.TIF
 <a class="reference internal" href="../functions/TIFFOpenOptions.html#c.TIFFOpenOptionsSetWarningHandlerExtR" title="TIFFOpenOptionsSetWarningHandlerExtR"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFOpenOptionsSetWarningHandlerExtR()</span></code></a></p></li>
 <li><p>Related to IFD-Loop detection refactoring, the number of IFDs that libtiff
 can browse through has been extended from 65535 to 1048576. This value is
-a build-time setting that can be configured with CMake’s TIFF_MAX_DIR_COUNT
-variable or autoconf’s –with-max-dir-count option.</p></li>
+a build-time setting that can be configured with CMake's TIFF_MAX_DIR_COUNT
+variable or autoconf's --with-max-dir-count option.</p></li>
 </ul>
 <p>API/ABI breaks:</p>
 <ul class="simple">
@@ -171,7 +171,7 @@ CVE-2022-34526)</p></li>
 <ul class="simple">
 <li><p><strong class="program">tiffcrop</strong>: add check if (bps != 1) in writeSingleSection()
 (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/169">issue #169</a>)</p></li>
-<li><p><strong class="program">tiffcrop</strong>: Fix too many ‘mode’ options on command line
+<li><p><strong class="program">tiffcrop</strong>: Fix too many 'mode' options on command line
 (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/470">issue #470</a> and <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/450">issue #450</a>)</p></li>
 <li><p><strong class="program">tiffcrop</strong>: Fix memory allocation to require a larger buffer
 (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/271">issue #271</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/381">issue #381</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/386">issue #386</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/388">issue #388</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/389">issue #389</a>,
@@ -183,7 +183,7 @@ CVE-2022-3597, <a class="reference external" href="https://gitlab.com/libtiff/li
 <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/414">issue #414</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/422">issue #422</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/423">issue #423</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/424">issue #424</a>)</p></li>
 <li><p><strong class="program">tiffcrop</strong>: fix floating-point exception (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/415">issue #415</a>,
 <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/427">issue #427</a>, <a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/428">issue #428</a>, CVE-2022-2056, CVE-2022-2057, CVE-2022-2058)</p></li>
-<li><p><strong class="program">tiff2pdf</strong>: Don’t try to seek into stdout (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/441">issue #441</a>)</p></li>
+<li><p><strong class="program">tiff2pdf</strong>: Don't try to seek into stdout (<a class="reference external" href="https://gitlab.com/libtiff/libtiff/-/issues/441">issue #441</a>)</p></li>
 <li><p><strong class="program">tiffinfo</strong>: update curdir from uint16_t to tdir_t for more than 64k
 IFD handling.</p></li>
 </ul>
@@ -258,14 +258,14 @@ IFD handling.</p></li>
         <li class="right" >
           <a href="v4.5.1.html" title="Changes in TIFF v4.5.1"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.5.0</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

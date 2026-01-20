@@ -1,3 +1,7 @@
+2026-01-20  Matt Gilarde <mattg@progress.com>
+
+        * Update libtiff from 4.5.1 to 4.7.1.
+		
 2026-01-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (ReadHEIFImageFrame): Fix opacity code for

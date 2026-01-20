@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v4.0.0 &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v4.0.0 &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Old release history" href="historical.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v4.0.1.html" title="Changes in TIFF v4.0.1"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.0.0</a></li> 
       </ul>
@@ -59,7 +59,7 @@
 </tbody>
 </table>
 <p>This document describes the changes made to the software between the
-<em>previous</em> and <em>current</em> versions (see above).  If you don’t
+<em>previous</em> and <em>current</em> versions (see above).  If you don't
 find something listed here, then it was not done in this timeframe, or
 it was not considered important enough to be mentioned. Please consult
 the ChangeLog file in the source package for full change details.  The
@@ -84,17 +84,17 @@ does not need to be aware which TIFF version an opened file is.)</p></li>
 <li><p>Although the tag count in BigTIFF is 64bit, we restricted the
 count in the implementation to a much more reasonable size. This is
 necessary in current implementation, because all tag data gets read
-automatically in the IFD reading stage, so if there’s half a dozen
+automatically in the IFD reading stage, so if there's half a dozen
 private tags with multiple gigabytes of data that causes considerable
 overhead even if the application level is never interested in these
 tags. Our choice to ignore tags with data longer then a certain sanity
 value is much needed as things stand. We also recommend to step away
 from writing tiles that are 8 kilobyte in their uncompressed form, or
-writing single-line strips, in really big files, resulting in mega’s
-of tiles or strips. It’s much more efficient to choose bigger tile or
+writing single-line strips, in really big files, resulting in mega's
+of tiles or strips. It's much more efficient to choose bigger tile or
 strip sizes, up to several megabyte if needed, and have a few kilo of
 tiles or strips instead.</p></li>
-<li><p>Although it’s rare, some application code does directly access
+<li><p>Although it's rare, some application code does directly access
 file offsets. Some of these are automatically upgraded because they
 used the <code class="xref c c-type docutils literal notranslate"><span class="pre">toff_t</span></code> type, others need to be aware that the datatype
 changed and need to start using <code class="xref c c-type docutils literal notranslate"><span class="pre">toff_t</span></code> or <code class="xref c c-type docutils literal notranslate"><span class="pre">uint64</span></code>. This impacts access
@@ -102,7 +102,7 @@ to tags like the <code class="docutils literal notranslate"><span class="pre">EX
 <code class="docutils literal notranslate"><span class="pre">StripOffsets</span></code> or <code class="docutils literal notranslate"><span class="pre">TileOffsets</span></code>, the return type of functions like
 <a class="reference internal" href="../functions/TIFFquery.html#c.TIFFCurrentDirOffset" title="TIFFCurrentDirOffset"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFCurrentDirOffset()</span></code></a>, and a parameter type to functions like
 <a class="reference internal" href="../functions/TIFFSetDirectory.html#c.TIFFSetSubDirectory" title="TIFFSetSubDirectory"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFSetSubDirectory()</span></code></a>.</p></li>
-<li><p>Although it’s rare, some application code does use structures
+<li><p>Although it's rare, some application code does use structures
 like <code class="xref c c-struct docutils literal notranslate"><span class="pre">TIFFHeader</span></code> or <code class="xref c c-struct docutils literal notranslate"><span class="pre">TIFFDirEntry</span></code> that used to be an exact binary
 representation of TIFF structures. These need to change. The old
 TIFFHeader structure is replaced by the new TIFFHeaderClassic,
@@ -186,7 +186,7 @@ Windows except for under Cygwin.</p></li>
 applied to 4.0.0.  There are too many to list here.  See the
 distribution <code class="file docutils literal notranslate"><span class="pre">ChangeLog</span></code> for a detailed change list.</p></li>
 <li><p>There is considerable change in some files like
-<code class="xref c c-func docutils literal notranslate"><span class="pre">tif_dirread()</span></code> and <code class="xref c c-func docutils literal notranslate"><span class="pre">tif_dirwrite()</span></code>. These changes don’t impact
+<code class="xref c c-func docutils literal notranslate"><span class="pre">tif_dirread()</span></code> and <code class="xref c c-func docutils literal notranslate"><span class="pre">tif_dirwrite()</span></code>. These changes don't impact
 backwards compatibility, they are mostly a clean rewrite that
 does allow BigTIFF support as well as somewhat more robust
 reading of the unexpected already and will also serve future
@@ -300,14 +300,14 @@ a particular directory, not just the first.</p></li>
         <li class="right" >
           <a href="v4.0.1.html" title="Changes in TIFF v4.0.1"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.0.0</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

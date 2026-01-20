@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "LIBTIFF" "3tiff" "Jun 10, 2023" "4.5" "LibTIFF"
+.TH "LIBTIFF" "3tiff" "Sep 11, 2025" "4.7" "LibTIFF"
 .SH NAME
 libtiff \- introduction to libtiff, a library for reading and writing TIFF files
 .SH SYNOPSIS
@@ -54,7 +54,7 @@ cc file.c \-ltiff
 .SH DESCRIPTION
 .sp
 \fBlibtiff\fP is a library for reading and writing data files encoded with the
-\fI“Tag Image File”\fP format, Revision 6.0 (or revision 5.0 or revision 4.0). This file
+\fI\(dqTag Image File\(dq\fP format, Revision 6.0 (or revision 5.0 or revision 4.0). This file
 format is suitable for archiving multi\-color and monochromatic image data.
 .sp
 The library supports several compression algorithms, as indicated by the
@@ -70,7 +70,7 @@ PackBits compression (32773).
 In addition, several nonstandard compression algorithms are supported: the
 4\-bit compression algorithm used by the
 \fIThunderScan\fP program (32809) (decompression only),
-NeXT’s 2\-bit compression algorithm (32766) (decompression only),
+NeXT\(aqs 2\-bit compression algorithm (32766) (decompression only),
 an experimental LZ\-style algorithm known as Deflate (32946),
 and an experimental CIE LogLuv compression scheme designed
 for images with high dynamic range (32845 for LogL and 32845 for LogLuv).
@@ -101,16 +101,29 @@ definitions or through parameters passed through the varargs interfaces.
 .sp
 .nf
 .ft C
-typedef uint32_t ttag_t;    // directory tag
-typedef uint32_t tdir_t;    // directory index
-typedef uint16_t tsample_t; // sample number
-typedef uint32_t tstrip_t;  // strip number
-typedef uint32_t ttile_t;   // tile number
-typedef int64_t tmsize_t;   // signed size type (int32_t on 32\-bit platforms)
-typedef tmsize_t tsize_t;   // i/o size in bytes
-typedef void* tdata_t;      // image data ref
-typedef void* thandle_t;    // client data handle
-typedef uint64_t toff_t;    // file offset
+typedef int64_t tmsize_t;   /* signed size type (int32_t on 32\-bit platforms) */
+typedef void* thandle_t;    /* client data handle */
+typedef uint64_t toff_t;    /* file offset */
+typedef uint32_t tdir_t;    /* directory index */
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The following typedefs are deprecated and should be replaced by their
+defining counterparts.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+typedef uint32_t ttag_t;    /* directory tag */
+typedef uint16_t tsample_t; /* sample number */
+typedef uint32_t tstrile_t; /* strip or tile number */
+typedef tstrile_t tstrip_t; /* strip number */
+typedef tstrile_t ttile_t;  /* tile number */
+typedef tmsize_t tsize_t;   /* i/o size in bytes */
+typedef void *tdata_t;      /* image data ref */
 .ft P
 .fi
 .UNINDENT
@@ -204,7 +217,7 @@ _
 T{
 \fI\%TIFFClientdata()\fP
 T}	T{
-return open file’s clientdata handle, which represents
+return open file\(aqs clientdata handle, which represents
 the file descriptor used within \fBlibtiff\fP\&.
 T}
 _
@@ -716,6 +729,12 @@ limits the maximum single memory allocation within \fBlibtiff\fP
 T}
 _
 T{
+\fI\%TIFFOpenOptionsSetMaxCumulatedMemAlloc()\fP
+T}	T{
+limits the maximum cumulated memory allocation within \fBlibtiff\fP
+T}
+_
+T{
 \fI\%TIFFOpenOptionsSetErrorHandlerExtR()\fP
 T}	T{
 setup of a user\-specific and per\-TIFF handle (re\-entrant) error handler
@@ -931,7 +950,7 @@ _
 T{
 \fI\%TIFFSetClientdata()\fP
 T}	T{
-set open file’s clientdata (file descriptor/handle),
+set open file\(aqs clientdata (file descriptor/handle),
 and return previous value
 T}
 _
@@ -968,7 +987,7 @@ _
 T{
 \fI\%TIFFSetField()\fP
 T}	T{
-set a tag’s value in the current directory
+set a tag\(aqs value in the current directory
 T}
 _
 T{
@@ -980,7 +999,7 @@ _
 T{
 \fI\%TIFFSetFileno()\fP
 T}	T{
-overwrites a copy of the open file’s I/O descriptor, and return previous value
+overwrites a copy of the open file\(aqs I/O descriptor, and return previous value
 (refer to detailed description)
 T}
 _
@@ -1162,7 +1181,7 @@ _
 T{
 \fI\%TIFFVSetField()\fP
 T}	T{
-set a tag’s value in the current directory
+set a tag\(aqs value in the current directory
 T}
 _
 T{
@@ -1290,7 +1309,7 @@ initialize YCbCr to RGB conversion state
 T}
 _
 .TE
-.SH LIBTIFF AUXILLARY FUNCTIONS
+.SH LIBTIFF AUXILIARY FUNCTIONS
 .TS
 center;
 |l|l|.
@@ -1393,7 +1412,7 @@ _
 .sp
 For a table of TIFF tags recognized by the library refer to
 \fI\%LibTIFF Coverage of the TIFF 6.0 Specification\fP\&.
-.SH “PSEUDO TAGS”
+.SH "PSEUDO TAGS"
 .sp
 In addition to the normal TIFF
 tags the library supports a collection of
@@ -1513,7 +1532,7 @@ _
 .INDENT 3.5
 Control the operation of the Group 3 codec.
 Possible values (independent bits that can be combined by
-or’ing them together) are:
+or\(aqing them together) are:
 .sp
 \fBFAXMODE_CLASSIC\fP:
 .INDENT 0.0
@@ -1574,7 +1593,7 @@ packed bilevel data.
 .INDENT 0.0
 .INDENT 3.5
 Tag contains image metadata per the IPTC newsphoto spec: Headline,
-captioning, credit, etc… Used by most wire services.
+captioning, credit, etc... Used by most wire services.
 .UNINDENT
 .UNINDENT
 .sp
@@ -1624,7 +1643,7 @@ The default value is \fBJPEGCOLORMODE_RAW\fP\&.
 .INDENT 3.5
 Control the information written in the \fBJPEGTables\fP tag.
 Possible values (independent bits that can be combined by
-or’ing them together) are:
+or\(aqing them together) are:
 .sp
 \fBJPEGTABLESMODE_QUANT\fP:
 .INDENT 0.0
@@ -1791,16 +1810,16 @@ Warning messages are likewise directed through the
 \fI\%tiffdither\fP,
 \fI\%tiffdump\fP,
 \fI\%tiffcp\fP,
-\fI\%tiff2cmp\fP,
+\fI\%tiffcmp\fP,
 \fI\%tiffgt\fP,
 \fI\%tiffinfo\fP,
 \fI\%tiffmedian\fP,
 \fI\%tiffsplit\fP,
 .sp
-\fB“Tag Image File Format Specification *Revision 6.0*”\fP,
+\fB\(dqTag Image File Format Specification *Revision 6.0*\(dq\fP,
 an Aldus Technical Memorandum.
 .sp
-\fB“The Spirit of TIFF Class F”\fP ,
+\fB\(dqThe Spirit of TIFF Class F\(dq\fP ,
 an appendix to the TIFF 5.0 specification prepared by Cygnet Technologies.
 .SH BUGS
 .INDENT 0.0
@@ -1814,6 +1833,6 @@ that is organized with more than one row per tile or strip.
 .SH AUTHOR
 LibTIFF contributors
 .SH COPYRIGHT
-1988-2022, LibTIFF contributors
+1988-2025, LibTIFF contributors
 .\" Generated by docutils manpage writer.
 .

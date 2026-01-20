@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v3.9.0 &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v3.9.0 &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changes in TIFF v3.9.0beta" href="v3.9.0beta.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v3.9.1.html" title="Changes in TIFF v3.9.1"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="historical.html" accesskey="U">Old release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v3.9.0</a></li> 
@@ -60,7 +60,7 @@
 </tbody>
 </table>
 <p>This document describes the changes made to the software between the
-<em>previous</em> and <em>current</em> versions (see above).  If you don’t
+<em>previous</em> and <em>current</em> versions (see above).  If you don't
 find something listed here, then it was not done in this timeframe, or
 it was not considered important enough to be mentioned.  The following
 information is located here:</p>
@@ -103,7 +103,7 @@ silently ignored.  (<a class="reference external" href="http://bugzilla.remotese
 be rewritten to the same location by comparing the current
 size to all the other blocks in the same directory.  This is
 dangerous in many situations and can easily corrupt a file.
-(observed in esoteric GDAL situation that’s hard to document).
+(observed in esoteric GDAL situation that's hard to document).
 This change involves leaving the <span class="c-expr sig sig-inline c"><span class="n">stripbytecount</span><span class="p">[</span><span class="p">]</span></span> values
 unaltered till <code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFAppendToStrip()</span></code>.  Now we only write a block
 back to the same location it used to be at if the new data is
@@ -131,7 +131,7 @@ to make MSVC 6.0 compiler happy.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_codec.c</span></code>: Avoid <code class="xref c c-macro docutils literal notranslate"><span class="pre">NULL</span></code> pointer dereferencing for exotic
 compression codec codes.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_dirread.c</span></code>: zero <code class="docutils literal notranslate"><span class="pre">tif-&gt;tif_dir</span></code> after freeing the
-directory in <a class="reference internal" href="../functions/TIFFCustomDirectory.html#c.TIFFReadCustomDirectory" title="TIFFReadCustomDirectory"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFReadCustomDirectory()</span></code></a>.  I don’t exactly
+directory in <a class="reference internal" href="../functions/TIFFCustomDirectory.html#c.TIFFReadCustomDirectory" title="TIFFReadCustomDirectory"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFReadCustomDirectory()</span></code></a>.  I don't exactly
 remember why this was important.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_dirwrite.c</span></code>: Fix potential memory leak writing large
 double tags.</p></li>
@@ -176,7 +176,7 @@ configuration is already set.
 be 1 on success instead of zero.
 <a class="reference external" href="http://bugzilla.maptools.org/show_bug.cgi?id=2069">MapTools bugzilla #2069</a></p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">libtiff/tif_print.c</span></code> (<a class="reference internal" href="../functions/TIFFPrintDirectory.html#c.TIFFPrintDirectory" title="TIFFPrintDirectory"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFPrintDirectory()</span></code></a>): Applied patch
-for “tag error may cause segfault in tif_print.c.”
+for &quot;tag error may cause segfault in tif_print.c.&quot;
 <a class="reference external" href="http://bugzilla.maptools.org/show_bug.cgi?id=1896">MapTools bugzilla #1896</a></p></li>
 </ul>
 </section>
@@ -195,7 +195,7 @@ instead of static when constructing output file names.</p></li>
 significant functionality update from Richard Nolde.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tools/tiff2ps.c</span></code>: Incorporated significant functionality
 update from Richard Nolde.  In particular, support for
-rotating the image by 90, 180, 270, and ‘auto’ has been added.</p></li>
+rotating the image by 90, 180, 270, and 'auto' has been added.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tools/tiff2ps.c</span></code>: Remove spurious message printed to
 <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tools/tiffsplit.c</span></code>: fix <code class="docutils literal notranslate"><span class="pre">sampleformat</span></code> to be <code class="xref c c-type docutils literal notranslate"><span class="pre">shortv</span></code> instead
@@ -278,15 +278,15 @@ inter-color space conversion tools.
         <li class="right" >
           <a href="v3.9.1.html" title="Changes in TIFF v3.9.1"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="historical.html" >Old release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v3.9.0</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>
