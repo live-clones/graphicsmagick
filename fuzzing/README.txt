@@ -106,6 +106,8 @@ de265
 
 Sources come from https://github.com/strukturag/libde265.
 
+This library provides both decoder and encoder for H.265/HEVC.
+
 With sources under ~/src/libde265::
 
   rm -rf ~/build/libde265
@@ -119,6 +121,8 @@ x265
 ++++
 
 Sources come from https://bitbucket.org/multicoreware/x265_git/src/master.
+
+This library provides a H.265/HEVC encoder.
 
 With sources under ~/src/x265-stable::
 
@@ -164,8 +168,8 @@ With sources under ~/src/aom::
   cmake --build . -- -j$(nproc)
   cmake --install .
 
-jpeg
-++++
+libjpeg-turbo
++++++++++++++
 
 Sources come from https://github.com/libjpeg-turbo/libjpeg-turbo.
 
@@ -253,6 +257,8 @@ libx264
 
 Project is at https://code.videolan.org/videolan/x264
 
+  libx264 provides only a H.264 encoder
+
   git clone https://code.videolan.org/videolan/x264.git/ ~/src/x264
 
   While 'configure' is provided, it is not an Autoconf configure script!
@@ -293,16 +299,23 @@ Sources come from https://github.com/strukturag/libheif.git
   cmake --build . -- -j$(nproc)
   cmake --install .
 
-=== Supported formats ===
-format        decoding   encoding
-AVC             YES        YES
-AVIF            YES        YES
-HEIC            YES        YES
-JPEG            YES        YES
-JPEG2000        YES        YES
-JPEG2000-HT     YES        YES
-Uncompressed    YES        YES
-VVC             YES        YES
+Cmake should produce this in its configuration summary::
+
+  === Supported formats ===
+  format        decoding   encoding
+  AVC             YES        YES
+  AVIF            YES        YES
+  HEIC            YES        YES
+  JPEG            YES        YES
+  JPEG2000        YES        YES
+  JPEG2000-HT     YES        YES
+  Uncompressed    YES        YES
+  VVC             YES        YES
+
+Check for expected configuration using::
+
+  heif-enc --list-encoders
+  heif-dec --list-decoders
 
 libwmf
 ++++++

@@ -1,3 +1,13 @@
+2026-01-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Re-written to eliminate pushd/popd,
+        avoid environment variable pollution, build everything outside of
+        the source trees, and added support for building openh264, vvdec,
+        vvenc, x264 (with support by libheif), once the oss-fuzz
+        Dockerfile is updated to provide them.
+
+        * configure.ac: Remove unwanted space.
+
 2026-01-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/pixel_cache.c, magick/resource.c, magick/resource.h: Add

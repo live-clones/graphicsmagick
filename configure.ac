@@ -3103,7 +3103,7 @@ AC_SUBST([LIB_WMF_DEPS])
 have_heif='no'
 LIB_HEIF=''
 if test "$with_heif" != 'no' ; then
-    AC_MSG_CHECKING([for HEIF support ])
+    AC_MSG_CHECKING([for HEIF support])
     AC_MSG_RESULT()
     OLD_CPPFLAGS=$CPPFLAGS
     OLD_LDFLAGS=$LDFLAGS
