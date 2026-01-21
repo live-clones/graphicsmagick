@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v3.9.0beta &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v3.9.0beta &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changes in TIFF v3.8.2" href="v3.8.2.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v3.9.0.html" title="Changes in TIFF v3.9.0"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="historical.html" accesskey="U">Old release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v3.9.0beta</a></li> 
@@ -61,7 +61,7 @@
 </table>
 <p>This document describes the changes made to the software between the
 <em>previous</em> and <em>current</em> versions (see above).
-If you don’t find something listed here, then it was not done in this
+If you don't find something listed here, then it was not done in this
 timeframe, or it was not considered important enough to be mentioned.
 The following information is located here:</p>
 <section id="major-changes">
@@ -97,9 +97,9 @@ Added support for OpenVMS by Alexey Chupahin.</p></li>
 <section id="library-changes">
 <h2>Library changes<a class="headerlink" href="#library-changes" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><code class="file docutils literal notranslate"><span class="pre">tif_dirinfo.c</span></code> (<code class="xref c c-func docutils literal notranslate"><span class="pre">_TIFFFindFieldInfo()</span></code>): Don’t attempt to
+<li><p><code class="file docutils literal notranslate"><span class="pre">tif_dirinfo.c</span></code> (<code class="xref c c-func docutils literal notranslate"><span class="pre">_TIFFFindFieldInfo()</span></code>): Don't attempt to
 <code class="xref c c-func docutils literal notranslate"><span class="pre">bsearch()</span></code> on a <code class="xref c c-macro docutils literal notranslate"><span class="pre">NULL</span></code> fieldinfo list.
-(<code class="xref c c-func docutils literal notranslate"><span class="pre">_TIFFFindFieldInfoByName()</span></code>): Don’t attempt to <code class="xref c c-func docutils literal notranslate"><span class="pre">lfind()</span></code> on a <code class="xref c c-macro docutils literal notranslate"><span class="pre">NULL</span></code>
+(<code class="xref c c-func docutils literal notranslate"><span class="pre">_TIFFFindFieldInfoByName()</span></code>): Don't attempt to <code class="xref c c-func docutils literal notranslate"><span class="pre">lfind()</span></code> on a <code class="xref c c-macro docutils literal notranslate"><span class="pre">NULL</span></code>
 fieldinfo list.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_jpeg.c</span></code>: Changed <code class="xref c c-func docutils literal notranslate"><span class="pre">JPEGInitializeLibJPEG()</span></code> so that it
 will convert from decompressor to compressor or compress to decompress
@@ -110,7 +110,7 @@ force flag set.  Occurs with the <strong class="program">addtiffo</strong> progr
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_dirwrite.c</span></code>: Fixed swapping of byte arrays stored
 in-place in tag offsets as per bug
 <a class="reference external" href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1363">Remote Sensing bugzilla #1363 [no longer available]</a></p></li>
-<li><p><code class="file docutils literal notranslate"><span class="pre">tif_getimage.c</span></code>: workaround for “Fractional scanline” error
+<li><p><code class="file docutils literal notranslate"><span class="pre">tif_getimage.c</span></code>: workaround for &quot;Fractional scanline&quot; error
 reading OJPEG images with rowsperstrip that is not a multiple of
 vertical subsampling factor. This bug is mentioned in
 <a class="reference external" href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1390">Remote Sensing bugzilla #1390 [no longer available]</a> and
@@ -187,7 +187,7 @@ more performant LUT, and calculation more correct</p></li>
 of OJPEG images in favor of tif_getimage.c native handling of
 YCbCr and desubsampling.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_jpeg.c</span></code>: <code class="xref c c-func docutils literal notranslate"><span class="pre">JPEGVSetField()</span></code> so that altering the photometric
-interpretation causes the “upsampled” flag to be recomputed.  Fixes
+interpretation causes the &quot;upsampled&quot; flag to be recomputed.  Fixes
 peculiar bug where photometric flag had to be set before jpegcolormode
 flag.</p></li>
 </ul>
@@ -201,7 +201,7 @@ Patch from William Bader.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tiff2pdf.c</span></code>: Fix for <code class="xref c c-macro docutils literal notranslate"><span class="pre">TIFFTAG_JPEGTABLES</span></code> tag fetching and
 significant upgrade of the whole utility as per bug
 <a class="reference external" href="http://bugzilla.remotesensing.org/show_bug.cgi?id=1560">Remote Sensing bugzilla #1560 [no longer available]</a>.
-Now we don’t need <code class="file docutils literal notranslate"><span class="pre">tiffiop.h</span></code> in <strong class="program">tiff2pdf</strong> anymore and will open output
+Now we don't need <code class="file docutils literal notranslate"><span class="pre">tiffiop.h</span></code> in <strong class="program">tiff2pdf</strong> anymore and will open output
 PDF file using <a class="reference internal" href="../functions/TIFFOpen.html#c.TIFFClientOpen" title="TIFFClientOpen"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFClientOpen()</span></code></a> machinery as it is implemented
 by Leon Bottou.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tiffcrop.c</span></code>:  New tiffcrop utility contributed
@@ -301,15 +301,15 @@ Though it is still far from the state of being working and useful.</p></li>
         <li class="right" >
           <a href="v3.9.0.html" title="Changes in TIFF v3.9.0"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="historical.html" >Old release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v3.9.0beta</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

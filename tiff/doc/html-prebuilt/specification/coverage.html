@@ -3,18 +3,18 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>LibTIFF Coverage of the TIFF 6.0 Specification &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>LibTIFF Coverage of the TIFF 6.0 Specification &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="LibTIFF Coverage of the BigTIFF Specification" href="coverage-bigtiff.html" />
-    <link rel="prev" title="BigTIFF Design" href="bigtiff.html" /> 
+    <link rel="next" title="BigTIFF Design" href="bigtiff.html" />
+    <link rel="prev" title="DRAFT TIFF Technical Note #2" href="technote2.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -23,12 +23,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="coverage-bigtiff.html" title="LibTIFF Coverage of the BigTIFF Specification"
+          <a href="bigtiff.html" title="BigTIFF Design"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="bigtiff.html" title="BigTIFF Design"
+          <a href="technote2.html" title="DRAFT TIFF Technical Note #2"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">TIFF File Format Specification</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">LibTIFF Coverage of the TIFF 6.0 Specification</a></li> 
       </ul>
@@ -107,7 +107,7 @@ updated.</p>
 </td>
 </tr>
 <tr class="row-even"><td><p>Class F for facsimile</p></td>
-<td><p>(<em>Class B tags plus…</em>)</p>
+<td><p>(<em>Class B tags plus...</em>)</p>
 <p><code class="docutils literal notranslate"><span class="pre">Compression</span></code> = 3 (CCITT Group 3), 4 (CCITT Group 4)</p>
 <p><code class="docutils literal notranslate"><span class="pre">FillOrder</span></code> = 1 (MSB), 2 (LSB)</p>
 <p><code class="docutils literal notranslate"><span class="pre">Group3Options</span></code> = 1 (2d encoding), 4 (zero fill), 5 (2d+fill)</p>
@@ -151,7 +151,7 @@ updated.</p>
 <p>(<em>colorimetry info from Appendix H; see above</em>)</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p>Class “JPEG” for JPEG images (per TTN2)</p></td>
+<tr class="row-odd"><td><p>Class &quot;JPEG&quot; for JPEG images (per TTN2)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">PhotometricInterpretation</span></code> = 1 (grayscale), 2 (RGB), 5 (CMYK), 6 (YCbCr)</p>
 <p>(<em>Class Y tags if YCbCr</em>)</p>
 <p>(<em>Class S tags if CMYK</em>)</p>
@@ -205,8 +205,10 @@ consult the materials available at
 </div>
 <p>The following table shows the tags that are recognized
 and how they are used by the library.  If no use is indicated,
-then the library reads and writes the tag, but does not use it internally.
-For the meaning of the tags look in <a class="reference external" href="https://www.awaresystems.be/imaging/tiff/tifftags.html">https://www.awaresystems.be/imaging/tiff/tifftags.html</a></p>
+then the library reads and writes the tag, but does not use it internally.</p>
+<p>Apart of the TIFF 6.0 specification the meaning of tags can be found on various places
+in the internet. For example:
+<a class="reference external" href="https://www.loc.gov/preservation/digital/formats/content/tiff_tags.shtml">https://www.loc.gov/preservation/digital/formats/content/tiff_tags.shtml</a></p>
 <p><code class="file docutils literal notranslate"><span class="pre">libtiff</span></code> supports also many private tags allocated for organizations that wish to
 store additional information in a TIFF file.
 Tags for TIFF/EP and for Digital Negative (DNG) Specification 1.1.0
@@ -234,7 +236,7 @@ tag has been previously set to the relevant compression scheme.</p>
 <tr class="row-odd"><th class="head"><p>Tag Name</p></th>
 <th class="head"><p>Value</p></th>
 <th class="head"><p>R/W&lt;</p></th>
-<th class="head"><p>Library’s Use (Comments)</p></th>
+<th class="head"><p>Library's Use (Comments)</p></th>
 </tr>
 </thead>
 <tbody>
@@ -276,7 +278,7 @@ tag has been previously set to the relevant compression scheme.</p>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Thresholding</span></code></p></td>
 <td><p>263</p></td>
 <td><p>R/W</p></td>
-<td><p>(tag in tif.h wrongly written as “Threshholding”)</p></td>
+<td><p>(tag in tif.h wrongly written as &quot;Threshholding&quot;)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CellWidth</span></code></p></td>
 <td><p>264</p></td>
@@ -1005,10 +1007,10 @@ Consult the documentation on the
 <code class="docutils literal notranslate"><span class="pre">ExtraSamples</span></code> tag and Associated Alpha for elaboration.  Note however
 that if you use Associated Alpha, you are expected to save data that is
 pre-multipled by Alpha.  If this means nothing to you, check out
-Porter &amp; Duff’s paper in the ‘84 SIGGRAPH proceedings: “Compositing Digital
-Images”.</p>
-<p>Tag <code class="docutils literal notranslate"><span class="pre">RichTIFFIPTC</span></code> (33723) is defined wrongly in TIFF/EP definition as “LONG or ASCII”.
-<code class="docutils literal notranslate"><span class="pre">libtiff</span></code> defines it as “UNDEFINED or BYTE”.</p>
+Porter &amp; Duff's paper in the '84 SIGGRAPH proceedings: &quot;Compositing Digital
+Images&quot;.</p>
+<p>Tag <code class="docutils literal notranslate"><span class="pre">RichTIFFIPTC</span></code> (33723) is defined wrongly in TIFF/EP definition as &quot;LONG or ASCII&quot;.
+<code class="docutils literal notranslate"><span class="pre">libtiff</span></code> defines it as &quot;UNDEFINED or BYTE&quot;.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ImageDepth</span></code>
 tag is a non-standard, but registered tag that specifies
 the Z-dimension of volumetric data.  The combination of <code class="docutils literal notranslate"><span class="pre">ImageWidth</span></code>,
@@ -1017,7 +1019,7 @@ defines a 3D volume of pixels that are
 further specified by <code class="docutils literal notranslate"><span class="pre">BitsPerSample</span></code> and
 <code class="docutils literal notranslate"><span class="pre">SamplesPerPixel</span></code>.  The <code class="docutils literal notranslate"><span class="pre">TileDepth</span></code>
 tag (also non-standard, but registered) can be used to specified a
-subvolume “tiling” of a volume of data.</p>
+subvolume &quot;tiling&quot; of a volume of data.</p>
 <p>The Colorimetry, and CMYK tags are additions that appear in TIFF 6.0.
 Consult the TIFF 6.0 specification and <a class="reference internal" href="index.html"><span class="doc">TIFF File Format Specification</span></a>.</p>
 </section>
@@ -1036,7 +1038,7 @@ Consult the TIFF 6.0 specification and <a class="reference internal" href="index
 <tr class="row-odd"><th class="head"><p>Tag Name</p></th>
 <th class="head"><p>Value</p></th>
 <th class="head"><p>R/W&lt;</p></th>
-<th class="head"><p>Library’s Use (Comments)</p></th>
+<th class="head"><p>Library's Use (Comments)</p></th>
 </tr>
 </thead>
 <tbody>
@@ -1146,7 +1148,7 @@ For reading / writing of this IFDs refer to <a class="reference internal" href="
 <tr class="row-odd"><th class="head"><p>Tag Name</p></th>
 <th class="head"><p>Value</p></th>
 <th class="head"><p>R/W&lt;</p></th>
-<th class="head"><p>Library’s Use (Comments)</p></th>
+<th class="head"><p>Library's Use (Comments)</p></th>
 </tr>
 </thead>
 <tbody>
@@ -1174,7 +1176,7 @@ For reading / writing of this IFDs refer to <a class="reference internal" href="
 <td><p>34855</p></td>
 <td><p>R/W</p></td>
 <td><p>After EXIF 2.2.1 ISOSpeedRatings is named <code class="docutils literal notranslate"><span class="pre">PhotographicSensitivity</span></code>.
-In addition, while “Count=Any”, only 1 count should be used.</p></td>
+In addition, while &quot;Count=Any&quot;, only 1 count should be used.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OptoelectricConversionFactor</span></code></p></td>
 <td><p>34856</p></td>
@@ -1573,7 +1575,7 @@ In addition, while “Count=Any”, only 1 count should be used.</p></td>
 <tr class="row-odd"><th class="head"><p>Tag Name</p></th>
 <th class="head"><p>Value</p></th>
 <th class="head"><p>R/W&lt;</p></th>
-<th class="head"><p>Library’s Use (Comments)</p></th>
+<th class="head"><p>Library's Use (Comments)</p></th>
 </tr>
 </thead>
 <tbody>
@@ -1769,13 +1771,13 @@ In addition, while “Count=Any”, only 1 count should be used.</p></td>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="bigtiff.html"
-                          title="previous chapter">BigTIFF Design</a></p>
+    <p class="topless"><a href="technote2.html"
+                          title="previous chapter">DRAFT TIFF Technical Note #2</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="coverage-bigtiff.html"
-                          title="next chapter">LibTIFF Coverage of the BigTIFF Specification</a></p>
+    <p class="topless"><a href="bigtiff.html"
+                          title="next chapter">BigTIFF Design</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -1805,19 +1807,19 @@ In addition, while “Count=Any”, only 1 count should be used.</p></td>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="coverage-bigtiff.html" title="LibTIFF Coverage of the BigTIFF Specification"
+          <a href="bigtiff.html" title="BigTIFF Design"
              >next</a> |</li>
         <li class="right" >
-          <a href="bigtiff.html" title="BigTIFF Design"
+          <a href="technote2.html" title="DRAFT TIFF Technical Note #2"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >TIFF File Format Specification</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">LibTIFF Coverage of the TIFF 6.0 Specification</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

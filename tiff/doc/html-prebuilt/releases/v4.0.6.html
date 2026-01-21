@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v4.0.6 &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v4.0.6 &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changes in TIFF v4.0.5" href="v4.0.5.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v4.0.7.html" title="Changes in TIFF v4.0.7"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.0.6</a></li> 
       </ul>
@@ -59,7 +59,7 @@
 </tbody>
 </table>
 <p>This document describes the changes made to the software between the
-<em>previous</em> and <em>current</em> versions (see above).  If you don’t
+<em>previous</em> and <em>current</em> versions (see above).  If you don't
 find something listed here, then it was not done in this timeframe, or
 it was not considered important enough to be mentioned.  The following
 information is located here:</p>
@@ -75,7 +75,7 @@ information is located here:</p>
 <li><p><code class="file docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> / CMake</p>
 <ul>
 <li><p>Supports CMake 2.8.9 and later.</p></li>
-<li><p>Add missing file which wasn’t being distributed, causing
+<li><p>Add missing file which wasn't being distributed, causing
 unit tests to fail.</p></li>
 <li><p>Make shared/static library building configurable.</p></li>
 <li><p>CMake reads all version information directly from
@@ -96,12 +96,12 @@ if CMake is available.</p></li>
 <ul class="simple">
 <li><p>Fixes to avoid undefined behaviour of signed types (C
 standard compliance).</p></li>
-<li><p>Fixes to avoid possible isses when casting to unsigned char.</p></li>
+<li><p>Fixes to avoid possible issues when casting to unsigned char.</p></li>
 <li><p>Fixes to avoid undefined behaviour with shifts.</p></li>
 <li><p>Fix generation of output with 16 bit or 32 bit integer, when
 byte swapping is needed, in horizontal predictor (<a class="reference external" href="http://bugzilla.maptools.org/show_bug.cgi?id=2521">MapTools bugzilla #2521</a>).</p></li>
 <li><p>Fix decoding when there is a single pixel to decode (unlikely
-case…) and byte swapping is involved.</p></li>
+case...) and byte swapping is involved.</p></li>
 <li><p>Add add explicit masking with <code class="docutils literal notranslate"><span class="pre">0xff</span></code> before casting to <code class="xref c c-type docutils literal notranslate"><span class="pre">uchar</span></code> in
 floating-point horizontal differencing and accumulation routines.</p></li>
 <li><p>Eliminate requirement for and use of 64-bit constant values.</p></li>
@@ -192,14 +192,14 @@ floating-point horizontal differencing and accumulation routines.</p></li>
         <li class="right" >
           <a href="v4.0.7.html" title="Changes in TIFF v4.0.7"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.0.6</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

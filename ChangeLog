@@ -1,3 +1,7 @@
+2026-01-21  Matt Gilarde <mattg@progress.com>
+
+        * Update libtiff from 4.5.1 to 4.7.1.
+
 2026-01-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Re-written to eliminate pushd/popd,
