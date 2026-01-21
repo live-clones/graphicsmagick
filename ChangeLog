@@ -1,3 +1,8 @@
+2026-01-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Magick++/lib/Thread.cpp (Magick::MutexLock::unlock): Fix
+        Magick::MutexLock::unlock cerr compilation.
+
 2026-01-21  Matt Gilarde <mattg@progress.com>
 
         * Update libtiff from 4.5.1 to 4.7.1.
