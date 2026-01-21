@@ -1,5 +1,8 @@
 2026-01-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * www/INSTALL-windows.rst: Record that libtiff is updated to
+        libtiff 4.7.1.
+
         * Magick++/lib/Thread.cpp (Magick::MutexLock::unlock): Fix
         Magick::MutexLock::unlock cerr compilation.
 

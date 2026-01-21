@@ -906,7 +906,7 @@ be found:
 
  * tiff
 
-   libtiff 4.5.1 (from 2023)
+   libtiff 4.7.1 (from 2025)
 
    This library is necessary to read and write the TIFF file format.
 
