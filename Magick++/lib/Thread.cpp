@@ -121,7 +121,6 @@ void Magick::MutexLock::unlock(void)
 #if defined(_MT) && defined(_VISUALC_)
   if ( ReleaseSemaphore(_mutex.id, 1, NULL) == TRUE )
     return;
-  std::cerr << "Magick::MutexLock::unlock: mutex unlock failed! "
-    "(" << strerror(sysError) << ")." << std::endl;
+  std::cerr << "Magick::MutexLock::unlock: mutex unlock failed! " << std::endl;
 #endif
 }
