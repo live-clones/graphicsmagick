@@ -1,3 +1,9 @@
+2026-01-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Add checks to verify that source
+        directory does exist before trying to compile it.  Disable
+        building libtiff temporarily due to a compilation issue.
+
 2026-01-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/INSTALL-windows.rst: Record that libtiff is updated to

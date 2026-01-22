@@ -58,15 +58,15 @@ enable_lcms=true
 enable_libde265=true
 enable_libwmf=true
 enable_libzip=true
-enable_openh264=false # new
+enable_openh264=true
 enable_openjpeg=true
-enable_openjph=false #new
+enable_openjph=true
 enable_png=true
-enable_tiff=true
-enable_vvdec=false # new
-enable_vvenc=false # new
+enable_tiff=false # Not compiling
+enable_vvdec=true
+enable_vvenc=true
 enable_webp=true
-enable_x264=false # new
+enable_x264=true
 enable_x265=true
 enable_xml=true
 enable_xz=true
@@ -126,7 +126,7 @@ set -x
 # build zlib
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static zlib --libs
 #    -L/work/lib -lz
-if $enable_zlib
+if ($enable_zlib) && [ -d ${SRC}/zlib ]
 then
     printf "\n\n=== Building zlib...\n"
     ZLIB_SRC="${SRC}/zlib"
@@ -146,7 +146,7 @@ fi
 # build xz
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static liblzma --libs
 #    -L/work/lib -llzma -pthread -lpthread
-if $enable_xz
+if ($enable_xz) && [ -d ${SRC}/xz ]
 then
     printf "\n\n=== Building xz...\n"
     (
@@ -182,7 +182,7 @@ fi
 # build zstd
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libzstd --libs
 #    -L/usr/local/lib -lzstd -pthread
-if $enable_zstd
+if ($enable_zstd) && [ -d ${SRC}/zstd ]
 then
     printf "\n\n==== Building zstd...\n"
     (
@@ -209,7 +209,7 @@ fi
 
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libpng --libs
 #    -L/work/lib -lpng16 -lm -lz
-if $enable_png
+if ($enable_png) && [ -d ${SRC}/libpng ]
 then
     printf "\n\n=== Building libpng...\n"
     (
@@ -233,7 +233,7 @@ then
     )
 fi
 
-if $enable_xml
+if ($enable_xml) && [ -d ${SRC}/libxml2 ]
 then
     printf "\n\n=== Building libxml2...\n"
     (
@@ -270,7 +270,7 @@ fi
 # build libjpeg-turbo
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjpeg --libs
 #     -L/work/lib -ljpeg
-if $enable_jpeg
+if ($enable_jpeg) && [ -d ${SRC}/libjpeg-turbo ]
 then
     printf "\n\n=== Building libjpeg-turbo...\n"
     (
@@ -295,7 +295,7 @@ then
     )
 fi
 
-if $enable_webp
+if ($enable_webp) && [ -d ${SRC}/libwebp ]
    then
        # Build webp
        # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libwebp --libs
@@ -334,7 +334,7 @@ if $enable_webp
        )
 fi
 
-if $enable_bzip2
+if ($enable_bzip2) && [ -d ${SRC}/bzip2 ]
 then
     printf "\n\n=== Building bzip2...\n"
     (
@@ -363,7 +363,7 @@ then
 fi
 
 # Build libjbig
-if $enable_jbig
+if ($enable_jbig) && [ -d ${SRC}/jbigkit ]
 then
     printf "\n\n=== Building jbigkit...\n"
     (
@@ -394,7 +394,7 @@ fi
 # FXIME: Add libdeflate, and libdeflate build here
 
 # Build OpenJPEG
-if $enable_openjpeg
+if ($enable_openjpeg) && [ -d ${SRC}/openjpeg ]
 then
     printf "\n\n=== Building openjpeg...\n"
     (
@@ -424,7 +424,7 @@ fi
 # Build libtiff
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libtiff-4 --libs
 #  -L/work/lib -L/usr/local/lib -L/work/lib -ltiff -lwebp -lzstd -llzma -ljpeg -lz -lm -lwebp -lm -lsharpyuv -lm -lzstd -pthread -llzma -pthread -lpthread -ljpeg -lz
-if $enable_tiff
+if ($enable_tiff) && [ -d ${SRC}/libtiff ]
 then
     printf "\n\n=== Building libtiff...\n"
     (
@@ -485,7 +485,7 @@ fi
 #    -L/work/lib -llcms2 -lm -lpthread
 # liblcms2 does not test for library dependencies using pkg-config!
 # LIBS="`pkg-config --static --libs-only-l zlib libjpeg libtiff-4`"
-if $enable_lcms
+if ($enable_lcms) && [ -d ${SRC}/Little-CMS ]
 then
     printf "\n\n=== Building Little-CMS...\n"
     (
@@ -520,7 +520,7 @@ fi
 #
 # Disable 'harfbuzz' to avoid compilation error of autofit module due
 # to "use of undeclared identifier 'RTLD_DEFAULT'".
-if $enable_freetype
+if ($enable_freetype) && [ -d ${SRC}/freetype ]
 then
     printf "\n\n=== Building freetype...\n"
     (
@@ -548,7 +548,7 @@ then
     )
 fi
 
-if $enable_jxl
+if ($enable_jxl) && [ -d ${SRC}/libjxl ]
 then
     # Build libjxl
     #  PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjxl_threads --libs
@@ -602,12 +602,12 @@ then
     )
 fi
 
-if $enable_heif
+if ($enable_heif) && [ -d ${SRC}/libheif ]
 then
     # Build libx264 (H.264 encoder)
 
     # FIXME: GraphicsMagick fails to link (unresolved symbol even though library with symbols does exist) if this is enabled!
-    if $enable_x264
+    if ($enable_x264) && [ -d ${SRC}/x264 ]
     then
         (
             LIBX264_SRC=${SRC}/x264
@@ -648,7 +648,7 @@ then
     #
 
     # The source for this is in source/x265.pc.in
-    if $enable_x265
+    if ($enable_x265) && [ -d ${SRC}/x265 ]
     then
         (
             LIBX265_SRC=${SRC}/x265
@@ -703,7 +703,7 @@ then
     #
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libde265 --libs
     #     -L/work/lib -lde265 -lc++
-    if $enable_libde265
+    if ($enable_libde265) && [ -d ${SRC}/libde265 ]
     then
         (
             printf "\n\n=== Building libde265...\n"
@@ -736,7 +736,7 @@ then
     fi
 
     # Build openh264
-    if $enable_openh264
+    if ($enable_openh264) && [ -d ${SRC}/openh264 ]
     then
         printf "\n\n=== Building openh264...\n"
         (
@@ -768,7 +768,7 @@ then
     # Build libaom (a mixed C/C++ library)
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static aom --libs
     #    -L/work/lib -laom -lm -lpthread
-    if $enable_aom
+    if ($enable_aom) && [ -d ${SRC}/aom ]
     then
         (
             printf "\n\n=== Building libaom...\n"
@@ -807,7 +807,7 @@ then
     fi
 
     # Build OpenJPH
-    if $enable_openjph
+    if ($enable_openjph) && [ -d ${SRC}/OpenJPH ]
     then
         (
             printf "\n\n=== Building OpenJPH...\n"
@@ -848,7 +848,7 @@ then
     fi
 
     # Build vvdec
-    if $enable_vvdec
+    if ($enable_vvdec) && [ -d ${SRC}/vvdec ]
     then
         (
             printf "\n\n=== Building vvdec...\n"
@@ -883,7 +883,7 @@ then
     fi
 
     # Build vvenc
-    if $enable_vvenc
+    if ($enable_vvenc) && [ -d ${SRC}/vvenc ]
     then
         (
             printf "\n\n=== Building vvenc...\n"
@@ -993,7 +993,7 @@ then
 
 fi
 
-if $enable_jasper
+if ($enable_jasper) && [ -d ${SRC}/jasper ]
 then
     printf "\n\n=== Building ${SRC}/jasper...\n"
     (
@@ -1037,7 +1037,7 @@ fi
 # Hopefully not required in order to work. Libzip's own oss-fuzz build
 # seems to dynamically link with OpenSSL and expects the same shared
 # library on the fuzzing host.
-if $enable_libzip
+if ($enable_libzip) && [ -d ${SRC}/libzip ]
 then
     if [ -d ${SRC}/libzip ]
     then
@@ -1078,7 +1078,7 @@ fi
 #
 # We only build libwmflite, which has no dependencies.
 # There is no pkg-config support for libwmflite (but there is for libwmf).
-if $enable_libwmf
+if ($enable_libwmf) && [ -d ${SRC}/libwmf ]
 then
     printf "\n\n=== Building libwmf...\n"
     (
@@ -1143,14 +1143,14 @@ esac
     GM_BUILD=${BUILD}/graphicsmagick
 
     # In a static build, libheif omits dependencies for some libraries!
-    if $enable_vvdec ; then
+    if ($enable_vvdec) && [ -d ${BUILD}/vvdec ] ; then
         LIB_VVDEC=`pkg-config --libs-only-l libvvdec`
         if [ -n "${LIB_VVDEC}" ] ; then
             EXTRA_LIBS="${LIB_VVDEC} ${EXTRA_LIBS}"
         fi
     fi
 
-    if $enable_vvenc ; then
+    if ($enable_vvenc) && [ -d ${BUILD}/vvenc ] ; then
         LIB_VVENC=`pkg-config --libs-only-l libvvenc`
         if [ -n "${LIB_VVENC}" ] ; then
             EXTRA_LIBS="${LIB_VVENC} ${EXTRA_LIBS}"
@@ -1158,7 +1158,7 @@ esac
     fi
 
     # A strange thing about x264 is its pkg-config Cflags says "Cflags: -I${prefix}/include -DX264_API_IMPORTS"
-    if $enable_x264 ; then
+    if ($enable_x264) && [ -d ${BUILD}/x264 ] ; then
         LIB_X264=`pkg-config --libs-only-l x264`
         if [ -n "${LIB_X264}" ] ; then
             EXTRA_LIBS="${LIB_X264} ${EXTRA_LIBS}"
