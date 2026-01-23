@@ -57,6 +57,7 @@ Build project fuzzer target::
     --architecture <x86_64/i386> graphicsmagick
 
   python3 infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers --sanitizer memory --architecture x86_64 graphicsmagick
   python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 graphicsmagick
 
 Reproduce using local source checkout (mount local sources into the running container)::

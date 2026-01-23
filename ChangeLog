@@ -1,3 +1,9 @@
+2026-01-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Add
+        -Wno-error=shorten-64-to-32 to vvenc i386 build options to avoid
+        build failure.
+
 2026-01-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Add checks to verify that source

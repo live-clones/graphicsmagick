@@ -626,7 +626,6 @@ then
                 ${LIBX264_SRC}/configure \
                               --prefix="$WORK" \
                               --enable-static \
-                              --disable-shared \
                               --disable-bashcompletion \
                               --disable-opencl \
                               --disable-asm \
@@ -900,12 +899,18 @@ then
                 SIMD_ENABLE=TRUE
             fi
 
+            # The i386 build fails due to -Wshorten-64-to-32
+            CXX_FLAGS_EXTRA=''
+            if [ ${ARCHITECTURE} = i386 ] ; then
+                CXX_FLAGS_EXTRA=' -Wno-error=shorten-64-to-32'
+            fi
+
             # x86 SIMD intrinsics enabled (using SIMDE for non-x86 targets)
 
             cmake \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_CXX_COMPILER=$CXX \
-                -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+                -DCMAKE_CXX_FLAGS="${CXXFLAGS}${CXX_FLAGS_EXTRA}" \
                 -DCMAKE_C_COMPILER=$CC \
                 -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
                 -DCMAKE_INSTALL_PREFIX=$WORK \
