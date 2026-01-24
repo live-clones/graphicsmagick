@@ -38,6 +38,20 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-01-24  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>fuzzing/oss-fuzz-build.sh: Tidy the GraphicsMagick part of the
+build. Install GraphicsMagick config files under /out so that they
+will be discovered, and possibly loaded.</p></li>
+<li><p>fuzzing/utils.cc (LLVMFuzzerInitialize): Provide an alternate
+build mode which uses LLVMFuzzerInitialize() to pass an argument
+to InitializeMagick() for dynamic initialization.  Default
+initialization is still based on as static class instantiation.</p></li>
+<li><p>fuzzing/coder_list.cc (main): Support passing an argument to
+InitializeMagick().</p></li>
+</ul>
+</blockquote>
 <p>2026-01-23  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

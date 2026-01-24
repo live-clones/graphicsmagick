@@ -94,6 +94,8 @@ Copy fuzzing build script into running container (given simultaneous shell sessi
 
   docker cp fuzzing/oss-fuzz-build.sh $(docker ps -lq):/src/graphicsmagick/fuzzing/oss-fuzz-build.sh
 
+  for file in oss-fuzz-build.sh utils.cc coder_list.cc ; do docker cp fuzzing/$file $(docker ps -lq):/src/graphicsmagick/fuzzing/ ; done
+
   Then use 'compile 2>&1 | tee build.log'.  This executes
   /src/build.sh while in the initial "/src/graphicsmagick" directory
   but does some other things as well.

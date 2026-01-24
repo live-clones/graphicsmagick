@@ -1,3 +1,17 @@
+2026-01-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Tidy the GraphicsMagick part of the
+        build. Install GraphicsMagick config files under /out so that they
+        will be discovered, and possibly loaded.
+
+        * fuzzing/utils.cc (LLVMFuzzerInitialize): Provide an alternate
+        build mode which uses LLVMFuzzerInitialize() to pass an argument
+        to InitializeMagick() for dynamic initialization.  Default
+        initialization is still based on as static class instantiation.
+
+        * fuzzing/coder_list.cc (main): Support passing an argument to
+        InitializeMagick().
+
 2026-01-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh (BUILD): Add

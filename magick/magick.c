@@ -1208,7 +1208,7 @@ InitializeMagickEx(const char *path, unsigned int options,
 
 #if defined(USE_GLIBC_MTRACE) && USE_GLIBC_MTRACE
   mtrace();
-#endif /* f defined(USE_GLIBC_MTRACE) && USE_GLIBC_MTRACE */
+#endif /* if defined(USE_GLIBC_MTRACE) && USE_GLIBC_MTRACE */
 
   /* Save initialization options in case we need them later */
   initialize_magick_options = options;
