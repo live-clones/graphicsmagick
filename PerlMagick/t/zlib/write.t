@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# Copyright (C) 2003 GraphicsMagick Group
+# Copyright (C) 2003-2026 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1991-1999 E. I. du Pont de Nemours and Company
 #
@@ -26,10 +26,9 @@ chdir 't/zlib' || die 'Cd failed';
 # 1) Test writing Zip-compressed MIFF
 #
 
-testReadWrite( 'input.miff',
-  'output.miff',
+testReadWrite( 'input_zlib.miff',
+  'output_zlib.miff',
   q/compression=>'Zip'/,
   '8b19185a62241bd7b79ecf3f619711f4ebbedd73eaeca0366f05778762b6614f' );
 
 $test = 0;  # Quench PERL compliaint
-

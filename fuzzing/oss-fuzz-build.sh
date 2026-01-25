@@ -1312,7 +1312,7 @@ fi
        zip -rj "${OUT}"/"${CPREFIX}"JPEG"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jpeg/*
        zip -rj "${OUT}"/"${CPREFIX}"JXL"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jxl/*.jxl
        zip -rj "${OUT}"/"${CPREFIX}"MAT"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.mat "${SRC}"/graphicsmagick/PerlMagick/t/zlib/*.mat
-       zip -r  "${OUT}"/"${CPREFIX}"MIFF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.miff "${SRC}"/graphicsmagick/PerlMagick/t/zlib/*.miff
+       zip -rj  "${OUT}"/"${CPREFIX}"MIFF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.miff "${SRC}"/graphicsmagick/PerlMagick/t/zlib/*.miff
        zip -rj "${OUT}"/"${CPREFIX}"MTV"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.mtv
        zip -rj "${OUT}"/"${CPREFIX}"ORA"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.ora
        zip -rj "${OUT}"/"${CPREFIX}"P7"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.p7

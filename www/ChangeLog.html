@@ -41,6 +41,11 @@
 <p>2026-01-25  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>fuzzing/oss-fuzz-build.sh (BUILD): Use -rj when creating MIFF
+corpus since now there are no conflicting names.</p></li>
+<li><p>PerlMagick/t/zlib/{read.t, write.t, input_zlib.miff:</p></li>
+<li><p>input_zlib.miff.gz]: Rename files so that they are
+non-conflicting for oss-fuzz corpus.</p></li>
 <li><p>coders/heif.c (RegisterHEIFImage): Re-add a module registration
 for HEIC, which got lost during prior edits.</p></li>
 <li><p>fuzzing/oss-fuzz-build.sh: Shell syntax clean-up.
