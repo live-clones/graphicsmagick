@@ -1,6 +1,10 @@
 2026-01-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/heif.c (RegisterHEIFImage): Re-add a module registration
+        for HEIC, which got lost during prior edits.
+
         * fuzzing/oss-fuzz-build.sh: Shell syntax clean-up.
+        (BUILD): Create seed_corpus files.
 
 2026-01-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

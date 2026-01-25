@@ -60,6 +60,9 @@ Build project fuzzer target::
   python3 infra/helper.py build_fuzzers --sanitizer memory --architecture x86_64 graphicsmagick
   python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 graphicsmagick
 
+  This one is broken due to oss-fuzz! 12/25/2026
+  python3 infra/helper.py build_fuzzers --sanitizer memory --architecture i386 graphicsmagick
+
 Reproduce using local source checkout (mount local sources into the running container)::
 
   python3 infra/helper.py build_fuzzers \
@@ -103,57 +106,6 @@ Copy fuzzing build script into running container (given simultaneous shell sessi
 Building a starter Corpus
 --------------------------
 
-    if (false)
-       #
-       # Add a starter corpus
-       # How can these be applied? Running the fuzzer with -help=1 provides help
-       #
-       zip -rj ${OUT}/aai.zip ${SRC}/graphicsmagick/PerlMagick/t/*.aai
-       zip -rj ${OUT}/art.zip ${SRC}/graphicsmagick/PerlMagick/t/*.art
-       zip -rj ${OUT}/bmp.zip ${SRC}/graphicsmagick/PerlMagick/t/*.bmp
-       zip -rj ${OUT}/cals.zip ${SRC}/graphicsmagick/PerlMagick/t/tiff/*.cals
-       zip -rj ${OUT}/cin.zip ${SRC}/graphicsmagick/PerlMagick/t/*.cin
-       zip -rj ${OUT}/dib.zip ${SRC}/graphicsmagick/PerlMagick/t/*.dib
-       zip -rj ${OUT}/fits.zip ${SRC}/graphicsmagick/PerlMagick/t/*.fits
-       zip -rj ${OUT}/gif.zip ${SRC}/graphicsmagick/PerlMagick/t/*.gif
-       zip -rj ${OUT}/heif.zip ${SRC}/graphicsmagick/PerlMagick/t/heif/*.* ${SRC}/libheif/fuzzing/data/corpus/*.heic
-       zip -rj ${OUT}/ico.zip ${SRC}/graphicsmagick/PerlMagick/t/*.ico
-       zip -rj ${OUT}/jbig.zip ${SRC}/jbigkit/examples/*.jbg ${SRC}/graphicsmagick/PerlMagick/t/jbig/*.jbig
-       zip -rj ${OUT}/jng.zip ${SRC}/graphicsmagick/PerlMagick/t/jng/*
-       zip -rj ${OUT}/jnx.zip ${SRC}/graphicsmagick/PerlMagick/t/*.jnx
-       zip -rj ${OUT}/jp2.zip ${SRC}/graphicsmagick/PerlMagick/t/jp2/*.jp2
-       zip -rj ${OUT}/jpc.zip ${SRC}/graphicsmagick/PerlMagick/t/jp2/*.jpc
-       zip -rj ${OUT}/jpeg.zip ${SRC}/graphicsmagick/PerlMagick/t/jpeg/*
-       zip -rj ${OUT}/jxl.zip ${SRC}/graphicsmagick/PerlMagick/t/jxl/*.jxl
-       zip -rj ${OUT}/mat.zip ${SRC}/graphicsmagick/PerlMagick/t/*.mat ${SRC}/graphicsmagick/PerlMagick/t/zlib/*.mat
-       zip -rj ${OUT}/miff.zip ${SRC}/graphicsmagick/PerlMagick/t/*.miff ${SRC}/graphicsmagick/PerlMagick/t/zlib/*.miff
-       zip -rj ${OUT}/mtv.zip ${SRC}/graphicsmagick/PerlMagick/t/*.mtv
-       zip -rj ${OUT}/ora.zip ${SRC}/graphicsmagick/PerlMagick/t/*.ora
-       zip -rj ${OUT}/p7.zip ${SRC}/graphicsmagick/PerlMagick/t/*.p7
-       zip -rj ${OUT}/palm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.palm
-       zip -rj ${OUT}/pam.zip ${SRC}/graphicsmagick/PerlMagick/t/*.pam
-       zip -rj ${OUT}/pbm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.pbm
-       zip -rj ${OUT}/pct.zip ${SRC}/graphicsmagick/PerlMagick/t/*.pct
-       zip -rj ${OUT}/pcx.zip ${SRC}/graphicsmagick/PerlMagick/t/*.pcx
-       zip -rj ${OUT}/pgm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.pgm
-       zip -rj ${OUT}/pgx.zip ${SRC}/graphicsmagick/PerlMagick/t/jp2/*.pgx
-       zip -rj ${OUT}/png.zip `find ${SRC}/libpng -name '*.png' -print` ${SRC}/graphicsmagick/PerlMagick/t/png/*.png
-       zip -rj ${OUT}/ppm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.ppm
-       zip -rj ${OUT}/ps.zip ${SRC}/graphicsmagick/PerlMagick/t/ps/*
-       zip -rj ${OUT}/pxr.zip ${SRC}/graphicsmagick/PerlMagick/t/*.pxr
-       zip -rj ${OUT}/rla.zip ${SRC}/graphicsmagick/PerlMagick/t/*.rla
-       zip -rj ${OUT}/rle.zip ${SRC}/graphicsmagick/PerlMagick/t/*.rle
-       zip -rj ${OUT}/sun.zip ${SRC}/graphicsmagick/PerlMagick/t/*.im1 ${SRC}/graphicsmagick/PerlMagick/t/*.im8 ${SRC}/graphicsmagick/PerlMagick/t/*.im24
-       zip -rj ${OUT}/tga.zip ${SRC}/graphicsmagick/PerlMagick/t/*.tga
-       zip -rj ${OUT}/tiff.zip ${SRC}/libtiff/test/images/*.tiff ${SRC}/graphicsmagick/PerlMagick/t/tiff/*.tif*
-       zip -rj ${OUT}/topol.zip ${SRC}/graphicsmagick/PerlMagick/t/topol*
-       zip -rj ${OUT}/wbmp.zip ${SRC}/graphicsmagick/PerlMagick/t/*.wbmp
-       zip -rj ${OUT}/wmf.zip ${SRC}/graphicsmagick/PerlMagick/t/wmf/*
-       zip -rj ${OUT}/wpg.zip ${SRC}/graphicsmagick/PerlMagick/t/*.wpg
-       zip -rj ${OUT}/xbm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.xbm
-       zip -rj ${OUT}/xpm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.xpm
-       zip -rj ${OUT}/xpm.zip ${SRC}/graphicsmagick/PerlMagick/t/*.xpm
-    fi
 
 
 Building libheif (and dependencies) for development

@@ -2126,6 +2126,10 @@ ModuleExport void RegisterHEIFImage(void)
       (void) RegisterMagickInfo(entry);
     }
 
+  /*
+    This entry is used for anything which looks like HEIF, but is not
+    one of our directly supported subformats.
+  */
   entry=SetMagickInfo("HEIF");
   entry->decoder=(DecoderHandler) ReadHEIFImage;
   entry->magick=(MagickHandler) IsHEIF;
@@ -2143,10 +2147,24 @@ ModuleExport void RegisterHEIFImage(void)
   if (heif_have_decoder_for_format(heif_compression_HEVC) /* || */
       /* heif_have_encoder_for_format(heif_compression_HEVC) */)
     {
+      entry=SetMagickInfo("HEIC");
+      entry->decoder=(DecoderHandler) ReadHEIFImage;
+      entry->magick=(MagickHandler) IsHEIF;
+      entry->description="High-Efficiency Image Codec in HEIF";
+      entry->adjoin=MagickFalse;
+      entry->seekable_stream=need_seekable_stream;
+      if (*version != '\0')
+        entry->version=version;
+      entry->module="HEIF";
+      entry->coder_class=PrimaryCoderClass;
+      entry->extension_treatment=ObeyExtensionTreatment;
+      (void) RegisterMagickInfo(entry);
+
+      /* Libheif supports some MP4 files */
       entry=SetMagickInfo("MP4");
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
-      entry->description="High Efficiency Image Format";
+      entry->description="MPEG-4 Part 14 in HEIF";
       entry->adjoin=MagickFalse;
       entry->seekable_stream=need_seekable_stream;
       if (*version != '\0')
