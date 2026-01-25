@@ -34,14 +34,14 @@
 # OUT=/out
 # SRC=/src
 
-printf "SANITIZER=${SANITIZER}\n"
-printf "ARCHITECTURE=${ARCHITECTURE}\n"
-printf "FUZZING_ENGINE=${FUZZING_ENGINE}\n"
-printf "LIB_FUZZING_ENGINE=${LIB_FUZZING_ENGINE}\n"
-printf "FUZZER_LDFLAGS=${FUZZER_LDFLAGS}\n"
-printf "WORK=${WORK}\n"
-printf "OUT=${OUT}\n"
-printf "SRC=${SRC}\n"
+printf "SANITIZER=%s\n" "${SANITIZER}"
+printf "ARCHITECTURE=%s\n" "${ARCHITECTURE}"
+printf "FUZZING_ENGINE=%s\n" "${FUZZING_ENGINE}"
+printf "LIB_FUZZING_ENGINE=%s\n" "${LIB_FUZZING_ENGINE}"
+printf "FUZZER_LDFLAGS=%s\n" "${FUZZER_LDFLAGS}"
+printf "WORK=%s\n" "${WORK}"
+printf "OUT=%s\n" "${OUT}"
+printf "SRC=%s\n" "${SRC}"
 
 # Libtiff build now requires autoconf-archive
 apt install autoconf-archive
@@ -73,14 +73,14 @@ enable_xz=true
 enable_zlib=true
 enable_zstd=true
 
-export PKG_CONFIG_PATH="$WORK/lib/pkgconfig"
+export PKG_CONFIG_PATH="${WORK}/lib/pkgconfig"
 export PKG_CONFIG='pkg-config --static'
 export VERBOSE=TRUE
-GM_SOURCE=${SRC}/graphicsmagick
+GM_SOURCE="${SRC}"/graphicsmagick
 
 # Don't check Coverage in CI as it gets killed
 if [[ -n "${OSS_FUZZ_CI-}" && "$SANITIZER" = coverage ]]; then
-  touch $OUT/exit
+  touch "${OUT}"/exit
   exit 0
 fi
 
@@ -108,15 +108,15 @@ else
     export MAGICK_CODER_STABILITY=UNSTABLE
 fi
 
-printf "SRC=${SRC}\n"
-printf "WORK=${WORK}\n"
+printf "SRC=%s\n" "${SRC}"
+printf "WORK=%s\n" "${WORK}"
 ls -l "${WORK}"
-printf "OUT=${OUT}\n"
+printf "OUT=%s\n" "${OUT}"
 ls -l "${OUT}"
 
-rm -f ${OUT}/*_fuzzer
+rm -f "${OUT}"/*_fuzzer
 
-BUILD=${WORK}/build
+BUILD="${WORK}"/build
 
 set -x
 
@@ -126,7 +126,7 @@ set -x
 # build zlib
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static zlib --libs
 #    -L/work/lib -lz
-if ($enable_zlib) && [ -d ${SRC}/zlib ]
+if ($enable_zlib) && [ -d "${SRC}"/zlib ]
 then
     printf "\n\n=== Building zlib...\n"
     ZLIB_SRC="${SRC}/zlib"
@@ -135,10 +135,10 @@ then
     mkdir -p "${ZLIB_BUILD}"
     (
         cd "${ZLIB_BUILD}"
-        ${ZLIB_SRC}/configure \
+        "${ZLIB_SRC}"/configure \
                    --static \
-                   --prefix="$WORK"
-        make -j$(nproc) CFLAGS="$CFLAGS -fPIC"
+                   --prefix="${WORK}"
+        make -j"$(nproc)" CFLAGS="${CFLAGS} -fPIC"
         make install
     )
 fi
@@ -146,17 +146,17 @@ fi
 # build xz
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static liblzma --libs
 #    -L/work/lib -llzma -pthread -lpthread
-if ($enable_xz) && [ -d ${SRC}/xz ]
+if ($enable_xz) && [ -d "${SRC}"/xz ]
 then
     printf "\n\n=== Building xz...\n"
     (
-        XZ_SRC=${SRC}/xz
-        XZ_BUILD=${BUILD}/xz
-        mkdir -p ${XZ_BUILD}
+        XZ_SRC="${SRC}"/xz
+        XZ_BUILD="${BUILD}"/xz
+        mkdir -p "${XZ_BUILD}"
         cd "${XZ_SRC}"
         ./autogen.sh --no-po4a --no-doxygen
-        cd ${XZ_BUILD}
-        ${XZ_SRC}/configure \
+        cd "${XZ_BUILD}"
+        "${XZ_SRC}"/configure \
             --disable-assembler \
             --disable-doc \
             --disable-doxygen \
@@ -173,8 +173,8 @@ then
             --enable-static \
             --enable-threads=no \
             --with-pic=yes \
-            --prefix="$WORK"
-        make -j$(nproc)
+            --prefix="${WORK}"
+        make -j"$(nproc)"
         make install
     )
 fi
@@ -182,69 +182,69 @@ fi
 # build zstd
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libzstd --libs
 #    -L/usr/local/lib -lzstd -pthread
-if ($enable_zstd) && [ -d ${SRC}/zstd ]
+if ($enable_zstd) && [ -d "${SRC}"/zstd ]
 then
     printf "\n\n==== Building zstd...\n"
     (
-        ZSTD_SRC=${SRC}/zstd
-        ZSTD_BUILD=${BUILD}/zstd
+        ZSTD_SRC="${SRC}"/zstd
+        ZSTD_BUILD="${BUILD}"/zstd
         rm -rf "${ZSTD_BUILD}"
         mkdir -p "${ZSTD_BUILD}"
         cd "${ZSTD_BUILD}"
         cmake \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER=$CXX \
+            -DCMAKE_CXX_COMPILER="${CXX}" \
             -DCMAKE_CXX_FLAGS="${CXXFLAGS} -fPIC" \
-            -DCMAKE_C_COMPILER=$CC \
+            -DCMAKE_C_COMPILER="${CC}" \
             -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
-            -DCMAKE_INSTALL_PREFIX=$WORK \
+            -DCMAKE_INSTALL_PREFIX="${WORK}" \
             -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
             -DZSTD_BUILD_SHARED=OFF \
             -DZSTD_BUILD_STATIC=ON \
-            "${ZSTD_SRC}/build/cmake"
-        make -j$(nproc)
+            "${ZSTD_SRC}"/build/cmake
+        make -j"$(nproc)"
         make install
     )
 fi
 
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libpng --libs
 #    -L/work/lib -lpng16 -lm -lz
-if ($enable_png) && [ -d ${SRC}/libpng ]
+if ($enable_png) && [ -d "${SRC}"/libpng ]
 then
     printf "\n\n=== Building libpng...\n"
     (
-        PNG_SRC=${SRC}/libpng
-        PNG_BUILD=${BUILD}/libpng
-        cd ${PNG_SRC}
+        PNG_SRC="${SRC}"/libpng
+        PNG_BUILD="${BUILD}"/libpng
+        cd "${PNG_SRC}"
         autoreconf -fiv
-        rm -rf ${PNG_BUILD}
-        mkdir -p ${PNG_BUILD}
-        cd ${PNG_BUILD}
-        ${PNG_SRC}/configure \
-                  --prefix="$WORK" \
+        rm -rf "${PNG_BUILD}"
+        mkdir -p "${PNG_BUILD}"
+        cd "${PNG_BUILD}"
+        "${PNG_SRC}"/configure \
+                  --prefix="${WORK}" \
                   --disable-shared \
                   --enable-static \
-                  CPPFLAGS="-I$WORK/include" \
+                  CPPFLAGS="-I${WORK}/include" \
                   CFLAGS="${CFLAGS} -fPIC" \
-                  LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
+                  LDFLAGS="${LDFLAGS:-} -L${WORK}/lib"
         make clean
-        make -j$(nproc)
+        make -j"$(nproc)"
         make install
     )
 fi
 
-if ($enable_xml) && [ -d ${SRC}/libxml2 ]
+if ($enable_xml) && [ -d "${SRC}"/libxml2 ]
 then
     printf "\n\n=== Building libxml2...\n"
     (
-        LIBXML2_SRC=${SRC}/libxml2
-        LIBXML2_BUILD=${BUILD}/libxml2
-        cd ${LIBXML2_SRC}
+        LIBXML2_SRC="${SRC}"/libxml2
+        LIBXML2_BUILD="${BUILD}"/libxml2
+        cd "${LIBXML2_SRC}"
         autoreconf -fiv
 
-        rm -rf ${LIBXML2_BUILD}
-        mkdir -p ${LIBXML2_BUILD}
-        cd ${LIBXML2_BUILD}
+        rm -rf "${LIBXML2_BUILD}"
+        mkdir -p "${LIBXML2_BUILD}"
+        cd "${LIBXML2_BUILD}"
 
         #
         # Build is patterned after libxml2/fuzz/oss-fuzz-build.sh
@@ -255,14 +255,15 @@ then
         else
             LIBXML2_EXTRA_CONFIG='--with-zlib --with-lzma'
         fi
-        ${LIBXML2_SRC}/configure \
+        # shellcheck disable=SC2086
+        "${LIBXML2_SRC}"/configure \
                       --disable-shared \
                       --without-debug \
                       --without-http \
                       --without-python \
-                      $LIBXML2_EXTRA_CONFIG \
+                      ${LIBXML2_EXTRA_CONFIG} \
                       --prefix="${WORK}"
-        make -j$(nproc)
+        make -j"$(nproc)"
         make install
     )
 fi
@@ -270,54 +271,54 @@ fi
 # build libjpeg-turbo
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjpeg --libs
 #     -L/work/lib -ljpeg
-if ($enable_jpeg) && [ -d ${SRC}/libjpeg-turbo ]
+if ($enable_jpeg) && [ -d "${SRC}"/libjpeg-turbo ]
 then
     printf "\n\n=== Building libjpeg-turbo...\n"
     (
-        LIBJPEG_SRC=${SRC}/libjpeg-turbo
-        LIBJPEG_BUILD=${BUILD}/libjpeg-turbo
+        LIBJPEG_SRC="${SRC}"/libjpeg-turbo
+        LIBJPEG_BUILD="${BUILD}"/libjpeg-turbo
 
-        rm -rf ${LIBJPEG_BUILD}
-        mkdir -p ${LIBJPEG_BUILD}
-        cd ${LIBJPEG_BUILD}
-        CFLAGS="$CFLAGS -fPIC" cmake . \
+        rm -rf "${LIBJPEG_BUILD}"
+        mkdir -p "${LIBJPEG_BUILD}"
+        cd "${LIBJPEG_BUILD}"
+        cmake . \
               -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-              -DCMAKE_INSTALL_PREFIX="$WORK" \
+              -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+              -DCMAKE_INSTALL_PREFIX="${WORK}" \
               -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
               -DENABLE_SHARED=off \
               -DENABLE_STATIC=on \
               -DWITH_JPEG8=1 \
               -DWITH_SIMD=0 \
-              ${LIBJPEG_SRC}
-        make -j$(nproc)
+              "${LIBJPEG_SRC}"
+        make -j"$(nproc)"
         make install
     )
 fi
 
-if ($enable_webp) && [ -d ${SRC}/libwebp ]
+if ($enable_webp) && [ -d "${SRC}"/libwebp ]
    then
        # Build webp
        # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libwebp --libs
        #    -L/work/lib -lwebp -lm -lsharpyuv -lm
        printf "\n\n=== Building libwebp...\n"
        (
-           LIBWEP_SRC=${SRC}/libwebp
-           LIBWEP_BUILD=${BUILD}/libwebp
+           LIBWEP_SRC="${SRC}"/libwebp
+           LIBWEP_BUILD="${BUILD}"/libwebp
 
-           rm -rf ${LIBWEP_BUILD}
-           mkdir -p ${LIBWEP_BUILD}
-           cd ${LIBWEP_BUILD}
+           rm -rf "${LIBWEP_BUILD}"
+           mkdir -p "${LIBWEP_BUILD}"
+           cd "${LIBWEP_BUILD}"
 
-           cd ${LIBWEP_SRC}
+           cd "${LIBWEP_SRC}"
            autoreconf -fiv
 
-           cd ${LIBWEP_BUILD}
-           #PKG_CONFIG_PATH="$WORK/lib/pkgconfig" PKG_CONFIG='pkg-config --static'
-           ${LIBWEP_SRC}/configure \
-               CPPFLAGS="-I$WORK/include" \
-               CFLAGS="$CFLAGS -fPIC" \
-               LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
+           cd "${LIBWEP_BUILD}"
+           #PKG_CONFIG_PATH="${WORK}/lib/pkgconfig" PKG_CONFIG='pkg-config --static'
+           "${LIBWEP_SRC}"/configure \
+               CPPFLAGS="-I${WORK}/include" \
+               CFLAGS="${CFLAGS} -fPIC" \
+               LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
                --disable-gif \
                --disable-gl \
                --disable-jpeg \
@@ -328,18 +329,18 @@ if ($enable_webp) && [ -d ${SRC}/libwebp ]
                --disable-wic \
                --enable-libwebpmux \
                --enable-static \
-               --prefix="$WORK"
-           make V=1 -j$(nproc)
+               --prefix="${WORK}"
+           make V=1 -j"$(nproc)"
            make install
        )
 fi
 
-if ($enable_bzip2) && [ -d ${SRC}/bzip2 ]
+if ($enable_bzip2) && [ -d "${SRC}"/bzip2 ]
 then
     printf "\n\n=== Building bzip2...\n"
     (
-        BZIP2_SRC=${SRC}/bzip2
-        BZIP2_BUILD=${BUILD}/bzip2
+        BZIP2_SRC="${SRC}"/bzip2
+        BZIP2_BUILD="${BUILD}"/bzip2
 
         rm -rf "${BZIP2_BUILD}"
         mkdir -p "${BZIP2_BUILD}"
@@ -347,37 +348,37 @@ then
 
         cmake -G "Unix Makefiles" \
               -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_C_COMPILER=$CC \
-              -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-              -DCMAKE_INSTALL_PREFIX="$WORK" \
+              -DCMAKE_C_COMPILER="${CC}" \
+              -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+              -DCMAKE_INSTALL_PREFIX="${WORK}" \
               -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
               -DENABLE_LIB_ONLY=ON \
               -DENABLE_SHARED_LIB=OFF \
               -DENABLE_STATIC_LIB=ON \
-              ${BZIP2_SRC}
+              "${BZIP2_SRC}"
         make clean
-        make -j$(nproc)
+        make -j"$(nproc)"
         make install
         mv "${WORK}/lib/libbz2_static.a" "${WORK}/lib/libbz2.a"
     )
 fi
 
 # Build libjbig
-if ($enable_jbig) && [ -d ${SRC}/jbigkit ]
+if ($enable_jbig) && [ -d "${SRC}"/jbigkit ]
 then
     printf "\n\n=== Building jbigkit...\n"
     (
-        JBIGKIT_SRC=${SRC}/jbigkit
-        JBIGKIT_BUILD=${BUILD}/jbigkit
+        JBIGKIT_SRC="${SRC}"/jbigkit
+        JBIGKIT_BUILD="${BUILD}"/jbigkit
 
-        LNDIR=${SRC}/graphicsmagick/lndir.sh
+        LNDIR="${SRC}"/graphicsmagick/lndir.sh
 
-        rm -rf ${JBIGKIT_BUILD}
-        mkdir -p ${JBIGKIT_BUILD}
-        cd ${JBIGKIT_BUILD}
+        rm -rf "${JBIGKIT_BUILD}"
+        mkdir -p "${JBIGKIT_BUILD}"
+        cd "${JBIGKIT_BUILD}"
 
         # Create link tree to source directory
-        sh ${LNDIR} ${JBIGKIT_SRC}
+        sh "${LNDIR}" "${JBIGKIT_SRC}"
 
         cd ./libjbig
 
@@ -386,37 +387,37 @@ then
         make clean
         make
 
-        cp -p *.a "$WORK/lib/"
-        cp -p *.h "$WORK/include/"
+        cp -p -- *.a "${WORK}/lib/"
+        cp -p -- *.h "${WORK}/include/"
     )
 fi
 
 # FXIME: Add libdeflate, and libdeflate build here
 
 # Build OpenJPEG
-if ($enable_openjpeg) && [ -d ${SRC}/openjpeg ]
+if ($enable_openjpeg) && [ -d "${SRC}"/openjpeg ]
 then
     printf "\n\n=== Building openjpeg...\n"
     (
-        OPENJPEG_SRC=${SRC}/openjpeg
-        OPENJPEG_BUILD=${BUILD}/openjpeg
+        OPENJPEG_SRC="${SRC}"/openjpeg
+        OPENJPEG_BUILD="${BUILD}"/openjpeg
 
-        rm -rf ${OPENJPEG_BUILD}
-        mkdir -p ${OPENJPEG_BUILD}
-        cd ${OPENJPEG_BUILD}
+        rm -rf "${OPENJPEG_BUILD}"
+        mkdir -p "${OPENJPEG_BUILD}"
+        cd "${OPENJPEG_BUILD}"
 
         cmake -G "Unix Makefiles" \
               -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_C_COMPILER=$CC \
-              -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-              -DCMAKE_INSTALL_PREFIX="$WORK" \
+              -DCMAKE_C_COMPILER="${CC}" \
+              -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+              -DCMAKE_INSTALL_PREFIX="${WORK}" \
               -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
               -DBUILD_CODEC=OFF \
               -DBUILD_SHARED_LIBS=OFF \
               -DBUILD_STATIC_LIBS=ON \
-              ${OPENJPEG_SRC}
+              "${OPENJPEG_SRC}"
         make clean
-        make -j$(nproc)
+        make -j"$(nproc)"
         make install
     )
 fi
@@ -424,29 +425,29 @@ fi
 # Build libtiff
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libtiff-4 --libs
 #  -L/work/lib -L/usr/local/lib -L/work/lib -ltiff -lwebp -lzstd -llzma -ljpeg -lz -lm -lwebp -lm -lsharpyuv -lm -lzstd -pthread -llzma -pthread -lpthread -ljpeg -lz
-if ($enable_tiff) && [ -d ${SRC}/libtiff ]
+if ($enable_tiff) && [ -d "${SRC}"/libtiff ]
 then
     printf "\n\n=== Building libtiff...\n"
     (
-        LIBTIFF_SRC=${SRC}/libtiff
-        LIBTIFF_BUILD=${BUILD}/libtiff
+        LIBTIFF_SRC="${SRC}"/libtiff
+        LIBTIFF_BUILD="${BUILD}"/libtiff
 
-        rm -rf ${LIBTIFF_BUILD}
-        mkdir -p ${LIBTIFF_BUILD}
-        cd ${LIBTIFF_BUILD}
+        rm -rf "${LIBTIFF_BUILD}"
+        mkdir -p "${LIBTIFF_BUILD}"
+        cd "${LIBTIFF_BUILD}"
 
         if true ; then
 
             # Use Autotools
-            cd ${LIBTIFF_SRC}
+            cd "${LIBTIFF_SRC}"
             sed -i 's/2\.71/2\.69/' configure.ac
             autoreconf -fiv
 
-            cd ${LIBTIFF_BUILD}
-            ${LIBTIFF_SRC}/configure \
-                          CPPFLAGS="-I$WORK/include" \
-                          CFLAGS="$CFLAGS -fPIC" \
-                          LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
+            cd "${LIBTIFF_BUILD}"
+            "${LIBTIFF_SRC}"/configure \
+                          CPPFLAGS="-I${WORK}/include" \
+                          CFLAGS="${CFLAGS} -fPIC" \
+                          LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
                           --disable-contrib \
                           --disable-ld-version-script \
                           --disable-old-jpeg \
@@ -456,8 +457,8 @@ then
                           --disable-tests \
                           --enable-static \
                           --enable-tools \
-                          --prefix="$WORK"
-            make -j$(nproc)
+                          --prefix="${WORK}"
+            make -j"$(nproc)"
             make install
 
         else
@@ -465,15 +466,15 @@ then
             # Use cmake
             cmake \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_CXX_COMPILER=$CXX \
+                -DCMAKE_CXX_COMPILER="${CXX}" \
                 -DCMAKE_CXX_FLAGS="${CXXFLAGS} -fPIC" \
-                -DCMAKE_C_COMPILER=$CC \
+                -DCMAKE_C_COMPILER="${CC}" \
                 -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
-                -DCMAKE_INSTALL_PREFIX=$WORK \
+                -DCMAKE_INSTALL_PREFIX="${WORK}" \
                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                 -DBUILD_SHARED_LIBS=OFF \
                 "${SRC}/libtiff"
-            make -j$(nproc)
+            make -j"$(nproc)"
             make install
 
         fi
@@ -485,31 +486,31 @@ fi
 #    -L/work/lib -llcms2 -lm -lpthread
 # liblcms2 does not test for library dependencies using pkg-config!
 # LIBS="`pkg-config --static --libs-only-l zlib libjpeg libtiff-4`"
-if ($enable_lcms) && [ -d ${SRC}/Little-CMS ]
+if ($enable_lcms) && [ -d "${SRC}"/Little-CMS ]
 then
     printf "\n\n=== Building Little-CMS...\n"
     (
-        LCMS_SRC=${SRC}/Little-CMS
-        LCMS_BUILD=${BUILD}/Little-CMS
+        LCMS_SRC="${SRC}"/Little-CMS
+        LCMS_BUILD="${BUILD}"/Little-CMS
 
-        cd ${LCMS_SRC}
+        cd "${LCMS_SRC}"
         autoreconf -fiv
 
-        rm -rf ${LCMS_BUILD}
-        mkdir -p ${LCMS_BUILD}
-        cd ${LCMS_BUILD}
+        rm -rf "${LCMS_BUILD}"
+        mkdir -p "${LCMS_BUILD}"
+        cd "${LCMS_BUILD}"
 
-        ${LCMS_SRC}/configure \
-                   CPPFLAGS="-I$WORK/include" \
-                   CFLAGS="$CFLAGS -fPIC" \
-                   LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
-                   --disable-shared \
-                   --enable-static \
-                   --prefix="$WORK" \
-                   --without-jpeg \
-                   --without-tiff \
-                   --without-zlib
-        make -j$(nproc)
+        "${LCMS_SRC}"/configure \
+                     CPPFLAGS="-I${WORK}/include" \
+                     CFLAGS="${CFLAGS} -fPIC" \
+                     LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
+                     --disable-shared \
+                     --enable-static \
+                     --prefix="${WORK}" \
+                     --without-jpeg \
+                     --without-tiff \
+                     --without-zlib
+        make -j"$(nproc)"
         make install
     )
 fi
@@ -520,35 +521,35 @@ fi
 #
 # Disable 'harfbuzz' to avoid compilation error of autofit module due
 # to "use of undeclared identifier 'RTLD_DEFAULT'".
-if ($enable_freetype) && [ -d ${SRC}/freetype ]
+if ($enable_freetype) && [ -d "${SRC}"/freetype ]
 then
     printf "\n\n=== Building freetype...\n"
     (
-        FREETYPE_SRC=${SRC}/freetype
-        FREETYPE_BUILD=${BUILD}/freetype
+        FREETYPE_SRC="${SRC}"/freetype
+        FREETYPE_BUILD="${BUILD}"/freetype
 
-        rm -rf ${FREETYPE_BUILD}
-        mkdir -p ${FREETYPE_BUILD}
+        rm -rf "${FREETYPE_BUILD}"
+        mkdir -p "${FREETYPE_BUILD}"
 
-        cd ${FREETYPE_SRC}
+        cd "${FREETYPE_SRC}"
         ./autogen.sh
 
-        cd ${FREETYPE_BUILD}
-        ${FREETYPE_SRC}/configure \
-                       CPPFLAGS="-I$WORK/include" \
-                       CFLAGS="$CFLAGS -fPIC" \
-                       LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
-                       --disable-shared \
-                       --enable-freetype-config \
-                       --enable-static \
-                       --without-harfbuzz \
-                       --prefix="$WORK"
-        make -j$(nproc)
+        cd "${FREETYPE_BUILD}"
+        "${FREETYPE_SRC}"/configure \
+                         CPPFLAGS="-I${WORK}/include" \
+                         CFLAGS="${CFLAGS} -fPIC" \
+                         LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
+                         --disable-shared \
+                         --enable-freetype-config \
+                         --enable-static \
+                         --without-harfbuzz \
+                         --prefix="${WORK}"
+        make -j"$(nproc)"
         make install
     )
 fi
 
-if ($enable_jxl) && [ -d ${SRC}/libjxl ]
+if ($enable_jxl) && [ -d "${SRC}"/libjxl ]
 then
     # Build libjxl
     #  PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libjxl_threads --libs
@@ -560,7 +561,7 @@ then
     # Added -DJPEGXL_ENABLE_SKCMS=true
     printf "\n\n=== Building libjxl...\n"
     (
-        LIBJXL_SRC=${SRC}/libjxl
+        LIBJXL_SRC="${SRC}"/libjxl
         LIBJXL_BUILD="${BUILD}/libjxl"
 
         rm -rf "${LIBJXL_BUILD}"
@@ -573,7 +574,7 @@ then
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_FLAGS="-DHWY_DISABLED_TARGETS=HWY_SSSE3 ${CXXFLAGS} -fPIC" \
             -DCMAKE_C_FLAGS="-DHWY_DISABLED_TARGETS=HWY_SSSE3 ${CFLAGS} -fPIC" \
-            -DCMAKE_INSTALL_PREFIX=$WORK \
+            -DCMAKE_INSTALL_PREFIX="${WORK}" \
             -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
             -DJPEGXL_ENABLE_BENCHMARK=false \
             -DJPEGXL_ENABLE_EXAMPLES=false \
@@ -586,50 +587,49 @@ then
             -DJPEGXL_ENABLE_TOOLS=true \
             -DJPEGXL_ENABLE_VIEWERS=false \
             -DJPEGXL_FORCE_SYSTEM_LCMS2=false \
-            ${LIBJXL_SRC}
+            "${LIBJXL_SRC}"
 
-        make -j$(nproc)
+        make -j"$(nproc)"
         # libjxl claims to require libjxl_cms, but does not build/install one!
         #sed -i 's/ libjxl_cms//' ./lib/libjxl.pc
 
         make install
-        cp third_party/brotli/*.a $WORK/lib
-        cp third_party/brotli/*.pc $WORK/lib/pkgconfig
+        cp third_party/brotli/*.a "${WORK}"/lib
+        cp third_party/brotli/*.pc "${WORK}"/lib/pkgconfig
         printf "==================\n"
         printf "JXL version info\n"
-        ${WORK}/bin/cjxl --version
+        "${WORK}"/bin/cjxl --version
         printf "==================\n"
     )
 fi
 
-if ($enable_heif) && [ -d ${SRC}/libheif ]
+if ($enable_heif) && [ -d "${SRC}"/libheif ]
 then
     # Build libx264 (H.264 encoder)
 
-    if ($enable_x264) && [ -d ${SRC}/x264 ]
+    if ($enable_x264) && [ -d "${SRC}"/x264 ]
     then
         (
-            LIBX264_SRC=${SRC}/x264
+            LIBX264_SRC="${SRC}"/x264
 
-            if [ -d ${LIBX264_SRC} ]
+            if [ -d "${LIBX264_SRC}" ]
             then
-                LIBX264_BUILD=${BUILD}/x264
-                rm -rf ${LIBX264_BUILD}
-                mkdir -p ${LIBX264_BUILD}
-                cd ${LIBX264_BUILD}
+                LIBX264_BUILD="${BUILD}"/x264
+                rm -rf "${LIBX264_BUILD}"
+                mkdir -p "${LIBX264_BUILD}"
+                cd "${LIBX264_BUILD}"
 
                 printf "\n\n=== Building libx264 ...\n"
-                CPPFLAGS="-I$WORK/include"
-                CFLAGS="$CFLAGS -fPIC"
-                LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
-                ${LIBX264_SRC}/configure \
-                              --prefix="$WORK" \
-                              --enable-static \
-                              --disable-bashcompletion \
-                              --disable-opencl \
-                              --disable-asm \
-                              --disable-cli
-                make -j$(nproc)
+                "${LIBX264_SRC}"/configure \
+                                --prefix="${WORK}" \
+                                --enable-static \
+                                --disable-bashcompletion \
+                                --disable-opencl \
+                                --disable-asm \
+                                --disable-cli \
+                                --extra-cflags="-I${WORK}/include ${CFLAGS} -fPIC" \
+                                --extra-ldflags="${LDFLAGS:-} -L${WORK}/lib"
+                make -j"$(nproc)"
                 make install
             fi
         )
@@ -646,40 +646,40 @@ then
     #
 
     # The source for this is in source/x265.pc.in
-    if ($enable_x265) && [ -d ${SRC}/x265 ]
+    if ($enable_x265) && [ -d "${SRC}"/x265 ]
     then
         (
-            LIBX265_SRC=${SRC}/x265
-            LIBX265_BUILD=${BUILD}/x265
+            LIBX265_SRC="${SRC}"/x265
+            LIBX265_BUILD="${BUILD}"/x265
 
            # If source/cmake/Version.cmake detects that the source
            # code is managed by git, it fails to build or install the
            # x265.pc file that libheif demands!
-           if [ -d ${LIBX265_SRC}/.git ]
+           if [ -d "${LIBX265_SRC}"/.git ]
            then
-               mv -f ${LIBX265_SRC}/.git ${LIBX265_SRC}/.git-moved
+               mv -f "${LIBX265_SRC}"/.git "${LIBX265_SRC}"/.git-moved
            fi
 
-           rm -rf ${LIBX265_BUILD}
-           mkdir -p ${LIBX265_BUILD}
-           cd ${LIBX265_BUILD}
+           rm -rf "${LIBX265_BUILD}"
+           mkdir -p "${LIBX265_BUILD}"
+           cd "${LIBX265_BUILD}"
 
            printf "\n\n=== Building libx265...\n"
            cmake -G "Unix Makefiles" \
                  -DCMAKE_BUILD_TYPE=Debug \
-                 -DCMAKE_CXX_COMPILER=$CXX \
-                 -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-                 -DCMAKE_C_COMPILER=$CC \
-                 -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-                 -DCMAKE_INSTALL_PREFIX="$WORK" \
+                 -DCMAKE_CXX_COMPILER="${CXX}" \
+                 -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                 -DCMAKE_C_COMPILER="${CC}" \
+                 -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+                 -DCMAKE_INSTALL_PREFIX="${WORK}" \
                  -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                  -DENABLE_ASSEMBLY:BOOL=OFF \
                  -DENABLE_SHARED:STRING=off \
                  -DX265_LATEST_TAG=TRUE \
-                 ${LIBX265_SRC}/source
+                 "${LIBX265_SRC}"/source
 
            make clean
-           make -j$(nproc) x265-static
+           make -j"$(nproc)" x265-static
            make install
 
            # Restore original git directory
@@ -701,77 +701,77 @@ then
     #
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libde265 --libs
     #     -L/work/lib -lde265 -lc++
-    if ($enable_libde265) && [ -d ${SRC}/libde265 ]
+    if ($enable_libde265) && [ -d "${SRC}"/libde265 ]
     then
         (
             printf "\n\n=== Building libde265...\n"
 
-            LIBDE265_SRC=${SRC}/libde265
-            LIBDE265_BUILD=${BUILD}/libde265
+            LIBDE265_SRC="${SRC}"/libde265
+            LIBDE265_BUILD="${BUILD}"/libde265
 
-            rm -rf ${LIBDE265_BUILD}
-            mkdir -p ${LIBDE265_BUILD}
-            cd ${LIBDE265_BUILD}
+            rm -rf "${LIBDE265_BUILD}"
+            mkdir -p "${LIBDE265_BUILD}"
+            cd "${LIBDE265_BUILD}"
 
             cmake -G "Unix Makefiles" \
                   -DCMAKE_BUILD_TYPE=Debug \
-                  -DCMAKE_CXX_COMPILER=$CXX \
-                  -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-                  -DCMAKE_C_COMPILER=$CC \
-                  -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
+                  -DCMAKE_CXX_COMPILER="${CXX}" \
+                  -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                  -DCMAKE_C_COMPILER="${CC}" \
+                  -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
                   -DCMAKE_INSTALL_RPATH='/usr/local/lib' \
-                  -DCMAKE_INSTALL_PREFIX="$WORK" \
+                  -DCMAKE_INSTALL_PREFIX="${WORK}" \
                   -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                   -DBUILD_SHARED_LIBS=OFF \
                   -DENABLE_SDL=OFF \
                   -DENABLE_DECODER=ON \
                   -DENABLE_ENCODER=OFF \
-                  ${LIBDE265_SRC}
+                  "${LIBDE265_SRC}"
             make clean
-            make -j$(nproc)
+            make -j"$(nproc)"
             make install
        )
     fi
 
     # Build openh264
-    if ($enable_openh264) && [ -d ${SRC}/openh264 ]
+    if ($enable_openh264) && [ -d "${SRC}"/openh264 ]
     then
         printf "\n\n=== Building openh264...\n"
         (
-            OPENH64_SRC=${SRC}/openh264
-            OPENH64_BUILD=${BUILD}/openh264
+            OPENH64_SRC="${SRC}"/openh264
+            OPENH64_BUILD="${BUILD}"/openh264
 
-            rm -rf ${OPENH64_BUILD}
-            mkdir -p ${OPENH64_BUILD}
-            cd ${OPENH64_BUILD}
+            rm -rf "${OPENH64_BUILD}"
+            mkdir -p "${OPENH64_BUILD}"
+            cd "${OPENH64_BUILD}"
 
             # Enable a verbose build (Yes/No)
             VERBOSE=Yes
 
             #cd "${OPENH64_SRC}"
             # Build using 'make', which is a GNU Makefile
-            if [[ $CXXFLAGS = *sanitize=memory* ]]; then
+            if [[ ${CXXFLAGS} = *sanitize=memory* ]]; then
                 ASM_BUILD=No
             else
                 ASM_BUILD=Yes
             fi
-            #  make -C ${OPENH64_SRC} SRC_PATH=${OPENH64_SRC} -j$(nproc) ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug clean
+            #  make -C ${OPENH64_SRC} SRC_PATH=${OPENH64_SRC} -j"$(nproc)" ARCH="${ARCHITECTURE}" USE_ASM="${ASM_BUILD}" BUILDTYPE=Debug clean
 
-            #make V=${VERBOSE} -C ${OPENH64_SRC} SRC_PATH=${OPENH64_SRC}/ -j$(nproc) OS=linux ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug clean
-            make V=${VERBOSE} -C ${OPENH64_SRC} SRC_PATH=${OPENH64_SRC}/ -j$(nproc) OS=linux ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug libopenh264.a
-            make V=${VERBOSE} -C ${OPENH64_SRC} SRC_PATH=${OPENH64_SRC}/ -j$(nproc) OS=linux ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug PREFIX="$WORK" install-static
+            #make V="${VERBOSE}" -C "${OPENH64_SRC}" SRC_PATH="${OPENH64_SRC}"/ -j"$(nproc)" OS=linux ARCH="${ARCHITECTURE}" USE_ASM="${ASM_BUILD}" BUILDTYPE=Debug clean
+            make V="${VERBOSE}" -C "${OPENH64_SRC}" SRC_PATH="${OPENH64_SRC}"/ -j"$(nproc)" OS=linux ARCH="${ARCHITECTURE}" USE_ASM="${ASM_BUILD}" BUILDTYPE=Debug libopenh264.a
+            make V="${VERBOSE}" -C "${OPENH64_SRC}" SRC_PATH="${OPENH64_SRC}"/ -j"$(nproc)" OS=linux ARCH="${ARCHITECTURE}" USE_ASM="${ASM_BUILD}" BUILDTYPE=Debug PREFIX="${WORK}" install-static
         )
     fi
 
     # Build libaom (a mixed C/C++ library)
     # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static aom --libs
     #    -L/work/lib -laom -lm -lpthread
-    if ($enable_aom) && [ -d ${SRC}/aom ]
+    if ($enable_aom) && [ -d "${SRC}"/aom ]
     then
         (
             printf "\n\n=== Building libaom...\n"
-            AOM_SRC=${SRC}/aom
-            AOM_BUILD=${BUILD}/aom
+            AOM_SRC="${SRC}"/aom
+            AOM_BUILD="${BUILD}"/aom
 
             rm -rf "${AOM_BUILD}"
             mkdir -p "${AOM_BUILD}"
@@ -781,11 +781,11 @@ then
                   -DAOM_MAX_ALLOCABLE_MEMORY=536870912 \
                   -DAOM_TARGET_CPU=generic \
                   -DCMAKE_BUILD_TYPE=Debug \
-                  -DCMAKE_CXX_COMPILER=$CXX \
-                  -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-                  -DCMAKE_C_COMPILER=$CC \
-                  -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-                  -DCMAKE_INSTALL_PREFIX="$WORK" \
+                  -DCMAKE_CXX_COMPILER="${CXX}" \
+                  -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                  -DCMAKE_C_COMPILER="${CC}" \
+                  -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+                  -DCMAKE_INSTALL_PREFIX="${WORK}" \
                   -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                   -DCONFIG_PIC=1 \
                   -DCONFIG_SIZE_LIMIT=1 \
@@ -796,28 +796,28 @@ then
                   -DENABLE_EXAMPLES=0 \
                   -DENABLE_SHARED:bool=off \
                   -DENABLE_TESTS=0 \
-                  ${AOM_SRC}
+                  "${AOM_SRC}"
 
             make clean
-            make -j$(nproc)
+            make -j"$(nproc)"
             make install
         )
     fi
 
     # Build OpenJPH
-    if ($enable_openjph) && [ -d ${SRC}/OpenJPH ]
+    if ($enable_openjph) && [ -d "${SRC}"/OpenJPH ]
     then
         (
             printf "\n\n=== Building OpenJPH...\n"
 
-            OPENJPH_SRC=${SRC}/OpenJPH
+            OPENJPH_SRC="${SRC}"/OpenJPH
             OPENJPH_BUILD="${BUILD}/OpenJPH"
 
-            rm -rf ${OPENJPH_BUILD}
-            mkdir -p ${OPENJPH_BUILD}
-            cd ${OPENJPH_BUILD}
+            rm -rf "${OPENJPH_BUILD}"
+            mkdir -p "${OPENJPH_BUILD}"
+            cd "${OPENJPH_BUILD}"
 
-            if [[ $CXXFLAGS = *sanitize=memory* ]]; then
+            if [[ ${CXXFLAGS} = *sanitize=memory* ]]; then
                 SIMD_DISABLE=TRUE
             else
                 SIMD_DISABLE=FALSE
@@ -825,19 +825,19 @@ then
 
             cmake \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_CXX_COMPILER=$CXX \
-                -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-                -DCMAKE_C_COMPILER=$CC \
-                -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-                -DCMAKE_INSTALL_PREFIX=$WORK \
+                -DCMAKE_CXX_COMPILER="${CXX}" \
+                -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                -DCMAKE_C_COMPILER="${CC}" \
+                -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+                -DCMAKE_INSTALL_PREFIX="${WORK}" \
                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                 -DBUILD_SHARED_LIBS=FALSE \
                 -DOJPH_ENABLE_TIFF_SUPPORT=OFF \
                 -DOJPH_BUILD_EXECUTABLES=ON \
                 -DOJPH_DISABLE_SIMD=${SIMD_DISABLE} \
-                ${OPENJPH_SRC}
+                "${OPENJPH_SRC}"
 
-                make -j$(nproc)
+                make -j"$(nproc)"
                 # FIXME: Debug build produces libopenjph_d.a but pkgconfig says -lopenjph
                 # At the moment, using a Release build solves it better than using sed.
                 #sed -i 's/-lopenjph/-lopenjph_d/' openjph.pc
@@ -846,18 +846,18 @@ then
     fi
 
     # Build vvdec
-    if ($enable_vvdec) && [ -d ${SRC}/vvdec ]
+    if ($enable_vvdec) && [ -d "${SRC}"/vvdec ]
     then
         (
             printf "\n\n=== Building vvdec...\n"
 
-            VVDEC_SRC=${SRC}/vvdec
+            VVDEC_SRC="${SRC}"/vvdec
 
-            VVDEC_BUILD=${BUILD}/vvdec
-            mkdir -p ${VVDEC_BUILD}
-            cd ${VVDEC_BUILD}
+            VVDEC_BUILD="${BUILD}"/vvdec
+            mkdir -p "${VVDEC_BUILD}"
+            cd "${VVDEC_BUILD}"
 
-            if [[ $CXXFLAGS = *sanitize=memory* ]]; then
+            if [[ ${CXXFLAGS} = *sanitize=memory* ]]; then
                 SIMD_ENABLE=FALSE
             else
                 SIMD_ENABLE=TRUE
@@ -865,34 +865,34 @@ then
 
             cmake \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_CXX_COMPILER=$CXX \
-                -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-                -DCMAKE_C_COMPILER=$CC \
-                -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-                -DCMAKE_INSTALL_PREFIX=$WORK \
+                -DCMAKE_CXX_COMPILER="${CXX}" \
+                -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                -DCMAKE_C_COMPILER="${CC}" \
+                -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+                -DCMAKE_INSTALL_PREFIX="${WORK}" \
                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                 -DVVDEC_ENABLE_BITSTREAM_DOWNLOAD=OFF \
                 -DBUILD_SHARED_LIBS=FALSE \
-                -DVVDEC_ENABLE_X86_SIMD=${SIMD_ENABLE} \
-                ${VVDEC_SRC}
-            make -j$(nproc)
+                -DVVDEC_ENABLE_X86_SIMD="${SIMD_ENABLE}" \
+                "${VVDEC_SRC}"
+            make -j"$(nproc)"
             make install
         )
     fi
 
     # Build vvenc
-    if ($enable_vvenc) && [ -d ${SRC}/vvenc ]
+    if ($enable_vvenc) && [ -d "${SRC}"/vvenc ]
     then
         (
             printf "\n\n=== Building vvenc...\n"
 
-            VVENC_SRC=${SRC}/vvenc
+            VVENC_SRC="${SRC}"/vvenc
 
-            VVENC_BUILD=${BUILD}/vvenc
-            mkdir -p ${VVENC_BUILD}
-            cd ${VVENC_BUILD}
+            VVENC_BUILD="${BUILD}"/vvenc
+            mkdir -p "${VVENC_BUILD}"
+            cd "${VVENC_BUILD}"
 
-            if [[ $CXXFLAGS = *sanitize=memory* ]]; then
+            if [[ ${CXXFLAGS} = *sanitize=memory* ]]; then
                 SIMD_ENABLE=FALSE
             else
                 SIMD_ENABLE=TRUE
@@ -900,24 +900,24 @@ then
 
             # The i386 build fails due to -Wshorten-64-to-32
             CXX_FLAGS_EXTRA=''
-            if [ ${ARCHITECTURE} = i386 ] ; then
+            if [ "${ARCHITECTURE}" = i386 ] ; then
                 CXX_FLAGS_EXTRA=' -Wno-error=shorten-64-to-32'
             fi
 
             # x86 SIMD intrinsics enabled (using SIMDE for non-x86 targets)
             cmake \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_CXX_COMPILER=$CXX \
+                -DCMAKE_CXX_COMPILER="${CXX}" \
                 -DCMAKE_CXX_FLAGS="${CXXFLAGS}${CXX_FLAGS_EXTRA}" \
-                -DCMAKE_C_COMPILER=$CC \
-                -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-                -DCMAKE_INSTALL_PREFIX=$WORK \
+                -DCMAKE_C_COMPILER="${CC}" \
+                -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+                -DCMAKE_INSTALL_PREFIX="${WORK}" \
                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                 -DBUILD_SHARED_LIBS=FALSE \
-                -DVVENC_ENABLE_X86_SIMD=${SIMD_ENABLE} \
-                ${VVENC_SRC}
+                -DVVENC_ENABLE_X86_SIMD="${SIMD_ENABLE}" \
+                "${VVENC_SRC}"
 
-            make -j$(nproc)
+            make -j"$(nproc)"
             make install
         )
     fi
@@ -928,22 +928,22 @@ then
     (
         printf "\n\n=== Building libheif...\n"
 
-        LIBHEIF_SRC=${SRC}/libheif
+        LIBHEIF_SRC="${SRC}"/libheif
 
-        LIBHEIF_BUILD=${BUILD}/libheif
+        LIBHEIF_BUILD="${BUILD}"/libheif
         rm -rf "${LIBHEIF_BUILD}"
         mkdir -p "${LIBHEIF_BUILD}"
 
         cd "${LIBHEIF_BUILD}"
         #cmake --preset=fuzzing \
-            #      -DCMAKE_C_COMPILER=$CC \
-            #      -DCMAKE_CXX_COMPILER=$CXX \
-            #      -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-            #      -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-            #      -DCMAKE_INSTALL_PREFIX=$WORK \
+            #      -DCMAKE_C_COMPILER="${CC}" \
+            #      -DCMAKE_CXX_COMPILER="${CXX}" \
+            #      -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+            #      -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+            #      -DCMAKE_INSTALL_PREFIX="${WORK}" \
             #      -DFUZZING_COMPILE_OPTIONS="" \
             #      -DFUZZING_LINKER_OPTIONS="$LIB_FUZZING_ENGINE" \
-            #      -DFUZZING_C_COMPILER=$CC -DFUZZING_CXX_COMPILER=$CXX \
+            #      -DFUZZING_C_COMPILER="${CC}" -DFUZZING_CXX_COMPILER="${CXX}" \
             #      -DWITH_DEFLATE_HEADER_COMPRESSION=OFF \
             #      -DENABLE_SHARED:bool=off \
             #      -DCONFIG_PIC=1 \
@@ -957,72 +957,72 @@ then
             -DBUILD_SHARED_LIBS=off \
             -DBUILD_TESTING=off \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER=$CXX \
-            -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-            -DCMAKE_C_COMPILER=$CC \
-            -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-            -DCMAKE_INSTALL_PREFIX=$WORK \
+            -DCMAKE_CXX_COMPILER="${CXX}" \
+            -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+            -DCMAKE_C_COMPILER="${CC}" \
+            -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+            -DCMAKE_INSTALL_PREFIX="${WORK}" \
             -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
             -DENABLE_PLUGIN_LOADING=off \
             -DENABLE_MULTITHREADING_SUPPORT=on \
-            -DWITH_AOM_DECODER=$(tv_on_off $enable_aom) \
-            -DWITH_AOM_ENCODER=$(tv_on_off $enable_aom) \
+            -DWITH_AOM_DECODER="$(tv_on_off $enable_aom)" \
+            -DWITH_AOM_ENCODER="$(tv_on_off $enable_aom)" \
             -DWITH_DAV1D=off \
             -DWITH_EXAMPLES=off \
             -DWITH_FFMPEG_DECODER=off \
-            -DWITH_JPEG_DECODER=$(tv_on_off $enable_jpeg) \
-            -DWITH_JPEG_ENCODER=$(tv_on_off $enable_jpeg) \
+            -DWITH_JPEG_DECODER="$(tv_on_off $enable_jpeg)" \
+            -DWITH_JPEG_ENCODER="$(tv_on_off $enable_jpeg)" \
             -DWITH_KVAZAAR=off \
-            -DWITH_LIBDE265=$(tv_on_off $enable_libde265) \
-            -DWITH_OpenH264_ENCODER=$(tv_on_off $enable_openh264) \
-            -DWITH_OpenH264_DECODER=$(tv_on_off $enable_openh264) \
+            -DWITH_LIBDE265="$(tv_on_off $enable_libde265)" \
+            -DWITH_OpenH264_ENCODER="$(tv_on_off $enable_openh264)" \
+            -DWITH_OpenH264_DECODER="$(tv_on_off $enable_openh264)" \
             -DWITH_OPENJPH_DECODER=off \
-            -DWITH_OPENJPH_ENCODER=$(tv_on_off $enable_openjph) \
+            -DWITH_OPENJPH_ENCODER="$(tv_on_off $enable_openjph)" \
             -DWITH_OPENJPH_ENCODER_PLUGIN=off \
-            -DWITH_OpenJPEG_DECODER=$(tv_on_off $enable_openjpeg) \
-            -DWITH_OpenJPEG_ENCODER=$(tv_on_off $enable_openjpeg) \
+            -DWITH_OpenJPEG_DECODER="$(tv_on_off $enable_openjpeg)" \
+            -DWITH_OpenJPEG_ENCODER="$(tv_on_off $enable_openjpeg)" \
             -DWITH_RAV1E=off \
             -DWITH_SvtEnc=off \
             -DWITH_UNCOMPRESSED_CODEC=on \
             -DWITH_UVG266=off \
-            -DWITH_VVDEC=$(tv_on_off $enable_vvdec) \
+            -DWITH_VVDEC="$(tv_on_off $enable_vvdec)" \
             -DWITH_VVDEC_PLUGIN=off \
-            -DWITH_VVENC=$(tv_on_off $enable_vvenc) \
+            -DWITH_VVENC="$(tv_on_off $enable_vvenc)" \
             -DWITH_VVENC_PLUGIN=off \
             -DWITH_WEBCODECS=off \
-            -DWITH_X264=$(tv_on_off $enable_x264) \
-            -DWITH_X265=$(tv_on_off $enable_x265) \
+            -DWITH_X264="$(tv_on_off $enable_x264)" \
+            -DWITH_X265="$(tv_on_off $enable_x265)" \
             -DHAVE_JPEG_WRITE_ICC_PROFILE=1 \
-            ${LIBHEIF_SRC}
-        make -j$(nproc)
+            "${LIBHEIF_SRC}"
+        make -j"$(nproc)"
         make install
     )
 #             -DHAVE_JPEG_WRITE_ICC_PROFILE=1 \
 
 fi
 
-if ($enable_jasper) && [ -d ${SRC}/jasper ]
+if ($enable_jasper) && [ -d "${SRC}"/jasper ]
 then
-    printf "\n\n=== Building ${SRC}/jasper...\n"
+    printf "\n\n=== Building %s/jasper...\n" "${SRC}"
     (
         # With all extras removed from libjasper
         # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static jasper --libs
         # -L/work/lib -ljasper
 
-        JASPER_SRC=${SRC}/jasper
-        JASPER_BUILD=${BUILD}/jasper
+        JASPER_SRC="${SRC}"/jasper
+        JASPER_BUILD="${BUILD}"/jasper
 
-        rm -rf ${JASPER_BUILD}
-        mkdir -p ${JASPER_BUILD}
-        cd ${JASPER_BUILD}
+        rm -rf "${JASPER_BUILD}"
+        mkdir -p "${JASPER_BUILD}"
+        cd "${JASPER_BUILD}"
 
         cmake -G "Unix Makefiles" -H"$SRC/jasper" \
               -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_CXX_COMPILER=$CXX \
-              -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
-              -DCMAKE_C_COMPILER=$CC \
-              -DCMAKE_C_FLAGS="$CFLAGS -fno-sanitize=undefined -fPIC" \
-              -DCMAKE_INSTALL_PREFIX=$WORK \
+              -DCMAKE_CXX_COMPILER="${CXX}" \
+              -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+              -DCMAKE_C_COMPILER="${CC}" \
+              -DCMAKE_C_FLAGS="${CFLAGS} -fno-sanitize=undefined -fPIC" \
+              -DCMAKE_INSTALL_PREFIX="${WORK}" \
               -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
               -DJAS_ENABLE_LIBHEIF=false \
               -DJAS_ENABLE_LIBJPEG=false \
@@ -1034,8 +1034,8 @@ then
               -DJAS_INCLUDE_MIF_CODEC=false \
               -DJAS_INCLUDE_PNM_CODEC=false \
               -DJAS_INCLUDE_RAS_CODEC=false \
-              ${JASPER_SRC}
-        make -j$(nproc)
+              "${JASPER_SRC}"
+        make -j"$(nproc)"
         make install
     )
 fi
@@ -1045,25 +1045,25 @@ fi
 # Hopefully not required in order to work. Libzip's own oss-fuzz build
 # seems to dynamically link with OpenSSL and expects the same shared
 # library on the fuzzing host.
-if ($enable_libzip) && [ -d ${SRC}/libzip ]
+if ($enable_libzip) && [ -d "${SRC}"/libzip ]
 then
-    if [ -d ${SRC}/libzip ]
+    if [ -d "${SRC}"/libzip ]
     then
         printf "\n\n=== Building libzip...\n"
         (
-            LIBZIP_SRC=${SRC}/libzip
+            LIBZIP_SRC="${SRC}"/libzip
             LIBZIP_BUILD="${BUILD}/libzip"
 
-            rm -rf ${LIBZIP_BUILD}
-            mkdir -p ${LIBZIP_BUILD}
-            cd ${LIBZIP_BUILD}
+            rm -rf "${LIBZIP_BUILD}"
+            mkdir -p "${LIBZIP_BUILD}"
+            cd "${LIBZIP_BUILD}"
 
             cmake \
                 -DBUILD_SHARED_LIBS=off \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_C_COMPILER=$CC \
-                -DCMAKE_C_FLAGS="$CFLAGS -fPIC" \
-                -DCMAKE_INSTALL_PREFIX=$WORK \
+                -DCMAKE_C_COMPILER="${CC}" \
+                -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+                -DCMAKE_INSTALL_PREFIX="${WORK}" \
                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                 -DBUILD_DOC=OFF \
                 -DBUILD_EXAMPLES=OFF \
@@ -1074,8 +1074,8 @@ then
                 -DENABLE_MBEDTLS=OFF \
                 -DENABLE_OPENSSL=OFF \
                 -DHAVE_CRYPTO=OFF  \
-                ${LIBZIP_SRC}
-            make -j$(nproc)
+                "${LIBZIP_SRC}"
+            make -j"$(nproc)"
             make install
         )
     fi
@@ -1086,37 +1086,37 @@ fi
 #
 # We only build libwmflite, which has no dependencies.
 # There is no pkg-config support for libwmflite (but there is for libwmf).
-if ($enable_libwmf) && [ -d ${SRC}/libwmf ]
+if ($enable_libwmf) && [ -d "${SRC}"/libwmf ]
 then
     printf "\n\n=== Building libwmf...\n"
     (
-        LIBWMF_SRC=${SRC}/libwmf
-        LIBWMF_BUILD=${BUILD}/libwmf
+        LIBWMF_SRC="${SRC}"/libwmf
+        LIBWMF_BUILD="${BUILD}"/libwmf
 
-        rm -rf ${LIBWMF_BUILD}
-        mkdir -p ${LIBWMF_BUILD}
+        rm -rf "${LIBWMF_BUILD}"
+        mkdir -p "${LIBWMF_BUILD}"
 
-        cd ${LIBWMF_SRC}
+        cd "${LIBWMF_SRC}"
         autoreconf -fiv
 
-        cd ${LIBWMF_BUILD}
-        ${LIBWMF_SRC}/configure \
-                     --prefix="$WORK" \
-                     --disable-heavy \
-                     --disable-shared \
-                     --enable-static \
-                     CPPFLAGS="-I$WORK/include" \
-                     CFLAGS="${CFLAGS} -fPIC" \
-                     LDFLAGS="${LDFLAGS:-} -L$WORK/lib"
+        cd "${LIBWMF_BUILD}"
+        "${LIBWMF_SRC}"/configure \
+                       --prefix="${WORK}" \
+                       --disable-heavy \
+                       --disable-shared \
+                       --enable-static \
+                       CPPFLAGS="-I${WORK}/include" \
+                       CFLAGS="${CFLAGS} -fPIC" \
+                       LDFLAGS="${LDFLAGS:-} -L${WORK}/lib"
         make clean
-        make -j$(nproc)
+        make -j"$(nproc)"
         make install
     )
 fi
 
 printf "Built libraries:\n"
-if [ -d ${WORK}/lib ] ; then
-    ls -l ${WORK}/lib
+if [ -d "${WORK}"/lib ] ; then
+    ls -l "${WORK}"/lib
 else
     printf "  None!\n"
 fi
@@ -1134,13 +1134,13 @@ fi
 
 # Configure and build GraphicsMagick
 {
-    GM_SOURCE=${SRC}/graphicsmagick
-    GM_BUILD=${BUILD}/graphicsmagick
+    GM_SOURCE="${SRC}"/graphicsmagick
+    GM_BUILD="${BUILD}"/graphicsmagick
 
-    # freetype-config is in $WORK/bin so we temporarily add $WORK/bin to the path
+    # freetype-config is in "${WORK}"/bin so we temporarily add "${WORK}"/bin to the path
     # pkg-config names GraphicsMagick, GraphicsMagickWand, GraphicsMagick++
     # -stdlib=libc++'
-    printf "\n\n=== Building GraphicsMagick (SANITIZER=${SANITIZER})...\n"
+    printf "\n\n=== Building GraphicsMagick (SANITIZER=%s)...\n" "${SANITIZER}"
     EXTRA_LIBS=''
     case "${SANITIZER}" in
         address)
@@ -1155,54 +1155,54 @@ fi
     esac
 
     # In a static build, libheif omits dependencies for some libraries!
-    if ($enable_vvdec) && [ -d ${BUILD}/vvdec ] ; then
-        LIB_VVDEC=`pkg-config --libs-only-l libvvdec`
+    if ($enable_vvdec) && [ -d "${BUILD}"/vvdec ] ; then
+        LIB_VVDEC=$(pkg-config --libs-only-l libvvdec)
         if [ -n "${LIB_VVDEC}" ] ; then
             EXTRA_LIBS="${LIB_VVDEC} ${EXTRA_LIBS}"
         fi
     fi
 
-    if ($enable_vvenc) && [ -d ${BUILD}/vvenc ] ; then
-        LIB_VVENC=`pkg-config --libs-only-l libvvenc`
+    if ($enable_vvenc) && [ -d "${BUILD}"/vvenc ] ; then
+        LIB_VVENC=$(pkg-config --libs-only-l libvvenc)
         if [ -n "${LIB_VVENC}" ] ; then
             EXTRA_LIBS="${LIB_VVENC} ${EXTRA_LIBS}"
         fi
     fi
 
     # A strange thing about x264 is its pkg-config Cflags says "Cflags: -I${prefix}/include -DX264_API_IMPORTS"
-    if ($enable_x264) && [ -d ${BUILD}/x264 ] ; then
-        LIB_X264=`pkg-config --libs-only-l x264`
+    if ($enable_x264) && [ -d "${BUILD}"/x264 ] ; then
+        LIB_X264=$(pkg-config --libs-only-l x264)
         if [ -n "${LIB_X264}" ] ; then
             EXTRA_LIBS="${LIB_X264} ${EXTRA_LIBS}"
         fi
     fi
 
-    rm -rf ${GM_BUILD}
-    mkdir -p ${GM_BUILD}
-    cd ${GM_BUILD}
+    rm -rf "${GM_BUILD}"
+    mkdir -p "${GM_BUILD}"
+    cd "${GM_BUILD}"
 
-    # -I$WORK/include/libpng16 -I$WORK/include/freetype2 -I$WORK/include/libxml2
-    PATH=$WORK/bin:$PATH  \
-        ${GM_SOURCE}/configure \
-        CPPFLAGS="-DEXPERIMENTAL_EXIF_TAGS=1  -I$WORK/include" \
+    # -I"${WORK}"/include/libpng16 -I"${WORK}"/include/freetype2 -I"${WORK}"/include/libxml2
+    PATH="${WORK}"/bin:$PATH  \
+        "${GM_SOURCE}"/configure \
+        CPPFLAGS="-DEXPERIMENTAL_EXIF_TAGS=1 -I${WORK}/include" \
         CFLAGS="${CFLAGS}" \
-        LDFLAGS="${LDFLAGS:-} -L$WORK/lib" \
+        LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
         LIBS="${EXTRA_LIBS}" \
         --prefix="${WORK}" \
         --disable-compressed-files \
         --disable-installed \
         --without-perl \
         --with-quantum-depth=16
-    make "-j$(nproc)"
+    make -j"$(nproc)"
     make install
 
-    printf "\nInstalling GraphicsMagick config files to ${OUT}...\n"
+    printf "\nInstalling GraphicsMagick config files to %s...\n" "${OUT}"
     # /out/lib/GraphicsMagick-1.4/config/
-    mkdir -p ${OUT}/lib/GraphicsMagick-1.4/config
-    cp -p ${WORK}/lib/GraphicsMagick-1.4/config/* ${OUT}/lib/GraphicsMagick-1.4/config/
+    mkdir -p "${OUT}"/lib/GraphicsMagick-1.4/config
+    cp -p "${WORK}"/lib/GraphicsMagick-1.4/config/* "${OUT}"/lib/GraphicsMagick-1.4/config/
     # /out/share/GraphicsMagick-1.4/
-    mkdir -p ${OUT}/share/GraphicsMagick-1.4/config
-    cp -p ${WORK}/share/GraphicsMagick-1.4/config/* ${OUT}/share/GraphicsMagick-1.4/config/
+    mkdir -p "${OUT}"/share/GraphicsMagick-1.4/config
+    cp -p "${WORK}"/share/GraphicsMagick-1.4/config/* "${OUT}"/share/GraphicsMagick-1.4/config/
 
     set +x # Turn off tracing
 
@@ -1216,12 +1216,12 @@ fi
     #
     # GraphicsMagick, GraphicsMagickWand, GraphicsMagick++
     MAGICK_LIBS="$(pkg-config --static --libs-only-L GraphicsMagick++) $(pkg-config --static --libs-only-other GraphicsMagick++) $(pkg-config pkg-config --static --libs-only-l GraphicsMagick++)"
-    printf "MAGICK_LIBS=${MAGICK_LIBS}\n"
+    printf "MAGICK_LIBS=%s\n" "${MAGICK_LIBS}"
 
     # FUZZ_GRAPHICSMAGICK_CODER_READANY
 
     printf "\n\n=== Building fuzzers...\n"
-    for f in ${GM_SOURCE}/fuzzing/*_fuzzer.cc; do
+    for f in "${GM_SOURCE}"/fuzzing/*_fuzzer.cc; do
         fuzzer=$(basename "$f" _fuzzer.cc)
         # coder_fuzzer is handled specially below.
         if [ "$fuzzer" == "coder" ]; then
@@ -1229,35 +1229,38 @@ fi
         fi
 
         target="$OUT/${fuzzer}_fuzzer"
-        printf "\n\n=== Building ${target}...\n"
+        printf "\n\n=== Building %s...\n" "${target}"
         set -x
-        $CXX $CXXFLAGS -std=c++11 -I"$WORK/include/GraphicsMagick" \
+        # shellcheck disable=SC2086
+        "${CXX}" ${CXXFLAGS} -std=c++11 -I"${WORK}/include/GraphicsMagick" \
              "$f" -o "${target}" \
              $LIB_FUZZING_ENGINE $MAGICK_LIBS
         set +x
     done
 
-    target="$WORK/coder_list"
-    printf "\n\n=== Building ${target}...\n"
+    target="${WORK}/coder_list"
+    printf "\n\n=== Building %s...\n" "${target}"
     set -x
-    $CXX $CXXFLAGS -std=c++11 -I"$WORK/include/GraphicsMagick" \
-         ${GM_SOURCE}/fuzzing/coder_list.cc -o "${target}" $MAGICK_LIBS
+     # shellcheck disable=SC2086
+    "${CXX}" ${CXXFLAGS} -std=c++11 -I"${WORK}/include/GraphicsMagick" \
+         "${GM_SOURCE}"/fuzzing/coder_list.cc -o "${target}" $MAGICK_LIBS
     set +x
 
-    for item in $("$WORK/coder_list"); do
+    for item in $("${WORK}/coder_list"); do
         coder="${item:1}"
-        coder_flags="-DFUZZ_GRAPHICSMAGICK_CODER=$coder"
+        coder_flags="-DFUZZ_GRAPHICSMAGICK_CODER=${coder}"
         if [ "${item:0:1}" == "+" ]; then
-            coder_flags="$coder_flags -DFUZZ_GRAPHICSMAGICK_CODER_WRITE=1"
+            coder_flags="${coder_flags} -DFUZZ_GRAPHICSMAGICK_CODER_WRITE=1"
         fi
 
         # Build fuzzers which force the input format
         target="${OUT}/coder_${coder}_fuzzer"
-        printf "\n\n=== Building ${target}...\n"
+        printf "\n\n=== Building %s...\n" "${target}"
         set -x
-        $CXX $CXXFLAGS -std=c++11 -I"$WORK/include/GraphicsMagick" \
-             ${GM_SOURCE}/fuzzing/coder_fuzzer.cc -o "${target}" \
-             $coder_flags $LIB_FUZZING_ENGINE $MAGICK_LIBS
+         # shellcheck disable=SC2086
+        "${CXX}" ${CXXFLAGS} -std=c++11 -I"${WORK}/include/GraphicsMagick" \
+             "${GM_SOURCE}"/fuzzing/coder_fuzzer.cc -o "${target}" \
+             ${coder_flags} $LIB_FUZZING_ENGINE $MAGICK_LIBS
         set +x
 
         # Additionally build fuzzers which auto-detect input for coders which write output
@@ -1265,11 +1268,12 @@ fi
             coder_flags="$coder_flags -DFUZZ_GRAPHICSMAGICK_CODER_READANY=1"
             target="${OUT}/coder_${coder}_any_fuzzer"
 
-            printf "\n\n=== Building ${target}...\n"
+            printf "\n\n=== Building %s...\n" "${target}"
             set -x
-            $CXX $CXXFLAGS -std=c++11 -I"$WORK/include/GraphicsMagick" \
-                 ${GM_SOURCE}/fuzzing/coder_fuzzer.cc -o "${target}" \
-                 $coder_flags $LIB_FUZZING_ENGINE $MAGICK_LIBS
+             # shellcheck disable=SC2086
+            "${CXX}" ${CXXFLAGS} -std=c++11 -I"${WORK}/include/GraphicsMagick" \
+                 "${GM_SOURCE}"/fuzzing/coder_fuzzer.cc -o "${target}" \
+                 ${coder_flags} $LIB_FUZZING_ENGINE $MAGICK_LIBS
             set +x
         fi
 

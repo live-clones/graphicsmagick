@@ -1,3 +1,7 @@
+2026-01-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Shell syntax clean-up.
+
 2026-01-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Tidy the GraphicsMagick part of the
