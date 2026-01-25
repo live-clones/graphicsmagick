@@ -1285,6 +1285,61 @@ fi
         fi
     done
 
+    if true ; then
+       #
+       # Add a seed corpus
+       #
+       # https://google.github.io/oss-fuzz/getting-started/new-project-guide/#efficient-fuzzing
+       #
+       set -x
+       CPREFIX='coder_'
+       CSUFFIX='_fuzzer_seed_corpus'
+       zip -rj "${OUT}"/"${CPREFIX}"AAI"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.aai
+       zip -rj "${OUT}"/"${CPREFIX}"ART"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.art
+       zip -rj "${OUT}"/"${CPREFIX}"BMP"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.bmp
+       zip -rj "${OUT}"/"${CPREFIX}"CALS"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/tiff/*.cals
+       zip -rj "${OUT}"/"${CPREFIX}"CIN"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.cin
+       zip -rj "${OUT}"/"${CPREFIX}"DIB"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.dib
+       zip -rj "${OUT}"/"${CPREFIX}"FITS"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.fits
+       zip -rj "${OUT}"/"${CPREFIX}"GIF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.gif
+       zip -rj "${OUT}"/"${CPREFIX}"HEIF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/heif/*.* "${SRC}"/libheif/fuzzing/data/corpus/*.heic
+       zip -rj "${OUT}"/"${CPREFIX}"ICO"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.ico
+       zip -rj "${OUT}"/"${CPREFIX}"JBIG"${CSUFFIX}".zip "${SRC}"/jbigkit/examples/*.jbg "${SRC}"/graphicsmagick/PerlMagick/t/jbig/*.jbig
+       zip -rj "${OUT}"/"${CPREFIX}"JNG"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jng/*
+       zip -rj "${OUT}"/"${CPREFIX}"JNX"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.jnx
+       zip -rj "${OUT}"/"${CPREFIX}"JP2"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jp2/*.jp2
+       zip -rj "${OUT}"/"${CPREFIX}"JPC"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jp2/*.jpc
+       zip -rj "${OUT}"/"${CPREFIX}"JPEG"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jpeg/*
+       zip -rj "${OUT}"/"${CPREFIX}"JXL"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jxl/*.jxl
+       zip -rj "${OUT}"/"${CPREFIX}"MAT"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.mat "${SRC}"/graphicsmagick/PerlMagick/t/zlib/*.mat
+       zip -r  "${OUT}"/"${CPREFIX}"MIFF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.miff "${SRC}"/graphicsmagick/PerlMagick/t/zlib/*.miff
+       zip -rj "${OUT}"/"${CPREFIX}"MTV"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.mtv
+       zip -rj "${OUT}"/"${CPREFIX}"ORA"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.ora
+       zip -rj "${OUT}"/"${CPREFIX}"P7"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.p7
+       zip -rj "${OUT}"/"${CPREFIX}"PALM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.palm
+       zip -rj "${OUT}"/"${CPREFIX}"PAM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.pam
+       zip -rj "${OUT}"/"${CPREFIX}"PBM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.pbm
+       zip -rj "${OUT}"/"${CPREFIX}"PCT"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.pct
+       zip -rj "${OUT}"/"${CPREFIX}"PCX"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.pcx
+       zip -rj "${OUT}"/"${CPREFIX}"PGM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.pgm
+       zip -rj "${OUT}"/"${CPREFIX}"PGX"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jp2/*.pgx
+       zip -rj "${OUT}"/"${CPREFIX}"PNG"${CSUFFIX}".zip "$(find "${SRC}"/libpng -name '*.png' -print)" "${SRC}"/graphicsmagick/PerlMagick/t/png/*.png
+       zip -rj "${OUT}"/"${CPREFIX}"PPM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.ppm
+       zip -rj "${OUT}"/"${CPREFIX}"PS"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/ps/*
+       #zip -rj "${OUT}"/"${CPREFIX}"PXR"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.pxr
+       zip -rj "${OUT}"/"${CPREFIX}"RLA"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.rla
+       zip -rj "${OUT}"/"${CPREFIX}"RLE"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.rle
+       zip -rj "${OUT}"/"${CPREFIX}"SUN"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.im1 "${SRC}"/graphicsmagick/PerlMagick/t/*.im8 "${SRC}"/graphicsmagick/PerlMagick/t/*.im24
+       zip -rj "${OUT}"/"${CPREFIX}"TGA"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.tga
+       zip -rj "${OUT}"/"${CPREFIX}"TIFF"${CSUFFIX}".zip "${SRC}"/libtiff/test/images/*.tiff "${SRC}"/graphicsmagick/PerlMagick/t/tiff/*.tif*
+       zip -rj "${OUT}"/"${CPREFIX}"TOPOL"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/topol*
+       zip -rj "${OUT}"/"${CPREFIX}"WBMP"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.wbmp
+       zip -rj "${OUT}"/"${CPREFIX}"WMF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/wmf/*
+       zip -rj "${OUT}"/"${CPREFIX}"WPG"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.wpg
+       zip -rj "${OUT}"/"${CPREFIX}"XBM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.xbm
+       zip -rj "${OUT}"/"${CPREFIX}"XPM"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.xpm
+       set +x
+    fi
 }
 
 set +x
