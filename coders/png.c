@@ -5800,7 +5800,14 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               image->page.y=mng_info->clip.top;
               image->background_color=mng_background_color;
               image->matte=MagickFalse;
-              (void) SetImage(image,OpaqueOpacity);
+              if (SetImage(image,OpaqueOpacity) == MagickFail)
+                {
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SetImage() returned MagickFail!");
+                  DestroyImageList(image);
+                  MngInfoFreeStruct(mng_info,&have_mng_structure);
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  return NULL from ReadMNGImage()");
+                  return((Image *) NULL);
+                }
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  Inserted background layer,"
@@ -6154,7 +6161,12 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   n=GetImagePixels(image,0,0,image->columns,1);
                   if(n == (PixelPacket *) NULL)
                     {
-                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  return NULL from ReadMNGImage()");
+                      MagickFreeMemory(next);
+                      MagickFreeMemory(prev);
+                      DestroyImageList(image);
+                      MngInfoFreeStruct(mng_info,&have_mng_structure);
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "  return NULL from ReadMNGImage()");
                       return ((Image *) NULL);
                     }
                   (void) memcpy(next,n,row_length);

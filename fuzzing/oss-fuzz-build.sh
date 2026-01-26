@@ -76,6 +76,9 @@ enable_zstd=true
 export PKG_CONFIG_PATH="${WORK}/lib/pkgconfig"
 export PKG_CONFIG='pkg-config --static'
 export VERBOSE=TRUE
+# Disable colorized output during build (since 2023 in clang)
+# Can also add -fno-color-diagnostics or set TERM=dumb.
+#export NO_COLOR=1
 GM_SOURCE="${SRC}"/graphicsmagick
 
 # Don't check Coverage in CI as it gets killed

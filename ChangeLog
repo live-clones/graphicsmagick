@@ -1,3 +1,16 @@
+2026-01-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/pixel_cache.c (OpenCache): After acquiring the images
+        resource, release the images resource if the cache otherwise fails
+        to successfully open.
+
+        * magick/pixel_cache.c: Include the cache_info address as a useful
+        identifier in CacheEvent log messages.
+
+        * coders/png.c: Attempt to release memory after error due to
+        hitting ImagesResource limit.  Addresses oss-fuzz 478558487
+        "graphicsmagick:coder_MNG_fuzzer: Direct-leak in MagickMalloc".
+
 2026-01-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh (BUILD): Use -rj when creating MIFF
