@@ -1,5 +1,9 @@
 2026-01-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * PerlMagick/Makefile.am (clean-perl): 'make clean' now removes
+        any symbolic links in the PerlMagick directory which point back to
+        the GraphicsMagick source tree.
+
         * magick/color_lookup.c (GetColorList): Add missing break
         statement. Should resolve Coverity 501366 "Resource leak".
 

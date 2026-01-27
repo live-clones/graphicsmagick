@@ -11456,7 +11456,8 @@ $(top_srcdir)/$(PERLMAGICK)/Magick.pm : $(PERLMAGICK)/Magick.pm
 @WITH_PERL_TRUE@	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 @WITH_PERL_TRUE@	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 @WITH_PERL_TRUE@	rm -f Makefile.old PerlMagick ; \
-@WITH_PERL_TRUE@	rm -f t/output* t/jng/*_tmp.jng t/*/output* )
+@WITH_PERL_TRUE@	rm -f t/output* t/jng/*_tmp.jng t/*/output* ; \
+@WITH_PERL_TRUE@	find . -type l -exec rm -f {} + ) ;
 @WITH_PERL_TRUE@	rm -f perl-sources
 
 @WITH_PERL_TRUE@distclean-perl: clean-perl

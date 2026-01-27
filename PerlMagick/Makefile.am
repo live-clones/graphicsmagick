@@ -132,7 +132,8 @@ clean-perl:
 	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 	rm -f Makefile.old PerlMagick ; \
-	rm -f t/output* t/jng/*_tmp.jng t/*/output* )
+	rm -f t/output* t/jng/*_tmp.jng t/*/output* ; \
+	find . -type l -exec rm -f {} + ) ;
 	rm -f perl-sources
 
 distclean-perl: clean-perl
