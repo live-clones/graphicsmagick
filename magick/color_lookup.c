@@ -1017,7 +1017,7 @@ GetColorList(const char *pattern,unsigned long *number_colors)
           if (GlobExpression(p->name,pattern))
             colorlist[i++]=AcquireString(p->name);
         }
-
+      break;
     };
 
   *number_colors=i;
