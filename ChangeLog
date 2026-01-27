@@ -1,5 +1,8 @@
 2026-01-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/color_lookup.c (GetColorList): Add missing break
+        statement. Should resolve Coverity 501366 "Resource leak".
+
         * magick/color_lookup.h: Move definition of ColorInfo into
         color_lookup.c. Move declarations of GetColorInfo() and
         GetColorInfoArray() into color_lookup.c.
