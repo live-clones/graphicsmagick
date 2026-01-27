@@ -1,3 +1,16 @@
+2026-01-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/color_lookup.h: Move definition of ColorInfo into
+        color_lookup.c. Move declarations of GetColorInfo() and
+        GetColorInfoArray() into color_lookup.c.
+
+        * magick/color_lookup.c (GetColorInfo): Optimize to minimize
+        up-front penalties rather than for repeated look-ups for the same
+        color name. No longer re-order linked list based on most recently
+        accessed entry. Remove locking which is no longer necessary in
+        other functions. Block out compilation of GetColorInfoArray()
+        since it was only declared privately, and was never used.
+
 2026-01-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/pixel_cache.c (OpenCache): After acquiring the images

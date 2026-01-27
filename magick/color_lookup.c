@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2016 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -27,21 +27,50 @@
 */
 #define ColorFilename  "colors.mgk"
 
+
 /*
-  Declare color map.
+  Information about a named color
 */
+typedef struct _ColorInfo
+{
+  char
+    *path,
+    *name;
+
+  ComplianceType
+    compliance;
+
+  PixelPacket
+    color;
+
+  unsigned int
+    stealth;
+
+  unsigned long
+    signature;
+
+  struct _ColorInfo
+    *previous,
+    *next;
+} ColorInfo;
 
 static const char
   BuiltInPath[]="[Built In]";
 
+/*
+  Declare color map.
+*/
 static const struct
 {
+  /* Color name */
   const char
     name[21];
 
+  /* Compliance based on flags from ComplianceType enumeration */
   unsigned short
     compliance;
 
+  /* Color value */
   unsigned char
     red,
     green,
@@ -631,12 +660,22 @@ static SemaphoreInfo
 
 static ColorInfo
   *color_list = (ColorInfo *) NULL;
+
 
 /*
   Forward declarations.
 */
 static unsigned int
   ReadColorConfigureFile(const char *,const unsigned int,ExceptionInfo *);
+
+static const ColorInfo
+  *GetColorInfo(const char *name, ExceptionInfo *exception);
+
+#if defined(EMIT_GET_COLOR_INFO_ARRAY)
+static ColorInfo
+  **GetColorInfoArray(ExceptionInfo *exception);
+#endif
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -704,8 +743,12 @@ DestroyColorInfo(void)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method GetColorInfo searches the color list for the specified name and if
-%  found returns attributes for that color.
+%  Method GetColorInfo uses case-insensitive matching to search the color
+%  list for the specified NUL-terminated name and if found returns
+%  attributes for that color.  If the name argument is NULL, or is the
+%  character '*', then return the head of the ColorInfo doubly-linked list.
+%
+%  The maximum color name length compared is 64 characters.
 %
 %  The format of the GetColorInfo method is:
 %
@@ -725,69 +768,71 @@ DestroyColorInfo(void)
 %
 %
 */
-const ColorInfo *
+static const ColorInfo *
 GetColorInfo(const char *name,ExceptionInfo *exception)
 {
-  char
-    colorname[MaxTextExtent];
+#define MaxColorLength 64
 
   register ColorInfo
     *p;
 
-  LockSemaphoreInfo(color_semaphore);
+  /*
+    If color configuration file (which includes the static table) has
+    not been loaded, then load it.
+  */
   if (color_list == (ColorInfo *) NULL)
     (void) ReadColorConfigureFile(ColorFilename,0,exception);
-  UnlockSemaphoreInfo(color_semaphore);
-  if ((name == (const char *) NULL) || (LocaleCompare(name,"*") == 0))
+  /*
+    If name is null, or '*', then return the head of the list
+  */
+  if ((name == (const char *) NULL) ||
+      ((name[0] == '*') && (name[1] == '\0')))
     return((const ColorInfo *) color_list);
   /*
-    Search for named color.
+    If name is empty, then stop looking
   */
-  if (strlcpy(colorname,name,MaxTextExtent) >= MaxTextExtent)
+  if (name[0] == '\0')
     {
       ThrowException(exception,OptionWarning,UnrecognizedColor,name);
       return (const ColorInfo *) NULL;
     }
   /*
-    Compact by removing spaces
+    Search for named color.
   */
-  LockSemaphoreInfo(color_semaphore);
   for (p=color_list; p != (ColorInfo *) NULL; p=p->next)
-    if (LocaleCompare(colorname,p->name) == 0)
+    if (LocaleNCompare(name,p->name,MaxColorLength) == 0)
       break;
   if (p == (ColorInfo *) NULL)
     {
-      /* Check common synonyms */
-      const char
-        *pos;
+      /*
+        Check common synonym for gray
+      */
+      char
+        colorname[MaxColorLength+1];
 
-      LocaleUpper(colorname);
-      if ((pos = strstr(colorname,"GREY")) != (const char *) NULL)
+      if (strlcpy(colorname,name,sizeof(colorname)) >= sizeof(colorname))
         {
-          colorname[pos-colorname+2]='A';
-          for (p=color_list; p != (ColorInfo *) NULL; p=p->next)
-            if (LocaleCompare(colorname,p->name) == 0)
-              break;
+          ThrowException(exception,OptionWarning,UnrecognizedColor,name);
+        }
+      else
+        {
+          const char
+            *pos;
+
+          LocaleUpper(colorname);
+          if ((pos = strstr(colorname,"GREY")) != (const char *) NULL)
+            {
+              colorname[pos-colorname+2]='A';
+              for (p=color_list; p != (ColorInfo *) NULL; p=p->next)
+                if (LocaleNCompare(colorname,p->name,MaxColorLength) == 0)
+                  break;
+            }
         }
     }
   if (p == (ColorInfo *) NULL)
-    ThrowException(exception,OptionWarning,UnrecognizedColor,name);
-  else
-    if (p != color_list)
-      {
-        /*
-          Self-adjusting list.
-        */
-        if (p->previous != (ColorInfo *) NULL)
-          p->previous->next=p->next;
-        if (p->next != (ColorInfo *) NULL)
-          p->next->previous=p->previous;
-        p->previous=(ColorInfo *) NULL;
-        p->next=color_list;
-        color_list->previous=p;
-        color_list=p;
-      }
-  UnlockSemaphoreInfo(color_semaphore);
+    {
+      ThrowException(exception,OptionWarning,UnrecognizedColor,name);
+    }
   return ((const ColorInfo *) p);
 }
 
@@ -823,6 +868,7 @@ GetColorInfo(const char *name,ExceptionInfo *exception)
 /*
   Compare two ColorInfo structures based on their name
 */
+#if defined(EMIT_GET_COLOR_INFO_ARRAY)
 static int
 ColorInfoCompare(const void *x, const void *y)
 {
@@ -832,7 +878,7 @@ ColorInfoCompare(const void *x, const void *y)
 
   return strcmp(xx->name, yy->name);
 }
-ColorInfo **
+static ColorInfo **
 GetColorInfoArray(ExceptionInfo *exception)
 {
   ColorInfo
@@ -857,8 +903,6 @@ GetColorInfoArray(ExceptionInfo *exception)
   if ((!color_list) || (exception->severity > UndefinedException))
     return 0;
 
-  LockSemaphoreInfo(color_semaphore);
-
   list=color_list;
 
   /*
@@ -873,7 +917,6 @@ GetColorInfoArray(ExceptionInfo *exception)
   array=MagickAllocateMemory(ColorInfo **,sizeof(ColorInfo *)*(entries+1));
   if (!array)
     {
-      UnlockSemaphoreInfo(color_semaphore);
       ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,0);
       return False;
     }
@@ -886,8 +929,6 @@ GetColorInfoArray(ExceptionInfo *exception)
   for (p=list; p != 0; p=p->next)
     array[i++]=p;
 
-  UnlockSemaphoreInfo(color_semaphore);
-
   /*
     Sort array entries
   */
@@ -895,6 +936,7 @@ GetColorInfoArray(ExceptionInfo *exception)
 
   return (array);
 }
+#endif
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -939,7 +981,6 @@ GetColorList(const char *pattern,unsigned long *number_colors)
   register const ColorInfo
     *p;
 
-
   assert(pattern != (char *) NULL);
   assert(number_colors != (unsigned long *) NULL);
   *number_colors=0;
@@ -952,32 +993,32 @@ GetColorList(const char *pattern,unsigned long *number_colors)
   /*
     Determine color list size
   */
-  LockSemaphoreInfo(color_semaphore);
-  i=0;
-  for (p=color_list; p != (const ColorInfo *) NULL; p=p->next)
-    i++;
-  UnlockSemaphoreInfo(color_semaphore);
+  while(1)
+    {
+      i=0;
+      for (p=color_list; p != (const ColorInfo *) NULL; p=p->next)
+        i++;
 
-  /*
-    Allocate color list.
-  */
-  colorlist=MagickAllocateMemory(char **,i*sizeof(char *));
-  if (colorlist == (char **) NULL)
-    return((char **) NULL);
+      /*
+        Allocate color list.
+      */
+      colorlist=MagickAllocateMemory(char **,i*sizeof(char *));
+      if (colorlist == (char **) NULL)
+        break;
 
-  /*
-    Add colors matching glob specification to list
-  */
-  LockSemaphoreInfo(color_semaphore);
-  i=0;
-  for (p=color_list; p != (const ColorInfo *) NULL; p=p->next)
-  {
-    if (p->stealth)
-      continue;
-    if (GlobExpression(p->name,pattern))
-      colorlist[i++]=AcquireString(p->name);
-  }
-  UnlockSemaphoreInfo(color_semaphore);
+      /*
+        Add colors matching glob specification to list
+      */
+      i=0;
+      for (p=color_list; p != (const ColorInfo *) NULL; p=p->next)
+        {
+          if (p->stealth)
+            continue;
+          if (GlobExpression(p->name,pattern))
+            colorlist[i++]=AcquireString(p->name);
+        }
+
+    };
 
   *number_colors=i;
   return(colorlist);
@@ -1022,7 +1063,6 @@ ListColorInfo(FILE *file,ExceptionInfo *exception)
   if (file == (const FILE *) NULL)
     file=stdout;
   (void) GetColorInfo("*",exception);
-  LockSemaphoreInfo(color_semaphore);
   for (p=color_list; p != (const ColorInfo *) NULL; p=p->next)
   {
     if ((p->previous == (ColorInfo *) NULL) ||
@@ -1064,7 +1104,6 @@ ListColorInfo(FILE *file,ExceptionInfo *exception)
     (void) fprintf(file,"\n");
   }
   (void) fflush(file);
-  UnlockSemaphoreInfo(color_semaphore);
   return(True);
 }
 
@@ -1445,6 +1484,16 @@ ReadColorConfigureFile(const char *basename,
     path[MaxTextExtent],
     *xml;
 
+  MagickPassFail
+    status=MagickPass;
+
+  LockSemaphoreInfo(color_semaphore);
+  if (color_list != (ColorInfo *) NULL)
+    {
+      UnlockSemaphoreInfo(color_semaphore);
+      return status;
+    }
+
   if (depth == 0)
     {
       size_t
@@ -1724,8 +1773,14 @@ ReadColorConfigureFile(const char *basename,
       MagickFreeMemory(xml);
     }
   if (color_list == (ColorInfo *) NULL)
-    return(MagickFail);
-  while (color_list->previous != (ColorInfo *) NULL)
-    color_list=color_list->previous;
-  return(MagickPass);
+    {
+      status=MagickFail;
+    }
+  else
+    {
+      while (color_list->previous != (ColorInfo *) NULL)
+        color_list=color_list->previous;
+    }
+   UnlockSemaphoreInfo(color_semaphore);
+  return(status);
 }

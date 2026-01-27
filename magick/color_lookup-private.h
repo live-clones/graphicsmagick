@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2020 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -8,38 +8,6 @@
 
   GraphicsMagick Private Color Lookup Methods.
 */
-
-/*
-  Information about a named color (Internal).
-*/
-typedef struct _ColorInfo
-{
-  char
-    *path,
-    *name;
-
-  ComplianceType
-    compliance;
-
-  PixelPacket
-    color;
-
-  unsigned int
-    stealth;
-
-  unsigned long
-    signature;
-
-  struct _ColorInfo
-    *previous,
-    *next;
-} ColorInfo;
-
-extern const ColorInfo
-  *GetColorInfo(const char *name, ExceptionInfo *exception);
-
-extern ColorInfo
-  **GetColorInfoArray(ExceptionInfo *exception);
 
 extern void
   DestroyColorInfo(void);
