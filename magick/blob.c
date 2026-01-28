@@ -1917,7 +1917,8 @@ MagickExport MagickBool GetBlobTemporary(const Image *image)
 %
 %  The format of the GetConfigureBlob method is:
 %
-%      void *GetConfigureBlob(const char *filename,ExceptionInfo *exception)
+%      void *GetConfigureBlob(const char *filename,char *path,
+%                             size_t *length,ExceptionInfo *exception)
 %
 %  A description of each parameter follows:
 %

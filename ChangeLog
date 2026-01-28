@@ -1,3 +1,11 @@
+2026-01-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/mat.c (ReadMATImage): Address oss-fuzz 479525103
+        "graphicsmagick:coder_MAT_fuzzer: Indirect-leak in
+        ___interceptor_malloc".
+
+        * magick/blob.c (GetConfigureBlob): Fix function documentation.
+
 2026-01-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * PerlMagick/Makefile.am (clean-perl): 'make clean' now removes

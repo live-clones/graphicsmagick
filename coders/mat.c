@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -87,8 +87,10 @@ typedef struct
 }
 MATHeader;
 
-static const char MonthsTab[12][4]={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-static const char DayOfWTab[7][4]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+static const char MonthsTab[12][4]=
+  {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+static const char DayOfWTab[7][4]=
+  {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 static const char OsDesc[]=
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
     "PCWIN";
@@ -354,7 +356,8 @@ static void ZLIBFreeFunc(voidpf opaque, voidpf address)
 }
 
 /** This procedure decompresses an image block for a new MATLAB format. */
-static Image *DecompressBlock(Image *orig, magick_uint32_t *Size, ImageInfo *clone_info, ExceptionInfo *exception)
+static Image *DecompressBlock(Image *orig, magick_uint32_t *Size, ImageInfo *clone_info,
+                              ExceptionInfo *exception)
 {
   Image *
     image2;
@@ -452,7 +455,8 @@ static Image *DecompressBlock(Image *orig, magick_uint32_t *Size, ImageInfo *clo
           fwrite(decompress_block, (size_t) 4096-zip_info.avail_out, 1, mat_file);
           TotalSize += (size_t) 4096-zip_info.avail_out;
 
-          if (zip_status == Z_STREAM_END) goto DblBreak;
+          if (zip_status == Z_STREAM_END)
+            goto DblBreak;
         }
       if (*Size >= magick_size)
         *Size -= (magick_uint32_t) magick_size;
@@ -467,8 +471,10 @@ static Image *DecompressBlock(Image *orig, magick_uint32_t *Size, ImageInfo *clo
   MagickFreeResourceLimitedMemory(unsigned char *,decompress_block);
   *Size = TotalSize;
 
-  if ((clone_info->file=fopen(clone_info->filename,"rb"))==NULL) goto UnlinkFile;
-  if ((image2 = AllocateImage(clone_info))==NULL) goto EraseFile;
+  if ((clone_info->file=fopen(clone_info->filename,"rb"))==NULL)
+    goto UnlinkFile;
+  if ((image2 = AllocateImage(clone_info))==NULL)
+    goto EraseFile;
   image2->rows=0;
   image2->columns=0;
 
@@ -521,7 +527,8 @@ typedef struct {
 
 
 /* Load Matlab V4 file. */
-static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image, ImportPixelAreaOptions *import_options,
+static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image,
+                             ImportPixelAreaOptions *import_options,
                              ExceptionInfo *exception, const int logging)
 {
   MAT4_HDR
@@ -951,7 +958,8 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
   if (strncmp(MATLAB_HDR.identific, "MATLAB", 6))
   {
     image2 = ReadMATImageV4(image_info,image,&import_options,exception,logging);
-    if (image2==NULL) goto MATLAB_KO;
+    if (image2==NULL)
+      goto MATLAB_KO;
     image = image2;
     goto END_OF_READING;
   }
@@ -984,7 +992,7 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
   }
   else                  /* unsupported endian */
   {
-MATLAB_KO: ThrowMATReaderException(CorruptImageError,ImproperImageHeader,image);
+MATLAB_KO: ThrowImg2MATReaderException(CorruptImageError,ImproperImageHeader,image);
   }
 
   filepos = TellBlob(image);
@@ -1010,13 +1018,15 @@ MATLAB_KO: ThrowMATReaderException(CorruptImageError,ImproperImageHeader,image);
     {
       ThrowMATReaderException(BlobError,UnableToObtainOffset,image);
     }
-    if (SeekBlob(image,filepos,SEEK_SET) != filepos) break;
+    if (SeekBlob(image,filepos,SEEK_SET) != filepos)
+      break;
     /* printf("pos=%lX\n",(long) TellBlob(image)); */
 
     MATLAB_HDR.DataType = ReadBlobXXXLong(image);
     if (EOFBlob(image)) break;
     MATLAB_HDR.ObjectSize = ReadBlobXXXLong(image);
-    if (EOFBlob(image)) break;
+    if (EOFBlob(image))
+      break;
 
     if (MATLAB_HDR.ObjectSize+filepos >= filesize)   /* Safety check for forged and or corrupted data. */
     {
@@ -1117,7 +1127,8 @@ MATLAB_KO: ThrowMATReaderException(CorruptImageError,ImproperImageHeader,image);
       case 0:
         size = ReadBlobXXXLong(image2); /* Object name string size */
         size = 4 * (((size_t) size + 3 + 1) / 4);
-        if (SeekBlob(image2, size, SEEK_CUR) < 0) goto MATLAB_KO;
+        if (SeekBlob(image2, size, SEEK_CUR) < 0)
+          goto MATLAB_KO;
         break;
       case 1:
       case 2:
@@ -1231,7 +1242,8 @@ NEXT_FRAME:
       if (AllocateImageColormap(image, image->colors) != MagickPass)
       {
          if (logging)
-           (void)LogMagickEvent(CoderEvent,GetMagickModule(), "Cannot allocate colormap with %d colors.", image->colors);
+           (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Cannot allocate colormap with %d colors.", image->colors);
 NoMemory: ThrowImg2MATReaderException(ResourceLimitError, MemoryAllocationFailed, image)
       }
     }
@@ -1242,7 +1254,7 @@ NoMemory: ThrowImg2MATReaderException(ResourceLimitError, MemoryAllocationFailed
     */
     if (image_info->ping)
     {
-      unsigned long temp = image->columns;  /* The true image is rotater 90 degs. Do rotation without data. */
+      unsigned long temp = image->columns;  /* The true image is rotated 90 degs. Do rotation without data. */
       image->columns = image->rows;
       image->rows = temp;
       goto skip_reading_current;
@@ -1600,7 +1612,8 @@ static MagickPassFail WriteMATLABImage(const ImageInfo *image_info,Image *image)
     Store MAT header.
   */
   (void) memset(MATLAB_HDR,' ',Min(sizeof(MATLAB_HDR),124));
-  snprintf(MATLAB_HDR,sizeof(MATLAB_HDR),"MATLAB 5.0 MAT-file, Platform: %.8s, Created on: %.3s %.3s %2d %2d:%2d:%2d %d",
+  snprintf(MATLAB_HDR,sizeof(MATLAB_HDR),
+           "MATLAB 5.0 MAT-file, Platform: %.8s, Created on: %.3s %.3s %2d %2d:%2d:%2d %d",
     OsDesc,
     DayOfWTab[t->tm_wday],
     MonthsTab[t->tm_mon],
