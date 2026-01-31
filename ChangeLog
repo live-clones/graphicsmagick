@@ -1,3 +1,11 @@
+2026-01-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/compress.c (HuffmanEncode2Image): Destroy 'huffman_image'
+        if SetImageType() fails. Assure that 'scanline' is cleared.
+
+        * fuzzing/oss-fuzz-build.sh: Disable ASAN instrumentation of
+        libjbig.
+
 2026-01-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/mat.c (ReadMATImage): Address oss-fuzz 479525103
