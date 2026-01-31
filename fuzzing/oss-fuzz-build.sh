@@ -374,6 +374,12 @@ then
         JBIGKIT_SRC="${SRC}"/jbigkit
         JBIGKIT_BUILD="${BUILD}"/jbigkit
 
+        # Disable instrumentation of libjbig because it has been
+        # oss-fuzz tested a long time, all remaining issues are due to
+        # slowness in the fuzzing build, and libjbig is no longer
+        # maintained.
+        export AFL_NOOPT=1
+
         LNDIR="${SRC}"/graphicsmagick/lndir.sh
 
         rm -rf "${JBIGKIT_BUILD}"
@@ -388,7 +394,9 @@ then
         sed -i 's/^CC =/# CC =/g' Makefile
         sed -i 's/^CFLAGS =/# CFLAGS =/g' Makefile
         make clean
-        make
+        make CFLAGS='-O2 -g'
+
+        unset AFL_NOOPT
 
         cp -p -- *.a "${WORK}/lib/"
         cp -p -- *.h "${WORK}/include/"
