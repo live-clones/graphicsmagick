@@ -1,5 +1,8 @@
 2026-01-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/pixel_cache.c: Trace the pixel cache identifier and
+        filename at the end of the trace output.
+
         * magick/compress.c (HuffmanEncode2Image): Destroy 'huffman_image'
         if SetImageType() fails. Assure that 'scanline' is cleared.
 

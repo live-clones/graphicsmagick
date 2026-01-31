@@ -41,6 +41,8 @@
 <p>2026-01-31  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/pixel_cache.c: Trace the pixel cache identifier and
+filename at the end of the trace output.</p></li>
 <li><p>magick/compress.c (HuffmanEncode2Image): Destroy 'huffman_image'
 if SetImageType() fails. Assure that 'scanline' is cleared.</p></li>
 <li><p>fuzzing/oss-fuzz-build.sh: Disable ASAN instrumentation of
