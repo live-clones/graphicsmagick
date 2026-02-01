@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -290,6 +290,9 @@ static MagickPassFail InsertRow(unsigned char *p,unsigned long y, Image *image, 
   IndexPacket *
     indexes;
 
+  MagickPassFail
+    status = MagickPass;
+
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Insert row %ld of %lu...", y, image->rows);
@@ -324,19 +327,19 @@ static MagickPassFail InsertRow(unsigned char *p,unsigned long y, Image *image, 
         while (x+3 < image->columns)
           {
             index = (IndexPacket)((*p >> 6) & 0x3);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x++]=index;
             *q++=image->colormap[index];
             index = (IndexPacket)((*p >> 4) & 0x3);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x++]=index;
             *q++=image->colormap[index];
             index = (IndexPacket)((*p >> 2) & 0x3);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x++]=index;
             *q++ = image->colormap[index];
             index = (IndexPacket)((*p) & 0x3);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x++]=index;
             *q++ = image->colormap[index];
             p++;
@@ -344,26 +347,26 @@ static MagickPassFail InsertRow(unsigned char *p,unsigned long y, Image *image, 
         if (x < image->columns)
           {
             index = (IndexPacket) ((*p >> 6) & 0x3);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x++] = index;
             *q++=image->colormap[index];
             if (x < image->columns)
               {
                 index = (IndexPacket) ((*p >> 4) & 0x3);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
                 indexes[x++] = index;
                 *q++=image->colormap[index];
                 if (x < image->columns)
                   {
                     index = (IndexPacket)((*p >> 2) & 0x3);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x] = index;
                     *q++=image->colormap[index];
                   }
               }
             /* p++; */
           }
-        RetVal = MagickPass;
+        RetVal = status;
         break;
       }
 

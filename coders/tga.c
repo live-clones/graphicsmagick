@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002-2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -757,7 +757,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info, ExceptionInfo *exception
                       index = ReadBlobByte(image);
                       if (image->storage_class == PseudoClass)
                         {
-                          VerifyColormapIndex(image,index);
+                          VerifyColormapIndex(status,image,index);
                           pixel=image->colormap[index];
                           indexes[x] = index;
                         }
@@ -792,7 +792,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info, ExceptionInfo *exception
                       if (image->storage_class == PseudoClass)
                         {
                           index=(IndexPacket) (packet & 0x7fff);
-                          VerifyColormapIndex(image,index);
+                          VerifyColormapIndex(status,image,index);
                         }
                       break;
                     }

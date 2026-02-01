@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -597,7 +597,7 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "    %u: %s", i-1, textlist[i-1]);
-          r=SetImagePixelsEx(image,0,y,image->columns,1,exception);
+          r=SetImagePixels(image,0,y,image->columns,1);
           if (r == (PixelPacket *) NULL)
             break;
           indexes=AccessMutableIndexes(image);
@@ -636,7 +636,9 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     }
                 }
 
-              VerifyColormapIndex(image,key.index);
+              VerifyColormapIndex(status,image,key.index);
+              if (status == MagickFail)
+                break;
               if (image->storage_class == PseudoClass)
                 indexes[x]=(IndexPacket) key.index;
               *r=image->colormap[key.index];
@@ -645,11 +647,11 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               r++;
               p+=width;
             }
-          if (!SyncImagePixelsEx(image,exception))
+          if (status == MagickFail)
+            break;
+          if (!SyncImagePixels(image))
             break;
         }
-      if (y < (long) image->rows)
-        ThrowXPMReaderException(CorruptImageError,InsufficientImageDataInFile,image);
     }
   /*
     Free resources.
@@ -666,6 +668,14 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
   CloseBlob(image);
   StopTimer(&image->timer);
+
+  if (image->exception.severity >= ErrorException)
+    {
+      GetImageException(image,exception);
+      DestroyImageList(image);
+      return((Image *) NULL);
+    }
+
   return(image);
 }
 

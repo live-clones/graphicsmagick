@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -860,7 +860,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     index=!PNMInteger(image,2,&status);
                     if (status == MagickFail)
                       break;
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x]=index;
                     *q++=image->colormap[index];
                   }
@@ -937,7 +937,9 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                           break;
                         ValidateScalingIndex(image, intensity, max_value);
                         index=intensity;
-                        VerifyColormapIndex(image,index);
+                        VerifyColormapIndex(status,image,index);
+                        if (status == MagickFail)
+                          break;
                         indexes[x]=index;
                         *q=image->colormap[index];
                         is_monochrome &= IsMonochrome(*q);

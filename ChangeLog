@@ -1,3 +1,10 @@
+2026-02-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/colormap-private.h (VerifyColormapIndex): Update a
+        MagickPassFail status variable.
+        (VerifyColormapIndexWithColors): Update a MagickPassFail status
+        variable.
+
 2026-01-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/pixel_cache.c: Trace the pixel cache identifier and

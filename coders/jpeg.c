@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1948,7 +1948,9 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                     for (x=0; x < (long) image->columns; x++)
                     {
                       index=(IndexPacket) ScaleQuantumToIndex((ScaleShortToQuantum(jpeg_pixels.t.j16[x])));
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       indexes[x]=index;
                       *q++=image->colormap[index];
                     }
@@ -1964,7 +1966,9 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                     for (x=0; x < (long) image->columns; x++)
                     {
                       index=(IndexPacket) ScaleQuantumToIndex((ScaleShortToQuantum(scale_short*((unsigned short)jpeg_pixels.t.j12[x]))));
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       indexes[x]=index;
                       *q++=image->colormap[index];
                     }
@@ -1976,7 +1980,9 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                     for (x=0; x < (long) image->columns; x++)
                       {
                         index=(IndexPacket) (GETJSAMPLE(jpeg_pixels.t.j[x]));
-                        VerifyColormapIndex(image,index);
+                        VerifyColormapIndex(status,image,index);
+                        if (status == MagickFail)
+                          break;
                         indexes[x]=index;
                         *q++=image->colormap[index];
                       }
@@ -2106,6 +2112,11 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                 }
             }
         }
+      if (status == MagickFail)
+        {
+          jpeg_abort_decompress(&jpeg_info);
+          break;
+        }
       if (!SyncImagePixels(image))
         {
           status=MagickFail;
@@ -2182,6 +2193,12 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
   GetImageException(image,exception);
   StopTimer(&image->timer);
+  if (image->exception.severity > exception->severity)
+    {
+      DestroyImageList(image);
+      return((Image *) NULL);
+    }
+
   return(image);
 }
 #endif

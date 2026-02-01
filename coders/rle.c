@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -640,7 +640,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
         for (i=0; i < number_pixels; i++)
           {
             index=*p & mask;
-            VerifyColormapIndexWithColors(image,index,colormap_entries);
+            VerifyColormapIndexWithColors(status,image,index,colormap_entries);
             *p=colormap[index];
             p++;
           }
@@ -650,7 +650,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
             for (x=0; x < number_planes; x++)
               {
                 index=x*(unsigned int) map_length+(*p & mask);
-                VerifyColormapIndexWithColors(image,index,colormap_entries);
+                VerifyColormapIndexWithColors(status,image,index,colormap_entries);
                 *p=colormap[index];
                 p++;
               }
@@ -760,13 +760,13 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
               for (x=0; x < image->columns; x++)
                 {
                   index=*p++;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
                   q->red=image->colormap[index].red;
                   index=*p++;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
                   q->green=image->colormap[index].green;
                   index=*p++;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
                   q->blue=image->colormap[index].blue;
                   q->opacity=(Quantum) (MaxRGB-ScaleCharToQuantum(*p++));
                   q++;

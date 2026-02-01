@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -6744,6 +6744,9 @@ static MagickPassFail DCM_ReadPaletteImage(Image *image,DicomStream *dcm,Excepti
   unsigned char
     byte;
 
+  MagickPassFail
+    status = MagickPass;
+
   byte=0;
 
   if (image->logging)
@@ -6810,7 +6813,7 @@ static MagickPassFail DCM_ReadPaletteImage(Image *image,DicomStream *dcm,Excepti
                 index=dcm->graymap[index];
 #endif
               index=(IndexPacket) (index);
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               indexes[x]=index;
               *q=image->colormap[index];
               q++;
@@ -6831,7 +6834,7 @@ static MagickPassFail DCM_ReadPaletteImage(Image *image,DicomStream *dcm,Excepti
                                       image->columns,image->rows))
             return MagickFail;
     }
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail DCM_ReadGrayscaleImage(Image *image,DicomStream *dcm,ExceptionInfo *exception)

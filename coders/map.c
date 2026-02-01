@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -197,7 +197,7 @@ static Image *ReadMAPImage(const ImageInfo *image_info,ExceptionInfo *exception)
       index=(*p++);
       if (image->colors > 256)
         index=((index << 8)+(*p++));
-      VerifyColormapIndex(image,index);
+      VerifyColormapIndex(status,image,index);
       indexes[x]=index;
       *q++=image->colormap[index];
     }

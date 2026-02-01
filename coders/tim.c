@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -302,17 +302,17 @@ static Image *ReadTIMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 for (x=0; x < ((long) image->columns-1); x+=2)
                   {
                     index=(*p) & 0xf;
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x]=index;
                     index=(*p >> 4) & 0xf;
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x+1]=index;
                     p++;
                   }
                 if ((image->columns % 2) != 0)
                   {
                     index=(*p >> 4) & 0xf;
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x]=(*p >> 4) & 0xf;
                     p++;
                   }
@@ -347,7 +347,7 @@ static Image *ReadTIMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 for (x=0; x < (long) image->columns; x++)
                   {
                     index=(*p++);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x]=index;
                   }
                 if (!SyncImagePixelsEx(image,exception))

@@ -3820,6 +3820,9 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
   register long
     i;
 
+  MagickPassFail
+    status = MagickPass;
+
   ARG_NOT_USED(mutable_data);
   ARG_NOT_USED(immutable_data);
   ARG_NOT_USED(exception);
@@ -3831,7 +3834,7 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
 
       for (i=0; i < npixels; i++)
         {
-          VerifyColormapIndex(image,indexes[i]);
+          VerifyColormapIndex(status,image,indexes[i]);
           /*
             Explicit member assignment is used in order to support a colormap
             simultaneous with with pixel opacity.
@@ -3846,7 +3849,7 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
     {
       for (i=0; i < npixels; i++)
         {
-          VerifyColormapIndex(image,indexes[i]);
+          VerifyColormapIndex(status,image,indexes[i]);
           /*
             Use structure assignment for improved performance.
             Trash whatever is in the opacity channel.
@@ -3855,7 +3858,7 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
         }
     }
 
-  return MagickPass;
+  return status;
 }
 MagickExport MagickPassFail SyncImage(Image *image)
 {

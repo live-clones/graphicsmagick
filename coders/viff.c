@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -767,7 +767,9 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
             for (bit=0; bit < 8; bit++)
               {
                 index=((*p) & (0x01 << bit) ? !polarity : polarity);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 indexes[x+bit]=(IndexPacket) index;
               }
             p++;
@@ -777,7 +779,9 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
               for (bit=0; bit < (long) (image->columns % 8); bit++)
                 {
                   index=((*p) & (0x01 << bit) ? !polarity : polarity);
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
+                  if (status == MagickFail)
+                    break;
                   indexes[x+bit]=(IndexPacket) index;
                 }
               p++;
@@ -803,7 +807,9 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
           for (x=0; x < (long) image->columns; x++)
             {
               index=(*p++);
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
+              if (status == MagickFail)
+                break;
               indexes[x]=index;
             }
           if (!SyncImagePixels(image))
@@ -834,13 +840,19 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
               if (image->colors != 0)
                 {
                   index=q->red;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
+                  if (status == MagickFail)
+                    break;
                   q->red=image->colormap[index].red;
                   index=q->green;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
+                  if (status == MagickFail)
+                    break;
                   q->green=image->colormap[index].green;
                   index=q->blue;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
+                  if (status == MagickFail)
+                    break;
                   q->blue=image->colormap[index].blue;
                 }
               q->opacity=(Quantum) (image->matte ? MaxRGB-
@@ -859,14 +871,20 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
           }
         }
     MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
-    if (image->storage_class == PseudoClass)
-      (void) SyncImage(image);
     if (EOFBlob(image))
       {
         ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
           image->filename);
-        break;
       }
+    if (image->exception.severity >= ErrorException)
+      {
+        CloseBlob(image);
+        GetImageException(image,exception);
+        DestroyImageList(image);
+        return((Image *) NULL);
+      }
+    if (image->storage_class == PseudoClass)
+      (void) SyncImage(image);
     StopTimer(&image->timer);
     /*
       Proceed to next image.

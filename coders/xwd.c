@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -726,18 +726,26 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                         pixel=XGetPixel(ximage,(int) x,(int) y);
                         index_val=(unsigned short)
                           ((pixel >> red_shift) & red_mask);
-                        VerifyColormapIndexWithColors(image,index_val,header.ncolors);
+                        VerifyColormapIndexWithColors(status,image,index_val,header.ncolors);
+                        if (status == MagickFail)
+                          break;
                         q->red=ScaleShortToQuantum(colors[index_val].red);
                         index_val=(unsigned short)
                           ((pixel >> green_shift) & green_mask);
-                        VerifyColormapIndexWithColors(image,index_val,header.ncolors);
+                        VerifyColormapIndexWithColors(status,image,index_val,header.ncolors);
+                        if (status == MagickFail)
+                          break;
                         q->green=ScaleShortToQuantum(colors[index_val].green);
                         index_val=(unsigned short)
                           ((pixel >> blue_shift) & blue_mask);
-                        VerifyColormapIndexWithColors(image,index_val,header.ncolors);
+                        VerifyColormapIndexWithColors(status,image,index_val,header.ncolors);
+                        if (status == MagickFail)
+                          break;
                         q->blue=ScaleShortToQuantum(colors[index_val].blue);
                         q++;
                       }
+                    if (status == MagickFail)
+                      break;
                     if (!SyncImagePixels(image))
                       break;
                     if (QuantumTick(y,image->rows))
@@ -810,10 +818,14 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 for (x=0; x < (long) image->columns; x++)
                   {
                     index_val=(IndexPacket) (XGetPixel(ximage,(int) x,(int) y));
-                    VerifyColormapIndex(image,index_val);
+                    VerifyColormapIndex(status,image,index_val);
+                    if (status == MagickFail)
+                      break;
                     indexes[x]=index_val;
                     *q++=image->colormap[index_val];
                   }
+                if (status == MagickFail)
+                  break;
                 if (!SyncImagePixels(image))
                   break;
                 if (QuantumTick(y,image->rows))
@@ -835,6 +847,14 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   MagickFreeResourceLimitedMemory(XImage *,ximage);
   CloseBlob(image);
   StopTimer(&image->timer);
+
+  if (image->exception.severity >= ErrorException)
+    {
+      GetImageException(image,exception);
+      DestroyImageList(image);
+      return((Image *) NULL);
+    }
+
   return(image);
 }
 #endif

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -186,7 +186,7 @@ static Image *ReadPIXImage(const ImageInfo *image_info,ExceptionInfo *exception)
           }
         if (image->storage_class == PseudoClass)
           {
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x]=index;
           }
         q->blue=blue;

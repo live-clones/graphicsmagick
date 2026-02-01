@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -594,7 +594,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
           {
             shift -= 2;
             index=(IndexPacket) (3-((*p >> shift) & 0x03));
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x]=index;
             *q++=image->colormap[index];
             if (shift == 0)
@@ -632,7 +632,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         {
           shift -= 4;
           index=(IndexPacket) (15-((*p >> shift) & 0x0f));
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q++=image->colormap[index];
           if (shift == 0)

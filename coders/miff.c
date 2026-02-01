@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -168,6 +168,9 @@ ImportRLEPixels(Image *image,
   register PixelPacket
     *q;
 
+  MagickPassFail
+    status = MagickPass;
+
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(source != (const unsigned char *) NULL);
@@ -222,7 +225,9 @@ ImportRLEPixels(Image *image,
                   if (length == 0)
                     {
                       index=((unsigned int) *p++);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       pixel=image->colormap[index];
                       length=((int) *p++)+1;
                     }
@@ -240,7 +245,9 @@ ImportRLEPixels(Image *image,
                     {
                       index =((unsigned int) *p++ << 8);
                       index|=((unsigned int) *p++);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       pixel=image->colormap[index];
                       length=((int) *p++)+1;
                     }
@@ -263,7 +270,9 @@ ImportRLEPixels(Image *image,
                       index|=((unsigned int) *p++ << 16);
                       index|=((unsigned int) *p++ << 8);
                       index|=((unsigned int) *p++);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       pixel=image->colormap[index];
                       length=((int) *p++)+1;
                     }
@@ -290,7 +299,9 @@ ImportRLEPixels(Image *image,
                   if (length == 0)
                     {
                       index=((unsigned int) *p++);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       pixel=image->colormap[index];
                       quantum=((unsigned int) *p++);
                       pixel.opacity=MaxRGB-ScaleCharToQuantum(quantum);
@@ -310,7 +321,9 @@ ImportRLEPixels(Image *image,
                     {
                       index =((unsigned int) *p++ << 8);
                       index|=((unsigned int) *p++);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       pixel=image->colormap[index];
                       quantum =((unsigned int) *p++ << 8);
                       quantum|=((unsigned int) *p++);
@@ -336,7 +349,9 @@ ImportRLEPixels(Image *image,
                       index|=((unsigned int) *p++ << 16);
                       index|=((unsigned int) *p++ << 8);
                       index|=((unsigned int) *p++);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       pixel=image->colormap[index];
                       quantum =((unsigned int) *p++ << 24);
                       quantum|=((unsigned int) *p++ << 16);
@@ -701,7 +716,7 @@ ImportRLEPixels(Image *image,
       {
       }
     }
-  return(MagickPass);
+  return status;
 }
 
 #if 0

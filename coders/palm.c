@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1055,7 +1055,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
               /* unsigned int r, g, b; */
               (void) ReadBlobByte(image);
               index=(image->colors-1) - i;
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               image->colormap[index].red = ScaleCharToQuantum(ReadBlobByte(image));
               image->colormap[index].green = ScaleCharToQuantum(ReadBlobByte(image));
               image->colormap[index].blue = ScaleCharToQuantum(ReadBlobByte(image));
@@ -1201,7 +1201,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
               if ((unsigned int) (ptr - one_row) >= palm_header.bytes_per_row)
                 ThrowPALMReaderException(CorruptImageError,CorruptImage,image);
               index =(IndexPacket) (mask - (((*ptr) & (mask << bit)) >> bit));
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               indexes[x] = index;
               *q++ = image->colormap[index];
               if (!bit)
@@ -1229,7 +1229,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
       if (image->storage_class == PseudoClass)
         {
           index = mask - palm_header.transparent_index;
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Index %u rgb(%u,%u,%u) set transparent",

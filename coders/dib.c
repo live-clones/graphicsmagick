@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -833,7 +833,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
           for (bit=0; bit < 8; bit++)
           {
             index=((*p) & (0x80 >> bit) ? 0x01 : 0x00);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x+bit]=index;
             *q++=image->colormap[index];
           }
@@ -844,7 +844,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
             for (bit=0; bit < (long) (image->columns % 8); bit++)
             {
               index=((*p) & (0x80 >> bit) ? 0x01 : 0x00);
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               indexes[x+bit]=index;
               *q++=image->colormap[index];
             }
@@ -880,11 +880,11 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         for (x=0; x < ((long) image->columns-1); x+=2)
         {
           index=(IndexPacket) ((*p >> 4) & 0xf);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q++=image->colormap[index];
           index=(IndexPacket) (*p & 0xf);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x+1]=index;
           *q++=image->colormap[index];
           p++;
@@ -892,7 +892,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if ((image->columns % 2) != 0)
           {
             index=(IndexPacket) ((*p >> 4) & 0xf);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x]=index;
             *q++=image->colormap[index];
             p++;
@@ -929,7 +929,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         for (x=0; x < (long) image->columns; x++)
         {
           index=(IndexPacket) (*p);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q=image->colormap[index];
           p++;

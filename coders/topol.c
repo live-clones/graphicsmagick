@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -100,6 +100,9 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
   register IndexPacket
     *indexes;
 
+  MagickPassFail
+    status = MagickPass;
+
   switch (depth)
     {
     case 1:                     /* Convert bitmap scanline. */
@@ -144,19 +147,19 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         for (x = 0; x < ((long)columns - 1); x += 2)
           {
             index = (IndexPacket) ((*p >> 6) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p >> 4) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p >> 2) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x + 1] = index;
             *q++ = image->colormap[index];
             p++;
@@ -164,19 +167,19 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         if ((columns % 4) != 0)
           {
             index = (IndexPacket) ((*p >> 6) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             if ((columns % 4) >= 1)
               {
                 index = (IndexPacket) ((*p >> 4) & 0x3);
-                VerifyColormapIndex(image, index);
+                VerifyColormapIndex(status,image,index);
                 indexes[x] = index;
                 *q++ = image->colormap[index];
                 if ((columns % 4) >= 2)
                   {
                     index = (IndexPacket) ((*p >> 2) & 0x3);
-                    VerifyColormapIndex(image, index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x] = index;
                     *q++ = image->colormap[index];
                   }
@@ -200,11 +203,11 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         for (x = 0; x < ((long)columns - 1); x += 2)
           {
             index = (IndexPacket) ((*p >> 4) & 0xF);    /* Lo nibble */
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p) & 0xF);         /* Hi nibble */
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x + 1] = index;
             *q++ = image->colormap[index];
             p++;
@@ -212,7 +215,7 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         if ((columns % 2) != 0)
           {
             index = (IndexPacket) ((*p >> 4) & 0xF);    /* padding nibble */
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             p++;
@@ -234,7 +237,7 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         for (x = 0; x < (long)columns; x++)
           {
             index = (IndexPacket) (*p);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             p++;
@@ -275,6 +278,9 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
       break;
 
     }
+
+  if (status == MagickFail)
+   return -1;
 
   return 0;
 }

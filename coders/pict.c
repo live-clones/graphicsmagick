@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1766,7 +1766,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                 if (tile_image->storage_class == PseudoClass)
                   {
                     index=(IndexPacket) (*p);
-                    VerifyColormapIndex(tile_image,index);
+                    VerifyColormapIndex(status,tile_image,index);
                     indexes[x]=index;
                     q->red=tile_image->colormap[index].red;
                     q->green=tile_image->colormap[index].green;

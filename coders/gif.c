@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -312,7 +312,7 @@ static MagickPassFail DecodeImage(Image *image,const long opacity)
           */
           top_stack--;
           index=(*top_stack);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q=image->colormap[index];
           q->opacity=(Quantum)
@@ -1153,7 +1153,7 @@ static Image *ReadGIFImage(const ImageInfo *image_info,ExceptionInfo *exception)
         p=global_colormap;
         for (i=0; i < image->colors; i++)
         {
-          VerifyColormapIndex(image, i);
+          VerifyColormapIndex(status, image, i);
           image->colormap[i].red=ScaleCharToQuantum(*p++);
           image->colormap[i].green=ScaleCharToQuantum(*p++);
           image->colormap[i].blue=ScaleCharToQuantum(*p++);
