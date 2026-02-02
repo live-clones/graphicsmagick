@@ -1165,26 +1165,30 @@ fi
             ;;
     esac
 
-    # In a static build, libheif omits dependencies for some libraries!
-    if ($enable_vvdec) && [ -d "${BUILD}"/vvdec ] ; then
-        LIB_VVDEC=$(pkg-config --libs-only-l libvvdec)
-        if [ -n "${LIB_VVDEC}" ] ; then
-            EXTRA_LIBS="${LIB_VVDEC} ${EXTRA_LIBS}"
+    if (true) ; then
+        # In a static build, libheif omits dependencies for some libraries!
+        if ($enable_vvdec) && [ -d "${BUILD}"/vvdec ] ; then
+            LIB_VVDEC=$(pkg-config --libs-only-l libvvdec)
+            if [ -n "${LIB_VVDEC}" ] ; then
+                EXTRA_LIBS="${LIB_VVDEC} ${EXTRA_LIBS}"
+            fi
+        fi
+
+        if ($enable_vvenc) && [ -d "${BUILD}"/vvenc ] ; then
+            LIB_VVENC=$(pkg-config --libs-only-l libvvenc)
+            if [ -n "${LIB_VVENC}" ] ; then
+                EXTRA_LIBS="${LIB_VVENC} ${EXTRA_LIBS}"
+            fi
         fi
     fi
 
-    if ($enable_vvenc) && [ -d "${BUILD}"/vvenc ] ; then
-        LIB_VVENC=$(pkg-config --libs-only-l libvvenc)
-        if [ -n "${LIB_VVENC}" ] ; then
-            EXTRA_LIBS="${LIB_VVENC} ${EXTRA_LIBS}"
-        fi
-    fi
-
-    # A strange thing about x264 is its pkg-config Cflags says "Cflags: -I${prefix}/include -DX264_API_IMPORTS"
-    if ($enable_x264) && [ -d "${BUILD}"/x264 ] ; then
-        LIB_X264=$(pkg-config --libs-only-l x264)
-        if [ -n "${LIB_X264}" ] ; then
-            EXTRA_LIBS="${LIB_X264} ${EXTRA_LIBS}"
+    if (false) ; then
+        # A strange thing about x264 is its pkg-config Cflags says "Cflags: -I${prefix}/include -DX264_API_IMPORTS"
+        if ($enable_x264) && [ -d "${BUILD}"/x264 ] ; then
+            LIB_X264=$(pkg-config --libs-only-l x264)
+            if [ -n "${LIB_X264}" ] ; then
+                EXTRA_LIBS="${LIB_X264} ${EXTRA_LIBS}"
+            fi
         fi
     fi
 

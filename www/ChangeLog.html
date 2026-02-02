@@ -41,6 +41,10 @@
 <p>2026-02-02  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>fuzzing/dictionaries/MVG.dict: Updates for GraphicsMagick.</p></li>
+<li><p>fuzzing/oss-fuzz-build.sh (BUILD): Libheif's pkgconf now reveals
+dependencies needed to statically link with x264, but not yet
+vvdec or vvenc. No longer add x264 dependencies.</p></li>
 <li><p>coders/heif.c (ReadHEIFImage): Use strlcpy() to avoid benign
 clang scan-build report.</p></li>
 </ul>

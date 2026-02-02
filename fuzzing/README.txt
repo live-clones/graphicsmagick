@@ -103,7 +103,20 @@ Copy fuzzing build script into running container (given simultaneous shell sessi
   /src/build.sh while in the initial "/src/graphicsmagick" directory
   but does some other things as well.
 
-Building a starter Corpus
+Build Directory Products
+------------------------
+
+When the oss-fuzz build is performed within the Docker container, a
+'build' directory is created and the directories 'out' and 'work' may
+be accessed from the host OS.  The directory build/out/graphicsmagick
+contains the build products for oss-fuzz's fuzzer, and the directory
+build/work/graphicsmagick includes the build directory.  In
+particular, build/work/graphicsmagick/bin includes static executables
+for 'gm', and static executables for the the other software which was
+built and installed (e.g. , which are capable of running under the host OS
+without the docker container.  This is useful for testing.
+
+Building A Starter Corpus
 --------------------------
 
 
