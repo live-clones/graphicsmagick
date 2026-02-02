@@ -146,7 +146,7 @@ typedef enum
 #define SetCacheInfoType(cache_info,cache_type)                         \
   {                                                                     \
     (void) LogMagickEvent(CacheEvent,GetMagickModule(),                 \
-                          "Cache type '%s' --> '%s' (cache %p) %.1024s", \
+                          "cache type '%s' --> '%s' (cache %p) %.1024s", \
                           CacheTypeToStr(cache_info->type),             \
                           CacheTypeToStr(cache_type),cache_info,        \
                           cache_info->filename);                        \
@@ -2474,19 +2474,23 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
   cache_info=(CacheInfo *) image->cache;
   assert(cache_info->signature == MagickSignature);
 
-  (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                        "Acquiring images resource (image %p) (cache %p) %.1024s",
-                        image,cache_info,cache_info->filename);
-  if (!AcquireMagickResource(ImagesResource,1))
+  if (cache_info->type == UndefinedCache)
     {
-      (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
-                            "Images resource %" MAGICK_INTMAX_F "d"
-                            " reached limit %" MAGICK_INTMAX_F "d",
-                            GetMagickResource(ImagesResource),
-                            GetMagickResourceLimit(ImagesResource));
-      ThrowException(exception,ResourceLimitError,ImagesLimitExceeded,
-                     image->filename);
-      goto open_cache_done;
+      (void) LogMagickEvent(CacheEvent,GetMagickModule(),
+                            "acquire images resource (image %p) (cache %p) %.1024s",
+                            image,cache_info,cache_info->filename);
+
+      if (!AcquireMagickResource(ImagesResource,1))
+        {
+          (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
+                                "images resource %" MAGICK_INTMAX_F "d"
+                                " reached limit %" MAGICK_INTMAX_F "d",
+                                GetMagickResource(ImagesResource),
+                                GetMagickResourceLimit(ImagesResource));
+          ThrowException(exception,ResourceLimitError,ImagesLimitExceeded,
+                         image->filename);
+          goto open_cache_done;
+        }
     }
 
   release_resource=MagickTrue;
@@ -2529,17 +2533,6 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
           }
         case MemoryCache:
           {
-            /*
-              First attempt at cache allocation is via
-              MagickReallocateResourceLimitedMemory().  The original
-              design would allocate for RGB, and then later for
-              RGBA. Maybe that is why memory is not freed here?  This
-              strategy seems bogus!
-
-              If we do free memory here, AppendImages() test fails.
-
-              MagickFreeResourceLimitedMemory(PixelPacket *, cache_info->pixels);
-            */
             break;
           }
         case DiskCache:
@@ -2549,12 +2542,20 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
               break;
             (void) close(cache_info->file);
             cache_info->file=(-1);
+            (void) LogMagickEvent(CacheEvent,GetMagickModule(),
+                                  "closed cache file %s (cache %p) %.1024s",
+                                  cache_info->cache_filename, cache_info,
+                                  cache_info->filename);
             LiberateMagickResource(FileResource,1);
             break;
           }
         case MapCache:
           {
             (void) UnmapBlob(cache_info->pixels,(size_t) cache_info->length);
+            (void) LogMagickEvent(CacheEvent,GetMagickModule(),
+                                  "unmapped cache file %s (cache %p) %.1024s",
+                                  cache_info->cache_filename, cache_info,
+                                  cache_info->filename);
             LiberateMagickResource(MapResource,cache_info->length);
             break;
           }
@@ -2644,13 +2645,16 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
                                                    cache_info->pixels,
                                                    (size_t) offset);
       if (pixels == (PixelPacket *) NULL)
-      {
-        MagickFreeResourceLimitedMemory(PixelPacket *, cache_info->pixels);
-      }
+        {
+          MagickFreeResourceLimitedMemory(PixelPacket *, cache_info->pixels);
+        }
       else
-      {
-        cache_info->pixels=pixels;
-      }
+        {
+          (void) LogMagickEvent(CacheEvent,GetMagickModule(),
+                                "reallocated cache memory (cache %p) %.1024s",
+                                cache_info,cache_info->filename);
+          cache_info->pixels=pixels;
+        }
       if (pixels != (PixelPacket *) NULL)
         {
           /*
@@ -2690,7 +2694,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     if(!AcquireTemporaryFileName(cache_info->cache_filename))
       {
         (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                              "Liberating images resource (cache %p) %.1024s",
+                              "liberate images resource (cache %p) %.1024s",
                               cache_info,cache_info->filename);
         LiberateMagickResource(ImagesResource,1);
         LiberateMagickResource(DiskResource,cache_info->length);
@@ -2769,7 +2773,9 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
       pixels=(PixelPacket *) MapBlob(file,mode,(off_t) cache_info->offset,
                                      (size_t) cache_info->length);
       if (pixels == (PixelPacket *) NULL)
-        LiberateMagickResource(MapResource,cache_info->length);
+        {
+          LiberateMagickResource(MapResource,cache_info->length);
+        }
       else
         {
           /*
@@ -2786,9 +2792,14 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
   if (cache_info->type == DiskCache)
     {
       if (AcquireMagickResource(FileResource,1))
-        cache_info->file=file;
+        {
+          cache_info->file=file;
+        }
       else
-        (void) close(file);
+        {
+          (void) close(file);
+          cache_info->file=-1;
+        }
     }
 #if defined(SIGBUS)
   /*   (void) signal(SIGBUS,CacheSignalHandler); */
@@ -2797,7 +2808,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
   FormatSize(cache_info->length,format);
   if (cache_info->logging)
     (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                          "open (%.1024s[%d], %.1024s, %.1024s)"
+                          "open (\"%.1024s\"[%d], %.1024s, %.1024s)"
                           " storage_class=%s, colorspace=%s, "
                           "(cache %p) %.1024s",
                           cache_info->cache_filename,
@@ -2811,7 +2822,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
   if (release_resource && status == MagickFail)
     {
       (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                            "Liberating images resource (cache %p) %.1024s",
+                            "liberate images resource (cache %p) %.1024s",
                             cache_info,cache_info->filename);
       LiberateMagickResource(ImagesResource,1);
     }
@@ -3820,11 +3831,11 @@ DestroyCacheInfo(Cache cache_info)
           LiberateMagickResource(FileResource,1);
           cache_info->file=(-1);
         }
-      (void) LiberateTemporaryFile(cache_info->cache_filename);
       (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                            "remove file (%.1024s) (cache%p) %.1024s ",
+                            "remove file (%.1024s) (cache %p) %.1024s ",
                             cache_info->cache_filename,
                             cache_info, cache_info->filename);
+      (void) LiberateTemporaryFile(cache_info->cache_filename);
       LiberateMagickResource(DiskResource,cache_info->length);
     }
 
@@ -3834,7 +3845,7 @@ DestroyCacheInfo(Cache cache_info)
   if (UndefinedCache != cache_info->type)
   {
     (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                          "Liberating images resource (cache %p) %.1024s",
+                          "liberate images resource (cache %p) %.1024s",
                           cache_info,cache_info->filename);
     LiberateMagickResource(ImagesResource,1);
   }
@@ -3842,7 +3853,7 @@ DestroyCacheInfo(Cache cache_info)
   DestroySemaphoreInfo(&cache_info->file_semaphore);
   DestroySemaphoreInfo(&cache_info->reference_semaphore);
   (void) LogMagickEvent(CacheEvent,GetMagickModule(),
-                        "destroy %s cache (cache %p) %.1024s",
+                        "destroy '%s' cache (cache %p) %.1024s",
                         CacheTypeToStr(cache_info->type),
                         cache_info, cache_info->filename);
   cache_info->signature=0;

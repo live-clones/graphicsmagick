@@ -1,5 +1,11 @@
 2026-02-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/pixel_cache.c: Added/improved tracing for CacheEvent and
+        ResourceEvent. Fixes for resource allocation logic.
+
+        * magick/resource.c (LiberateMagickResource): Log resource limit
+        information before an intentional crash.
+
         * fuzzing/dictionaries/MVG.dict: Updates for GraphicsMagick.
 
         * fuzzing/oss-fuzz-build.sh (BUILD): Libheif's pkgconf now reveals

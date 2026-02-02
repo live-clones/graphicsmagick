@@ -851,6 +851,12 @@ MagickExport void LiberateMagickResource(const ResourceType type,
             LockSemaphoreInfo(info->semaphore);
             info->value-=size;
 #if defined(DEBUG_MAGICK_RESOURCES) && DEBUG_MAGICK_RESOURCES
+            if (!(info->value >= info->minimum))
+              (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
+                                    "%s resource"
+                                    " value=%" MAGICK_INTMAX_F "d,"
+                                    " minimum=%" MAGICK_INTMAX_F "d",
+                                    info->name, info->value, info->minimum);
             assert(info->value >= info->minimum);
 #endif /* if defined(DEBUG_MAGICK_RESOURCES) && DEBUG_MAGICK_RESOURCES */
             value=info->value;
