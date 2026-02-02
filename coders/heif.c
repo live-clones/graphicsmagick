@@ -1803,7 +1803,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     magick="MP4";
   else if (heif_has_compatible_brand(in_buf, in_len, "mp42") == 1)
     magick="MP4";
-  (void) strcpy(image->magick,magick);
+  (void) strlcpy(image->magick,magick,sizeof(image->magick));
    if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Assigned magick: %s", magick);
