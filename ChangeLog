@@ -1,5 +1,8 @@
 2026-02-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * fuzzing/oss-fuzz-build.sh: Re-enable ASAN instrumentation of
+        libjbig.
+
         * PerlMagick/MANIFEST: Update PerlMagick manifest.
 
 2026-02-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
