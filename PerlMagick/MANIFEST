@@ -183,6 +183,13 @@ t/input_rgb_16bit_rle.palm
 t/input_rgb_16bit_scan.palm
 t/input_rgb_16bit_trans.palm
 t/input_rgb_lsb_08bit.mat
+t/heif/heif-avc-rgb-8.avci
+t/heif/heif-avif-gray-10.avif
+t/heif/heif-avif-gray-12.avif
+t/heif/heif-avif-gray-8.avif
+t/heif/heif-avif-rgb-8.avif
+t/heif/heif-hevc-gray-8.heic
+t/heif/heif-hevc-rgb-8.heic
 t/jbig/input.jbig
 t/jbig/read.t
 t/jbig/write.t
@@ -429,8 +436,8 @@ t/x/read.t
 t/x/write.t
 t/xfig/input.fig
 t/xfig/read.t
-t/zlib/input.miff
-t/zlib/input.miff.gz
+t/zlib/input_zlib.miff
+t/zlib/input_zlib.miff.gz
 t/zlib/input_gray_lsb_08bit_zip.mat
 t/zlib/read.t
 t/zlib/write.t

@@ -1,3 +1,7 @@
+2026-02-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * PerlMagick/MANIFEST: Update PerlMagick manifest.
+
 2026-02-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/pixel_cache.c: Added/improved tracing for CacheEvent and
