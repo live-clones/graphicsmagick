@@ -461,7 +461,9 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       /* Allocate temporary palette. */
       if (image->colormap != (PixelPacket *)NULL)
         MagickFreeMemory(image->colormap);
-      image->colormap=MagickAllocateMemory(PixelPacket *,MagickArraySize((size_t) image->colors,sizeof(PixelPacket)));
+      image->colormap=MagickAllocateMemory(PixelPacket *,
+                                           MagickArraySize((size_t) image->colors,
+                                                           sizeof(PixelPacket)));
       if (image->colormap==NULL)
         ThrowXPMReaderException(ResourceLimitError,MemoryAllocationFailed,image);
     }
@@ -565,6 +567,10 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
   if (!image_info->ping)
     {
+      size_t
+        expected_pixels=(size_t) image->rows * (size_t) image->columns,
+        pixels=0;
+
       xpmkey_t
         key = { 0, 0 },
         *keyp;
@@ -591,6 +597,8 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                             "Parsing pixels...");
       for (y=0; y < (long) image->rows; y++)
         {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "  y=%ld", y);
           p=textlist[i++];
           if ((p == (char *) NULL) || (p[0] == '\0'))
             break;
@@ -603,6 +611,8 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
           indexes=AccessMutableIndexes(image);
           for (x=0; x < (long) image->columns; x++)
             {
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "  x=%ld", y);
               keyval=0;
               for (k=0; k < width; k++)
                 {
@@ -620,7 +630,7 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 {
                   key.keyval = keyval;
                   keyp=(xpmkey_t *) bsearch((const void *) &key,(void *) keys,image->colors,
-                                        sizeof(keys[0]),XPMKeyCompare);
+                                            sizeof(keys[0]),XPMKeyCompare);
                   if (keyp != (xpmkey_t *) NULL)
                     {
                       key.index = keyp->index;
@@ -644,15 +654,26 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
               *r=image->colormap[key.index];
               r->opacity=(Quantum)
                 (key.index == none ? TransparentOpacity : OpaqueOpacity);
+              pixels++;
               r++;
               p+=width;
-            }
+            } /* for (x= */
           if (status == MagickFail)
             break;
           if (!SyncImagePixels(image))
             break;
+        } /* for (y= */
+      if (pixels != expected_pixels)
+        {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Failed to transfer required"
+                                " number of pixels (%lu vs %lu)",pixels,expected_pixels);
+          ThrowXPMReaderException(CorruptImageError,CorruptImage,
+                                  image);
         }
-    }
+    } /* if (!image_info->ping) */
+  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                        "status=%u", status);
   /*
     Free resources.
   */
@@ -668,13 +689,6 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
   CloseBlob(image);
   StopTimer(&image->timer);
-
-  if (image->exception.severity >= ErrorException)
-    {
-      GetImageException(image,exception);
-      DestroyImageList(image);
-      return((Image *) NULL);
-    }
 
   return(image);
 }

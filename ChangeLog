@@ -1,5 +1,12 @@
 2026-02-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/xpm.c (ReadXPMImage): Verify that the expected number of
+        pixels were transferred to the image. Addresses oss-fuzz 481429902
+        "graphicsmagick:coder_XPM_fuzzer: Use-of-uninitialized-value in
+        GrayscalePseudoClassImage" and 481419152
+        "graphicsmagick:coder_XPM_fuzzer: Use-of-uninitialized-value in
+        WriteXPMImage".
+
         * fuzzing/oss-fuzz-build.sh: Re-enable ASAN instrumentation of
         libjbig.
 

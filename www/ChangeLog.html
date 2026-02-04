@@ -41,6 +41,12 @@
 <p>2026-02-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/xpm.c (ReadXPMImage): Verify that the expected number of
+pixels were transferred to the image. Addresses oss-fuzz 481429902
+&quot;graphicsmagick:coder_XPM_fuzzer: Use-of-uninitialized-value in
+GrayscalePseudoClassImage&quot; and 481419152
+&quot;graphicsmagick:coder_XPM_fuzzer: Use-of-uninitialized-value in
+WriteXPMImage&quot;.</p></li>
 <li><p>fuzzing/oss-fuzz-build.sh: Re-enable ASAN instrumentation of
 libjbig.</p></li>
 <li><p>PerlMagick/MANIFEST: Update PerlMagick manifest.</p></li>
