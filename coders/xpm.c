@@ -790,12 +790,12 @@ ModuleExport void UnregisterXPMImage(void)
 %
 %  The format of the WritePICONImage method is:
 %
-%      unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
+%      MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
 %
 %  A description of each parameter follows.
 %
-%    o status: Method WritePICONImage return True if the image is written.
-%      False is returned is there is a memory shortage or if the image file
+%    o status: Method WritePICONImage return MagickPass if the image is written.
+%      MagickFail is returned is there is a memory shortage or if the image file
 %      fails to write.
 %
 %    o image_info: Specifies a pointer to a ImageInfo structure.
@@ -804,7 +804,7 @@ ModuleExport void UnregisterXPMImage(void)
 %
 %
 */
-static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
+static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
 {
 #define ColormapExtent  155
 #define GraymapExtent  95
@@ -852,8 +852,8 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
     symbol[MaxTextExtent];
 
   Image
-    *picon,
-    *map;
+    *picon = (Image *) NULL,
+    *map = (Image *) NULL;
 
   int
     j;
@@ -894,12 +894,16 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
     Open output image file.
   */
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
-    ThrowWriterException(FileOpenError,UnableToOpenFile,image);
+  if (status == MagickFail)
+    return status;
   /*
     Ensure that image is in an RGB space.
   */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    {
+      CloseBlob(image);
+      return MagickFail;
+    }
   /*
     Analyze image to be written.
   */
@@ -914,21 +918,32 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
   (void) GetMagickGeometry(PiconGeometry,&geometry.x,&geometry.y,
     &geometry.width,&geometry.height);
   picon=ThumbnailImage(image,geometry.width,geometry.height,&image->exception);
+  if (picon == (Image *) NULL)
+    {
+      CloseBlob(image);
+      return MagickFail;
+    }
   if ((image_info->type != TrueColorType) &&
       (characteristics.grayscale))
     map=BlobToImage(image_info,Graymap,GraymapExtent,&image->exception);
   else
     map=BlobToImage(image_info,Colormap,ColormapExtent,&image->exception);
-  if ((picon == (Image *) NULL) || (map == (Image *) NULL))
-    return(False);
+  if (map == (Image *) NULL)
+    {
+      DestroyImage(picon);
+      picon=(Image *) NULL;
+      CloseBlob(image);
+      return MagickFail;
+    }
   status=MapImage(picon,map,image_info->dither);
   DestroyImage(map);
-  transparent=False;
+  map=(Image *) NULL;
+  transparent=MagickFalse;
   if (picon->storage_class == PseudoClass)
     {
       CompressImageColormap(picon);
       if (picon->matte)
-        transparent=True;
+        transparent=MagickTrue;
     }
   else
     {
@@ -956,8 +971,23 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
             if (!SyncImagePixels(picon))
               break;
           }
+          if (picon->exception.severity >= ErrorException)
+            {
+              GetImageException(picon,&image->exception);
+              DestroyImage(picon);
+              picon=(Image *) NULL;
+              CloseBlob(image);
+              return MagickFail;
+            }
         }
-      (void) SetImageType(picon,PaletteType);
+      if (SetImageType(picon,PaletteType) == MagickFail)
+        {
+          GetImageException(picon,&image->exception);
+          DestroyImage(picon);
+          picon=(Image *) NULL;
+          CloseBlob(image);
+          return MagickFail;
+        }
     }
   colors=picon->colors;
   if (transparent)
@@ -965,7 +995,11 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
       colors++;
       MagickReallocMemory(PixelPacket *,picon->colormap,colors*sizeof(PixelPacket));
       if (picon->colormap == (PixelPacket *) NULL)
-        ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,picon);
+        {
+          DestroyImage(picon);
+          picon=(Image *) NULL;
+          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+        }
       picon->colormap[colors-1].red=picon->colormap[colors-1].green=picon->colormap[colors-1].blue=0;
       picon->colormap[colors-1].opacity=TransparentOpacity;
       for (y=0; y < (long) picon->rows; y++)
@@ -986,6 +1020,14 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
         if (!SyncImagePixels(picon))
           break;
       }
+      if (picon->exception.severity >= ErrorException)
+        {
+          GetImageException(picon,&image->exception);
+          DestroyImage(picon);
+          picon=(Image *) NULL;
+          CloseBlob(image);
+          return MagickFail;
+        }
     }
   /*
     Compute the character per pixel.
@@ -1067,7 +1109,16 @@ static unsigned int WritePICONImage(const ImageInfo *image_info,Image *image)
                                   image->columns,image->rows))
         break;
   }
+  if (picon->exception.severity >= ErrorException)
+    {
+      GetImageException(picon,&image->exception);
+      DestroyImage(picon);
+      picon=(Image *) NULL;
+      CloseBlob(image);
+      return MagickFail;
+    }
   DestroyImage(picon);
+  picon=(Image *) NULL;
   (void) WriteBlobString(image,"};\n");
   status &= CloseBlob(image);
   return(status);

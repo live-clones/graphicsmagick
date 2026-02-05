@@ -1,3 +1,13 @@
+2026-02-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/xpm.c (WritePICONImage): Add full error checking, and
+        error reporting. Addresses oss-fuzz 481985895
+        "graphicsmagick:coder_PICON_fuzzer: Indirect-leak in
+        MagickMallocCleared" and os-fuzz 481985892
+        "Graphicsmagick:coder_PICON_fuzzer: Indirect-leak in
+        _MagickReallocateResourceLimitedMemoryLoc".  These problems became
+        apparent due to the XPM/PICON reader issue fixed yesterday.
+
 2026-02-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/xpm.c (ReadXPMImage): Verify that the expected number of

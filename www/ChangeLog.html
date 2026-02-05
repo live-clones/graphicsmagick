@@ -38,6 +38,18 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-02-05  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/xpm.c (WritePICONImage): Add full error checking, and
+error reporting. Addresses oss-fuzz 481985895
+&quot;graphicsmagick:coder_PICON_fuzzer: Indirect-leak in
+MagickMallocCleared&quot; and os-fuzz 481985892
+&quot;Graphicsmagick:coder_PICON_fuzzer: Indirect-leak in
+_MagickReallocateResourceLimitedMemoryLoc&quot;.  These problems became
+apparent due to the XPM/PICON reader issue fixed yesterday.</p></li>
+</ul>
+</blockquote>
 <p>2026-02-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
