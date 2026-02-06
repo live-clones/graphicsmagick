@@ -1688,18 +1688,26 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
       }
     case BS_DIBPATTERN /* 5 */:
       {
-        wmfBMP
+        wmfBMP  /* struct _wmfBMP { U16 width; U16 height; void* data; } */
           *brush_bmp = WMF_BRUSH_BITMAP(brush);
-
         if (brush_bmp && brush_bmp->data != 0)
           {
+             /*
+               oss-fuzz 482160523 reveals that brush_bmp->data can be non-zero without being set-up by ipa_bmp_read()!
+               It seems that libwmf does not enforce an order of operations.
+             */
+#if 0
             CompositeOperator
               mode;
 
             const Image
               *image;
 
+            /* This is supposed to be set to a decoded image by ipa_bmp_read() */
             image = (Image*)brush_bmp->data;
+
+            assert(image != (Image *) NULL);
+            assert(image->signature == MagickSignature);
 
             mode = CopyCompositeOp;  /* Default is copy */
             switch (WMF_DC_ROP(dc))
@@ -1778,6 +1786,7 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
                 DrawSetFillPatternURL(WmfDrawContext,pattern_id);
               ++ddata->pattern_id;
             }
+#endif
           }
         else
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"util_set_brush: no BMP image data!");
@@ -2387,6 +2396,28 @@ static long ipa_blob_tell(void* context)
   return (long)TellBlob((Image*)context);
 }
 
+static void *api_malloc(void* context,size_t size)
+{
+  (void) context;
+  /* return MagickMallocCleared(size); */
+  return MagickAllocateResourceLimitedClearedMemory(void *,size);
+}
+
+static void *api_realloc(void* context,void* memory,size_t size)
+{
+  (void) context;
+  /* return MagickRealloc(memory,size); */
+  return MagickReallocateResourceLimitedMemory(void *,memory,size);
+}
+
+static void api_free(void* context,void* memory)
+{
+  (void) context;
+  /* MagickFree(mem); */
+  MagickFreeResourceLimitedMemory(void *,memory);
+  return;
+}
+
 static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * exception)
 {
   Image
@@ -2449,6 +2480,12 @@ static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * excepti
   /* Register callbacks */
   wmf_options_flags |= WMF_OPT_FUNCTION;
   (void) memset(&wmf_api_options, 0, sizeof(wmf_api_options));
+
+  wmf_api_options.context = 0;
+  wmf_api_options.malloc = api_malloc;
+  wmf_api_options.realloc = api_realloc;
+  wmf_api_options.free = api_free;
+
   wmf_api_options.function = ipa_functions;
 
   /* Ignore non-fatal errors */
@@ -2829,6 +2866,7 @@ ModuleExport void RegisterWMFImage(void)
   entry->blob_support = True;
   entry->seekable_stream=True;
   entry->module = "WMF";
+  entry->coder_class=UnstableCoderClass;
   (void) RegisterMagickInfo(entry);
 #endif /* HasWMF || HasWMFlite */
 }

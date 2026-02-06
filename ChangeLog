@@ -1,5 +1,14 @@
 2026-02-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/wmf.c (RegisterWMFImage): Register WMF to be in the
+        UnstableCoderClass.
+        (ReadWMFImage): Use the managed memory allocator.
+        (util_set_brush): Comment the BS_DIBPATTERN implementation since
+        bmp->data is non-NULL even though it was not set-up by
+        ipa_bmp_read().  This addresses oss-fuzz 482160523
+        "graphicsmagick:coder_WMF_fuzzer: Segv on unknown address in
+        DrawComposite".
+
         * coders/*.c: Check the return status from TransformColorspace()
         and GetImageCharacteristics() and attempt to perform appropriate
         error handling. These are complex functions which may fail, and
