@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -878,7 +878,9 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   else
     image->colorspace=YCCColorspace;
   /* FIXME: YCCColorspace transform is broken! 1.1 is ok! */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowException(exception,CoderError,UnableToTransformColorspace,
+                   image->filename);
   if ((rotate == 1) || (rotate == 3))
     {
       double
@@ -1091,7 +1093,13 @@ static unsigned int WritePCDTile(const ImageInfo *image_info,
                           tile_geometry,
                           image->columns, image->rows);
   (void) TransformImage(&tile_image,(char *) NULL,tile_geometry);
-  (void) TransformColorspace(tile_image,YCCColorspace);
+  if (TransformColorspace(tile_image,YCCColorspace) == MagickFail)
+    {
+      ThrowException(&image->exception,CoderError,UnableToTransformColorspace,
+                     image->filename);
+      DestroyImage(tile_image);
+      return(MagickFail);
+    }
   downsample_image=ResizeImage(tile_image,tile_image->columns/2,
     tile_image->rows/2,TriangleFilter,1.0,&image->exception);
   if (downsample_image == (Image *) NULL)
@@ -1181,7 +1189,8 @@ static MagickPassFail WritePCDImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,pcd_image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,pcd_image);
-  (void) TransformColorspace(pcd_image,RGBColorspace);
+  if (TransformColorspace(pcd_image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,pcd_image);
   /*
     Write PCD image header.
   */

@@ -2875,7 +2875,8 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
                               "  Transforming colorspace from %s to %s",
                               ColorspaceTypeToString(image->colorspace),
                               ColorspaceTypeToString(image_info->colorspace));
-      (void) TransformColorspace(image,image_info->colorspace);
+      if (TransformColorspace(image,image_info->colorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     }
 
   /*
@@ -2895,7 +2896,8 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "  Transforming colorspace from %s to RGB",
                               ColorspaceTypeToString(image->colorspace));
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     }
 
   /*

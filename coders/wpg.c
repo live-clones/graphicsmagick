@@ -2186,7 +2186,8 @@ static MagickPassFail WriteWPGImage(const ImageInfo *image_info, Image *image)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   WPG_RLE_Init(&PackRLE);
 
-  (void)TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
   if ((image->storage_class == DirectClass) ||
       ((image->storage_class == PseudoClass) && (image->colors<=0 || image->colors>256)))

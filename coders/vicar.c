@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -428,7 +428,8 @@ static unsigned int WriteVICARImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Write header.
   */

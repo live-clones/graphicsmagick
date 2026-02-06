@@ -1714,7 +1714,8 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
           /*
             Make sure that image is in an RGB type space.
           */
-          (void) TransformColorspace(image,RGBColorspace);
+          if (TransformColorspace(image,RGBColorspace) == MagickFail)
+            ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
           /*
             Analyze image to be written.
@@ -1722,10 +1723,7 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
           if (!GetImageCharacteristics(image,&characteristics,
                                        (OptimizeType == image_info->type),
                                        &image->exception))
-            {
-              CloseBlob(image);
-              return MagickFail;
-            }
+            ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
 
           if ((characteristics.monochrome) &&
               (image_info->type != GrayscaleType) &&
@@ -1906,7 +1904,8 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
             /*
               Make sure that image is in an RGB type space.
             */
-            (void) TransformColorspace(image,RGBColorspace);
+            if (TransformColorspace(image,RGBColorspace) == MagickFail)
+              ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
             i=0;
             j=0;
@@ -1996,7 +1995,8 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
             /*
               Make sure that image is in an RGB type space.
             */
-            (void) TransformColorspace(image,RGBColorspace);
+            if (TransformColorspace(image,RGBColorspace) == MagickFail)
+              ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
             i=0;
             j=0;

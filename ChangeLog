@@ -1,3 +1,10 @@
+2026-02-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/*.c: Check the return status from TransformColorspace()
+        and GetImageCharacteristics() and attempt to perform appropriate
+        error handling. These are complex functions which may fail, and
+        the failure should handled immediately.
+
 2026-02-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/xpm.c (WritePICONImage): Add full error checking, and

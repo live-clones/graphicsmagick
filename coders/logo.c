@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Parts Copyright (c) 1985-1988 by Supoj Sutanthavibul
 % Parts Copyright (c) 1989-2000 by Brian V. Smith
 % Parts Copyright (c) 1991 by Paul King
@@ -5269,15 +5269,16 @@ static unsigned int WriteLOGOImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  logo_image=CloneImage(image,0,0,True,&image->exception);
-  if (logo_image == (Image *) NULL)
-    ThrowWriterException2(ResourceLimitError,image->exception.reason,image);
   /*
     Analyze image to be written.
   */
-  (void) GetImageCharacteristics(logo_image,&characteristics,
-                                 (OptimizeType == image_info->type),
-                                 &image->exception);
+  if (GetImageCharacteristics(image,&characteristics,
+                              (OptimizeType == image_info->type),
+                              &image->exception) == MagickFail)
+    ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
+  logo_image=CloneImage(image,0,0,True,&image->exception);
+  if (logo_image == (Image *) NULL)
+    ThrowWriterException2(ResourceLimitError,image->exception.reason,image);
   if ((characteristics.monochrome) &&
       (logo_image->columns*logo_image->rows < 4097))
     {

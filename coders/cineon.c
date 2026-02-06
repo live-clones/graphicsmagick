@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -1191,7 +1191,8 @@ static unsigned int WriteCINEONImage(const ImageInfo *image_info,Image *image)
     Cineon files are written in Cineon Log color space.
   */
   if (image->colorspace != CineonLogRGBColorspace)
-    (void) TransformColorspace(image,CineonLogRGBColorspace);
+    if (TransformColorspace(image,CineonLogRGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
 #if !defined(WORDS_BIGENDIAN)
   swab=MagickTrue;

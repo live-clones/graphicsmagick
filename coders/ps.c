@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -727,7 +727,15 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
     /*
       Scale image to size of Postscript page.
     */
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    /*
+      Analyze image to be written.
+    */
+    if (GetImageCharacteristics(image,&characteristics,
+                                (OptimizeType == image_info->type),
+                                &image->exception) == MagickFail)
+      ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
     text_size=0;
     attribute=GetImageAttribute(image,"label");
     if (attribute != (const ImageAttribute *) NULL)
@@ -1259,12 +1267,6 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
     i=0;
     index=0;
     x=0;
-    /*
-      Analyze image to be written.
-    */
-    (void) GetImageCharacteristics(image,&characteristics,
-                                   (OptimizeType == image_info->type),
-                                   &image->exception);
     if ((image_info->type != TrueColorType) &&
         (characteristics.grayscale))
       {

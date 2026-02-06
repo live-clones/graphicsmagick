@@ -2455,9 +2455,15 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
     if (((image_info->colorspace != UndefinedColorspace) ||
          (image->colorspace != CMYKColorspace)) &&
          (image_info->colorspace != CMYKColorspace))
-      (void) TransformColorspace(image,RGBColorspace);
+      {
+        if (TransformColorspace(image,RGBColorspace) == MagickFail)
+          ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      }
     else
-      (void) TransformColorspace(image,CMYKColorspace);
+      {
+        if (TransformColorspace(image,CMYKColorspace) == MagickFail)
+          ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      }
     /*
       Valid depths are 8/16/32
     */

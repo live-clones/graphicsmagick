@@ -895,34 +895,26 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
   */
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == MagickFail)
-    return status;
+    ThrowWriterException(CoderError,UnableToOpenFile,image);
   /*
     Ensure that image is in an RGB space.
   */
   if (TransformColorspace(image,RGBColorspace) == MagickFail)
-    {
-      CloseBlob(image);
-      return MagickFail;
-    }
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Analyze image to be written.
   */
   if (!GetImageCharacteristics(image,&characteristics,
                                (OptimizeType == image_info->type),
                                &image->exception))
-    {
-      CloseBlob(image);
-      return MagickFail;
-    }
+    ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
+
   SetGeometry(image,&geometry);
   (void) GetMagickGeometry(PiconGeometry,&geometry.x,&geometry.y,
     &geometry.width,&geometry.height);
   picon=ThumbnailImage(image,geometry.width,geometry.height,&image->exception);
   if (picon == (Image *) NULL)
-    {
-      CloseBlob(image);
-      return MagickFail;
-    }
+      ThrowWriterException(CoderError,UnableToResizeImage,image);
   if ((image_info->type != TrueColorType) &&
       (characteristics.grayscale))
     map=BlobToImage(image_info,Graymap,GraymapExtent,&image->exception);
@@ -932,7 +924,7 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
     {
       DestroyImage(picon);
       picon=(Image *) NULL;
-      CloseBlob(image);
+      ThrowWriterException(CoderError,UnableToDecodeImage,image);
       return MagickFail;
     }
   status=MapImage(picon,map,image_info->dither);
@@ -973,20 +965,18 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
           }
           if (picon->exception.severity >= ErrorException)
             {
-              GetImageException(picon,&image->exception);
+              CopyException(&picon->exception,&image->exception);
               DestroyImage(picon);
               picon=(Image *) NULL;
-              CloseBlob(image);
-              return MagickFail;
+              ThrowWriterException(CoderError,UnableToSetImageOpacity,image);
             }
         }
       if (SetImageType(picon,PaletteType) == MagickFail)
         {
-          GetImageException(picon,&image->exception);
+          CopyException(&picon->exception,&image->exception);
           DestroyImage(picon);
           picon=(Image *) NULL;
-          CloseBlob(image);
-          return MagickFail;
+          ThrowWriterException(CoderError,UnableToSetImageType,image);
         }
     }
   colors=picon->colors;
@@ -1022,11 +1012,10 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
       }
       if (picon->exception.severity >= ErrorException)
         {
-          GetImageException(picon,&image->exception);
+          CopyException(&picon->exception,&image->exception);
           DestroyImage(picon);
           picon=(Image *) NULL;
-          CloseBlob(image);
-          return MagickFail;
+          ThrowWriterException(CoderError,UnableToSetImageOpacity,image);
         }
     }
   /*
@@ -1202,7 +1191,8 @@ static unsigned int WriteXPMImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Limit color resolution to what XPM can traditionally handle
   */

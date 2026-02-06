@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -172,7 +172,9 @@ static Image *ReadUYVYImage(const ImageInfo *image_info,
         break;
   }
   image->colorspace=YCbCrColorspace;
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowException(exception,CoderError,UnableToTransformColorspace,
+                   image->filename);
   if (EOFBlob(image))
     ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
       image->filename);
@@ -326,7 +328,8 @@ static unsigned int WriteUYVYImage(const ImageInfo *image_info,Image *image)
     Convert to YUV, at full resolution.
   */
   original_colorspace=image->colorspace;
-  (void) TransformColorspace(image,YCbCrColorspace);
+  if (TransformColorspace(image,YCbCrColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Accumulate two pixels, then output.
   */
@@ -363,7 +366,8 @@ static unsigned int WriteUYVYImage(const ImageInfo *image_info,Image *image)
   /*
     Restore colorspace
   */
-  (void) TransformColorspace(image,original_colorspace);
+  if (TransformColorspace(image,original_colorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   status &= CloseBlob(image);
   return(status);
 }

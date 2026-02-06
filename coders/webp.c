@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2013-2025 GraphicsMagick Group
+% Copyright (C) 2013-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -652,7 +652,8 @@ static unsigned int WriteWEBPImage(const ImageInfo *image_info,Image *image)
   /*
     Make sure that image is in an RGB type space and DirectClass.
   */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   image->storage_class=DirectClass;
   picture.use_argb = 1;
 

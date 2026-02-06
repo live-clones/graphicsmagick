@@ -1088,7 +1088,8 @@ static unsigned int WritePCXImage(const ImageInfo *image_info,Image *image)
     /*
       Ensure that image is in RGB space.
     */
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowPCXWriterException(CoderError,UnableToTransformColorspace,image);
     /*
       Analyze image to be written.
     */

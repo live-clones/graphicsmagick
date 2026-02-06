@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1482,7 +1482,8 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   /*
     Ensure that image is in RGB space.
   */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
   /*
     PGX format requires a grayscale representation

@@ -1470,7 +1470,10 @@ OptimizePALMImage(const ImageInfo *image_info,
             Make sure that image is in an RGB type space.
           */
           if (TransformColorspace(palm_image,RGBColorspace) == MagickFail)
-            break;
+            {
+              ThrowException(CoderError,UnableToTransformColorspace,image);
+              break;
+            }
 
           /*
             Map optimize image to colormap without dithering.
@@ -1562,7 +1565,10 @@ OptimizePALMImage(const ImageInfo *image_info,
                 Make sure that image is in an RGB type space.
               */
               if (TransformColorspace(palm_image,RGBColorspace) == MagickFail)
-                break;
+                {
+                  ThrowException(CoderError,UnableToTransformColorspace,image);
+                  break;
+                }
 
               GetQuantizeInfo(&quantize_info);
               quantize_info.number_colors=256;
@@ -1621,9 +1627,11 @@ OptimizePALMImage(const ImageInfo *image_info,
           /*
             Make sure that image is in an RGB type space.
           */
-          if (!TransformColorspace(palm_image,RGBColorspace))
-            break;
-
+          if (TransformColorspace(palm_image,RGBColorspace) == MagickFail)
+            {
+              ThrowException(CoderError,UnableToTransformColorspace,image);
+              break;
+            }
 
           if (palm_image->storage_class == PseudoClass)
             {

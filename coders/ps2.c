@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -440,6 +440,14 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
       characteristics;
 
     /*
+      Analyze image to be written.
+    */
+    if (GetImageCharacteristics(image,&characteristics,
+                                (OptimizeType == image_info->type),
+                                &image->exception) == MagickFail)
+      ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
+
+    /*
       Scale image to size of Postscript page.
     */
     text_size=0;
@@ -813,12 +821,6 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
       }
     number_pixels=image->columns*image->rows;
 
-    /*
-      Analyze image to be written.
-    */
-    (void) GetImageCharacteristics(image,&characteristics,
-                                   (OptimizeType == image_info->type),
-                                   &image->exception);
     if ((compression == FaxCompression) ||
         ((image_info->type != TrueColorType) &&
          (characteristics.grayscale)))

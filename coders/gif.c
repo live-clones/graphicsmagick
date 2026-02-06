@@ -1455,7 +1455,8 @@ static MagickPassFail WriteGIFImage(const ImageInfo *image_info,Image *image)
   scene=0;
   do
   {
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     if ((image->storage_class == DirectClass) || (image->colors > 256))
       {
         /*

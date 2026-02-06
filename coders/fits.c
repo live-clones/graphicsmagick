@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -875,10 +875,7 @@ static MagickPassFail WriteFITSImage(const ImageInfo *image_info,Image *image)
   if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   if (TransformColorspace(image,RGBColorspace) == MagickFail)
-    {
-      CloseBlob(image);
-      return MagickFail;
-    }
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
   ExportPixelAreaOptionsInit(&export_options);
   export_options.endian = MSBEndian;

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -951,7 +951,8 @@ static unsigned int WriteFPXImage(const ImageInfo *image_info,Image *image)
 
   (void) memset(&summary_info,0,sizeof(summary_info));
   image->depth=8;
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   tile_width=64;
   tile_height=64;
   colorspace.numberOfComponents=3;

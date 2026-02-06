@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -231,7 +231,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   CloseBlob(image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   clone_info=CloneImageInfo(image_info);
   clone_info->quality=0;
   colors=2;
@@ -350,7 +351,9 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
         GetQuantizeInfo(&quantize_info);
         FormatString(factor,"%lu",colors);
         FormatString(label,"colors %.1024s",factor);
-        (void) TransformColorspace(preview_image,GRAYColorspace);
+        if (TransformColorspace(preview_image,GRAYColorspace) == MagickFail)
+          ThrowException(&image->exception,CoderError,UnableToTransformColorspace,
+                         image->filename);
         quantize_info.number_colors=colors;
         quantize_info.colorspace=GRAYColorspace;
         quantize_info.dither=image_info->dither;

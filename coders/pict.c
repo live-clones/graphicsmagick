@@ -2245,7 +2245,8 @@ static unsigned int WritePICTImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowPICTWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowPICTWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Initialize image info.
   */

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -5646,10 +5646,20 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
       */
       if ((image_info->type != UndefinedType) &&
           (image_info->type != OptimizeType))
-        (void) SetImageType(image,image_info->type);
+        {
+          (void) SetImageType(image,image_info->type);
+        }
       else if (!IsCMYKColorspace(image->colorspace) &&
                (!IsRGBColorspace(image->colorspace)))
-        (void) TransformColorspace(image,RGBColorspace);
+        {
+          if (TransformColorspace(image,RGBColorspace) == MagickFail)
+            {
+              ThrowException(&image->exception,CoderError,UnableToTransformColorspace,
+                             image->filename);
+              status=MagickFail;
+              break;
+            }
+        }
 
       /*
         Analyze image to be written.
@@ -5658,6 +5668,8 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                                    (OptimizeType == image_info->type),
                                    &image->exception))
         {
+          ThrowException(&image->exception,CoderError,UnableToGetImageCharacteristics,
+                         image->filename);
           status=MagickFail;
           break;
         }

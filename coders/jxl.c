@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2023-2025 GraphicsMagick Group
+% Copyright (C) 2023-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -1279,7 +1279,10 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
     (void) SetImageType(image,image_info->type);
   else if (!IsCMYKColorspace(image->colorspace) &&
            (!IsRGBColorspace(image->colorspace)))
-    (void) TransformColorspace(image,RGBColorspace);
+    {
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
 
   /*
     Analyze image to be written.

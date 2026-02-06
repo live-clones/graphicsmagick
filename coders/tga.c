@@ -1099,14 +1099,16 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
       /*
         Convert colorspace to an RGB-compatible type.
       */
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
       /*
         Analyze image to be written.
       */
-      (void) GetImageCharacteristics(image,&characteristics,
-                                     (OptimizeType == image_info->type),
-                                     &image->exception);
+      if (GetImageCharacteristics(image,&characteristics,
+                                  (OptimizeType == image_info->type),
+                                  &image->exception) == MagickFail)
+        ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
 
       /*
         If some other type has not been requested and the image is

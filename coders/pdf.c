@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -823,9 +823,10 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
       /*
         Analyze image properties.
       */
-      (void) GetImageCharacteristics(image,&characteristics,
-                                     (OptimizeType == image_info->type),
-                                     &image->exception);
+      if (GetImageCharacteristics(image,&characteristics,
+                                  (OptimizeType == image_info->type),
+                                  &image->exception) == MagickFail)
+        ThrowPDFWriterException(CoderError,UnableToGetImageCharacteristics,image);
 
       compression=image->compression;
       if (image_info->compression != UndefinedCompression)

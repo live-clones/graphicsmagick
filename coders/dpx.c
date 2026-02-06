@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2005-2025 GraphicsMagick Group
+% Copyright (C) 2005-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -3034,7 +3034,9 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (IsYCbCrColorspace(image->colorspace) &&
       (transfer_characteristic == TransferCharacteristicPrintingDensity))
     {
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowException(exception,CoderError,UnableToTransformColorspace,
+                       image->filename);
       image->colorspace=CineonLogRGBColorspace;
     }
 
@@ -3795,30 +3797,54 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
   */
   if ((image_info->colorspace == CineonLogRGBColorspace) &&
       (image->colorspace != CineonLogRGBColorspace))
-    (void) TransformColorspace(image,CineonLogRGBColorspace);
+    {
+      if (TransformColorspace(image,CineonLogRGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec601LumaColorspace) &&
            (image->colorspace != Rec601LumaColorspace))
-    (void) TransformColorspace(image,Rec601LumaColorspace);
+    {
+      if (TransformColorspace(image,Rec601LumaColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec601YCbCrColorspace) &&
            (image->colorspace != Rec601YCbCrColorspace))
-    (void) TransformColorspace(image,Rec601YCbCrColorspace);
+    {
+      if (TransformColorspace(image,Rec601YCbCrColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == YCbCrColorspace) &&
            (image->colorspace != Rec601YCbCrColorspace))
-    (void) TransformColorspace(image,Rec601YCbCrColorspace);
+    {
+      if (TransformColorspace(image,Rec601YCbCrColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec709LumaColorspace) &&
            (image->colorspace != Rec709LumaColorspace))
-    (void) TransformColorspace(image,Rec709LumaColorspace);
+    {
+      if (TransformColorspace(image,Rec709LumaColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec709YCbCrColorspace) &&
            (image->colorspace != Rec709YCbCrColorspace))
-    (void) TransformColorspace(image,Rec709YCbCrColorspace);
+    {
+      if (TransformColorspace(image,Rec709YCbCrColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if (IsRGBColorspace(image_info->colorspace) &&
            !IsRGBColorspace(image->colorspace))
-    (void) TransformColorspace(image,RGBColorspace);
+    {
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if (!IsRGBColorspace(image->colorspace) &&
            (image->colorspace != CineonLogRGBColorspace) &&
            (image->colorspace != Rec601YCbCrColorspace) &&
            (image->colorspace != Rec709YCbCrColorspace))
-    (void) TransformColorspace(image,RGBColorspace);
+    {
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
 
   /*
     Compute desired/necessary number of bits per sample.
@@ -4336,7 +4362,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
     Allocate row samples.
   */
   samples=MagickAllocateResourceLimitedArray(sample_t *,image->columns,
-                              max_samples_per_pixel*sizeof(sample_t));
+                                             max_samples_per_pixel*sizeof(sample_t));
   if (samples == (sample_t *) NULL)
     ThrowDPXWriterException(ResourceLimitError,MemoryAllocationFailed,image);
   (void) memset((void *) samples,0,(size_t) max_samples_per_pixel*image->columns*

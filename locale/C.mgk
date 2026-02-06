@@ -234,8 +234,14 @@
       <Message name="UnableToCreateADC">
         Unable to create a DC
       </Message>
+      <Message name="UnableToDecodeImage">
+        Unable to decode image
+      </Message>
       <Message name="UnableToDecompressImage">
         Unable to decompress image
+      </Message>
+      <Message name="UnableToOpenFile">
+        Unable to open file
       </Message>
       <Message name="UnableToReadCIELABImages">
         Unable to read CIELAB images
@@ -245,6 +251,9 @@
       </Message>
       <Message name="UnableToReadSummaryInfo">
         Unable to read summary info
+      </Message>
+      <Message name="UnableToResizeImage">
+        Unable to resize image
       </Message>
       <Message name="UnableToSetAffineMatrix">
         Unable to set affine matrix
@@ -267,6 +276,9 @@
       <Message name="UnableToSetImageTitle">
         Unable to set image title
       </Message>
+      <Message name="UnableToSetImageType">
+        Unable to set image type
+      </Message>
       <Message name="UnableToSetJPEGLevel">
         Unable to set JPEG level
       </Message>
@@ -275,6 +287,9 @@
       </Message>
       <Message name="UnableToSetSummaryInfo">
         Unable to set summary info
+      </Message>
+      <Message name="UnableToSetImageOpacity">
+        Unable to set image opacity
       </Message>
       <Message name="UnableToTranslateText">
         Unable to translate text
@@ -329,6 +344,12 @@
       </Message>
       <Message name="WebPInvalidParameter">
         WebP failed: invalid parameter
+      </Message>
+      <Message name="UnableToGetImageCharacteristics">
+        Unable to get image characteristics
+      </Message>
+      <Message name="UnableToTransformColorspace">
+        Unable to transform image colorspace
       </Message>
       <Message name="UnableToWriteTemporaryFile">
         Unable to write to temporary file

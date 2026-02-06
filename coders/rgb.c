@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -728,7 +728,8 @@ static unsigned int WriteRGBImage(const ImageInfo *image_info,Image *image)
     /*
       Convert MIFF to RGB raster pixels.
     */
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     if (LocaleCompare(image_info->magick,"RGBA") == 0)
       if (!image->matte)
         SetImageOpacity(image,OpaqueOpacity);

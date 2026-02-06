@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -620,12 +620,6 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
   do
   {
     /*
-      Allocate scanline
-    */
-    scanline=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->columns);
-    if (scanline == (unsigned char *) NULL)
-      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-    /*
       Transform to target color space
     */
     switch (quantum_type)
@@ -635,17 +629,27 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
       case YellowQuantum:
       case BlackQuantum:
         {
-          (void) TransformColorspace(image,CMYKColorspace);
+          if (TransformColorspace(image,CMYKColorspace) == MagickFail)
+            ThrowWriterException(CoderError,UnableToTransformColorspace,image);
           break;
         }
       default:
         {
-          (void) TransformColorspace(image,RGBColorspace);
+          if (TransformColorspace(image,RGBColorspace) == MagickFail)
+            ThrowWriterException(CoderError,UnableToTransformColorspace,image);
         }
       }
     if (!(image->matte) &&
         ((quantum_type == GrayAlphaQuantum) || (quantum_type == AlphaQuantum)))
       (void) SetImageOpacity(image,OpaqueOpacity);
+
+    /*
+      Allocate scanline
+    */
+    scanline=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->columns);
+    if (scanline == (unsigned char *) NULL)
+      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+
     /*
       Initialize export options.
     */

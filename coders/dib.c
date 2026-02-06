@@ -1307,7 +1307,8 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
   /*
     Ensure that image is in an RGB space.
   */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Analyze image to be written.
   */

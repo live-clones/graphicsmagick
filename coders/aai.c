@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2024-2025 GraphicsMagick Group
+% Copyright (C) 2024-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -280,7 +280,9 @@ static unsigned int WriteAAIImage(const ImageInfo *image_info,Image *image)
       /*
         Write AAI header.
       */
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+
       (void) WriteBlobLSBLong(image,image->columns);
       (void) WriteBlobLSBLong(image,image->rows);
       /*

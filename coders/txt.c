@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1258,7 +1258,8 @@ static unsigned int WriteTXTImage(const ImageInfo *image_info,Image *image)
       unsigned int
         depth;
 
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
       if (image->depth <= 8)
         depth=8;
       else if (image->depth <= 16)
