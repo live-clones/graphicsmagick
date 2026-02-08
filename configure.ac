@@ -548,10 +548,11 @@ if test "$with_symbol_prefix" != 'no' ; then
   DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --enable-symbol-prefix "
 fi
 
-# Enable ImageMagick utilities compatibility shortcuts (default no)
+# Enable ImageMagick (version 6 and earlier) utilities compatibility shortcuts (default no)
+# ImageMagick 7 provides only a single 'magick' program.
 AC_ARG_ENABLE([magick-compat],
               AS_HELP_STRING([--enable-magick-compat],
-                             [install ImageMagick utility shortcuts]),
+                             [install ImageMagick (v6 and earlier) utility shortcuts]),
               [with_magick_compat=$enableval],
               [with_magick_compat='no'])
 AM_CONDITIONAL([MAGICK_COMPAT],[test "$with_magick_compat" != 'no'])
@@ -689,7 +690,7 @@ fi
 # Disable HEIF.
 AC_ARG_WITH([heif],
         AS_HELP_STRING([--without-heif],
-                             [disable HEIF support]),
+                             [disable HEIF (e.g. AVCI, AVIF, HEIC, MP4) support]),
         [with_heif=$withval],
         [with_heif='yes'])
 if test "$with_heif" != 'yes' ; then
@@ -776,7 +777,7 @@ fi
 # Enable TRIO.
 AC_ARG_WITH([trio],
               AS_HELP_STRING([--with-trio],
-                             [enable TRIO support]),
+                             [enable TRIO (C'99 printf/scanf) support]),
               [with_trio=$withval],
               [with_trio='no'])
 if test "$with_trio" != 'no' ; then
@@ -862,10 +863,10 @@ if test "$with_fontpath=" != '' ; then
   DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --with-fontpath=$with_fontpath "
 fi
 
-# Set Ghostscript font directory
+# Set legacy Ghostscript font directory
 AC_ARG_WITH([gs-font-dir],
               AS_HELP_STRING([--with-gs-font-dir=DIR],
-                             [directory containing Ghostscript fonts]),
+                             [directory containing legacy Ghostscript fonts (type-ghostscript.mgk)]),
               [with_gs_font_dir=$withval],
               [with_gs_font_dir='default'])
 if test "$with_gs_font_dir" != 'default' ; then
@@ -885,7 +886,7 @@ fi
 # Set Windows font directory
 AC_ARG_WITH([windows-font-dir],
               AS_HELP_STRING([--with-windows-font-dir=DIR],
-                             [directory containing MS-Windows fonts]),
+                             [directory containing MS-Windows XP fonts (type-windows.mgk)]),
               [with_windows_font_dir=$withval],
               [with_windows_font_dir=''])
 if test "$with_windows_font_dir" != '' ; then

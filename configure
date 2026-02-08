@@ -1852,7 +1852,8 @@ Optional Features:
   --enable-gprof          enable 'gprof' profiling support
   --enable-gcov           enable 'gcov' profiling support
   --enable-symbol-prefix  enable prefixing library symbols with "Gm"
-  --enable-magick-compat  install ImageMagick utility shortcuts
+  --enable-magick-compat  install ImageMagick (v6 and earlier) utility
+                          shortcuts
   --enable-quantum-library-names
                           shared library name includes quantum depth to allow
                           shared libraries with different quantum depths to
@@ -1883,7 +1884,7 @@ Optional Packages:
   --without-gs            disable Ghostscript support
   --without-jbig          disable JBIG support
   --without-webp          disable WEBP support
-  --without-heif          disable HEIF support
+  --without-heif          disable HEIF (e.g. AVCI, AVIF, HEIC, MP4) support
   --without-jpeg          disable JPEG support
   --without-jp2           disable JPEG v2 support
   --without-jxl           disable JPEG-XL support
@@ -1891,7 +1892,7 @@ Optional Packages:
   --without-lzma          disable LZMA support
   --without-png           disable PNG support
   --without-tiff          disable TIFF support
-  --with-trio             enable TRIO support
+  --with-trio             enable TRIO (C'99 printf/scanf) support
   --without-ttf           disable TrueType support
   --without-libzip        disable libzip support
   --with-tcmalloc         enable Google perftools tcmalloc (minimal) memory
@@ -1902,11 +1903,13 @@ Optional Packages:
                           support
   --without-wmf           disable WMF support
   --with-fontpath=DIR     prepend to default font search path
-  --with-gs-font-dir=DIR  directory containing Ghostscript fonts
+  --with-gs-font-dir=DIR  directory containing legacy Ghostscript fonts
+                          (type-ghostscript.mgk)
   --with-urwbase35otf-font-dir=DIR
                           directory containing Artifex URW Base35 OTF fonts
   --with-windows-font-dir=DIR
-                          directory containing MS-Windows fonts
+                          directory containing MS-Windows XP fonts
+                          (type-windows.mgk)
   --without-xml           disable XML support
   --without-zlib          disable ZLIB support
   --without-zstd          disable Zstd support
@@ -22510,7 +22513,8 @@ printf "%s\n" "#define PREFIX_MAGICK_SYMBOLS 1" >>confdefs.h
   DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --enable-symbol-prefix "
 fi
 
-# Enable ImageMagick utilities compatibility shortcuts (default no)
+# Enable ImageMagick (version 6 and earlier) utilities compatibility shortcuts (default no)
+# ImageMagick 7 provides only a single 'magick' program.
 # Check whether --enable-magick-compat was given.
 if test ${enable_magick_compat+y}
 then :
@@ -22979,7 +22983,7 @@ if test "$with_fontpath=" != '' ; then
   DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --with-fontpath=$with_fontpath "
 fi
 
-# Set Ghostscript font directory
+# Set legacy Ghostscript font directory
 
 # Check whether --with-gs-font-dir was given.
 if test ${with_gs_font_dir+y}

@@ -1,3 +1,14 @@
+2026-02-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/INSTALL-unix.rst: Describe configure options in the same
+        order produced by "./configure --help". Clarify the descriptions
+        for some options. Update OS distribution package lists.
+
+        * configure.ac: Clarifications for help output messages.
+
+        * config/type-windows.mgk.in: Add a comment that this file is for
+        Windows XP font names.
+
 2026-02-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/wmf.c (RegisterWMFImage): Register WMF to be in the
