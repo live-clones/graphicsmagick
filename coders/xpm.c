@@ -667,7 +667,7 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Failed to transfer required"
-                                " number of pixels (%lu vs %lu)",pixels,expected_pixels);
+                                " number of pixels (%zu vs %zu)",pixels,expected_pixels);
           ThrowXPMReaderException(CorruptImageError,CorruptImage,
                                   image);
         }
