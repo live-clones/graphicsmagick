@@ -1,4 +1,17 @@
+2026-02-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * config/config.guess, config/config.sub: Update to latest.
+
+        * fuzzing/README.txt: Add notes about configuring and building
+        Jasper.
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Fully specify available build
+        options to Jasper's cmake.
+
 2026-02-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Add -DVVENC_ENABLE_WERROR=0
+        to the vvenc cmake arguments.
 
         * coders/xpm.c (ReadXPMImage): Fix the log message formatter for
         pixels.

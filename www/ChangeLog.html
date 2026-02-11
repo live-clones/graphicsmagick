@@ -38,9 +38,21 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-02-11  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>config/config.guess, config/config.sub: Update to latest.</p></li>
+<li><p>fuzzing/README.txt: Add notes about configuring and building
+Jasper.</p></li>
+<li><p>fuzzing/oss-fuzz-build.sh (BUILD): Fully specify available build
+options to Jasper's cmake.</p></li>
+</ul>
+</blockquote>
 <p>2026-02-09  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>fuzzing/oss-fuzz-build.sh (BUILD): Add -DVVENC_ENABLE_WERROR=0
+to the vvenc cmake arguments.</p></li>
 <li><p>coders/xpm.c (ReadXPMImage): Fix the log message formatter for
 pixels.</p></li>
 </ul>
