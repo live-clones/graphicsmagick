@@ -120,6 +120,51 @@ Building A Starter Corpus
 --------------------------
 
 
+Building dependencies for development
+-------------------------------------
+
+Jasper
+++++++
+
+  git clone https://github.com/jasper-software/jasper.git jasper
+
+  rm -rf ~/build/jasper
+  mkdir -p ~/build/jasper
+  cd ~/build/jasper
+  cmake -G "Unix Makefiles" -H"$SRC/jasper" \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER=g++ \
+              -DCMAKE_CXX_FLAGS='-O -g' \
+              -DCMAKE_C_COMPILER=gcc \
+              -DCMAKE_C_FLAGS='-O -g' \
+              -DCMAKE_INSTALL_RPATH='/usr/local/lib'\
+              -DCMAKE_INSTALL_PREFIX=/usr/local \
+              -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+              -DBUILD_SHARED_LIBS=on \
+              -DJAS_ENABLE_LIBHEIF=true \
+              -DJAS_ENABLE_LIBJPEG=true \
+              -DJAS_ENABLE_OPENGL=true \
+              -DJAS_ENABLE_PROGRAMS=true \
+              -DJAS_ENABLE_SHARED=true \
+              -DJAS_ENABLE_BMP_CODEC=on \
+              -DJAS_ENABLE_HEIC_CODEC=on \
+              -DJAS_ENABLE_JP2_CODEC=on \
+              -DJAS_ENABLE_JPC_CODEC=on \
+              -DJAS_ENABLE_MIF_CODEC=off \
+              -DJAS_ENABLE_PGX_CODEC=on \
+              -DJAS_ENABLE_PNM_CODEC=on \
+              -DJAS_ENABLE_RAS_CODEC=on \
+              -DJAS_INCLUDE_BMP_CODEC=true \
+              -DJAS_INCLUDE_JP2_CODEC=true \
+              -DJAS_INCLUDE_JPC_CODEC=true \
+              -DJAS_INCLUDE_JPG_CODEC=true \
+              -DJAS_INCLUDE_MIF_CODEC=false \
+              -DJAS_INCLUDE_PGX_CODEC=true \
+              -DJAS_INCLUDE_PNM_CODEC=true \
+              -DJAS_INCLUDE_RAS_CODEC=true \
+              ~/src/jasper
+  make -j"$(nproc)"
+  make install
 
 Building libheif (and dependencies) for development
 ---------------------------------------------------
