@@ -902,10 +902,15 @@ then
             fi
 
             # The i386 build fails due to -Wshorten-64-to-32
+            #
+            # Adding -DVVENC_ENABLE_WERROR=0 to Cmake options keeps it
+            # from adding -Werror.
+
+            #CXX_FLAGS_EXTRA=''
+            #if [ "${ARCHITECTURE}" = i386 ] ; then
+            #    CXX_FLAGS_EXTRA=' -Wno-error=shorten-64-to-32'
+            #fi
             CXX_FLAGS_EXTRA=''
-            if [ "${ARCHITECTURE}" = i386 ] ; then
-                CXX_FLAGS_EXTRA=' -Wno-error=shorten-64-to-32'
-            fi
 
             # x86 SIMD intrinsics enabled (using SIMDE for non-x86 targets)
             cmake \
@@ -918,6 +923,7 @@ then
                 -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
                 -DBUILD_SHARED_LIBS=FALSE \
                 -DVVENC_ENABLE_X86_SIMD="${SIMD_ENABLE}" \
+                -DVVENC_ENABLE_WERROR=0 \
                 "${VVENC_SRC}"
 
             make -j"$(nproc)"
@@ -1030,11 +1036,22 @@ then
               -DJAS_ENABLE_LIBHEIF=false \
               -DJAS_ENABLE_LIBJPEG=false \
               -DJAS_ENABLE_OPENGL=false \
-              -DJAS_ENABLE_OPENGL=false \
+              -DJAS_ENABLE_PROGRAMS=false \
               -DJAS_ENABLE_SHARED=false \
+              -DJAS_ENABLE_BMP_CODEC=off \
+              -DJAS_ENABLE_HEIC_CODEC=off \
+              -DJAS_ENABLE_JP2_CODEC=on \
+              -DJAS_ENABLE_JPC_CODEC=on \
+              -DJAS_ENABLE_MIF_CODEC=off \
+              -DJAS_ENABLE_PGX_CODEC=on \
+              -DJAS_ENABLE_PNM_CODEC=off \
+              -DJAS_ENABLE_RAS_CODEC=off \
               -DJAS_INCLUDE_BMP_CODEC=false \
+              -DJAS_INCLUDE_JP2_CODEC=true \
+              -DJAS_INCLUDE_JPC_CODEC=true \
               -DJAS_INCLUDE_JPG_CODEC=false \
               -DJAS_INCLUDE_MIF_CODEC=false \
+              -DJAS_INCLUDE_PGX_CODEC=true \
               -DJAS_INCLUDE_PNM_CODEC=false \
               -DJAS_INCLUDE_RAS_CODEC=false \
               "${JASPER_SRC}"
