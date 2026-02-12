@@ -993,37 +993,70 @@ Building under MinGW-W64 & MSYS2
 --------------------------------
 
 GraphicsMagick may easily be built using the free `MSYS2
-<https://www.msys2.org/>`_ distribution which provides GCC compilers,
-libraries, and headers, targeting native Windows along with a
-Unix-like command shell and a package manager ('pacman') to install
+<https://www.msys2.org/>`_ distribution which provides GCC or Clang
+compilers, libraries, and headers, targeting native Windows along with
+a Unix-like command shell and a package manager ('pacman') to install
 pre-compiled components.  Using the pre-compiled packages, it is as
 easy to compile GraphicsMagick under MSYS2 as it is under Linux!
 
-When using MSYS2, requesting to install these packages using 'pacman
--S' should result in getting up to speed very quicky with a featureful
-64-bit build:
+When using MSYS2, installing developer packages using 'pacman' results
+in getting up to speed very quickly with a featureful 64-bit build.
 
-mingw-w64-x86_64-toolchain, mingw-w64-x86_64-bzip2,
-mingw-w64-x86_64-freetype, mingw-w64-x86_64-ghostscript,
-mingw-w64-x86_64-jasper, mingw-w64-x86_64-jbigkit,
-mingw-w64-x86_64-lcms2, mingw-w64-x86_64-libheif,
-mingw-w64-x86_64-libjpeg-turbo, mingw-w64-x86_64-libjxl,
-mingw-w64-x86_64-libpng, mingw-w64-x86_64-libtiff,
-mingw-w64-x86_64-libtool, mingw-w64-x86_64-libwebp,
-mingw-w64-x86_64-libwmf, mingw-w64-x86_64-libxml2,
-mingw-w64-x86_64-libzip, mingw-w64-x86_64-zlib,
+MSYS2 installs multiple build environments.  The original build
+environment based on the classic msvcrt.dll (works for Windows 7/8 and
+usually later) is called "MSYS2 MINGW64", and the modern build
+environment based on ucrtbase.dll (works for Windows 10/11) is called
+"MSYS2 UCRT64".  There are also build environments based on the Clang
+compiler ("MSYS2 CLANG64"), and targetting the ARM64 CPU ("MSYS2
+CLANGARM64").
 
-and/or use the following to add support for a 32-bit build:
+If support for older Windows is not needed, then targetting UCRT64
+will result in more performant, more reliable, and more capable
+software since ucrtbase.dll supports more/updated interfaces such as
+C'99 and does not require the "shim" wrapper layer that msvcrt.dll
+does.
 
-mingw-w64-i686-toolchain, mingw-w64-i686-bzip2,
-mingw-w64-i686-freetype, mingw-w64-i686-ghostscript,
-mingw-w64-i686-jasper, mingw-w64-i686-jbigkit,
-mingw-w64-i686-lcms2, mingw-w64-i686-libheif,
-mingw-w64-i686-libjpeg-turbo, mingw-w64-i686-libjxl,
-mingw-w64-i686-libpng, mingw-w64-i686-libtiff,
-mingw-w64-i686-libtool, mingw-w64-i686-libwebp,
-mingw-w64-i686-libwmf, mingw-w64-i686-libxml2,
-mingw-w64-i686-libzip, mingw-w64-i686-zlib,
+Packages targetting MINGW64 use an architecture specification of
+"mingw-w64-x86_64" in package names whereas packages targetting UCRT64
+use "mingw-w64-ucrt-x86_64".
+
+If you have not yet updated MSYS2 after the initial install, or have
+not updated for several months, then enter the MSYS2 shell, and update
+MSYS2 first using 'pacman -Syuu'. Once 'pacman -Syuu' completes, exit
+the MSYS2 shell, open a MSYS2 shell, and execute 'pacman -Syuu' again
+to ensure that all packages are up to date.
+
+Use 'pacman -S' to install packages.  The following package names are
+an example and should be ammended when targetting UCRT64, or other
+MSYS2 development target.
+
+These packages are needed for a complete 64-bit x86_64 build:
+
+base-devel mingw-w64-x86_64-autotools mingw-w64-x86_64-gcc
+mingw-w64-x86_64-toolchain mingw-w64-x86_64-bzip2
+mingw-w64-x86_64-freetype mingw-w64-x86_64-ghostscript
+mingw-w64-x86_64-jasper mingw-w64-x86_64-jbigkit
+mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libheif
+mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-libjxl
+mingw-w64-x86_64-libpng mingw-w64-x86_64-libtiff
+mingw-w64-x86_64-libtool mingw-w64-x86_64-libwebp
+mingw-w64-x86_64-libwmf mingw-w64-x86_64-libxml2
+mingw-w64-x86_64-libzip mingw-w64-x86_64-zlib
+
+And/or use the following to add support for a 32-bit i686 build:
+
+base-devel mingw-w64-i686-toolchain mingw-w64-i686-bzip2
+mingw-w64-i686-freetype mingw-w64-i686-ghostscript
+mingw-w64-i686-jasper mingw-w64-i686-jbigkit mingw-w64-i686-lcms2
+mingw-w64-i686-libheif mingw-w64-i686-libjpeg-turbo
+mingw-w64-i686-libjxl mingw-w64-i686-libpng mingw-w64-i686-libtiff
+mingw-w64-i686-libtool mingw-w64-i686-libwebp mingw-w64-i686-libwmf
+mingw-w64-i686-libxml2 mingw-w64-i686-libzip mingw-w64-i686-zlib
+
+If you would like to install Mercurial in order to access the
+GraphicsMagick source repository, then install 'mercurial'. If you
+would like to use Clang for development, then install
+'mingw-w64-clang-x86_64-toolchain.'
 
 Note that the default installation prefix is MSYS's notion of
 ``/usr/local`` which installs the package into a MSYS directory. To

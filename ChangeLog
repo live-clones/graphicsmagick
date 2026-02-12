@@ -1,3 +1,8 @@
+2026-02-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/INSTALL-unix.rst: Update documentation regarding using MSYS2
+        under Microsoft Windows.
+
 2026-02-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * config/config.guess, config/config.sub: Update to latest.
