@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to December 30, 2025.
+This file was last updated to reflect changes up to February 12, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -26,12 +26,11 @@ Special Issues:
 
 * GraphicsMagick needs some additional productive volunteers.  For
   several years now, the burden has entirely been on me (Bob
-  Friesenhahn).  I have been sheparding the project for 23 years
+  Friesenhahn).  I have been sheparding the project for 24 years
   already (and contributed to ImageMagick and GraphicsMagick combined
-  for 29 years already).  Volunteers are needed to add/improve
+  for 30 years already).  Volunteers are needed to add/improve
   new/existing file format support, and to assure correct operation on
-  all targets.  Donations are requested in order to purchase a new
-  computer to run Windows 11.
+  all targets.
 
 Security Fixes:
 
@@ -43,6 +42,12 @@ Bug fixes:
 
 * Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
   been present since 2003!
+
+* Magick++: If monochrome is disabled, then clear the image
+  is_monochrome flag if it is set.
+
+* Magick++: No longer throw a C++ exception from the MutexLock
+  destructor.
 
 * JP2: Fix a bug which caused lossless compression to not be engaged
   by '-define jp2:rate=1.0'.
@@ -94,6 +99,11 @@ Bug fixes:
 * PerlMagick: PerlMagick is now "const correct" and data which could
   be const is now declared as such.
 
+* MAT: Fix a memory leak.
+
+* XPM/PICON: Verify that the expected number of pixels were
+  transferred to the image.
+
 API Updates:
 
 * Wand API: Added the MagickSetBackgroundColor() function to support
@@ -102,7 +112,8 @@ API Updates:
 * Drawing API: DrawNewContext(), is a new function to allocate an
   empty drawing context.
 
-* Wand API: The wand/drawing_wand.c functions which duplicate code in magick/draw.c are gutted and replaced with calls into magick/draw.c.
+* Wand API: The wand/drawing_wand.c functions which duplicate code in
+  magick/draw.c are gutted and replaced with calls into magick/draw.c.
 
 New Features:
 
@@ -110,12 +121,16 @@ New Features:
   files which lack a newline character at the end of the last
   line.
 
-* HEIF (HEIC, AVIF, etc.): Memory limits and many more libheif
-  resource limits are now applied/available.
+* HEIF (HEIC, AVCI, AVIF, MP4, etc.): Memory limits and many more
+  libheif resource limits are now applied/available. Support reading
+  multiple image frames. Deduce file type by consulting
+  libheif. Support reading HEIF image from an in-memory BLOB, or
+  memory mapped file.
 
 * The 'convert' and 'mogrify' subcommands now support -remap, which is
   equivalent to -map.  This is to improve compatibility with
-  ImageMagick, which changed from -map to -remap after the fork.
+  ImageMagick, which changed from -map to -remap some time after the
+  GraphicsMagick fork in 2022.
 
 * Command arguments which currently accept "Opacity" now accept
   "Alpha" as a synonym.  This is to improve compatibility with
@@ -129,13 +144,24 @@ New Features:
   for the purpose of tracing, and to capture the source location where
   the allocation was made.
 
+* Resource limit for number of simultaneous images: Add an
+  'ImagesResource' limit and '-limit images' to place a limit on
+  discrete raster images which may be loaded into the program
+  simultaneously.  The resource which is limited is the number of
+  Image pixel cache stores with allocated pixels rather than
+  reference-counted "Image" handles.
+
 * WBMP: Support alternate file extensions "WBM" and "WBP".
+
+* OSS-Fuzz: The oss-fuzz build script is completely re-written and
+  supports building almost all of the available library dependencies.
 
 Behavior Changes:
 
 * Apple PICT: Older GraphicsMagick will be unable to read the PICT
   files that newer versions write, but newer GraphicsMagick can still
-  read files which were written in the broken format.
+  read files which were written by ImageMagick or GraphicsMagick in
+  the broken format.
 
 * C API: MagickRealloc() now behaves like standard realloc() and the
   MagickReallocMemory() macro takes responsibility for freeing the
@@ -149,9 +175,18 @@ Build Changes:
 
 * It is now supported to build the C code using C++.
 
+* PerlMagick can be built with C++.
+
 Windows Delegate Updates/Additions:
 
 * Installer: Do not attempt to execute vcredist_x64.exe.
+
+* Libtiff: Libtiff is updated to version 4.7.1.
+
+Other News:
+
+* A used laptop running Windows 11 has been contributed to the
+  project. Thank you very much for the contribution!
 
 1.3.46 (October 29, 2025)
 ===========================

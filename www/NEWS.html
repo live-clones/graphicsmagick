@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to December 30, 2025.</p>
+<p>This file was last updated to reflect changes up to February 12, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -109,12 +109,11 @@ release and not attempt to patch older releases.</p>
 <ul class="simple">
 <li><p>GraphicsMagick needs some additional productive volunteers.  For
 several years now, the burden has entirely been on me (Bob
-Friesenhahn).  I have been sheparding the project for 23 years
+Friesenhahn).  I have been sheparding the project for 24 years
 already (and contributed to ImageMagick and GraphicsMagick combined
-for 29 years already).  Volunteers are needed to add/improve
+for 30 years already).  Volunteers are needed to add/improve
 new/existing file format support, and to assure correct operation on
-all targets.  Donations are requested in order to purchase a new
-computer to run Windows 11.</p></li>
+all targets.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
@@ -126,6 +125,10 @@ computer to run Windows 11.</p></li>
 <ul class="simple">
 <li><p>Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
 been present since 2003!</p></li>
+<li><p>Magick++: If monochrome is disabled, then clear the image
+is_monochrome flag if it is set.</p></li>
+<li><p>Magick++: No longer throw a C++ exception from the MutexLock
+destructor.</p></li>
 <li><p>JP2: Fix a bug which caused lossless compression to not be engaged
 by '-define jp2:rate=1.0'.</p></li>
 <li><p>ModuleAliases: Added a mapping from magick &quot;MPRI&quot; to module
@@ -165,6 +168,9 @@ frame.</p></li>
 as 'static' which were accidentally left visible.</p></li>
 <li><p>PerlMagick: PerlMagick is now &quot;const correct&quot; and data which could
 be const is now declared as such.</p></li>
+<li><p>MAT: Fix a memory leak.</p></li>
+<li><p>XPM/PICON: Verify that the expected number of pixels were
+transferred to the image.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
@@ -172,18 +178,23 @@ be const is now declared as such.</p></li>
 setting the default background color.</p></li>
 <li><p>Drawing API: DrawNewContext(), is a new function to allocate an
 empty drawing context.</p></li>
-<li><p>Wand API: The wand/drawing_wand.c functions which duplicate code in magick/draw.c are gutted and replaced with calls into magick/draw.c.</p></li>
+<li><p>Wand API: The wand/drawing_wand.c functions which duplicate code in
+magick/draw.c are gutted and replaced with calls into magick/draw.c.</p></li>
 </ul>
 <p>New Features:</p>
 <ul class="simple">
 <li><p>PNM: Support reading PBM raw (P1), PGM raw (P2), and PPM raw (P3)
 files which lack a newline character at the end of the last
 line.</p></li>
-<li><p>HEIF (HEIC, AVIF, etc.): Memory limits and many more libheif
-resource limits are now applied/available.</p></li>
+<li><p>HEIF (HEIC, AVCI, AVIF, MP4, etc.): Memory limits and many more
+libheif resource limits are now applied/available. Support reading
+multiple image frames. Deduce file type by consulting
+libheif. Support reading HEIF image from an in-memory BLOB, or
+memory mapped file.</p></li>
 <li><p>The 'convert' and 'mogrify' subcommands now support -remap, which is
 equivalent to -map.  This is to improve compatibility with
-ImageMagick, which changed from -map to -remap after the fork.</p></li>
+ImageMagick, which changed from -map to -remap some time after the
+GraphicsMagick fork in 2022.</p></li>
 <li><p>Command arguments which currently accept &quot;Opacity&quot; now accept
 &quot;Alpha&quot; as a synonym.  This is to improve compatibility with
 ImageMagick</p></li>
@@ -193,13 +204,22 @@ ImageMagick.</p></li>
 <li><p>Resource Limited Memory: Added module, function, and line parameters
 for the purpose of tracing, and to capture the source location where
 the allocation was made.</p></li>
+<li><p>Resource limit for number of simultaneous images: Add an
+'ImagesResource' limit and '-limit images' to place a limit on
+discrete raster images which may be loaded into the program
+simultaneously.  The resource which is limited is the number of
+Image pixel cache stores with allocated pixels rather than
+reference-counted &quot;Image&quot; handles.</p></li>
 <li><p>WBMP: Support alternate file extensions &quot;WBM&quot; and &quot;WBP&quot;.</p></li>
+<li><p>OSS-Fuzz: The oss-fuzz build script is completely re-written and
+supports building almost all of the available library dependencies.</p></li>
 </ul>
 <p>Behavior Changes:</p>
 <ul class="simple">
 <li><p>Apple PICT: Older GraphicsMagick will be unable to read the PICT
 files that newer versions write, but newer GraphicsMagick can still
-read files which were written in the broken format.</p></li>
+read files which were written by ImageMagick or GraphicsMagick in
+the broken format.</p></li>
 <li><p>C API: MagickRealloc() now behaves like standard realloc() and the
 MagickReallocMemory() macro takes responsibility for freeing the
 original memory upon a reallocation failure.</p></li>
@@ -210,10 +230,17 @@ transparent. Previously, the image was always set to opaque.</p></li>
 <p>Build Changes:</p>
 <ul class="simple">
 <li><p>It is now supported to build the C code using C++.</p></li>
+<li><p>PerlMagick can be built with C++.</p></li>
 </ul>
 <p>Windows Delegate Updates/Additions:</p>
 <ul class="simple">
 <li><p>Installer: Do not attempt to execute vcredist_x64.exe.</p></li>
+<li><p>Libtiff: Libtiff is updated to version 4.7.1.</p></li>
+</ul>
+<p>Other News:</p>
+<ul class="simple">
+<li><p>A used laptop running Windows 11 has been contributed to the
+project. Thank you very much for the contribution!</p></li>
 </ul>
 </section>
 <section id="october-29-2025">

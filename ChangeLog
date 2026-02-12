@@ -1,5 +1,7 @@
 2026-02-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * www/INSTALL-unix.rst: Update documentation regarding using MSYS2
         under Microsoft Windows.
 
