@@ -1,3 +1,10 @@
+2026-02-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/tiff.c (AddIFDExifFields): Don't transfer
+        TIFFTAG_PLANARCONFIG since it is not an EXIF parameter. Addresses
+        oss-fuzz "graphicsmagick:coder_TIFF_any_fuzzer:
+        Heap-buffer-overflow in ExportViewPixelArea".
+
 2026-02-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.
