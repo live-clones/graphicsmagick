@@ -74,7 +74,7 @@
 #  endif /* if defined(COMPRESSION_ZSTD) && defined(HasZSTD) */
 
 #if !defined(EXPERIMENTAL_EXIF_TAGS)
-#  define EXPERIMENTAL_EXIF_TAGS 1
+#  define EXPERIMENTAL_EXIF_TAGS 0
 #endif /* if !defined(EXPERIMENTAL_EXIF_TAGS) */
 
 /*
@@ -4849,11 +4849,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                  (unsigned) Tag, (unsigned) Tag, (unsigned) Field,
                                  FipFieldTypeToStr((TIFFDataType) Field),
                                  (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
-          /*
-            Skip tags which are about image storage rather than EXIF
-            metadata.  This should really be based on what is allowed
-            rather than what is denied!
-          */
+
           if (Tag == 0 ||
               Tag == TIFFTAG_COLORMAP ||
               Tag == TIFFTAG_COMPRESSION ||
@@ -4862,27 +4858,15 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
               Tag == TIFFTAG_SAMPLESPERPIXEL ||
               Tag == TIFFTAG_BITSPERSAMPLE ||
               Tag == TIFFTAG_SAMPLEFORMAT ||
-              Tag == TIFFTAG_SUBFILETYPE ||
-              Tag == TIFFTAG_OSUBFILETYPE ||
-              Tag == TIFFTAG_FILLORDER ||
               Tag == TIFFTAG_STRIPOFFSETS ||
               Tag == TIFFTAG_ROWSPERSTRIP ||
               Tag == TIFFTAG_STRIPBYTECOUNTS ||
               Tag == TIFFTAG_ORIENTATION || /* Orientation is handled different way. */
               Tag == TIFFTAG_XRESOLUTION ||
               Tag == TIFFTAG_YRESOLUTION ||
-              Tag == TIFFTAG_PLANARCONFIG ||
               Tag == TIFFTAG_TRANSFERFUNCTION /* Depends on TIFFTAG_BITSPERSAMPLE and TIFFTAG_SAMPLESPERPIXEL (above) */
               )
             {
-#if 1
-              if (logging && (Flags & FLAG_BASE) != 0)
-                (void)LogMagickEvent(CoderEvent,GetMagickModule(),
-                                     "  Skipping EXIF tag %xh.H (%u), Field %u (%s), Long2 %u, val %u %s",
-                                     (unsigned) Tag, (unsigned) Tag, (unsigned) Field,
-                                     FipFieldTypeToStr((TIFFDataType) Field),
-                                     (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
-#endif
               goto NextItem;        /* Banned TIFF tags that cannot be copied from EXIF. */
             }
 

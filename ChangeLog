@@ -1,3 +1,10 @@
+2026-02-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/tiff.c (EXPERIMENTAL_EXIF_TAGS): Disable experimental
+        EXIF tags again since yesterday my understanding of the problem
+        was wrong, and a correct solution should be implemented before it
+        is enabled again.  Revert changes from 2026-02-15.
+
 2026-02-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/tiff.c (AddIFDExifFields): Don't transfer
