@@ -1,5 +1,11 @@
 2026-02-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/enhance.c (ModulateImage): Address Coverity 501588
+        "Unchecked return value".
+
+        * magick/composite.c (CompositeImage): Address Coverity 501590
+        "Unchecked return value".
+
         * magick/cdl.c (CdlImage): Address Coverity 501592 "Unchecked
         return value".
 
