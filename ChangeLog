@@ -1,5 +1,8 @@
 2026-02-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/cdl.c (CdlImage): Address Coverity 501592 "Unchecked
+        return value".
+
         * coders/tiff.c: (EXPERIMENTAL_EXIF_TAGS): Re-enable
         EXPERIMENTAL_EXIF_TAGS by default. Modify the EXIF blob tag
         transfer so that it will only transfer tags from EXIF and GPS

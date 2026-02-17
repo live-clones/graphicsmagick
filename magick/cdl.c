@@ -200,7 +200,8 @@ MagickExport MagickPassFail CdlImage(Image *image,const char *cdl)
                param.saturation);
 
   if (!IsRGBCompatibleColorspace(image->colorspace))
-    TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      return MagickFail;
 
   /*
     Build a LUT if it is beneficial to do so.
