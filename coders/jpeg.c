@@ -2876,7 +2876,10 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
                               ColorspaceTypeToString(image->colorspace),
                               ColorspaceTypeToString(image_info->colorspace));
       if (TransformColorspace(image,image_info->colorspace) == MagickFail)
-        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+        {
+          client_data=FreeMagickClientData(client_data);
+          ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+        }
     }
 
   /*
@@ -2897,7 +2900,10 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
                               "  Transforming colorspace from %s to RGB",
                               ColorspaceTypeToString(image->colorspace));
       if (TransformColorspace(image,RGBColorspace) == MagickFail)
-        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+        {
+          client_data=FreeMagickClientData(client_data);
+          ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+        }
     }
 
   /*
