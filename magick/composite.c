@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2018 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -3355,6 +3355,9 @@ CompositeImage(Image *canvas_image,
       break;
     }
 
+  if (status == MagickFail)
+    goto composite_image_error;
+
   /*
     Make sure that the composite image is in a colorspace which is
     compatible (as need be) with the canvas image.
@@ -3379,25 +3382,32 @@ CompositeImage(Image *canvas_image,
         if (IsRGBColorspace(canvas_image->colorspace))
           {
             if (!IsRGBColorspace(change_image->colorspace))
-              TransformColorspace(change_image,RGBColorspace);
+              if (TransformColorspace(change_image,RGBColorspace) == MagickFail)
+                status=MagickFail;
           }
         else if (IsYCbCrColorspace(canvas_image->colorspace))
           {
             if (canvas_image->colorspace != change_image->colorspace)
-              TransformColorspace(change_image,canvas_image->colorspace);
+              if (TransformColorspace(change_image,canvas_image->colorspace) == MagickFail)
+                status=MagickFail;
           }
         else if (IsCMYKColorspace(canvas_image->colorspace))
           {
             if (!IsCMYKColorspace(change_image->colorspace))
-              TransformColorspace(change_image,canvas_image->colorspace);
+              if (TransformColorspace(change_image,canvas_image->colorspace) == MagickFail)
+                status=MagickFail;
           }
         else
           {
-            TransformColorspace(change_image,canvas_image->colorspace);
+            if (TransformColorspace(change_image,canvas_image->colorspace) == MagickFail)
+              status=MagickFail;
           }
         break;
       }
     }
+
+  if (status == MagickFail)
+    goto composite_image_error;
 
   /*
     Composite image.
@@ -3525,6 +3535,8 @@ CompositeImage(Image *canvas_image,
           }
       }
   }
+
+ composite_image_error:
 
   DestroyImage(change_image);
   change_image=(Image *) NULL;

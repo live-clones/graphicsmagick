@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 GraphicsMagick Group
+ * Copyright (C) 2009-2026 GraphicsMagick Group
  *
  * American Society of Cinematographers Color Decision List (ASC-CDL)
  * implementation.
