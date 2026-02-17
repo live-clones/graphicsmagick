@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2009 GraphicsMagick Group
+% Copyright (C) 2009-2026 GraphicsMagick Group
 % Copyright (C) 2005 Eskil Steenberg.  All rights reserved.
 %
 % This program is covered by multiple licenses, which are described in
@@ -253,19 +253,19 @@ HaldClutImage(Image *image, const Image *clut)
                param.level,clut->columns,clut->rows);
 
   if (!IsRGBCompatibleColorspace(image->colorspace))
-    TransformColorspace(image,RGBColorspace);
+    status&=TransformColorspace(image,RGBColorspace);
   if (image->storage_class == PseudoClass)
     {
-      (void) HaldClutImagePixels(NULL,&param,image,image->colormap,
-                                 (IndexPacket *) NULL,image->colors,
-                                 &image->exception);
-      status=SyncImage(image);
+      status&=HaldClutImagePixels(NULL,&param,image,image->colormap,
+                                  (IndexPacket *) NULL,image->colors,
+                                  &image->exception);
+      status&=SyncImage(image);
     }
   else
     {
-      status=PixelIterateMonoModify(HaldClutImagePixels,NULL,progress_message,
-                                    NULL,&param,0,0,image->columns,image->rows,
-                                    image,&image->exception);
+      status&=PixelIterateMonoModify(HaldClutImagePixels,NULL,progress_message,
+                                     NULL,&param,0,0,image->columns,image->rows,
+                                     image,&image->exception);
     }
 
   return(status);
