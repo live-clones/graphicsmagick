@@ -1,3 +1,12 @@
+2026-02-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/tiff.c: (EXPERIMENTAL_EXIF_TAGS): Re-enable
+        EXPERIMENTAL_EXIF_TAGS by default. Modify the EXIF blob tag
+        transfer so that it will only transfer tags from EXIF and GPS
+        IFDs.  The code was also transferring tags from the main IFD,
+        which may wreak havoc on the output file.  Re-write the EXIF
+        reader data marshalling functions to avoid alignment violations.
+
 2026-02-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/tiff.c (EXPERIMENTAL_EXIF_TAGS): Disable experimental

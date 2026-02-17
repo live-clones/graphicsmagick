@@ -74,7 +74,7 @@
 #  endif /* if defined(COMPRESSION_ZSTD) && defined(HasZSTD) */
 
 #if !defined(EXPERIMENTAL_EXIF_TAGS)
-#  define EXPERIMENTAL_EXIF_TAGS 0
+#  define EXPERIMENTAL_EXIF_TAGS 1
 #endif /* if !defined(EXPERIMENTAL_EXIF_TAGS) */
 
 /*
@@ -4631,9 +4631,9 @@ WritePTIFImage(const ImageInfo *image_info,Image *image)
 #if EXPERIMENTAL_EXIF_TAGS
 #if TIFFLIB_VERSION >= 20120922
 
-#define FLAG_EXIF       1
-#define FLAG_GPS        2
-#define FLAG_BASE       4
+#define FLAG_EXIF       1 /* In (or have handled) EXIF IFD */
+#define FLAG_GPS        2 /* In (or have handled) GPS IFD */
+#define FLAG_BASE       4 /* Transfer tags. Used to be set globally, so primary IFD would be updated/trashed */
 
 
 /*
@@ -4645,33 +4645,50 @@ static TIFFField customFields[] = {
 static TIFFFieldArray customFieldArray = {tfiatOther, 0, 1, customFields};
 */
 
+/*
+  EXIF data-marshalling functions. The "_LO" variants are for reading
+  little-endian EXIF and the "_HI" variants are for big-endian
+  EXIF. Reading is done in bytes in order to avoid address alignment
+  violations.
 
+  The implementations are reversed from what may be intuitively
+  expected, since they also perform endian swapping.
+*/
 static magick_uint32_t LD_UINT32_LO(const unsigned char *Mem)
 {
 #ifdef WORDS_BIGENDIAN
-  return (magick_uint32_t)Mem[0] | ((magick_uint32_t)Mem[1] << 8) | ((magick_uint32_t)Mem[2] << 16) | ((magick_uint32_t)Mem[3] << 24);
+  return (((magick_uint32_t)Mem[0]<<24) | ((magick_uint32_t)Mem[1] << 16) | ((magick_uint32_t)Mem[2] << 8) | ((magick_uint32_t)Mem[3]));
 #else
-  return *(magick_uint32_t*)Mem;
+  return ((magick_uint32_t)Mem[0] | ((magick_uint32_t)Mem[1] << 8) | ((magick_uint32_t)Mem[2] << 16) | ((magick_uint32_t)Mem[3] << 24));
 #endif
 }
 
 static magick_uint32_t LD_UINT32_HI(const unsigned char *Mem)
 {
-  return ((magick_uint32_t)Mem[0]<<24) | ((magick_uint32_t)Mem[1] << 16) | ((magick_uint32_t)Mem[2] << 8) | ((magick_uint32_t)Mem[3]);
+#ifdef WORDS_BIGENDIAN
+  return ((magick_uint32_t)Mem[0] | ((magick_uint32_t)Mem[1] << 8) | ((magick_uint32_t)Mem[2] << 16) | ((magick_uint32_t)Mem[3] << 24));
+#else
+  return (((magick_uint32_t)Mem[0]<<24) | ((magick_uint32_t)Mem[1] << 16) | ((magick_uint32_t)Mem[2] << 8) | ((magick_uint32_t)Mem[3]));
+#endif
 }
+
 
 static magick_uint16_t LD_UINT16_LO(const unsigned char *Mem)
 {
 #ifdef WORDS_BIGENDIAN
-  return (magick_uint16_t)Mem[0] | ((magick_uint16_t)Mem[1] << 8);
+  return (((magick_uint16_t)Mem[0] << 8) | ((magick_uint16_t)Mem[1]));
 #else
-  return *(magick_uint16_t*)Mem;
+  return ((magick_uint16_t)Mem[0] | ((magick_uint16_t)Mem[1] << 8));
 #endif
 }
 
 static magick_uint16_t LD_UINT16_HI(const unsigned char *Mem)
 {
-  return ((magick_uint16_t)Mem[0] << 8) | ((magick_uint16_t)Mem[1]);
+#ifdef WORDS_BIGENDIAN
+  return ((magick_uint16_t)Mem[0] | ((magick_uint16_t)Mem[1] << 8));
+#else
+  return (((magick_uint16_t)Mem[0] << 8) | ((magick_uint16_t)Mem[1]));
+#endif
 }
 
 
@@ -4808,13 +4825,21 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
 
   if (*profile_data == 'M')
     {
+      /* "MM" is big-endian */
+      if (logging)
+        (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                             "Big-endian IFD");
       LD_UINT32 = LD_UINT32_HI;
       LD_UINT16 = LD_UINT16_HI;
     }
   else
     {
+      /* "II" is little-endian */
       if (*profile_data != 'I')
         return 0;
+      if (logging)
+        (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                             "Little-endian IFD");
       LD_UINT32 = LD_UINT32_LO;
       LD_UINT16 = LD_UINT16_LO;
     }
@@ -4826,8 +4851,11 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
 
       if (profile_length < (size_t)(IFD_data-profile_data)+2)
         return 0;
+      if (logging)
+        (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                             "Flags=0x%02x", (unsigned) Flags);
       EntryNum = LD_UINT16(IFD_data); /* Number of IFD directory entries */
-      if (logging && (Flags & FLAG_BASE) != 0)
+      if (logging /* && (Flags & FLAG_BASE) != 0 */)
         (void)LogMagickEvent(CoderEvent,GetMagickModule(),
                              "IFD EntryNum %u", (unsigned) EntryNum);
       if (profile_length < (size_t)(IFD_data-profile_data)+(EntryNum*12))
@@ -4850,23 +4878,35 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                  FipFieldTypeToStr((TIFFDataType) Field),
                                  (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
 
+          /*
+            Skip EXIF tags which are redundant with the main IFD
+            (there are many more).
+          */
           if (Tag == 0 ||
-              Tag == TIFFTAG_COLORMAP ||
-              Tag == TIFFTAG_COMPRESSION ||
-              Tag == TIFFTAG_IMAGELENGTH ||
-              Tag == TIFFTAG_IMAGEWIDTH ||
-              Tag == TIFFTAG_SAMPLESPERPIXEL ||
-              Tag == TIFFTAG_BITSPERSAMPLE ||
-              Tag == TIFFTAG_SAMPLEFORMAT ||
-              Tag == TIFFTAG_STRIPOFFSETS ||
-              Tag == TIFFTAG_ROWSPERSTRIP ||
-              Tag == TIFFTAG_STRIPBYTECOUNTS ||
-              Tag == TIFFTAG_ORIENTATION || /* Orientation is handled different way. */
-              Tag == TIFFTAG_XRESOLUTION ||
-              Tag == TIFFTAG_YRESOLUTION ||
-              Tag == TIFFTAG_TRANSFERFUNCTION /* Depends on TIFFTAG_BITSPERSAMPLE and TIFFTAG_SAMPLESPERPIXEL (above) */
+              Tag == TIFFTAG_COLORMAP ||        /* 0x0140 */
+              Tag == TIFFTAG_COMPRESSION ||     /* 0x0103 */
+              Tag == TIFFTAG_IMAGELENGTH ||     /* 0x0101 */
+              Tag == TIFFTAG_IMAGEWIDTH ||      /* 0x0100 */
+              Tag == TIFFTAG_SAMPLESPERPIXEL || /* 0x0115 */
+              Tag == TIFFTAG_BITSPERSAMPLE ||   /* 0x0102 */
+              Tag == TIFFTAG_SAMPLEFORMAT ||    /* 0x0153 */
+              Tag == TIFFTAG_STRIPOFFSETS ||    /* 0x0111 */
+              Tag == TIFFTAG_ROWSPERSTRIP ||    /* 0x0116 */
+              Tag == TIFFTAG_STRIPBYTECOUNTS || /* 0x0117 */
+              Tag == TIFFTAG_ORIENTATION ||     /* 0x0112 */ /* Orientation is handled different way. */
+              Tag == TIFFTAG_XRESOLUTION ||     /* 0x011A */
+              Tag == TIFFTAG_YRESOLUTION ||     /* 0x011B */
+              Tag == TIFFTAG_PLANARCONFIG ||    /* 0x011C */
+              Tag == TIFFTAG_TRANSFERFUNCTION ||/* 0x012D */ /* Depends on TIFFTAG_BITSPERSAMPLE and TIFFTAG_SAMPLESPERPIXEL (above) */
+              Tag == TIFFTAG_EXTRASAMPLES       /* 0x0152 */
               )
             {
+              if (logging && (Flags & FLAG_BASE) != 0)
+                (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                                     "  Skipping tag from EXIF %xh.H (%u), Field %u (%s), Long2 %u, val %u %s",
+                                     (unsigned) Tag, (unsigned) Tag, (unsigned) Field,
+                                     FipFieldTypeToStr((TIFFDataType) Field),
+                                     (unsigned) Long2, (unsigned) Value, FipFieldName(fip));
               goto NextItem;        /* Banned TIFF tags that cannot be copied from EXIF. */
             }
 
@@ -5186,13 +5226,18 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
 }
 
 
-static int AddExifFields(TIFF *tiff, const unsigned char *profile_data, size_t profile_length, MagickBool logging, magick_uint16_t Flags)
+static int AddExifFields(TIFF *tiff, const unsigned char *profile_data,
+                         size_t profile_length, MagickBool logging,
+                         magick_uint16_t Flags)
 {
   const char EXIF[6]
     = {'E','x','i','f',0,0};
 
   unsigned int
     ifds_handled = 0;
+
+  size_t
+    profile_data_len;
 
   if (profile_data==NULL || profile_length < 12+8)
     return 0;
@@ -5208,8 +5253,15 @@ static int AddExifFields(TIFF *tiff, const unsigned char *profile_data, size_t p
   if (profile_data[0] != profile_data[1])
     return 0;
 
+  profile_data_len = (size_t)((profile_data[0]=='M') ?
+                              LD_UINT32_HI(profile_data+4) :
+                              LD_UINT32_LO(profile_data+4));
+  if (logging)
+    (void)LogMagickEvent(CoderEvent,GetMagickModule(),
+                         "Profile data length %zu", profile_data_len);
+
   return AddIFDExifFields(tiff, &ifds_handled, profile_data,
-                          profile_data + ((profile_data[0]=='M')?LD_UINT32_HI(profile_data+4):LD_UINT32_LO(profile_data+4)),
+                          profile_data + profile_data_len,
                           profile_length-2, logging, Flags);
 }
 
@@ -6684,7 +6736,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           size_t profile_length;
           if ((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
           {
-            AddExifFields(tiff,profile_data,profile_length,logging, FLAG_BASE);
+            AddExifFields(tiff,profile_data,profile_length,logging, 0/* FLAG_BASE */);
           }
         }
 #endif /* TIFFLIB_VERSION >= 20120922 */
@@ -7368,7 +7420,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
          /*
           * Unfortunately it depends on the prehistory, what number TIFFCurrentDirectory() will get back.
           * Therefore, the current main IFD number has to be adapted. However, this is an inconsistency in LibTIFF which should be
-          * corrected. This means that the provided code to determíne/handle current directory number here is just a current work around.
+          * corrected. This means that the provided code to determine/handle current directory number here is just a current work around.
           */
             tdir_t current_mainifd = TIFFCurrentDirectory(tiff);
             if (TIFFCurrentDirOffset(tiff) > 0 && current_mainifd > 0) current_mainifd--;
