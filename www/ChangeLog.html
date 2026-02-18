@@ -38,9 +38,24 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-02-18  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>fuzzing/utils.cc (LLVMFuzzerInitialize): Enable use of
+LLVMFuzzerInitialize() to pass program path.</p></li>
+<li><p>coders/heif.c (HEIF_channel_to_string): Include
+'heif_channel_unknown' in switch statement.</p></li>
+<li><p>magick/utility.c (DefineClientPathAndName): Assure that
+'component' is initialized.</p></li>
+</ul>
+</blockquote>
 <p>2026-02-17  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>www/index.rst: Report that we are back down to zero Coverity
+defects.</p></li>
+<li><p>coders/jpeg.c (WriteJPEGImage): Address Coverity 501589
+&quot;Resource leak&quot;.</p></li>
 <li><p>magick/hclut.c (HaldClutImage): Address Coverity 501591
 &quot;Unchecked return value&quot;.</p></li>
 <li><p>magick/enhance.c (ModulateImage): Address Coverity 501588

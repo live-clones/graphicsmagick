@@ -1,4 +1,21 @@
+2026-02-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/utils.cc (LLVMFuzzerInitialize): Enable use of
+        LLVMFuzzerInitialize() to pass program path.
+
+        * coders/heif.c (HEIF_channel_to_string): Include
+        'heif_channel_unknown' in switch statement.
+
+        * magick/utility.c (DefineClientPathAndName): Assure that
+        'component' is initialized.
+
 2026-02-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/index.rst: Report that we are back down to zero Coverity
+        defects.
+
+        * coders/jpeg.c (WriteJPEGImage): Address Coverity 501589
+        "Resource leak".
 
         * magick/hclut.c (HaldClutImage): Address Coverity 501591
         "Unchecked return value".

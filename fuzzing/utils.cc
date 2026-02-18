@@ -2,7 +2,7 @@
 // See https://llvm.org/docs/LibFuzzer.html
 //
 
-#define USE_DYNAMIC_INITIALIZATION 0
+#define USE_DYNAMIC_INITIALIZATION 1
 
 #if USE_DYNAMIC_INITIALIZATION
 

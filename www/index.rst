@@ -136,9 +136,9 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (377,726 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (378,167 total
     lines included) according to `Coverity Analysis Metrics`_ on
-    January 15th, 2026.
+    February 17th, 2026.
 
   * GM has zero issues detected by Clang 15 scan-build.
 

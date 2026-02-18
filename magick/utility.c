@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (c) 2000 Markus Friedl.  All rights reserved.
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
@@ -690,6 +690,7 @@ MagickExport void DefineClientPathAndName(const char *path)
       char
         component[MaxTextExtent];
 
+      component[0]='\0';
       /* This is the path only - including the parent folder */
       GetPathComponent(path,HeadPath,component);
       (void) SetClientPath(component);

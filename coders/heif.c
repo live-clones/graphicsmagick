@@ -884,6 +884,9 @@ static const char *HEIF_channel_to_string(const enum heif_channel c)
     case heif_channel_disparity:
       s = "disparity";
       break;
+    case heif_channel_unknown:
+      s = "unknown";
+      break;
     }
 
   return s;

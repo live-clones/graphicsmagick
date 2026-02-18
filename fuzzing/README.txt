@@ -60,8 +60,10 @@ Build project fuzzer target::
   python3 infra/helper.py build_fuzzers --sanitizer memory --architecture x86_64 graphicsmagick
   python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 graphicsmagick
 
-  This one is broken due to oss-fuzz! 12/25/2026
-  python3 infra/helper.py build_fuzzers --sanitizer memory --architecture i386 graphicsmagick
+  python3 infra/helper.py build_fuzzers --sanitizer address --architecture i386 graphicsmagick
+  # Following is broken due to missing ASAN library
+  #python3 infra/helper.py build_fuzzers --sanitizer memory --architecture i386 graphicsmagick
+  python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture i386 graphicsmagick
 
 Reproduce using local source checkout (mount local sources into the running container)::
 
@@ -214,6 +216,7 @@ The openh264 build is based on a well-designed pure GNU Makefile.
 
 With sources under ~/src/openh264::
 
+  rm -rf ~/build/openh264
   mkdir -p ~/build/openh264
   cd ~/build/openh264
   make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local clean
