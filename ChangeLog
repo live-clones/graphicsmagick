@@ -1,8 +1,7 @@
 2026-02-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-        * magick/utility.c (DefineClientPathAndName): Memset entire
-        'component' value.  Trying to get over the oss-fuzz Ubuntu 24.04
-        hurdle.
+        * magick/utility.c (DefineClientName): Assure that component name
+        is initialized.
 
 2026-02-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

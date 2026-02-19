@@ -651,6 +651,7 @@ MagickExport void DefineClientName(const char *path)
       char
         component[MaxTextExtent];
 
+      component[0]='\0';
       GetPathComponent(path,BasePath,component);
       (void) SetClientName(component);
     }
@@ -690,8 +691,7 @@ MagickExport void DefineClientPathAndName(const char *path)
       char
         component[MaxTextExtent];
 
-      /* FIXME: memset of whole buffer should not be required (oss-fuzz failure) */
-      (void) memset(component,0,sizeof(component));
+      component[0]='\0';
       /* This is the path only - including the parent folder */
       GetPathComponent(path,HeadPath,component);
       (void) SetClientPath(component);
