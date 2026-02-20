@@ -2121,6 +2121,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       char
         prefix[MaxTextExtent];
 
+      (void) memset(prefix,0,sizeof(prefix));
       /*
         Search based on executable directory if directory is known.
       */
