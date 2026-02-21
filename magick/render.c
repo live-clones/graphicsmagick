@@ -3133,13 +3133,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               zero-length token, which is a valid argument. But
               MagickGetToken() now returns 0 and an empty token.
             */
-            char *q2=q;
-            MagickGetToken(q,&q2,token,token_max_length);
-            if (q == q2)
-              {
-                status=MagickFail;
-                break;
-              }
+            MagickGetToken(q,&q,token,token_max_length);
             (void) CloneString(&graphic_context[n]->encoding,token);
             break;
           }
