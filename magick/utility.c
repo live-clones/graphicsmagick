@@ -651,7 +651,6 @@ MagickExport void DefineClientName(const char *path)
       char
         component[MaxTextExtent];
 
-      (void) memset(component,0,sizeof(component));
       GetPathComponent(path,BasePath,component);
       (void) SetClientName(component);
     }
@@ -691,7 +690,6 @@ MagickExport void DefineClientPathAndName(const char *path)
       char
         component[MaxTextExtent];
 
-      (void) memset(component,0,sizeof(component));
       /* This is the path only - including the parent folder */
       GetPathComponent(path,HeadPath,component);
       (void) SetClientPath(component);
@@ -4168,45 +4166,53 @@ MagickExport size_t MagickFormatString(char *string,
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method MagickGetToken gets a token from the token stream.  A token is defined
-%  as sequence of characters delimited by whitespace (e.g. clip-path), a
-%  sequence delimited with quotes (.e.g "Quote me"), or a sequence enclosed
-%  in parenthesis (e.g. rgb(0,0,0)).
+%  Method MagickGetToken gets a token from the token stream given a
+%  NUL-terminated buffer.  A token is defined as sequence of characters
+%  delimited by whitespace (e.g. clip-path), a sequence delimited with
+%  quotes (.e.g "Quote me"), or a sequence enclosed in parenthesis
+%  (e.g. rgb(0,0,0)).
 %
 %  The format of the MagickGetToken method is:
 %
-%      void MagickGetToken(const char *start,char **end,char *token,
-%                          const size_t buffer_length)
+%      size_t MagickGetToken(const char *start,char **end,char *token,
+%                            const size_t max_token_length)
 %
 %  A description of each parameter follows:
 %
-%    o start: the start of the token sequence.
+%    o start: the start of the token sequence in a NUL-terminated buffer.
 %
-%    o end: point to the end of the token sequence (may be NULL).
+%    o end: points to the end of the scanned token sequence (may be NULL).
 %
 %    o token: copy the token to this buffer.
 %
-%    o buffer_length: size of the token buffer.  If the token exceeds
-%             the buffer size, the token will be truncated, but the
-%             parser will still update the end pointer as if the
-%             truncation did not occur.
+%    o max_token_length: maximum token length which may be returned.
+%     If the token exceeds the maximum token size,
+%     then the token will be truncated, but the parser will still
+%     update the end pointer (constrained by the terminating NUL
+%     character) as if the truncation did not occur. This allows
+%     using the end pointer as start when scanning a next token.
 %
-%    o returns: Size of the consumed token, not including a terminating
-%             null character.  If this is larger or equal to the buffer
-%             size then truncation has occurred.
+%    o returns: The size of the token returned.
+%
+%      This function used to "Report the size of the consumed token,
+%      not including a terminating null character.  If this is
+%      larger or equal to the buffer size then truncation has
+%      occurred". The old behavior is not useful given that
+%      the difference between 'end' and 'start' may be used to
+%      determine how many characters were consumed.
 %
 */
 MagickExport size_t MagickGetToken(const char *start,char **end,char *token,
-                                   const size_t buffer_length)
+                                   const size_t max_token_length)
 {
-  register char
+  register const char
     *p;
 
   register size_t
     i;
 
   register size_t
-    length = buffer_length - 1;
+    length = max_token_length - 1;
 
   double
     double_val;
@@ -4215,7 +4221,8 @@ MagickExport size_t MagickGetToken(const char *start,char **end,char *token,
   assert(token != (char *) NULL);
 
   i=0;
-  p=(char *) start;
+  token[i]='\0';
+  p=start;
 
   if (*p != '\0')
     {
@@ -4319,8 +4326,8 @@ MagickExport size_t MagickGetToken(const char *start,char **end,char *token,
       }
   }
   if (end != (char **) NULL)
-    *end=p;
-  return (p-start+1);
+    *end=(char *)p;
+  return (i); /* Was (p-start+1) to report consumed text */
 }
 
 /*

@@ -87,8 +87,13 @@ Check the build (this can take very long!)::
     <fuzz_target_name>
 
   python3 infra/helper.py build_fuzzers --sanitizer address   --architecture x86_64 --engine libfuzzer graphicsmagick
+  python3 infra/helper.py check_build   --sanitizer address   --architecture x86_64 --engine libfuzzer graphicsmagick
+
   python3 infra/helper.py build_fuzzers --sanitizer memory    --architecture x86_64 --engine libfuzzer graphicsmagick
+  python3 infra/helper.py check_build   --sanitizer memory    --architecture x86_64 --engine libfuzzer graphicsmagick
+
   python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 --engine libfuzzer graphicsmagick
+  python3 infra/helper.py check_build   --sanitizer undefined --architecture x86_64 --engine libfuzzer graphicsmagick
 
 Get a shell into the container and compile::
 

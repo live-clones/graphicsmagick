@@ -2121,11 +2121,10 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       char
         prefix[MaxTextExtent];
 
-      (void) memset(prefix,0,sizeof(prefix));
       /*
         Search based on executable directory if directory is known.
       */
-      (void) strlcpy(prefix,SetClientPath((char *) NULL),MaxTextExtent);
+      (void) strlcpy(prefix,SetClientPath((char *) NULL),sizeof(prefix));
       ChopPathComponents(prefix,1);
 
       FormatString(path,"%.1024s/lib/%s/",prefix,MagickLibConfigSubDir);

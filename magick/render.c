@@ -3128,7 +3128,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           }
         if (LocaleCompare("encoding",keyword) == 0)
           {
-            if (MagickGetToken(q,&q,token,token_max_length) < 1)
+            /*
+              If the encoding argument is '', it will result in a
+              zero-length token, which is a valid argument. But
+              MagickGetToken() now returns 0 and an empty token.
+            */
+            char *q2=q;
+            MagickGetToken(q,&q2,token,token_max_length);
+            if (q == q2)
               {
                 status=MagickFail;
                 break;

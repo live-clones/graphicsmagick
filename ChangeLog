@@ -1,3 +1,19 @@
+2026-02-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Add an options file for
+        coder_JBIG_fuzzer.
+
+        * magick/render.c (DrawImage): The change to MagickGetToken()
+        resulted in a change to 'encoding' behavior.  Add a work-around.
+
+        * magick/blob.c (GetConfigureBlob): Remove useless memset().
+
+        * magick/log.c (ReadLogConfigureFile): Use returned token length
+        for purpose of optimization and error handling.
+
+        * magick/utility.c (MagickGetToken): Now returns the size of the
+        token which was parsed, which will be zero if no token was parsed.
+
 2026-02-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/utility.c (DefineClientName): Assure that component name
