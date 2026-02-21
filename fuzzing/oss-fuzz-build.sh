@@ -1309,6 +1309,11 @@ fi
         fi
     done
 
+    # Add fuzzer settings for specific coders
+    cat << 'MARKER' > "${OUT}/coder_JBIG_fuzzer.options"
+timeout = 240
+MARKER
+
     if true ; then
        #
        # Add a seed corpus
