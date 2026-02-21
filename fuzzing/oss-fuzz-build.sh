@@ -1310,7 +1310,19 @@ fi
     done
 
     # Add fuzzer settings for specific coders
+    #
+    # libfuzzer supports these:
+    #
+    # timeout = <seconds>: Specifies the maximum time in seconds the fuzzer should run a single input before considering it a timeout bug
+    #
+    # rss_limit_mb = <megabytes>: Sets the maximum memory usage in megabytes for the fuzzer process. Exceeding this limit results in an OOM (Out-Of-Memory) bug.
+    #
+    # dict = <dict_file>: Specifies the path to a dictionary file to help the fuzzer discover deeper code paths.
+    #
+    # max_len = <bytes>: Sets the maximum length of the input data that the fuzzer will generate.
+    #
     cat << 'MARKER' > "${OUT}/coder_JBIG_fuzzer.options"
+[libfuzzer]
 timeout = 240
 MARKER
 
