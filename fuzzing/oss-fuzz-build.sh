@@ -73,6 +73,12 @@ enable_xz=true
 enable_zlib=true
 enable_zstd=true
 
+if [ "${SANITIZER}" = 'memory' ]
+then
+  # Libzip uses the host OpenSSL, which is not built for sanitizing.
+  enable_libzip=false
+fi
+
 export PKG_CONFIG_PATH="${WORK}/lib/pkgconfig"
 export PKG_CONFIG='pkg-config --static'
 export VERBOSE=TRUE

@@ -107,14 +107,8 @@ Check the build (this can take very long!)::
   python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
   python3 infra/helper.py check_build    --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine none      --sanitizer address   --architecture x86_64 graphicsmagick
-  python3 infra/helper.py check_build    --engine none      --sanitizer address   --architecture x86_64 graphicsmagick
-
   python3 infra/helper.py build_fuzzers  --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
-
-  python3 infra/helper.py build_fuzzers  --engine centipede --sanitizer none      --architecture x86_64 graphicsmagick
-  python3 infra/helper.py check_build    --engine centipede --sanitizer none      --architecture x86_64 graphicsmagick
 
 Get a shell into the container and compile::
 
