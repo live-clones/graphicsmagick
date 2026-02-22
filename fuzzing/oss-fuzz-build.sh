@@ -1160,10 +1160,13 @@ fi
     # freetype-config is in "${WORK}"/bin so we temporarily add "${WORK}"/bin to the path
     # pkg-config names GraphicsMagick, GraphicsMagickWand, GraphicsMagick++
     # -stdlib=libc++'
-    printf "\n\n=== Building GraphicsMagick (SANITIZER=%s)...\n" "${SANITIZER}"
+    printf "\n\n=== Building GraphicsMagick (SANITIZER=\"%s\")...\n" "${SANITIZER}"
     EXTRA_LIBS=''
     case "${SANITIZER}" in
         address)
+            EXTRA_LIBS='-lc++'
+            ;;
+        none)
             EXTRA_LIBS='-lc++'
             ;;
         memory)
@@ -1171,6 +1174,9 @@ fi
             ;;
         undefined)
             EXTRA_LIBS='-lubsan -lc++'
+            ;;
+        *)
+            EXTRA_LIBS='-lc++'
             ;;
     esac
 

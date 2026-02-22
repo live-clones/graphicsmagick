@@ -86,22 +86,43 @@ Check the build (this can take very long!)::
     --engine <libfuzzer/afl/honggfuzz/centipede> --architecture <x86_64/i386> graphicsmagick \
     <fuzz_target_name>
 
-  python3 infra/helper.py build_fuzzers --sanitizer address   --architecture x86_64 --engine libfuzzer graphicsmagick
-  python3 infra/helper.py check_build   --sanitizer address   --architecture x86_64 --engine libfuzzer graphicsmagick
+  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine libfuzzer --sanitizer address   --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers --sanitizer memory    --architecture x86_64 --engine libfuzzer graphicsmagick
-  python3 infra/helper.py check_build   --sanitizer memory    --architecture x86_64 --engine libfuzzer graphicsmagick
+  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer memory    --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine libfuzzer --sanitizer memory    --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 --engine libfuzzer graphicsmagick
-  python3 infra/helper.py check_build   --sanitizer undefined --architecture x86_64 --engine libfuzzer graphicsmagick
+  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer undefined --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine libfuzzer --sanitizer undefined --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer coverage --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine libfuzzer --sanitizer coverage --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine afl       --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine afl       --sanitizer address   --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine honggfuzz --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine honggfuzz --sanitizer address   --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
+  python3 infra/helper.py check_build    --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine none      --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine none      --sanitizer address   --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers  --engine centipede --sanitizer none      --architecture x86_64 graphicsmagick
+  python3 infra/helper.py check_build    --engine centipede --sanitizer none      --architecture x86_64 graphicsmagick
 
 Get a shell into the container and compile::
 
-  python3 infra/helper.py shell --sanitizer address --architecture x86_64 graphicsmagick
+  python3 infra/helper.py shell --engine libfuzzer --sanitizer address --architecture x86_64 graphicsmagick
     or
-  python3 infra/helper.py shell --sanitizer memory --architecture x86_64 graphicsmagick
+  python3 infra/helper.py shell --engine libfuzzer --sanitizer memory --architecture x86_64 graphicsmagick
     or
-  python3 infra/helper.py shell --sanitizer undefined --architecture x86_64 graphicsmagick
+  python3 infra/helper.py shell --engine libfuzzer --sanitizer undefined --architecture x86_64 graphicsmagick
   compile 2>&1 | tee build.log
 
 Copy fuzzing build script into running container (given simultaneous shell session)::

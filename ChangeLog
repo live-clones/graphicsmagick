@@ -1,3 +1,7 @@
+2026-02-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Handle SANITIZER=none.
+
 2026-02-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Add an options file for
