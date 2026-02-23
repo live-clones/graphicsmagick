@@ -1,3 +1,10 @@
+2026-02-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImageFrame): Handle per-channel
+        bits_per_pixel_range properly. Addresses oss-fuzz 485932184
+        "graphicsmagick:coder_MP4_fuzzer: Heap-buffer-overflow in
+        ReadHEIFImageFrame".
+
 2026-02-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Handle SANITIZER=none.

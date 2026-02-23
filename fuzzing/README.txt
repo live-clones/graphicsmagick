@@ -129,6 +129,13 @@ Copy fuzzing build script into running container (given simultaneous shell sessi
   /src/build.sh while in the initial "/src/graphicsmagick" directory
   but does some other things as well.
 
+Discover Projects Using Ubuntu 24.04 Baseline And MSan
+------------------------------------------------------
+
+This grody shell command will report projects which are using the new Ubuntu 24.04 Baseline and the memory sanitizer::
+
+  for yaml in projects/*/project.yaml ; do { egrep -- '^language: c' $yaml > /dev/null && egrep -- '^  - memory' $yaml > /dev/null && egrep -- '^base_os_version: ubuntu-24-04' $yaml > /dev/null && printf "%s\n" $yaml } ; done | sed -e 's/projects\///' | sed -e 's/\/project.yaml//'
+
 Build Directory Products
 ------------------------
 

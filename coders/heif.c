@@ -928,8 +928,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     y;
 
   int
-    bits_per_pixel,
-    bits_per_pixel_range;
+    bits_per_pixel;
 
   struct heif_error
     heif_status;
@@ -1249,6 +1248,12 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           size_t
             row_stride[4];
 
+          int
+            channel_bits_per_pixel[4];
+
+          int
+            channel_bits_per_pixel_range[4];
+
           unsigned int
             channel_index,
             max_value_given_bits,
@@ -1280,17 +1285,18 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
-              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
+              channel_bits_per_pixel[channel_index] = heif_image_get_bits_per_pixel(heif_image,
                                                              heif_channel);
-              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
+              channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
                                                                          heif_channel);
-              if ((int) image->depth < bits_per_pixel_range)
-                image->depth=(unsigned int) bits_per_pixel_range;
+              if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
+                image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  channel %s row stride %zu (%d bits in %d bit quantum)",
                                       heif_channel_str, row_stride[channel_index],
-                                      bits_per_pixel_range, bits_per_pixel);
+                                      channel_bits_per_pixel_range[channel_index],
+                                      channel_bits_per_pixel[channel_index]);
             }
           max_value_given_bits=MaxValueGivenBits(image->depth);
 
@@ -1318,7 +1324,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                       Quantum
                         quantum;
 
-                      if (image->depth > 8)
+                      if (channel_bits_per_pixel_range[channel_index] > 8)
                         {
                           sample = *line[channel_index].u16;
                           line[channel_index].u16++;
@@ -1379,6 +1385,12 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           size_t
             row_stride[4];
 
+          int
+            channel_bits_per_pixel[4];
+
+          int
+            channel_bits_per_pixel_range[4];
+
           unsigned int
             channel_index,
             max_value_given_bits,
@@ -1411,17 +1423,18 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
-              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
+              channel_bits_per_pixel[channel_index] = heif_image_get_bits_per_pixel(heif_image,
                                                              heif_channel);
-              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
+              channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
                                                                          heif_channel);
-              if ((int) image->depth < bits_per_pixel_range)
-                image->depth=(unsigned int) bits_per_pixel_range;
+              if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
+                image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  channel %s row stride %zu (%d bits in %d bit quantum)",
                                       heif_channel_str, row_stride[channel_index],
-                                      bits_per_pixel_range, bits_per_pixel);
+                                      channel_bits_per_pixel_range[channel_index],
+                                      channel_bits_per_pixel[channel_index]);
             }
           max_value_given_bits=MaxValueGivenBits(image->depth);
 
@@ -1449,7 +1462,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                       uint16_t
                         sample;
 
-                      if (image->depth > 8)
+                      if (channel_bits_per_pixel_range[channel_index] > 8)
                         {
                           sample = *line[channel_index].u16;
                           line[channel_index].u16++;
@@ -1510,6 +1523,12 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           size_t
             row_stride[2];
 
+          int
+            channel_bits_per_pixel[2];
+
+          int
+            channel_bits_per_pixel_range[2];
+
           unsigned int
             channel_index,
             max_value_given_bits,
@@ -1543,18 +1562,19 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
-              bits_per_pixel = heif_image_get_bits_per_pixel(heif_image,
+              channel_bits_per_pixel[channel_index] = heif_image_get_bits_per_pixel(heif_image,
                                                              heif_channel);
-              bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
+              channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
                                                                          heif_channel);
-              if ((int) image->depth < bits_per_pixel_range)
-                image->depth=(unsigned int) bits_per_pixel_range;
+              if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
+                image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               heif_channel_str = HEIF_channel_to_string(heif_channel);
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  channel %s row stride %zu (%d bits in %d bit quantum)",
                                       heif_channel_str, row_stride[channel_index],
-                                      bits_per_pixel_range, bits_per_pixel);
+                                      channel_bits_per_pixel_range[channel_index],
+                                      channel_bits_per_pixel[channel_index]);
             }
           max_value_given_bits=MaxValueGivenBits(image->depth);
 
@@ -1582,7 +1602,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                       uint16_t
                         sample;
 
-                      if (image->depth > 8)
+                      if (channel_bits_per_pixel_range[channel_index] > 8)
                         {
                           sample = *line[channel_index].u16;
                           line[channel_index].u16++;
