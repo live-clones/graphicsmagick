@@ -1,5 +1,8 @@
 2026-02-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * Magick++/lib/Magick++/Include.h: Still need to undef 'strlcpy'
+        and 'strlcat'.
+
         * coders/heif.c (HEIF_channel_to_string): 'heif_channel_unknown'
         was added by changeset b4326c42 on 2/12/26 after v1.21.2.
 

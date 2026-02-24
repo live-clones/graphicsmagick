@@ -41,6 +41,8 @@ namespace MagickLib
 #include <magick/api.h>
 #undef inline // Remove possible definition from config.h
 #undef class
+#undef strlcpy
+#undef strlcat
 }
 
 //
