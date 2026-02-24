@@ -82,6 +82,11 @@ fi
 export PKG_CONFIG_PATH="${WORK}/lib/pkgconfig"
 export PKG_CONFIG='pkg-config --static'
 export VERBOSE=TRUE
+
+# Disable system-provided strlcpy() and strlcat() in Autoconf scripts
+export ac_cv_func_strlcpy=no
+export ac_cv_func_strlcat=no
+
 # Disable colorized output during build (since 2023 in clang)
 # Can also add -fno-color-diagnostics or set TERM=dumb.
 #export NO_COLOR=1

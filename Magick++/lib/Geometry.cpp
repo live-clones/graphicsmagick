@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999 - 2014
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Geometry implementation
 //
@@ -335,22 +335,19 @@ Magick::Geometry& Magick::Geometry::operator = ( const Geometry& geometry_ )
 /* virtual */ const Magick::Geometry&
 Magick::Geometry::operator = ( const std::string &geometry_ )
 {
-  char
-    geom[MaxTextExtent];
-
   // If argument does not start with digit, presume that it is a
   // page-size specification that needs to be converted to an
   // equivalent geometry specification using PostscriptGeometry()
-  strlcpy(geom,geometry_.c_str(),sizeof(geom));
-  if ( geom[0] != '-' &&
-       geom[0] != '+' &&
-       geom[0] != 'x' &&
-       !isdigit(static_cast<int>(geom[0])))
+  std::string geom = geometry_;
+  if (geom[0] != '-' &&
+      geom[0] != '+' &&
+      geom[0] != 'x' &&
+      !std::isdigit(static_cast<int>(geom[0])))
     {
-      char *pageptr = GetPageGeometry( geom );
+      char *pageptr = GetPageGeometry( geom.c_str() );
       if ( pageptr != 0 )
         {
-          strlcpy(geom,pageptr,sizeof(geom));
+          geom = pageptr;
           MagickFreeMemory(pageptr);
         }
     }
@@ -359,7 +356,7 @@ Magick::Geometry::operator = ( const std::string &geometry_ )
   long y = 0;
   unsigned long width_val = 0;
   unsigned long height_val = 0;
-  int flags = GetGeometry (geom, &x, &y, &width_val, &height_val );
+  int flags = GetGeometry (geom.c_str(), &x, &y, &width_val, &height_val );
 
   if (flags == NoValue)
     {

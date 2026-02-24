@@ -40,7 +40,6 @@ namespace MagickLib
 {
 #include <magick/api.h>
 #undef inline // Remove possible definition from config.h
-
 #undef class
 }
 
@@ -1127,7 +1126,6 @@ namespace Magick
 
 
 #endif // MAGICK_IMPLEMENTATION
-
 }
 
 #endif // Magick_Include_header

@@ -1,3 +1,14 @@
+2026-02-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Magick++/lib/Image.cpp (Magick::Image::annotate): Use C++ rather
+        than C to form geometry string.
+
+        * Magick++/lib/Geometry.cpp (Magick::Geometry::operator =): Use
+        C++ rather than C to form geometry string.
+
+        * fuzzing/oss-fuzz-build.sh: Disable system-provided strlcpy() and
+        strlcat() in Autoconf scripts
+
 2026-02-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (ReadHEIFImageFrame): Handle per-channel

@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2025
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Implementation of Image
 //
@@ -10,6 +10,7 @@
 
 #include "Magick++/Include.h"
 #include <cstdlib>
+#include <sstream>
 #include <string>
 #include <string.h>
 #include <errno.h>
@@ -402,24 +403,27 @@ void Magick::Image::annotate ( const std::string &text_,
   DrawInfo *drawInfo
     = options()->drawInfo();
 
+  // This string is not modified and the pointer is reset to zero
   drawInfo->text = const_cast<char *>(text_.c_str());
-
-  char boundingArea[MaxTextExtent];
-
   drawInfo->geometry = 0;
-  if ( boundingArea_.isValid() ){
-    if ( boundingArea_.width() == 0 || boundingArea_.height() == 0 )
-      {
-        FormatString( boundingArea, "+%u+%u",
-                      boundingArea_.xOff(), boundingArea_.yOff() );
-      }
-    else
-      {
-        strlcpy( boundingArea, string(boundingArea_).c_str(),
-                 sizeof(boundingArea));
-      }
-    drawInfo->geometry = boundingArea;
-  }
+
+  std::string boundingArea;
+  if ( boundingArea_.isValid() )
+    {
+      if ( boundingArea_.width() == 0 || boundingArea_.height() == 0 )
+        {
+          std::ostringstream geometry_stream;
+          geometry_stream << '+' << boundingArea_.xOff()
+                          << '+' << boundingArea_.yOff();
+          boundingArea = geometry_stream.str();
+        }
+      else
+        {
+          boundingArea = std::string(boundingArea_);
+        }
+      // This string is not modified and the pointer is reset to zero
+      drawInfo->geometry = const_cast<char *>(boundingArea.c_str());
+    }
 
   drawInfo->gravity = gravity_;
 
