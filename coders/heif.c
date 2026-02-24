@@ -73,7 +73,7 @@
   1.14.0.
  */
 #if !defined(LIBHEIF_HAVE_VERSION)
-#define LIBHEIF_MAKE_VERSION(h, m, l) ((h) << 24 | (m) << 16 | (l) << 8)
+#define LIBHEIF_MAKE_VERSION(h, m, l) (((h) << 24 | (m) << 16 | (l) << 8) | 0)
 #define LIBHEIF_HAVE_VERSION(h, m, l) (LIBHEIF_NUMERIC_VERSION >= LIBHEIF_MAKE_VERSION(h, m, l))
 #endif /* if !defined(LIBHEIF_HAVE_VERSION) */
 
