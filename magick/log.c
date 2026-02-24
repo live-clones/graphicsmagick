@@ -1073,7 +1073,7 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
           token_length=MagickGetToken(q,&q,token,MaxTextExtent);
           if ((token_length) && (*token != '='))
             continue;
-          token_length=MagickGetToken(q,&q,token,MaxTextExtent);
+          (void) MagickGetToken(q,&q,token,MaxTextExtent);
           if (LocaleCompare(keyword,"file") == 0)
             {
               if (depth > 200)
@@ -1107,8 +1107,8 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
     token_length=MagickGetToken(q,(char **) NULL,token,MaxTextExtent);
     if ((token_length) && (*token != '='))
       continue;
-    token_length=MagickGetToken(q,&q,token,MaxTextExtent);
-    token_length=MagickGetToken(q,&q,token,MaxTextExtent);
+    (void) MagickGetToken(q,&q,token,MaxTextExtent);
+    (void) MagickGetToken(q,&q,token,MaxTextExtent);
     switch (*keyword)
     {
       case 'E':

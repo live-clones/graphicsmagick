@@ -1,5 +1,8 @@
 2026-02-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/log.c (ReadLogConfigureFile): Address Coverity 501657
+        "Unused value".
+
         * Magick++/lib/Magick++/Include.h: Still need to undef 'strlcpy'
         and 'strlcat'.
 
