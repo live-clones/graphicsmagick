@@ -1,5 +1,8 @@
 2026-02-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/heif.c (HEIF_channel_to_string): 'heif_channel_unknown'
+        was added by changeset b4326c42 on 2/12/26 after v1.21.2.
+
         * Magick++/lib/Image.cpp (Magick::Image::annotate): Use C++ rather
         than C to form geometry string.
 

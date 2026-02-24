@@ -884,7 +884,13 @@ static const char *HEIF_channel_to_string(const enum heif_channel c)
     case heif_channel_disparity:
       s = "disparity";
       break;
+#if LIBHEIF_NUMERIC_VERSION > LIBHEIF_HAVE_VERSION(1,21,3)
+      /* Added by changeset b4326c42 on 2/12/26 after v1.21.2 */
     case heif_channel_unknown:
+      s = "unknown";
+      break;
+#endif /* if LIBHEIF_NUMERIC_VERSION > LIBHEIF_HAVE_VERSION(1,21,3) */
+    default:
       s = "unknown";
       break;
     }
