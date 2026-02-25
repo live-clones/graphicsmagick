@@ -1,3 +1,10 @@
+2026-02-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Magick++/lib/Image.cpp (Magick::Image::annotate): Follow
+        DrawInfo normal allocation policies.  Solves Coverity 501673
+        "Wrapper object use after free". I don't agree with Coverity's
+        opinion, but there was other opportunity for a leak.
+
 2026-02-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/log.c (ReadLogConfigureFile): Address Coverity 501657

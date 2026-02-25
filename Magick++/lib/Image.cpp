@@ -403,62 +403,62 @@ void Magick::Image::annotate ( const std::string &text_,
   DrawInfo *drawInfo
     = options()->drawInfo();
 
-  // This string is not modified and the pointer is reset to zero
-  drawInfo->text = const_cast<char *>(text_.c_str());
-  drawInfo->geometry = 0;
+  CloneString(&drawInfo->text,text_.c_str());
+  MagickFreeMemory(drawInfo->geometry);
 
-  std::string boundingArea;
-  if ( boundingArea_.isValid() )
-    {
-      if ( boundingArea_.width() == 0 || boundingArea_.height() == 0 )
-        {
-          std::ostringstream geometry_stream;
-          geometry_stream << '+' << boundingArea_.xOff()
-                          << '+' << boundingArea_.yOff();
-          boundingArea = geometry_stream.str();
-        }
-      else
-        {
-          boundingArea = std::string(boundingArea_);
-        }
-      // This string is not modified and the pointer is reset to zero
-      drawInfo->geometry = const_cast<char *>(boundingArea.c_str());
-    }
+  {
+    std::string boundingArea;
+    if ( boundingArea_.isValid() )
+      {
+        if ( boundingArea_.width() == 0 || boundingArea_.height() == 0 )
+          {
+            std::ostringstream geometry_stream;
+            geometry_stream << '+' << boundingArea_.xOff()
+                            << '+' << boundingArea_.yOff();
+            boundingArea = geometry_stream.str();
+          }
+        else
+          {
+            boundingArea = std::string(boundingArea_);
+          }
+        CloneString(&drawInfo->geometry,boundingArea.c_str());
+      }
+  }
 
   drawInfo->gravity = gravity_;
 
   AffineMatrix oaffine = drawInfo->affine;
   if ( degrees_ != 0.0)
     {
-        AffineMatrix affine;
-        affine.sx=1.0;
-        affine.rx=0.0;
-        affine.ry=0.0;
-        affine.sy=1.0;
-        affine.tx=0.0;
-        affine.ty=0.0;
+      AffineMatrix affine;
+      affine.sx=1.0;
+      affine.rx=0.0;
+      affine.ry=0.0;
+      affine.sy=1.0;
+      affine.tx=0.0;
+      affine.ty=0.0;
 
-        AffineMatrix current = drawInfo->affine;
+      AffineMatrix current = drawInfo->affine;
 #define DegreesToRadians(x) ((x)*3.14159265358979323846/180.0)
-        affine.sx=cos(DegreesToRadians(fmod(degrees_,360.0)));
-        affine.rx=sin(DegreesToRadians(fmod(degrees_,360.0)));
-        affine.ry=(-sin(DegreesToRadians(fmod(degrees_,360.0))));
-        affine.sy=cos(DegreesToRadians(fmod(degrees_,360.0)));
+      affine.sx=cos(DegreesToRadians(fmod(degrees_,360.0)));
+      affine.rx=sin(DegreesToRadians(fmod(degrees_,360.0)));
+      affine.ry=(-sin(DegreesToRadians(fmod(degrees_,360.0))));
+      affine.sy=cos(DegreesToRadians(fmod(degrees_,360.0)));
 
-        drawInfo->affine.sx=current.sx*affine.sx+current.ry*affine.rx;
-        drawInfo->affine.rx=current.rx*affine.sx+current.sy*affine.rx;
-        drawInfo->affine.ry=current.sx*affine.ry+current.ry*affine.sy;
-        drawInfo->affine.sy=current.rx*affine.ry+current.sy*affine.sy;
-        drawInfo->affine.tx=current.sx*affine.tx+current.ry*affine.ty
-          +current.tx;
+      drawInfo->affine.sx=current.sx*affine.sx+current.ry*affine.rx;
+      drawInfo->affine.rx=current.rx*affine.sx+current.sy*affine.rx;
+      drawInfo->affine.ry=current.sx*affine.ry+current.ry*affine.sy;
+      drawInfo->affine.sy=current.rx*affine.ry+current.sy*affine.sy;
+      drawInfo->affine.tx=current.sx*affine.tx+current.ry*affine.ty
+        +current.tx;
     }
 
   AnnotateImage( image(), drawInfo );
 
-  // Restore original values
+  // Restore original state
   drawInfo->affine = oaffine;
-  drawInfo->text = 0;
-  drawInfo->geometry = 0;
+  MagickFreeMemory(drawInfo->text);
+  MagickFreeMemory(drawInfo->geometry);
 
   throwImageException();
 }
