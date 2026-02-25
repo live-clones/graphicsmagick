@@ -118,7 +118,8 @@
 %
 %
 */
-
+/* FIXME: There is a data-sharing issue (causing corruption) if OpenMP is enabled. */
+#define ENABLE_COLORFLOODFILL_OPENMP 0
 MagickExport MagickPassFail ColorFloodfillImage(Image *image,
                                                 const DrawInfo *draw_info,
                                                 const PixelPacket target,
@@ -402,8 +403,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       */
       if (status == MagickPass)
         {
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp parallel for schedule(static,64) shared(status)
+#endif
 #endif
           for (y=0; y < (long) image->rows; y++)
             {
@@ -434,8 +437,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
               /* There was a problem */
             tile_color_fail:;
               status=MagickFail;
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp flush (status)
+#endif
 #endif
             }
         }
@@ -447,8 +452,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       */
       if (status == MagickPass)
         {
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp parallel for schedule(static,64) shared(status)
+#endif
 #endif
           for (y=0; y < (long) image->rows; y++)
             {
@@ -492,8 +499,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
               /* There was a problem */
             tile_pattern_fail:;
               status=MagickFail;
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp flush (status)
+#endif
 #endif
             } /* for y ... */
         } /* if status ... */
