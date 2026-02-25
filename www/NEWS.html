@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to February 12, 2026.</p>
+<p>This file was last updated to reflect changes up to February 25, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -117,12 +117,16 @@ all targets.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
-<li><p>TIFF: Detect and prevent infinite looping in the EXIF IFD writer
-(EXIF IFD writer code may be excluded by the
--DEXPERIMENTAL_EXIF_TAGS=0 define).</p></li>
+<li><p>TIFF EXIF IFD writer: Detect and prevent infinite looping (EXIF IFD
+writer code may be excluded by the -DEXPERIMENTAL_EXIF_TAGS=0
+define).</p></li>
+<li><p>TIFF EXIF IFD writer: Only transfer tags from EXIF and GPS IFDs. Do
+not transfer tags from the main IFDs.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
+<li><p>ColorFloodfillImage(): Disable OpenMP since it was observed to
+create corrupt images.</p></li>
 <li><p>Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
 been present since 2003!</p></li>
 <li><p>Magick++: If monochrome is disabled, then clear the image

@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to February 12, 2026.
+This file was last updated to reflect changes up to February 25, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -34,11 +34,17 @@ Special Issues:
 
 Security Fixes:
 
-* TIFF: Detect and prevent infinite looping in the EXIF IFD writer
-  (EXIF IFD writer code may be excluded by the
-  -DEXPERIMENTAL_EXIF_TAGS=0 define).
+* TIFF EXIF IFD writer: Detect and prevent infinite looping (EXIF IFD
+  writer code may be excluded by the -DEXPERIMENTAL_EXIF_TAGS=0
+  define).
+
+* TIFF EXIF IFD writer: Only transfer tags from EXIF and GPS IFDs. Do
+  not transfer tags from the main IFDs.
 
 Bug fixes:
+
+* ColorFloodfillImage(): Disable OpenMP since it was observed to
+  create corrupt images.
 
 * Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
   been present since 2003!

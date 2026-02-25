@@ -1,5 +1,7 @@
 2026-02-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * magick/paint.c (ColorFloodfillImage): Disable OpenMP since it
         was observed to create corrupt images, such as with the Magick++
         shapes demo.
@@ -48,18 +50,11 @@
         * magick/render.c (DrawImage): The change to MagickGetToken()
         resulted in a change to 'encoding' behavior.  Add a work-around.
 
-        * magick/blob.c (GetConfigureBlob): Remove useless memset().
-
         * magick/log.c (ReadLogConfigureFile): Use returned token length
         for purpose of optimization and error handling.
 
         * magick/utility.c (MagickGetToken): Now returns the size of the
         token which was parsed, which will be zero if no token was parsed.
-
-2026-02-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
-
-        * magick/utility.c (DefineClientName): Assure that component name
-        is initialized.
 
 2026-02-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
@@ -68,9 +63,6 @@
 
         * coders/heif.c (HEIF_channel_to_string): Include
         'heif_channel_unknown' in switch statement.
-
-        * magick/utility.c (DefineClientPathAndName): Assure that
-        'component' is initialized.
 
 2026-02-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

@@ -41,6 +41,7 @@
 <p>2026-02-25  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>NEWS.txt: Update the news.</p></li>
 <li><p>magick/paint.c (ColorFloodfillImage): Disable OpenMP since it
 was observed to create corrupt images, such as with the Magick++
 shapes demo.</p></li>
@@ -89,18 +90,10 @@ ReadHEIFImageFrame&quot;.</p></li>
 coder_JBIG_fuzzer.</p></li>
 <li><p>magick/render.c (DrawImage): The change to MagickGetToken()
 resulted in a change to 'encoding' behavior.  Add a work-around.</p></li>
-<li><p>magick/blob.c (GetConfigureBlob): Remove useless memset().</p></li>
 <li><p>magick/log.c (ReadLogConfigureFile): Use returned token length
 for purpose of optimization and error handling.</p></li>
 <li><p>magick/utility.c (MagickGetToken): Now returns the size of the
 token which was parsed, which will be zero if no token was parsed.</p></li>
-</ul>
-</blockquote>
-<p>2026-02-19  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
-<blockquote>
-<ul class="simple">
-<li><p>magick/utility.c (DefineClientName): Assure that component name
-is initialized.</p></li>
 </ul>
 </blockquote>
 <p>2026-02-18  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
@@ -110,8 +103,6 @@ is initialized.</p></li>
 LLVMFuzzerInitialize() to pass program path.</p></li>
 <li><p>coders/heif.c (HEIF_channel_to_string): Include
 'heif_channel_unknown' in switch statement.</p></li>
-<li><p>magick/utility.c (DefineClientPathAndName): Assure that
-'component' is initialized.</p></li>
 </ul>
 </blockquote>
 <p>2026-02-17  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
