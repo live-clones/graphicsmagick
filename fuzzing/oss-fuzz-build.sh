@@ -1338,9 +1338,10 @@ fi
     #
     # max_len = <bytes>: Sets the maximum length of the input data that the fuzzer will generate.
     #
+    # It seems that ClusterFuzz hard-limits the maximum timeout value to 65 seconds.
     cat << 'MARKER' > "${OUT}/coder_JBIG_fuzzer.options"
 [libfuzzer]
-timeout = 240
+timeout = 65
 MARKER
 
     if true ; then

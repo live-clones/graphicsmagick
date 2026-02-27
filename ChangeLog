@@ -1,3 +1,12 @@
+2026-02-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (HEIF_colorspace_to_string): Document that
+        heif_colorspace_filter_array was added to development code.
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Change JBIG oss-fuzz timeout
+        to 65, since that is apparently the maximum value that ClusterFuzz
+        allows.
+
 2026-02-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.
