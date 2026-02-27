@@ -749,6 +749,12 @@ static MagickPassFail apply_security_limits(const ImageInfo *image_info,
   return MagickPass;
 }
 
+/*
+  libheif/color-conversion/colorconversion.cc provides this to output to
+  an ostream, but our code is not C++!
+
+  std::ostream& operator<<(std::ostream& ostr, heif_colorspace c)
+*/
 static const char *HEIF_colorspace_to_string(const enum heif_colorspace c)
 {
   const char *s = "unknown";
@@ -770,6 +776,12 @@ static const char *HEIF_colorspace_to_string(const enum heif_colorspace c)
     case heif_colorspace_nonvisual:
       s = "nonvisual";
       break;
+#if 0
+      /* Git commit cb6e524 added on 2/24/26 */
+    case heif_colorspace_filter_array:
+      s = "filter_array";
+      break;
+#endif
     }
 
   return s;
