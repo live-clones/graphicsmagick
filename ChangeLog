@@ -1,5 +1,7 @@
 2026-03-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * coders/yuv.c (ReadYUVImage, WriteYUVImage): Address
         GraphicsMagick bug #763 "CVE-2026-25799".  This fixes a
         '-sampling-factor' / 'ImageInfo->sampling_factor' argument

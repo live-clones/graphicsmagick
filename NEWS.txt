@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to February 25, 2026.
+This file was last updated to reflect changes up to March 6, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -40,6 +40,11 @@ Security Fixes:
 
 * TIFF EXIF IFD writer: Only transfer tags from EXIF and GPS IFDs. Do
   not transfer tags from the main IFDs.
+
+* YUV: Fix validation of 'sampling-factor' argument. This is known as
+  ImageMagick CVE-2026-25799. Given that the argument normally comes
+  from a user (rather than an input file) this seems to be a minor
+  security issue at most.
 
 Bug fixes:
 
