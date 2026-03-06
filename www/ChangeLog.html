@@ -38,6 +38,18 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-03-06  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/yuv.c (ReadYUVImage, WriteYUVImage): Address
+GraphicsMagick bug #763 &quot;CVE-2026-25799&quot;.  This fixes a
+'-sampling-factor' / 'ImageInfo-&gt;sampling_factor' argument
+validation issue inherited from the ImageMagick code base. The
+symptom is a divide by zero exception. Given that this issue
+arises from an external user argument, rather than from an input
+file, this seems like a bug, but not very CVE-worthy.</p></li>
+</ul>
+</blockquote>
 <p>2026-02-27  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

@@ -1,3 +1,13 @@
+2026-03-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/yuv.c (ReadYUVImage, WriteYUVImage): Address
+        GraphicsMagick bug #763 "CVE-2026-25799".  This fixes a
+        '-sampling-factor' / 'ImageInfo->sampling_factor' argument
+        validation issue inherited from the ImageMagick code base. The
+        symptom is a divide by zero exception. Given that this issue
+        arises from an external user argument, rather than from an input
+        file, this seems like a bug, but not very CVE-worthy.
+
 2026-02-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (HEIF_colorspace_to_string): Document that

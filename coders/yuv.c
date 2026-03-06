@@ -154,8 +154,8 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
         &vertical_factor);
       if (factors != 2)
         vertical_factor=horizontal_factor;
-      if ((horizontal_factor != 1) && (horizontal_factor != 2) &&
-          (vertical_factor != 1) && (vertical_factor != 2))
+      if (((horizontal_factor != 1) && (horizontal_factor != 2)) ||
+          ((vertical_factor != 1) && (vertical_factor != 2)))
         ThrowYUVReaderException(OptionError,UnsupportedSamplingFactor,
           image);
     }
@@ -582,8 +582,8 @@ static unsigned int WriteYUVImage(const ImageInfo *image_info,Image *image)
         &vertical_factor);
       if (factors != 2)
         vertical_factor=horizontal_factor;
-      if ((horizontal_factor != 1) && (horizontal_factor != 2) &&
-          (vertical_factor != 1) && (vertical_factor != 2))
+      if (((horizontal_factor != 1) && (horizontal_factor != 2)) ||
+          ((vertical_factor != 1) && (vertical_factor != 2)))
         ThrowWriterException(OptionError,UnsupportedSamplingFactor,
           image);
     }
