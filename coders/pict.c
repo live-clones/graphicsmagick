@@ -1305,7 +1305,7 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
 }
 
 static Image *ReadPICTImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                            ExceptionInfo *exception)
 {
   char
     geometry[MaxTextExtent];
@@ -1363,7 +1363,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
   MagickBool
     logging;
 
-   logging=IsEventLogged(CoderEvent);
+  logging=IsEventLogged(CoderEvent);
 
   /*
     Open image file.
@@ -1433,614 +1433,614 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
   */
   jpeg=False;
   for (code=0; EOFBlob(image) == False; )
-  {
-    if (image_info->ping && (image_info->subrange != 0))
-      if (image->scene >= (image_info->subimage+image_info->subrange-1))
-        break;
-    if ((version == 1) || ((TellBlob(image) % 2) != 0))
-      {
-        if ((c=ReadBlobByte(image)) == EOF) /* returns int */
+    {
+      if (image_info->ping && (image_info->subrange != 0))
+        if (image->scene >= (image_info->subimage+image_info->subrange-1))
           break;
-        code=(unsigned int) c;
-      }
-    if (version == 2)
-      code=ReadBlobMSBShort(image); /* returns magick_uint16_t */
-    if (code > 0xa1)
-      {
-        if (logging)
-          {
-            if (0xff == code)
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X %.1024s: %.1024s",code,
-                                    "EndOfPicture","End of picture");
-            else /* Unknown code */
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X:",code);
-          }
-      }
-    else
-      {
-        if (logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X %.1024s: %.1024s",code,
-                                lookup_string(code_names,sizeof(code_names),code),
-                                lookup_string(code_descriptions,sizeof(code_descriptions),code));
-        switch (code)
+      if ((version == 1) || ((TellBlob(image) % 2) != 0))
         {
-          case 0x01:
-          {
-            /*
-              Clipping rectangle.
-            */
-            length=ReadBlobMSBShort(image);
-            if (length != 0x000a)
+          if ((c=ReadBlobByte(image)) == EOF) /* returns int */
+            break;
+          code=(unsigned int) c;
+        }
+      if (version == 2)
+        code=ReadBlobMSBShort(image); /* returns magick_uint16_t */
+      if (code > 0xa1)
+        {
+          if (logging)
+            {
+              if (0xff == code)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X %.1024s: %.1024s",code,
+                                      "EndOfPicture","End of picture");
+              else /* Unknown code */
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X:",code);
+            }
+        }
+      else
+        {
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),"Code 0x%04X %.1024s: %.1024s",code,
+                                  lookup_string(code_names,sizeof(code_names),code),
+                                  lookup_string(code_descriptions,sizeof(code_descriptions),code));
+          switch (code)
+            {
+            case 0x01:
               {
+                /*
+                  Clipping rectangle.
+                */
+                length=ReadBlobMSBShort(image);
+                if (length != 0x000a)
+                  {
+                    for (i=0; i < (long) (length-2); i++)
+                      if (ReadBlobByte(image) == EOF)
+                        break;
+                    break;
+                  }
+                ReadRectangle(frame);
+                TraceRectangle(image,frame);
+                if (!ValidateRectangle(frame))
+                  ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+                if ((frame.left & 0x8000) || (frame.top & 0x8000))
+                  break;
+                image->columns=frame.right-frame.left;
+                image->rows=frame.bottom-frame.top;
+                if (CheckImagePixelLimits(image, exception) != MagickPass)
+                  ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+                (void) SetImageEx(image,OpaqueOpacity,exception);
+                break;
+              }
+            case 0x12:
+            case 0x13:
+            case 0x14:
+              {
+                long
+                  pattern;
+
+                unsigned long
+                  height,
+                  width;
+
+                /*
+                  Skip pattern definition.
+                */
+                pattern=ReadBlobMSBShort(image);
+                for (i=0; i < 8; i++)
+                  (void) ReadBlobByte(image);
+                if (pattern == 2)
+                  {
+                    for (i=0; i < 5; i++)
+                      (void) ReadBlobByte(image);
+                    break;
+                  }
+                if (pattern != 1)
+                  ThrowPICTReaderException(CorruptImageError,UnknownPatternType,
+                                           image);
+                length=ReadBlobMSBShort(image);
+                ReadRectangle(frame);
+                TraceRectangle(image,frame);
+                if (!ValidateRectangle(frame))
+                  ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+                ReadPixmap(pixmap);
+                TracePixMap(image,pixmap);
+                if (!ValidatePixmap(pixmap))
+                  ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+                image->depth=pixmap.component_size;
+                image->x_resolution=1.0*pixmap.horizontal_resolution;
+                image->y_resolution=1.0*pixmap.vertical_resolution;
+                if (logging)
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Depth %u, X resolution %g, Y resolution %g",
+                                        image->depth,
+                                        image->x_resolution, image->y_resolution);
+                image->units=PixelsPerInchResolution;
+                (void) ReadBlobMSBLong(image);
+                flags=ReadBlobMSBShort(image);
+                length=ReadBlobMSBShort(image);
+                for (i=0; i <= (long) length; i++)
+                  (void) ReadBlobMSBLong(image);
+                width=frame.bottom-frame.top;
+                height=frame.right-frame.left;
+#if 0
+                image->depth=pixmap.bits_per_pixel <= 8 ? 8 : QuantumDepth;
+                if (pixmap.bits_per_pixel < 8)
+                  image->depth=8;
+#endif
+                if (pixmap.bits_per_pixel <= 8)
+                  length&=0x7fff;
+                if (pixmap.bits_per_pixel == 16)
+                  width<<=1;
+                if (length == 0)
+                  length=width;
+                if (length < 8)
+                  {
+                    for (i=0; i < (long) (length*height); i++)
+                      if (ReadBlobByte(image) == EOF)
+                        break;
+                  }
+                else
+                  {
+                    for (j=0; j < (int) height; j++)
+                      {
+                        if (EOFBlob(image))
+                          break;
+                        if (length > 250)
+                          {
+                            for (j=0; j < ReadBlobMSBShort(image); j++)
+                              if (ReadBlobByte(image) == EOF)
+                                break;
+                          }
+                        else
+                          {
+                            for (j=0; j < ReadBlobByte(image); j++)
+                              if (ReadBlobByte(image) == EOF)
+                                break;
+                          }
+                      }
+                  }
+                break;
+              }
+            case 0x1b:
+              {
+                /*
+                  Initialize image background color.
+                */
+                image->background_color.red=(Quantum)
+                  ScaleShortToQuantum(ReadBlobMSBShort(image));
+                image->background_color.green=(Quantum)
+                  ScaleShortToQuantum(ReadBlobMSBShort(image));
+                image->background_color.blue=(Quantum)
+                  ScaleShortToQuantum(ReadBlobMSBShort(image));
+                break;
+              }
+            case 0x70:
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+            case 0x75:
+            case 0x76:
+            case 0x77:
+              {
+                /*
+                  Skip polygon or region.
+                */
+                length=ReadBlobMSBShort(image);
                 for (i=0; i < (long) (length-2); i++)
                   if (ReadBlobByte(image) == EOF)
                     break;
                 break;
               }
-            ReadRectangle(frame);
-            TraceRectangle(image,frame);
-            if (!ValidateRectangle(frame))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            if ((frame.left & 0x8000) || (frame.top & 0x8000))
-              break;
-            image->columns=frame.right-frame.left;
-            image->rows=frame.bottom-frame.top;
-            if (CheckImagePixelLimits(image, exception) != MagickPass)
-              ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
-            (void) SetImageEx(image,OpaqueOpacity,exception);
-            break;
-          }
-          case 0x12:
-          case 0x13:
-          case 0x14:
-          {
-            long
-              pattern;
+            case 0x90:
+            case 0x91:
+            case 0x98:
+            case 0x99:
+            case 0x9a:
+            case 0x9b:
+              {
+                long
+                  bytes_per_line;
 
-            unsigned long
-              height,
-              width;
+                PICTRectangle
+                  source,
+                  destination;
 
-            /*
-              Skip pattern definition.
-            */
-            pattern=ReadBlobMSBShort(image);
-            for (i=0; i < 8; i++)
-              (void) ReadBlobByte(image);
-            if (pattern == 2)
-              {
-                for (i=0; i < 5; i++)
-                  (void) ReadBlobByte(image);
-                break;
-              }
-            if (pattern != 1)
-              ThrowPICTReaderException(CorruptImageError,UnknownPatternType,
-                image);
-            length=ReadBlobMSBShort(image);
-            ReadRectangle(frame);
-            TraceRectangle(image,frame);
-            if (!ValidateRectangle(frame))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            ReadPixmap(pixmap);
-            TracePixMap(image,pixmap);
-            if (!ValidatePixmap(pixmap))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            image->depth=pixmap.component_size;
-            image->x_resolution=1.0*pixmap.horizontal_resolution;
-            image->y_resolution=1.0*pixmap.vertical_resolution;
-            if (logging)
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Depth %u, X resolution %g, Y resolution %g",
-                                    image->depth,
-                                    image->x_resolution, image->y_resolution);
-            image->units=PixelsPerInchResolution;
-            (void) ReadBlobMSBLong(image);
-            flags=ReadBlobMSBShort(image);
-            length=ReadBlobMSBShort(image);
-            for (i=0; i <= (long) length; i++)
-              (void) ReadBlobMSBLong(image);
-            width=frame.bottom-frame.top;
-            height=frame.right-frame.left;
-#if 0
-            image->depth=pixmap.bits_per_pixel <= 8 ? 8 : QuantumDepth;
-            if (pixmap.bits_per_pixel < 8)
-              image->depth=8;
-#endif
-            if (pixmap.bits_per_pixel <= 8)
-              length&=0x7fff;
-            if (pixmap.bits_per_pixel == 16)
-              width<<=1;
-            if (length == 0)
-              length=width;
-            if (length < 8)
-              {
-                for (i=0; i < (long) (length*height); i++)
-                  if (ReadBlobByte(image) == EOF)
-                    break;
-              }
-            else
-              {
-                for (j=0; j < (int) height; j++)
+                register unsigned char
+                  *p;
+
+                size_t
+                  j;
+
+                unsigned char
+                  *pixels;
+
+                /*
+                  Pixmap clipped by a rectangle.
+                */
+                bytes_per_line=0;
+                if ((code != 0x9a) && (code != 0x9b))
+                  bytes_per_line=ReadBlobMSBShort(image);
+                else
                   {
-                    if (EOFBlob(image))
-                      break;
-                    if (length > 250)
-                      {
-                        for (j=0; j < ReadBlobMSBShort(image); j++)
-                          if (ReadBlobByte(image) == EOF)
-                            break;
-                      }
-                    else
-                      {
-                        for (j=0; j < ReadBlobByte(image); j++)
-                          if (ReadBlobByte(image) == EOF)
-                            break;
-                      }
+                    (void) ReadBlobMSBShort(image);
+                    (void) ReadBlobMSBShort(image);
+                    (void) ReadBlobMSBShort(image);
                   }
-              }
-            break;
-          }
-          case 0x1b:
-          {
-            /*
-              Initialize image background color.
-            */
-            image->background_color.red=(Quantum)
-              ScaleShortToQuantum(ReadBlobMSBShort(image));
-            image->background_color.green=(Quantum)
-              ScaleShortToQuantum(ReadBlobMSBShort(image));
-            image->background_color.blue=(Quantum)
-              ScaleShortToQuantum(ReadBlobMSBShort(image));
-            break;
-          }
-          case 0x70:
-          case 0x71:
-          case 0x72:
-          case 0x73:
-          case 0x74:
-          case 0x75:
-          case 0x76:
-          case 0x77:
-          {
-            /*
-              Skip polygon or region.
-            */
-            length=ReadBlobMSBShort(image);
-            for (i=0; i < (long) (length-2); i++)
-              if (ReadBlobByte(image) == EOF)
-                break;
-            break;
-          }
-          case 0x90:
-          case 0x91:
-          case 0x98:
-          case 0x99:
-          case 0x9a:
-          case 0x9b:
-          {
-            long
-              bytes_per_line;
-
-            PICTRectangle
-              source,
-              destination;
-
-            register unsigned char
-              *p;
-
-            size_t
-              j;
-
-            unsigned char
-              *pixels;
-
-            /*
-              Pixmap clipped by a rectangle.
-            */
-            bytes_per_line=0;
-            if ((code != 0x9a) && (code != 0x9b))
-              bytes_per_line=ReadBlobMSBShort(image);
-            else
-              {
-                (void) ReadBlobMSBShort(image);
-                (void) ReadBlobMSBShort(image);
-                (void) ReadBlobMSBShort(image);
-              }
-            ReadRectangle(frame);
-            TraceRectangle(image,frame);
-            if (!ValidateRectangle(frame))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            /*
-              Initialize tile image.
-            */
-            tile_image=CloneImage(image,frame.right-frame.left,
-              frame.bottom-frame.top,True,exception);
-            if (tile_image == (Image *) NULL)
-              {
-                DestroyImage(image);
-                return((Image *) NULL);
-              }
-            DestroyBlob(tile_image);
-            tile_image->blob=CloneBlobInfo((BlobInfo *) NULL);
-            if ((code == 0x9a) || (code == 0x9b) || (bytes_per_line & 0x8000))
-              {
-                ReadPixmap(pixmap);
-                TracePixMap(image,pixmap);
-                if (!ValidatePixmap(pixmap))
+                ReadRectangle(frame);
+                TraceRectangle(image,frame);
+                if (!ValidateRectangle(frame))
                   ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-                tile_image->matte=pixmap.component_count == 4;
-              }
-            if ((code != 0x9a) && (code != 0x9b))
-              {
                 /*
-                  Initialize colormap.
+                  Initialize tile image.
                 */
-                tile_image->colors=2;
-                if (bytes_per_line & 0x8000)
+                tile_image=CloneImage(image,frame.right-frame.left,
+                                      frame.bottom-frame.top,True,exception);
+                if (tile_image == (Image *) NULL)
                   {
-                    (void) ReadBlobMSBLong(image);
-                    flags=ReadBlobMSBShort(image);
-                    tile_image->colors=ReadBlobMSBShort(image)+1;
+                    DestroyImage(image);
+                    return((Image *) NULL);
                   }
-                if (!AllocateImageColormap(tile_image,tile_image->colors))
-                  ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                if (logging)
-                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                  "Allocated tile image colormap with %u colors",tile_image->colors);
-                if (bytes_per_line & 0x8000)
+                DestroyBlob(tile_image);
+                tile_image->blob=CloneBlobInfo((BlobInfo *) NULL);
+                if ((code == 0x9a) || (code == 0x9b) || (bytes_per_line & 0x8000))
                   {
-                    for (i=0; i < (long) tile_image->colors; i++)
-                    {
-                      j=ReadBlobMSBShort(image) % tile_image->colors;
-                      if (flags & 0x8000)
-                        j=i;
-                      tile_image->colormap[j].red=(Quantum)
-                        ScaleShortToQuantum(ReadBlobMSBShort(image));
-                      tile_image->colormap[j].green=(Quantum)
-                        ScaleShortToQuantum(ReadBlobMSBShort(image));
-                      tile_image->colormap[j].blue=(Quantum)
-                        ScaleShortToQuantum(ReadBlobMSBShort(image));
-                      if (EOFBlob(image))
-                        break;
-                    }
+                    ReadPixmap(pixmap);
+                    TracePixMap(image,pixmap);
+                    if (!ValidatePixmap(pixmap))
+                      ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+                    tile_image->matte=pixmap.component_count == 4;
                   }
-                else
+                if ((code != 0x9a) && (code != 0x9b))
                   {
-                    for (i=0; i < (long) tile_image->colors; i++)
-                    {
-                      tile_image->colormap[i].red=(Quantum) (MaxRGB-
-                        tile_image->colormap[i].red);
-                      tile_image->colormap[i].green=(Quantum) (MaxRGB-
-                        tile_image->colormap[i].green);
-                      tile_image->colormap[i].blue=(Quantum) (MaxRGB-
-                        tile_image->colormap[i].blue);
-                    }
-                  }
-              }
-            if (EOFBlob(image))
-              ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-            ReadRectangle(source);
-            TraceRectangle(image,source);
-            if (!ValidateRectangle(source))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            ReadRectangle(destination);
-            TraceRectangle(image,destination);
-            if (!ValidateRectangle(destination))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            (void) ReadBlobMSBShort(image);
-            if ((code == 0x91) || (code == 0x99) || (code == 0x9b))
-              {
-                /*
-                  Skip region.
-                */
-                length=ReadBlobMSBShort(image);
-                for (i=0; i <= (long) (length-2); i++)
-                  if (ReadBlobByte(image) == EOF)
-                    break;
-              }
-            if (CheckImagePixelLimits(tile_image, exception) != MagickPass)
-              ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
-            if ((code != 0x9a) && (code != 0x9b) &&
-                (bytes_per_line & 0x8000) == 0)
-              pixels=DecodeImage(image_info,image,tile_image,bytes_per_line,1);
-            else
-              pixels=DecodeImage(image_info,image,tile_image,bytes_per_line,
-                pixmap.bits_per_pixel);
-            if (pixels == (unsigned char *) NULL)
-              {
-                CopyException(exception, &tile_image->exception);
-                ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image)
-              }
-            /*
-              Convert PICT tile image to pixel packets.
-            */
-            p=pixels;
-            for (y=0; y < (long) tile_image->rows; y++)
-            {
-              q=SetImagePixelsEx(tile_image,0,y,tile_image->columns,1,&image->exception);
-              if (q == (PixelPacket *) NULL)
-                break;
-              indexes=AccessMutableIndexes(tile_image);
-              for (x=0; x < (long) tile_image->columns; x++)
-              {
-                if (tile_image->storage_class == PseudoClass)
-                  {
-                    index=(IndexPacket) (*p);
-                    VerifyColormapIndex(status,tile_image,index);
-                    indexes[x]=index;
-                    q->red=tile_image->colormap[index].red;
-                    q->green=tile_image->colormap[index].green;
-                    q->blue=tile_image->colormap[index].blue;
-                  }
-                else
-                  {
-                    if (pixmap.bits_per_pixel == 16)
+                    /*
+                      Initialize colormap.
+                    */
+                    tile_image->colors=2;
+                    if (bytes_per_line & 0x8000)
                       {
-                        i=(*p++);
-                        j=(*p);
-                        q->red=ScaleCharToQuantum((i & 0x7c) << 1);
-                        q->green=ScaleCharToQuantum((((size_t)i & 0x03) << 6) |
-                          (((size_t) j & 0xe0) >> 2));
-                        q->blue=ScaleCharToQuantum((j & 0x1f) << 3);
+                        (void) ReadBlobMSBLong(image);
+                        flags=ReadBlobMSBShort(image);
+                        tile_image->colors=ReadBlobMSBShort(image)+1;
+                      }
+                    if (!AllocateImageColormap(tile_image,tile_image->colors))
+                      ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+                    if (logging)
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "Allocated tile image colormap with %u colors",tile_image->colors);
+                    if (bytes_per_line & 0x8000)
+                      {
+                        for (i=0; i < (long) tile_image->colors; i++)
+                          {
+                            j=ReadBlobMSBShort(image) % tile_image->colors;
+                            if (flags & 0x8000)
+                              j=i;
+                            tile_image->colormap[j].red=(Quantum)
+                              ScaleShortToQuantum(ReadBlobMSBShort(image));
+                            tile_image->colormap[j].green=(Quantum)
+                              ScaleShortToQuantum(ReadBlobMSBShort(image));
+                            tile_image->colormap[j].blue=(Quantum)
+                              ScaleShortToQuantum(ReadBlobMSBShort(image));
+                            if (EOFBlob(image))
+                              break;
+                          }
                       }
                     else
                       {
-                        if (!tile_image->matte)
+                        for (i=0; i < (long) tile_image->colors; i++)
                           {
-                            q->red=ScaleCharToQuantum(*p);
-                            q->green=
-                              ScaleCharToQuantum(*(p+tile_image->columns));
-                            q->blue=ScaleCharToQuantum(*(p+ (size_t)2*tile_image->columns));
+                            tile_image->colormap[i].red=(Quantum) (MaxRGB-
+                                                                   tile_image->colormap[i].red);
+                            tile_image->colormap[i].green=(Quantum) (MaxRGB-
+                                                                     tile_image->colormap[i].green);
+                            tile_image->colormap[i].blue=(Quantum) (MaxRGB-
+                                                                    tile_image->colormap[i].blue);
+                          }
+                      }
+                  }
+                if (EOFBlob(image))
+                  ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+                ReadRectangle(source);
+                TraceRectangle(image,source);
+                if (!ValidateRectangle(source))
+                  ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+                ReadRectangle(destination);
+                TraceRectangle(image,destination);
+                if (!ValidateRectangle(destination))
+                  ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+                (void) ReadBlobMSBShort(image);
+                if ((code == 0x91) || (code == 0x99) || (code == 0x9b))
+                  {
+                    /*
+                      Skip region.
+                    */
+                    length=ReadBlobMSBShort(image);
+                    for (i=0; i <= (long) (length-2); i++)
+                      if (ReadBlobByte(image) == EOF)
+                        break;
+                  }
+                if (CheckImagePixelLimits(tile_image, exception) != MagickPass)
+                  ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+                if ((code != 0x9a) && (code != 0x9b) &&
+                    (bytes_per_line & 0x8000) == 0)
+                  pixels=DecodeImage(image_info,image,tile_image,bytes_per_line,1);
+                else
+                  pixels=DecodeImage(image_info,image,tile_image,bytes_per_line,
+                                     pixmap.bits_per_pixel);
+                if (pixels == (unsigned char *) NULL)
+                  {
+                    CopyException(exception, &tile_image->exception);
+                    ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image)
+                      }
+                /*
+                  Convert PICT tile image to pixel packets.
+                */
+                p=pixels;
+                for (y=0; y < (long) tile_image->rows; y++)
+                  {
+                    q=SetImagePixelsEx(tile_image,0,y,tile_image->columns,1,&image->exception);
+                    if (q == (PixelPacket *) NULL)
+                      break;
+                    indexes=AccessMutableIndexes(tile_image);
+                    for (x=0; x < (long) tile_image->columns; x++)
+                      {
+                        if (tile_image->storage_class == PseudoClass)
+                          {
+                            index=(IndexPacket) (*p);
+                            VerifyColormapIndex(status,tile_image,index);
+                            indexes[x]=index;
+                            q->red=tile_image->colormap[index].red;
+                            q->green=tile_image->colormap[index].green;
+                            q->blue=tile_image->colormap[index].blue;
                           }
                         else
                           {
-                            q->opacity=(Quantum) (MaxRGB-ScaleCharToQuantum(*p));
-                            q->red=ScaleCharToQuantum(*(p+tile_image->columns));
-                            q->green=(Quantum)
-                              ScaleCharToQuantum(*(p+ (size_t)2*tile_image->columns));
-                            q->blue=
-                              ScaleCharToQuantum(*(p+ (size_t)3*tile_image->columns));
+                            if (pixmap.bits_per_pixel == 16)
+                              {
+                                i=(*p++);
+                                j=(*p);
+                                q->red=ScaleCharToQuantum((i & 0x7c) << 1);
+                                q->green=ScaleCharToQuantum((((size_t)i & 0x03) << 6) |
+                                                            (((size_t) j & 0xe0) >> 2));
+                                q->blue=ScaleCharToQuantum((j & 0x1f) << 3);
+                              }
+                            else
+                              {
+                                if (!tile_image->matte)
+                                  {
+                                    q->red=ScaleCharToQuantum(*p);
+                                    q->green=
+                                      ScaleCharToQuantum(*(p+tile_image->columns));
+                                    q->blue=ScaleCharToQuantum(*(p+ (size_t)2*tile_image->columns));
+                                  }
+                                else
+                                  {
+                                    q->opacity=(Quantum) (MaxRGB-ScaleCharToQuantum(*p));
+                                    q->red=ScaleCharToQuantum(*(p+tile_image->columns));
+                                    q->green=(Quantum)
+                                      ScaleCharToQuantum(*(p+ (size_t)2*tile_image->columns));
+                                    q->blue=
+                                      ScaleCharToQuantum(*(p+ (size_t)3*tile_image->columns));
+                                  }
+                              }
                           }
+                        p++;
+                        q++;
                       }
+                    if (!SyncImagePixelsEx(tile_image,&image->exception))
+                      break;
+                    if ((tile_image->storage_class == DirectClass) &&
+                        (pixmap.bits_per_pixel != 16))
+                      p+=((size_t) pixmap.component_count-1)*tile_image->columns;
+                    if (destination.bottom == (long) image->rows)
+                      if (QuantumTick(y,tile_image->rows))
+                        if (!MagickMonitorFormatted(y,tile_image->rows,&image->exception,
+                                                    LoadImageText,image->filename,
+                                                    image->columns,image->rows))
+                          break;
                   }
-                p++;
-                q++;
-              }
-              if (!SyncImagePixelsEx(tile_image,&image->exception))
-                break;
-              if ((tile_image->storage_class == DirectClass) &&
-                  (pixmap.bits_per_pixel != 16))
-                p+=((size_t) pixmap.component_count-1)*tile_image->columns;
-              if (destination.bottom == (long) image->rows)
-                if (QuantumTick(y,tile_image->rows))
-                  if (!MagickMonitorFormatted(y,tile_image->rows,&image->exception,
+                MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+                if (tile_image->exception.severity > image->exception.severity)
+                  CopyException(&image->exception,&tile_image->exception);
+                if ((tile_image->exception.severity < ErrorException) && (jpeg == False))
+                  if ((code == 0x9a) || (code == 0x9b) ||
+                      (bytes_per_line & 0x8000))
+                    {
+                      if (logging)
+                        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                              "Composite tile: %lux%lu%+d%+d",
+                                              tile_image->columns, tile_image->rows,
+                                              destination.left, destination.top);
+                      (void) CompositeImage(image,CopyCompositeOp,tile_image,
+                                            destination.left,destination.top);
+                    }
+                DestroyImage(tile_image);
+                tile_image=(Image *) NULL;
+                if (destination.bottom != (long) image->rows)
+                  if (!MagickMonitorFormatted(destination.bottom,image->rows,&image->exception,
                                               LoadImageText,image->filename,
                                               image->columns,image->rows))
                     break;
+                break;
+              }
+            case 0xa1:
+              {
+                unsigned char
+                  *info;
+
+                unsigned int
+                  type;
+
+                /*
+                  Comment.
+                */
+                type=ReadBlobMSBShort(image);
+                length=ReadBlobMSBShort(image);
+                if (length == 0)
+                  break;
+                (void) ReadBlobMSBLong(image);
+                length-=Min(4,length);
+                if (length == 0)
+                  break;
+                info=MagickAllocateResourceLimitedMemory(unsigned char *,length);
+                if (info == (unsigned char *) NULL)
+                  break;
+                (void) ReadBlob(image,length,info);
+                switch (type)
+                  {
+                  case 0xe0:
+                    {
+                      if (length == 0)
+                        break;
+                      if (SetImageProfile(image,"ICM",info,length) == MagickFail)
+                        ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+                      MagickFreeResourceLimitedMemory(unsigned char *,info);
+                      break;
+                    }
+                  case 0x1f2:
+                    {
+                      if (length == 0)
+                        break;
+                      if (SetImageProfile(image,"IPTC",info,length) == MagickFail)
+                        ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+                      MagickFreeResourceLimitedMemory(unsigned char *,info);
+                      break;
+                    }
+                  default:
+                    break;
+                  }
+                MagickFreeResourceLimitedMemory(unsigned char *,info);
+                break;
+              }
+            default:
+              {
+                /*
+                  Skip to next op code.
+                */
+                if (code_lengths[code] == -1)
+                  (void) ReadBlobMSBShort(image);
+                else
+                  for (i=0; i < (long) code_lengths[code]; i++)
+                    if (ReadBlobByte(image) == EOF)
+                      break;
+              }
             }
-            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-            if (tile_image->exception.severity > image->exception.severity)
-              CopyException(&image->exception,&tile_image->exception);
-            if ((tile_image->exception.severity < ErrorException) && (jpeg == False))
-              if ((code == 0x9a) || (code == 0x9b) ||
-                  (bytes_per_line & 0x8000))
+        }
+      if (code == 0xc00)
+        {
+          /*
+            Skip header.
+          */
+          for (i=0; i < 24; i++)
+            if (ReadBlobByte(image) == EOF)
+              break;
+          continue;
+        }
+      if (((code >= 0xb0) && (code <= 0xcf)) ||
+          ((code >= 0x8000) && (code <= 0x80ff)))
+        continue;
+      if (code == 0x8200)
+        {
+          /*
+            Embedded JPEG.
+          */
+          jpeg=True;
+          length=ReadBlobMSBLong(image);
+          if ((length > 154) && ((file_size <= 0) || ((size_t) (file_size-TellBlob(image)) > length)))
+            {
+              void
+                *blob,
+                *blob_alloc;
+
+              const size_t
+                blob_alloc_size = length-154;
+
+              for (i=0; i < 6; i++)
+                (void) ReadBlobMSBLong(image);
+              ReadRectangle(frame);
+              TraceRectangle(image,frame);
+              if (!ValidateRectangle(frame))
+                ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
+              for (i=0; i < 122; i++)
+                if (ReadBlobByte(image) == EOF)
+                  ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+              if ((blob_alloc=MagickAllocateResourceLimitedMemory(void *,blob_alloc_size)) == (void *) NULL)
+                ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+              blob=blob_alloc;
+              clone_info=CloneImageInfo(image_info);
+              clone_info->blob=(_BlobInfoPtr_) NULL;
+              clone_info->length=0;
+              (void) strlcpy(clone_info->filename,"JPEG:",sizeof(clone_info->filename));
+              if (ReadBlobZC(image,blob_alloc_size,&blob) != blob_alloc_size)
+                {
+                  MagickFreeResourceLimitedMemory(void *,blob_alloc);
+                  ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+                }
+              if (blob != blob_alloc)
                 {
                   if (logging)
-                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                            "Composite tile: %lux%lu%+d%+d",
-                                            tile_image->columns, tile_image->rows,
-                                            destination.left, destination.top);
-                  (void) CompositeImage(image,CopyCompositeOp,tile_image,
-                                        destination.left,destination.top);
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "Tile Zero copy read.");
                 }
-            DestroyImage(tile_image);
-            tile_image=(Image *) NULL;
-            if (destination.bottom != (long) image->rows)
-              if (!MagickMonitorFormatted(destination.bottom,image->rows,&image->exception,
-                                          LoadImageText,image->filename,
-                                          image->columns,image->rows))
-                break;
-            break;
-          }
-          case 0xa1:
-          {
-            unsigned char
-              *info;
-
-            unsigned int
-              type;
-
-            /*
-              Comment.
-            */
-            type=ReadBlobMSBShort(image);
-            length=ReadBlobMSBShort(image);
-            if (length == 0)
-              break;
-            (void) ReadBlobMSBLong(image);
-            length-=Min(4,length);
-            if (length == 0)
-              break;
-            info=MagickAllocateResourceLimitedMemory(unsigned char *,length);
-            if (info == (unsigned char *) NULL)
-              break;
-            (void) ReadBlob(image,length,info);
-            switch (type)
-            {
-              case 0xe0:
-              {
-                if (length == 0)
-                  break;
-                if (SetImageProfile(image,"ICM",info,length) == MagickFail)
-                  ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                MagickFreeResourceLimitedMemory(unsigned char *,info);
-                break;
-              }
-              case 0x1f2:
-              {
-                if (length == 0)
-                  break;
-                if (SetImageProfile(image,"IPTC",info,length) == MagickFail)
-                  ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-                MagickFreeResourceLimitedMemory(unsigned char *,info);
-                break;
-              }
-              default:
-                break;
+              tile_image=BlobToImage(clone_info, blob, blob_alloc_size, &image->exception );
+              DestroyImageInfo(clone_info);
+              clone_info=(ImageInfo *) NULL;
+              MagickFreeResourceLimitedMemory(void *,blob_alloc);
             }
-            MagickFreeResourceLimitedMemory(unsigned char *,info);
-            break;
-          }
-          default:
-          {
-            /*
-              Skip to next op code.
-            */
-            if (code_lengths[code] == -1)
-              (void) ReadBlobMSBShort(image);
-            else
-              for (i=0; i < (long) code_lengths[code]; i++)
-                if (ReadBlobByte(image) == EOF)
-                  break;
-          }
-        }
-      }
-    if (code == 0xc00)
-      {
-        /*
-          Skip header.
-        */
-        for (i=0; i < 24; i++)
-          if (ReadBlobByte(image) == EOF)
-            break;
-        continue;
-      }
-    if (((code >= 0xb0) && (code <= 0xcf)) ||
-        ((code >= 0x8000) && (code <= 0x80ff)))
-      continue;
-    if (code == 0x8200)
-      {
-        /*
-          Embedded JPEG.
-        */
-        jpeg=True;
-        length=ReadBlobMSBLong(image);
-        if ((length > 154) && ((file_size <= 0) || ((size_t) (file_size-TellBlob(image)) > length)))
-          {
-            void
-              *blob,
-              *blob_alloc;
-
-            const size_t
-              blob_alloc_size = length-154;
-
-            for (i=0; i < 6; i++)
-              (void) ReadBlobMSBLong(image);
-            ReadRectangle(frame);
-            TraceRectangle(image,frame);
-            if (!ValidateRectangle(frame))
-              ThrowPICTReaderException(CorruptImageError,ImproperImageHeader,image);
-            for (i=0; i < 122; i++)
-              if (ReadBlobByte(image) == EOF)
-                ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-            if ((blob_alloc=MagickAllocateResourceLimitedMemory(void *,blob_alloc_size)) == (void *) NULL)
-              ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-            blob=blob_alloc;
-            clone_info=CloneImageInfo(image_info);
-            clone_info->blob=(_BlobInfoPtr_) NULL;
-            clone_info->length=0;
-            (void) strlcpy(clone_info->filename,"JPEG:",sizeof(clone_info->filename));
-            if (ReadBlobZC(image,blob_alloc_size,&blob) != blob_alloc_size)
-              {
-                MagickFreeResourceLimitedMemory(void *,blob_alloc);
-                ThrowPICTReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-              }
-            if (blob != blob_alloc)
-              {
-                if (logging)
-                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                        "Tile Zero copy read.");
-              }
-            tile_image=BlobToImage(clone_info, blob, blob_alloc_size, &image->exception );
-            DestroyImageInfo(clone_info);
-            clone_info=(ImageInfo *) NULL;
-            MagickFreeResourceLimitedMemory(void *,blob_alloc);
-          }
-        if (tile_image == (Image *) NULL)
+          if (tile_image == (Image *) NULL)
+            continue;
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Tile Dimensions: %lux%lu",
+                                  tile_image->columns,tile_image->rows);
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Tile Resolution: %gx%g %s",
+                                  tile_image->x_resolution,
+                                  tile_image->y_resolution,
+                                  tile_image->units == PixelsPerInchResolution ?
+                                  "pixels/inch" :
+                                  (tile_image->units == PixelsPerCentimeterResolution ?
+                                   "pixels/centimeter" :
+                                   "pixels"));
+          MagickFormatString(geometry,sizeof(geometry),"%lux%lu",Max(image->columns,tile_image->columns),
+                             Max(image->rows,tile_image->rows));
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Tile Transform %lux%lu ==> %s",
+                                  tile_image->columns,tile_image->rows,
+                                  geometry);
+          if (TransformImage(&tile_image,(char *) NULL,geometry) != MagickPass)
+            {
+              if (logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "Tile transform failed!");
+            }
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Tile Composite of %lux%lu on canvas %lux%lu at +%u,+%u",
+                                  tile_image->columns,tile_image->rows,
+                                  image->columns,image->rows,frame.left,frame.right);
+          if (CompositeImage(image,CopyCompositeOp,tile_image,frame.left,
+                             frame.right) != MagickPass)
+            {
+              if (logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "Tile composite failed!");
+            }
+          image->compression=tile_image->compression;
+          DestroyImage(tile_image);
+          tile_image=(Image *) NULL;
           continue;
-        if (logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Tile Dimensions: %lux%lu",
-                                tile_image->columns,tile_image->rows);
-        if (logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Tile Resolution: %gx%g %s",
-                                tile_image->x_resolution,
-                                tile_image->y_resolution,
-                                tile_image->units == PixelsPerInchResolution ?
-                                "pixels/inch" :
-                                (tile_image->units == PixelsPerCentimeterResolution ?
-                                 "pixels/centimeter" :
-                                 "pixels"));
-        FormatString(geometry,"%lux%lu",Max(image->columns,tile_image->columns),
-          Max(image->rows,tile_image->rows));
-        if (logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Tile Transform %lux%lu ==> %s",
-                                tile_image->columns,tile_image->rows,
-                                geometry);
-        if (TransformImage(&tile_image,(char *) NULL,geometry) != MagickPass)
-          {
-            if (logging)
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Tile transform failed!");
-          }
-        if (logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Tile Composite of %lux%lu on canvas %lux%lu at +%u,+%u",
-                                tile_image->columns,tile_image->rows,
-                                image->columns,image->rows,frame.left,frame.right);
-        if (CompositeImage(image,CopyCompositeOp,tile_image,frame.left,
-                           frame.right) != MagickPass)
-          {
-            if (logging)
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Tile composite failed!");
-          }
-        image->compression=tile_image->compression;
-        DestroyImage(tile_image);
-        tile_image=(Image *) NULL;
-        continue;
-      }
-    if ((code == 0xff) || (code == 0xffff))
-      break;
-    if (((code >= 0xd0) && (code <= 0xfe)) ||
-        ((code >= 0x8100) && (code <= 0xffff)))
-      {
-        /*
-          Skip reserved.
-        */
-        length=ReadBlobMSBShort(image);
-        for (i=0; i < (long) length; i++)
-          if (ReadBlobByte(image) == EOF)
-            break;
-        continue;
-      }
-    if ((code >= 0x100) && (code <= 0x7fff))
-      {
-        /*
-          Skip reserved.
-        */
-        length=(code >> 7) & 0xff;
-        for (i=0; i < (long) length; i++)
-          if (ReadBlobByte(image) == EOF)
-            break;
-        continue;
-      }
-  }
+        }
+      if ((code == 0xff) || (code == 0xffff))
+        break;
+      if (((code >= 0xd0) && (code <= 0xfe)) ||
+          ((code >= 0x8100) && (code <= 0xffff)))
+        {
+          /*
+            Skip reserved.
+          */
+          length=ReadBlobMSBShort(image);
+          for (i=0; i < (long) length; i++)
+            if (ReadBlobByte(image) == EOF)
+              break;
+          continue;
+        }
+      if ((code >= 0x100) && (code <= 0x7fff))
+        {
+          /*
+            Skip reserved.
+          */
+          length=(code >> 7) & 0xff;
+          for (i=0; i < (long) length; i++)
+            if (ReadBlobByte(image) == EOF)
+              break;
+          continue;
+        }
+    }
   if (EOFBlob(image))
     ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-      image->filename);
+                   image->filename);
   CloseBlob(image);
   StopTimer(&image->timer);
   return(image);

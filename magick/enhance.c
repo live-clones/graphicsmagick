@@ -1147,9 +1147,10 @@ MagickExport MagickPassFail ModulateImage(Image *image,const char *modulate)
   param.percent_saturation=AbsoluteValue(param.percent_saturation);
   param.percent_hue=AbsoluteValue(param.percent_hue);
 
-  FormatString(progress_message,"[%%s] Modulate %g/%g/%g...",
-               param.percent_brightness,param.percent_saturation,
-               param.percent_hue);
+  MagickFormatString(progress_message,sizeof(progress_message),
+                     "[%%s] Modulate %g/%g/%g...",
+                     param.percent_brightness,param.percent_saturation,
+                     param.percent_hue);
   status&=TransformColorspace(image,RGBColorspace);
 
   if (status == MagickFail)

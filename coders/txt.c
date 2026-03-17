@@ -682,11 +682,11 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     continue;
                   }
                 if (ch == 0 || ch > 128 ||	/* Duplicate image check for data with fixed geometry previous check is skipped. */
-                      (ch >= 'a' && ch <= 'z') ||
-                      (ch >= 'A' && ch <= 'Z'))
-                {                                 /* not a text data */
-                  ThrowNOTXTReaderException(CoderError,ImageTypeNotSupported,image);
-                }
+                    (ch >= 'a' && ch <= 'z') ||
+                    (ch >= 'A' && ch <= 'Z'))
+                  {                                 /* not a text data */
+                    ThrowNOTXTReaderException(CoderError,ImageTypeNotSupported,image);
+                  }
               }
 
             x = ReadInt(image,&ch);             /* x */
@@ -968,7 +968,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
     draw_info=CloneDrawInfo(image_info,(DrawInfo *) NULL);
     draw_info->fill=image_info->pen;
     (void) CloneString(&draw_info->text,image_info->filename);
-    FormatString(geometry,"0x0%+ld%+ld",page.x,page.y);
+    MagickFormatString(geometry,sizeof(geometry),"0x0%+ld%+ld",page.x,page.y);
     (void) CloneString(&draw_info->geometry,geometry);
     status=GetTypeMetrics(image,draw_info,&metrics);
     if (status == False)
@@ -1273,9 +1273,9 @@ static unsigned int WriteTXTImage(const ImageInfo *image_info,Image *image)
 
           unsigned char a = image->matte ? 'a' : ' ';
 
-          FormatString(buffer,
-                       "# ImageMagick pixel enumeration: %.20g,%.20g,%.20g,rgb%c\n",
-                       (double) image->columns, (double) image->rows, (double) depth, a);
+          MagickFormatString(buffer,sizeof(buffer),
+                             "# ImageMagick pixel enumeration: %.20g,%.20g,%.20g,rgb%c\n",
+                             (double) image->columns, (double) image->rows, (double) depth, a);
 
           (void) WriteBlobString(image,buffer);
         }
@@ -1290,7 +1290,7 @@ static unsigned int WriteTXTImage(const ImageInfo *image_info,Image *image)
             break;
           for (x=0; x < (long) image->columns; x++)
             {
-              FormatString(buffer,"%ld,%ld: ",x,y);
+              MagickFormatString(buffer,sizeof(buffer),"%ld,%ld: ",x,y);
               (void) WriteBlobString(image,buffer);
               GetColorTuple(p,depth,image->matte,MagickFalse,tuple);
               (void) strlcat(tuple," ",sizeof(tuple));

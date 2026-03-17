@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2025 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -79,7 +79,7 @@ int main ( int argc, char **argv )
     (void) printf("Keyed access ...\n");
     for (i=0; KeyVal[i].key; i++)
       {
-        FormatString(str_index,"%u",i);
+        MagickFormatString(str_index,sizeof(str_index),"%u",i);
         (void) printf("key=\"%s\" value=\"%s\"\n", str_index,
                       (char *)MagickMapAccessEntry(map,str_index,0));
       }

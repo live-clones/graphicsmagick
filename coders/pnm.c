@@ -1816,7 +1816,7 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
         }
       if ((PAM_Format != format) && (XV_332_Format != format))
         {
-          FormatString(buffer,"%lu %lu\n",image->columns,image->rows);
+          MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n",image->columns,image->rows);
           (void) WriteBlobString(image,buffer);
         }
       /*
@@ -2030,16 +2030,16 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                     else if (depth <= 16)
                       {
                         j += snprintf(&buffer[j],(sizeof(buffer)-j),"%u %u %u ",
-                                     ScaleQuantumToShort(p->red),
-                                     ScaleQuantumToShort(p->green),
-                                     ScaleQuantumToShort(p->blue));
+                                      ScaleQuantumToShort(p->red),
+                                      ScaleQuantumToShort(p->green),
+                                      ScaleQuantumToShort(p->blue));
                       }
                     else
                       {
                         j += snprintf(&buffer[j],(sizeof(buffer)-j),"%u %u %u ",
-                                     (unsigned int) ScaleQuantumToLong(p->red),
-                                     (unsigned int) ScaleQuantumToLong(p->green),
-                                     (unsigned int) ScaleQuantumToLong(p->blue));
+                                      (unsigned int) ScaleQuantumToLong(p->red),
+                                      (unsigned int) ScaleQuantumToLong(p->green),
+                                      (unsigned int) ScaleQuantumToLong(p->blue));
                       }
                     i++;
                     if (i == 4)
@@ -2251,10 +2251,10 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                 else if (CMYKAQuantum == quantum_type)
                   tuple_type="CMYK_ALPHA";
 
-                FormatString(buffer,"WIDTH %lu\nHEIGHT %lu\nDEPTH %u"
-                             "\nMAXVAL %lu\nTUPLTYPE %s\n",
-                             image->columns,image->rows,samples_per_pixel,
-                             MaxValueGivenBits(bits_per_sample),tuple_type);
+                MagickFormatString(buffer,sizeof(buffer),"WIDTH %lu\nHEIGHT %lu\nDEPTH %u"
+                                   "\nMAXVAL %lu\nTUPLTYPE %s\n",
+                                   image->columns,image->rows,samples_per_pixel,
+                                   MaxValueGivenBits(bits_per_sample),tuple_type);
                 if (image->logging)
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "PAM Header: WIDTH %lu, HEIGHT %lu, "
@@ -2272,7 +2272,7 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                 /*
                   PGM, PPM header
                 */
-                FormatString(buffer,"%lu\n",MaxValueGivenBits(bits_per_sample));
+                MagickFormatString(buffer,sizeof(buffer),"%lu\n",MaxValueGivenBits(bits_per_sample));
                 WriteBlobString(image,buffer);
               }
 
@@ -2308,136 +2308,136 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                 { 15, -5,  0,-12, 13, -7,  2,-10, 14, -6,  1,-11, 12, -8,  3, -9}
               },
               dither_green[2][16]=
+              {
+                { 11,-15,  7, -3,  8,-14,  4, -2, 10,-16,  6, -4,  9,-13,  5, -1},
+                {-12, 14, -8,  2, -9, 13, -5,  1,-11, 15, -7,  3,-10, 12, -6,  0}
+              },
+              dither_blue[2][16]=
+              {
+                { -3,  9,-13,  7, -1, 11,-15,  5, -4,  8,-14,  6, -2, 10,-16,  4},
+                {  2,-10, 12, -8,  0,-12, 14, -6,  3, -9, 13, -7,  1,-11, 15, -5}
+              };
+
+            long
+              value;
+
+            Quantum
+              pixel;
+
+            unsigned short
+              *blue_map[2][16],
+              *green_map[2][16],
+              *red_map[2][16];
+
+            unsigned int
+              j;
+
+            /*
+              Allocate and initialize dither maps.
+            */
+            memset(blue_map,0,sizeof(blue_map));
+            memset(green_map,0,sizeof(green_map));
+            memset(red_map,0,sizeof(red_map));
+            for (i=0; i < 2; i++)
+              for (j=0; j < 16; j++)
                 {
-                  { 11,-15,  7, -3,  8,-14,  4, -2, 10,-16,  6, -4,  9,-13,  5, -1},
-                  {-12, 14, -8,  2, -9, 13, -5,  1,-11, 15, -7,  3,-10, 12, -6,  0}
-                },
-                dither_blue[2][16]=
-                  {
-                    { -3,  9,-13,  7, -1, 11,-15,  5, -4,  8,-14,  6, -2, 10,-16,  4},
-                    {  2,-10, 12, -8,  0,-12, 14, -6,  3, -9, 13, -7,  1,-11, 15, -5}
-                  };
-
-                long
-                  value;
-
-                Quantum
-                  pixel;
-
-                unsigned short
-                  *blue_map[2][16],
-                  *green_map[2][16],
-                  *red_map[2][16];
-
-                unsigned int
-                  j;
-
-                /*
-                  Allocate and initialize dither maps.
-                */
-                memset(blue_map,0,sizeof(blue_map));
-                memset(green_map,0,sizeof(green_map));
-                memset(red_map,0,sizeof(red_map));
-                for (i=0; i < 2; i++)
-                  for (j=0; j < 16; j++)
+                  red_map[i][j]=MagickAllocateResourceLimitedMemory(unsigned short *,
+                                                                    256*sizeof(unsigned short));
+                  green_map[i][j]=MagickAllocateResourceLimitedMemory(unsigned short *,
+                                                                      256*sizeof(unsigned short));
+                  blue_map[i][j]=MagickAllocateResourceLimitedMemory(unsigned short *,
+                                                                     256*sizeof(unsigned short));
+                  if ((red_map[i][j] == (unsigned short *) NULL) ||
+                      (green_map[i][j] == (unsigned short *) NULL) ||
+                      (blue_map[i][j] == (unsigned short *) NULL))
                     {
-                      red_map[i][j]=MagickAllocateResourceLimitedMemory(unsigned short *,
-                                                         256*sizeof(unsigned short));
-                      green_map[i][j]=MagickAllocateResourceLimitedMemory(unsigned short *,
-                                                           256*sizeof(unsigned short));
-                      blue_map[i][j]=MagickAllocateResourceLimitedMemory(unsigned short *,
-                                                          256*sizeof(unsigned short));
-                      if ((red_map[i][j] == (unsigned short *) NULL) ||
-                          (green_map[i][j] == (unsigned short *) NULL) ||
-                          (blue_map[i][j] == (unsigned short *) NULL))
-                        {
-                          for (i=0; i < 2; i++)
-                            for (j=0; j < 16; j++)
-                              {
-                                MagickFreeResourceLimitedMemory(unsigned short *,green_map[i][j]);
-                                MagickFreeResourceLimitedMemory(unsigned short *,blue_map[i][j]);
-                                MagickFreeResourceLimitedMemory(unsigned short *,red_map[i][j]);
-                              }
-                          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                                               image);
-                        }
+                      for (i=0; i < 2; i++)
+                        for (j=0; j < 16; j++)
+                          {
+                            MagickFreeResourceLimitedMemory(unsigned short *,green_map[i][j]);
+                            MagickFreeResourceLimitedMemory(unsigned short *,blue_map[i][j]);
+                            MagickFreeResourceLimitedMemory(unsigned short *,red_map[i][j]);
+                          }
+                      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
+                                           image);
                     }
-                /*
-                  Initialize dither tables.
-                */
-                for (i=0; i < 2; i++)
-                  for (j=0; j < 16; j++)
-                    for (x=0; x < 256; x++)
-                      {
-                        value=x-16;
-                        if (x < 48)
-                          value=x/2+8;
-                        value+=dither_red[i][j];
-                        red_map[i][j][x]=(unsigned short)
-                          ((value < 0) ? 0 : (value > 255) ? 255 : value);
-                        value=x-16;
-                        if (x < 48)
-                          value=x/2+8;
-                        value+=dither_green[i][j];
-                        green_map[i][j][x]=(unsigned short)
-                          ((value < 0) ? 0 : (value > 255) ? 255 : value);
-                        value=x-32;
-                        if (x < 112)
-                          value=x/2+24;
-                        value+=2*dither_blue[i][j];
-                        blue_map[i][j][x]=(unsigned short)
-                          ((value < 0) ? 0 : (value > 255) ? 255 : value);
-                      }
-                /*
-                  Write pixels.
-                */
-                (void) WriteBlobString(image,"#END_OF_COMMENTS\n");
-                FormatString(buffer,"%lu %lu 255\n",image->columns,image->rows);
-                (void) WriteBlobString(image,buffer);
-                i=0;
-                j=0;
-                for (y=0; y < image->rows; y++)
+                }
+            /*
+              Initialize dither tables.
+            */
+            for (i=0; i < 2; i++)
+              for (j=0; j < 16; j++)
+                for (x=0; x < 256; x++)
                   {
-                    p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-                    if (p == (const PixelPacket *) NULL)
-                      break;
-                    for (x=0; x < image->columns; x++)
-                      {
-                        if (!image_info->dither)
-                          pixel=(Quantum) ((ScaleQuantumToChar(p->red) & 0xe0) |
-                                           ((ScaleQuantumToChar(p->green) & 0xe0) >> 3) |
-                                           ((ScaleQuantumToChar(p->blue) & 0xc0) >> 6));
-                        else
-                          pixel=(Quantum)
-                            ((red_map[i][j][ScaleQuantumToChar(p->red)] & 0xe0) |
-                             ((green_map[i][j][ScaleQuantumToChar(p->green)] & 0xe0) >> 3) |
-                             ((blue_map[i][j][ScaleQuantumToChar(p->blue)] & 0xc0) >> 6));
-                        (void) WriteBlobByte(image,pixel);
-                        p++;
-                        j++;
-                        if (j == 16)
-                          j=0;
-                      }
-                    i++;
-                    if (i == 2)
-                      i=0;
-                    if (QuantumTick(y,image->rows))
-                      if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                                  SaveImageText,image->filename,
-                                                  image->columns,image->rows))
-                        break;
+                    value=x-16;
+                    if (x < 48)
+                      value=x/2+8;
+                    value+=dither_red[i][j];
+                    red_map[i][j][x]=(unsigned short)
+                      ((value < 0) ? 0 : (value > 255) ? 255 : value);
+                    value=x-16;
+                    if (x < 48)
+                      value=x/2+8;
+                    value+=dither_green[i][j];
+                    green_map[i][j][x]=(unsigned short)
+                      ((value < 0) ? 0 : (value > 255) ? 255 : value);
+                    value=x-32;
+                    if (x < 112)
+                      value=x/2+24;
+                    value+=2*dither_blue[i][j];
+                    blue_map[i][j][x]=(unsigned short)
+                      ((value < 0) ? 0 : (value > 255) ? 255 : value);
                   }
-                /*
-                  Free allocated memory.
-                */
-                for (i=0; i < 2; i++)
-                  for (j=0; j < 16; j++)
-                    {
-                      MagickFreeResourceLimitedMemory(unsigned short *,green_map[i][j]);
-                      MagickFreeResourceLimitedMemory(unsigned short *,blue_map[i][j]);
-                      MagickFreeResourceLimitedMemory(unsigned short *,red_map[i][j]);
-                    }
-                break;
+            /*
+              Write pixels.
+            */
+            (void) WriteBlobString(image,"#END_OF_COMMENTS\n");
+            MagickFormatString(buffer,sizeof(buffer),"%lu %lu 255\n",image->columns,image->rows);
+            (void) WriteBlobString(image,buffer);
+            i=0;
+            j=0;
+            for (y=0; y < image->rows; y++)
+              {
+                p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+                if (p == (const PixelPacket *) NULL)
+                  break;
+                for (x=0; x < image->columns; x++)
+                  {
+                    if (!image_info->dither)
+                      pixel=(Quantum) ((ScaleQuantumToChar(p->red) & 0xe0) |
+                                       ((ScaleQuantumToChar(p->green) & 0xe0) >> 3) |
+                                       ((ScaleQuantumToChar(p->blue) & 0xc0) >> 6));
+                    else
+                      pixel=(Quantum)
+                        ((red_map[i][j][ScaleQuantumToChar(p->red)] & 0xe0) |
+                         ((green_map[i][j][ScaleQuantumToChar(p->green)] & 0xe0) >> 3) |
+                         ((blue_map[i][j][ScaleQuantumToChar(p->blue)] & 0xc0) >> 6));
+                    (void) WriteBlobByte(image,pixel);
+                    p++;
+                    j++;
+                    if (j == 16)
+                      j=0;
+                  }
+                i++;
+                if (i == 2)
+                  i=0;
+                if (QuantumTick(y,image->rows))
+                  if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                              SaveImageText,image->filename,
+                                              image->columns,image->rows))
+                    break;
+              }
+            /*
+              Free allocated memory.
+            */
+            for (i=0; i < 2; i++)
+              for (j=0; j < 16; j++)
+                {
+                  MagickFreeResourceLimitedMemory(unsigned short *,green_map[i][j]);
+                  MagickFreeResourceLimitedMemory(unsigned short *,blue_map[i][j]);
+                  MagickFreeResourceLimitedMemory(unsigned short *,red_map[i][j]);
+                }
+            break;
           }
         case Undefined_PNM_Format:
           break;

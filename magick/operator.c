@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2004 - 2022 GraphicsMagick Group
+% Copyright (C) 2004-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -2422,10 +2422,11 @@ QuantumOperatorRegionImage(Image *image,
 
   if (call_back)
     {
-      FormatString(description,"[%%s] Apply operator '%s %g (%g%%%%)' to channel '%s'...",
-                   QuantumOperatorToString(quantum_operator),rvalue,
-                   ((rvalue/MaxRGBFloat)*100),
-                   ChannelTypeToString(channel));
+      MagickFormatString(description,sizeof(description),
+                         "[%%s] Apply operator '%s %g (%g%%%%)' to channel '%s'...",
+                         QuantumOperatorToString(quantum_operator),rvalue,
+                         ((rvalue/MaxRGBFloat)*100),
+                         ChannelTypeToString(channel));
       status=PixelIterateMonoModify(call_back,
                                     NULL,
                                     description,

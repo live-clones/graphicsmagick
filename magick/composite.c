@@ -3452,12 +3452,12 @@ CompositeImage(Image *canvas_image,
     fprintf(stderr,
             "Parameters: canvas=%lux%lu | composite=%lux%lu | offset x=%ld y=%ld\n"
             "Overlap:    canvas x=%ld y=%ld | composite x=%ld y=%ld | size=%ldx%ld\n",
-           canvas_image->columns,canvas_image->rows,
-           change_image->columns,change_image->rows,
-           x_offset,y_offset,
-           canvas_x,canvas_y,
-           composite_x,composite_y,
-           columns,rows);
+            canvas_image->columns,canvas_image->rows,
+            change_image->columns,change_image->rows,
+            x_offset,y_offset,
+            canvas_x,canvas_y,
+            composite_x,composite_y,
+            columns,rows);
 #endif
 
     if (((unsigned long) canvas_x < canvas_image->columns) &&
@@ -3485,8 +3485,9 @@ CompositeImage(Image *canvas_image,
             char
               description[MaxTextExtent];
 
-            FormatString(description,"[%%s] Composite %s image pixels ...",
-                         CompositeOperatorToString(compose));
+            MagickFormatString(description,sizeof(description),
+                               "[%%s] Composite %s image pixels ...",
+                               CompositeOperatorToString(compose));
 
             if (clear_pixels)
               {

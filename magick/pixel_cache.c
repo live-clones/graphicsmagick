@@ -750,10 +750,10 @@ SetNexus(const Image * restrict image,const long x,const long y,
   if (region_pixels > cache_info->limit_pixels)
     {
       errno=0;
-      FormatString(message,
-                   "Total pixels %" MAGICK_SIZE_T_F "u > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
-                   (MAGICK_SIZE_T) region_pixels,
-                   cache_info->limit_pixels,image->filename);
+      MagickFormatString(message,sizeof(message),
+                         "Total pixels %" MAGICK_SIZE_T_F "u > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
+                         (MAGICK_SIZE_T) region_pixels,
+                         cache_info->limit_pixels,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelLimitExceeded,
                      message);
       return (PixelPacket *) NULL;
@@ -762,8 +762,8 @@ SetNexus(const Image * restrict image,const long x,const long y,
   if (!(columns <= cache_info->limit_width))
     {
       errno=0;
-      FormatString(message,"Width %lu > %lu \"%.1024s\"",
-                   columns,cache_info->limit_width,image->filename);
+      MagickFormatString(message,sizeof(message),"Width %lu > %lu \"%.1024s\"",
+                         columns,cache_info->limit_width,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelWidthLimitExceeded,
                      message);
       return (PixelPacket *) NULL;
@@ -772,8 +772,8 @@ SetNexus(const Image * restrict image,const long x,const long y,
       (x <= -(long) cache_info->limit_width))
     {
       errno=0;
-      FormatString(message,"Xoffset abs(%ld) > %lu \"%.1024s\"",
-                   x,cache_info->limit_width,image->filename);
+      MagickFormatString(message,sizeof(message),"Xoffset abs(%ld) > %lu \"%.1024s\"",
+                         x,cache_info->limit_width,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelWidthLimitExceeded,
                      message);
       return (PixelPacket *) NULL;
@@ -783,8 +783,8 @@ SetNexus(const Image * restrict image,const long x,const long y,
   if (!(rows <= cache_info->limit_height))
     {
       errno=0;
-      FormatString(message,"Height %lu > %lu \"%.1024s\"",
-                   rows,cache_info->limit_height,image->filename);
+      MagickFormatString(message,sizeof(message),"Height %lu > %lu \"%.1024s\"",
+                         rows,cache_info->limit_height,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelHeightLimitExceeded,
                      message);
       return (PixelPacket *) NULL;
@@ -793,8 +793,8 @@ SetNexus(const Image * restrict image,const long x,const long y,
       (y <= -(long) cache_info->limit_height))
     {
       errno=0;
-      FormatString(message,"Y offset abs(%ld) > %lu \"%.1024s\"",
-                   y,cache_info->limit_height,image->filename);
+      MagickFormatString(message,sizeof(message),"Y offset abs(%ld) > %lu \"%.1024s\"",
+                         y,cache_info->limit_height,image->filename);
       ThrowException(exception,ResourceLimitError,NexusPixelHeightLimitExceeded,
                      message);
       return (PixelPacket *) NULL;
@@ -2504,8 +2504,9 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
       goto open_cache_done;
     }
 
-  FormatString(cache_info->filename,"%.1024s[%ld]",image->filename,
-               image->scene /*GetImageIndexInList(image)*/);
+  MagickFormatString(cache_info->filename,sizeof(cache_info->filename),
+                     "%.1024s[%ld]",image->filename,
+                     image->scene /*GetImageIndexInList(image)*/);
   number_pixels=(magick_uint64_t) image->columns*image->rows;
   if (number_pixels/image->columns != image->rows)
     {
@@ -3365,8 +3366,8 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
       limit=GetMagickResourceLimit(WidthResource);
       if (limit >= LONG_MAX)
         limit = LONG_MAX;
-      FormatString(message,"%lu > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
-                   image->columns,(magick_uintmax_t) limit,image->filename);
+      MagickFormatString(message,sizeof(message),"%lu > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
+                         image->columns,(magick_uintmax_t) limit,image->filename);
       ThrowException(exception,ResourceLimitError,ImagePixelWidthLimitExceeded,
                      message);
       return MagickFail;
@@ -3387,8 +3388,8 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
       limit=GetMagickResourceLimit(HeightResource);
       if (limit >= LONG_MAX)
         limit = LONG_MAX;
-      FormatString(message,"%lu > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
-                   image->rows,(magick_uintmax_t) limit,image->filename);
+      MagickFormatString(message,sizeof(message),"%lu > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
+                         image->rows,(magick_uintmax_t) limit,image->filename);
       ThrowException(exception,ResourceLimitError,ImagePixelHeightLimitExceeded,
                      message);
       return MagickFail;
@@ -3406,7 +3407,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
           message[MaxTextExtent];
 
         errno=0;
-        FormatString(message,
+        MagickFormatString(message,sizeof(message),
                      "%" MAGICK_INTMAX_F "d > %" MAGICK_UINTMAX_F "u \"%.1024s\"",
                      (magick_intmax_t) total_pixels,
                      (magick_uintmax_t) GetMagickResourceLimit(PixelsResource),

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2004 - 2018 GraphicsMagick Group
+% Copyright (C) 2004-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -242,8 +242,9 @@ MagickExport MagickPassFail ChannelImage(Image *image,const ChannelType channel)
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
 
-  FormatString(progress_message,"[%%s] Extract %s channel...  ",
-               ChannelTypeToString(channel));
+  MagickFormatString(progress_message,sizeof(progress_message),
+                     "[%%s] Extract %s channel...  ",
+                     ChannelTypeToString(channel));
 
   /*
     Verify that image colorspace is compatible with with requested

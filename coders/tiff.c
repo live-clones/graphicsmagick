@@ -4408,7 +4408,7 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
     return(False);
 
   (void) SetImageType(huffman_image,BilevelType);
-  FormatString(huffman_image->filename,"tiff:%s",temporary_filename);
+  MagickFormatString(huffman_image->filename,sizeof(huffman_image->filename),"tiff:%s",temporary_filename);
   clone_info=CloneImageInfo((const ImageInfo *) NULL);
 /*   clone_info->blob=0; */
   clone_info->compression=Group4Compression;

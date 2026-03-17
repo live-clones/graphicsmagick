@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2021 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -547,8 +547,9 @@ GetImageChannelDifference(const Image *reference_image,
       char
         description[MaxTextExtent];
 
-      FormatString(description,"[%%s]*[%%s] Compute image difference using %s metric...",
-                   MetricTypeToString(metric));
+      MagickFormatString(description,sizeof(description),
+                         "[%%s]*[%%s] Compute image difference using %s metric...",
+                         MetricTypeToString(metric));
 
       status=PixelIterateDualRead(call_back,
                                   NULL,

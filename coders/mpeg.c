@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -207,7 +207,7 @@ ModuleExport void UnregisterMPEGImage(void)
 }
 
 static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
-  Image *image)
+                                            Image *image)
 {
   char
     filename[MaxTextExtent];
@@ -231,16 +231,16 @@ static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
 
   static const int
     q_matrix[]=
-    {
-       8, 16, 19, 22, 26, 27, 29, 34,
-      16, 16, 22, 24, 27, 29, 34, 37,
-      19, 22, 26, 27, 29, 34, 34, 38,
-      22, 22, 26, 27, 29, 34, 37, 40,
-      22, 26, 27, 29, 32, 35, 40, 48,
-      26, 27, 29, 32, 35, 40, 48, 58,
-      26, 27, 29, 34, 38, 46, 56, 69,
-      27, 29, 35, 38, 46, 56, 69, 83
-    };
+  {
+    8, 16, 19, 22, 26, 27, 29, 34,
+    16, 16, 22, 24, 27, 29, 34, 37,
+    19, 22, 26, 27, 29, 34, 34, 38,
+    22, 22, 26, 27, 29, 34, 37, 40,
+    22, 26, 27, 29, 32, 35, 40, 48,
+    26, 27, 29, 32, 35, 40, 48, 58,
+    26, 27, 29, 34, 38, 46, 56, 69,
+    27, 29, 35, 38, 46, 56, 69, 83
+  };
 
   unsigned int
     mpeg;
@@ -269,7 +269,7 @@ static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
       /*
         Write intra quant matrix file.
       */
-      FormatString(filename,"%.1024s.iqm",image_info->unique);
+      MagickFormatString(filename,sizeof(filename),"%.1024s.iqm",image_info->unique);
       (void) fprintf(file,"%s\n",filename);
       parameter_file=fopen(filename,"w");
       if (parameter_file == (FILE *) NULL)
@@ -282,23 +282,23 @@ static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
         {
           q=Max((DefaultCompressionQuality-image_info->quality)/8.0,1.0);
           for (i=0; i < 64; i++)
-          {
-            quant=(long) Min(Max(q*q_matrix[i]+0.5,1.0),255.0);
-            (void) fprintf(parameter_file," %ld",quant);
-            if ((i % 8) == 7)
-              (void) fprintf(parameter_file,"\n");
-          }
+            {
+              quant=(long) Min(Max(q*q_matrix[i]+0.5,1.0),255.0);
+              (void) fprintf(parameter_file," %ld",quant);
+              if ((i % 8) == 7)
+                (void) fprintf(parameter_file,"\n");
+            }
         }
       else
         {
           q=Max((image_info->quality-DefaultCompressionQuality)*2.0,1.0);
           for (i=0; i < 64; i++)
-          {
-            quant=(long) Min(Max(q_matrix[i]/q,1.0),255.0);
-            (void) fprintf(parameter_file," %ld",quant);
-            if ((i % 8) == 7)
-              (void) fprintf(parameter_file,"\n");
-          }
+            {
+              quant=(long) Min(Max(q_matrix[i]/q,1.0),255.0);
+              (void) fprintf(parameter_file," %ld",quant);
+              if ((i % 8) == 7)
+                (void) fprintf(parameter_file,"\n");
+            }
         }
       (void) fclose(parameter_file);
 #if !defined(__COVERITY__) /* 384796 Unused value */
@@ -312,7 +312,7 @@ static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
       /*
         Write non intra quant matrix file.
       */
-      FormatString(filename,"%.1024s.niq",image_info->unique);
+      MagickFormatString(filename,sizeof(filename),"%.1024s.niq",image_info->unique);
       (void) fprintf(file,"%s\n",filename);
       parameter_file=fopen(filename,"w");
       if (parameter_file == (FILE *) NULL)
@@ -323,11 +323,11 @@ static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
         }
       q=Min(Max(66.0-(2.0*image_info->quality)/3.0,1.0),255.0);
       for (i=0; i < 64; i++)
-      {
-        (void) fprintf(parameter_file," %d",(int) q);
-        if ((i % 8) == 7)
-          (void) fprintf(parameter_file,"\n");
-      }
+        {
+          (void) fprintf(parameter_file," %d",(int) q);
+          if ((i % 8) == 7)
+            (void) fprintf(parameter_file,"\n");
+        }
       (void) fclose(parameter_file);
       parameter_file=(FILE *) NULL;
     }
@@ -370,7 +370,7 @@ static unsigned int WriteMPEGParameterFiles(const ImageInfo *image_info,
 
       horizontal_factor=2;
       count=sscanf(image_info->sampling_factor,"%ldx%ld",&horizontal_factor,
-        &vertical_factor);
+                   &vertical_factor);
       if (count != 2)
         vertical_factor=horizontal_factor;
       if (mpeg)
@@ -476,15 +476,15 @@ static unsigned int WriteMPEGImage(const ImageInfo *image_info,Image *image)
   */
   coalesce_image=image;
   for (next_image=image; next_image != (Image *) NULL; )
-  {
-    if ((image->columns != next_image->columns) ||
-        (image->rows != next_image->rows))
-      break;
-    if ((image->page.x != next_image->page.x) ||
-        (image->page.y != next_image->page.y))
-      break;
-    next_image=next_image->next;
-  }
+    {
+      if ((image->columns != next_image->columns) ||
+          (image->rows != next_image->rows))
+        break;
+      if ((image->page.x != next_image->page.x) ||
+          (image->page.y != next_image->page.y))
+        break;
+      next_image=next_image->next;
+    }
   if (next_image != (Image *) NULL)
     {
       coalesce_image=CoalesceImages(image,&image->exception);
@@ -499,7 +499,7 @@ static unsigned int WriteMPEGImage(const ImageInfo *image_info,Image *image)
       DestroyImageList(coalesce_image);
       ThrowWriterTemporaryFileException(basename);
     }
-  FormatString(coalesce_image->filename,"%.1024s",basename);
+  MagickFormatString(coalesce_image->filename,sizeof(coalesce_image->filename),"%.1024s",basename);
   clone_info=CloneImageInfo(image_info);
   (void) strlcpy(clone_info->unique,basename,MaxTextExtent);
   status=WriteMPEGParameterFiles(clone_info,coalesce_image);
@@ -510,9 +510,9 @@ static unsigned int WriteMPEGImage(const ImageInfo *image_info,Image *image)
       (void) LiberateTemporaryFile(basename);
       if (image_info->quality != DefaultCompressionQuality)
         {
-          FormatString(filename,"%.1024s.iqm",basename);
+          MagickFormatString(filename,sizeof(filename),"%.1024s.iqm",basename);
           (void) remove(filename);
-          FormatString(filename,"%.1024s.niq",basename);
+          MagickFormatString(filename,sizeof(filename),"%.1024s.niq",basename);
           (void) remove(filename);
         }
       ThrowMPEGWriterException(CoderError,UnableToWriteMPEGParameters,image);
@@ -520,95 +520,95 @@ static unsigned int WriteMPEGImage(const ImageInfo *image_info,Image *image)
   count=0;
   clone_info->interlace=PlaneInterlace;
   for (p=coalesce_image; p != (Image *) NULL; p=p->next)
-  {
-    char
-      previous_image[MaxTextExtent];
-
-    blob=(unsigned char *) NULL;
-    length=0;
-    scene=p->scene;
-    for (i=0; i < (long) Max((p->delay+1)/3,1); i++)
     {
-      p->scene=count;
-      count++;
-      status=False;
-      switch (i)
-      {
-        case 0:
-        {
-          Image
-            *frame;
+      char
+        previous_image[MaxTextExtent];
 
-          FormatString(p->filename,"%.1024s.%lu.yuv",basename,p->scene);
-          FormatString(filename,"%.1024s.%lu.yuv",basename,p->scene);
-          FormatString(previous_image,"%.1024s.%lu.yuv",basename,p->scene);
-          frame=CloneImage(p,0,0,True,&p->exception);
-          if (frame == (Image *) NULL)
-            break;
-          status=WriteImage(clone_info,frame);
-          DestroyImage(frame);
-          break;
-        }
-        case 1:
+      blob=(unsigned char *) NULL;
+      length=0;
+      scene=p->scene;
+      for (i=0; i < (long) Max((p->delay+1)/3,1); i++)
         {
-          blob=(unsigned char *)
-            FileToBlob(previous_image,&length,&image->exception);
-          FormatString(filename,"%.1024s.%lu.yuv",basename,p->scene);
-          if (length > 0)
-            status=BlobToFile(filename,blob,length,&image->exception);
-          break;
+          p->scene=count;
+          count++;
+          status=False;
+          switch (i)
+            {
+            case 0:
+              {
+                Image
+                  *frame;
+
+                MagickFormatString(p->filename,sizeof(p->filename),"%.1024s.%lu.yuv",basename,p->scene);
+                MagickFormatString(filename,sizeof(filename),"%.1024s.%lu.yuv",basename,p->scene);
+                MagickFormatString(previous_image,sizeof(previous_image),"%.1024s.%lu.yuv",basename,p->scene);
+                frame=CloneImage(p,0,0,True,&p->exception);
+                if (frame == (Image *) NULL)
+                  break;
+                status=WriteImage(clone_info,frame);
+                DestroyImage(frame);
+                break;
+              }
+            case 1:
+              {
+                blob=(unsigned char *)
+                  FileToBlob(previous_image,&length,&image->exception);
+                MagickFormatString(filename,sizeof(filename),"%.1024s.%lu.yuv",basename,p->scene);
+                if (length > 0)
+                  status=BlobToFile(filename,blob,length,&image->exception);
+                break;
+              }
+            default:
+              {
+                MagickFormatString(filename,sizeof(filename),"%.1024s.%lu.yuv",basename,p->scene);
+                if (length > 0)
+                  status=BlobToFile(filename,blob,length,&image->exception);
+                break;
+              }
+            }
+          if (logging)
+            {
+              if (status)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "%lu. Wrote YUV file for scene %lu:",i,p->scene);
+              else
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "%lu. Failed to write YUV file for scene %lu:",i,p->scene);
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%.1024s",
+                                    filename);
+            }
         }
-        default:
-        {
-          FormatString(filename,"%.1024s.%lu.yuv",basename,p->scene);
-          if (length > 0)
-            status=BlobToFile(filename,blob,length,&image->exception);
-          break;
-        }
-      }
-      if (logging)
-        {
-          if (status)
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-              "%lu. Wrote YUV file for scene %lu:",i,p->scene);
-          else
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-              "%lu. Failed to write YUV file for scene %lu:",i,p->scene);
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%.1024s",
-            filename);
-        }
+      p->scene=scene;
+      if (blob != (unsigned char *) NULL)
+        MagickFreeMemory(blob);
+      if (status == False)
+        break;
     }
-    p->scene=scene;
-    if (blob != (unsigned char *) NULL)
-      MagickFreeMemory(blob);
-    if (status == False)
-      break;
-  }
   /*
     Convert YUV to MPEG.
   */
   (void) strlcpy(coalesce_image->filename,clone_info->unique,MaxTextExtent);
   status=InvokeDelegate(clone_info,coalesce_image,(char *) NULL,"mpeg-encode",
-    &image->exception);
+                        &image->exception);
   DestroyImageInfo(clone_info);
   /*
     Free resources.
   */
   count=0;
   for (p=coalesce_image; p != (Image *) NULL; p=p->next)
-  {
-    for (i=0; i < (long) Max((p->delay+1)/3,1); i++)
     {
-      FormatString(p->filename,"%.1024s.%lu.yuv",basename,count++);
-      (void) remove(p->filename);
+      for (i=0; i < (long) Max((p->delay+1)/3,1); i++)
+        {
+          MagickFormatString(p->filename,sizeof(p->filename),"%.1024s.%lu.yuv",basename,count++);
+          (void) remove(p->filename);
+        }
+      (void) strlcpy(p->filename,image_info->filename,MaxTextExtent);
     }
-    (void) strlcpy(p->filename,image_info->filename,MaxTextExtent);
-  }
-  FormatString(filename,"%.1024s.iqm",basename);
+  MagickFormatString(filename,sizeof(filename),"%.1024s.iqm",basename);
   (void) remove(filename);
-  FormatString(filename,"%.1024s.niq",basename);
+  MagickFormatString(filename,sizeof(filename),"%.1024s.niq",basename);
   (void) remove(filename);
-  FormatString(filename,"%.1024s.log",basename);
+  MagickFormatString(filename,sizeof(filename),"%.1024s.log",basename);
   (void) remove(filename);
   (void) LiberateTemporaryFile(basename);
   if (coalesce_image != image)

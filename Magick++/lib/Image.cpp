@@ -11,6 +11,7 @@
 #include "Magick++/Include.h"
 #include <cstdlib>
 #include <sstream>
+#include <iomanip>
 #include <string>
 #include <string.h>
 #include <errno.h>
@@ -608,13 +609,13 @@ void Magick::Image::colorize ( const unsigned int opacityRed_,
                             "Pen color argument is invalid");
   }
 
-  char opacity[MaxTextExtent];
-  FormatString(opacity,"%u/%u/%u",opacityRed_,opacityGreen_,opacityBlue_);
+  std::ostringstream opacity;
+  opacity << opacityRed_ << '/' << opacityGreen_ << '/' << opacityBlue_;
 
   ExceptionInfo exceptionInfo;
   GetExceptionInfo( &exceptionInfo );
   MagickLib::Image* newImage =
-  ColorizeImage ( image(), opacity,
+    ColorizeImage ( image(), opacity.str().c_str(),
                   penColor_, &exceptionInfo );
   replaceImage( newImage );
   throwImageException( exceptionInfo );
@@ -1146,22 +1147,22 @@ void Magick::Image::frame ( const unsigned int width_,
 // Gamma correct image
 void Magick::Image::gamma ( const double gamma_ )
 {
-  char gamma[MaxTextExtent + 1];
-  FormatString( gamma, "%3.6f", gamma_);
-
+  std::ostringstream gamma;
+  gamma << std::fixed << std::setprecision(6) << gamma_;
   modifyImage();
-  GammaImage ( image(), gamma );
+  GammaImage ( image(), gamma.str().c_str() );
 }
 void Magick::Image::gamma ( const double gammaRed_,
                             const double gammaGreen_,
                             const double gammaBlue_ )
 {
-  char gamma[MaxTextExtent + 1];
-  FormatString( gamma, "%3.6f/%3.6f/%3.6f/",
-                gammaRed_, gammaGreen_, gammaBlue_);
-
+  std::ostringstream gamma;
+  gamma << std::fixed << std::setprecision(6)
+        << gammaRed_ << '/'
+        << gammaGreen_ << '/'
+        << gammaBlue_;
   modifyImage();
-  GammaImage ( image(), gamma );
+  GammaImage ( image(), gamma.str().c_str() );
   throwImageException();
 }
 
@@ -1215,9 +1216,12 @@ void Magick::Image::level ( const double black_point,
                             const double mid_point )
 {
   modifyImage();
-  char levels[MaxTextExtent];
-  FormatString( levels, "%g,%g,%g",black_point,mid_point,white_point);
-  (void) LevelImage( image(), levels );
+  std::ostringstream levels;
+  levels << std::fixed
+         << black_point << ','
+         << mid_point << ','
+         << white_point;
+  (void) LevelImage( image(), levels.str().c_str() );
   throwImageException();
 }
 
@@ -1311,12 +1315,13 @@ void Magick::Image::modulate ( const double brightness_,
                                const double saturation_,
                                const double hue_ )
 {
-  char modulate[MaxTextExtent + 1];
-  FormatString( modulate, "%3.6f/%3.6f/%3.6f",
-                brightness_, saturation_, hue_);
-
+  std::ostringstream modulate;
+  modulate << std::fixed << std::setprecision(6)
+        << brightness_ << '/'
+        << saturation_ << '/'
+        << hue_;
   modifyImage();
-  ModulateImage( image(), modulate );
+  ModulateImage( image(), modulate.str().c_str() );
   throwImageException();
 }
 
@@ -3289,9 +3294,9 @@ void Magick::Image::orientation ( const Magick::OrientationType orientation_ )
 {
   modifyImage();
   image()->orientation = orientation_;
-  char orientation[MaxTextExtent];
-  FormatString(orientation,"%d",constImage()->orientation);
-  (void) SetImageAttribute(image(),"EXIF:Orientation",orientation);
+  std::ostringstream orientation_str;
+  orientation_str << (int) orientation_;
+  (void) SetImageAttribute(image(),"EXIF:Orientation",orientation_str.str().c_str());
 }
 Magick::OrientationType Magick::Image::orientation ( void ) const
 {

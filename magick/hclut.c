@@ -248,9 +248,9 @@ HaldClutImage(Image *image, const Image *clut)
   if (param.ppcl == (const PixelPacket *) NULL)
     return MagickFail;
 
-  FormatString(progress_message,
-               "[%%s] Applying Hald CLUT level %u (%lux%lu) ...",
-               param.level,clut->columns,clut->rows);
+  MagickFormatString(progress_message,sizeof(progress_message),
+                     "[%%s] Applying Hald CLUT level %u (%lux%lu) ...",
+                     param.level,clut->columns,clut->rows);
 
   if (!IsRGBCompatibleColorspace(image->colorspace))
     status&=TransformColorspace(image,RGBColorspace);

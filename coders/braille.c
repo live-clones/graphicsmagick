@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2019 GraphicsMagick Group
+% Copyright (C) 2019-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -215,20 +215,20 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
     {
       if (image->page.x != 0)
         {
-          (void) FormatString(buffer,"X: %.20g\n",(double)
+          (void) MagickFormatString(buffer,sizeof(buffer),"X: %.20g\n",(double)
             image->page.x);
           (void) WriteBlobString(image,buffer);
         }
       if (image->page.y != 0)
         {
-          (void) FormatString(buffer,"Y: %.20g\n",(double)
+          (void) MagickFormatString(buffer,sizeof(buffer),"Y: %.20g\n",(double)
             image->page.y);
           (void) WriteBlobString(image,buffer);
         }
-      (void) FormatString(buffer,"Width: %.20g\n",(double)
+      (void) MagickFormatString(buffer,sizeof(buffer),"Width: %.20g\n",(double)
         image->columns+(image->columns % 2));
       (void) WriteBlobString(image,buffer);
-      (void) FormatString(buffer,"Height: %.20g\n",(double)
+      (void) MagickFormatString(buffer,sizeof(buffer),"Height: %.20g\n",(double)
         image->rows);
       (void) WriteBlobString(image,buffer);
       (void) WriteBlobString(image,"\n");

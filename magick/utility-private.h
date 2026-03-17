@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2023 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
   Copyright 1991-1999 E. I. du Pont de Nemours and Company
 
@@ -26,18 +26,18 @@
 extern double MagickFmin(const double x, const double y) MAGICK_FUNC_CONST;
 extern double MagickFmax(const double x, const double y) MAGICK_FUNC_CONST;
 
-extern MagickExport MagickPassFail MagickAtoFChk(const char *str, double *value);
-extern MagickExport MagickPassFail MagickAtoIChk(const char *str, int *value);
-extern MagickExport MagickPassFail MagickAtoUIChk(const char *str, unsigned int *value);
-extern MagickExport MagickPassFail MagickAtoLChk(const char *str, long *value);
-extern MagickExport MagickPassFail MagickAtoULChk(const char *str, unsigned long *value);
-extern MagickExport MagickPassFail MagickAtoULLChk(const char *str, unsigned long long *value);
-extern MagickExport unsigned long MagickDoubleToULong(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
+extern MagickExport MagickPassFail MagickAtoFChk(const char *str, double *value) MAGICK_FUNC_WARN_UNUSED_RESULT;
+extern MagickExport MagickPassFail MagickAtoIChk(const char *str, int *value) MAGICK_FUNC_WARN_UNUSED_RESULT;
+extern MagickExport MagickPassFail MagickAtoUIChk(const char *str, unsigned int *value) MAGICK_FUNC_WARN_UNUSED_RESULT;
+extern MagickExport MagickPassFail MagickAtoLChk(const char *str, long *value) MAGICK_FUNC_WARN_UNUSED_RESULT;
+extern MagickExport MagickPassFail MagickAtoULChk(const char *str, unsigned long *value) MAGICK_FUNC_WARN_UNUSED_RESULT;
+extern MagickExport MagickPassFail MagickAtoULLChk(const char *str, unsigned long long *value) MAGICK_FUNC_WARN_UNUSED_RESULT;
+extern MagickExport unsigned long MagickDoubleToULong(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST MAGICK_FUNC_DEPRECATED;
 extern MagickExport unsigned int MagickDoubleToUInt(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
 extern MagickExport long MagickDoubleToLong(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
-extern MagickExport int MagickDoubleToInt(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
-extern MagickExport unsigned short int MagickDoubleToUShort(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
-extern MagickExport short int MagickDoubleToShort(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST;
+extern MagickExport int MagickDoubleToInt(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST MAGICK_FUNC_DEPRECATED;
+extern MagickExport unsigned short int MagickDoubleToUShort(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST MAGICK_FUNC_DEPRECATED;
+extern MagickExport short int MagickDoubleToShort(const double dval/*, ExceptionInfo *exception*/) MAGICK_FUNC_CONST MAGICK_FUNC_DEPRECATED;
 
 extern MagickExport size_t
   MagickStripSpacesFromString(char *string),

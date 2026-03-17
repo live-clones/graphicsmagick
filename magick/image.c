@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -135,7 +135,7 @@ MagickExport const char *AccessDefinition(const ImageInfo *image_info,
 
   if (image_info->definitions)
     {
-      FormatString(search_key, "%.60s:%.1024s", magick, key);
+      MagickFormatString(search_key, sizeof(search_key), "%.60s:%.1024s", magick, key);
       value=(const char*) MagickMapAccessEntry((MagickMap) image_info->definitions,search_key,0);
     }
   return value;
@@ -193,7 +193,7 @@ AddDefinition(ImageInfo *image_info,const char *magick, const char *key,
       /*
         Format string like "magick:key"
       */
-      FormatString(search_key, "%.60s:%.1024s", magick, key);
+      MagickFormatString(search_key, sizeof(search_key), "%.60s:%.1024s", magick, key);
 
       /*
         Add entry to map
@@ -847,7 +847,7 @@ ClipPathImageCallBack(void *mutable_data,         /* User provided mutable data 
   return MagickPass;
 }
 MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
-  const MagickBool inside)
+                                          const MagickBool inside)
 {
 
   char
@@ -868,15 +868,15 @@ MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
   assert(image != (const Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(pathname != NULL);
-  FormatString(key,"8BIM:1999,2998:%s",pathname);
+  MagickFormatString(key,sizeof(key),"8BIM:1999,2998:%s",pathname);
   attribute=GetImageAttribute(image,key);
   if (attribute == (const ImageAttribute *) NULL)
     return(MagickFail);
   image_info=CloneImageInfo((ImageInfo *) NULL);
   (void) QueryColorDatabase("#ffffffff",&image_info->background_color,
-    &image->exception);
+                            &image->exception);
   clip_mask=BlobToImage(image_info,attribute->value,strlen(attribute->value),
-    &image->exception);
+                        &image->exception);
   DestroyImageInfo(image_info);
   if (clip_mask == (Image *) NULL)
     return (MagickFail);
@@ -901,7 +901,8 @@ MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
     This is needed so we can get the path as postscript for PS coders
     to create a postscript vector based clipping path.
   */
-  FormatString(clip_mask->magick_filename,"8BIM:1999,2998:%s\nPS",pathname);
+  MagickFormatString(clip_mask->magick_filename,sizeof(clip_mask->magick_filename),
+                     "8BIM:1999,2998:%s\nPS",pathname);
 
   clip_mask->is_grayscale=True;
   clip_mask->is_monochrome=True;
@@ -989,7 +990,7 @@ CompositePathImageCallBack(void *mutable_data,    /* User provided mutable data 
   return MagickPass;
 }
 MagickExport MagickPassFail CompositePathImage(Image *image,const char *pathname,
-  const MagickBool inside)
+                                               const MagickBool inside)
 {
 
   char
@@ -1010,15 +1011,15 @@ MagickExport MagickPassFail CompositePathImage(Image *image,const char *pathname
   assert(image != (const Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(pathname != NULL);
-  FormatString(key,"8BIM:1999,2998:%s",pathname);
+  MagickFormatString(key,sizeof(key),"8BIM:1999,2998:%s",pathname);
   attribute=GetImageAttribute(image,key);
   if (attribute == (const ImageAttribute *) NULL)
     return(MagickFail);
   image_info=CloneImageInfo((ImageInfo *) NULL);
   (void) QueryColorDatabase("#ffffffff",&image_info->background_color,
-    &image->exception);
+                            &image->exception);
   composite_mask=BlobToImage(image_info,attribute->value,strlen(attribute->value),
-    &image->exception);
+                             &image->exception);
   DestroyImageInfo(image_info);
   if (composite_mask == (Image *) NULL)
     return (MagickFail);
@@ -1041,7 +1042,8 @@ MagickExport MagickPassFail CompositePathImage(Image *image,const char *pathname
     This is needed so we can get the path as postscript for PS coders
     to create a postscript vector based compositing path.
   */
-  FormatString(composite_mask->magick_filename,"8BIM:1999,2998:%s\nPS",pathname);
+  MagickFormatString(composite_mask->magick_filename,sizeof(composite_mask->magick_filename),
+                     "8BIM:1999,2998:%s\nPS",pathname);
 
   composite_mask->is_grayscale=True;
   composite_mask->is_monochrome=True;

@@ -11,6 +11,8 @@
 #include "Magick++/Include.h"
 #include <string>
 #include <ctype.h> // for isdigit
+#include <iostream>
+#include <sstream> // for ostringstream
 #include <string.h> // for strcpy
 #include <cassert>
 
@@ -431,57 +433,55 @@ Magick::Geometry::operator std::string() const
     }
 
   string geometry;
-  char buffer[MaxTextExtent];
+  std::ostringstream oss;
 
-  if ( _width )
+   if ( _width )
     {
-      FormatString( buffer, "%u", _width );
-      geometry += buffer;
+      oss << _width;
     }
 
-  if ( _width && _height )
-    {
-      FormatString( buffer, "%u",  _height);
-      geometry += 'x';
-      geometry +=  buffer;
-    }
+   if ( _width && _height )
+     {
+       oss << 'x'
+           << _height;
+     }
 
-  if ( _xOff || _yOff )
+   if ( _xOff || _yOff )
     {
       if ( xNegative() )
-        geometry += '-';
+        oss << '-';
       else
-        geometry += '+';
+        oss << '+';
 
-      FormatString( buffer, "%u", _xOff);
-      geometry += buffer;
+      oss << _xOff;
 
       if ( yNegative() )
-        geometry += '-';
+        oss << '-';
       else
-        geometry += '+';
+        oss << '+';
 
-      FormatString( buffer, "%u", _yOff);
-      geometry += buffer;
+      oss << _yOff;
     }
 
-  if ( percent() )
-    geometry += '%';
+   if ( percent() )
+     oss << '%';
 
   if ( aspect() )
-    geometry += '!';
+    oss << '!';
 
   if ( greater() )
-    geometry += '>';
+    oss << '>';
 
   if ( less() )
-    geometry += '<';
+    oss << '<';
 
   if ( limitPixels() )
-    geometry += '@';
+    oss << '@';
 
   if ( fillArea() )
-    geometry += '^';
+    oss << '^';
+
+  geometry = oss.str();
 
   return geometry;
 }

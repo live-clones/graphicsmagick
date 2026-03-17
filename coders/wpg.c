@@ -980,7 +980,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     char file_name[MaxTextExtent];
     FILE *file;
 
-    FormatString(file_name,"wpg-blob.%s",format);
+    MagickFormatString(file_name,sizeof(file_name),"wpg-blob.%s",format);
     if ((file=fopen(file_name,"w")) != (FILE *) NULL)
       {
         if (image->logging)

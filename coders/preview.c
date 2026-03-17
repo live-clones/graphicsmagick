@@ -274,8 +274,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       case RotatePreview:
       {
         degrees += 45.0;
-        FormatString(factor,"%.1f",degrees);
-        FormatString(label,"rotate %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%.1f",degrees);
+        MagickFormatString(label,sizeof(label),"rotate %.1024s",factor);
         ReplaceImage(preview_image,RotateImage(preview_image,degrees,
           &image->exception));
         break;
@@ -283,8 +283,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       case ShearPreview:
       {
         degrees+=10.0;
-        FormatString(factor,"%.1fx%.1f",degrees,2.0*degrees);
-        FormatString(label,"shear %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%.1fx%.1f",degrees,2.0*degrees);
+        MagickFormatString(label,sizeof(label),"shear %.1024s",factor);
         ReplaceImage(preview_image,ShearImage(preview_image,degrees,
           2.0*degrees,&image->exception));
         break;
@@ -293,30 +293,30 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       {
         x=(long) ((i+1)*preview_image->columns)/NumberTiles;
         y=(long) ((i+1)*preview_image->rows)/NumberTiles;
-        FormatString(factor,"%+ld%+ld",x,y);
-        FormatString(label,"roll %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%+ld%+ld",x,y);
+        MagickFormatString(label,sizeof(label),"roll %.1024s",factor);
         ReplaceImage(preview_image,RollImage(preview_image,x,y,
           &image->exception));
         break;
       }
       case HuePreview:
       {
-        FormatString(factor,"100/100/%g",2.0*percentage);
-        FormatString(label,"modulate %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"100/100/%g",2.0*percentage);
+        MagickFormatString(label,sizeof(label),"modulate %.1024s",factor);
         (void) ModulateImage(preview_image,factor);
         break;
       }
       case SaturationPreview:
       {
-        FormatString(factor,"100/%g",2.0*percentage);
-        FormatString(label,"modulate %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"100/%g",2.0*percentage);
+        MagickFormatString(label,sizeof(label),"modulate %.1024s",factor);
         (void) ModulateImage(preview_image,factor);
         break;
       }
       case BrightnessPreview:
       {
-        FormatString(factor,"%g",2.0*percentage);
-        FormatString(label,"modulate %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%g",2.0*percentage);
+        MagickFormatString(label,sizeof(label),"modulate %.1024s",factor);
         (void) ModulateImage(preview_image,factor);
         break;
       }
@@ -324,8 +324,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       default:
       {
         gamma += 0.4f;
-        FormatString(factor,"%g",gamma);
-        FormatString(label,"gamma %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%g",gamma);
+        MagickFormatString(label,sizeof(label),"gamma %.1024s",factor);
         (void) GammaImage(preview_image,factor);
         break;
       }
@@ -333,14 +333,14 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       {
         for (x=0; x < i; x++)
           (void) ContrastImage(preview_image,True);
-        FormatString(label,"-contrast %ld",i+1);
+        MagickFormatString(label,sizeof(label),"-contrast %ld",i+1);
         break;
       }
       case DullPreview:
       {
         for (x=0; x < i; x++)
           (void) ContrastImage(preview_image,False);
-        FormatString(label,"+contrast %ld",i+1);
+        MagickFormatString(label,sizeof(label),"+contrast %ld",i+1);
         break;
       }
       case GrayscalePreview:
@@ -349,8 +349,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
           quantize_info;
 
         GetQuantizeInfo(&quantize_info);
-        FormatString(factor,"%lu",colors);
-        FormatString(label,"colors %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%lu",colors);
+        MagickFormatString(label,sizeof(label),"colors %.1024s",factor);
         if (TransformColorspace(preview_image,GRAYColorspace) == MagickFail)
           ThrowException(&image->exception,CoderError,UnableToTransformColorspace,
                          image->filename);
@@ -368,8 +368,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
           quantize_info;
 
         GetQuantizeInfo(&quantize_info);
-        FormatString(factor,"%lu",colors);
-        FormatString(label,"colors %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%lu",colors);
+        MagickFormatString(label,sizeof(label),"colors %.1024s",factor);
         quantize_info.number_colors=colors;
         quantize_info.colorspace=preview_image->colorspace;
         quantize_info.dither=image_info->dither;
@@ -385,13 +385,13 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
             ReplaceImage(preview_image,DespeckleImage(preview_image,
               &image->exception));
           }
-        FormatString(label,"despeckle %ld",i+1);
+        MagickFormatString(label,sizeof(label),"despeckle %ld",i+1);
         break;
       }
       case ReduceNoisePreview:
       {
-        FormatString(factor,"%gx%g",radius,sigma);
-        FormatString(label,"noise %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%gx%g",radius,sigma);
+        MagickFormatString(label,sizeof(label),"noise %.1024s",factor);
         ReplaceImage(preview_image,ReduceNoiseImage(preview_image,radius,
           &image->exception));
         break;
@@ -433,56 +433,56 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
             break;
         }
         x++;
-        FormatString(label,"+noise %.1024s",factor);
+        MagickFormatString(label,sizeof(label),"+noise %.1024s",factor);
         ReplaceImage(preview_image,AddNoiseImage(preview_image,noise,
           &image->exception));
         break;
       }
       case SharpenPreview:
       {
-        FormatString(factor,"%gx%g",radius,sigma);
-        FormatString(label,"sharpen %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%gx%g",radius,sigma);
+        MagickFormatString(label,sizeof(label),"sharpen %.1024s",factor);
         ReplaceImage(preview_image,SharpenImage(preview_image,radius,sigma,
           &image->exception));
         break;
       }
       case BlurPreview:
       {
-        FormatString(factor,"%gx%g",radius,sigma);
-        FormatString(label,"-blur %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%gx%g",radius,sigma);
+        MagickFormatString(label,sizeof(label),"-blur %.1024s",factor);
         ReplaceImage(preview_image,BlurImage(preview_image,radius,sigma,
           &image->exception));
         break;
       }
       case ThresholdPreview:
       {
-        FormatString(factor,"%lu",(unsigned long)
+        MagickFormatString(factor,sizeof(factor),"%lu",(unsigned long)
           ((percentage*((double) MaxRGB+1.0))/100));
-        FormatString(label,"threshold %.1024s",factor);
+        MagickFormatString(label,sizeof(label),"threshold %.1024s",factor);
         (void ) ThresholdImage(preview_image,
           (percentage*((double) MaxRGB+1.0))/100);
         break;
       }
       case EdgeDetectPreview:
       {
-        FormatString(factor,"%gx%g",radius,sigma);
-        FormatString(label,"edge %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%gx%g",radius,sigma);
+        MagickFormatString(label,sizeof(label),"edge %.1024s",factor);
         ReplaceImage(preview_image,EdgeImage(preview_image,radius,
           &image->exception));
         break;
       }
       case SpreadPreview:
       {
-        FormatString(factor,"%ld",i+1);
-        FormatString(label,"spread %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%ld",i+1);
+        MagickFormatString(label,sizeof(label),"spread %.1024s",factor);
         ReplaceImage(preview_image,SpreadImage(preview_image,i+1,
           &image->exception));
         break;
       }
       case SolarizePreview:
       {
-        FormatString(factor,"%g",percentage);
-        FormatString(label,"solarize %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%g",percentage);
+        MagickFormatString(label,sizeof(label),"solarize %.1024s",factor);
         (void) SolarizeImage(preview_image,
                              (percentage*((double) MaxRGB+1.0))/100);
         break;
@@ -491,15 +491,15 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       {
         if (i == 0)
           {
-            FormatString(factor,"30x30");
-            FormatString(label,"+shade %.1024s",factor);
+            MagickFormatString(factor,sizeof(factor),"30x30");
+            MagickFormatString(label,sizeof(label),"+shade %.1024s",factor);
             ReplaceImage(preview_image,ShadeImage(preview_image,False,30,30,
               &image->exception));
             break;
           }
         degrees+=10.0;
-        FormatString(factor,"%gx%g",degrees,degrees);
-        FormatString(label,"shade %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%gx%g",degrees,degrees);
+        MagickFormatString(label,sizeof(label),"shade %.1024s",factor);
         ReplaceImage(preview_image,ShadeImage(preview_image,True,degrees,
           degrees,&image->exception));
         break;
@@ -513,24 +513,24 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
         raise_info.height=2*i+2;
         raise_info.x=0;
         raise_info.y=0;
-        FormatString(factor,"%ldx%ld",2*i+2,2*i+2);
-        FormatString(label,"raise %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%ldx%ld",2*i+2,2*i+2);
+        MagickFormatString(label,sizeof(label),"raise %.1024s",factor);
         (void) RaiseImage(preview_image,&raise_info,True);
         break;
       }
       case SegmentPreview:
       {
         threshold+=0.4f;
-        FormatString(factor,"%.1fx%.1f",threshold,threshold);
-        FormatString(label,"segment %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%.1fx%.1f",threshold,threshold);
+        MagickFormatString(label,sizeof(label),"segment %.1024s",factor);
         (void) SegmentImage(preview_image,preview_image->colorspace,False,
                             threshold,threshold);
         break;
       }
       case SwirlPreview:
       {
-        FormatString(factor,"%.1f",degrees);
-        FormatString(label,"swirl %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%.1f",degrees);
+        MagickFormatString(label,sizeof(label),"swirl %.1024s",factor);
         ReplaceImage(preview_image,SwirlImage(preview_image,degrees,
           &image->exception));
         degrees+=45.0;
@@ -538,8 +538,8 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       }
       case ImplodePreview:
       {
-        FormatString(factor,"%.1f",percentage/100.0);
-        FormatString(label,"implode %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%.1f",percentage/100.0);
+        MagickFormatString(label,sizeof(label),"implode %.1024s",factor);
         ReplaceImage(preview_image,ImplodeImage(preview_image,
           percentage/100.0,&image->exception));
         break;
@@ -547,24 +547,24 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       case WavePreview:
       {
         degrees+=5.0;
-        FormatString(factor,"%.1fx%.1f",0.5*degrees,2.0*degrees);
-        FormatString(label,"wave %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%.1fx%.1f",0.5*degrees,2.0*degrees);
+        MagickFormatString(label,sizeof(label),"wave %.1024s",factor);
         ReplaceImage(preview_image,WaveImage(preview_image,0.5*degrees,
           2.0*degrees,&image->exception));
         break;
       }
       case OilPaintPreview:
       {
-        FormatString(factor,"%g",0.5*((double) i+1));
-        FormatString(label,"paint %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%g",0.5*((double) i+1));
+        MagickFormatString(label,sizeof(label),"paint %.1024s",factor);
         ReplaceImage(preview_image,OilPaintImage(preview_image,0.5*((double) i+1),
           &image->exception));
         break;
       }
       case CharcoalDrawingPreview:
       {
-        FormatString(factor,"%gx%g",radius,sigma);
-        FormatString(label,"charcoal %.1024s",factor);
+        MagickFormatString(factor,sizeof(factor),"%gx%g",radius,sigma);
+        MagickFormatString(label,sizeof(label),"charcoal %.1024s",factor);
         ReplaceImage(preview_image,CharcoalImage(preview_image,radius,sigma,
           &image->exception));
         break;
@@ -575,14 +575,14 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
           filename[MaxTextExtent];
 
         clone_info->quality=(unsigned int) (percentage+13.0);
-        FormatString(factor,"%lu",clone_info->quality);
+        MagickFormatString(factor,sizeof(factor),"%lu",clone_info->quality);
         if(!AcquireTemporaryFileName(filename))
           {
             DestroyImage(master_image);
             DestroyImageInfo(clone_info);
             ThrowWriterTemporaryFileException(filename);
           }
-        FormatString(preview_image->filename,"jpeg:%.1024s",filename);
+        MagickFormatString(preview_image->filename,sizeof(preview_image->filename),"jpeg:%.1024s",filename);
         status=WriteImage(clone_info,preview_image);
         if (status != False)
           {
@@ -600,14 +600,14 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
           }
         (void) LiberateTemporaryFile(filename);
         if ((GetBlobSize(preview_image)/1024) >= 1024)
-          FormatString(label,"quality %.1024s\n%gmb ",factor,
+          MagickFormatString(label,sizeof(label),"quality %.1024s\n%gmb ",factor,
             (double) GetBlobSize(preview_image)/1024.0/1024.0);
         else
           if (GetBlobSize(preview_image) >= 1024)
-            FormatString(label,"quality %.1024s\n%gkb ",factor,
+            MagickFormatString(label,sizeof(label),"quality %.1024s\n%gkb ",factor,
               (double) GetBlobSize(preview_image)/1024.0);
           else
-            FormatString(label,"quality %.1024s\n%lub ",factor,
+            MagickFormatString(label,sizeof(label),"quality %.1024s\n%lub ",factor,
               (unsigned long) GetBlobSize(preview_image));
         break;
       }
@@ -649,7 +649,7 @@ static unsigned int WritePreviewImage(const ImageInfo *image_info,Image *image)
       MagickFreeMemory(montage_image->montage);
       MagickFreeMemory(montage_image->directory);
     }
-  FormatString(montage_image->filename,"miff:%.1024s",image_info->filename);
+  MagickFormatString(montage_image->filename,sizeof(montage_image->filename),"miff:%.1024s",image_info->filename);
   status=WriteImage(image_info,montage_image);
   DestroyImage(montage_image);
   return(status);

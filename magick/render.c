@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1337,7 +1337,7 @@ InverseAffineMatrix(const AffineMatrix *affine, AffineMatrix *inverse_affine,
   if (AbsoluteValue(divisor) < 0.0001)
     {
       char message[MaxTextExtent];
-      FormatString(message,"Inverse affine divisor: %g", divisor);
+      MagickFormatString(message,sizeof(message),"Inverse affine divisor: %g", divisor);
       ThrowException(exception,DrawError,UnreasonableAffineMatrix,message);
       status=MagickFail;
     }
@@ -1772,7 +1772,7 @@ DrawClipPath(Image *image,const DrawInfo *draw_info, const char *name)
   assert(image->signature == MagickSignature);
   assert(draw_info != (const DrawInfo *) NULL);
   assert(name != (const char *) NULL);
-  FormatString(clip_path,"[MVG:%.1024s]",name);
+  MagickFormatString(clip_path,sizeof(clip_path),"[MVG:%.1024s]",name);
   attribute=GetImageAttribute(image,clip_path);
   if (attribute == (ImageAttribute *) NULL)
     return(MagickPass);
@@ -1937,7 +1937,7 @@ DrawCompositeMask(Image *image,const DrawInfo *draw_info, const char *name)
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(draw_info != (const DrawInfo *) NULL);
-  FormatString(composite_path,"[MVG:%.1024s]",name);
+  MagickFormatString(composite_path,sizeof(composite_path),"[MVG:%.1024s]",name);
   do
     {
       if ((attribute=GetImageAttribute(image,composite_path)) == (ImageAttribute *) NULL)
@@ -2140,7 +2140,7 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
     if (maximum_length > maximum_length_limit)
       {
         char message[MaxTextExtent];
-        FormatString(message,"Maximum length: %g, Scale: %g", maximum_length, scale);
+        MagickFormatString(message,sizeof(message),"Maximum length: %g, Scale: %g", maximum_length, scale);
         ThrowException(&image->exception,DrawError,UnreasonableDashPolygonLength,message);
         status=MagickFail;
         goto draw_dash_polygon_fail;
@@ -2301,7 +2301,7 @@ static void DrawImageSetCurrentRecurseLevel(Image *image,const long recurse_leve
   char
     recursion_str[MaxTextExtent];
 
-  FormatString(recursion_str,"%ld",recurse_level);
+  MagickFormatString(recursion_str,sizeof(recursion_str),"%ld",recurse_level);
   /* SetImageAttribute concatenates values! Delete with NULL */
   (void) SetImageAttribute(image,recursion_key,NULL);
   (void) SetImageAttribute(image,recursion_key,recursion_str);
@@ -2319,7 +2319,7 @@ static MagickPassFail DrawImageRecurseIn(Image *image)
     {
       char
         recursion_str[MaxTextExtent];
-      FormatString(recursion_str,"%ld",recurse_level);
+      MagickFormatString(recursion_str,sizeof(recursion_str),"%ld",recurse_level);
       ThrowException(&image->exception,DrawError,DrawingRecursionDetected,
                      recursion_str);
       return MagickFail;
@@ -2364,7 +2364,7 @@ char *  ExtractTokensBetweenPushPop (
   size_t ExtractedLength = 0;
   MagickBool found_pop = MagickFalse;
 
-  FormatString(pop_message,"push %.512s", pop_string);
+  MagickFormatString(pop_message,sizeof(pop_message),"push %.512s", pop_string);
 
   /* next token is name associated with push/pop data */
   pq = q;
@@ -2376,8 +2376,8 @@ char *  ExtractTokensBetweenPushPop (
           *pExtractedLength = ExtractedLength;
         return NULL;
     }
-  FormatString(name,"[MVG:%.1024s]",token);
-  FormatString(pop_message,"push %.512s %.512s", pop_string, token);
+  MagickFormatString(name,sizeof(name),"[MVG:%.1024s]",token);
+  MagickFormatString(pop_message,sizeof(pop_message),"push %.512s %.512s", pop_string, token);
 
   /* search for "pop <pop_string>" */
   for (p=q; *q != '\0'; )
@@ -2469,7 +2469,7 @@ char * InsertAttributeIntoInputStream (
       *pStatus = MagickFail;
       return(q);
     }
-  FormatString(AttributeName,"[MVG:%.1024s]",*ptoken);
+  MagickFormatString(AttributeName,sizeof(AttributeName),"[MVG:%.1024s]",*ptoken);
   attribute=GetImageAttribute(image,AttributeName);
   if (attribute == (ImageAttribute *) NULL)
     {
@@ -2477,7 +2477,7 @@ char * InsertAttributeIntoInputStream (
       if  ( UndefAttrIsError )
         {
           char message[MaxTextExtent];
-          FormatString(message,"Primitive \"%s\" id \"%s\" not defined",keyword,*ptoken);
+          MagickFormatString(message,sizeof(message),"Primitive \"%s\" id \"%s\" not defined",keyword,*ptoken);
           ThrowException(&image->exception,DrawError,InvalidPrimitiveArgument,message);
           *pStatus = MagickFail;
         }
@@ -2795,17 +2795,17 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       return MagickPass;
     }
 
-    primitive_extent=strlen(original_primitive);
-    primitive = MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
-    if (primitive == (char *) NULL)
-      {
-        if (original_primitive != draw_info->primitive)
-          MagickFreeMemory(original_primitive);
-        return(MagickFail);
-      }
-    (void) memcpy(primitive, original_primitive, primitive_extent+1);
-    if (original_primitive != draw_info->primitive)
-          MagickFreeMemory(original_primitive);
+  primitive_extent=strlen(original_primitive);
+  primitive = MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
+  if (primitive == (char *) NULL)
+    {
+      if (original_primitive != draw_info->primitive)
+        MagickFreeMemory(original_primitive);
+      return(MagickFail);
+    }
+  (void) memcpy(primitive, original_primitive, primitive_extent+1);
+  if (original_primitive != draw_info->primitive)
+    MagickFreeMemory(original_primitive);
 
   n=0;
   /*
@@ -2816,8 +2816,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     {
       MagickFreeResourceLimitedMemory(char *, primitive);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
-        UnableToDrawOnImage)
-    }
+                            UnableToDrawOnImage)
+        }
 
   /* Set up to manage growing the PrimitiveInfo array */
   PIMgr.pp_PrimitiveInfo = &primitive_info;
@@ -2886,8 +2886,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     perform text rotation (i.e., next character is to be rotated) by supplying the following
     sequence:
 
-      translate x y (where x, y indicate the current text position)
-      rotate angle (where angle is the rotation angle)
+    translate x y (where x, y indicate the current text position)
+    rotate angle (where angle is the rotation angle)
 
     Later, when the actual 'text x y string' is supplied by the client, x and y must both
     be zero since the positioning has already been taken care of by the translate/rotate
@@ -2897,2119 +2897,2124 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   TextRotationPerformed = MagickFalse;
 
   for (q=primitive; *q != '\0'; )
-  {
-    UseCurrentTextPosition = False;
-    /*
-      Interpret graphic primitive.
-    */
-    if (MagickGetToken(q,&q,keyword,MaxTextExtent) < 1)
-      break;
-    if (*keyword == '\0')
-      break;
-    if (*keyword == '#')
-      {
-        /*
-          Comment.
-        */
-        while ((*q != '\n') && (*q != '\0'))
-          q++;
-        continue;
-      }
-    p=q-strlen(keyword); /* FIXME: Make sure that this rule works! */
-    primitive_type=UndefinedPrimitive;
-    current=graphic_context[n]->affine;
-    IdentityAffine(&affine);
-    token[0]='\0';
-    switch (*keyword)
     {
-      case ';':
+      UseCurrentTextPosition = False;
+      /*
+        Interpret graphic primitive.
+      */
+      if (MagickGetToken(q,&q,keyword,MaxTextExtent) < 1)
         break;
-      case 'a':
-      case 'A':
-      {
-        if (LocaleCompare("affine",keyword) == 0)
-          {
-            MagickBool affine_args_good = MagickFalse;
-            do
-              {
-                /* sx */
-                if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                  break;
-                if (MagickAtoFChk(token,&affine.sx) != MagickPass)
-                  break;
-                /* rx */
-                if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                  break;
-                if (*token == ',')
-                  if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                    break;
-                if (MagickAtoFChk(token,&affine.rx) != MagickPass)
-                  break;
-                /* ry */
-                if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                  break;
-                if (*token == ',')
-                  if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                    break;
-                if (MagickAtoFChk(token,&affine.ry) != MagickPass)
-                  break;
-                /* sy */
-                if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                  break;
-                if (*token == ',')
-                  if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                    break;
-                if (MagickAtoFChk(token,&affine.sy) != MagickPass)
-                  break;
-                /* tx */
-                if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                  break;
-                if (*token == ',')
-                  if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                    break;
-                if (MagickAtoFChk(token,&affine.tx) != MagickPass)
-                  break;
-                /* ty */
-                if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                  break;
-                if (*token == ',')
-                  if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                    break;
-                if (MagickAtoFChk(token,&affine.ty) != MagickPass)
-                  break;
-                affine_args_good=MagickTrue;
-              } while (0);
-            if (affine_args_good != MagickTrue)
-              {
-                status=MagickFail;
-              }
-            break;
-          }
-        if (LocaleCompare("arc",keyword) == 0)
-          {
-            primitive_type=ArcPrimitive;
-            break;
-          }
-        status=MagickFail;
+      if (*keyword == '\0')
         break;
-      }
-      case 'b':
-      case 'B':
-      {
-        if (LocaleCompare("bezier",keyword) == 0)
+      if (*keyword == '#')
+        {
+          /*
+            Comment.
+          */
+          while ((*q != '\n') && (*q != '\0'))
+            q++;
+          continue;
+        }
+      p=q-strlen(keyword); /* FIXME: Make sure that this rule works! */
+      primitive_type=UndefinedPrimitive;
+      current=graphic_context[n]->affine;
+      IdentityAffine(&affine);
+      token[0]='\0';
+      switch (*keyword)
+        {
+        case ';':
+          break;
+        case 'a':
+        case 'A':
           {
-            primitive_type=BezierPrimitive;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'c':
-      case 'C':
-      {
-        if (LocaleCompare("class",keyword) == 0)
-          {/*class*/
-            /* FIXME: Deal with possible recursion */
-            q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
-                                               &token,&token_max_length,image,
-                                               &status,MagickFalse/*UndefAttrIsError*/);
-            break;
-          }/*class*/
-        if (LocaleCompare("clip-path",keyword) == 0)
-          {
-            /*
-              Create clip mask.
-            */
-            if (MagickGetToken(q,&q,token,token_max_length) < 1)
+            if (LocaleCompare("affine",keyword) == 0)
               {
-                status=MagickFail;
-                break;
-              }
-            (void) CloneString(&graphic_context[n]->extra->clip_path,token);
-            if (DrawClipPath(image,graphic_context[n],
-                             graphic_context[n]->extra->clip_path) == MagickFail)
-              status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("clip-rule",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("evenodd",token) == 0)
-              {
-                graphic_context[n]->fill_rule=EvenOddRule;
-                break;
-              }
-            if (LocaleCompare("nonzero",token) == 0)
-              {
-                graphic_context[n]->fill_rule=NonZeroRule;
-                break;
-              }
-            status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("clip-units",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("userSpace",token) == 0)
-              {
-                graphic_context[n]->clip_units=UserSpace;
-                break;
-              }
-            if (LocaleCompare("userSpaceOnUse",token) == 0)
-              {
-                graphic_context[n]->clip_units=UserSpaceOnUse;
-                break;
-              }
-            if (LocaleCompare("objectBoundingBox",token) == 0)
-              {
-                graphic_context[n]->clip_units=ObjectBoundingBox;
-                IdentityAffine(&current);
-                affine.sx=draw_info->bounds.x2;
-                affine.sy=draw_info->bounds.y2;
-                affine.tx=draw_info->bounds.x1;
-                affine.ty=draw_info->bounds.y1;
-                break;
-              }
-            status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("circle",keyword) == 0)
-          {
-            primitive_type=CirclePrimitive;
-            break;
-          }
-        if (LocaleCompare("color",keyword) == 0)
-          {
-            primitive_type=ColorPrimitive;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'd':
-      case 'D':
-      {
-        if (LocaleCompare("decorate",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("none",token) == 0)
-              {
-                graphic_context[n]->decorate=NoDecoration;
-                break;
-              }
-            if (LocaleCompare("underline",token) == 0)
-              {
-                graphic_context[n]->decorate=UnderlineDecoration;
-                break;
-              }
-            if (LocaleCompare("overline",token) == 0)
-              {
-                graphic_context[n]->decorate=OverlineDecoration;
-                break;
-              }
-            if (LocaleCompare("line-through",token) == 0)
-              {
-                graphic_context[n]->decorate=LineThroughDecoration;
-                break;
-              }
-            status=MagickFail;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'e':
-      case 'E':
-      {
-        if (LocaleCompare("ellipse",keyword) == 0)
-          {
-            primitive_type=EllipsePrimitive;
-            break;
-          }
-        if (LocaleCompare("encoding",keyword) == 0)
-          {
-            /*
-              If the encoding argument is '', it will result in a
-              zero-length token, which is a valid argument. But
-              MagickGetToken() now returns 0 and an empty token.
-            */
-            MagickGetToken(q,&q,token,token_max_length);
-            (void) CloneString(&graphic_context[n]->encoding,token);
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'f':
-      case 'F':
-      {
-        if (LocaleCompare("fill",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
-              break;    /* if drawing clip path, ignore changes to fill color */
-            FormatString(pattern,"[MVG:%.1024s]",token);
-            if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
-              {
-                if (DrawPatternPath(image,draw_info,token,
-                                    &graphic_context[n]->fill_pattern) != MagickPass)
+                MagickBool affine_args_good = MagickFalse;
+                do
                   {
-                    status=MagickFail;
-                    break;
-                  }
-              }
-            else
-              {/*fill color, not pattern*/
-
-                /* when setting new fill color, try to preserve fill-opacity */
-                Quantum FillOpacityOld = graphic_context[n]->fill.opacity;
-                if (QueryColorDatabase(token,&graphic_context[n]->fill,&image->exception) != MagickPass)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                if (graphic_context[n]->fill.opacity != TransparentOpacity)
-                  {/*new fill color != 'none'*/
-
-                    if  ( FillOpacityOld != TransparentOpacity )
-                      graphic_context[n]->fill.opacity = FillOpacityOld;  /* already has group opacity included */
-                    else  /* combine fill color's opacity with group opacity per SVG spec */
-                      {
-                        Quantum FillOpacity = FillOpacityPending ?
-                          MaxRGB - (Quantum) (MaxRGBDouble * FillOpacitySaved + 0.5) : graphic_context[n]->fill.opacity;
-                        graphic_context[n]->fill.opacity = MaxRGB - (Quantum)((double)(MaxRGB - FillOpacity) * (double)(MaxRGB - graphic_context[n]->opacity) / MaxRGBDouble + 0.5);
-                      }
-                    FillOpacityPending = MagickFalse;
-
-                  }/*new fill color != 'none'*/
-
-              }/*fill color, not pattern*/
-            break;
-          }
-        if (LocaleCompare("fill-rule",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("evenodd",token) == 0)
-              {
-                graphic_context[n]->fill_rule=EvenOddRule;
-                break;
-              }
-            if (LocaleCompare("nonzero",token) == 0)
-              {
-                graphic_context[n]->fill_rule=NonZeroRule;
-                break;
-              }
-            status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("fill-opacity",keyword) == 0)
-          {
-            double opacity;
-            MagickGetToken(q,&q,token,token_max_length);
-            if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
-              break;    /* if drawing clip path, ignore changes to fill opacity */
-            factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
-            if ((MagickAtoFChk(token,&opacity) != MagickPass) ||
-                (opacity < 0.0))
-              {
-                status=MagickFail;
-                break;
-              }
-            opacity *= factor;
-            if  ( opacity <= 0.0 )   /* per SVG spec */
-              opacity = 0.0;
-            else if  ( opacity > 1.0 )
-              opacity = 1.0;
-            FillOpacitySaved = opacity;
-            if (graphic_context[n]->fill.opacity != TransparentOpacity)
-              {
-                /* combine new fill-opacity with group opacity per SVG spec */
-                double opacityGroup = MaxRGB - graphic_context[n]->opacity; /* MaxRGB==opaque */
-                graphic_context[n]->fill.opacity = MaxRGB - (Quantum)(opacity * opacityGroup + 0.5);
-                FillOpacityPending = MagickFalse;
-              }
-            else
-              FillOpacityPending = MagickTrue;
-            break;
-          }
-        if (LocaleCompare("font",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            (void) CloneString(&graphic_context[n]->font,token);
-            if (LocaleCompare("none",token) == 0)
-              MagickFreeMemory(graphic_context[n]->font);
-            break;
-          }
-        if (LocaleCompare("font-family",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            (void) CloneString(&graphic_context[n]->family,token);
-            break;
-          }
-        if (LocaleCompare("font-size",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&graphic_context[n]->pointsize)
-                != MagickPass)
-              {
-                status=MagickFail;
-              }
-            break;
-          }
-        if (LocaleCompare("font-stretch",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare(token,"all") == 0)
-              graphic_context[n]->stretch=AnyStretch;
-            if (LocaleCompare(token,"condensed") == 0)
-              graphic_context[n]->stretch=CondensedStretch;
-            if (LocaleCompare(token,"expanded") == 0)
-              graphic_context[n]->stretch=ExpandedStretch;
-            if (LocaleCompare(token,"extra-condensed") == 0)
-              graphic_context[n]->stretch=ExtraCondensedStretch;
-            if (LocaleCompare(token,"extra-expanded") == 0)
-              graphic_context[n]->stretch=ExtraExpandedStretch;
-            if (LocaleCompare(token,"normal") == 0)
-              graphic_context[n]->stretch=NormalStretch;
-            if (LocaleCompare(token,"semi-condensed") == 0)
-              graphic_context[n]->stretch=SemiCondensedStretch;
-            if (LocaleCompare(token,"semi-expanded") == 0)
-              graphic_context[n]->stretch=SemiExpandedStretch;
-            if (LocaleCompare(token,"ultra-condensed") == 0)
-              graphic_context[n]->stretch=UltraCondensedStretch;
-            if (LocaleCompare(token,"ultra-expanded") == 0)
-              graphic_context[n]->stretch=UltraExpandedStretch;
-            break;
-          }
-        if (LocaleCompare("font-style",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare(token,"all") == 0)
-              graphic_context[n]->style=AnyStyle;
-            if (LocaleCompare(token,"italic") == 0)
-              graphic_context[n]->style=ItalicStyle;
-            if (LocaleCompare(token,"normal") == 0)
-              graphic_context[n]->style=NormalStyle;
-            if (LocaleCompare(token,"oblique") == 0)
-              graphic_context[n]->style=ObliqueStyle;
-            break;
-          }
-        if (LocaleCompare("font-weight",keyword) == 0)
-          {
-            if (MagickGetToken(q,&q,token,token_max_length) < 1)
-              {
-                status=MagickFail;
-                break;
-              }
-            if (LocaleCompare(token,"all") == 0)
-              graphic_context[n]->weight=0;
-            else if (LocaleCompare(token,"bold") == 0)
-              graphic_context[n]->weight=700;
-            else if (LocaleCompare(token,"bolder") == 0)
-              {
-                if (graphic_context[n]->weight <= 800)
-                  graphic_context[n]->weight+=100;
-              }
-            else if (LocaleCompare(token,"lighter") == 0)
-              {
-                if (graphic_context[n]->weight >= 100)
-                  graphic_context[n]->weight-=100;
-              }
-            else if (LocaleCompare(token,"normal") == 0)
-              graphic_context[n]->weight=400;
-            else if (MagickAtoULChk(token,&graphic_context[n]->weight) != MagickPass)
-              status=MagickFail;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'g':
-      case 'G':
-      {
-        if (LocaleCompare("gradient-units",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            /* FIXME: Not implemented! */
-            break;
-          }
-        if (LocaleCompare("gravity",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            graphic_context[n]->gravity=StringToGravityType(token);
-            if (ForgetGravity != graphic_context[n]->gravity)
-              break;
-            status=MagickFail;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'i':
-      case 'I':
-      {
-        if (LocaleCompare("image",keyword) == 0)
-          {
-            primitive_type=ImagePrimitive;
-            MagickGetToken(q,&q,token,token_max_length);
-            graphic_context[n]->compose=StringToCompositeOperator(token);
-            if (UndefinedCompositeOp == graphic_context[n]->compose)
-              status=MagickFail;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'l':
-      case 'L':
-      {
-        if (LocaleCompare("line",keyword) == 0)
-          {
-            primitive_type=LinePrimitive;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'm':
-      case 'M':
-      {
-          if (LocaleCompare("mask",keyword) == 0)   /* added mask */
-            {
-              /*
-                Create mask.
-              */
-              if (MagickGetToken(q,&q,token,token_max_length) < 1)
-                {
-                  status=MagickFail;
-                  break;
-                }
-              (void) CloneString(&graphic_context[n]->extra->composite_path,token);
-              status &= DrawCompositeMask(image,graphic_context[n],
-                                          graphic_context[n]->extra->composite_path);
-              break;
-            }
-        if (LocaleCompare("matte",keyword) == 0)
-          {
-            primitive_type=MattePrimitive;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'o':
-      case 'O':
-      {
-        if (LocaleCompare("offset",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            break;
-          }
-        if (LocaleCompare("opacity",keyword) == 0)
-          {
-            double opacity,opacityGroupOld,opacityGroupNew;
-            MagickGetToken(q,&q,token,token_max_length);
-            if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
-              break;    /* if drawing clip path, ignore changes to group/global opacity */
-            factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
-            if (MagickAtoFChk(token,&opacity) != MagickPass)
-              {
-                status=MagickFail;
-                break;
-              }
-            opacity *= factor;
-            if  ( opacity <= 0.0 )  /* per SVG spec */
-              opacity = 0.0;
-            else if ( opacity > 1.0 )
-              opacity = 1.0;
-            opacityGroupOld = MaxRGB - graphic_context[n]->opacity; /* MaxRGB==opaque */
-            opacityGroupNew = opacityGroupOld * opacity; /* MaxRGB==opaque */
-            graphic_context[n]->opacity = MaxRGB - (Quantum)(opacityGroupNew + /*round*/0.5);
-            if (graphic_context[n]->fill.opacity != TransparentOpacity)
-            {/*fill color != 'none'*/
-
-              if  ( opacityGroupOld == 0.0 )  /* can't back out old group opacity */
-                graphic_context[n]->fill.opacity = graphic_context[n]->opacity; /* reasonable alternative */
-              else
-              {
-                /* back out old group opacity value, include new group opacity value */
-                double opacityFill = MaxRGB - graphic_context[n]->fill.opacity; /* MaxRGB==opaque */
-                opacityFill = opacityFill * (opacityGroupNew / opacityGroupOld);
-                graphic_context[n]->fill.opacity =
-                  (opacityFill < MaxRGBDouble) ? MaxRGB - (Quantum)(opacityFill + /*round*/0.5) : 0;
-              }
-
-            }/*fill color != 'none'*/
-
-            if (graphic_context[n]->stroke.opacity != TransparentOpacity)
-            {/*stroke color != 'none'*/
-
-              if  ( opacityGroupOld == 0.0 ) /* can't back out old group opacity */
-                graphic_context[n]->stroke.opacity = graphic_context[n]->opacity; /* reasonable alternative */
-              else
-              {
-                /* back out old group opacity value, include new group opacity value */
-                double opacityStroke = MaxRGB - graphic_context[n]->stroke.opacity; /* MaxRGB==opaque */
-                opacityStroke = opacityStroke * (opacityGroupNew / opacityGroupOld);
-                graphic_context[n]->stroke.opacity =
-                  (opacityStroke < MaxRGBDouble) ? MaxRGB - (Quantum)(opacityStroke + /*round*/0.5) : 0;
-              }
-
-            }/*stroke color != 'none'*/
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'p':
-      case 'P':
-      {
-        if (LocaleCompare("path",keyword) == 0)
-          {
-            primitive_type=PathPrimitive;
-            break;
-          }
-        if (LocaleCompare("point",keyword) == 0)
-          {
-            primitive_type=PointPrimitive;
-            break;
-          }
-        if (LocaleCompare("polyline",keyword) == 0)
-          {
-            primitive_type=PolylinePrimitive;
-            break;
-          }
-        if (LocaleCompare("polygon",keyword) == 0)
-          {
-            primitive_type=PolygonPrimitive;
-            break;
-          }
-        if (LocaleCompare("pop",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("class",token) == 0)  /* added "pop class" to support "defs" */
-              break;
-            if (LocaleCompare("clip-path",token) == 0)
-              break;
-            if (LocaleCompare("defs",token) == 0)
-              {
-                /* do not render graphic elements if inside <defs> ... </defs> */
-                defsPushCount--;
-                graphic_context[n]->render = (defsPushCount > 0) ? 0 : 1;
-                break;
-              }
-            if (LocaleCompare("gradient",token) == 0)
-              break;
-            if (LocaleCompare("graphic-context",token) == 0)
-              {
-                if (n <= 0)
-                  {
-                    ThrowException(&image->exception,DrawError,UnbalancedGraphicContextPushPop,token);
-                    status=MagickFail;
-                    break;
-                  }
-                if (graphic_context[n]->extra->clip_path != (char *) NULL)
-                  if (LocaleCompare(graphic_context[n]->extra->clip_path,
-                      graphic_context[n-1]->extra->clip_path) != 0)
-                    (void) SetImageClipMask(image,(Image *) NULL);
-                if (graphic_context[n]->extra->composite_path != (char *) NULL)
-                  {
-                    /* clean up composite mask if different from parent */
-                    if (LocaleCompare(graphic_context[n]->extra->composite_path,
-                        graphic_context[n-1]->extra->composite_path) != 0)
-                      (void) SetImageCompositeMask(image,(Image *) NULL);
-                  }
-                DestroyDrawInfo(graphic_context[n]);
-                n--;
-                FillOpacityPending = StrokeOpacityPending = MagickFalse;
-                break;
-              }
-            if (LocaleCompare("id",token) == 0)   /* added "pop id" (to support "defs") */
-              break;
-            if (LocaleCompare("mask",token) == 0)   /* added mask */
-              break;
-            if (LocaleCompare("pattern",token) == 0)
-              break;
-            status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("push",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("class",token) == 0)  /* added "push class" to support "defs" */
-              {
-                char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"class",image,0);
-                if (nq != NULL)
-                  q=nq;
-                else
-                  status=MagickFail;
-                break;
-              }
-            if (LocaleCompare("clip-path",token) == 0)
-              {
-                /*
-                  Code that extracted tokens between push/pop clip-path has been refactored
-                  into new function ExtractTokensBetweenPushPop().
-                */
-                size_t ExtractedLength;
-                char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"clip-path",image,&ExtractedLength); /* NULLED */
-                if  ( (ExtractedLength == 0) || (nq == NULL) )
-                  status=MagickFail;
-                else
-                  q=nq;
-                break;
-              }
-            if (LocaleCompare("gradient",token) == 0)
-              {
-                char
-                  key[2*MaxTextExtent],
-                  name[MaxTextExtent],
-                  type[MaxTextExtent];
-
-                SegmentInfo
-                  segment;
-
-                double
-                  gradient_width,
-                  gradient_height;
-
-                MagickGetToken(q,&q,token,token_max_length);
-                (void) strlcpy(name,token,MaxTextExtent);
-                MagickGetToken(q,&q,token,token_max_length);
-                (void) strlcpy(type,token,MaxTextExtent);
-                MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&segment.x1) != MagickPass)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                MagickGetToken(q,&q,token,token_max_length);
-
-                if (*token == ',')
-                  MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&segment.y1) != MagickPass)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                MagickGetToken(q,&q,token,token_max_length);
-
-                if (*token == ',')
-                  MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&segment.x2) != MagickPass)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                MagickGetToken(q,&q,token,token_max_length);
-
-                if (*token == ',')
-                  MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&segment.y2) != MagickPass)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                if (LocaleCompare(type,"radial") == 0)
-                  {
-                    MagickGetToken(q,&q,token,token_max_length);
+                    /* sx */
+                    if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                      break;
+                    if (MagickAtoFChk(token,&affine.sx) != MagickPass)
+                      break;
+                    /* rx */
+                    if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                      break;
                     if (*token == ',')
-                      MagickGetToken(q,&q,token,token_max_length);
-                  }
-                for (p=q; *q != '\0'; )
-                {
-                  MagickGetToken(q,&q,token,token_max_length);
-                  if (LocaleCompare(token,"pop") != 0)
-                    continue;
-                  MagickGetToken(q,(char **) NULL,token,token_max_length);
-                  if (LocaleCompare(token,"gradient") != 0)
-                    continue;
-                  break;
-                }
-                if ((q == NULL) || (p == NULL) || (q-4 < p))
+                      if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                        break;
+                    if (MagickAtoFChk(token,&affine.rx) != MagickPass)
+                      break;
+                    /* ry */
+                    if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                      break;
+                    if (*token == ',')
+                      if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                        break;
+                    if (MagickAtoFChk(token,&affine.ry) != MagickPass)
+                      break;
+                    /* sy */
+                    if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                      break;
+                    if (*token == ',')
+                      if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                        break;
+                    if (MagickAtoFChk(token,&affine.sy) != MagickPass)
+                      break;
+                    /* tx */
+                    if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                      break;
+                    if (*token == ',')
+                      if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                        break;
+                    if (MagickAtoFChk(token,&affine.tx) != MagickPass)
+                      break;
+                    /* ty */
+                    if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                      break;
+                    if (*token == ',')
+                      if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                        break;
+                    if (MagickAtoFChk(token,&affine.ty) != MagickPass)
+                      break;
+                    affine_args_good=MagickTrue;
+                  } while (0);
+                if (affine_args_good != MagickTrue)
                   {
                     status=MagickFail;
-                    break;
                   }
-                (void) strncpy(token,p,q-p-4);
-                token[q-p-4]='\0';
-                bounds.x1=graphic_context[n]->affine.sx*segment.x1+
-                  graphic_context[n]->affine.ry*segment.y1+
-                  graphic_context[n]->affine.tx;
-                bounds.y1=graphic_context[n]->affine.rx*segment.x1+
-                  graphic_context[n]->affine.sy*segment.y1+
-                  graphic_context[n]->affine.ty;
-                bounds.x2=graphic_context[n]->affine.sx*segment.x2+
-                  graphic_context[n]->affine.ry*segment.y2+
-                  graphic_context[n]->affine.tx;
-                bounds.y2=graphic_context[n]->affine.rx*segment.x2+
-                  graphic_context[n]->affine.sy*segment.y2+
-                  graphic_context[n]->affine.ty;
+                break;
+              }
+            if (LocaleCompare("arc",keyword) == 0)
+              {
+                primitive_type=ArcPrimitive;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'b':
+        case 'B':
+          {
+            if (LocaleCompare("bezier",keyword) == 0)
+              {
+                primitive_type=BezierPrimitive;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'c':
+        case 'C':
+          {
+            if (LocaleCompare("class",keyword) == 0)
+              {/*class*/
+                /* FIXME: Deal with possible recursion */
+                q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
+                                                   &token,&token_max_length,image,
+                                                   &status,MagickFalse/*UndefAttrIsError*/);
+                break;
+              }/*class*/
+            if (LocaleCompare("clip-path",keyword) == 0)
+              {
                 /*
-                  Validate gradient image size
+                  Create clip mask.
                 */
-                gradient_width=Max(AbsoluteValue(bounds.x2-bounds.x1+1),1);
-                gradient_height=Max(AbsoluteValue(bounds.y2-bounds.y1+1),1);
-                if (AcquireMagickResource(WidthResource,gradient_width) != MagickPass)
+                if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   {
-                    char resource_str[MaxTextExtent];
-                    const magick_int64_t width_resource_limit = GetMagickResourceLimit(WidthResource);
-                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) width_resource_limit);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelWidthLimitExceeded,resource_str);
                     status=MagickFail;
                     break;
                   }
-                if (AcquireMagickResource(HeightResource,gradient_height) != MagickPass)
+                (void) CloneString(&graphic_context[n]->extra->clip_path,token);
+                if (DrawClipPath(image,graphic_context[n],
+                                 graphic_context[n]->extra->clip_path) == MagickFail)
+                  status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("clip-rule",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("evenodd",token) == 0)
                   {
-                    char resource_str[MaxTextExtent];
-                    const magick_int64_t hight_resource_limit = GetMagickResourceLimit(HeightResource);
-                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) hight_resource_limit);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelHeightLimitExceeded,resource_str);
+                    graphic_context[n]->fill_rule=EvenOddRule;
+                    break;
+                  }
+                if (LocaleCompare("nonzero",token) == 0)
+                  {
+                    graphic_context[n]->fill_rule=NonZeroRule;
+                    break;
+                  }
+                status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("clip-units",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("userSpace",token) == 0)
+                  {
+                    graphic_context[n]->clip_units=UserSpace;
+                    break;
+                  }
+                if (LocaleCompare("userSpaceOnUse",token) == 0)
+                  {
+                    graphic_context[n]->clip_units=UserSpaceOnUse;
+                    break;
+                  }
+                if (LocaleCompare("objectBoundingBox",token) == 0)
+                  {
+                    graphic_context[n]->clip_units=ObjectBoundingBox;
+                    IdentityAffine(&current);
+                    affine.sx=draw_info->bounds.x2;
+                    affine.sy=draw_info->bounds.y2;
+                    affine.tx=draw_info->bounds.x1;
+                    affine.ty=draw_info->bounds.y1;
+                    break;
+                  }
+                status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("circle",keyword) == 0)
+              {
+                primitive_type=CirclePrimitive;
+                break;
+              }
+            if (LocaleCompare("color",keyword) == 0)
+              {
+                primitive_type=ColorPrimitive;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'd':
+        case 'D':
+          {
+            if (LocaleCompare("decorate",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("none",token) == 0)
+                  {
+                    graphic_context[n]->decorate=NoDecoration;
+                    break;
+                  }
+                if (LocaleCompare("underline",token) == 0)
+                  {
+                    graphic_context[n]->decorate=UnderlineDecoration;
+                    break;
+                  }
+                if (LocaleCompare("overline",token) == 0)
+                  {
+                    graphic_context[n]->decorate=OverlineDecoration;
+                    break;
+                  }
+                if (LocaleCompare("line-through",token) == 0)
+                  {
+                    graphic_context[n]->decorate=LineThroughDecoration;
+                    break;
+                  }
+                status=MagickFail;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'e':
+        case 'E':
+          {
+            if (LocaleCompare("ellipse",keyword) == 0)
+              {
+                primitive_type=EllipsePrimitive;
+                break;
+              }
+            if (LocaleCompare("encoding",keyword) == 0)
+              {
+                /*
+                  If the encoding argument is '', it will result in a
+                  zero-length token, which is a valid argument. But
+                  MagickGetToken() now returns 0 and an empty token.
+                */
+                MagickGetToken(q,&q,token,token_max_length);
+                (void) CloneString(&graphic_context[n]->encoding,token);
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'f':
+        case 'F':
+          {
+            if (LocaleCompare("fill",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
+                  break;    /* if drawing clip path, ignore changes to fill color */
+                MagickFormatString(pattern,sizeof(pattern),"[MVG:%.1024s]",token);
+                if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
+                  {
+                    if (DrawPatternPath(image,draw_info,token,
+                                        &graphic_context[n]->fill_pattern) != MagickPass)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                  }
+                else
+                  {/*fill color, not pattern*/
+
+                    /* when setting new fill color, try to preserve fill-opacity */
+                    Quantum FillOpacityOld = graphic_context[n]->fill.opacity;
+                    if (QueryColorDatabase(token,&graphic_context[n]->fill,&image->exception) != MagickPass)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    if (graphic_context[n]->fill.opacity != TransparentOpacity)
+                      {/*new fill color != 'none'*/
+
+                        if  ( FillOpacityOld != TransparentOpacity )
+                          graphic_context[n]->fill.opacity = FillOpacityOld;  /* already has group opacity included */
+                        else  /* combine fill color's opacity with group opacity per SVG spec */
+                          {
+                            Quantum FillOpacity = FillOpacityPending ?
+                              MaxRGB - (Quantum) (MaxRGBDouble * FillOpacitySaved + 0.5) : graphic_context[n]->fill.opacity;
+                            graphic_context[n]->fill.opacity = MaxRGB - (Quantum)((double)(MaxRGB - FillOpacity) * (double)(MaxRGB - graphic_context[n]->opacity) / MaxRGBDouble + 0.5);
+                          }
+                        FillOpacityPending = MagickFalse;
+
+                      }/*new fill color != 'none'*/
+
+                  }/*fill color, not pattern*/
+                break;
+              }
+            if (LocaleCompare("fill-rule",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("evenodd",token) == 0)
+                  {
+                    graphic_context[n]->fill_rule=EvenOddRule;
+                    break;
+                  }
+                if (LocaleCompare("nonzero",token) == 0)
+                  {
+                    graphic_context[n]->fill_rule=NonZeroRule;
+                    break;
+                  }
+                status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("fill-opacity",keyword) == 0)
+              {
+                double opacity;
+                MagickGetToken(q,&q,token,token_max_length);
+                if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
+                  break;    /* if drawing clip path, ignore changes to fill opacity */
+                factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
+                if ((MagickAtoFChk(token,&opacity) != MagickPass) ||
+                    (opacity < 0.0))
+                  {
                     status=MagickFail;
                     break;
-                    }
-                if (AcquireMagickResource(PixelsResource,(magick_uint64_t) gradient_width*gradient_height)
+                  }
+                opacity *= factor;
+                if  ( opacity <= 0.0 )   /* per SVG spec */
+                  opacity = 0.0;
+                else if  ( opacity > 1.0 )
+                  opacity = 1.0;
+                FillOpacitySaved = opacity;
+                if (graphic_context[n]->fill.opacity != TransparentOpacity)
+                  {
+                    /* combine new fill-opacity with group opacity per SVG spec */
+                    double opacityGroup = MaxRGB - graphic_context[n]->opacity; /* MaxRGB==opaque */
+                    graphic_context[n]->fill.opacity = MaxRGB - (Quantum)(opacity * opacityGroup + 0.5);
+                    FillOpacityPending = MagickFalse;
+                  }
+                else
+                  FillOpacityPending = MagickTrue;
+                break;
+              }
+            if (LocaleCompare("font",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                (void) CloneString(&graphic_context[n]->font,token);
+                if (LocaleCompare("none",token) == 0)
+                  MagickFreeMemory(graphic_context[n]->font);
+                break;
+              }
+            if (LocaleCompare("font-family",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                (void) CloneString(&graphic_context[n]->family,token);
+                break;
+              }
+            if (LocaleCompare("font-size",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&graphic_context[n]->pointsize)
                     != MagickPass)
                   {
-                    char resource_str[MaxTextExtent];
-                    const magick_int64_t pixels_resource_limit = GetMagickResourceLimit(PixelsResource);
-                    FormatString(resource_str,"%" MAGICK_INTMAX_F "d", (magick_intmax_t) pixels_resource_limit);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelLimitExceeded,resource_str);
                     status=MagickFail;
-                    break;
                   }
-                /*
-                  Apply an arbitrary limit to gradient size requests
-                  since gradient images can take a lot of memory.
-                  Some tiny SVGs request huge gradients.  This is here
-                  to avoid denial of service.
-                */
-                if (gradient_width*gradient_height > (double) 5000*5000 /*10000*10000*/)
+                break;
+              }
+            if (LocaleCompare("font-stretch",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare(token,"all") == 0)
+                  graphic_context[n]->stretch=AnyStretch;
+                if (LocaleCompare(token,"condensed") == 0)
+                  graphic_context[n]->stretch=CondensedStretch;
+                if (LocaleCompare(token,"expanded") == 0)
+                  graphic_context[n]->stretch=ExpandedStretch;
+                if (LocaleCompare(token,"extra-condensed") == 0)
+                  graphic_context[n]->stretch=ExtraCondensedStretch;
+                if (LocaleCompare(token,"extra-expanded") == 0)
+                  graphic_context[n]->stretch=ExtraExpandedStretch;
+                if (LocaleCompare(token,"normal") == 0)
+                  graphic_context[n]->stretch=NormalStretch;
+                if (LocaleCompare(token,"semi-condensed") == 0)
+                  graphic_context[n]->stretch=SemiCondensedStretch;
+                if (LocaleCompare(token,"semi-expanded") == 0)
+                  graphic_context[n]->stretch=SemiExpandedStretch;
+                if (LocaleCompare(token,"ultra-condensed") == 0)
+                  graphic_context[n]->stretch=UltraCondensedStretch;
+                if (LocaleCompare(token,"ultra-expanded") == 0)
+                  graphic_context[n]->stretch=UltraExpandedStretch;
+                break;
+              }
+            if (LocaleCompare("font-style",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare(token,"all") == 0)
+                  graphic_context[n]->style=AnyStyle;
+                if (LocaleCompare(token,"italic") == 0)
+                  graphic_context[n]->style=ItalicStyle;
+                if (LocaleCompare(token,"normal") == 0)
+                  graphic_context[n]->style=NormalStyle;
+                if (LocaleCompare(token,"oblique") == 0)
+                  graphic_context[n]->style=ObliqueStyle;
+                break;
+              }
+            if (LocaleCompare("font-weight",keyword) == 0)
+              {
+                if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   {
-                    char gradient_size_str[MaxTextExtent];
-                    FormatString(gradient_size_str,"%gx%g",
-                                 gradient_width,gradient_height);
-                    ThrowException(&image->exception,DrawError,
-                                   UnreasonableGradientSize,gradient_size_str);
                     status=MagickFail;
                     break;
                   }
-                FormatString(key,"[MVG:%.1024s]",name);
-                /* SetImageAttribute concatenates values! Delete with NULL */
-                (void) SetImageAttribute(image,key,NULL);
-                (void) SetImageAttribute(image,key,token);
-                FormatString(key,"[MVG:%.1024s-geometry]",name);
-                FormatString(geometry,"%gx%g%+g%+g",
-                  Max(AbsoluteValue(bounds.x2-bounds.x1+1),1),
-                  Max(AbsoluteValue(bounds.y2-bounds.y1+1),1),
-                  bounds.x1,bounds.y1);
-                /* SetImageAttribute concatenates values! Delete with NULL */
-                (void) SetImageAttribute(image,key,NULL);
-                (void) SetImageAttribute(image,key,geometry);
+                if (LocaleCompare(token,"all") == 0)
+                  graphic_context[n]->weight=0;
+                else if (LocaleCompare(token,"bold") == 0)
+                  graphic_context[n]->weight=700;
+                else if (LocaleCompare(token,"bolder") == 0)
+                  {
+                    if (graphic_context[n]->weight <= 800)
+                      graphic_context[n]->weight+=100;
+                  }
+                else if (LocaleCompare(token,"lighter") == 0)
+                  {
+                    if (graphic_context[n]->weight >= 100)
+                      graphic_context[n]->weight-=100;
+                  }
+                else if (LocaleCompare(token,"normal") == 0)
+                  graphic_context[n]->weight=400;
+                else if (MagickAtoULChk(token,&graphic_context[n]->weight) != MagickPass)
+                  status=MagickFail;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'g':
+        case 'G':
+          {
+            if (LocaleCompare("gradient-units",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                /* FIXME: Not implemented! */
+                break;
+              }
+            if (LocaleCompare("gravity",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                graphic_context[n]->gravity=StringToGravityType(token);
+                if (ForgetGravity != graphic_context[n]->gravity)
+                  break;
+                status=MagickFail;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'i':
+        case 'I':
+          {
+            if (LocaleCompare("image",keyword) == 0)
+              {
+                primitive_type=ImagePrimitive;
+                MagickGetToken(q,&q,token,token_max_length);
+                graphic_context[n]->compose=StringToCompositeOperator(token);
+                if (UndefinedCompositeOp == graphic_context[n]->compose)
+                  status=MagickFail;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'l':
+        case 'L':
+          {
+            if (LocaleCompare("line",keyword) == 0)
+              {
+                primitive_type=LinePrimitive;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'm':
+        case 'M':
+          {
+            if (LocaleCompare("mask",keyword) == 0)   /* added mask */
+              {
+                /*
+                  Create mask.
+                */
+                if (MagickGetToken(q,&q,token,token_max_length) < 1)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+                (void) CloneString(&graphic_context[n]->extra->composite_path,token);
+                status &= DrawCompositeMask(image,graphic_context[n],
+                                            graphic_context[n]->extra->composite_path);
+                break;
+              }
+            if (LocaleCompare("matte",keyword) == 0)
+              {
+                primitive_type=MattePrimitive;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'o':
+        case 'O':
+          {
+            if (LocaleCompare("offset",keyword) == 0)
+              {
                 MagickGetToken(q,&q,token,token_max_length);
                 break;
               }
-            if (LocaleCompare("id",token) == 0)   /* added "push id" (to support "defs") */
+            if (LocaleCompare("opacity",keyword) == 0)
               {
-                if  ( defsPushCount > 0 )
+                double opacity,opacityGroupOld,opacityGroupNew;
+                MagickGetToken(q,&q,token,token_max_length);
+                if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
+                  break;    /* if drawing clip path, ignore changes to group/global opacity */
+                factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
+                if (MagickAtoFChk(token,&opacity) != MagickPass)
                   {
-                    char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"id",image,0);
-                    if (nq == NULL)
+                    status=MagickFail;
+                    break;
+                  }
+                opacity *= factor;
+                if  ( opacity <= 0.0 )  /* per SVG spec */
+                  opacity = 0.0;
+                else if ( opacity > 1.0 )
+                  opacity = 1.0;
+                opacityGroupOld = MaxRGB - graphic_context[n]->opacity; /* MaxRGB==opaque */
+                opacityGroupNew = opacityGroupOld * opacity; /* MaxRGB==opaque */
+                graphic_context[n]->opacity = MaxRGB - (Quantum)(opacityGroupNew + /*round*/0.5);
+                if (graphic_context[n]->fill.opacity != TransparentOpacity)
+                  {/*fill color != 'none'*/
+
+                    if  ( opacityGroupOld == 0.0 )  /* can't back out old group opacity */
+                      graphic_context[n]->fill.opacity = graphic_context[n]->opacity; /* reasonable alternative */
+                    else
+                      {
+                        /* back out old group opacity value, include new group opacity value */
+                        double opacityFill = MaxRGB - graphic_context[n]->fill.opacity; /* MaxRGB==opaque */
+                        opacityFill = opacityFill * (opacityGroupNew / opacityGroupOld);
+                        graphic_context[n]->fill.opacity =
+                          (opacityFill < MaxRGBDouble) ? MaxRGB - (Quantum)(opacityFill + /*round*/0.5) : 0;
+                      }
+
+                  }/*fill color != 'none'*/
+
+                if (graphic_context[n]->stroke.opacity != TransparentOpacity)
+                  {/*stroke color != 'none'*/
+
+                    if  ( opacityGroupOld == 0.0 ) /* can't back out old group opacity */
+                      graphic_context[n]->stroke.opacity = graphic_context[n]->opacity; /* reasonable alternative */
+                    else
+                      {
+                        /* back out old group opacity value, include new group opacity value */
+                        double opacityStroke = MaxRGB - graphic_context[n]->stroke.opacity; /* MaxRGB==opaque */
+                        opacityStroke = opacityStroke * (opacityGroupNew / opacityGroupOld);
+                        graphic_context[n]->stroke.opacity =
+                          (opacityStroke < MaxRGBDouble) ? MaxRGB - (Quantum)(opacityStroke + /*round*/0.5) : 0;
+                      }
+
+                  }/*stroke color != 'none'*/
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 'p':
+        case 'P':
+          {
+            if (LocaleCompare("path",keyword) == 0)
+              {
+                primitive_type=PathPrimitive;
+                break;
+              }
+            if (LocaleCompare("point",keyword) == 0)
+              {
+                primitive_type=PointPrimitive;
+                break;
+              }
+            if (LocaleCompare("polyline",keyword) == 0)
+              {
+                primitive_type=PolylinePrimitive;
+                break;
+              }
+            if (LocaleCompare("polygon",keyword) == 0)
+              {
+                primitive_type=PolygonPrimitive;
+                break;
+              }
+            if (LocaleCompare("pop",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("class",token) == 0)  /* added "pop class" to support "defs" */
+                  break;
+                if (LocaleCompare("clip-path",token) == 0)
+                  break;
+                if (LocaleCompare("defs",token) == 0)
+                  {
+                    /* do not render graphic elements if inside <defs> ... </defs> */
+                    defsPushCount--;
+                    graphic_context[n]->render = (defsPushCount > 0) ? 0 : 1;
+                    break;
+                  }
+                if (LocaleCompare("gradient",token) == 0)
+                  break;
+                if (LocaleCompare("graphic-context",token) == 0)
+                  {
+                    if (n <= 0)
+                      {
+                        ThrowException(&image->exception,DrawError,UnbalancedGraphicContextPushPop,token);
+                        status=MagickFail;
+                        break;
+                      }
+                    if (graphic_context[n]->extra->clip_path != (char *) NULL)
+                      if (LocaleCompare(graphic_context[n]->extra->clip_path,
+                                        graphic_context[n-1]->extra->clip_path) != 0)
+                        (void) SetImageClipMask(image,(Image *) NULL);
+                    if (graphic_context[n]->extra->composite_path != (char *) NULL)
+                      {
+                        /* clean up composite mask if different from parent */
+                        if (LocaleCompare(graphic_context[n]->extra->composite_path,
+                                          graphic_context[n-1]->extra->composite_path) != 0)
+                          (void) SetImageCompositeMask(image,(Image *) NULL);
+                      }
+                    DestroyDrawInfo(graphic_context[n]);
+                    n--;
+                    FillOpacityPending = StrokeOpacityPending = MagickFalse;
+                    break;
+                  }
+                if (LocaleCompare("id",token) == 0)   /* added "pop id" (to support "defs") */
+                  break;
+                if (LocaleCompare("mask",token) == 0)   /* added mask */
+                  break;
+                if (LocaleCompare("pattern",token) == 0)
+                  break;
+                status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("push",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("class",token) == 0)  /* added "push class" to support "defs" */
+                  {
+                    char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"class",image,0);
+                    if (nq != NULL)
+                      q=nq;
+                    else
+                      status=MagickFail;
+                    break;
+                  }
+                if (LocaleCompare("clip-path",token) == 0)
+                  {
+                    /*
+                      Code that extracted tokens between push/pop clip-path has been refactored
+                      into new function ExtractTokensBetweenPushPop().
+                    */
+                    size_t ExtractedLength;
+                    char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"clip-path",image,&ExtractedLength); /* NULLED */
+                    if  ( (ExtractedLength == 0) || (nq == NULL) )
                       status=MagickFail;
                     else
                       q=nq;
                     break;
                   }
-                else    /* extract <identifier> from "push id <identifier>" */
+                if (LocaleCompare("gradient",token) == 0)
                   {
+                    char
+                      key[2*MaxTextExtent],
+                      name[MaxTextExtent],
+                      type[MaxTextExtent];
+
+                    SegmentInfo
+                      segment;
+
+                    double
+                      gradient_width,
+                      gradient_height;
+
                     MagickGetToken(q,&q,token,token_max_length);
+                    (void) strlcpy(name,token,MaxTextExtent);
+                    MagickGetToken(q,&q,token,token_max_length);
+                    (void) strlcpy(type,token,MaxTextExtent);
+                    MagickGetToken(q,&q,token,token_max_length);
+                    if (MagickAtoFChk(token,&segment.x1) != MagickPass)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    MagickGetToken(q,&q,token,token_max_length);
+
+                    if (*token == ',')
+                      MagickGetToken(q,&q,token,token_max_length);
+                    if (MagickAtoFChk(token,&segment.y1) != MagickPass)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    MagickGetToken(q,&q,token,token_max_length);
+
+                    if (*token == ',')
+                      MagickGetToken(q,&q,token,token_max_length);
+                    if (MagickAtoFChk(token,&segment.x2) != MagickPass)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    MagickGetToken(q,&q,token,token_max_length);
+
+                    if (*token == ',')
+                      MagickGetToken(q,&q,token,token_max_length);
+                    if (MagickAtoFChk(token,&segment.y2) != MagickPass)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    if (LocaleCompare(type,"radial") == 0)
+                      {
+                        MagickGetToken(q,&q,token,token_max_length);
+                        if (*token == ',')
+                          MagickGetToken(q,&q,token,token_max_length);
+                      }
+                    for (p=q; *q != '\0'; )
+                      {
+                        MagickGetToken(q,&q,token,token_max_length);
+                        if (LocaleCompare(token,"pop") != 0)
+                          continue;
+                        MagickGetToken(q,(char **) NULL,token,token_max_length);
+                        if (LocaleCompare(token,"gradient") != 0)
+                          continue;
+                        break;
+                      }
+                    if ((q == NULL) || (p == NULL) || (q-4 < p))
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    (void) strncpy(token,p,q-p-4);
+                    token[q-p-4]='\0';
+                    bounds.x1=graphic_context[n]->affine.sx*segment.x1+
+                      graphic_context[n]->affine.ry*segment.y1+
+                      graphic_context[n]->affine.tx;
+                    bounds.y1=graphic_context[n]->affine.rx*segment.x1+
+                      graphic_context[n]->affine.sy*segment.y1+
+                      graphic_context[n]->affine.ty;
+                    bounds.x2=graphic_context[n]->affine.sx*segment.x2+
+                      graphic_context[n]->affine.ry*segment.y2+
+                      graphic_context[n]->affine.tx;
+                    bounds.y2=graphic_context[n]->affine.rx*segment.x2+
+                      graphic_context[n]->affine.sy*segment.y2+
+                      graphic_context[n]->affine.ty;
+                    /*
+                      Validate gradient image size
+                    */
+                    gradient_width=Max(AbsoluteValue(bounds.x2-bounds.x1+1),1);
+                    gradient_height=Max(AbsoluteValue(bounds.y2-bounds.y1+1),1);
+                    if (AcquireMagickResource(WidthResource,gradient_width) != MagickPass)
+                      {
+                        char resource_str[MaxTextExtent];
+                        const magick_int64_t width_resource_limit = GetMagickResourceLimit(WidthResource);
+                        MagickFormatString(resource_str,sizeof(resource_str),
+                                           "%" MAGICK_INTMAX_F "d", (magick_intmax_t) width_resource_limit);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelWidthLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    if (AcquireMagickResource(HeightResource,gradient_height) != MagickPass)
+                      {
+                        char resource_str[MaxTextExtent];
+                        const magick_int64_t hight_resource_limit = GetMagickResourceLimit(HeightResource);
+                        MagickFormatString(resource_str,sizeof(resource_str),
+                                           "%" MAGICK_INTMAX_F "d", (magick_intmax_t) hight_resource_limit);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelHeightLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    if (AcquireMagickResource(PixelsResource,(magick_uint64_t) gradient_width*gradient_height)
+                        != MagickPass)
+                      {
+                        char resource_str[MaxTextExtent];
+                        const magick_int64_t pixels_resource_limit = GetMagickResourceLimit(PixelsResource);
+                        MagickFormatString(resource_str,sizeof(resource_str),
+                                           "%" MAGICK_INTMAX_F "d", (magick_intmax_t) pixels_resource_limit);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    /*
+                      Apply an arbitrary limit to gradient size requests
+                      since gradient images can take a lot of memory.
+                      Some tiny SVGs request huge gradients.  This is here
+                      to avoid denial of service.
+                    */
+                    if (gradient_width*gradient_height > (double) 5000*5000 /*10000*10000*/)
+                      {
+                        char gradient_size_str[MaxTextExtent];
+                        MagickFormatString(gradient_size_str,sizeof(gradient_size_str),"%gx%g",
+                                           gradient_width,gradient_height);
+                        ThrowException(&image->exception,DrawError,
+                                       UnreasonableGradientSize,gradient_size_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    MagickFormatString(key,sizeof(key),"[MVG:%.1024s]",name);
+                    /* SetImageAttribute concatenates values! Delete with NULL */
+                    (void) SetImageAttribute(image,key,NULL);
+                    (void) SetImageAttribute(image,key,token);
+                    MagickFormatString(key,sizeof(key),"[MVG:%.1024s-geometry]",name);
+                    MagickFormatString(geometry,sizeof(geometry),"%gx%g%+g%+g",
+                                       Max(AbsoluteValue(bounds.x2-bounds.x1+1),1),
+                                       Max(AbsoluteValue(bounds.y2-bounds.y1+1),1),
+                                       bounds.x1,bounds.y1);
+                    /* SetImageAttribute concatenates values! Delete with NULL */
+                    (void) SetImageAttribute(image,key,NULL);
+                    (void) SetImageAttribute(image,key,geometry);
+                    MagickGetToken(q,&q,token,token_max_length);
+                    break;
                   }
+                if (LocaleCompare("id",token) == 0)   /* added "push id" (to support "defs") */
+                  {
+                    if  ( defsPushCount > 0 )
+                      {
+                        char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"id",image,0);
+                        if (nq == NULL)
+                          status=MagickFail;
+                        else
+                          q=nq;
+                        break;
+                      }
+                    else    /* extract <identifier> from "push id <identifier>" */
+                      {
+                        MagickGetToken(q,&q,token,token_max_length);
+                      }
+                    break;
+                  }
+                if (LocaleCompare("mask",token) == 0)   /* added mask */
+                  {
+                    size_t ExtractedLength;
+                    char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"mask",image,&ExtractedLength);
+                    if  ( (ExtractedLength == 0) || (nq == NULL) )
+                      status=MagickFail;
+                    else
+                      q=nq;
+                    break;
+                  }
+                if (LocaleCompare("pattern",token) == 0)
+                  {
+                    double
+                      ordinate,
+                      dval;
+
+                    RectangleInfo
+                      bounds;
+
+                    MagickGetToken(q,&q,token,token_max_length);
+                    (void) strlcpy(name,token,MaxTextExtent);
+                    MagickGetToken(q,&q,token,token_max_length);
+                    if (MagickAtoFChk(token,&ordinate) == MagickFail)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    dval=ceil(ordinate-0.5);
+                    if ((dval < DTOLONG_MIN) || (dval > DTOLONG_MAX) ||
+                        (AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval)) != MagickPass))
+                      {
+                        char resource_str[MaxTextExtent];
+                        MagickFormatString(resource_str,sizeof(resource_str),"pattern x ordinate (%g)", ordinate);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelWidthLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    bounds.x=(long) dval;
+                    MagickGetToken(q,&q,token,token_max_length);
+                    if (*token == ',')
+                      MagickGetToken(q,&q,token,token_max_length);
+                    if (MagickAtoFChk(token,&ordinate) == MagickFail)
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    dval=ceil(ordinate-0.5);
+                    if ((dval < DTOLONG_MIN) || (dval > DTOLONG_MAX) ||
+                        (AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval)) != MagickPass))
+                      {
+                        char resource_str[MaxTextExtent];
+                        MagickFormatString(resource_str,sizeof(resource_str),"pattern x ordinate (%g)", ordinate);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelHeightLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    bounds.y=(long) dval;
+                    MagickGetToken(q,&q,token,token_max_length);
+                    if (*token == ',')
+                      MagickGetToken(q,&q,token,token_max_length);
+                    if ((MagickAtoFChk(token,&ordinate) == MagickFail) ||
+                        (ordinate < 0.0))
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    dval=floor(ordinate+0.5);
+                    if ((dval > DTOLONG_MAX) ||
+                        (AcquireMagickResource(WidthResource,(magick_int64_t) dval) != MagickPass))
+                      {
+                        char resource_str[MaxTextExtent];
+                        MagickFormatString(resource_str,sizeof(resource_str),"pattern width (%g)", ordinate);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelWidthLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    bounds.width=(unsigned long) dval;
+                    MagickGetToken(q,&q,token,token_max_length);
+                    if (*token == ',')
+                      MagickGetToken(q,&q,token,token_max_length);
+                    if ((MagickAtoFChk(token,&ordinate) == MagickFail) ||
+                        (ordinate < 0.0))
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    dval=floor(ordinate+0.5);
+                    if ((dval > DTOLONG_MAX) ||
+                        (AcquireMagickResource(WidthResource,(magick_int64_t) dval) != MagickPass))
+                      {
+                        char resource_str[MaxTextExtent];
+                        MagickFormatString(resource_str,sizeof(resource_str),"pattern height (%g)", ordinate);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelHeightLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    bounds.height=(unsigned long) dval;
+                    if (AcquireMagickResource(PixelsResource,(magick_uint64_t) bounds.width*bounds.height)
+                        != MagickPass)
+                      {
+                        char resource_str[MaxTextExtent];
+                        MagickFormatString(resource_str,sizeof(resource_str),
+                                           "pattern dimensions %lux%lu", bounds.width,bounds.height);
+                        ThrowException(&image->exception,ResourceLimitError,
+                                       ImagePixelLimitExceeded,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    if ((bounds.width == 0) || (bounds.height == 0))
+                      {
+                        char resource_str[MaxTextExtent];
+                        MagickFormatString(resource_str,sizeof(resource_str),
+                                           "pattern dimensions %lux%lu", bounds.width,bounds.height);
+                        ThrowException(&image->exception,DrawError,
+                                       InvalidPrimitiveArgument,resource_str);
+                        status=MagickFail;
+                        break;
+                      }
+                    for (p=q; *q != '\0'; )
+                      {
+                        MagickGetToken(q,&q,token,token_max_length);
+                        if (LocaleCompare(token,"pop") != 0)
+                          continue;
+                        MagickGetToken(q,(char **) NULL,token,token_max_length);
+                        if (LocaleCompare(token,"pattern") != 0)
+                          continue;
+                        break;
+                      }
+                    if ((q == NULL) || (p == NULL) || (q-4 < p))
+                      {
+                        status=MagickFail;
+                        break;
+                      }
+                    (void) strncpy(token,p,q-p-4);
+                    token[q-p-4]='\0';
+                    MagickFormatString(key,sizeof(key),"[MVG:%.1024s]",name);
+                    /* SetImageAttribute concatenates values! Delete with NULL */
+                    (void) SetImageAttribute(image,key,NULL);
+                    (void) SetImageAttribute(image,key,token);
+                    MagickFormatString(key,sizeof(key),"[MVG:%.1024s-geometry]",name);
+                    MagickFormatString(geometry,sizeof(geometry),"%lux%lu%+ld%+ld",bounds.width,
+                                       bounds.height,bounds.x,bounds.y);
+                    /* SetImageAttribute concatenates values! Delete with NULL */
+                    (void) SetImageAttribute(image,key,NULL);
+                    (void) SetImageAttribute(image,key,geometry);
+                    MagickGetToken(q,&q,token,token_max_length);
+                    break;
+                  }
+                if (LocaleCompare("graphic-context",token) == 0)
+                  {
+                    DrawInfo** new_graphic_context;
+                    n++; /* Yes, this increment before alloc must be here! */
+                    new_graphic_context=
+                      MagickReallocateResourceLimitedArray(DrawInfo**,graphic_context,
+                                                           ((size_t) n+1),sizeof(DrawInfo *));
+                    if (graphic_context == (DrawInfo **) NULL)
+                      {
+                        for ( ; n >= 0; n--)
+                          DestroyDrawInfo(graphic_context[n]);
+                        ThrowException3(&image->exception,ResourceLimitError,
+                                        MemoryAllocationFailed,UnableToDrawOnImage);
+                        break;
+                      }
+                    graphic_context=new_graphic_context;
+                    graphic_context[n]=
+                      CloneDrawInfo((ImageInfo *) NULL,graphic_context[n-1]);
+                    if (graphic_context[n] == (DrawInfo *) NULL)
+                      {
+                        ThrowException3(&image->exception,ResourceLimitError,
+                                        MemoryAllocationFailed,UnableToDrawOnImage);
+                        break;
+                      }
+                    FillOpacityPending = StrokeOpacityPending = MagickFalse;
+                    break;
+                  }
+                if (LocaleCompare("defs",token) == 0)
+                  {
+                    /* do not render graphic elements if inside <defs> ... </defs> */
+                    defsPushCount++;
+                    graphic_context[n]->render = (defsPushCount > 0) ? 0 : 1;
+                    break;
+                  }
+                status=MagickFail;
                 break;
               }
-            if (LocaleCompare("mask",token) == 0)   /* added mask */
+            status=MagickFail;
+            break;
+          }
+        case 'r':
+        case 'R':
+          {
+            if (LocaleCompare("rectangle",keyword) == 0)
               {
-                size_t ExtractedLength;
-                char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"mask",image,&ExtractedLength);
-                if  ( (ExtractedLength == 0) || (nq == NULL) )
+                primitive_type=RectanglePrimitive;
+                break;
+              }
+            if (LocaleCompare("rotate",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&angle) != MagickPass)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+                affine.sx=cos(DegreesToRadians(fmod(angle,360.0)));
+                affine.rx=sin(DegreesToRadians(fmod(angle,360.0)));
+                affine.ry=(-sin(DegreesToRadians(fmod(angle,360.0))));
+                affine.sy=cos(DegreesToRadians(fmod(angle,360.0)));
+                break;
+              }
+            if (LocaleCompare("roundRectangle",keyword) == 0)
+              {
+                primitive_type=RoundRectanglePrimitive;
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 's':
+        case 'S':
+          {
+            if (LocaleCompare("scale",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&affine.sx) != MagickPass)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+                MagickGetToken(q,&q,token,token_max_length);
+                if (*token == ',')
+                  MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&affine.sy) != MagickPass)
                   status=MagickFail;
-                else
-                  q=nq;
                 break;
               }
-            if (LocaleCompare("pattern",token) == 0)
+            if (LocaleCompare("skewX",keyword) == 0)
               {
-                double
-                  ordinate,
-                  dval;
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&angle) != MagickPass)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+                affine.ry=tan(DegreesToRadians(fmod(angle,360.0)));
+                break;
+              }
+            if (LocaleCompare("skewY",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&angle) != MagickPass)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+                affine.rx=tan(DegreesToRadians(fmod(angle,360.0)));
+                break;
+              }
+            if (LocaleCompare("stop-color",keyword) == 0)
+              {
+                PixelPacket
+                  stop_color;
 
-                RectangleInfo
-                  bounds;
+                MagickGetToken(q,&q,token,token_max_length);
+                if ((status &= QueryColorDatabase(token,&stop_color,&image->exception)) == MagickFail)
+                  break;
+                (void) GradientImage(image,&start_color,&stop_color);
+                start_color=stop_color;
+                MagickGetToken(q,&q,token,token_max_length);
+                break;
+              }
+            if (LocaleCompare("stroke",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
+                  break;    /* if drawing clip path, ignore changes to stroke color */
+                MagickFormatString(pattern,sizeof(pattern),"[MVG:%.1024s]",token);
+                if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
+                  {
+                    if ((status &= DrawPatternPath(image,draw_info,token,
+                                                   &graphic_context[n]->stroke_pattern)) == MagickFail)
+                      break;
+                  }
+                else
+                  {/*stroke color, not pattern*/
 
+                    /* when setting new stroke color, try to preserve stroke-opacity */
+                    Quantum StrokeOpacityOld = graphic_context[n]->stroke.opacity;
+                    if ((status &= QueryColorDatabase(token,&graphic_context[n]->stroke,&image->exception)) == MagickFail)
+                      break;
+                    if (graphic_context[n]->stroke.opacity != TransparentOpacity)
+                      {/*stroke color != 'none'*/
+
+                        if  ( StrokeOpacityOld != TransparentOpacity )
+                          graphic_context[n]->stroke.opacity = StrokeOpacityOld;  /* already has group opacity included */
+                        else  /* combine stroke color's opacity with group opacity per SVG spec */
+                          {
+                            Quantum StrokeOpacity = StrokeOpacityPending ? MaxRGB - (Quantum) (MaxRGBDouble * StrokeOpacitySaved + 0.5) : graphic_context[n]->stroke.opacity;
+                            graphic_context[n]->stroke.opacity = MaxRGB - (Quantum)((double)(MaxRGB - StrokeOpacity) * (double)(MaxRGB - graphic_context[n]->opacity) / MaxRGBDouble + 0.5);
+                          }
+                        StrokeOpacityPending = MagickFalse;
+
+                      }/*stroke color != 'none'*/
+
+                  }/*stroke color, not pattern*/
+                break;
+              }
+            if (LocaleCompare("stroke-antialias",keyword) == 0)
+              {
                 MagickGetToken(q,&q,token,token_max_length);
-                (void) strlcpy(name,token,MaxTextExtent);
-                MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&ordinate) == MagickFail)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                dval=ceil(ordinate-0.5);
-                if ((dval < DTOLONG_MIN) || (dval > DTOLONG_MAX) ||
-                    (AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval)) != MagickPass))
-                  {
-                    char resource_str[MaxTextExtent];
-                    FormatString(resource_str,"pattern x ordinate (%g)", ordinate);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelWidthLimitExceeded,resource_str);
-                    status=MagickFail;
-                    break;
-                  }
-                bounds.x=(long) dval;
-                MagickGetToken(q,&q,token,token_max_length);
-                if (*token == ',')
-                  MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&ordinate) == MagickFail)
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                dval=ceil(ordinate-0.5);
-                if ((dval < DTOLONG_MIN) || (dval > DTOLONG_MAX) ||
-                    (AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval)) != MagickPass))
-                  {
-                    char resource_str[MaxTextExtent];
-                    FormatString(resource_str,"pattern x ordinate (%g)", ordinate);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelHeightLimitExceeded,resource_str);
-                    status=MagickFail;
-                    break;
-                  }
-                bounds.y=(long) dval;
-                MagickGetToken(q,&q,token,token_max_length);
-                if (*token == ',')
-                  MagickGetToken(q,&q,token,token_max_length);
-                if ((MagickAtoFChk(token,&ordinate) == MagickFail) ||
-                    (ordinate < 0.0))
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                dval=floor(ordinate+0.5);
-                if ((dval > DTOLONG_MAX) ||
-                    (AcquireMagickResource(WidthResource,(magick_int64_t) dval) != MagickPass))
-                  {
-                    char resource_str[MaxTextExtent];
-                    FormatString(resource_str,"pattern width (%g)", ordinate);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelWidthLimitExceeded,resource_str);
-                    status=MagickFail;
-                    break;
-                  }
-                bounds.width=(unsigned long) dval;
-                MagickGetToken(q,&q,token,token_max_length);
-                if (*token == ',')
-                  MagickGetToken(q,&q,token,token_max_length);
-                if ((MagickAtoFChk(token,&ordinate) == MagickFail) ||
-                    (ordinate < 0.0))
-                  {
-                    status=MagickFail;
-                    break;
-                  }
-                dval=floor(ordinate+0.5);
-                if ((dval > DTOLONG_MAX) ||
-                    (AcquireMagickResource(WidthResource,(magick_int64_t) dval) != MagickPass))
-                  {
-                    char resource_str[MaxTextExtent];
-                    FormatString(resource_str,"pattern height (%g)", ordinate);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelHeightLimitExceeded,resource_str);
-                    status=MagickFail;
-                    break;
-                  }
-                bounds.height=(unsigned long) dval;
-                if (AcquireMagickResource(PixelsResource,(magick_uint64_t) bounds.width*bounds.height)
+                if (MagickAtoUIChk(token,&graphic_context[n]->stroke_antialias)
                     != MagickPass)
                   {
-                    char resource_str[MaxTextExtent];
-                    FormatString(resource_str,"pattern dimensions %lux%lu", bounds.width,bounds.height);
-                    ThrowException(&image->exception,ResourceLimitError,
-                                   ImagePixelLimitExceeded,resource_str);
                     status=MagickFail;
-                    break;
                   }
-                if ((bounds.width == 0) || (bounds.height == 0))
-                {
-                    char resource_str[MaxTextExtent];
-                    FormatString(resource_str,"pattern dimensions %lux%lu", bounds.width,bounds.height);
-                    ThrowException(&image->exception,DrawError,
-                                   InvalidPrimitiveArgument,resource_str);
-                    status=MagickFail;
-                    break;
-                }
-                for (p=q; *q != '\0'; )
-                {
-                  MagickGetToken(q,&q,token,token_max_length);
-                  if (LocaleCompare(token,"pop") != 0)
-                    continue;
-                  MagickGetToken(q,(char **) NULL,token,token_max_length);
-                  if (LocaleCompare(token,"pattern") != 0)
-                    continue;
-                  break;
-                }
-                if ((q == NULL) || (p == NULL) || (q-4 < p))
+                break;
+              }
+            if (LocaleCompare("stroke-dasharray",keyword) == 0)
+              {
+                MagickFreeMemory(graphic_context[n]->dash_pattern);
+                if (IsPoint(q))
                   {
-                    status=MagickFail;
+                    char
+                      *p;
+
+                    p=q;
+                    MagickGetToken(p,&p,token,token_max_length);
+                    if (*token == ',')
+                      MagickGetToken(p,&p,token,token_max_length);
+                    for (x=0; IsPoint(token); x++)
+                      {
+                        MagickGetToken(p,&p,token,token_max_length);
+                        if (*token == ',')
+                          MagickGetToken(p,&p,token,token_max_length);
+                      }
+                    graphic_context[n]->dash_pattern=
+                      MagickAllocateClearedArray(double *,((size_t) 2*x+2),sizeof(double));
+                    if (graphic_context[n]->dash_pattern == (double *) NULL)
+                      {
+                        status=MagickFail;
+                        ThrowException3(&image->exception,ResourceLimitError,
+                                        MemoryAllocationFailed,UnableToDrawOnImage);
+                        break;
+                      }
+                    for (j=0; j < x; j++)
+                      {
+                        MagickGetToken(q,&q,token,token_max_length);
+                        if (*token == ',')
+                          MagickGetToken(q,&q,token,token_max_length);
+                        if ((MagickAtoFChk(token,&graphic_context[n]->dash_pattern[j])
+                             == MagickFail) ||
+                            (graphic_context[n]->dash_pattern[j] < 0.0))
+                          status=MagickFail;
+                      }
+                    if (status == MagickFail)
+                      {
+                        MagickFreeMemory(graphic_context[n]->dash_pattern);
+                        break;
+                      }
+                    if (x & 0x01)
+                      for ( ; j < (2*x); j++)
+                        graphic_context[n]->dash_pattern[j]=
+                          graphic_context[n]->dash_pattern[j-x];
+                    graphic_context[n]->dash_pattern[j]=0.0;
                     break;
                   }
-                (void) strncpy(token,p,q-p-4);
-                token[q-p-4]='\0';
-                FormatString(key,"[MVG:%.1024s]",name);
-                /* SetImageAttribute concatenates values! Delete with NULL */
-                (void) SetImageAttribute(image,key,NULL);
-                (void) SetImageAttribute(image,key,token);
-                FormatString(key,"[MVG:%.1024s-geometry]",name);
-                FormatString(geometry,"%lux%lu%+ld%+ld",bounds.width,
-                  bounds.height,bounds.x,bounds.y);
-                /* SetImageAttribute concatenates values! Delete with NULL */
-                (void) SetImageAttribute(image,key,NULL);
-                (void) SetImageAttribute(image,key,geometry);
                 MagickGetToken(q,&q,token,token_max_length);
                 break;
               }
-            if (LocaleCompare("graphic-context",token) == 0)
+            if (LocaleCompare("stroke-dashoffset",keyword) == 0)
               {
-                DrawInfo** new_graphic_context;
-                n++; /* Yes, this increment before alloc must be here! */
-                new_graphic_context=
-                  MagickReallocateResourceLimitedArray(DrawInfo**,graphic_context,
-                                                       ((size_t) n+1),sizeof(DrawInfo *));
-                if (graphic_context == (DrawInfo **) NULL)
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&graphic_context[n]->dash_offset)
+                    == MagickFail)
+                  status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("stroke-linecap",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("butt",token) == 0)
                   {
-                    for ( ; n >= 0; n--)
-                      DestroyDrawInfo(graphic_context[n]);
-                    ThrowException3(&image->exception,ResourceLimitError,
-                                    MemoryAllocationFailed,UnableToDrawOnImage);
+                    graphic_context[n]->linecap=ButtCap;
                     break;
                   }
-                graphic_context=new_graphic_context;
-                graphic_context[n]=
-                  CloneDrawInfo((ImageInfo *) NULL,graphic_context[n-1]);
-                if (graphic_context[n] == (DrawInfo *) NULL)
+                if (LocaleCompare("round",token) == 0)
                   {
-                    ThrowException3(&image->exception,ResourceLimitError,
-                                    MemoryAllocationFailed,UnableToDrawOnImage);
+                    graphic_context[n]->linecap=RoundCap;
                     break;
                   }
-                FillOpacityPending = StrokeOpacityPending = MagickFalse;
-                break;
-              }
-            if (LocaleCompare("defs",token) == 0)
-              {
-                /* do not render graphic elements if inside <defs> ... </defs> */
-                defsPushCount++;
-                graphic_context[n]->render = (defsPushCount > 0) ? 0 : 1;
-                break;
-              }
-            status=MagickFail;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'r':
-      case 'R':
-      {
-        if (LocaleCompare("rectangle",keyword) == 0)
-          {
-            primitive_type=RectanglePrimitive;
-            break;
-          }
-        if (LocaleCompare("rotate",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&angle) != MagickPass)
-              {
+                if (LocaleCompare("square",token) == 0)
+                  {
+                    graphic_context[n]->linecap=SquareCap;
+                    break;
+                  }
                 status=MagickFail;
                 break;
               }
-            affine.sx=cos(DegreesToRadians(fmod(angle,360.0)));
-            affine.rx=sin(DegreesToRadians(fmod(angle,360.0)));
-            affine.ry=(-sin(DegreesToRadians(fmod(angle,360.0))));
-            affine.sy=cos(DegreesToRadians(fmod(angle,360.0)));
-            break;
-          }
-        if (LocaleCompare("roundRectangle",keyword) == 0)
-          {
-            primitive_type=RoundRectanglePrimitive;
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 's':
-      case 'S':
-      {
-        if (LocaleCompare("scale",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&affine.sx) != MagickPass)
+            if (LocaleCompare("stroke-linejoin",keyword) == 0)
               {
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare("bevel",token) == 0)
+                  {
+                    graphic_context[n]->linejoin=BevelJoin;
+                    break;
+                  }
+                if (LocaleCompare("miter",token) == 0)
+                  {
+                    graphic_context[n]->linejoin=MiterJoin;
+                    break;
+                  }
+                if (LocaleCompare("round",token) == 0)
+                  {
+                    graphic_context[n]->linejoin=RoundJoin;
+                    break;
+                  }
                 status=MagickFail;
                 break;
               }
-            MagickGetToken(q,&q,token,token_max_length);
-            if (*token == ',')
-              MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&affine.sy) != MagickPass)
-              status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("skewX",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&angle) != MagickPass)
+            if (LocaleCompare("stroke-miterlimit",keyword) == 0)
               {
-                status=MagickFail;
+                MagickGetToken(q,&q,token,token_max_length);
+                if ((MagickAtoULChk(token,&graphic_context[n]->miterlimit)
+                     != MagickPass) || (graphic_context[n]->miterlimit < 1))
+                  status=MagickFail;
                 break;
               }
-            affine.ry=tan(DegreesToRadians(fmod(angle,360.0)));
-            break;
-          }
-        if (LocaleCompare("skewY",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&angle) != MagickPass)
+            if (LocaleCompare("stroke-opacity",keyword) == 0)
               {
-                status=MagickFail;
-                break;
-              }
-            affine.rx=tan(DegreesToRadians(fmod(angle,360.0)));
-            break;
-          }
-        if (LocaleCompare("stop-color",keyword) == 0)
-          {
-            PixelPacket
-              stop_color;
-
-            MagickGetToken(q,&q,token,token_max_length);
-            if ((status &= QueryColorDatabase(token,&stop_color,&image->exception)) == MagickFail)
-              break;
-            (void) GradientImage(image,&start_color,&stop_color);
-            start_color=stop_color;
-            MagickGetToken(q,&q,token,token_max_length);
-            break;
-          }
-        if (LocaleCompare("stroke",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
-              break;    /* if drawing clip path, ignore changes to stroke color */
-            FormatString(pattern,"[MVG:%.1024s]",token);
-            if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
-              {
-                if ((status &= DrawPatternPath(image,draw_info,token,
-                                               &graphic_context[n]->stroke_pattern)) == MagickFail)
-                  break;
-              }
-            else
-              {/*stroke color, not pattern*/
-
-                /* when setting new stroke color, try to preserve stroke-opacity */
-                Quantum StrokeOpacityOld = graphic_context[n]->stroke.opacity;
-                if ((status &= QueryColorDatabase(token,&graphic_context[n]->stroke,&image->exception)) == MagickFail)
-                  break;
+                double opacity;
+                MagickGetToken(q,&q,token,token_max_length);
+                if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
+                  break;    /* if drawing clip path, ignore changes to stroke opacity */
+                factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
+                if ((MagickAtoFChk(token,&opacity) != MagickPass) ||
+                    opacity < 0.0)
+                  {
+                    status=MagickFail;
+                    break;
+                  }
+                opacity *= factor;
+                if  ( opacity <= 0.0 )  /* per SVG spec */
+                  opacity = 0.0;
+                else if  ( opacity > 1.0 )
+                  opacity = 1.0;
+                StrokeOpacitySaved = opacity;
                 if (graphic_context[n]->stroke.opacity != TransparentOpacity)
-                  {/*stroke color != 'none'*/
-
-                    if  ( StrokeOpacityOld != TransparentOpacity )
-                      graphic_context[n]->stroke.opacity = StrokeOpacityOld;  /* already has group opacity included */
-                    else  /* combine stroke color's opacity with group opacity per SVG spec */
-                    {
-                      Quantum StrokeOpacity = StrokeOpacityPending ? MaxRGB - (Quantum) (MaxRGBDouble * StrokeOpacitySaved + 0.5) : graphic_context[n]->stroke.opacity;
-                      graphic_context[n]->stroke.opacity = MaxRGB - (Quantum)((double)(MaxRGB - StrokeOpacity) * (double)(MaxRGB - graphic_context[n]->opacity) / MaxRGBDouble + 0.5);
-                    }
+                  {
+                    /* combine new stroke-opacity with group opacity per SVG spec */
+                    double opacityGroup = MaxRGB - graphic_context[n]->opacity;
+                    graphic_context[n]->stroke.opacity = MaxRGB - (Quantum)(opacity * opacityGroup + 0.5);
                     StrokeOpacityPending = MagickFalse;
-
-                  }/*stroke color != 'none'*/
-
-              }/*stroke color, not pattern*/
-            break;
-          }
-        if (LocaleCompare("stroke-antialias",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoUIChk(token,&graphic_context[n]->stroke_antialias)
-                != MagickPass)
-              {
-                status=MagickFail;
+                  }
+                else
+                  StrokeOpacityPending = MagickTrue;
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("stroke-dasharray",keyword) == 0)
-          {
-            MagickFreeMemory(graphic_context[n]->dash_pattern);
-            if (IsPoint(q))
+            if (LocaleCompare("stroke-width",keyword) == 0)
               {
-                char
-                  *p;
-
-                p=q;
-                MagickGetToken(p,&p,token,token_max_length);
-                if (*token == ',')
-                  MagickGetToken(p,&p,token,token_max_length);
-                for (x=0; IsPoint(token); x++)
-                {
-                  MagickGetToken(p,&p,token,token_max_length);
-                  if (*token == ',')
-                    MagickGetToken(p,&p,token,token_max_length);
-                }
-                graphic_context[n]->dash_pattern=
-                  MagickAllocateClearedArray(double *,((size_t) 2*x+2),sizeof(double));
-                if (graphic_context[n]->dash_pattern == (double *) NULL)
+                MagickGetToken(q,&q,token,token_max_length);
+                if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
+                  break;    /* if drawing clip path, ignore changes to stroke width */
+                if ((MagickAtoFChk(token,&graphic_context[n]->stroke_width)
+                     == MagickFail) ||
+                    (graphic_context[n]->stroke_width < 0.0))
+                  status=MagickFail;
+                break;
+              }
+            if (LocaleCompare("svg-compliant",keyword) == 0)
+              {
+                /* mark the DrawInfo as being drawn SVG compliant or not */
+                unsigned int SVGCompliant;
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoUIChk(token,&SVGCompliant) != MagickPass)
                   {
                     status=MagickFail;
-                    ThrowException3(&image->exception,ResourceLimitError,
-                      MemoryAllocationFailed,UnableToDrawOnImage);
-                    break;
                   }
-                for (j=0; j < x; j++)
-                {
-                  MagickGetToken(q,&q,token,token_max_length);
-                  if (*token == ',')
-                    MagickGetToken(q,&q,token,token_max_length);
-                  if ((MagickAtoFChk(token,&graphic_context[n]->dash_pattern[j])
-                       == MagickFail) ||
-                      (graphic_context[n]->dash_pattern[j] < 0.0))
-                    status=MagickFail;
-                }
+                else
+                  SetDrawInfoSVGCompliant(graphic_context[n],SVGCompliant?MagickTrue:MagickFalse);
+                break;
+              }
+            status=MagickFail;
+            break;
+          }
+        case 't':
+        case 'T':
+          {
+            if (LocaleCompare("text",keyword) == 0)
+              {
+                primitive_type=TextPrimitive;
+                UseCurrentTextPosition = MagickFalse;   /* use client-supplied text locations */
+                break;
+              }
+            if (LocaleCompare("textc",keyword) == 0)  /* draw text at current text position */
+              {
+                primitive_type=TextPrimitive;
+                UseCurrentTextPosition = MagickTrue;        /* use internally tracked text location*/
+                break;
+              }
+            if (LocaleCompare("textdx",keyword) == 0)  /* update current x position for text */
+              {/*textdx*/
+                double value;
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&value);
                 if (status == MagickFail)
+                  break;
+                /* value may be specified using "em" or "ex" units */
+                if (LocaleNCompare(q,"em",2) == 0)
                   {
-                    MagickFreeMemory(graphic_context[n]->dash_pattern);
+                    value *= graphic_context[n]->pointsize;
+                    MagickGetToken(q,&q,token,token_max_length);    /* skip over "em" */
+                  }
+                else if (LocaleNCompare(q,"ex",2) == 0)
+                  {
+                    value *= 0.5 * graphic_context[n]->pointsize;
+                    MagickGetToken(q,&q,token,token_max_length);    /* skip over "ex" */
+                  }
+                xTextCurrent += value;
+                break;
+              }/*textdx*/
+            if (LocaleCompare("textdy",keyword) == 0)  /* update current y position for text */
+              {/*textdy*/
+                double value;
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&value);
+                if (status == MagickFail)
+                  break;
+                /* value may be specified using "em" or "ex" units */
+                if (LocaleNCompare(q,"em",2) == 0)
+                  {
+                    value *= graphic_context[n]->pointsize;
+                    MagickGetToken(q,&q,token,token_max_length);    /* skip over "em" */
+                  }
+                else if (LocaleNCompare(q,"ex",2) == 0)
+                  {
+                    value *= 0.5 * graphic_context[n]->pointsize;
+                    MagickGetToken(q,&q,token,token_max_length);    /* skip over "ex" */
+                  }
+                yTextCurrent += value;
+                break;
+              }/*textdy*/
+            /*
+              When the current text position was managed in SVGStartElement() in svg.c, and a "rotate"
+              was encountered (indicating that the text character was to be rotated), the code would
+              emit to the MVG file:
+
+              translate x y (where x, y indicate the current text position)
+              rotate angle (where angle indicates the rotation angle)
+
+              Now that the current text position is being managed by DrawImage() in render.c, the code
+              in SVGStartElement() cannot issue the "translate" because it can't know the current text
+              position.  To handle this, "textr" (text rotation) has been implemented here to perform
+              the appropriate translation/rotation sequence.
+            */
+            if (LocaleCompare("textr",keyword) == 0)  /* text rotation */
+              {/*textr*/
+                TextRotationPerformed = MagickTrue;
+                /* translate x y */
+                affine.tx = xTextCurrent;
+                affine.ty = yTextCurrent;
+                /* rotation angle */
+                MagickGetToken(q,&q,token,token_max_length);
+                if (MagickAtoFChk(token,&angle) != MagickPass)
+                  {
+                    status=MagickFail;
                     break;
                   }
-                if (x & 0x01)
-                  for ( ; j < (2*x); j++)
-                    graphic_context[n]->dash_pattern[j]=
-                      graphic_context[n]->dash_pattern[j-x];
-                graphic_context[n]->dash_pattern[j]=0.0;
+                affine.sx=cos(DegreesToRadians(fmod(angle,360.0)));
+                affine.rx=sin(DegreesToRadians(fmod(angle,360.0)));
+                affine.ry=(-sin(DegreesToRadians(fmod(angle,360.0))));
+                affine.sy=cos(DegreesToRadians(fmod(angle,360.0)));
+                break;
+              }/*textr*/
+            if (LocaleCompare("textx",keyword) == 0)  /* set current x position for text */
+              {
+                double value;
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&value);
+                xTextCurrent = value;
                 break;
               }
-            MagickGetToken(q,&q,token,token_max_length);
-            break;
-          }
-        if (LocaleCompare("stroke-dashoffset",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&graphic_context[n]->dash_offset)
-                == MagickFail)
-              status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("stroke-linecap",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("butt",token) == 0)
+            if (LocaleCompare("texty",keyword) == 0)  /* set current y position for text */
               {
-                graphic_context[n]->linecap=ButtCap;
+                double value;
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&value);
+                yTextCurrent = value;
                 break;
               }
-            if (LocaleCompare("round",token) == 0)
+            if (LocaleCompare("text-align",keyword) == 0)
               {
-                graphic_context[n]->linecap=RoundCap;
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare(token,"left") == 0)
+                  graphic_context[n]->align=LeftAlign;
+                if (LocaleCompare(token,"center") == 0)
+                  graphic_context[n]->align=CenterAlign;
+                if (LocaleCompare(token,"right") == 0)
+                  graphic_context[n]->align=RightAlign;
                 break;
               }
-            if (LocaleCompare("square",token) == 0)
+            if (LocaleCompare("text-anchor",keyword) == 0)
               {
-                graphic_context[n]->linecap=SquareCap;
+                MagickGetToken(q,&q,token,token_max_length);
+                if (LocaleCompare(token,"start") == 0)
+                  graphic_context[n]->align=LeftAlign;
+                if (LocaleCompare(token,"middle") == 0)
+                  graphic_context[n]->align=CenterAlign;
+                if (LocaleCompare(token,"end") == 0)
+                  graphic_context[n]->align=RightAlign;
+                break;
+              }
+            if (LocaleCompare("text-antialias",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                graphic_context[n]->text_antialias=MagickAtoI(token);
+                break;
+              }
+            if (LocaleCompare("text-undercolor",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= QueryColorDatabase(token,&graphic_context[n]->undercolor,
+                                             &image->exception);
+                break;
+              }
+            if (LocaleCompare("translate",keyword) == 0)
+              {
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&affine.tx);
+                MagickGetToken(q,&q,token,token_max_length);
+                if (*token == ',')
+                  MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&affine.ty);
                 break;
               }
             status=MagickFail;
             break;
           }
-        if (LocaleCompare("stroke-linejoin",keyword) == 0)
+        case 'u':
+        case 'U':
           {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare("bevel",token) == 0)
+            if (LocaleCompare("use",keyword) == 0)
               {
-                graphic_context[n]->linejoin=BevelJoin;
-                break;
-              }
-            if (LocaleCompare("miter",token) == 0)
-              {
-                graphic_context[n]->linejoin=MiterJoin;
-                break;
-              }
-            if (LocaleCompare("round",token) == 0)
-              {
-                graphic_context[n]->linejoin=RoundJoin;
+                /* FIXME: nothing prevents infinite recursion of "use" */
+                q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
+                                                   &token,&token_max_length,image,
+                                                   &status,MagickTrue/*UndefAttrIsError*/);
                 break;
               }
             status=MagickFail;
             break;
           }
-        if (LocaleCompare("stroke-miterlimit",keyword) == 0)
+        case 'v':
+        case 'V':
           {
-            MagickGetToken(q,&q,token,token_max_length);
-            if ((MagickAtoULChk(token,&graphic_context[n]->miterlimit)
-                 != MagickPass) || (graphic_context[n]->miterlimit < 1))
-              status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("stroke-opacity",keyword) == 0)
-          {
-            double opacity;
-            MagickGetToken(q,&q,token,token_max_length);
-            if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
-              break;    /* if drawing clip path, ignore changes to stroke opacity */
-            factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
-            if ((MagickAtoFChk(token,&opacity) != MagickPass) ||
-                opacity < 0.0)
+            if (LocaleCompare("viewbox",keyword) == 0)
               {
-                status=MagickFail;
-                break;
-              }
-            opacity *= factor;
-            if  ( opacity <= 0.0 )  /* per SVG spec */
-              opacity = 0.0;
-            else if  ( opacity > 1.0 )
-              opacity = 1.0;
-            StrokeOpacitySaved = opacity;
-            if (graphic_context[n]->stroke.opacity != TransparentOpacity)
-              {
-                /* combine new stroke-opacity with group opacity per SVG spec */
-                double opacityGroup = MaxRGB - graphic_context[n]->opacity;
-                graphic_context[n]->stroke.opacity = MaxRGB - (Quantum)(opacity * opacityGroup + 0.5);
-                StrokeOpacityPending = MagickFalse;
-              }
-            else
-              StrokeOpacityPending = MagickTrue;
-            break;
-          }
-        if (LocaleCompare("stroke-width",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
-              break;    /* if drawing clip path, ignore changes to stroke width */
-            if ((MagickAtoFChk(token,&graphic_context[n]->stroke_width)
-                 == MagickFail) ||
-                (graphic_context[n]->stroke_width < 0.0))
-              status=MagickFail;
-            break;
-          }
-        if (LocaleCompare("svg-compliant",keyword) == 0)
-          {
-            /* mark the DrawInfo as being drawn SVG compliant or not */
-            unsigned int SVGCompliant;
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoUIChk(token,&SVGCompliant) != MagickPass)
-              {
-                status=MagickFail;
-              }
-            else
-              SetDrawInfoSVGCompliant(graphic_context[n],SVGCompliant?MagickTrue:MagickFalse);
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 't':
-      case 'T':
-      {
-        if (LocaleCompare("text",keyword) == 0)
-          {
-            primitive_type=TextPrimitive;
-            UseCurrentTextPosition = MagickFalse;   /* use client-supplied text locations */
-            break;
-          }
-        if (LocaleCompare("textc",keyword) == 0)  /* draw text at current text position */
-          {
-            primitive_type=TextPrimitive;
-            UseCurrentTextPosition = MagickTrue;        /* use internally tracked text location*/
-            break;
-          }
-        if (LocaleCompare("textdx",keyword) == 0)  /* update current x position for text */
-          {/*textdx*/
-            double value;
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&value);
-            if (status == MagickFail)
-              break;
-            /* value may be specified using "em" or "ex" units */
-            if (LocaleNCompare(q,"em",2) == 0)
-              {
-                value *= graphic_context[n]->pointsize;
-                MagickGetToken(q,&q,token,token_max_length);    /* skip over "em" */
-              }
-            else if (LocaleNCompare(q,"ex",2) == 0)
-              {
-                value *= 0.5 * graphic_context[n]->pointsize;
-                MagickGetToken(q,&q,token,token_max_length);    /* skip over "ex" */
-              }
-            xTextCurrent += value;
-            break;
-          }/*textdx*/
-        if (LocaleCompare("textdy",keyword) == 0)  /* update current y position for text */
-          {/*textdy*/
-            double value;
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&value);
-            if (status == MagickFail)
-              break;
-            /* value may be specified using "em" or "ex" units */
-            if (LocaleNCompare(q,"em",2) == 0)
-              {
-                value *= graphic_context[n]->pointsize;
-                MagickGetToken(q,&q,token,token_max_length);    /* skip over "em" */
-              }
-            else if (LocaleNCompare(q,"ex",2) == 0)
-              {
-                value *= 0.5 * graphic_context[n]->pointsize;
-                MagickGetToken(q,&q,token,token_max_length);    /* skip over "ex" */
-              }
-            yTextCurrent += value;
-            break;
-          }/*textdy*/
-        /*
-          When the current text position was managed in SVGStartElement() in svg.c, and a "rotate"
-          was encountered (indicating that the text character was to be rotated), the code would
-          emit to the MVG file:
-
-            translate x y (where x, y indicate the current text position)
-            rotate angle (where angle indicates the rotation angle)
-
-          Now that the current text position is being managed by DrawImage() in render.c, the code
-          in SVGStartElement() cannot issue the "translate" because it can't know the current text
-          position.  To handle this, "textr" (text rotation) has been implemented here to perform
-          the appropriate translation/rotation sequence.
-        */
-        if (LocaleCompare("textr",keyword) == 0)  /* text rotation */
-          {/*textr*/
-            TextRotationPerformed = MagickTrue;
-            /* translate x y */
-            affine.tx = xTextCurrent;
-            affine.ty = yTextCurrent;
-            /* rotation angle */
-            MagickGetToken(q,&q,token,token_max_length);
-            if (MagickAtoFChk(token,&angle) != MagickPass)
-              {
-                status=MagickFail;
-                break;
-              }
-            affine.sx=cos(DegreesToRadians(fmod(angle,360.0)));
-            affine.rx=sin(DegreesToRadians(fmod(angle,360.0)));
-            affine.ry=(-sin(DegreesToRadians(fmod(angle,360.0))));
-            affine.sy=cos(DegreesToRadians(fmod(angle,360.0)));
-            break;
-          }/*textr*/
-        if (LocaleCompare("textx",keyword) == 0)  /* set current x position for text */
-          {
-            double value;
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&value);
-            xTextCurrent = value;
-            break;
-          }
-        if (LocaleCompare("texty",keyword) == 0)  /* set current y position for text */
-          {
-            double value;
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&value);
-            yTextCurrent = value;
-            break;
-          }
-        if (LocaleCompare("text-align",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare(token,"left") == 0)
-              graphic_context[n]->align=LeftAlign;
-            if (LocaleCompare(token,"center") == 0)
-              graphic_context[n]->align=CenterAlign;
-            if (LocaleCompare(token,"right") == 0)
-              graphic_context[n]->align=RightAlign;
-            break;
-          }
-        if (LocaleCompare("text-anchor",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            if (LocaleCompare(token,"start") == 0)
-              graphic_context[n]->align=LeftAlign;
-            if (LocaleCompare(token,"middle") == 0)
-              graphic_context[n]->align=CenterAlign;
-            if (LocaleCompare(token,"end") == 0)
-              graphic_context[n]->align=RightAlign;
-            break;
-          }
-        if (LocaleCompare("text-antialias",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            graphic_context[n]->text_antialias=MagickAtoI(token);
-            break;
-          }
-        if (LocaleCompare("text-undercolor",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= QueryColorDatabase(token,&graphic_context[n]->undercolor,
-                                         &image->exception);
-            break;
-          }
-        if (LocaleCompare("translate",keyword) == 0)
-          {
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&affine.tx);
-            MagickGetToken(q,&q,token,token_max_length);
-            if (*token == ',')
-              MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&affine.ty);
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'u':
-      case 'U':
-      {
-        if (LocaleCompare("use",keyword) == 0)
-          {
-            /* FIXME: nothing prevents infinite recursion of "use" */
-            q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
-                                               &token,&token_max_length,image,
-                                               &status,MagickTrue/*UndefAttrIsError*/);
-            break;
-          }
-        status=MagickFail;
-        break;
-      }
-      case 'v':
-      case 'V':
-      {
-        if (LocaleCompare("viewbox",keyword) == 0)
-          {
-            /* This is not currently used for anything */
-            unsigned long
-              viewbox_columns,
-              viewbox_rows;
-            MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&viewbox.x1);
-            MagickGetToken(q,&q,token,token_max_length);
-            if (*token == ',')
-              MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&viewbox.y1);
-            MagickGetToken(q,&q,token,token_max_length);
-            if (*token == ',')
-              MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&viewbox.x2);
-            MagickGetToken(q,&q,token,token_max_length);
-            if (*token == ',')
-              MagickGetToken(q,&q,token,token_max_length);
-            status &= MagickAtoFChk(token,&viewbox.y2);
-            viewbox_columns=(unsigned long) (viewbox.x2-viewbox.x1+0.5);
-            viewbox_rows=(unsigned long) (viewbox.y2-viewbox.y1+0.5);
+                /* This is not currently used for anything */
+                unsigned long
+                  viewbox_columns,
+                  viewbox_rows;
+                MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&viewbox.x1);
+                MagickGetToken(q,&q,token,token_max_length);
+                if (*token == ',')
+                  MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&viewbox.y1);
+                MagickGetToken(q,&q,token,token_max_length);
+                if (*token == ',')
+                  MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&viewbox.x2);
+                MagickGetToken(q,&q,token,token_max_length);
+                if (*token == ',')
+                  MagickGetToken(q,&q,token,token_max_length);
+                status &= MagickAtoFChk(token,&viewbox.y2);
+                viewbox_columns=(unsigned long) (viewbox.x2-viewbox.x1+0.5);
+                viewbox_rows=(unsigned long) (viewbox.y2-viewbox.y1+0.5);
 #if 0
-            (void) LogMagickEvent(RenderEvent,GetMagickModule(),
-                                   "ViewBox: %g %g %g %g, Geometry: %lux%lu",
-                                  viewbox.x1, viewbox.y1, viewbox.x2, viewbox.y2,
-                                  viewbox_columns,viewbox_rows);
-            /* image->columns=viewbox_columns; */
-            /* image->rows=viewbox_rows; */
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                                      "ViewBox: %g %g %g %g, Geometry: %lux%lu",
+                                      viewbox.x1, viewbox.y1, viewbox.x2, viewbox.y2,
+                                      viewbox_columns,viewbox_rows);
+                /* image->columns=viewbox_columns; */
+                /* image->rows=viewbox_rows; */
 #else
-            (void) viewbox_columns;
-            (void) viewbox_rows;
+                (void) viewbox_columns;
+                (void) viewbox_rows;
 #endif
+                break;
+              }
+            status=MagickFail;
             break;
           }
-        status=MagickFail;
-        break;
-      }
-      default:
-      {
-        status=MagickFail;
-        break;
-      }
-    }
-    if (status == MagickFail)
-      break;
-    if ((affine.sx != 1.0) || (affine.rx != 0.0) || (affine.ry != 0.0) ||
-        (affine.sy != 1.0) || (affine.tx != 0.0) || (affine.ty != 0.0))
-      {
-        graphic_context[n]->affine.sx=current.sx*affine.sx+current.ry*affine.rx;
-        graphic_context[n]->affine.rx=current.rx*affine.sx+current.sy*affine.rx;
-        graphic_context[n]->affine.ry=current.sx*affine.ry+current.ry*affine.sy;
-        graphic_context[n]->affine.sy=current.rx*affine.ry+current.sy*affine.sy;
-        graphic_context[n]->affine.tx=
-          current.sx*affine.tx+current.ry*affine.ty+current.tx;
-        graphic_context[n]->affine.ty=
-          current.rx*affine.tx+current.sy*affine.ty+current.ty;
-      }
-    if (primitive_type == UndefinedPrimitive)
-      {
-        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",
-                              (int) (q-p),p);
-        continue;
-      }
-    /*
-      Parse the primitive attributes.
-    */
-    PIMgr.StoreStartingAt = i = 0;
-    j=0;
-    primitive_info[0].point.x=0.0;
-    primitive_info[0].point.y=0.0;
-    primitive_info[0].coordinates=0;
-    primitive_info[0].method=FloodfillMethod;
-    PRIMINF_CLEAR_FLAGS(&primitive_info[0]);
-    for (x=0; *q != '\0'; x++)
-    {
-      /*
-        Define points.
-      */
-      if (!IsPoint(q))
-        break;
-      MagickGetToken(q,&q,token,token_max_length);
-      status &= MagickAtoFChk(token,&point.x);
-      if (status == MagickFail)
-        break;
-      MagickGetToken(q,&q,token,token_max_length);
-      if (*token == ',')
-        MagickGetToken(q,&q,token,token_max_length);
-      status &= MagickAtoFChk(token,&point.y);
-      if (status == MagickFail)
-        break;
-      MagickGetToken(q,(char **) NULL,token,token_max_length);
-      if (*token == ',')
-        MagickGetToken(q,&q,token,token_max_length);
-      assert(i < number_points);
-      primitive_info[i].primitive=primitive_type;
-      primitive_info[i].point=point;
-      primitive_info[i].coordinates=0;
-      primitive_info[i].method=FloodfillMethod;
-      PRIMINF_CLEAR_FLAGS(&primitive_info[i]);
-      i++;
-      PIMgr.StoreStartingAt = i;
-      if (i < number_points)
-        continue;
-      /* Array is full; double the array size */
-      if ((status &= PrimitiveInfoRealloc(&PIMgr,number_points)) != MagickPass)
-        break;
-    }
-    if (status == MagickFail)
-      break;
-    /*
-      Special handling when using textc with character rotation; see comments
-      above near "textr".
-    */
-    if  ( (primitive_type == TextPrimitive) && UseCurrentTextPosition && (i == 0) )
-      {
-        primitive_info[0].primitive=primitive_type;
-        PRIMINF_CLEAR_FLAGS(&primitive_info[0]);
-        if  ( TextRotationPerformed )
+        default:
           {
-            /* text positioning has already been performed by translate/rotate sequence */
-            primitive_info[0].point.x=0;
-            primitive_info[0].point.y=0;
-            TextRotationPerformed = MagickFalse;
+            status=MagickFail;
+            break;
           }
-        else
-          {
-            primitive_info[0].point.x=xTextCurrent;
-            primitive_info[0].point.y=yTextCurrent;
-          }
-        primitive_info[0].coordinates=0;
-        primitive_info[0].method=FloodfillMethod;
-        i++;
-        PIMgr.StoreStartingAt = i;
-        x++;
-      }
-    assert(j < (long) number_points);
-    primitive_info[j].primitive=primitive_type;
-    primitive_info[j].coordinates=x;
-    primitive_info[j].method=FloodfillMethod;
-    PRIMINF_CLEAR_FLAGS(&primitive_info[j]);
-    primitive_info[j].text=(char *) NULL;
-    /*
-      Circumscribe primitive within a circle.
-    */
-    bounds.x1=primitive_info[j].point.x;
-    bounds.y1=primitive_info[j].point.y;
-    bounds.x2=primitive_info[j].point.x;
-    bounds.y2=primitive_info[j].point.y;
-    for (k=1; k < (long) primitive_info[j].coordinates; k++)
-    {
-      assert(j+k < (long) number_points);
-      point=primitive_info[j+k].point;
-      if (point.x < bounds.x1)
-        bounds.x1=point.x;
-      if (point.y < bounds.y1)
-        bounds.y1=point.y;
-      if (point.x > bounds.x2)
-        bounds.x2=point.x;
-      if (point.y > bounds.y2)
-        bounds.y2=point.y;
-    }
-    /*
-      Estimate how many points will be required for the primitive.
-    */
-    points_length=primitive_info[j].coordinates;
-    switch (primitive_type)
-    {
-      case RectanglePrimitive:
-      {
-        points_length*=5;
-        break;
-      }
-      case RoundRectanglePrimitive:
-      {
-        /*
-          Round rectangle is rectangle plus elipse
-        */
-        double
-          alpha,
-          beta,
-          radius;
-
-        alpha=bounds.x2-bounds.x1;
-        beta=bounds.y2-bounds.y1;
-        radius=hypot((double) alpha,(double) beta);
-        points_length*=5;
-        points_length+=2*((size_t) ceil((double) MagickPI*radius))+6*BezierQuantum+360;
-        break;
-      }
-      case BezierPrimitive:
-      {
-        if (primitive_info[j].coordinates > 107)
-          (void) ThrowException(&image->exception,DrawError,
-                                TooManyCoordinates,token);
-        points_length=primitive_info[j].coordinates*BezierQuantum;
-        break;
-      }
-      case PathPrimitive:
-      {
-        char
-          *s,
-          *t;
-
-        MagickGetToken(q,&q,token,token_max_length);
-        points_length=1;
-        t=token;
-        for (s=token; *s != '\0'; s=t)
-        {
-          double
-            value;
-
-          value=strtod(s,&t);
-          (void) value;
-          if (s == t)
-            {
-              t++;
-              continue;
-            }
-          points_length++;
         }
-        points_length=points_length*BezierQuantum;
+      if (status == MagickFail)
         break;
-      }
-      case CirclePrimitive:
-      case ArcPrimitive:
-      case EllipsePrimitive:
-      {
-        double
-          alpha,
-          beta,
-          radius;
-
-        alpha=bounds.x2-bounds.x1;
-        beta=bounds.y2-bounds.y1;
-        radius=hypot(alpha,beta);
-        points_length=2.0*(ceil(MagickPI*radius))+6.0*BezierQuantum+360.0;
-        break;
-      }
-      default:
-        break;
-    }
-
-    if (((size_t) points_length) < points_length)
-      {
-        /* points_length too big to be represented as a size_t */
-        status=MagickFail;
-        ThrowException(&image->exception,DrawError,
-                       PrimitiveArithmeticOverflow,keyword);
-      }
-
-    if (status == MagickFail)
-      break;
-
-    if ((i+points_length) >= number_points)
-      {
-        double new_number_points = ceil(number_points+points_length+1);
-        size_t new_number_points_size_t;
-        if (new_number_points > (double) PRIMITIVE_INFO_POINTS_MAX)
-          {
-            /* new_number_points too big */
-            status=MagickFail;
-            ThrowException3(&image->exception,ResourceLimitError,
-                            MemoryAllocationFailed,UnableToDrawOnImage);
-            break;
-          }
-        new_number_points_size_t = (size_t) new_number_points;
-
-        PIMgr.StoreStartingAt = i;  /* should already be this value; just bein' sure */
-        if (PrimitiveInfoRealloc(&PIMgr,new_number_points_size_t-number_points) == MagickFail)
-          {
-            status=MagickFail;
-            break;
-          }
-      }
-
-    assert(j < (long) number_points);
-
-    /*
-      The TraceXXX functions that generate a dynamic number of points will automatically
-      grow the primitive array as needed.  To make sure that the simpler ones (TracePoint()
-      TraceLine(), TraceRectangle(), etc.) have enough space, we make sure there are at
-      least 100 elements available.
-    */
-    if (PrimitiveInfoRealloc(&PIMgr,100) == MagickFail)
-      {
-        status=MagickFail;
-        break;
-      }
-
-    /*
-      Trace points
-    */
-    switch (primitive_type)
-    {
-      case PointPrimitive:
-      default:
-      {
-        if (primitive_info[j].coordinates != 1)
-          {
-            status=MagickFail;
-            break;
-          }
-        if ((status &= TracePoint(primitive_info+j,primitive_info[j].point)) == MagickFail)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case LinePrimitive:
-      {
-        if (primitive_info[j].coordinates != 2)
-          {
-            status=MagickFail;
-            break;
-          }
-        if ((status &= TraceLine(primitive_info+j,primitive_info[j].point,
-                                 primitive_info[j+1].point)) == MagickFail)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case RectanglePrimitive:
-      {
-        /*
-          Rectangle requires 2 primitives.
-        */
-        if (primitive_info[j].coordinates != 2)
-          {
-            status=MagickFail;
-            break;
-          }
-        /*
-          Negative width is an error
-        */
-        if ((primitive_info[j+1].point.x - primitive_info[j].point.x) < 0.0)
-          {
-            status=MagickFail;
-            break;
-          }
-        /*
-          Negative height is an error
-        */
-        if ((primitive_info[j+1].point.y - primitive_info[j].point.y) < 0.0)
-          {
-            status=MagickFail;
-            break;
-          }
-        if ((status &= TraceRectangle(primitive_info+j,
-                                      /*start*/primitive_info[j].point,
-                                      /*end*/primitive_info[j+1].point)) == MagickFail)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case RoundRectanglePrimitive:
-      {
-        /*
-          Round rectangle requires 3 primitives.
-        */
-        if (primitive_info[j].coordinates != 3)
-          {
-            status=MagickFail;
-            break;
-          }
-        /*
-          Negative radius values are an error.
-        */
-        if ((primitive_info[j+2].point.x < 0.0) || (primitive_info[j+2].point.y < 0.0))
-          {
-            status=MagickFail;
-            break;
-          }
-        /*
-          Negative width is an error
-        */
-        if ((primitive_info[j+1].point.x - primitive_info[j].point.x) < 0.0)
-          {
-            status=MagickFail;
-            break;
-          }
-        /*
-          Negative height is an error
-        */
-        if ((primitive_info[j+1].point.y - primitive_info[j].point.y) < 0.0)
-          {
-            status=MagickFail;
-            break;
-          }
-        PIMgr.StoreStartingAt=j;
-        if ((status &= TraceRoundRectangle(&PIMgr,
-                                           /*start*/primitive_info[j].point,
-                                           /*end*/primitive_info[j+1].point,
-                                           /*arc*/primitive_info[j+2].point)) == MagickFail)
-          break;
-         PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case ArcPrimitive:
-      {
-        if (primitive_info[j].coordinates != 3)
-          {
-            primitive_type=UndefinedPrimitive;
-            break;
-          }
-        PIMgr.StoreStartingAt=j;
-        if ((status &= TraceArc(&PIMgr,primitive_info[j].point,
-                                primitive_info[j+1].point,primitive_info[j+2].point)) == MagickFail)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case EllipsePrimitive:
-      {
-        if (primitive_info[j].coordinates != 3)
-          {
-            status=MagickFail;
-            break;
-          }
-        /*
-          Negative radius values are an error.
-        */
-        if ((primitive_info[j+1].point.x < 0.0) ||
-            (primitive_info[j+1].point.y < 0.0))
-          {
-            status=MagickFail;
-            break;
-          }
-        PIMgr.StoreStartingAt=j;
-        if ((status &= TraceEllipse(&PIMgr,
-                                    /*start*/primitive_info[j].point, /*centerX,centerY*/
-                                    /*stop*/primitive_info[j+1].point, /*radiusX,radiusY*/
-                                    /*degrees*/primitive_info[j+2].point)) == MagickFail) /*arcStart,arcEnd*/
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case CirclePrimitive:
-      {
-        if (primitive_info[j].coordinates != 2)
-          {
-            status=MagickFail;
-            break;
-          }
-        PIMgr.StoreStartingAt=j;
-        if ((status &= TraceCircle(&PIMgr,primitive_info[j].point,
-                                   primitive_info[j+1].point)) == MagickFail)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case PolylinePrimitive:
-      {
-        /* the SVG spec does not prohibit polylines containing a single point */
-        if (primitive_info[j].coordinates < 1)
-          {
-            status=MagickFail;
-            break;
-          }
-        break;
-      }
-      case PolygonPrimitive:
-      {
-        /*
-          Polygon requires at least three points.
-        */
-        if (primitive_info[j].coordinates < 3)
-          {
-            status=MagickFail;
-            break;
-          }
-        primitive_info[i]=primitive_info[j];
-        primitive_info[i].coordinates=0;
-        primitive_info[j].coordinates++;
-        PRIMINF_SET_IS_CLOSED_SUBPATH(&primitive_info[j],1);
-        i++;
-        break;
-      }
-      case BezierPrimitive:
-      {
-        if (primitive_info[j].coordinates < 3)
-          {
-            status=MagickFail;
-            break;
-          }
-        PIMgr.StoreStartingAt=j;
-        if ((status &= TraceBezier(&PIMgr,primitive_info[j].coordinates)) != MagickPass)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
-        break;
-      }
-      case PathPrimitive:
-      {
-        size_t number_coordinates=0;
-        PIMgr.StoreStartingAt=j;
-        if ((status &= TracePath(image,&PIMgr,token, &number_coordinates)) != MagickPass)
-          break;
-        PIMgr.StoreStartingAt=i=(long) (j+number_coordinates);
-        break;
-      }
-      case ColorPrimitive:
-      case MattePrimitive:
-      {
-        if (primitive_info[j].coordinates != 1)
-          {
-            status=MagickFail;
-            break;
-          }
-        MagickGetToken(q,&q,token,token_max_length);
-        if (LocaleCompare("point",token) == 0)
-          primitive_info[j].method=PointMethod;
-        if (LocaleCompare("replace",token) == 0)
-          primitive_info[j].method=ReplaceMethod;
-        if (LocaleCompare("floodfill",token) == 0)
-          primitive_info[j].method=FloodfillMethod;
-        if (LocaleCompare("filltoborder",token) == 0)
-          primitive_info[j].method=FillToBorderMethod;
-        if (LocaleCompare("reset",token) == 0)
-          primitive_info[j].method=ResetMethod;
-        break;
-      }
-      case TextPrimitive:
-      {
-        if (primitive_info[j].coordinates != 1)
-          {
-            status=MagickFail;
-            break;
-          }
-        if (*token != ',')
-          MagickGetToken(q,&q,token,token_max_length);
-        primitive_info[j].text=AllocateString(token);
-        {/*update current text position for next time*/
+      if ((affine.sx != 1.0) || (affine.rx != 0.0) || (affine.ry != 0.0) ||
+          (affine.sy != 1.0) || (affine.tx != 0.0) || (affine.ty != 0.0))
+        {
+          graphic_context[n]->affine.sx=current.sx*affine.sx+current.ry*affine.rx;
+          graphic_context[n]->affine.rx=current.rx*affine.sx+current.sy*affine.rx;
+          graphic_context[n]->affine.ry=current.sx*affine.ry+current.ry*affine.sy;
+          graphic_context[n]->affine.sy=current.rx*affine.ry+current.sy*affine.sy;
+          graphic_context[n]->affine.tx=
+            current.sx*affine.tx+current.ry*affine.ty+current.tx;
+          graphic_context[n]->affine.ty=
+            current.rx*affine.tx+current.sy*affine.ty+current.ty;
+        }
+      if (primitive_type == UndefinedPrimitive)
+        {
+          (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",
+                                (int) (q-p),p);
+          continue;
+        }
+      /*
+        Parse the primitive attributes.
+      */
+      PIMgr.StoreStartingAt = i = 0;
+      j=0;
+      primitive_info[0].point.x=0.0;
+      primitive_info[0].point.y=0.0;
+      primitive_info[0].coordinates=0;
+      primitive_info[0].method=FloodfillMethod;
+      PRIMINF_CLEAR_FLAGS(&primitive_info[0]);
+      for (x=0; *q != '\0'; x++)
+        {
           /*
-            Clone the DrawInfo, add a blank to the end of
-            the text, get the metrics for the concatenated
-            string, and use the width to update the text
-            current x position.
+            Define points.
           */
-          DrawInfo * clone_info;
-          TypeMetric  metrics;
-          clone_info=CloneDrawInfo((ImageInfo *) NULL,graphic_context[n]);
-          MagickFreeMemory(clone_info->density);        /* density values already converted, don't do again! */
-          clone_info->render = 0;
-          clone_info->text=AllocateString(token);
-          (void) ConcatenateString(&clone_info->text," ");
-          (void) GetTypeMetrics(image,clone_info,&metrics);
-          xTextCurrent += metrics.width;
-          DestroyDrawInfo(clone_info);
-        }/*update current text position for next time*/
+          if (!IsPoint(q))
+            break;
+          MagickGetToken(q,&q,token,token_max_length);
+          status &= MagickAtoFChk(token,&point.x);
+          if (status == MagickFail)
+            break;
+          MagickGetToken(q,&q,token,token_max_length);
+          if (*token == ',')
+            MagickGetToken(q,&q,token,token_max_length);
+          status &= MagickAtoFChk(token,&point.y);
+          if (status == MagickFail)
+            break;
+          MagickGetToken(q,(char **) NULL,token,token_max_length);
+          if (*token == ',')
+            MagickGetToken(q,&q,token,token_max_length);
+          assert(i < number_points);
+          primitive_info[i].primitive=primitive_type;
+          primitive_info[i].point=point;
+          primitive_info[i].coordinates=0;
+          primitive_info[i].method=FloodfillMethod;
+          PRIMINF_CLEAR_FLAGS(&primitive_info[i]);
+          i++;
+          PIMgr.StoreStartingAt = i;
+          if (i < number_points)
+            continue;
+          /* Array is full; double the array size */
+          if ((status &= PrimitiveInfoRealloc(&PIMgr,number_points)) != MagickPass)
+            break;
+        }
+      if (status == MagickFail)
         break;
-      }
-      case ImagePrimitive:
-      {
-        if (primitive_info[j].coordinates != 2)
+      /*
+        Special handling when using textc with character rotation; see comments
+        above near "textr".
+      */
+      if  ( (primitive_type == TextPrimitive) && UseCurrentTextPosition && (i == 0) )
+        {
+          primitive_info[0].primitive=primitive_type;
+          PRIMINF_CLEAR_FLAGS(&primitive_info[0]);
+          if  ( TextRotationPerformed )
+            {
+              /* text positioning has already been performed by translate/rotate sequence */
+              primitive_info[0].point.x=0;
+              primitive_info[0].point.y=0;
+              TextRotationPerformed = MagickFalse;
+            }
+          else
+            {
+              primitive_info[0].point.x=xTextCurrent;
+              primitive_info[0].point.y=yTextCurrent;
+            }
+          primitive_info[0].coordinates=0;
+          primitive_info[0].method=FloodfillMethod;
+          i++;
+          PIMgr.StoreStartingAt = i;
+          x++;
+        }
+      assert(j < (long) number_points);
+      primitive_info[j].primitive=primitive_type;
+      primitive_info[j].coordinates=x;
+      primitive_info[j].method=FloodfillMethod;
+      PRIMINF_CLEAR_FLAGS(&primitive_info[j]);
+      primitive_info[j].text=(char *) NULL;
+      /*
+        Circumscribe primitive within a circle.
+      */
+      bounds.x1=primitive_info[j].point.x;
+      bounds.y1=primitive_info[j].point.y;
+      bounds.x2=primitive_info[j].point.x;
+      bounds.y2=primitive_info[j].point.y;
+      for (k=1; k < (long) primitive_info[j].coordinates; k++)
+        {
+          assert(j+k < (long) number_points);
+          point=primitive_info[j+k].point;
+          if (point.x < bounds.x1)
+            bounds.x1=point.x;
+          if (point.y < bounds.y1)
+            bounds.y1=point.y;
+          if (point.x > bounds.x2)
+            bounds.x2=point.x;
+          if (point.y > bounds.y2)
+            bounds.y2=point.y;
+        }
+      /*
+        Estimate how many points will be required for the primitive.
+      */
+      points_length=primitive_info[j].coordinates;
+      switch (primitive_type)
+        {
+        case RectanglePrimitive:
           {
-            status=MagickFail;
+            points_length*=5;
             break;
           }
-        MagickGetToken(q,&q,token,token_max_length);
-        primitive_info[j].text=AllocateString(token);
-        break;
-      }
-    }
-
-    if (primitive_info == (PrimitiveInfo *) NULL)
-      break;
-    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",(int) (q-p),p);
-    if (status == MagickFail)
-      break;
-    assert(i < number_points); /* FIXME: This assertion may be hit (oss-fuzz 459618468) if +100 "headroom" not provided */
-    primitive_info[i].primitive=UndefinedPrimitive;
-    if (i == 0)
-      continue;
-    /*
-      Transform points.
-    */
-    for (i=0; primitive_info[i].primitive != UndefinedPrimitive; i++)
-    {
-      assert((unsigned long) i < number_points);
-      point=primitive_info[i].point;
-      primitive_info[i].point.x=graphic_context[n]->affine.sx*point.x+
-        graphic_context[n]->affine.ry*point.y+graphic_context[n]->affine.tx;
-      primitive_info[i].point.y=graphic_context[n]->affine.rx*point.x+
-        graphic_context[n]->affine.sy*point.y+graphic_context[n]->affine.ty;
-      point=primitive_info[i].point;
-      if (point.x < graphic_context[n]->bounds.x1)
-        graphic_context[n]->bounds.x1=point.x;
-      if (point.y < graphic_context[n]->bounds.y1)
-        graphic_context[n]->bounds.y1=point.y;
-      if (point.x > graphic_context[n]->bounds.x2)
-        graphic_context[n]->bounds.x2=point.x;
-      if (point.y > graphic_context[n]->bounds.y2)
-        graphic_context[n]->bounds.y2=point.y;
-      if (primitive_info[i].primitive == ImagePrimitive)
-        break;
-    }
-    if (graphic_context[n]->render)
-      {
-        if ((n != 0) && (graphic_context[n]->extra->clip_path != (char *) NULL) &&
-            (LocaleCompare(graphic_context[n]->extra->clip_path,
-             graphic_context[n-1]->extra->clip_path) != 0))
-          if (DrawClipPath(image,graphic_context[n],
-                           graphic_context[n]->extra->clip_path) == MagickFail)
-            status=MagickFail;
-        if ((n != 0) && (graphic_context[n]->extra->composite_path != (char *) NULL) &&
-            (LocaleCompare(graphic_context[n]->extra->composite_path,
-            graphic_context[n-1]->extra->composite_path) != 0))
+        case RoundRectanglePrimitive:
           {
-            if (DrawCompositeMask(image,graphic_context[n],
-                graphic_context[n]->extra->composite_path) == MagickFail)
-              status=MagickFail;
+            /*
+              Round rectangle is rectangle plus elipse
+            */
+            double
+              alpha,
+              beta,
+              radius;
+
+            alpha=bounds.x2-bounds.x1;
+            beta=bounds.y2-bounds.y1;
+            radius=hypot((double) alpha,(double) beta);
+            points_length*=5;
+            points_length+=2*((size_t) ceil((double) MagickPI*radius))+6*BezierQuantum+360;
+            break;
           }
-        if (DrawPrimitive(image,graphic_context[n],primitive_info)
-            == MagickFail)
+        case BezierPrimitive:
+          {
+            if (primitive_info[j].coordinates > 107)
+              (void) ThrowException(&image->exception,DrawError,
+                                    TooManyCoordinates,token);
+            points_length=primitive_info[j].coordinates*BezierQuantum;
+            break;
+          }
+        case PathPrimitive:
+          {
+            char
+              *s,
+              *t;
+
+            MagickGetToken(q,&q,token,token_max_length);
+            points_length=1;
+            t=token;
+            for (s=token; *s != '\0'; s=t)
+              {
+                double
+                  value;
+
+                value=strtod(s,&t);
+                (void) value;
+                if (s == t)
+                  {
+                    t++;
+                    continue;
+                  }
+                points_length++;
+              }
+            points_length=points_length*BezierQuantum;
+            break;
+          }
+        case CirclePrimitive:
+        case ArcPrimitive:
+        case EllipsePrimitive:
+          {
+            double
+              alpha,
+              beta,
+              radius;
+
+            alpha=bounds.x2-bounds.x1;
+            beta=bounds.y2-bounds.y1;
+            radius=hypot(alpha,beta);
+            points_length=2.0*(ceil(MagickPI*radius))+6.0*BezierQuantum+360.0;
+            break;
+          }
+        default:
+          break;
+        }
+
+      if (((size_t) points_length) < points_length)
+        {
+          /* points_length too big to be represented as a size_t */
           status=MagickFail;
-      }
-    if (primitive_info->text != (char *) NULL)
-      MagickFreeMemory(primitive_info->text);
-    if (MagickMonitorFormatted(q-primitive,
-                               (magick_uint64_t) primitive_extent,
-                               &image->exception,
-                               RenderImageText,image->filename) == MagickFail)
-      status=MagickFail;
-    if (status == MagickFail)
-      break;
-  }
+          ThrowException(&image->exception,DrawError,
+                         PrimitiveArithmeticOverflow,keyword);
+        }
+
+      if (status == MagickFail)
+        break;
+
+      if ((i+points_length) >= number_points)
+        {
+          double new_number_points = ceil(number_points+points_length+1);
+          size_t new_number_points_size_t;
+          if (new_number_points > (double) PRIMITIVE_INFO_POINTS_MAX)
+            {
+              /* new_number_points too big */
+              status=MagickFail;
+              ThrowException3(&image->exception,ResourceLimitError,
+                              MemoryAllocationFailed,UnableToDrawOnImage);
+              break;
+            }
+          new_number_points_size_t = (size_t) new_number_points;
+
+          PIMgr.StoreStartingAt = i;  /* should already be this value; just bein' sure */
+          if (PrimitiveInfoRealloc(&PIMgr,new_number_points_size_t-number_points) == MagickFail)
+            {
+              status=MagickFail;
+              break;
+            }
+        }
+
+      assert(j < (long) number_points);
+
+      /*
+        The TraceXXX functions that generate a dynamic number of points will automatically
+        grow the primitive array as needed.  To make sure that the simpler ones (TracePoint()
+        TraceLine(), TraceRectangle(), etc.) have enough space, we make sure there are at
+        least 100 elements available.
+      */
+      if (PrimitiveInfoRealloc(&PIMgr,100) == MagickFail)
+        {
+          status=MagickFail;
+          break;
+        }
+
+      /*
+        Trace points
+      */
+      switch (primitive_type)
+        {
+        case PointPrimitive:
+        default:
+          {
+            if (primitive_info[j].coordinates != 1)
+              {
+                status=MagickFail;
+                break;
+              }
+            if ((status &= TracePoint(primitive_info+j,primitive_info[j].point)) == MagickFail)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case LinePrimitive:
+          {
+            if (primitive_info[j].coordinates != 2)
+              {
+                status=MagickFail;
+                break;
+              }
+            if ((status &= TraceLine(primitive_info+j,primitive_info[j].point,
+                                     primitive_info[j+1].point)) == MagickFail)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case RectanglePrimitive:
+          {
+            /*
+              Rectangle requires 2 primitives.
+            */
+            if (primitive_info[j].coordinates != 2)
+              {
+                status=MagickFail;
+                break;
+              }
+            /*
+              Negative width is an error
+            */
+            if ((primitive_info[j+1].point.x - primitive_info[j].point.x) < 0.0)
+              {
+                status=MagickFail;
+                break;
+              }
+            /*
+              Negative height is an error
+            */
+            if ((primitive_info[j+1].point.y - primitive_info[j].point.y) < 0.0)
+              {
+                status=MagickFail;
+                break;
+              }
+            if ((status &= TraceRectangle(primitive_info+j,
+                                          /*start*/primitive_info[j].point,
+                                          /*end*/primitive_info[j+1].point)) == MagickFail)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case RoundRectanglePrimitive:
+          {
+            /*
+              Round rectangle requires 3 primitives.
+            */
+            if (primitive_info[j].coordinates != 3)
+              {
+                status=MagickFail;
+                break;
+              }
+            /*
+              Negative radius values are an error.
+            */
+            if ((primitive_info[j+2].point.x < 0.0) || (primitive_info[j+2].point.y < 0.0))
+              {
+                status=MagickFail;
+                break;
+              }
+            /*
+              Negative width is an error
+            */
+            if ((primitive_info[j+1].point.x - primitive_info[j].point.x) < 0.0)
+              {
+                status=MagickFail;
+                break;
+              }
+            /*
+              Negative height is an error
+            */
+            if ((primitive_info[j+1].point.y - primitive_info[j].point.y) < 0.0)
+              {
+                status=MagickFail;
+                break;
+              }
+            PIMgr.StoreStartingAt=j;
+            if ((status &= TraceRoundRectangle(&PIMgr,
+                                               /*start*/primitive_info[j].point,
+                                               /*end*/primitive_info[j+1].point,
+                                               /*arc*/primitive_info[j+2].point)) == MagickFail)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case ArcPrimitive:
+          {
+            if (primitive_info[j].coordinates != 3)
+              {
+                primitive_type=UndefinedPrimitive;
+                break;
+              }
+            PIMgr.StoreStartingAt=j;
+            if ((status &= TraceArc(&PIMgr,primitive_info[j].point,
+                                    primitive_info[j+1].point,primitive_info[j+2].point)) == MagickFail)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case EllipsePrimitive:
+          {
+            if (primitive_info[j].coordinates != 3)
+              {
+                status=MagickFail;
+                break;
+              }
+            /*
+              Negative radius values are an error.
+            */
+            if ((primitive_info[j+1].point.x < 0.0) ||
+                (primitive_info[j+1].point.y < 0.0))
+              {
+                status=MagickFail;
+                break;
+              }
+            PIMgr.StoreStartingAt=j;
+            if ((status &= TraceEllipse(&PIMgr,
+                                        /*start*/primitive_info[j].point, /*centerX,centerY*/
+                                        /*stop*/primitive_info[j+1].point, /*radiusX,radiusY*/
+                                        /*degrees*/primitive_info[j+2].point)) == MagickFail) /*arcStart,arcEnd*/
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case CirclePrimitive:
+          {
+            if (primitive_info[j].coordinates != 2)
+              {
+                status=MagickFail;
+                break;
+              }
+            PIMgr.StoreStartingAt=j;
+            if ((status &= TraceCircle(&PIMgr,primitive_info[j].point,
+                                       primitive_info[j+1].point)) == MagickFail)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case PolylinePrimitive:
+          {
+            /* the SVG spec does not prohibit polylines containing a single point */
+            if (primitive_info[j].coordinates < 1)
+              {
+                status=MagickFail;
+                break;
+              }
+            break;
+          }
+        case PolygonPrimitive:
+          {
+            /*
+              Polygon requires at least three points.
+            */
+            if (primitive_info[j].coordinates < 3)
+              {
+                status=MagickFail;
+                break;
+              }
+            primitive_info[i]=primitive_info[j];
+            primitive_info[i].coordinates=0;
+            primitive_info[j].coordinates++;
+            PRIMINF_SET_IS_CLOSED_SUBPATH(&primitive_info[j],1);
+            i++;
+            break;
+          }
+        case BezierPrimitive:
+          {
+            if (primitive_info[j].coordinates < 3)
+              {
+                status=MagickFail;
+                break;
+              }
+            PIMgr.StoreStartingAt=j;
+            if ((status &= TraceBezier(&PIMgr,primitive_info[j].coordinates)) != MagickPass)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
+            break;
+          }
+        case PathPrimitive:
+          {
+            size_t number_coordinates=0;
+            PIMgr.StoreStartingAt=j;
+            if ((status &= TracePath(image,&PIMgr,token, &number_coordinates)) != MagickPass)
+              break;
+            PIMgr.StoreStartingAt=i=(long) (j+number_coordinates);
+            break;
+          }
+        case ColorPrimitive:
+        case MattePrimitive:
+          {
+            if (primitive_info[j].coordinates != 1)
+              {
+                status=MagickFail;
+                break;
+              }
+            MagickGetToken(q,&q,token,token_max_length);
+            if (LocaleCompare("point",token) == 0)
+              primitive_info[j].method=PointMethod;
+            if (LocaleCompare("replace",token) == 0)
+              primitive_info[j].method=ReplaceMethod;
+            if (LocaleCompare("floodfill",token) == 0)
+              primitive_info[j].method=FloodfillMethod;
+            if (LocaleCompare("filltoborder",token) == 0)
+              primitive_info[j].method=FillToBorderMethod;
+            if (LocaleCompare("reset",token) == 0)
+              primitive_info[j].method=ResetMethod;
+            break;
+          }
+        case TextPrimitive:
+          {
+            if (primitive_info[j].coordinates != 1)
+              {
+                status=MagickFail;
+                break;
+              }
+            if (*token != ',')
+              MagickGetToken(q,&q,token,token_max_length);
+            primitive_info[j].text=AllocateString(token);
+            {/*update current text position for next time*/
+              /*
+                Clone the DrawInfo, add a blank to the end of
+                the text, get the metrics for the concatenated
+                string, and use the width to update the text
+                current x position.
+              */
+              DrawInfo * clone_info;
+              TypeMetric  metrics;
+              clone_info=CloneDrawInfo((ImageInfo *) NULL,graphic_context[n]);
+              MagickFreeMemory(clone_info->density);        /* density values already converted, don't do again! */
+              clone_info->render = 0;
+              clone_info->text=AllocateString(token);
+              (void) ConcatenateString(&clone_info->text," ");
+              (void) GetTypeMetrics(image,clone_info,&metrics);
+              xTextCurrent += metrics.width;
+              DestroyDrawInfo(clone_info);
+            }/*update current text position for next time*/
+            break;
+          }
+        case ImagePrimitive:
+          {
+            if (primitive_info[j].coordinates != 2)
+              {
+                status=MagickFail;
+                break;
+              }
+            MagickGetToken(q,&q,token,token_max_length);
+            primitive_info[j].text=AllocateString(token);
+            break;
+          }
+        }
+
+      if (primitive_info == (PrimitiveInfo *) NULL)
+        break;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",(int) (q-p),p);
+      if (status == MagickFail)
+        break;
+      assert(i < number_points); /* FIXME: This assertion may be hit (oss-fuzz 459618468) if +100 "headroom" not provided */
+      primitive_info[i].primitive=UndefinedPrimitive;
+      if (i == 0)
+        continue;
+      /*
+        Transform points.
+      */
+      for (i=0; primitive_info[i].primitive != UndefinedPrimitive; i++)
+        {
+          assert((unsigned long) i < number_points);
+          point=primitive_info[i].point;
+          primitive_info[i].point.x=graphic_context[n]->affine.sx*point.x+
+            graphic_context[n]->affine.ry*point.y+graphic_context[n]->affine.tx;
+          primitive_info[i].point.y=graphic_context[n]->affine.rx*point.x+
+            graphic_context[n]->affine.sy*point.y+graphic_context[n]->affine.ty;
+          point=primitive_info[i].point;
+          if (point.x < graphic_context[n]->bounds.x1)
+            graphic_context[n]->bounds.x1=point.x;
+          if (point.y < graphic_context[n]->bounds.y1)
+            graphic_context[n]->bounds.y1=point.y;
+          if (point.x > graphic_context[n]->bounds.x2)
+            graphic_context[n]->bounds.x2=point.x;
+          if (point.y > graphic_context[n]->bounds.y2)
+            graphic_context[n]->bounds.y2=point.y;
+          if (primitive_info[i].primitive == ImagePrimitive)
+            break;
+        }
+      if (graphic_context[n]->render)
+        {
+          if ((n != 0) && (graphic_context[n]->extra->clip_path != (char *) NULL) &&
+              (LocaleCompare(graphic_context[n]->extra->clip_path,
+                             graphic_context[n-1]->extra->clip_path) != 0))
+            if (DrawClipPath(image,graphic_context[n],
+                             graphic_context[n]->extra->clip_path) == MagickFail)
+              status=MagickFail;
+          if ((n != 0) && (graphic_context[n]->extra->composite_path != (char *) NULL) &&
+              (LocaleCompare(graphic_context[n]->extra->composite_path,
+                             graphic_context[n-1]->extra->composite_path) != 0))
+            {
+              if (DrawCompositeMask(image,graphic_context[n],
+                                    graphic_context[n]->extra->composite_path) == MagickFail)
+                status=MagickFail;
+            }
+          if (DrawPrimitive(image,graphic_context[n],primitive_info)
+              == MagickFail)
+            status=MagickFail;
+        }
+      if (primitive_info->text != (char *) NULL)
+        MagickFreeMemory(primitive_info->text);
+      if (MagickMonitorFormatted(q-primitive,
+                                 (magick_uint64_t) primitive_extent,
+                                 &image->exception,
+                                 RenderImageText,image->filename) == MagickFail)
+        status=MagickFail;
+      if (status == MagickFail)
+        break;
+    }
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"end draw-image");
   /*
     Free resources.
@@ -5082,11 +5087,11 @@ DrawPatternPath(Image *image,const DrawInfo *draw_info,const char *name,
   assert(image->signature == MagickSignature);
   assert(draw_info != (const DrawInfo *) NULL);
   assert(name != (const char *) NULL);
-  FormatString(attribute,"[MVG:%.1024s]",name);
+  MagickFormatString(attribute,sizeof(attribute),"[MVG:%.1024s]",name);
   path=GetImageAttribute(image,attribute);
   if (path == (ImageAttribute *) NULL)
     return(MagickFail);
-  FormatString(attribute,"[MVG:%.1024s-geometry]",name);
+  MagickFormatString(attribute,sizeof(attribute),"[MVG:%.1024s-geometry]",name);
   geometry=GetImageAttribute(image,attribute);
   if (geometry == (ImageAttribute *) NULL)
     return(MagickFail);
@@ -5097,10 +5102,10 @@ DrawPatternPath(Image *image,const DrawInfo *draw_info,const char *name,
   *pattern=AllocateImage(image_info);
   DestroyImageInfo(image_info);
   status &= QueryColorDatabase("none",&(*pattern)->background_color,
-    &image->exception);
+                               &image->exception);
   (void) SetImage(*pattern,OpaqueOpacity);
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),
-    "begin pattern-path %.1024s %.1024s",name,geometry->value);
+                        "begin pattern-path %.1024s %.1024s",name,geometry->value);
   clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
   DestroyImage(clone_info->fill_pattern);
   clone_info->fill_pattern=(Image *) NULL;
@@ -6022,9 +6027,9 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
 
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  begin draw-primitive");
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),
-    "    affine: %g,%g,%g,%g,%g,%g",draw_info->affine.sx,draw_info->affine.rx,
-    draw_info->affine.ry,draw_info->affine.sy,draw_info->affine.tx,
-    draw_info->affine.ty);
+                        "    affine: %g,%g,%g,%g,%g,%g",draw_info->affine.sx,draw_info->affine.rx,
+                        draw_info->affine.ry,draw_info->affine.sy,draw_info->affine.tx,
+                        draw_info->affine.ty);
   status &= ModifyCache(image,&image->exception);
   if (status == MagickFail)
     {
@@ -6035,7 +6040,7 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
   if (MAGICK_ISNAN(dvalue) || ((dvalue < DTOLONG_MIN)) || (dvalue > DTOLONG_MAX))
     {
       char double_str[MaxTextExtent];
-      FormatString(double_str,"%g",dvalue);
+      MagickFormatString(double_str,sizeof(double_str),"%g",dvalue);
       ThrowException(&image->exception,DrawError,PrimitiveArithmeticOverflow,double_str);
       return MagickFail;
     }
@@ -6044,378 +6049,378 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
   if (MAGICK_ISNAN(dvalue) || ((dvalue < DTOLONG_MIN)) || (dvalue > DTOLONG_MAX))
     {
       char double_str[MaxTextExtent];
-      FormatString(double_str,"%g",dvalue);
+      MagickFormatString(double_str,sizeof(double_str),"%g",dvalue);
       ThrowException(&image->exception,DrawError,PrimitiveArithmeticOverflow,double_str);
       return MagickFail;
     }
   y=(long) dvalue;
   switch (primitive_info->primitive)
-  {
+    {
     case PointPrimitive:
-    {
-      if ((q=GetImagePixels(image,x,y,1,1)) != (PixelPacket *) NULL)
-        {
-          *q=draw_info->fill;
-          status&=SyncImagePixels(image);
-        }
-      break;
-    }
+      {
+        if ((q=GetImagePixels(image,x,y,1,1)) != (PixelPacket *) NULL)
+          {
+            *q=draw_info->fill;
+            status&=SyncImagePixels(image);
+          }
+        break;
+      }
     case ColorPrimitive:
-    {
-      switch (primitive_info->method)
       {
-        case PointMethod:
-        default:
-        {
-          if ((q=GetImagePixels(image,x,y,1,1)) != (PixelPacket *) NULL)
-            {
-              *q=draw_info->fill;
-              status&=SyncImagePixels(image);
-            }
-          break;
-        }
-        case ReplaceMethod:
-        {
-          Image
-            *pattern;
-
-          PixelPacket
-            color,
-            target;
-
-          color=draw_info->fill;
-          if (AcquireOnePixelByReference(image,&target,x,y,
-                                         &image->exception) == MagickFail)
-            break;
-          pattern=draw_info->fill_pattern;
-          for (y=0; y < (long) image->rows; y++)
+        switch (primitive_info->method)
           {
-            q=GetImagePixels(image,0,y,image->columns,1);
-            if (q == (PixelPacket *) NULL)
-              break;
-            for (x=0; x < (long) image->columns; x++)
+          case PointMethod:
+          default:
             {
-              if (!FuzzyColorMatch(q,&target,image->fuzz))
+              if ((q=GetImagePixels(image,x,y,1,1)) != (PixelPacket *) NULL)
                 {
-                  q++;
-                  continue;
+                  *q=draw_info->fill;
+                  status&=SyncImagePixels(image);
                 }
-              if (pattern != (Image *) NULL)
+              break;
+            }
+          case ReplaceMethod:
+            {
+              Image
+                *pattern;
+
+              PixelPacket
+                color,
+                target;
+
+              color=draw_info->fill;
+              if (AcquireOnePixelByReference(image,&target,x,y,
+                                             &image->exception) == MagickFail)
+                break;
+              pattern=draw_info->fill_pattern;
+              for (y=0; y < (long) image->rows; y++)
                 {
-                  if (AcquireOnePixelByReference(pattern,&color,
-                     (long) (x-pattern->tile_info.x) % pattern->columns,
-                     (long) (y-pattern->tile_info.y) % pattern->rows,
-                                                 &image->exception) == MagickFail)
+                  q=GetImagePixels(image,0,y,image->columns,1);
+                  if (q == (PixelPacket *) NULL)
                     break;
-                  if (!pattern->matte)
-                    color.opacity=OpaqueOpacity;
+                  for (x=0; x < (long) image->columns; x++)
+                    {
+                      if (!FuzzyColorMatch(q,&target,image->fuzz))
+                        {
+                          q++;
+                          continue;
+                        }
+                      if (pattern != (Image *) NULL)
+                        {
+                          if (AcquireOnePixelByReference(pattern,&color,
+                                                         (long) (x-pattern->tile_info.x) % pattern->columns,
+                                                         (long) (y-pattern->tile_info.y) % pattern->rows,
+                                                         &image->exception) == MagickFail)
+                            break;
+                          if (!pattern->matte)
+                            color.opacity=OpaqueOpacity;
+                        }
+                      if (color.opacity != TransparentOpacity)
+                        AlphaCompositePixel(q,&color,color.opacity,q,q->opacity);
+                      q++;
+                    }
+                  status&=SyncImagePixels(image);
+                  if (status == MagickFail)
+                    break;
                 }
-              if (color.opacity != TransparentOpacity)
-                AlphaCompositePixel(q,&color,color.opacity,q,q->opacity);
-              q++;
-            }
-            status&=SyncImagePixels(image);
-            if (status == MagickFail)
               break;
-          }
-          break;
-        }
-        case FloodfillMethod:
-        case FillToBorderMethod:
-        {
-          PixelPacket
-            border_color,
-            target;
+            }
+          case FloodfillMethod:
+          case FillToBorderMethod:
+            {
+              PixelPacket
+                border_color,
+                target;
 
-          if (AcquireOnePixelByReference(image,&target,x,y,
-                                         &image->exception) == MagickFail)
-            break;
-          if (primitive_info->method == FillToBorderMethod)
-            {
-              border_color=draw_info->border_color;
-              target=border_color;
-            }
-          status&=ColorFloodfillImage(image,draw_info,target,x,y,
-                                      primitive_info->method);
-          break;
-        }
-        case ResetMethod:
-        {
-          for (y=0; y < (long) image->rows; y++)
-          {
-            q=GetImagePixels(image,0,y,image->columns,1);
-            if (q == (PixelPacket *) NULL)
+              if (AcquireOnePixelByReference(image,&target,x,y,
+                                             &image->exception) == MagickFail)
+                break;
+              if (primitive_info->method == FillToBorderMethod)
+                {
+                  border_color=draw_info->border_color;
+                  target=border_color;
+                }
+              status&=ColorFloodfillImage(image,draw_info,target,x,y,
+                                          primitive_info->method);
               break;
-            for (x=0; x < (long) image->columns; x++)
-            {
-              *q=draw_info->fill;
-              q++;
             }
-            status&=SyncImagePixels(image);
-            if (status == MagickFail)
+          case ResetMethod:
+            {
+              for (y=0; y < (long) image->rows; y++)
+                {
+                  q=GetImagePixels(image,0,y,image->columns,1);
+                  if (q == (PixelPacket *) NULL)
+                    break;
+                  for (x=0; x < (long) image->columns; x++)
+                    {
+                      *q=draw_info->fill;
+                      q++;
+                    }
+                  status&=SyncImagePixels(image);
+                  if (status == MagickFail)
+                    break;
+                }
               break;
+            }
           }
-          break;
-        }
+        break;
       }
-      break;
-    }
     case MattePrimitive:
-    {
-      if (!image->matte)
-        SetImageOpacity(image,OpaqueOpacity);
-      switch (primitive_info->method)
       {
-        case PointMethod:
-        default:
-        {
-          q=GetImagePixels(image,x,y,1,1);
-          if (q == (PixelPacket *) NULL)
-            break;
-          q->opacity=TransparentOpacity;
-          status&=SyncImagePixels(image);
-          break;
-        }
-        case ReplaceMethod:
-        {
-          PixelPacket
-            target;
-
-          if (AcquireOnePixelByReference(image,&target,x,y,
-                                         &image->exception) == MagickFail)
-            break;
-          status&=TransparentImage(image,target,TransparentOpacity);
-          break;
-        }
-        case FloodfillMethod:
-        case FillToBorderMethod:
-        {
-          PixelPacket
-            border_color,
-            target;
-
-          if (AcquireOnePixelByReference(image,&target,x,y,
-                                         &image->exception) == MagickFail)
-            break;
-          if (primitive_info->method == FillToBorderMethod)
-            {
-              border_color=draw_info->border_color;
-              target=border_color;
-            }
-          status&=MatteFloodfillImage(image,target,TransparentOpacity,x,y,
-                                      primitive_info->method);
-          break;
-        }
-        case ResetMethod:
-        {
-          for (y=0; y < (long) image->rows; y++)
+        if (!image->matte)
+          SetImageOpacity(image,OpaqueOpacity);
+        switch (primitive_info->method)
           {
-            q=GetImagePixels(image,0,y,image->columns,1);
-            if (q == (PixelPacket *) NULL)
+          case PointMethod:
+          default:
+            {
+              q=GetImagePixels(image,x,y,1,1);
+              if (q == (PixelPacket *) NULL)
+                break;
+              q->opacity=TransparentOpacity;
+              status&=SyncImagePixels(image);
               break;
-            for (x=0; x < (long) image->columns; x++)
-              {
-                q->opacity=draw_info->fill.opacity;
-                q++;
-              }
-            status&=SyncImagePixels(image);
-            if (status == MagickFail)
+            }
+          case ReplaceMethod:
+            {
+              PixelPacket
+                target;
+
+              if (AcquireOnePixelByReference(image,&target,x,y,
+                                             &image->exception) == MagickFail)
+                break;
+              status&=TransparentImage(image,target,TransparentOpacity);
               break;
+            }
+          case FloodfillMethod:
+          case FillToBorderMethod:
+            {
+              PixelPacket
+                border_color,
+                target;
+
+              if (AcquireOnePixelByReference(image,&target,x,y,
+                                             &image->exception) == MagickFail)
+                break;
+              if (primitive_info->method == FillToBorderMethod)
+                {
+                  border_color=draw_info->border_color;
+                  target=border_color;
+                }
+              status&=MatteFloodfillImage(image,target,TransparentOpacity,x,y,
+                                          primitive_info->method);
+              break;
+            }
+          case ResetMethod:
+            {
+              for (y=0; y < (long) image->rows; y++)
+                {
+                  q=GetImagePixels(image,0,y,image->columns,1);
+                  if (q == (PixelPacket *) NULL)
+                    break;
+                  for (x=0; x < (long) image->columns; x++)
+                    {
+                      q->opacity=draw_info->fill.opacity;
+                      q++;
+                    }
+                  status&=SyncImagePixels(image);
+                  if (status == MagickFail)
+                    break;
+                }
+              break;
+            }
           }
-          break;
-        }
+        break;
       }
-      break;
-    }
     case TextPrimitive:
-    {
-      char
-        geometry[MaxTextExtent];
+      {
+        char
+          geometry[MaxTextExtent];
 
-      DrawInfo
-        *clone_info;
+        DrawInfo
+          *clone_info;
 
-      if (primitive_info->text == (char *) NULL)
+        if (primitive_info->text == (char *) NULL)
+          break;
+        clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
+        (void) CloneString(&clone_info->text,primitive_info->text);
+        MagickFormatString(geometry,sizeof(geometry),"%+g%+g",primitive_info->point.x,
+                           primitive_info->point.y);
+        (void) CloneString(&clone_info->geometry,geometry);
+        /*
+          FIXME: AnnotateImage sometimes returns error status here
+          without throwing exception and under conditions which should
+          be ok when rendering (e.g. off-canvas drawing).
+
+          AnnotateImage() recurses back to DrawImage().
+          DrawImage--> DrawPrimitive() --> AnnotateImage() --> DrawImage
+        */
+        status&=AnnotateImage(image,clone_info);
+        DestroyDrawInfo(clone_info);
         break;
-      clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
-      (void) CloneString(&clone_info->text,primitive_info->text);
-      FormatString(geometry,"%+g%+g",primitive_info->point.x,
-        primitive_info->point.y);
-      (void) CloneString(&clone_info->geometry,geometry);
-      /*
-        FIXME: AnnotateImage sometimes returns error status here
-        without throwing exception and under conditions which should
-        be ok when rendering (e.g. off-canvas drawing).
-
-        AnnotateImage() recurses back to DrawImage().
-        DrawImage--> DrawPrimitive() --> AnnotateImage() --> DrawImage
-      */
-      status&=AnnotateImage(image,clone_info);
-      DestroyDrawInfo(clone_info);
-      break;
-    }
+      }
     case ImagePrimitive:
-    {
-      AffineMatrix
-        affine;
+      {
+        AffineMatrix
+          affine;
 
-      Image
-        *composite_image=(Image *) NULL;
+        Image
+          *composite_image=(Image *) NULL;
 
-      ImageInfo
-        *clone_info;
+        ImageInfo
+          *clone_info;
 
-      if (primitive_info->text == (char *) NULL)
-        break;
-      clone_info=CloneImageInfo((ImageInfo *) NULL);
-      clone_info->subimage=0;
-      clone_info->subrange=1;
-      if (LocaleNCompare(primitive_info->text,"data:",5) == 0)
-        {
-          composite_image=ReadInlineImage(clone_info,primitive_info->text,
-                                          &image->exception);
-        }
-      else
-        {
-          /*
-            Sanity check URL/path before passing it to ReadImage()
+        if (primitive_info->text == (char *) NULL)
+          break;
+        clone_info=CloneImageInfo((ImageInfo *) NULL);
+        clone_info->subimage=0;
+        clone_info->subrange=1;
+        if (LocaleNCompare(primitive_info->text,"data:",5) == 0)
+          {
+            composite_image=ReadInlineImage(clone_info,primitive_info->text,
+                                            &image->exception);
+          }
+        else
+          {
+            /*
+              Sanity check URL/path before passing it to ReadImage()
 
-            This is a temporary fix until suitable flags can be passed
-            to keep SetImageInfo() from doing potentially dangerous
-            magick things.
-          */
+              This is a temporary fix until suitable flags can be passed
+              to keep SetImageInfo() from doing potentially dangerous
+              magick things.
+            */
 #define VALID_PREFIX(str,url) (LocaleNCompare(str,url,sizeof(str)-1) == 0)
-          if (!VALID_PREFIX("http://", primitive_info->text) &&
-              !VALID_PREFIX("https://", primitive_info->text) &&
-              !VALID_PREFIX("ftp://", primitive_info->text)  &&
-              !(IsAccessibleNoLogging(primitive_info->text))
-              )
-            {
-              ThrowException(&image->exception,FileOpenError,UnableToOpenFile,primitive_info->text);
-              status=MagickFail;
-            }
-          else
-            {
-              (void) strlcpy(clone_info->filename,primitive_info->text,
-                             MaxTextExtent);
-              composite_image=ReadImage(clone_info,&image->exception);
-            }
-        }
-      if (image->exception.severity != UndefinedException)
-        MagickError2(image->exception.severity,image->exception.reason,
-          image->exception.description);
-      DestroyImageInfo(clone_info);
-      if (composite_image == (Image *) NULL)
-        {
-          status=MagickFail;
-          break;
-        }
-      /*
-        If the requested size is not 0x0 (to be filled in later with
-        composite image size) and the requested size is different than
-        the composite image size, then transform to the requested
-        size.
-      */
-      if ((0 != primitive_info[1].point.x) &&
-          (0 != primitive_info[1].point.y) &&
-          (primitive_info[1].point.x != composite_image->columns) &&
-          (primitive_info[1].point.y != composite_image->rows))
-        {
-          char
-            geometry[MaxTextExtent];
+            if (!VALID_PREFIX("http://", primitive_info->text) &&
+                !VALID_PREFIX("https://", primitive_info->text) &&
+                !VALID_PREFIX("ftp://", primitive_info->text)  &&
+                !(IsAccessibleNoLogging(primitive_info->text))
+                )
+              {
+                ThrowException(&image->exception,FileOpenError,UnableToOpenFile,primitive_info->text);
+                status=MagickFail;
+              }
+            else
+              {
+                (void) strlcpy(clone_info->filename,primitive_info->text,
+                               MaxTextExtent);
+                composite_image=ReadImage(clone_info,&image->exception);
+              }
+          }
+        if (image->exception.severity != UndefinedException)
+          MagickError2(image->exception.severity,image->exception.reason,
+                       image->exception.description);
+        DestroyImageInfo(clone_info);
+        if (composite_image == (Image *) NULL)
+          {
+            status=MagickFail;
+            break;
+          }
+        /*
+          If the requested size is not 0x0 (to be filled in later with
+          composite image size) and the requested size is different than
+          the composite image size, then transform to the requested
+          size.
+        */
+        if ((0 != primitive_info[1].point.x) &&
+            (0 != primitive_info[1].point.y) &&
+            (primitive_info[1].point.x != composite_image->columns) &&
+            (primitive_info[1].point.y != composite_image->rows))
+          {
+            char
+              geometry[MaxTextExtent];
 
-          /*
-            Resize image.
-          */
-          FormatString(geometry,"%gx%g!",primitive_info[1].point.x,
-            primitive_info[1].point.y);
-          handler=SetMonitorHandler((MonitorHandler) NULL);
-          status&=TransformImage(&composite_image,(char *) NULL,geometry);
-          (void) SetMonitorHandler(handler);
-          if (status == MagickFail)
-            {
-              DestroyImageList(composite_image);
-              break;
-            }
-        }
-      if (!composite_image->matte)
-        status&=SetImageOpacity(composite_image,OpaqueOpacity);
-      if (draw_info->opacity != OpaqueOpacity)
-        status&=SetImageOpacity(composite_image,draw_info->opacity);
-      affine=draw_info->affine;
-      affine.tx=x;
-      affine.ty=y;
-      status&=DrawAffineImage(image,composite_image,&affine);
-      DestroyImageList(composite_image);
-      break;
-    }
+            /*
+              Resize image.
+            */
+            MagickFormatString(geometry,sizeof(geometry),"%gx%g!",
+                               primitive_info[1].point.x,primitive_info[1].point.y);
+            handler=SetMonitorHandler((MonitorHandler) NULL);
+            status&=TransformImage(&composite_image,(char *) NULL,geometry);
+            (void) SetMonitorHandler(handler);
+            if (status == MagickFail)
+              {
+                DestroyImageList(composite_image);
+                break;
+              }
+          }
+        if (!composite_image->matte)
+          status&=SetImageOpacity(composite_image,OpaqueOpacity);
+        if (draw_info->opacity != OpaqueOpacity)
+          status&=SetImageOpacity(composite_image,draw_info->opacity);
+        affine=draw_info->affine;
+        affine.tx=x;
+        affine.ty=y;
+        status&=DrawAffineImage(image,composite_image,&affine);
+        DestroyImageList(composite_image);
+        break;
+      }
     default:
-    {
-      double
-        mid,
-        stroke_width_limited,
-        scale;
+      {
+        double
+          mid,
+          stroke_width_limited,
+          scale;
 
-      DrawInfo
-        *clone_info;
+        DrawInfo
+          *clone_info;
 
-      if (IsEventLogged(RenderEvent))
-        LogPrimitiveInfo(primitive_info);
-      scale=ExpandAffine(&draw_info->affine);
-      if ((draw_info->dash_pattern != (double *) NULL) &&
-          (draw_info->dash_pattern[0] != 0.0) &&
-          ((scale*draw_info->stroke_width) > MagickEpsilon) &&
-          (draw_info->stroke.opacity != TransparentOpacity))
-        {
-          /*
-            Draw dash polygon.
-          */
-          clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
-          clone_info->stroke_width=0.0;
-          clone_info->stroke.opacity=TransparentOpacity;
-          status&=DrawPolygonPrimitive(image,clone_info,primitive_info);
-          DestroyDrawInfo(clone_info);
-          status&=DrawDashPolygon(draw_info,primitive_info,image); /* oss-fuzz 455298154 always here while drawing filled 1 pixel circle, due to 'stroke-dasharray 1' */
-          break;
-        }
+        if (IsEventLogged(RenderEvent))
+          LogPrimitiveInfo(primitive_info);
+        scale=ExpandAffine(&draw_info->affine);
+        if ((draw_info->dash_pattern != (double *) NULL) &&
+            (draw_info->dash_pattern[0] != 0.0) &&
+            ((scale*draw_info->stroke_width) > MagickEpsilon) &&
+            (draw_info->stroke.opacity != TransparentOpacity))
+          {
+            /*
+              Draw dash polygon.
+            */
+            clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
+            clone_info->stroke_width=0.0;
+            clone_info->stroke.opacity=TransparentOpacity;
+            status&=DrawPolygonPrimitive(image,clone_info,primitive_info);
+            DestroyDrawInfo(clone_info);
+            status&=DrawDashPolygon(draw_info,primitive_info,image); /* oss-fuzz 455298154 always here while drawing filled 1 pixel circle, due to 'stroke-dasharray 1' */
+            break;
+          }
 
-      /* sanity check for excessively big stroke_width (ticket #515) */
-      if  ( (stroke_width_limited = STROKE_WIDTH_LIMIT(image)) > draw_info->stroke_width )
+        /* sanity check for excessively big stroke_width (ticket #515) */
+        if  ( (stroke_width_limited = STROKE_WIDTH_LIMIT(image)) > draw_info->stroke_width )
           stroke_width_limited = draw_info->stroke_width;
 
-      mid=ExpandAffine(&draw_info->affine)*stroke_width_limited/2.0;
-      if ((mid > 1.0) && (draw_info->stroke.opacity != TransparentOpacity))
-        {
-          unsigned int
-            closed_path;
+        mid=ExpandAffine(&draw_info->affine)*stroke_width_limited/2.0;
+        if ((mid > 1.0) && (draw_info->stroke.opacity != TransparentOpacity))
+          {
+            unsigned int
+              closed_path;
 
-          /*
-            Draw strokes while respecting line cap/join attributes.
-          */
-          closed_path=PRIMINF_GET_IS_CLOSED_SUBPATH(&primitive_info[0]);
-          i=(long) primitive_info[0].coordinates;
-          if ((((draw_info->linecap == RoundCap) || closed_path) &&
-               (draw_info->linejoin == RoundJoin)) ||
-               (primitive_info[i].primitive != UndefinedPrimitive))
-            {
-              status&=DrawPolygonPrimitive(image,draw_info,primitive_info);
-              break;
-            }
-          /* first fill the polygon by cloning and turning off stroking ... */
-          clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
-          clone_info->stroke_width=0.0;
-          clone_info->stroke.opacity=TransparentOpacity;
-          status&=DrawPolygonPrimitive(image,clone_info,primitive_info);
-          DestroyDrawInfo(clone_info);
-          /* ... and then stroke the polygon */
-          if (status != MagickFail)
-            status&=DrawStrokePolygon(image,draw_info,primitive_info);
-          break;
-        }
-      status&=DrawPolygonPrimitive(image,draw_info,primitive_info);
-      break;
+            /*
+              Draw strokes while respecting line cap/join attributes.
+            */
+            closed_path=PRIMINF_GET_IS_CLOSED_SUBPATH(&primitive_info[0]);
+            i=(long) primitive_info[0].coordinates;
+            if ((((draw_info->linecap == RoundCap) || closed_path) &&
+                 (draw_info->linejoin == RoundJoin)) ||
+                (primitive_info[i].primitive != UndefinedPrimitive))
+              {
+                status&=DrawPolygonPrimitive(image,draw_info,primitive_info);
+                break;
+              }
+            /* first fill the polygon by cloning and turning off stroking ... */
+            clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
+            clone_info->stroke_width=0.0;
+            clone_info->stroke.opacity=TransparentOpacity;
+            status&=DrawPolygonPrimitive(image,clone_info,primitive_info);
+            DestroyDrawInfo(clone_info);
+            /* ... and then stroke the polygon */
+            if (status != MagickFail)
+              status&=DrawStrokePolygon(image,draw_info,primitive_info);
+            break;
+          }
+        status&=DrawPolygonPrimitive(image,draw_info,primitive_info);
+        break;
+      }
     }
-  }
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  end draw-primitive");
   return(status);
 }

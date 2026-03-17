@@ -911,10 +911,10 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
 
   SetGeometry(image,&geometry);
   (void) GetMagickGeometry(PiconGeometry,&geometry.x,&geometry.y,
-    &geometry.width,&geometry.height);
+                           &geometry.width,&geometry.height);
   picon=ThumbnailImage(image,geometry.width,geometry.height,&image->exception);
   if (picon == (Image *) NULL)
-      ThrowWriterException(CoderError,UnableToResizeImage,image);
+    ThrowWriterException(CoderError,UnableToResizeImage,image);
   if ((image_info->type != TrueColorType) &&
       (characteristics.grayscale))
     map=BlobToImage(image_info,Graymap,GraymapExtent,&image->exception);
@@ -948,21 +948,21 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
             Map all the transparent pixels.
           */
           for (y=0; y < (long) picon->rows; y++)
-          {
-            q=GetImagePixels(picon,0,y,picon->columns,1);
-            if (q == (PixelPacket *) NULL)
-              break;
-            for (x=0; x < (long) picon->columns; x++)
             {
-              if (q->opacity == TransparentOpacity)
-                transparent=True;
-              else
-                q->opacity=OpaqueOpacity;
-              q++;
+              q=GetImagePixels(picon,0,y,picon->columns,1);
+              if (q == (PixelPacket *) NULL)
+                break;
+              for (x=0; x < (long) picon->columns; x++)
+                {
+                  if (q->opacity == TransparentOpacity)
+                    transparent=True;
+                  else
+                    q->opacity=OpaqueOpacity;
+                  q++;
+                }
+              if (!SyncImagePixels(picon))
+                break;
             }
-            if (!SyncImagePixels(picon))
-              break;
-          }
           if (picon->exception.severity >= ErrorException)
             {
               CopyException(&picon->exception,&image->exception);
@@ -993,23 +993,23 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
       picon->colormap[colors-1].red=picon->colormap[colors-1].green=picon->colormap[colors-1].blue=0;
       picon->colormap[colors-1].opacity=TransparentOpacity;
       for (y=0; y < (long) picon->rows; y++)
-      {
-        register IndexPacket
-          *indexes;
-
-        q=GetImagePixels(picon,0,y,picon->columns,1);
-        if (q == (PixelPacket *) NULL)
-          break;
-        indexes=AccessMutableIndexes(picon);
-        for (x=0; x < (long) picon->columns; x++)
         {
-          if (q->opacity == TransparentOpacity)
-            indexes[x]=(IndexPacket) picon->colors;
-          q++;
+          register IndexPacket
+            *indexes;
+
+          q=GetImagePixels(picon,0,y,picon->columns,1);
+          if (q == (PixelPacket *) NULL)
+            break;
+          indexes=AccessMutableIndexes(picon);
+          for (x=0; x < (long) picon->columns; x++)
+            {
+              if (q->opacity == TransparentOpacity)
+                indexes[x]=(IndexPacket) picon->colors;
+              q++;
+            }
+          if (!SyncImagePixels(picon))
+            break;
         }
-        if (!SyncImagePixels(picon))
-          break;
-      }
       if (picon->exception.severity >= ErrorException)
         {
           CopyException(&picon->exception,&image->exception);
@@ -1029,75 +1029,75 @@ static MagickPassFail WritePICONImage(const ImageInfo *image_info,Image *image)
   */
   (void) WriteBlobString(image,"/* XPM */\n");
   GetPathComponent(picon->filename,BasePath,basename);
-  (void) FormatString(buffer,"static char *%.1024s[] = {\n",basename);
+  (void) MagickFormatString(buffer,sizeof(buffer),"static char *%.1024s[] = {\n",basename);
   (void) WriteBlobString(image,buffer);
   (void) WriteBlobString(image,"/* columns rows colors chars-per-pixel */\n");
-  FormatString(buffer,"\"%lu %lu %lu %ld\",\n",picon->columns,picon->rows,
-    colors,characters_per_pixel);
+  MagickFormatString(buffer,sizeof(buffer),"\"%lu %lu %lu %ld\",\n",picon->columns,picon->rows,
+                     colors,characters_per_pixel);
   (void) WriteBlobString(image,buffer);
   for (i=0; i < (long) colors; i++)
-  {
-    /*
-      Define XPM color.
-    */
-    picon->colormap[i].opacity=OpaqueOpacity;
-    (void) QueryColorname(picon,picon->colormap+i,XPMCompliance,name,
-      &picon->exception);
-    if (transparent)
-      {
-        if (i == (long) (colors-1))
-          (void) strlcpy(name,"grey75",sizeof(name));
-      }
-    /*
-      Write XPM color.
-    */
-    k=i % MaxCixels;
-    symbol[0]=Cixel[k];
-    for (j=1; j < (long) characters_per_pixel; j++)
     {
-      k=((i-k)/MaxCixels) % MaxCixels;
-      symbol[j]=Cixel[k];
+      /*
+        Define XPM color.
+      */
+      picon->colormap[i].opacity=OpaqueOpacity;
+      (void) QueryColorname(picon,picon->colormap+i,XPMCompliance,name,
+                            &picon->exception);
+      if (transparent)
+        {
+          if (i == (long) (colors-1))
+            (void) strlcpy(name,"grey75",sizeof(name));
+        }
+      /*
+        Write XPM color.
+      */
+      k=i % MaxCixels;
+      symbol[0]=Cixel[k];
+      for (j=1; j < (long) characters_per_pixel; j++)
+        {
+          k=((i-k)/MaxCixels) % MaxCixels;
+          symbol[j]=Cixel[k];
+        }
+      symbol[j]='\0';
+      MagickFormatString(buffer,sizeof(buffer),"\"%.1024s c %.1024s\",\n",symbol,name);
+      (void) WriteBlobString(image,buffer);
     }
-    symbol[j]='\0';
-    FormatString(buffer,"\"%.1024s c %.1024s\",\n",symbol,name);
-    (void) WriteBlobString(image,buffer);
-  }
   /*
     Define XPM pixels.
   */
   (void) WriteBlobString(image,"/* pixels */\n");
   for (y=0; y < (long) picon->rows; y++)
-  {
-    register const IndexPacket
-      *indexes;
-
-    p=AcquireImagePixels(picon,0,y,picon->columns,1,&picon->exception);
-    if (p == (const PixelPacket *) NULL)
-      break;
-    indexes=AccessImmutableIndexes(picon);
-    (void) WriteBlobString(image,"\"");
-    for (x=0; x < (long) picon->columns; x++)
     {
-      k=indexes[x] % MaxCixels;
-      symbol[0]=Cixel[k];
-      for (j=1; j < (long) characters_per_pixel; j++)
-      {
-        k=(((int) indexes[x]-k)/MaxCixels) % MaxCixels;
-        symbol[j]=Cixel[k];
-      }
-      symbol[j]='\0';
-      (void) strlcpy(buffer,symbol,MaxTextExtent);
-      (void) WriteBlobString(image,buffer);
-    }
-    FormatString(buffer,"\"%.1024s\n",
-      (y == (long) (picon->rows-1) ? "" : ","));
-    (void) WriteBlobString(image,buffer);
-    if (QuantumTick(y,picon->rows))
-      if (!MagickMonitorFormatted(y,picon->rows,&image->exception,
-                                  SaveImageText,image->filename,
-                                  image->columns,image->rows))
+      register const IndexPacket
+        *indexes;
+
+      p=AcquireImagePixels(picon,0,y,picon->columns,1,&picon->exception);
+      if (p == (const PixelPacket *) NULL)
         break;
-  }
+      indexes=AccessImmutableIndexes(picon);
+      (void) WriteBlobString(image,"\"");
+      for (x=0; x < (long) picon->columns; x++)
+        {
+          k=indexes[x] % MaxCixels;
+          symbol[0]=Cixel[k];
+          for (j=1; j < (long) characters_per_pixel; j++)
+            {
+              k=(((int) indexes[x]-k)/MaxCixels) % MaxCixels;
+              symbol[j]=Cixel[k];
+            }
+          symbol[j]='\0';
+          (void) strlcpy(buffer,symbol,MaxTextExtent);
+          (void) WriteBlobString(image,buffer);
+        }
+      MagickFormatString(buffer,sizeof(buffer),"\"%.1024s\n",
+                         (y == (long) (picon->rows-1) ? "" : ","));
+      (void) WriteBlobString(image,buffer);
+      if (QuantumTick(y,picon->rows))
+        if (!MagickMonitorFormatted(y,picon->rows,&image->exception,
+                                    SaveImageText,image->filename,
+                                    image->columns,image->rows))
+          break;
+    }
   if (picon->exception.severity >= ErrorException)
     {
       GetImageException(picon,&image->exception);
@@ -1273,10 +1273,10 @@ static unsigned int WriteXPMImage(const ImageInfo *image_info,Image *image)
   */
   (void) WriteBlobString(image,"/* XPM */\n");
   GetPathComponent(image->filename,BasePath,basename);
-  (void) FormatString(buffer,"static char *%.1024s[] = {\n",basename);
+  (void) MagickFormatString(buffer,sizeof(buffer),"static char *%.1024s[] = {\n",basename);
   (void) WriteBlobString(image,buffer);
   (void) WriteBlobString(image,"/* columns rows colors chars-per-pixel */\n");
-  FormatString(buffer,"\"%lu %lu %lu %ld\",\n",image->columns,
+  MagickFormatString(buffer,sizeof(buffer),"\"%lu %lu %lu %ld\",\n",image->columns,
     image->rows,colors,characters_per_pixel);
   (void) WriteBlobString(image,buffer);
   for (i=0; i < (long) colors; i++)
@@ -1303,7 +1303,7 @@ static unsigned int WriteXPMImage(const ImageInfo *image_info,Image *image)
       symbol[j]=Cixel[k];
     }
     symbol[j]='\0';
-    FormatString(buffer,"\"%.1024s c %.1024s\",\n",symbol,name);
+    MagickFormatString(buffer,sizeof(buffer),"\"%.1024s c %.1024s\",\n",symbol,name);
     (void) WriteBlobString(image,buffer);
   }
   /*
@@ -1333,7 +1333,7 @@ static unsigned int WriteXPMImage(const ImageInfo *image_info,Image *image)
       (void) strlcpy(buffer,symbol,MaxTextExtent);
       (void) WriteBlobString(image,buffer);
     }
-    FormatString(buffer,"\"%.1024s\n",
+    MagickFormatString(buffer,sizeof(buffer),"\"%.1024s\n",
       (y == (long) (image->rows-1) ? "" : ","));
     (void) WriteBlobString(image,buffer);
     if (QuantumTick(y,image->rows))

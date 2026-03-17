@@ -918,24 +918,24 @@ static MagickPassFail WriteFITSImage(const ImageInfo *image_info,Image *image)
       memset(fits_info,' ',FITS_BLOCK_SIZE);
       y = 0;
       y = InsertRowHDU(fits_info, "SIMPLE  =                    T", y);
-      FormatString(buffer,        "BITPIX  =                    %u",quantum_size);
+      MagickFormatString(buffer, sizeof(buffer),        "BITPIX  =                    %u",quantum_size);
       y = InsertRowHDU(fits_info, buffer, y);
       y = InsertRowHDU(fits_info, "NAXIS   =                    2", y);
-      FormatString(buffer,        "NAXIS1  =           %10lu",image->columns);
+      MagickFormatString(buffer, sizeof(buffer), "NAXIS1  =           %10lu",image->columns);
       y = InsertRowHDU(fits_info, buffer, y);
-      FormatString(buffer,        "NAXIS2  =           %10lu",image->rows);
+      MagickFormatString(buffer, sizeof(buffer), "NAXIS2  =           %10lu",image->rows);
       y = InsertRowHDU(fits_info, buffer, y);
-      FormatString(buffer,        "DATAMIN =           %10u",0);
+      MagickFormatString(buffer, sizeof(buffer), "DATAMIN =           %10u",0);
       y = InsertRowHDU(fits_info, buffer, y);
-      FormatString(buffer,        "DATAMAX =           %10lu", MaxValueGivenBits(quantum_size));
+      MagickFormatString(buffer, sizeof(buffer), "DATAMAX =           %10lu", MaxValueGivenBits(quantum_size));
       y = InsertRowHDU(fits_info, buffer, y);
       if (quantum_size>8)
         {
-          FormatString(buffer,      "BZERO   =           %10u", (quantum_size <= 16) ? 32768U : 2147483648U);
+          MagickFormatString(buffer, sizeof(buffer), "BZERO   =           %10u", (quantum_size <= 16) ? 32768U : 2147483648U);
           y = InsertRowHDU(fits_info, buffer, y);
         }
       /* Magick version data can only be 60 bytes. */
-      (void) FormatString(buffer, "HISTORY Created by %.60s.",MagickPackageName " " MagickLibVersionText);
+      (void) MagickFormatString(buffer, sizeof(buffer), "HISTORY Created by %.60s.",MagickPackageName " " MagickLibVersionText);
       y = InsertRowHDU(fits_info, buffer, y);
       if (image->next!=NULL)
         y = InsertRowHDU(fits_info, "EXTEND   =                    T", y);

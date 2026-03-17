@@ -5302,11 +5302,11 @@ static unsigned int WriteLOGOImage(const ImageInfo *image_info,Image *image)
       ThrowWriterException2(FileOpenError,image->exception.reason,image)
     }
   (void) WriteBlobString(image,"/*\n");
-  FormatString(buffer,"  Logo image declaration (%s format).\n",
+  MagickFormatString(buffer,sizeof(buffer),"  Logo image declaration (%s format).\n",
                logo_image->magick);
   (void) WriteBlobString(image,buffer);
   (void) WriteBlobString(image,"*/\n");
-  FormatString(buffer,"#define LogoImageExtent  %lu\n\n",
+  MagickFormatString(buffer,sizeof(buffer),"#define LogoImageExtent  %lu\n\n",
                (unsigned long) length);
   (void) WriteBlobString(image,buffer);
   (void) WriteBlobString(image,"static const unsigned char\n");
@@ -5316,7 +5316,7 @@ static unsigned int WriteLOGOImage(const ImageInfo *image_info,Image *image)
   p=(char *) blob;
   for (i=0; i < length ; i++)
   {
-    FormatString(buffer,"0x%02X%s",*p & 0xff, (size_t)i+1 < length ? ", " : "");
+    MagickFormatString(buffer,sizeof(buffer),"0x%02X%s",*p & 0xff, (size_t)i+1 < length ? ", " : "");
     (void) WriteBlobString(image,buffer);
     if (((i+1) % 12) == 0)
       {

@@ -469,7 +469,7 @@ static void JPEGDecodeProgressMonitor(j_common_ptr cinfo)
       if (scan_no > max_scan_number)
         {
           char message[MaxTextExtent];
-          FormatString(message,"Scan number %d exceeds maximum scans (%d)",
+          MagickFormatString(message,sizeof(message),"Scan number %d exceeds maximum scans (%d)",
                        scan_no, max_scan_number);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s", message);
           ThrowException2(&image->exception,CorruptImageError,(char *) message,
@@ -689,7 +689,7 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
   /*
     Compute generic profile name.
   */
-  FormatString(profile_name,"APP%d",marker);
+  MagickFormatString(profile_name,sizeof(profile_name),"APP%d",marker);
 
   /*
     Obtain Image.
@@ -717,7 +717,7 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
   if ((marker == 1) && (length > 4) &&
       (strncmp((char *) profile,"Exif",4) == 0))
     {
-      FormatString(profile_name,"EXIF");
+      MagickFormatString(profile_name,sizeof(profile_name),"EXIF");
     }
   else if (((marker == 1) && (length > strlen(xmp_std_header)+1)) &&
            (memcmp(profile, xmp_std_header, strlen(xmp_std_header)+1) == 0))
@@ -727,7 +727,7 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
          namespace header.
       */
       header_length=strlen(xmp_std_header)+1;
-      FormatString((char *) profile_name,"XMP");
+      MagickFormatString((char *) profile_name,sizeof(profile_name),"XMP");
     }
 
   /*
@@ -1176,7 +1176,8 @@ FormatJPEGColorSpace(const J_COLOR_SPACE colorspace,
 */
 static MagickPassFail
 FormatJPEGSamplingFactors(const struct jpeg_decompress_struct *jpeg_info,
-                          char *sampling_factors)
+                          char *sampling_factors,
+                          const size_t sizeof_sampling_factors)
 {
   unsigned int
     quantums = 0;
@@ -1269,31 +1270,31 @@ FormatJPEGSamplingFactors(const struct jpeg_decompress_struct *jpeg_info,
     case 0:
       break;
     case 1:
-      (void) FormatString(sampling_factors,"%dx%d",
-                          jpeg_info->comp_info[0].h_samp_factor,
-                          jpeg_info->comp_info[0].v_samp_factor);
+      (void) MagickFormatString(sampling_factors,sizeof_sampling_factors,"%dx%d",
+                                jpeg_info->comp_info[0].h_samp_factor,
+                                jpeg_info->comp_info[0].v_samp_factor);
       status = MagickPass;
       break;
     case 3:
-      (void) FormatString(sampling_factors,"%dx%d,%dx%d,%dx%d",
-                          jpeg_info->comp_info[0].h_samp_factor,
-                          jpeg_info->comp_info[0].v_samp_factor,
-                          jpeg_info->comp_info[1].h_samp_factor,
-                          jpeg_info->comp_info[1].v_samp_factor,
-                          jpeg_info->comp_info[2].h_samp_factor,
-                          jpeg_info->comp_info[2].v_samp_factor);
+      (void) MagickFormatString(sampling_factors,sizeof_sampling_factors,"%dx%d,%dx%d,%dx%d",
+                                jpeg_info->comp_info[0].h_samp_factor,
+                                jpeg_info->comp_info[0].v_samp_factor,
+                                jpeg_info->comp_info[1].h_samp_factor,
+                                jpeg_info->comp_info[1].v_samp_factor,
+                                jpeg_info->comp_info[2].h_samp_factor,
+                                jpeg_info->comp_info[2].v_samp_factor);
       status = MagickPass;
       break;
     case 4:
-      (void) FormatString(sampling_factors,"%dx%d,%dx%d,%dx%d,%dx%d",
-                          jpeg_info->comp_info[0].h_samp_factor,
-                          jpeg_info->comp_info[0].v_samp_factor,
-                          jpeg_info->comp_info[1].h_samp_factor,
-                          jpeg_info->comp_info[1].v_samp_factor,
-                          jpeg_info->comp_info[2].h_samp_factor,
-                          jpeg_info->comp_info[2].v_samp_factor,
-                          jpeg_info->comp_info[3].h_samp_factor,
-                          jpeg_info->comp_info[3].v_samp_factor);
+      (void) MagickFormatString(sampling_factors,sizeof_sampling_factors,"%dx%d,%dx%d,%dx%d,%dx%d",
+                                jpeg_info->comp_info[0].h_samp_factor,
+                                jpeg_info->comp_info[0].v_samp_factor,
+                                jpeg_info->comp_info[1].h_samp_factor,
+                                jpeg_info->comp_info[1].v_samp_factor,
+                                jpeg_info->comp_info[2].h_samp_factor,
+                                jpeg_info->comp_info[2].v_samp_factor,
+                                jpeg_info->comp_info[3].h_samp_factor,
+                                jpeg_info->comp_info[3].v_samp_factor);
       status = MagickPass;
       break;
     }
@@ -1677,10 +1678,10 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
     /*
       Estimate and retain JPEG properties as attributes.
     */
-    FormatString(attribute,"%d",EstimateJPEGQuality(&jpeg_info,image));
+    MagickFormatString(attribute,sizeof(attribute),"%d",EstimateJPEGQuality(&jpeg_info,image));
     (void) SetImageAttribute(image,"JPEG-Quality",attribute);
 
-    FormatString(attribute,"%ld",(long)jpeg_info.out_color_space);
+    MagickFormatString(attribute,sizeof(attribute),"%ld",(long)jpeg_info.out_color_space);
     (void) SetImageAttribute(image,"JPEG-Colorspace",attribute);
 
     FormatJPEGColorSpace(jpeg_info.out_color_space,attribute);
@@ -1690,7 +1691,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                             "Colorspace: %s (%d)", attribute,
                             jpeg_info.out_color_space);
 
-    if (FormatJPEGSamplingFactors(&jpeg_info,attribute) != MagickFail)
+    if (FormatJPEGSamplingFactors(&jpeg_info,attribute,sizeof(attribute)) != MagickFail)
       {
         (void) SetImageAttribute(image,"JPEG-Sampling-factors",attribute);
         if (image->logging)

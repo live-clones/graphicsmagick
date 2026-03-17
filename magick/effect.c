@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1405,7 +1405,7 @@ MagickExport Image *ConvolveImage(const Image * restrict image,const unsigned in
           *row_text='\0';
           for (u=0; u < width; u++)
             {
-              FormatString(cell_text,"%#12.4g",*k++);
+              MagickFormatString(cell_text,sizeof(cell_text),"%#12.4g",*k++);
               (void) strlcat(row_text,cell_text,sizeof(row_text));
               if (u%5 == 4)
                 {
@@ -4760,8 +4760,8 @@ UnsharpMaskPixels(void *mutable_data,                /* User provided mutable da
 }
 
 MagickExport Image *UnsharpMaskImage(const Image *image,const double radius,
-  const double sigma,const double amount,const double threshold,
-  ExceptionInfo *exception)
+                                     const double sigma,const double amount,const double threshold,
+                                     ExceptionInfo *exception)
 {
   UnsharpMaskOptions_t
     options;
@@ -4780,8 +4780,9 @@ MagickExport Image *UnsharpMaskImage(const Image *image,const double radius,
     return((Image *) NULL);
   options.amount=amount;
   options.threshold=(MaxRGBFloat*threshold)/2.0;
-  FormatString(message,"[%%s] Unsharp mask: amount %g, threshold %g...",
-               amount,threshold);
+  MagickFormatString(message,sizeof(message),
+                     "[%%s] Unsharp mask: amount %g, threshold %g...",
+                     amount,threshold);
   (void) PixelIterateDualModify(UnsharpMaskPixels,NULL,
                                 message,NULL,&options,
                                 image->columns,image->rows,image,0,0,

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -138,7 +138,7 @@ static unsigned int IsEPT(const unsigned char *magick,const size_t length)
   }
 
 static Image *ReadEPTImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                           ExceptionInfo *exception)
 {
 #define BoundingBox  "%%BoundingBox:"
 #define DocumentMedia  "%%DocumentMedia:"
@@ -225,11 +225,11 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
     {
       (void) strlcpy(density,PSDensityGeometry,sizeof(density));
       count=GetMagickDimension(density,&image->x_resolution,
-        &image->y_resolution,NULL,NULL);
+                               &image->y_resolution,NULL,NULL);
       if (count != 2)
         image->y_resolution=image->x_resolution;
     }
-  FormatString(density,"%gx%g",image->x_resolution,image->y_resolution);
+  MagickFormatString(density,sizeof(density),"%gx%g",image->x_resolution,image->y_resolution);
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Density: %s", density);
@@ -259,8 +259,8 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
   */
   file=AcquireTemporaryFileStream(postscript_filename,BinaryFileIOMode);
   if (file == (FILE *) NULL)
-      ThrowReaderTemporaryFileException(postscript_filename);
-  FormatString(translate_geometry,"%g %g translate\n              ",0.0,0.0);
+    ThrowReaderTemporaryFileException(postscript_filename);
+  MagickFormatString(translate_geometry,sizeof(translate_geometry),"%g %g translate\n              ",0.0,0.0);
   ThrowReaderExceptionOnFOpFailure(fputs(translate_geometry,file) == EOF,1);
   /*
     Copy Postscript to temporary file.
@@ -277,54 +277,54 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
   bounds.x2=0.0;
   bounds.y2=0.0;
   for (i=0; i < filesize; i++)
-  {
-    if ((c=ReadBlobByte(image)) == EOF)
-      break;
-    ThrowReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
-    *p++=c;
-    if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
-      continue;
-    *p='\0';
-    p=command;
-    /*
-      Parse a bounding box statement.
-    */
-    count=0;
-    if (LocaleNCompare(BoundingBox,command,strlen(BoundingBox)) == 0)
-      count=sscanf(command,"%%%%BoundingBox: %lf %lf %lf %lf",&bounds.x1,
-        &bounds.y1,&bounds.x2,&bounds.y2);
-    if (LocaleNCompare(DocumentMedia,command,strlen(DocumentMedia)) == 0)
-      count=sscanf(command,"%%%%DocumentMedia: %*s %lf %lf",&bounds.x2,
-        &bounds.y2)+2;
-    if (LocaleNCompare(PageBoundingBox,command,strlen(PageBoundingBox)) == 0)
-      count=sscanf(command,"%%%%PageBoundingBox: %lf %lf %lf %lf",
-        &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
-    if (count != 4)
-      continue;
-    if ((bounds.x1 > bounds.x2) ||
-        (bounds.y1 > bounds.y2))
-      continue;
-    /*
-      Set Postscript render geometry.
-    */
-    FormatString(translate_geometry,"%g %g translate\n",-bounds.x1,-bounds.y1);
-    width=(unsigned long) (bounds.x2-bounds.x1+0.5);
-    height=(unsigned long) (bounds.y2-bounds.y1+0.5);
-    if ((width <= box.width) && (height <= box.height))
-      continue;
-    page.width=width;
-    page.height=height;
-    box=page;
-  }
+    {
+      if ((c=ReadBlobByte(image)) == EOF)
+        break;
+      ThrowReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
+      *p++=c;
+      if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
+        continue;
+      *p='\0';
+      p=command;
+      /*
+        Parse a bounding box statement.
+      */
+      count=0;
+      if (LocaleNCompare(BoundingBox,command,strlen(BoundingBox)) == 0)
+        count=sscanf(command,"%%%%BoundingBox: %lf %lf %lf %lf",&bounds.x1,
+                     &bounds.y1,&bounds.x2,&bounds.y2);
+      if (LocaleNCompare(DocumentMedia,command,strlen(DocumentMedia)) == 0)
+        count=sscanf(command,"%%%%DocumentMedia: %*s %lf %lf",&bounds.x2,
+                     &bounds.y2)+2;
+      if (LocaleNCompare(PageBoundingBox,command,strlen(PageBoundingBox)) == 0)
+        count=sscanf(command,"%%%%PageBoundingBox: %lf %lf %lf %lf",
+                     &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
+      if (count != 4)
+        continue;
+      if ((bounds.x1 > bounds.x2) ||
+          (bounds.y1 > bounds.y2))
+        continue;
+      /*
+        Set Postscript render geometry.
+      */
+      MagickFormatString(translate_geometry,sizeof(translate_geometry),"%g %g translate\n",-bounds.x1,-bounds.y1);
+      width=(unsigned long) (bounds.x2-bounds.x1+0.5);
+      height=(unsigned long) (bounds.y2-bounds.y1+0.5);
+      if ((width <= box.width) && (height <= box.height))
+        continue;
+      page.width=width;
+      page.height=height;
+      box=page;
+    }
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Done copying.");
   if (image_info->page != (char *) NULL)
     (void) GetGeometry(image_info->page,&page.x,&page.y,&page.width,
-      &page.height);
-  FormatString(geometry,"%lux%lu",
-    (unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5),
-    (unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5));
+                       &page.height);
+  MagickFormatString(geometry,sizeof(geometry),"%lux%lu",
+                     (unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5),
+                     (unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5));
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Page geometry: %s",geometry);
@@ -344,17 +344,21 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
     char
       options[MaxTextExtent];
 
+    size_t
+      options_len;
+
     options[0]='\0';
     /*
       Append subrange.
     */
     if (image_info->subrange != 0)
-      FormatString(options,"-dFirstPage=%lu -dLastPage=%lu",
-                   image_info->subimage+1,image_info->subimage+image_info->subrange);
+      MagickFormatString(options,sizeof(options),"-dFirstPage=%lu -dLastPage=%lu",
+                         image_info->subimage+1,image_info->subimage+image_info->subrange);
     /*
       Append bounding box.
     */
-    FormatString(options+strlen(options)," -g%s",geometry);
+    options_len=strlen(options);
+    MagickFormatString(options+options_len,sizeof(options)-options_len," -g%s",geometry);
     (void) strlcpy(filename,image_info->filename,MaxTextExtent);
     if (image_info->temporary)
       (void) LiberateTemporaryFile((char *) image_info->filename);
@@ -363,9 +367,9 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
         (void) LiberateTemporaryFile(postscript_filename);
         ThrowReaderTemporaryFileException(image_info->filename);
       }
-    FormatString(command,delegate_info->commands,antialias,
-                 antialias,density,options,image_info->filename,
-                 postscript_filename);
+    MagickFormatString(command,sizeof(command),delegate_info->commands,antialias,
+                       antialias,density,options,image_info->filename,
+                       postscript_filename);
   }
   (void) MagickMonitorFormatted(0,8,exception,RenderPostscriptText,
                                 image_info->filename);
@@ -595,7 +599,7 @@ static unsigned int WriteEPTImage(const ImageInfo *image_info,Image *image)
           (LocaleCompare(subformat,"EPS") == 0))
         (void) strlcpy(subformat,"eps2",sizeof(subformat));
 
-      FormatString(image->filename,"%s:%.1024s",subformat,ps_filename);
+      MagickFormatString(image->filename,sizeof(image->filename),"%s:%.1024s",subformat,ps_filename);
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Writing temporary EPS file \"%s\"",ps_filename);
@@ -610,7 +614,7 @@ static unsigned int WriteEPTImage(const ImageInfo *image_info,Image *image)
       ThrowWriterTemporaryFileException(tiff_filename);
     }
 
-  FormatString(image->filename,"tiff:%.1024s",tiff_filename);
+  MagickFormatString(image->filename,sizeof(image->filename),"tiff:%.1024s",tiff_filename);
   image->compression=RLECompression;
   if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -710,7 +714,7 @@ static unsigned int WriteEPTImage(const ImageInfo *image_info,Image *image)
   else
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Failed to open \"%s\" for write",
+                            "Failed to open \"%s\" for write",
                             image->filename);
     }
   if (LocaleCompare(image_info->magick,"EPS") != 0)

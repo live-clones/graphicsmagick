@@ -148,7 +148,7 @@ static unsigned int WriteUILImage(const ImageInfo *image_info,Image *image)
 
   static const char
     Cixel[MaxCixels+1] = " .XoO+@#$%&*=-;:>,<1234567890qwertyuipasdfghjk"
-                         "lzxcvbnmMNBVCZASDFGHJKLPIUYTREWQ!~^/()_`'][{}|";
+    "lzxcvbnmMNBVCZASDFGHJKLPIUYTREWQ!~^/()_`'][{}|";
 
   char
     basename[MaxTextExtent],
@@ -214,21 +214,21 @@ static unsigned int WriteUILImage(const ImageInfo *image_info,Image *image)
           matte_image=MagickAllocateResourceLimitedMemory(unsigned char *,number_pixels);
           if (matte_image == (unsigned char *) NULL)
             ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-              image);
+                                 image);
           for (y=0; y < (long) image->rows; y++)
-          {
-            p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-            if (p == (const PixelPacket *) NULL)
-              break;
-            for (x=0; x < (long) image->columns; x++)
             {
-              matte_image[i]=(unsigned char) (p->opacity == TransparentOpacity);
-              if (matte_image[i])
-                transparent=True;
-              i++;
-              p++;
+              p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+              if (p == (const PixelPacket *) NULL)
+                break;
+              for (x=0; x < (long) image->columns; x++)
+                {
+                  matte_image[i]=(unsigned char) (p->opacity == TransparentOpacity);
+                  if (matte_image[i])
+                    transparent=True;
+                  i++;
+                  p++;
+                }
             }
-          }
         }
       (void) SetImageType(image,PaletteType);
       colors=image->colors;
@@ -237,21 +237,21 @@ static unsigned int WriteUILImage(const ImageInfo *image_info,Image *image)
           i=0;
           colors++;
           for (y=0; y < (long) image->rows; y++)
-          {
-            register IndexPacket
-              *indexes;
-
-            p=GetImagePixelsEx(image,0,y,image->columns,1,&image->exception);
-            if (p == (const PixelPacket *) NULL)
-              break;
-            indexes=AccessMutableIndexes(image);
-            for (x=0; x < (long) image->columns; x++)
             {
-              if (matte_image[i])
-                indexes[x]=(IndexPacket) image->colors;
-              p++;
+              register IndexPacket
+                *indexes;
+
+              p=GetImagePixelsEx(image,0,y,image->columns,1,&image->exception);
+              if (p == (const PixelPacket *) NULL)
+                break;
+              indexes=AccessMutableIndexes(image);
+              for (x=0; x < (long) image->columns; x++)
+                {
+                  if (matte_image[i])
+                    indexes[x]=(IndexPacket) image->colors;
+                  p++;
+                }
             }
-          }
         }
       if (matte_image != (unsigned char *) NULL)
         MagickFreeResourceLimitedMemory(unsigned char *,matte_image);
@@ -267,79 +267,79 @@ static unsigned int WriteUILImage(const ImageInfo *image_info,Image *image)
   */
   (void) WriteBlobString(image,"/* UIL */\n");
   GetPathComponent(image->filename,BasePath,basename);
-  FormatString(buffer,"value\n  %.1024s_ct : color_table(\n",basename);
+  MagickFormatString(buffer,sizeof(buffer),"value\n  %.1024s_ct : color_table(\n",basename);
   (void) WriteBlobString(image,buffer);
   for (i=0; i < (long) image->colors; i++)
-  {
-    /*
-      Define UIL color.
-    */
-    (void) QueryColorname(image,image->colormap+i,X11Compliance,name,
-      &image->exception);
-    if (transparent)
-      if (i == (long) (colors-1))
-        (void) strlcpy(name,"None",sizeof(name));
-    /*
-      Write UIL color.
-    */
-    k=i % MaxCixels;
-    symbol[0]=Cixel[k];
-    for (j=1; j < (int) characters_per_pixel; j++)
     {
-      k=((i-k)/MaxCixels) % MaxCixels;
-      symbol[j]=Cixel[k];
+      /*
+        Define UIL color.
+      */
+      (void) QueryColorname(image,image->colormap+i,X11Compliance,name,
+                            &image->exception);
+      if (transparent)
+        if (i == (long) (colors-1))
+          (void) strlcpy(name,"None",sizeof(name));
+      /*
+        Write UIL color.
+      */
+      k=i % MaxCixels;
+      symbol[0]=Cixel[k];
+      for (j=1; j < (int) characters_per_pixel; j++)
+        {
+          k=((i-k)/MaxCixels) % MaxCixels;
+          symbol[j]=Cixel[k];
+        }
+      symbol[j]='\0';
+      if (LocaleCompare(name,"None") == 0)
+        MagickFormatString(buffer,sizeof(buffer),"    background color = '%.1024s'",symbol);
+      else
+        MagickFormatString(buffer,sizeof(buffer),"    color('%.1024s',%.1024s) = '%.1024s'",name,
+                           PixelIntensityToQuantum(image->colormap+i) < (((double) MaxRGB+1.0)/2.0) ?
+                           "background" : "foreground",symbol);
+      (void) WriteBlobString(image,buffer);
+      MagickFormatString(buffer,sizeof(buffer),"%.1024s",(i == (long) (colors-1) ? ");\n" : ",\n"));
+      (void) WriteBlobString(image,buffer);
     }
-    symbol[j]='\0';
-    if (LocaleCompare(name,"None") == 0)
-      FormatString(buffer,"    background color = '%.1024s'",symbol);
-    else
-      FormatString(buffer,"    color('%.1024s',%.1024s) = '%.1024s'",name,
-        PixelIntensityToQuantum(image->colormap+i) < (((double) MaxRGB+1.0)/2.0) ?
-        "background" : "foreground",symbol);
-    (void) WriteBlobString(image,buffer);
-    FormatString(buffer,"%.1024s",(i == (long) (colors-1) ? ");\n" : ",\n"));
-    (void) WriteBlobString(image,buffer);
-  }
   /*
     Define UIL pixels.
   */
   GetPathComponent(image->filename,BasePath,basename);
-  FormatString(buffer,
-    "  %.1024s_icon : icon(color_table = %.1024s_ct,\n",basename,basename);
+  MagickFormatString(buffer,sizeof(buffer),
+                     "  %.1024s_icon : icon(color_table = %.1024s_ct,\n",basename,basename);
   (void) WriteBlobString(image,buffer);
   for (y=0; y < (long) image->rows; y++)
-  {
-    register const IndexPacket
-      *indexes;
-
-    p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-    if (p == (const PixelPacket *) NULL)
-      break;
-    indexes=AccessImmutableIndexes(image);
-    (void) WriteBlobString(image,"    \"");
-    for (x=0; x < (long) image->columns; x++)
     {
-      k=(long) (indexes[x] % MaxCixels);
-      symbol[0]=Cixel[k];
-      for (j=1; j < (int) characters_per_pixel; j++)
-      {
-        k=(((int) indexes[x]-k)/MaxCixels) % MaxCixels;
-        symbol[j]=Cixel[k];
-      }
-      symbol[j]='\0';
-      (void) strlcpy(buffer,symbol,MaxTextExtent);
-      (void) WriteBlobString(image,buffer);
-      p++;
-    }
-    FormatString(buffer,"\"%.1024s\n",
-      (y == (long) (image->rows-1) ? ");" : ","));
-    (void) WriteBlobString(image,buffer);
-    if (QuantumTick(y,image->rows))
-      if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                  SaveImageText,image->filename,
-                                  image->columns,image->rows))
+      register const IndexPacket
+        *indexes;
+
+      p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+      if (p == (const PixelPacket *) NULL)
         break;
-  }
+      indexes=AccessImmutableIndexes(image);
+      (void) WriteBlobString(image,"    \"");
+      for (x=0; x < (long) image->columns; x++)
+        {
+          k=(long) (indexes[x] % MaxCixels);
+          symbol[0]=Cixel[k];
+          for (j=1; j < (int) characters_per_pixel; j++)
+            {
+              k=(((int) indexes[x]-k)/MaxCixels) % MaxCixels;
+              symbol[j]=Cixel[k];
+            }
+          symbol[j]='\0';
+          (void) strlcpy(buffer,symbol,MaxTextExtent);
+          (void) WriteBlobString(image,buffer);
+          p++;
+        }
+      MagickFormatString(buffer,sizeof(buffer),"\"%.1024s\n",
+                         (y == (long) (image->rows-1) ? ");" : ","));
+      (void) WriteBlobString(image,buffer);
+      if (QuantumTick(y,image->rows))
+        if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                    SaveImageText,image->filename,
+                                    image->columns,image->rows))
+          break;
+    }
   status &= CloseBlob(image);
   return(status);
 }

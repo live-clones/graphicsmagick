@@ -155,7 +155,7 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
       ThrowBinaryException(FileOpenError,UnableToCreateTemporaryFile,
         filename);
     }
-  FormatString(huffman_image->filename,"tiff:%s",filename);
+  MagickFormatString(huffman_image->filename,sizeof(huffman_image->filename),"tiff:%s",filename);
   clone_info=CloneImageInfo(image_info);
   clone_info->compression=Group4Compression;
   clone_info->type=BilevelType;
@@ -412,827 +412,827 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
   if (image_info->compression != UndefinedCompression)
     compression=image_info->compression;
   switch (compression)
-  {
+    {
 #if !defined(HasJPEG)
     case JPEGCompression:
-    {
-      compression=RLECompression;
-      ThrowException(&image->exception,MissingDelegateError,JPEGLibraryIsNotAvailable,image->filename);
-      break;
-    }
+      {
+        compression=RLECompression;
+        ThrowException(&image->exception,MissingDelegateError,JPEGLibraryIsNotAvailable,image->filename);
+        break;
+      }
 #endif
 #if !defined(HasZLIB)
     case ZipCompression:
-    {
-      compression=RLECompression;
-      ThrowException(&image->exception,MissingDelegateError,ZipLibraryIsNotAvailable,image->filename);
-      break;
-    }
+      {
+        compression=RLECompression;
+        ThrowException(&image->exception,MissingDelegateError,ZipLibraryIsNotAvailable,image->filename);
+        break;
+      }
 #endif
     default:
       break;
-  }
+    }
   page=1;
   scene=0;
   do
-  {
-    ImageCharacteristics
-      characteristics;
+    {
+      ImageCharacteristics
+        characteristics;
 
-    /*
-      Analyze image to be written.
-    */
-    if (GetImageCharacteristics(image,&characteristics,
-                                (OptimizeType == image_info->type),
-                                &image->exception) == MagickFail)
-      ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
+      /*
+        Analyze image to be written.
+      */
+      if (GetImageCharacteristics(image,&characteristics,
+                                  (OptimizeType == image_info->type),
+                                  &image->exception) == MagickFail)
+        ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
 
-    /*
-      Scale image to size of Postscript page.
-    */
-    text_size=0;
-    attribute=GetImageAttribute(image,"label");
-    if (attribute != (const ImageAttribute *) NULL)
-      text_size=(unsigned int)
-        (MultilineCensus(attribute->value)*image_info->pointsize+12);
-    SetGeometry(image,&geometry);
-    geometry.y=(long) text_size;
-    FormatString(page_geometry,"%lux%lu",image->columns,image->rows);
-    if (image_info->page != (char *) NULL)
-      (void) strlcpy(page_geometry,image_info->page,MaxTextExtent);
-    else
-      if ((image->page.width != 0) && (image->page.height != 0))
-        (void) FormatString(page_geometry,"%lux%lu%+ld%+ld",image->page.width,
-          image->page.height,image->page.x,image->page.y);
+      /*
+        Scale image to size of Postscript page.
+      */
+      text_size=0;
+      attribute=GetImageAttribute(image,"label");
+      if (attribute != (const ImageAttribute *) NULL)
+        text_size=(unsigned int)
+          (MultilineCensus(attribute->value)*image_info->pointsize+12);
+      SetGeometry(image,&geometry);
+      geometry.y=(long) text_size;
+      MagickFormatString(page_geometry,sizeof(page_geometry),"%lux%lu",image->columns,image->rows);
+      if (image_info->page != (char *) NULL)
+        (void) strlcpy(page_geometry,image_info->page,MaxTextExtent);
       else
-        if (LocaleCompare(image_info->magick,"PS2") == 0)
-          (void) strlcpy(page_geometry,PSPageGeometry,sizeof(page_geometry));
-    (void) GetMagickGeometry(page_geometry,&geometry.x,&geometry.y,
-       &geometry.width,&geometry.height);
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Image Resolution: %gx%g %s",
-                          image->x_resolution,
-                          image->y_resolution,
-                          ResolutionTypeToString(image->units));
-    /*
-      Scale relative to dots-per-inch.
-    */
-    dx_resolution=72.0;
-    dy_resolution=72.0;
-    x_resolution=72.0;
-    (void) strlcpy(density,PSDensityGeometry,sizeof(density));
-    count=GetMagickDimension(density,&x_resolution,&y_resolution,NULL,NULL);
-    if (count != 2)
-      y_resolution=x_resolution;
-    /*
-      Use override resolution information if it appears to be valid.
-    */
-    if ((image_info->density != (char *) NULL) &&
-        ((image_info->units == PixelsPerInchResolution) ||
-         (image_info->units == PixelsPerCentimeterResolution)))
-      {
-        count=GetMagickDimension(image_info->density,&x_resolution,
-          &y_resolution,NULL,NULL);
-        if (count != 2)
-          y_resolution=x_resolution;
-        if (image_info->units == PixelsPerCentimeterResolution)
-          {
-            x_resolution *= 2.54;
-            y_resolution *= 2.54;
-          }
-      }
-    /*
-      Use image resolution information if it appears to be valid.
-    */
-    else if ((image->x_resolution > 0.0) && (image->y_resolution > 0.0) &&
-             ((image->units == PixelsPerInchResolution) ||
-              (image->units == PixelsPerCentimeterResolution)))
-      {
-        x_resolution = image->x_resolution;
-        y_resolution = image->y_resolution;
-        if (image->units == PixelsPerCentimeterResolution)
-          {
-            x_resolution *= 2.54;
-            y_resolution *= 2.54;
-          }
-      }
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Postscript Resolution: %gx%g DPI",
-                          x_resolution,y_resolution);
-    x_scale=(geometry.width*dx_resolution)/x_resolution;
-    geometry.width=(unsigned long) (x_scale+0.5);
-    y_scale=(geometry.height*dy_resolution)/y_resolution;
-    geometry.height=(unsigned long) (y_scale+0.5);
-    if (page == 1)
-      {
-        /*
-          Output Postscript header.
-        */
- #if defined(HAVE_CTIME_R)
-        char time_buf[26];
-#endif /* defined(HAVE_CTIME_R) */
-       if (LocaleCompare(image_info->magick,"PS2") == 0)
-         (void) strlcpy(buffer,"%!PS-Adobe-3.0\n",sizeof(buffer));
+        if ((image->page.width != 0) && (image->page.height != 0))
+          (void) MagickFormatString(page_geometry,sizeof(page_geometry),"%lux%lu%+ld%+ld",image->page.width,
+                                    image->page.height,image->page.x,image->page.y);
         else
-          (void) strlcpy(buffer,"%!PS-Adobe-3.0 EPSF-3.0\n",sizeof(buffer));
-        (void) WriteBlobString(image,buffer);
-        (void) WriteBlobString(image,"%%Creator: (GraphicsMagick)\n");
-        FormatString(buffer,"%%%%Title: (%.1024s)\n",image->filename);
-        (void) WriteBlobString(image,buffer);
-        timer=time((time_t *) NULL);
-#if defined(HAVE_CTIME_R)
-        (void) strlcpy(date,ctime_r(&timer,time_buf),MaxTextExtent);
-#else
-        (void) strlcpy(date,ctime(&timer),MaxTextExtent); /* Thread-unsafe version */
-#endif /* defined(HAVE_CTIME_R) */
-        date[strlen(date)-1]='\0';
-        FormatString(buffer,"%%%%CreationDate: (%.1024s)\n",date);
-        (void) WriteBlobString(image,buffer);
-        bounds.x1=geometry.x;
-        bounds.y1=geometry.y;
-        bounds.x2=geometry.x+(size_t) geometry.width;
-        bounds.y2=geometry.y+(size_t) geometry.height+text_size;
-        if (image_info->adjoin && (image->next != (Image *) NULL))
-          (void) strlcpy(buffer,"%%BoundingBox: (atend)\n",sizeof(buffer));
-        else
-          FormatString(buffer,"%%%%BoundingBox: %g %g %g %g\n",
-            floor(bounds.x1+0.5),floor(bounds.y1+0.5),ceil(bounds.x2-0.5),
-            ceil(bounds.y2-0.5));
-        (void) WriteBlobString(image,buffer);
-        attribute=GetImageAttribute(image,"label");
-        if (attribute != (const ImageAttribute *) NULL)
-          (void) WriteBlobString(image,
-            "%%DocumentNeededResources: font Helvetica\n");
-        (void) WriteBlobString(image,"%%LanguageLevel: 2\n");
-        if (LocaleCompare(image_info->magick,"PS2") != 0)
-          (void) WriteBlobString(image,"%%Pages: 1\n");
-        else
-          {
-            (void) WriteBlobString(image,"%%Orientation: Portrait\n");
-            (void) WriteBlobString(image,"%%PageOrder: Ascend\n");
-            if (!image_info->adjoin)
-              (void) strlcpy(buffer,"%%Pages: 1\n",sizeof(buffer));
-            else
-              FormatString(buffer,"%%%%Pages: %lu\n",(unsigned long)
-                image_list_length);
-            (void) WriteBlobString(image,buffer);
-          }
-        (void) WriteBlobString(image,"%%EndComments\n");
-        (void) WriteBlobString(image,"\n%%BeginDefaults\n");
-        (void) WriteBlobString(image,"%%EndDefaults\n\n");
-        /*
-          Output Postscript commands.
-        */
+          if (LocaleCompare(image_info->magick,"PS2") == 0)
+            (void) strlcpy(page_geometry,PSPageGeometry,sizeof(page_geometry));
+      (void) GetMagickGeometry(page_geometry,&geometry.x,&geometry.y,
+                               &geometry.width,&geometry.height);
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Image Resolution: %gx%g %s",
+                            image->x_resolution,
+                            image->y_resolution,
+                            ResolutionTypeToString(image->units));
+      /*
+        Scale relative to dots-per-inch.
+      */
+      dx_resolution=72.0;
+      dy_resolution=72.0;
+      x_resolution=72.0;
+      (void) strlcpy(density,PSDensityGeometry,sizeof(density));
+      count=GetMagickDimension(density,&x_resolution,&y_resolution,NULL,NULL);
+      if (count != 2)
+        y_resolution=x_resolution;
+      /*
+        Use override resolution information if it appears to be valid.
+      */
+      if ((image_info->density != (char *) NULL) &&
+          ((image_info->units == PixelsPerInchResolution) ||
+           (image_info->units == PixelsPerCentimeterResolution)))
         {
-          const char * ps_compress;
-
-          switch (compression)
-          {
-          case NoCompression: ps_compress="ASCII85Decode"; break;
-            case JPEGCompression: ps_compress="DCTDecode"; break;
-            case LZWCompression: ps_compress="LZWDecode"; break;
-            case FaxCompression: ps_compress="ASCII85Decode"; break;
-            default: ps_compress="RunLengthDecode"; break;
-          }
-          (void) WriteBlobString(image,
-                       "%%BeginProlog\n"
-                       "%\n"
-                       "% Display a color image.  The image is displayed in color on\n"
-                       "% Postscript viewers or printers that support color, otherwise\n"
-                       "% it is displayed as grayscale.\n"
-                       "%\n"
-                       "/DirectClassImage\n");
-          FormatString(buffer,
-                       "{\n"
-                       "  %%\n"
-                       "  %% Display a DirectClass image.\n"
-                       "  %%\n"
-                       "  colorspace 0 eq\n"
-                       "  {\n"
-                       "    /DeviceRGB setcolorspace\n"
-                       "    <<\n"
-                       "      /ImageType 1\n"
-                       "      /Width columns\n"
-                       "      /Height rows\n"
-                       "      /BitsPerComponent 8\n"
-                       "      /Decode [0 1 0 1 0 1]\n"
-                       "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
-                       "      compression 0 gt\n"
-                       "      { /DataSource pixel_stream /%.1024s filter }\n"
-                       "      { /DataSource pixel_stream /%.1024s filter } ifelse\n"
-                       "    >> image\n"
-                       "  }\n",
-                       ps_compress, ps_compress);
-          (void) WriteBlobString(image,buffer);
-          FormatString(buffer,
-                       "  {\n"
-                       "    /DeviceCMYK setcolorspace\n"
-                       "    <<\n"
-                       "      /ImageType 1\n"
-                       "      /Width columns\n"
-                       "      /Height rows\n"
-                       "      /BitsPerComponent 8\n"
-                       "      /Decode [1 0 1 0 1 0 1 0]\n"
-                       "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
-                       "      compression 0 gt\n"
-                       "      { /DataSource pixel_stream /%.1024s filter }\n"
-                       "      { /DataSource pixel_stream /%.1024s filter } ifelse\n"
-                       "    >> image\n"
-                       "  } ifelse\n"
-                       "} bind def\n"
-                       "\n",
-                       ps_compress, ps_compress);
-          (void) WriteBlobString(image,buffer);
-          FormatString(buffer,
-                       "/PseudoClassImage\n"
-                       "{\n"
-                       "  %%\n"
-                       "  %% Display a PseudoClass image.\n"
-                       "  %%\n"
-                       "  %% Parameters:\n"
-                       "  %%   colors: number of colors in the colormap.\n"
-                       "  %%\n"
-                       "  currentfile buffer readline pop\n"
-                       "  token pop /colors exch def pop\n"
-                       "  colors 0 eq\n"
-                       "  {\n"
-                       "    %%\n"
-                       "    %% Image is grayscale.\n"
-                       "    %%\n"
-                       "    currentfile buffer readline pop\n"
-                       "    token pop /bits exch def pop\n"
-                       "    /DeviceGray setcolorspace\n"
-                       "    <<\n"
-                       "      /ImageType 1\n"
-                       "      /Width columns\n"
-                       "      /Height rows\n"
-                       "      /BitsPerComponent bits\n"
-                       "      /Decode [0 1]\n"
-                       "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
-                       "      compression 0 gt\n"
-                       "      { /DataSource pixel_stream /%.1024s filter }\n"
-                       "      {\n"
-                       "        /DataSource pixel_stream /%.1024s filter\n"
-                       "        <<\n"
-                       "           /K " CCITTParam "\n"
-                       "           /Columns columns\n"
-                       "           /Rows rows\n"
-                       "        >> /CCITTFaxDecode filter\n"
-                       "      } ifelse\n"
-                       "    >> image\n"
-                       "  }\n",
-                       ps_compress, ps_compress);
-          (void) WriteBlobString(image,buffer);
-          FormatString(buffer,
-                       "  {\n"
-                       "    %%\n"
-                       "    %% Parameters:\n"
-                       "    %%   colormap: red, green, blue color packets.\n"
-                       "    %%\n"
-                       "    /colormap colors 3 mul string def\n"
-                       "    currentfile colormap readhexstring pop pop\n"
-                       "    currentfile buffer readline pop\n"
-                       "    [ /Indexed /DeviceRGB colors 1 sub colormap ] setcolorspace\n"
-                       "    <<\n"
-                       "      /ImageType 1\n"
-                       "      /Width columns\n"
-                       "      /Height rows\n"
-                       "      /BitsPerComponent 8\n"
-                       "      /Decode [0 255]\n"
-                       "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
-                       "      compression 0 gt\n"
-                       "      { /DataSource pixel_stream /%.1024s filter }\n"
-                       "      { /DataSource pixel_stream /%.1024s filter } ifelse\n"
-                       "    >> image\n"
-                       "  } ifelse\n"
-                       "} bind def\n"
-                       "\n",
-                       ps_compress, ps_compress);
-          (void) WriteBlobString(image,buffer);
-          (void) WriteBlobString(image,
-                       "/DisplayImage\n"
-                       "{\n"
-                       "  %\n"
-                       "  % Display a DirectClass or PseudoClass image.\n"
-                       "  %\n"
-                       "  % Parameters:\n"
-                       "  %   x & y translation.\n"
-                       "  %   x & y scale.\n"
-                       "  %   label pointsize.\n"
-                       "  %   image label.\n"
-                       "  %   image columns & rows.\n"
-                       "  %   class: 0-DirectClass or 1-PseudoClass.\n"
-                       "  %   colorspace: 0-RGB or 1-CMYK.\n"
-                       "  %   compression: 0-RLECompression or 1-NoCompression.\n"
-                       "  %   hex color packets.\n"
-                       "  %\n"
-                       "  gsave\n"
-                       "  /buffer 512 string def\n"
-                       "  /pixel_stream currentfile def\n"
-                       "\n"
-                       "  currentfile buffer readline pop\n"
-                       "  token pop /x exch def\n"
-                       "  token pop /y exch def pop\n"
-                       "  x y translate\n"
-                       "  currentfile buffer readline pop\n"
-                       "  token pop /x exch def\n"
-                       "  token pop /y exch def pop\n"
-                       "  currentfile buffer readline pop\n"
-                       "  token pop /pointsize exch def pop\n"
-                       "  /Helvetica findfont pointsize scalefont setfont\n"
-               );
+          count=GetMagickDimension(image_info->density,&x_resolution,
+                                   &y_resolution,NULL,NULL);
+          if (count != 2)
+            y_resolution=x_resolution;
+          if (image_info->units == PixelsPerCentimeterResolution)
+            {
+              x_resolution *= 2.54;
+              y_resolution *= 2.54;
+            }
         }
-        attribute=GetImageAttribute(image,"label");
-        if (attribute != (const ImageAttribute *) NULL)
-          for (j=(long) MultilineCensus(attribute->value)-1; j >= 0; j--)
-          {
-            (void) WriteBlobString(image,"  /label 512 string def\n");
-            (void) WriteBlobString(image,"  currentfile label readline pop\n");
-            FormatString(buffer,"  0 y %g add moveto label show pop\n",
-              j*image_info->pointsize+12);
-            (void) WriteBlobString(image,buffer);
-          }
-            (void) WriteBlobString(image,
-                                   "  x y scale\n"
-                                   "  currentfile buffer readline pop\n"
-                                   "  token pop /columns exch def\n"
-                                   "  token pop /rows exch def pop\n"
-                                   "  currentfile buffer readline pop\n"
-                                   "  token pop /class exch def pop\n"
-                                   "  currentfile buffer readline pop\n"
-                                   "  token pop /colorspace exch def pop\n"
-                                   "  currentfile buffer readline pop\n"
-                                   "  token pop /compression exch def pop\n"
-                                   "  class 0 gt { PseudoClassImage } { DirectClassImage } ifelse\n"
-                                   "  grestore\n");
-        if (LocaleCompare(image_info->magick,"PS2") == 0)
-          (void) WriteBlobString(image,"  showpage\n");
-        (void) WriteBlobString(image,"} bind def\n");
-        (void) WriteBlobString(image,"%%EndProlog\n");
-      }
-    FormatString(buffer,"%%%%Page:  1 %lu\n",page++);
-    (void) WriteBlobString(image,buffer);
-    FormatString(buffer,"%%%%PageBoundingBox: %ld %ld %ld %ld\n",geometry.x,
-      geometry.y,geometry.x+(long) geometry.width,geometry.y+(long)
-      (geometry.height+text_size));
-    (void) WriteBlobString(image,buffer);
-    if (geometry.x < bounds.x1)
-      bounds.x1=geometry.x;
-    if (geometry.y < bounds.y1)
-      bounds.y1=geometry.y;
-    if ((geometry.x+(size_t) geometry.width-1) > bounds.x2)
-      bounds.x2=geometry.x+(size_t) geometry.width-1;
-    if ((geometry.y+((size_t) geometry.height+text_size)-1) > bounds.y2)
-      bounds.y2=geometry.y+((size_t) geometry.height+text_size)-1;
-    attribute=GetImageAttribute(image,"label");
-    if (attribute != (const ImageAttribute *) NULL)
-      (void) WriteBlobString(image,"%%PageResources: font Times-Roman\n");
-    if (LocaleCompare(image_info->magick,"PS2") != 0)
-      (void) WriteBlobString(image,"userdict begin\n");
-    start=TellBlob(image);
-    if (start < 0)
-      ThrowWriterException(BlobError,UnableToObtainOffset,image);
-    FormatString(buffer,"%%%%BeginData:%13ld %s Bytes\n",0L,
-      compression == NoCompression ? "ASCII" : "Binary");
-    (void) WriteBlobString(image,buffer);
-    stop=TellBlob(image);
-    if (stop < 0)
-      ThrowWriterException(BlobError,UnableToObtainOffset,image);
-    (void) WriteBlobString(image,"DisplayImage\n");
-    /*
-      Output image data.
-    */
-    FormatString(buffer,"%ld %ld\n%g %g\n%f\n",geometry.x,geometry.y,
-      x_scale,y_scale,image_info->pointsize);
-    (void) WriteBlobString(image,buffer);
-    labels=(char **) NULL;
-    attribute=GetImageAttribute(image,"label");
-    if (attribute != (const ImageAttribute *) NULL)
-      labels=StringToList(attribute->value);
-    if (labels != (char **) NULL)
-      {
-        for (i=0; labels[i] != (char *) NULL; i++)
+      /*
+        Use image resolution information if it appears to be valid.
+      */
+      else if ((image->x_resolution > 0.0) && (image->y_resolution > 0.0) &&
+               ((image->units == PixelsPerInchResolution) ||
+                (image->units == PixelsPerCentimeterResolution)))
         {
-          FormatString(buffer,"%.1024s \n",labels[i]);
-          (void) WriteBlobString(image,buffer);
-          MagickFreeMemory(labels[i]);
+          x_resolution = image->x_resolution;
+          y_resolution = image->y_resolution;
+          if (image->units == PixelsPerCentimeterResolution)
+            {
+              x_resolution *= 2.54;
+              y_resolution *= 2.54;
+            }
         }
-        MagickFreeMemory(labels);
-      }
-    number_pixels=image->columns*image->rows;
-
-    if ((compression == FaxCompression) ||
-        ((image_info->type != TrueColorType) &&
-         (characteristics.grayscale)))
-      {
-        FormatString(buffer,"%lu %lu\n1\n%d\n",image->columns,image->rows,
-          (int) (image->colorspace == CMYKColorspace));
-        (void) WriteBlobString(image,buffer);
-        FormatString(buffer,"%d\n",(int) (compression != FaxCompression));
-        (void) WriteBlobString(image,buffer);
-        (void) WriteBlobString(image,"0\n");
-        FormatString(buffer,"%d\n",compression == FaxCompression ? 1 : 8);
-        (void) WriteBlobString(image,buffer);
-        switch (compression)
-        {
-          case FaxCompression:
-          {
-            if (LocaleCompare(CCITTParam,"0") == 0)
-              {
-                (void) HuffmanEncodeImage(image_info,image);
-                break;
-              }
-            (void) Huffman2DEncodeImage(image_info,image);
-            break;
-          }
-          case JPEGCompression:
-          {
-            /*
-              Write image in JPEG format.
-            */
-            blob=ImageToJPEGBlob(image,image_info,&length,&image->exception);
-            if (blob == (char *) NULL)
-              ThrowWriterException2(CoderError,image->exception.reason,image);
-            (void) WriteBlob(image,length,blob);
-            MagickFreeMemory(blob);
-            break;
-          }
-          case RLECompression:
-          default:
-          {
-            register unsigned char
-              *q;
-
-            /*
-              Allocate pixel array.
-            */
-            length=number_pixels;
-            pixels=MagickAllocateResourceLimitedMemory(unsigned char *,length);
-            if (pixels == (unsigned char *) NULL)
-              ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                image);
-            /*
-              Dump Runlength encoded pixels.
-            */
-            q=pixels;
-            for (y=0; y < (long) image->rows; y++)
-            {
-              p=AcquireImagePixels(image,0,y,image->columns,1,
-                &image->exception);
-              if (p == (const PixelPacket *) NULL)
-                break;
-              for (x=0; x < (long) image->columns; x++)
-              {
-                *q++=ScaleQuantumToChar(PixelIntensityToQuantum(p));
-                p++;
-              }
-              if (image->previous == (Image *) NULL)
-                if (QuantumTick(y,image->rows))
-                  {
-                    status=MagickMonitorFormatted(y,image->rows,
-                                                  &image->exception,
-                                                  SaveImageText,
-                                                  image->filename,
-                                                  image->columns,image->rows);
-                    if (status == False)
-                      break;
-                  }
-            }
-            if (compression == LZWCompression)
-              status=LZWEncodeImage(image,length,pixels);
-            else
-              status=PackbitsEncodeImage(image,length,pixels);
-            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-            if (!status)
-              {
-                CloseBlob(image);
-                return(False);
-              }
-            break;
-          }
-          case NoCompression:
-          {
-            /*
-              Dump uncompressed PseudoColor packets.
-            */
-            Ascii85Initialize(image);
-            for (y=0; y < (long) image->rows; y++)
-            {
-              p=AcquireImagePixels(image,0,y,image->columns,1,
-                &image->exception);
-              if (p == (const PixelPacket *) NULL)
-                break;
-              for (x=0; x < (long) image->columns; x++)
-              {
-                Ascii85Encode(image,
-                  ScaleQuantumToChar(PixelIntensityToQuantum(p)));
-                p++;
-              }
-              if (image->previous == (Image *) NULL)
-                if (QuantumTick(y,image->rows))
-                  {
-                    status=MagickMonitorFormatted(y,image->rows,
-                                                  &image->exception,
-                                                  SaveImageText,
-                                                  image->filename,
-                                                  image->columns,image->rows);
-                    if (status == False)
-                      break;
-                  }
-            }
-            Ascii85Flush(image);
-            break;
-          }
-        }
-      }
-    else
-      if ((image->storage_class == DirectClass) || (image->colors > 256) ||
-          (compression == JPEGCompression))
-        {
-          FormatString(buffer,"%lu %lu\n0\n%d\n",image->columns,image->rows,
-            (int) (image->colorspace == CMYKColorspace));
-          (void) WriteBlobString(image,buffer);
-          FormatString(buffer,"%d\n",(int) (compression == NoCompression));
-          (void) WriteBlobString(image,buffer);
-          switch (compression)
-          {
-            case JPEGCompression:
-            {
-              /*
-                Write image in JPEG format.
-              */
-              blob=ImageToJPEGBlob(image,image_info,&length,&image->exception);
-              if (blob == (char *) NULL)
-                ThrowWriterException2(CoderError,image->exception.reason,image);
-              (void) WriteBlob(image,length,blob);
-              MagickFreeMemory(blob);
-              break;
-            }
-            case RLECompression:
-            default:
-            {
-              register unsigned char
-                *q;
-
-              /*
-                Allocate pixel array.
-              */
-              length=MagickArraySize(image->colorspace == CMYKColorspace ? 4 : 3,
-                number_pixels);
-              pixels=MagickAllocateResourceLimitedMemory(unsigned char *,length);
-              if (pixels == (unsigned char *) NULL)
-                ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-              /*
-                Dump Packbit encoded pixels.
-              */
-              q=pixels;
-              for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                for (x=0; x < (long) image->columns; x++)
-                {
-                  if (image->matte && (p->opacity == TransparentOpacity))
-                    {
-                      *q++=ScaleQuantumToChar(MaxRGB);
-                      *q++=ScaleQuantumToChar(MaxRGB);
-                      *q++=ScaleQuantumToChar(MaxRGB);
-                    }
-                  else
-                    if (image->colorspace != CMYKColorspace)
-                      {
-                        *q++=ScaleQuantumToChar(p->red);
-                        *q++=ScaleQuantumToChar(p->green);
-                        *q++=ScaleQuantumToChar(p->blue);
-                      }
-                    else
-                      {
-                        *q++=ScaleQuantumToChar(p->red);
-                        *q++=ScaleQuantumToChar(p->green);
-                        *q++=ScaleQuantumToChar(p->blue);
-                        *q++=ScaleQuantumToChar(p->opacity);
-                      }
-                  p++;
-                }
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    {
-                      status=MagickMonitorFormatted(y,image->rows,
-                                                    &image->exception,
-                                                    SaveImageText,
-                                                    image->filename,
-                                                    image->columns,image->rows);
-                      if (status == False)
-                        break;
-                    }
-              }
-              if (compression == LZWCompression)
-                status=LZWEncodeImage(image,length,pixels);
-              else
-                status=PackbitsEncodeImage(image,length,pixels);
-              if (!status)
-                {
-                  CloseBlob(image);
-                  return(False);
-                }
-              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-              break;
-            }
-            case NoCompression:
-            {
-              /*
-                Dump uncompressed DirectColor packets.
-              */
-              Ascii85Initialize(image);
-              for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                for (x=0; x < (long) image->columns; x++)
-                {
-                  if (image->matte && (p->opacity == TransparentOpacity))
-                    {
-                      Ascii85Encode(image,ScaleQuantumToChar(MaxRGB));
-                      Ascii85Encode(image,ScaleQuantumToChar(MaxRGB));
-                      Ascii85Encode(image,ScaleQuantumToChar(MaxRGB));
-                    }
-                  else
-                    if (image->colorspace != CMYKColorspace)
-                      {
-                        Ascii85Encode(image,ScaleQuantumToChar(p->red));
-                        Ascii85Encode(image,ScaleQuantumToChar(p->green));
-                        Ascii85Encode(image,ScaleQuantumToChar(p->blue));
-                      }
-                    else
-                      {
-                        Ascii85Encode(image,ScaleQuantumToChar(p->red));
-                        Ascii85Encode(image,ScaleQuantumToChar(p->green));
-                        Ascii85Encode(image,ScaleQuantumToChar(p->blue));
-                        Ascii85Encode(image,ScaleQuantumToChar(p->opacity));
-                      }
-                  p++;
-                }
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    {
-                      status=MagickMonitorFormatted(y,image->rows,
-                                                    &image->exception,
-                                                    SaveImageText,
-                                                    image->filename,
-                                                    image->columns,image->rows);
-                      if (status == False)
-                        break;
-                    }
-              }
-              Ascii85Flush(image);
-              break;
-            }
-          }
-        }
-      else
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Postscript Resolution: %gx%g DPI",
+                            x_resolution,y_resolution);
+      x_scale=(geometry.width*dx_resolution)/x_resolution;
+      geometry.width=(unsigned long) (x_scale+0.5);
+      y_scale=(geometry.height*dy_resolution)/y_resolution;
+      geometry.height=(unsigned long) (y_scale+0.5);
+      if (page == 1)
         {
           /*
-            Dump number of colors and colormap.
+            Output Postscript header.
           */
-          FormatString(buffer,"%lu %lu\n1\n%d\n",image->columns,image->rows,
-            (int) (image->colorspace == CMYKColorspace));
+#if defined(HAVE_CTIME_R)
+          char time_buf[26];
+#endif /* defined(HAVE_CTIME_R) */
+          if (LocaleCompare(image_info->magick,"PS2") == 0)
+            (void) strlcpy(buffer,"%!PS-Adobe-3.0\n",sizeof(buffer));
+          else
+            (void) strlcpy(buffer,"%!PS-Adobe-3.0 EPSF-3.0\n",sizeof(buffer));
           (void) WriteBlobString(image,buffer);
-          FormatString(buffer,"%d\n",(int) (compression == NoCompression));
+          (void) WriteBlobString(image,"%%Creator: (GraphicsMagick)\n");
+          MagickFormatString(buffer,sizeof(buffer),"%%%%Title: (%.1024s)\n",image->filename);
           (void) WriteBlobString(image,buffer);
-          FormatString(buffer,"%u\n",image->colors);
+          timer=time((time_t *) NULL);
+#if defined(HAVE_CTIME_R)
+          (void) strlcpy(date,ctime_r(&timer,time_buf),MaxTextExtent);
+#else
+          (void) strlcpy(date,ctime(&timer),MaxTextExtent); /* Thread-unsafe version */
+#endif /* defined(HAVE_CTIME_R) */
+          date[strlen(date)-1]='\0';
+          MagickFormatString(buffer,sizeof(buffer),"%%%%CreationDate: (%.1024s)\n",date);
           (void) WriteBlobString(image,buffer);
-          for (i=0; i < (long) image->colors; i++)
+          bounds.x1=geometry.x;
+          bounds.y1=geometry.y;
+          bounds.x2=geometry.x+(size_t) geometry.width;
+          bounds.y2=geometry.y+(size_t) geometry.height+text_size;
+          if (image_info->adjoin && (image->next != (Image *) NULL))
+            (void) strlcpy(buffer,"%%BoundingBox: (atend)\n",sizeof(buffer));
+          else
+            MagickFormatString(buffer,sizeof(buffer),"%%%%BoundingBox: %g %g %g %g\n",
+                               floor(bounds.x1+0.5),floor(bounds.y1+0.5),ceil(bounds.x2-0.5),
+                               ceil(bounds.y2-0.5));
+          (void) WriteBlobString(image,buffer);
+          attribute=GetImageAttribute(image,"label");
+          if (attribute != (const ImageAttribute *) NULL)
+            (void) WriteBlobString(image,
+                                   "%%DocumentNeededResources: font Helvetica\n");
+          (void) WriteBlobString(image,"%%LanguageLevel: 2\n");
+          if (LocaleCompare(image_info->magick,"PS2") != 0)
+            (void) WriteBlobString(image,"%%Pages: 1\n");
+          else
+            {
+              (void) WriteBlobString(image,"%%Orientation: Portrait\n");
+              (void) WriteBlobString(image,"%%PageOrder: Ascend\n");
+              if (!image_info->adjoin)
+                (void) strlcpy(buffer,"%%Pages: 1\n",sizeof(buffer));
+              else
+                MagickFormatString(buffer,sizeof(buffer),"%%%%Pages: %lu\n",(unsigned long)
+                                   image_list_length);
+              (void) WriteBlobString(image,buffer);
+            }
+          (void) WriteBlobString(image,"%%EndComments\n");
+          (void) WriteBlobString(image,"\n%%BeginDefaults\n");
+          (void) WriteBlobString(image,"%%EndDefaults\n\n");
+          /*
+            Output Postscript commands.
+          */
           {
-            FormatString(buffer,"%02X%02X%02X\n",
-              ScaleQuantumToChar(image->colormap[i].red),
-              ScaleQuantumToChar(image->colormap[i].green),
-              ScaleQuantumToChar(image->colormap[i].blue));
+            const char * ps_compress;
+
+            switch (compression)
+              {
+              case NoCompression: ps_compress="ASCII85Decode"; break;
+              case JPEGCompression: ps_compress="DCTDecode"; break;
+              case LZWCompression: ps_compress="LZWDecode"; break;
+              case FaxCompression: ps_compress="ASCII85Decode"; break;
+              default: ps_compress="RunLengthDecode"; break;
+              }
+            (void) WriteBlobString(image,
+                                   "%%BeginProlog\n"
+                                   "%\n"
+                                   "% Display a color image.  The image is displayed in color on\n"
+                                   "% Postscript viewers or printers that support color, otherwise\n"
+                                   "% it is displayed as grayscale.\n"
+                                   "%\n"
+                                   "/DirectClassImage\n");
+            MagickFormatString(buffer,sizeof(buffer),
+                               "{\n"
+                               "  %%\n"
+                               "  %% Display a DirectClass image.\n"
+                               "  %%\n"
+                               "  colorspace 0 eq\n"
+                               "  {\n"
+                               "    /DeviceRGB setcolorspace\n"
+                               "    <<\n"
+                               "      /ImageType 1\n"
+                               "      /Width columns\n"
+                               "      /Height rows\n"
+                               "      /BitsPerComponent 8\n"
+                               "      /Decode [0 1 0 1 0 1]\n"
+                               "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
+                               "      compression 0 gt\n"
+                               "      { /DataSource pixel_stream /%.1024s filter }\n"
+                               "      { /DataSource pixel_stream /%.1024s filter } ifelse\n"
+                               "    >> image\n"
+                               "  }\n",
+                               ps_compress, ps_compress);
             (void) WriteBlobString(image,buffer);
+            MagickFormatString(buffer,sizeof(buffer),
+                               "  {\n"
+                               "    /DeviceCMYK setcolorspace\n"
+                               "    <<\n"
+                               "      /ImageType 1\n"
+                               "      /Width columns\n"
+                               "      /Height rows\n"
+                               "      /BitsPerComponent 8\n"
+                               "      /Decode [1 0 1 0 1 0 1 0]\n"
+                               "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
+                               "      compression 0 gt\n"
+                               "      { /DataSource pixel_stream /%.1024s filter }\n"
+                               "      { /DataSource pixel_stream /%.1024s filter } ifelse\n"
+                               "    >> image\n"
+                               "  } ifelse\n"
+                               "} bind def\n"
+                               "\n",
+                               ps_compress, ps_compress);
+            (void) WriteBlobString(image,buffer);
+            MagickFormatString(buffer,sizeof(buffer),
+                               "/PseudoClassImage\n"
+                               "{\n"
+                               "  %%\n"
+                               "  %% Display a PseudoClass image.\n"
+                               "  %%\n"
+                               "  %% Parameters:\n"
+                               "  %%   colors: number of colors in the colormap.\n"
+                               "  %%\n"
+                               "  currentfile buffer readline pop\n"
+                               "  token pop /colors exch def pop\n"
+                               "  colors 0 eq\n"
+                               "  {\n"
+                               "    %%\n"
+                               "    %% Image is grayscale.\n"
+                               "    %%\n"
+                               "    currentfile buffer readline pop\n"
+                               "    token pop /bits exch def pop\n"
+                               "    /DeviceGray setcolorspace\n"
+                               "    <<\n"
+                               "      /ImageType 1\n"
+                               "      /Width columns\n"
+                               "      /Height rows\n"
+                               "      /BitsPerComponent bits\n"
+                               "      /Decode [0 1]\n"
+                               "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
+                               "      compression 0 gt\n"
+                               "      { /DataSource pixel_stream /%.1024s filter }\n"
+                               "      {\n"
+                               "        /DataSource pixel_stream /%.1024s filter\n"
+                               "        <<\n"
+                               "           /K " CCITTParam "\n"
+                               "           /Columns columns\n"
+                               "           /Rows rows\n"
+                               "        >> /CCITTFaxDecode filter\n"
+                               "      } ifelse\n"
+                               "    >> image\n"
+                               "  }\n",
+                               ps_compress, ps_compress);
+            (void) WriteBlobString(image,buffer);
+            MagickFormatString(buffer,sizeof(buffer),
+                               "  {\n"
+                               "    %%\n"
+                               "    %% Parameters:\n"
+                               "    %%   colormap: red, green, blue color packets.\n"
+                               "    %%\n"
+                               "    /colormap colors 3 mul string def\n"
+                               "    currentfile colormap readhexstring pop pop\n"
+                               "    currentfile buffer readline pop\n"
+                               "    [ /Indexed /DeviceRGB colors 1 sub colormap ] setcolorspace\n"
+                               "    <<\n"
+                               "      /ImageType 1\n"
+                               "      /Width columns\n"
+                               "      /Height rows\n"
+                               "      /BitsPerComponent 8\n"
+                               "      /Decode [0 255]\n"
+                               "      /ImageMatrix [columns 0 0 rows neg 0 rows]\n"
+                               "      compression 0 gt\n"
+                               "      { /DataSource pixel_stream /%.1024s filter }\n"
+                               "      { /DataSource pixel_stream /%.1024s filter } ifelse\n"
+                               "    >> image\n"
+                               "  } ifelse\n"
+                               "} bind def\n"
+                               "\n",
+                               ps_compress, ps_compress);
+            (void) WriteBlobString(image,buffer);
+            (void) WriteBlobString(image,
+                                   "/DisplayImage\n"
+                                   "{\n"
+                                   "  %\n"
+                                   "  % Display a DirectClass or PseudoClass image.\n"
+                                   "  %\n"
+                                   "  % Parameters:\n"
+                                   "  %   x & y translation.\n"
+                                   "  %   x & y scale.\n"
+                                   "  %   label pointsize.\n"
+                                   "  %   image label.\n"
+                                   "  %   image columns & rows.\n"
+                                   "  %   class: 0-DirectClass or 1-PseudoClass.\n"
+                                   "  %   colorspace: 0-RGB or 1-CMYK.\n"
+                                   "  %   compression: 0-RLECompression or 1-NoCompression.\n"
+                                   "  %   hex color packets.\n"
+                                   "  %\n"
+                                   "  gsave\n"
+                                   "  /buffer 512 string def\n"
+                                   "  /pixel_stream currentfile def\n"
+                                   "\n"
+                                   "  currentfile buffer readline pop\n"
+                                   "  token pop /x exch def\n"
+                                   "  token pop /y exch def pop\n"
+                                   "  x y translate\n"
+                                   "  currentfile buffer readline pop\n"
+                                   "  token pop /x exch def\n"
+                                   "  token pop /y exch def pop\n"
+                                   "  currentfile buffer readline pop\n"
+                                   "  token pop /pointsize exch def pop\n"
+                                   "  /Helvetica findfont pointsize scalefont setfont\n"
+                                   );
           }
+          attribute=GetImageAttribute(image,"label");
+          if (attribute != (const ImageAttribute *) NULL)
+            for (j=(long) MultilineCensus(attribute->value)-1; j >= 0; j--)
+              {
+                (void) WriteBlobString(image,"  /label 512 string def\n");
+                (void) WriteBlobString(image,"  currentfile label readline pop\n");
+                MagickFormatString(buffer,sizeof(buffer),"  0 y %g add moveto label show pop\n",
+                                   j*image_info->pointsize+12);
+                (void) WriteBlobString(image,buffer);
+              }
+          (void) WriteBlobString(image,
+                                 "  x y scale\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /columns exch def\n"
+                                 "  token pop /rows exch def pop\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /class exch def pop\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /colorspace exch def pop\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /compression exch def pop\n"
+                                 "  class 0 gt { PseudoClassImage } { DirectClassImage } ifelse\n"
+                                 "  grestore\n");
+          if (LocaleCompare(image_info->magick,"PS2") == 0)
+            (void) WriteBlobString(image,"  showpage\n");
+          (void) WriteBlobString(image,"} bind def\n");
+          (void) WriteBlobString(image,"%%EndProlog\n");
+        }
+      MagickFormatString(buffer,sizeof(buffer),"%%%%Page:  1 %lu\n",page++);
+      (void) WriteBlobString(image,buffer);
+      MagickFormatString(buffer,sizeof(buffer),"%%%%PageBoundingBox: %ld %ld %ld %ld\n",geometry.x,
+                         geometry.y,geometry.x+(long) geometry.width,geometry.y+(long)
+                         (geometry.height+text_size));
+      (void) WriteBlobString(image,buffer);
+      if (geometry.x < bounds.x1)
+        bounds.x1=geometry.x;
+      if (geometry.y < bounds.y1)
+        bounds.y1=geometry.y;
+      if ((geometry.x+(size_t) geometry.width-1) > bounds.x2)
+        bounds.x2=geometry.x+(size_t) geometry.width-1;
+      if ((geometry.y+((size_t) geometry.height+text_size)-1) > bounds.y2)
+        bounds.y2=geometry.y+((size_t) geometry.height+text_size)-1;
+      attribute=GetImageAttribute(image,"label");
+      if (attribute != (const ImageAttribute *) NULL)
+        (void) WriteBlobString(image,"%%PageResources: font Times-Roman\n");
+      if (LocaleCompare(image_info->magick,"PS2") != 0)
+        (void) WriteBlobString(image,"userdict begin\n");
+      start=TellBlob(image);
+      if (start < 0)
+        ThrowWriterException(BlobError,UnableToObtainOffset,image);
+      MagickFormatString(buffer,sizeof(buffer),"%%%%BeginData:%13ld %s Bytes\n",0L,
+                         compression == NoCompression ? "ASCII" : "Binary");
+      (void) WriteBlobString(image,buffer);
+      stop=TellBlob(image);
+      if (stop < 0)
+        ThrowWriterException(BlobError,UnableToObtainOffset,image);
+      (void) WriteBlobString(image,"DisplayImage\n");
+      /*
+        Output image data.
+      */
+      MagickFormatString(buffer,sizeof(buffer),"%ld %ld\n%g %g\n%f\n",geometry.x,geometry.y,
+                         x_scale,y_scale,image_info->pointsize);
+      (void) WriteBlobString(image,buffer);
+      labels=(char **) NULL;
+      attribute=GetImageAttribute(image,"label");
+      if (attribute != (const ImageAttribute *) NULL)
+        labels=StringToList(attribute->value);
+      if (labels != (char **) NULL)
+        {
+          for (i=0; labels[i] != (char *) NULL; i++)
+            {
+              MagickFormatString(buffer,sizeof(buffer),"%.1024s \n",labels[i]);
+              (void) WriteBlobString(image,buffer);
+              MagickFreeMemory(labels[i]);
+            }
+          MagickFreeMemory(labels);
+        }
+      number_pixels=image->columns*image->rows;
+
+      if ((compression == FaxCompression) ||
+          ((image_info->type != TrueColorType) &&
+           (characteristics.grayscale)))
+        {
+          MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n1\n%d\n",image->columns,image->rows,
+                             (int) (image->colorspace == CMYKColorspace));
+          (void) WriteBlobString(image,buffer);
+          MagickFormatString(buffer,sizeof(buffer),"%d\n",(int) (compression != FaxCompression));
+          (void) WriteBlobString(image,buffer);
+          (void) WriteBlobString(image,"0\n");
+          MagickFormatString(buffer,sizeof(buffer),"%d\n",compression == FaxCompression ? 1 : 8);
+          (void) WriteBlobString(image,buffer);
           switch (compression)
-          {
+            {
+            case FaxCompression:
+              {
+                if (LocaleCompare(CCITTParam,"0") == 0)
+                  {
+                    (void) HuffmanEncodeImage(image_info,image);
+                    break;
+                  }
+                (void) Huffman2DEncodeImage(image_info,image);
+                break;
+              }
+            case JPEGCompression:
+              {
+                /*
+                  Write image in JPEG format.
+                */
+                blob=ImageToJPEGBlob(image,image_info,&length,&image->exception);
+                if (blob == (char *) NULL)
+                  ThrowWriterException2(CoderError,image->exception.reason,image);
+                (void) WriteBlob(image,length,blob);
+                MagickFreeMemory(blob);
+                break;
+              }
             case RLECompression:
             default:
-            {
-              register unsigned char
-                *q;
+              {
+                register unsigned char
+                  *q;
 
-              /*
-                Allocate pixel array.
-              */
-              length=number_pixels;
-              pixels=MagickAllocateResourceLimitedMemory(unsigned char *,length);
-              if (pixels == (unsigned char *) NULL)
-                ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-              /*
-                Dump Runlength encoded pixels.
-              */
-              q=pixels;
-              for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                indexes=AccessImmutableIndexes(image);
-                for (x=0; x < (long) image->columns; x++)
-                  *q++=indexes[x];
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    {
-                      status=MagickMonitorFormatted(y,image->rows,
-                                                    &image->exception,
-                                                    SaveImageText,
-                                                    image->filename,
-                                                    image->columns,image->rows);
-                      if (status == False)
-                        break;
-                    }
+                /*
+                  Allocate pixel array.
+                */
+                length=number_pixels;
+                pixels=MagickAllocateResourceLimitedMemory(unsigned char *,length);
+                if (pixels == (unsigned char *) NULL)
+                  ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
+                                       image);
+                /*
+                  Dump Runlength encoded pixels.
+                */
+                q=pixels;
+                for (y=0; y < (long) image->rows; y++)
+                  {
+                    p=AcquireImagePixels(image,0,y,image->columns,1,
+                                         &image->exception);
+                    if (p == (const PixelPacket *) NULL)
+                      break;
+                    for (x=0; x < (long) image->columns; x++)
+                      {
+                        *q++=ScaleQuantumToChar(PixelIntensityToQuantum(p));
+                        p++;
+                      }
+                    if (image->previous == (Image *) NULL)
+                      if (QuantumTick(y,image->rows))
+                        {
+                          status=MagickMonitorFormatted(y,image->rows,
+                                                        &image->exception,
+                                                        SaveImageText,
+                                                        image->filename,
+                                                        image->columns,image->rows);
+                          if (status == False)
+                            break;
+                        }
+                  }
+                if (compression == LZWCompression)
+                  status=LZWEncodeImage(image,length,pixels);
+                else
+                  status=PackbitsEncodeImage(image,length,pixels);
+                MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+                if (!status)
+                  {
+                    CloseBlob(image);
+                    return(False);
+                  }
+                break;
               }
-              if (compression == LZWCompression)
-                status=LZWEncodeImage(image,length,pixels);
-              else
-                status=PackbitsEncodeImage(image,length,pixels);
-              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-              if (!status)
-                {
-                  CloseBlob(image);
-                  return(False);
-                }
-              break;
-            }
             case NoCompression:
-            {
-              /*
-                Dump uncompressed PseudoColor packets.
-              */
-              Ascii85Initialize(image);
-              for (y=0; y < (long) image->rows; y++)
               {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                indexes=AccessImmutableIndexes(image);
-                for (x=0; x < (long) image->columns; x++)
-                  Ascii85Encode(image,indexes[x]);
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    {
-                      status=MagickMonitorFormatted(y,image->rows,
-                                                    &image->exception,
-                                                    SaveImageText,
-                                                    image->filename,
-                                                    image->columns,image->rows);
-                      if (status == False)
-                        break;
-                    }
+                /*
+                  Dump uncompressed PseudoColor packets.
+                */
+                Ascii85Initialize(image);
+                for (y=0; y < (long) image->rows; y++)
+                  {
+                    p=AcquireImagePixels(image,0,y,image->columns,1,
+                                         &image->exception);
+                    if (p == (const PixelPacket *) NULL)
+                      break;
+                    for (x=0; x < (long) image->columns; x++)
+                      {
+                        Ascii85Encode(image,
+                                      ScaleQuantumToChar(PixelIntensityToQuantum(p)));
+                        p++;
+                      }
+                    if (image->previous == (Image *) NULL)
+                      if (QuantumTick(y,image->rows))
+                        {
+                          status=MagickMonitorFormatted(y,image->rows,
+                                                        &image->exception,
+                                                        SaveImageText,
+                                                        image->filename,
+                                                        image->columns,image->rows);
+                          if (status == False)
+                            break;
+                        }
+                  }
+                Ascii85Flush(image);
+                break;
               }
-              Ascii85Flush(image);
-              break;
             }
-          }
         }
-    (void) WriteBlobByte(image,'\n');
-    current=TellBlob(image);
-    if (current < 0)
-      ThrowWriterException(BlobError,UnableToObtainOffset,image);
-    length=current-stop;
-    stop=TellBlob(image);
-    if (stop < 0)
-      ThrowWriterException(BlobError,UnableToObtainOffset,image);
-    if (SeekBlob(image,start,SEEK_SET) != start)
-      ThrowWriterException(BlobError,UnableToSeekToOffset,image);
-    FormatString(buffer,"%%%%BeginData:%13ld %s Bytes\n",(long) length,
-      compression == NoCompression ? "ASCII" : "Binary");
-    (void) WriteBlobString(image,buffer);
-    if (SeekBlob(image,stop,SEEK_SET) != stop)
-      ThrowWriterException(BlobError,UnableToSeekToOffset,image);
-    (void) WriteBlobString(image,"%%EndData\n");
-    if (LocaleCompare(image_info->magick,"PS2") != 0)
-      (void) WriteBlobString(image,"end\n");
-    (void) WriteBlobString(image,"%%PageTrailer\n");
-    if (image->next == (Image *) NULL)
-      break;
-    image=SyncNextImageInList(image);
-    status=MagickMonitorFormatted(scene++,image_list_length,
-                                  &image->exception,SaveImagesText,
-                                  image->filename);
-    if (status == False)
-      break;
-  } while (image_info->adjoin);
+      else
+        if ((image->storage_class == DirectClass) || (image->colors > 256) ||
+            (compression == JPEGCompression))
+          {
+            MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n0\n%d\n",image->columns,image->rows,
+                               (int) (image->colorspace == CMYKColorspace));
+            (void) WriteBlobString(image,buffer);
+            MagickFormatString(buffer,sizeof(buffer),"%d\n",(int) (compression == NoCompression));
+            (void) WriteBlobString(image,buffer);
+            switch (compression)
+              {
+              case JPEGCompression:
+                {
+                  /*
+                    Write image in JPEG format.
+                  */
+                  blob=ImageToJPEGBlob(image,image_info,&length,&image->exception);
+                  if (blob == (char *) NULL)
+                    ThrowWriterException2(CoderError,image->exception.reason,image);
+                  (void) WriteBlob(image,length,blob);
+                  MagickFreeMemory(blob);
+                  break;
+                }
+              case RLECompression:
+              default:
+                {
+                  register unsigned char
+                    *q;
+
+                  /*
+                    Allocate pixel array.
+                  */
+                  length=MagickArraySize(image->colorspace == CMYKColorspace ? 4 : 3,
+                                         number_pixels);
+                  pixels=MagickAllocateResourceLimitedMemory(unsigned char *,length);
+                  if (pixels == (unsigned char *) NULL)
+                    ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+                  /*
+                    Dump Packbit encoded pixels.
+                  */
+                  q=pixels;
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      for (x=0; x < (long) image->columns; x++)
+                        {
+                          if (image->matte && (p->opacity == TransparentOpacity))
+                            {
+                              *q++=ScaleQuantumToChar(MaxRGB);
+                              *q++=ScaleQuantumToChar(MaxRGB);
+                              *q++=ScaleQuantumToChar(MaxRGB);
+                            }
+                          else
+                            if (image->colorspace != CMYKColorspace)
+                              {
+                                *q++=ScaleQuantumToChar(p->red);
+                                *q++=ScaleQuantumToChar(p->green);
+                                *q++=ScaleQuantumToChar(p->blue);
+                              }
+                            else
+                              {
+                                *q++=ScaleQuantumToChar(p->red);
+                                *q++=ScaleQuantumToChar(p->green);
+                                *q++=ScaleQuantumToChar(p->blue);
+                                *q++=ScaleQuantumToChar(p->opacity);
+                              }
+                          p++;
+                        }
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          {
+                            status=MagickMonitorFormatted(y,image->rows,
+                                                          &image->exception,
+                                                          SaveImageText,
+                                                          image->filename,
+                                                          image->columns,image->rows);
+                            if (status == False)
+                              break;
+                          }
+                    }
+                  if (compression == LZWCompression)
+                    status=LZWEncodeImage(image,length,pixels);
+                  else
+                    status=PackbitsEncodeImage(image,length,pixels);
+                  if (!status)
+                    {
+                      CloseBlob(image);
+                      return(False);
+                    }
+                  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+                  break;
+                }
+              case NoCompression:
+                {
+                  /*
+                    Dump uncompressed DirectColor packets.
+                  */
+                  Ascii85Initialize(image);
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      for (x=0; x < (long) image->columns; x++)
+                        {
+                          if (image->matte && (p->opacity == TransparentOpacity))
+                            {
+                              Ascii85Encode(image,ScaleQuantumToChar(MaxRGB));
+                              Ascii85Encode(image,ScaleQuantumToChar(MaxRGB));
+                              Ascii85Encode(image,ScaleQuantumToChar(MaxRGB));
+                            }
+                          else
+                            if (image->colorspace != CMYKColorspace)
+                              {
+                                Ascii85Encode(image,ScaleQuantumToChar(p->red));
+                                Ascii85Encode(image,ScaleQuantumToChar(p->green));
+                                Ascii85Encode(image,ScaleQuantumToChar(p->blue));
+                              }
+                            else
+                              {
+                                Ascii85Encode(image,ScaleQuantumToChar(p->red));
+                                Ascii85Encode(image,ScaleQuantumToChar(p->green));
+                                Ascii85Encode(image,ScaleQuantumToChar(p->blue));
+                                Ascii85Encode(image,ScaleQuantumToChar(p->opacity));
+                              }
+                          p++;
+                        }
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          {
+                            status=MagickMonitorFormatted(y,image->rows,
+                                                          &image->exception,
+                                                          SaveImageText,
+                                                          image->filename,
+                                                          image->columns,image->rows);
+                            if (status == False)
+                              break;
+                          }
+                    }
+                  Ascii85Flush(image);
+                  break;
+                }
+              }
+          }
+        else
+          {
+            /*
+              Dump number of colors and colormap.
+            */
+            MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n1\n%d\n",image->columns,image->rows,
+                               (int) (image->colorspace == CMYKColorspace));
+            (void) WriteBlobString(image,buffer);
+            MagickFormatString(buffer,sizeof(buffer),"%d\n",(int) (compression == NoCompression));
+            (void) WriteBlobString(image,buffer);
+            MagickFormatString(buffer,sizeof(buffer),"%u\n",image->colors);
+            (void) WriteBlobString(image,buffer);
+            for (i=0; i < (long) image->colors; i++)
+              {
+                MagickFormatString(buffer,sizeof(buffer),"%02X%02X%02X\n",
+                                   ScaleQuantumToChar(image->colormap[i].red),
+                                   ScaleQuantumToChar(image->colormap[i].green),
+                                   ScaleQuantumToChar(image->colormap[i].blue));
+                (void) WriteBlobString(image,buffer);
+              }
+            switch (compression)
+              {
+              case RLECompression:
+              default:
+                {
+                  register unsigned char
+                    *q;
+
+                  /*
+                    Allocate pixel array.
+                  */
+                  length=number_pixels;
+                  pixels=MagickAllocateResourceLimitedMemory(unsigned char *,length);
+                  if (pixels == (unsigned char *) NULL)
+                    ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+                  /*
+                    Dump Runlength encoded pixels.
+                  */
+                  q=pixels;
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      indexes=AccessImmutableIndexes(image);
+                      for (x=0; x < (long) image->columns; x++)
+                        *q++=indexes[x];
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          {
+                            status=MagickMonitorFormatted(y,image->rows,
+                                                          &image->exception,
+                                                          SaveImageText,
+                                                          image->filename,
+                                                          image->columns,image->rows);
+                            if (status == False)
+                              break;
+                          }
+                    }
+                  if (compression == LZWCompression)
+                    status=LZWEncodeImage(image,length,pixels);
+                  else
+                    status=PackbitsEncodeImage(image,length,pixels);
+                  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+                  if (!status)
+                    {
+                      CloseBlob(image);
+                      return(False);
+                    }
+                  break;
+                }
+              case NoCompression:
+                {
+                  /*
+                    Dump uncompressed PseudoColor packets.
+                  */
+                  Ascii85Initialize(image);
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      indexes=AccessImmutableIndexes(image);
+                      for (x=0; x < (long) image->columns; x++)
+                        Ascii85Encode(image,indexes[x]);
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          {
+                            status=MagickMonitorFormatted(y,image->rows,
+                                                          &image->exception,
+                                                          SaveImageText,
+                                                          image->filename,
+                                                          image->columns,image->rows);
+                            if (status == False)
+                              break;
+                          }
+                    }
+                  Ascii85Flush(image);
+                  break;
+                }
+              }
+          }
+      (void) WriteBlobByte(image,'\n');
+      current=TellBlob(image);
+      if (current < 0)
+        ThrowWriterException(BlobError,UnableToObtainOffset,image);
+      length=current-stop;
+      stop=TellBlob(image);
+      if (stop < 0)
+        ThrowWriterException(BlobError,UnableToObtainOffset,image);
+      if (SeekBlob(image,start,SEEK_SET) != start)
+        ThrowWriterException(BlobError,UnableToSeekToOffset,image);
+      MagickFormatString(buffer,sizeof(buffer),"%%%%BeginData:%13ld %s Bytes\n",(long) length,
+                         compression == NoCompression ? "ASCII" : "Binary");
+      (void) WriteBlobString(image,buffer);
+      if (SeekBlob(image,stop,SEEK_SET) != stop)
+        ThrowWriterException(BlobError,UnableToSeekToOffset,image);
+      (void) WriteBlobString(image,"%%EndData\n");
+      if (LocaleCompare(image_info->magick,"PS2") != 0)
+        (void) WriteBlobString(image,"end\n");
+      (void) WriteBlobString(image,"%%PageTrailer\n");
+      if (image->next == (Image *) NULL)
+        break;
+      image=SyncNextImageInList(image);
+      status=MagickMonitorFormatted(scene++,image_list_length,
+                                    &image->exception,SaveImagesText,
+                                    image->filename);
+      if (status == False)
+        break;
+    } while (image_info->adjoin);
   if (image_info->adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;
   (void) WriteBlobString(image,"%%Trailer\n");
   if (page > 1)
     {
-      FormatString(buffer,"%%%%BoundingBox: %g %g %g %g\n",floor(bounds.x1+0.5),
-        floor(bounds.y1+0.5),ceil(bounds.x2-0.5),ceil(bounds.y2-0.5));
+      MagickFormatString(buffer,sizeof(buffer),"%%%%BoundingBox: %g %g %g %g\n",floor(bounds.x1+0.5),
+                         floor(bounds.y1+0.5),ceil(bounds.x2-0.5),ceil(bounds.y2-0.5));
       (void) WriteBlobString(image,buffer);
     }
   (void) WriteBlobString(image,"%%EOF\n");

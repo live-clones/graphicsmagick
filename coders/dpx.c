@@ -496,7 +496,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U8(member)) \
     { \
-      FormatString(buffer_,"%u",(unsigned int) member); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%u",(unsigned int) member); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -508,7 +508,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U16(member)) \
     { \
-      FormatString(buffer_,"%u",(unsigned int) member); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%u",(unsigned int) member); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -520,7 +520,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U32(member)) \
     { \
-      FormatString(buffer_,"%u",member); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%u",member); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -544,7 +544,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_R32(member)) \
     { \
-      FormatString(buffer_,"%g",member.f); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%g",member.f); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -752,7 +752,7 @@ STATIC size_t DPXIOOctets(const long current_row, /* 0 based */
 
 }
 #endif
-STATIC const char *DescribeImageElementDescriptor(char *buffer, const DPXImageElementDescriptor descriptor)
+STATIC const char *DescribeImageElementDescriptor(char *buffer, const size_t buffer_size, const DPXImageElementDescriptor descriptor)
 {
   const char *
     description="Unknown";
@@ -830,7 +830,7 @@ STATIC const char *DescribeImageElementDescriptor(char *buffer, const DPXImageEl
       break;
     default:
       {
-        FormatString(buffer,"Unknown (%u)",(unsigned int) descriptor);
+        MagickFormatString(buffer,buffer_size,"Unknown (%u)",(unsigned int) descriptor);
         description=buffer;
       }
     }
@@ -840,7 +840,7 @@ STATIC const char *DescribeImageElementDescriptor(char *buffer, const DPXImageEl
 /*
   Describe the element transfer characteristic.
 */
-STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const DPXTransferCharacteristic characteristic)
+STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const size_t buffer_size, const DPXTransferCharacteristic characteristic)
 {
   const char
     *description=buffer;
@@ -889,7 +889,7 @@ STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const DPXTr
       break;
     default:
       {
-        FormatString(buffer,"Reserved(%u)",(unsigned int) characteristic);
+        MagickFormatString(buffer,buffer_size,"Reserved(%u)",(unsigned int) characteristic);
       }
     }
 
@@ -898,7 +898,7 @@ STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const DPXTr
 /*
   Describe the element colorimetric.
 */
-STATIC const char *DescribeImageColorimetric(char *buffer, const DPXColorimetric colorimetric)
+STATIC const char *DescribeImageColorimetric(char *buffer, const size_t buffer_size, const DPXColorimetric colorimetric)
 {
   const char
     *description=buffer;
@@ -947,7 +947,7 @@ STATIC const char *DescribeImageColorimetric(char *buffer, const DPXColorimetric
       break;
     default:
       {
-        FormatString(buffer,"Reserved(%u)",(unsigned int) colorimetric);
+        MagickFormatString(buffer,buffer_size,"Reserved(%u)",(unsigned int) colorimetric);
       }
     }
 
@@ -978,11 +978,11 @@ STATIC void DescribeDPXImageElement(const DPXImageElement *element_info,
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Element %u: descriptor=%s(%u) transfer_characteristic=%s(%u) colorimetric=%s(%u)",
                         element,
-                        DescribeImageElementDescriptor(txt_buffer,(DPXImageElementDescriptor) element_info->descriptor),
+                        DescribeImageElementDescriptor(txt_buffer,sizeof(txt_buffer),(DPXImageElementDescriptor) element_info->descriptor),
                         (unsigned int) element_info->descriptor,
-                        DescribeImageTransferCharacteristic(txt_buffer,(DPXTransferCharacteristic) element_info->transfer_characteristic),
+                        DescribeImageTransferCharacteristic(txt_buffer,sizeof(txt_buffer),(DPXTransferCharacteristic) element_info->transfer_characteristic),
                         (unsigned int) element_info->transfer_characteristic,
-                        DescribeImageColorimetric(txt_buffer,(DPXColorimetric) element_info->colorimetric),
+                        DescribeImageColorimetric(txt_buffer,sizeof(txt_buffer),(DPXColorimetric) element_info->colorimetric),
                         (unsigned int) element_info->colorimetric);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Element %u: bits-per-sample=%u",
@@ -1720,17 +1720,17 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (IS_UNDEFINED_U32(dpx_file_info.generic_section_length))
         (void) strlcpy(generic_length_str,"UNDEFINED",sizeof(generic_length_str));
       else
-        FormatString(generic_length_str,"%u",dpx_file_info.generic_section_length);
+        MagickFormatString(generic_length_str,sizeof(generic_length_str),"%u",dpx_file_info.generic_section_length);
 
       if (IS_UNDEFINED_U32(dpx_file_info.industry_section_length))
         (void) strlcpy(industry_length_str,"UNDEFINED",sizeof(industry_length_str));
       else
-        FormatString(industry_length_str,"%u",dpx_file_info.industry_section_length);
+        MagickFormatString(industry_length_str,sizeof(industry_length_str),"%u",dpx_file_info.industry_section_length);
 
       if (IS_UNDEFINED_U32(dpx_file_info.user_defined_length))
         (void) strlcpy(user_length_str,"UNDEFINED",sizeof(user_length_str));
       else
-        FormatString(user_length_str,"%u",dpx_file_info.user_defined_length);
+        MagickFormatString(user_length_str,sizeof(user_length_str),"%u",dpx_file_info.user_defined_length);
 
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -2026,6 +2026,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                           "Image width must be evenly divisible"
                                           " by 2 for \"%s\" element",
                                           DescribeImageElementDescriptor(txt_buffer,
+                                                                         sizeof(txt_buffer),
                                                                          element_descriptor));
                   }
                 dpx_image_info.elements=element;
@@ -2085,7 +2086,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                     "Unhandled element descriptor (%u): %s"
                                     " (truncating elements)",
                                     element_descriptor,
-                                    DescribeImageElementDescriptor(txt_buffer,element_descriptor));
+                                    DescribeImageElementDescriptor(txt_buffer,sizeof(txt_buffer),element_descriptor));
               dpx_image_info.elements=element;
               break;
             }
@@ -4233,12 +4234,14 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
     {
       (void) strlcpy(dpx_image_info.element_info[i].description,
                      DescribeImageElementDescriptor(txt_buffer,
+                                                    sizeof(txt_buffer),
                      (DPXImageElementDescriptor) dpx_image_info.element_info[i].descriptor),
                      sizeof(dpx_image_info.element_info[0].description));
       (void) strlcat(dpx_image_info.element_info[i].description," / ",
                      sizeof(dpx_image_info.element_info[0].description));
       (void) strlcat(dpx_image_info.element_info[i].description,
                      DescribeImageTransferCharacteristic(txt_buffer,
+                                                         sizeof(txt_buffer),
                      (DPXTransferCharacteristic) dpx_image_info.element_info[i].transfer_characteristic),
                      sizeof(dpx_image_info.element_info[0].description));
     }

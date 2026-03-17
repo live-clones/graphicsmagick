@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2020
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Implementation of Options
 //
@@ -11,7 +11,10 @@
 #define MAGICK_PLUSPLUS_IMPLEMENTATION
 
 #include "Magick++/Include.h"
+#include <sstream>
+#include <iomanip>
 #include <string>
+#include <algorithm>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -342,9 +345,13 @@ Magick::InterlaceType Magick::Options::interlaceType ( void ) const
 
 void Magick::Options::magick ( const std::string &magick_ )
 {
-  ExceptionInfo exception;
+  std::ostringstream magick_str;
+  magick_str << magick_.substr(0,1024) << ':';
+  size_t copy_size=std::min(magick_str.str().size(),sizeof(_imageInfo->filename)-1);
+  magick_str.str().copy(_imageInfo->filename, copy_size);
+  _imageInfo->filename[copy_size]='\0';
 
-  FormatString( _imageInfo->filename, "%.1024s:", magick_.c_str() );
+  ExceptionInfo exception;
   GetExceptionInfo(&exception);
   SetImageInfo( _imageInfo, 1, &exception);
   if ( _imageInfo->magick[0] == '\0' )

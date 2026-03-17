@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -2070,7 +2070,7 @@ void MagickXColorBrowserWidget(Display *display,MagickXWindows *windows,
           (unsigned int) windows->widget.visual_info->colormap_size,
           &windows->widget.pixel_info->matte_color);
         mode_info.text=colorname;
-        FormatString(mode_info.text,"#%02x%02x%02x",
+        MagickFormatString(mode_info.text,sizeof(colorname),"#%02x%02x%02x",
           windows->widget.pixel_info->matte_color.red,
           windows->widget.pixel_info->matte_color.green,
           windows->widget.pixel_info->matte_color.blue);
@@ -4166,7 +4166,7 @@ int MagickXDialogWidget(Display *display,MagickXWindows *windows,
 %
 */
 void MagickXFileBrowserWidget(Display *display,MagickXWindows *windows,
-  const char *action,char *reply)
+                              const char *action,char *reply)
 {
 #define CancelButtonText  "Cancel"
 #define DirectoryText  "Directory:"
@@ -4267,7 +4267,7 @@ void MagickXFileBrowserWidget(Display *display,MagickXWindows *windows,
         Directory read failed.
       */
       MagickXNoticeWidget(display,windows,"Unable to read directory:",
-        working_directory);
+                          working_directory);
       (void) MagickXDialogWidget(display,windows,action,"Enter filename:",reply);
       return;
     }
@@ -4324,7 +4324,7 @@ void MagickXFileBrowserWidget(Display *display,MagickXWindows *windows,
   window_changes.x=windows->widget.x;
   window_changes.y=windows->widget.y;
   (void) XReconfigureWMWindow(display,windows->widget.id,
-    windows->widget.screen,mask,&window_changes);
+                              windows->widget.screen,mask,&window_changes);
   (void) XMapRaised(display,windows->widget.id);
   windows->widget.mapped=False;
   /*
@@ -4339,1003 +4339,1003 @@ void MagickXFileBrowserWidget(Display *display,MagickXWindows *windows,
   delay=SuspendTime << 2;
   state=UpdateConfigurationState;
   do
-  {
-    if (state & UpdateConfigurationState)
-      {
-        int
-          id;
-
-        /*
-          Initialize button information.
-        */
-        XGetWidgetInfo(CancelButtonText,&cancel_info);
-        cancel_info.width=width;
-        cancel_info.height=(3*height) >> 1;
-        cancel_info.x=windows->widget.width-cancel_info.width-QuantumMargin-2;
-        cancel_info.y=windows->widget.height-cancel_info.height-QuantumMargin;
-        XGetWidgetInfo(action,&action_info);
-        action_info.width=width;
-        action_info.height=(3*height) >> 1;
-        action_info.x=cancel_info.x-(cancel_info.width+(QuantumMargin >> 1)+
-          (action_info.bevel_width << 1));
-        action_info.y=cancel_info.y;
-        XGetWidgetInfo(GrabButtonText,&special_info);
-        special_info.width=width;
-        special_info.height=(3*height) >> 1;
-        special_info.x=action_info.x-(action_info.width+(QuantumMargin >> 1)+
-          (special_info.bevel_width << 1));
-        special_info.y=action_info.y;
-        if (!anomaly)
-          {
-            register char
-              *p;
-
-            special_info.text=(char *) FormatButtonText;
-            p=reply+Extent(reply)-1;
-            while ((p > (reply+1)) && (*(p-1) != '.'))
-              p--;
-            if ((p > (reply+1)) && (*(p-1) == '.'))
-              (void) strlcpy(format,p,MaxTextExtent);
-          }
-        XGetWidgetInfo(UpButtonText,&up_info);
-        up_info.width=width;
-        up_info.height=(3*height) >> 1;
-        up_info.x=QuantumMargin;
-        up_info.y=((5*QuantumMargin) >> 1)+height;
-        XGetWidgetInfo(HomeButtonText,&home_info);
-        home_info.width=width;
-        home_info.height=(3*height) >> 1;
-        home_info.x=QuantumMargin;
-        home_info.y=up_info.y+up_info.height+QuantumMargin;
-        /*
-          Initialize reply information.
-        */
-        XGetWidgetInfo(reply,&reply_info);
-        reply_info.raised=False;
-        reply_info.bevel_width--;
-        reply_info.width=windows->widget.width-width-((6*QuantumMargin) >> 1);
-        reply_info.height=height << 1;
-        reply_info.x=width+(QuantumMargin << 1);
-        reply_info.y=action_info.y-reply_info.height-QuantumMargin;
-        /*
-          Initialize scroll information.
-        */
-        XGetWidgetInfo((char *) NULL,&scroll_info);
-        scroll_info.bevel_width--;
-        scroll_info.width=height;
-        scroll_info.height=reply_info.y-up_info.y-(QuantumMargin >> 1);
-        scroll_info.x=reply_info.x+(reply_info.width-scroll_info.width);
-        scroll_info.y=up_info.y-reply_info.bevel_width;
-        scroll_info.raised=False;
-        scroll_info.trough=True;
-        north_info=scroll_info;
-        north_info.raised=True;
-        north_info.width-=(north_info.bevel_width << 1);
-        north_info.height=north_info.width-1;
-        north_info.x+=north_info.bevel_width;
-        north_info.y+=north_info.bevel_width;
-        south_info=north_info;
-        south_info.y=scroll_info.y+scroll_info.height-scroll_info.bevel_width-
-          south_info.height;
-        id=slider_info.id;
-        slider_info=north_info;
-        slider_info.id=id;
-        slider_info.width-=2;
-        slider_info.min_y=north_info.y+north_info.height+north_info.bevel_width+
-          slider_info.bevel_width+2;
-        slider_info.height=
-          scroll_info.height-((slider_info.min_y-scroll_info.y+1) << 1)+2;
-        visible_files=(scroll_info.height-(height >> 3)-3)/((9*height) >> 3);
-        if (files > (int) visible_files)
-          slider_info.height=(visible_files*slider_info.height)/files;
-        slider_info.max_y=south_info.y-south_info.bevel_width-
-          slider_info.bevel_width-2;
-        slider_info.x=scroll_info.x+slider_info.bevel_width+1;
-        slider_info.y=slider_info.min_y;
-        expose_info=scroll_info;
-        expose_info.y=slider_info.y;
-        /*
-          Initialize list information.
-        */
-        XGetWidgetInfo((char *) NULL,&list_info);
-        list_info.raised=False;
-        list_info.bevel_width--;
-        list_info.width=scroll_info.x-reply_info.x-(QuantumMargin >> 1);
-        list_info.height=scroll_info.height;
-        list_info.x=reply_info.x;
-        list_info.y=scroll_info.y;
-        if (!windows->widget.mapped)
-          state|=JumpListState;
-        /*
-          Initialize text information.
-        */
-        *text='\0';
-        XGetWidgetInfo(text,&text_info);
-        text_info.center=False;
-        text_info.width=reply_info.width;
-        text_info.height=height;
-        text_info.x=list_info.x-(QuantumMargin >> 1);
-        text_info.y=QuantumMargin;
-        /*
-          Initialize selection information.
-        */
-        XGetWidgetInfo((char *) NULL,&selection_info);
-        selection_info.center=False;
-        selection_info.width=list_info.width;
-        selection_info.height=(9*height) >> 3;
-        selection_info.x=list_info.x;
-        state&=(~UpdateConfigurationState);
-      }
-    if (state & RedrawWidgetState)
-      {
-        /*
-          Redraw File Browser window.
-        */
-        x=QuantumMargin;
-        y=text_info.y+((text_info.height-height) >> 1)+font_info->ascent;
-        (void) XDrawString(display,windows->widget.id,
-          windows->widget.annotate_context,x,y,DirectoryText,
-          Extent(DirectoryText));
-        FormatString(text_info.text,"%.1024s%.1024s%.1024s",working_directory,
-          DirectorySeparator,glob_pattern);
-        XDrawWidgetText(display,&windows->widget,&text_info);
-        XDrawBeveledButton(display,&windows->widget,&up_info);
-        XDrawBeveledButton(display,&windows->widget,&home_info);
-        XDrawBeveledMatte(display,&windows->widget,&list_info);
-        XDrawBeveledMatte(display,&windows->widget,&scroll_info);
-        XDrawTriangleNorth(display,&windows->widget,&north_info);
-        XDrawBeveledButton(display,&windows->widget,&slider_info);
-        XDrawTriangleSouth(display,&windows->widget,&south_info);
-        x=QuantumMargin;
-        y=reply_info.y+((reply_info.height-height) >> 1)+font_info->ascent;
-        (void) XDrawString(display,windows->widget.id,
-          windows->widget.annotate_context,x,y,FilenameText,
-          Extent(FilenameText));
-        XDrawBeveledMatte(display,&windows->widget,&reply_info);
-        XDrawMatteText(display,&windows->widget,&reply_info);
-        XDrawBeveledButton(display,&windows->widget,&special_info);
-        XDrawBeveledButton(display,&windows->widget,&action_info);
-        XDrawBeveledButton(display,&windows->widget,&cancel_info);
-        XHighlightWidget(display,&windows->widget,BorderOffset,BorderOffset);
-        selection_info.id=(~0);
-        state|=RedrawListState;
-        state&=(~RedrawWidgetState);
-      }
-    if (state & UpdateListState)
-      {
-        char
-          **checklist;
-
-        long
-          number_files;
-
-        /*
-          Update file list.
-        */
-        checklist=ListFiles(working_directory,glob_pattern,&number_files);
-        if (checklist == (char **) NULL)
-          {
-            /*
-              Reply is a filename, exit.
-            */
-            action_info.raised=False;
-            XDrawBeveledButton(display,&windows->widget,&action_info);
-            break;
-          }
-        for (i=0; i < files; i++)
-          MagickFreeMemory(filelist[i]);
-        if (filelist != (char **) NULL)
-          MagickFreeMemory(filelist);
-        filelist=checklist;
-        files=number_files;
-        /*
-          Update file list.
-        */
-        slider_info.height=
-          scroll_info.height-((slider_info.min_y-scroll_info.y+1) << 1)+1;
-        if (files > (int) visible_files)
-          slider_info.height=(visible_files*slider_info.height)/files;
-        slider_info.max_y=south_info.y-south_info.bevel_width-
-          slider_info.bevel_width-2;
-        slider_info.id=0;
-        slider_info.y=slider_info.min_y;
-        expose_info.y=slider_info.y;
-        selection_info.id=(~0);
-        list_info.id=(~0);
-        state|=RedrawListState;
-        /*
-          Redraw directory name & reply.
-        */
-        if (!IsGlob(reply_info.text))
-          {
-            *reply_info.text='\0';
-            reply_info.cursor=reply_info.text;
-          }
-        FormatString(text_info.text,"%.1024s%.1024s%.1024s",working_directory,
-          DirectorySeparator,glob_pattern);
-        XDrawWidgetText(display,&windows->widget,&text_info);
-        XDrawMatteText(display,&windows->widget,&reply_info);
-        XDrawBeveledMatte(display,&windows->widget,&scroll_info);
-        XDrawTriangleNorth(display,&windows->widget,&north_info);
-        XDrawBeveledButton(display,&windows->widget,&slider_info);
-        XDrawTriangleSouth(display,&windows->widget,&south_info);
-        XHighlightWidget(display,&windows->widget,BorderOffset,BorderOffset);
-        state&=(~UpdateListState);
-      }
-    if (state & JumpListState)
-      {
-        /*
-          Jump scroll to match user filename.
-        */
-        list_info.id=(~0);
-        for (i=0; i < files; i++)
-          if (LocaleCompare(filelist[i],reply) >= 0)
-            {
-              list_info.id=LocaleCompare(filelist[i],reply) == 0 ? i : ~0;
-              break;
-            }
-        if ((i < slider_info.id) || (i >= (int) (slider_info.id+visible_files)))
-          slider_info.id=i-(visible_files >> 1);
-        selection_info.id=(~0);
-        state|=RedrawListState;
-        state&=(~JumpListState);
-      }
-    if (state & RedrawListState)
-      {
-        /*
-          Determine slider id and position.
-        */
-        if (slider_info.id >= (int) (files-visible_files))
-          slider_info.id=(int) (files-visible_files);
-        if ((slider_info.id < 0) || (files <= (int) visible_files))
-          slider_info.id=0;
-        slider_info.y=slider_info.min_y;
-        if (files > 0)
-          slider_info.y+=
-            slider_info.id*(slider_info.max_y-slider_info.min_y+1)/files;
-        if (slider_info.id != selection_info.id)
-          {
-            /*
-              Redraw scroll bar and file names.
-            */
-            selection_info.id=slider_info.id;
-            selection_info.y=list_info.y+(height >> 3)+2;
-            for (i=0; i < (int) visible_files; i++)
-            {
-              selection_info.raised=(slider_info.id+i) != list_info.id;
-              selection_info.text=(char *) NULL;
-              if ((slider_info.id+i) < files)
-                selection_info.text=filelist[slider_info.id+i];
-              XDrawWidgetText(display,&windows->widget,&selection_info);
-              selection_info.y+=(int) selection_info.height;
-            }
-            /*
-              Update slider.
-            */
-            if (slider_info.y > expose_info.y)
-              {
-                expose_info.height=slider_info.y-expose_info.y;
-                expose_info.y=slider_info.y-expose_info.height-
-                  slider_info.bevel_width-1;
-              }
-            else
-              {
-                expose_info.height=expose_info.y-slider_info.y;
-                expose_info.y=slider_info.y+slider_info.height+
-                  slider_info.bevel_width+1;
-              }
-            XDrawTriangleNorth(display,&windows->widget,&north_info);
-            XDrawMatte(display,&windows->widget,&expose_info);
-            XDrawBeveledButton(display,&windows->widget,&slider_info);
-            XDrawTriangleSouth(display,&windows->widget,&south_info);
-            expose_info.y=slider_info.y;
-          }
-        state&=(~RedrawListState);
-      }
-    /*
-      Wait for next event.
-    */
-    if (north_info.raised && south_info.raised)
-      (void) XIfEvent(display,&event,XScreenEvent,(char *) windows);
-    else
-      {
-        /*
-          Brief delay before advancing scroll bar.
-        */
-        MagickXDelay(display,delay);
-        delay=SuspendTime;
-        (void) XCheckIfEvent(display,&event,XScreenEvent,(char *) windows);
-        if (!north_info.raised)
-          if (slider_info.id > 0)
-            {
-              /*
-                Move slider up.
-              */
-              slider_info.id--;
-              state|=RedrawListState;
-            }
-        if (!south_info.raised)
-          if (slider_info.id < files)
-            {
-              /*
-                Move slider down.
-              */
-              slider_info.id++;
-              state|=RedrawListState;
-            }
-        if (event.type != ButtonRelease)
-          continue;
-      }
-    switch (event.type)
     {
-      case ButtonPress:
-      {
-        if (MatteIsActive(slider_info,event.xbutton))
-          {
-            /*
-              Track slider.
-            */
-            slider_info.active=True;
-            break;
-          }
-        if (MatteIsActive(north_info,event.xbutton))
-          if (slider_info.id > 0)
+      if (state & UpdateConfigurationState)
+        {
+          int
+            id;
+
+          /*
+            Initialize button information.
+          */
+          XGetWidgetInfo(CancelButtonText,&cancel_info);
+          cancel_info.width=width;
+          cancel_info.height=(3*height) >> 1;
+          cancel_info.x=windows->widget.width-cancel_info.width-QuantumMargin-2;
+          cancel_info.y=windows->widget.height-cancel_info.height-QuantumMargin;
+          XGetWidgetInfo(action,&action_info);
+          action_info.width=width;
+          action_info.height=(3*height) >> 1;
+          action_info.x=cancel_info.x-(cancel_info.width+(QuantumMargin >> 1)+
+                                       (action_info.bevel_width << 1));
+          action_info.y=cancel_info.y;
+          XGetWidgetInfo(GrabButtonText,&special_info);
+          special_info.width=width;
+          special_info.height=(3*height) >> 1;
+          special_info.x=action_info.x-(action_info.width+(QuantumMargin >> 1)+
+                                        (special_info.bevel_width << 1));
+          special_info.y=action_info.y;
+          if (!anomaly)
+            {
+              register char
+                *p;
+
+              special_info.text=(char *) FormatButtonText;
+              p=reply+Extent(reply)-1;
+              while ((p > (reply+1)) && (*(p-1) != '.'))
+                p--;
+              if ((p > (reply+1)) && (*(p-1) == '.'))
+                (void) strlcpy(format,p,MaxTextExtent);
+            }
+          XGetWidgetInfo(UpButtonText,&up_info);
+          up_info.width=width;
+          up_info.height=(3*height) >> 1;
+          up_info.x=QuantumMargin;
+          up_info.y=((5*QuantumMargin) >> 1)+height;
+          XGetWidgetInfo(HomeButtonText,&home_info);
+          home_info.width=width;
+          home_info.height=(3*height) >> 1;
+          home_info.x=QuantumMargin;
+          home_info.y=up_info.y+up_info.height+QuantumMargin;
+          /*
+            Initialize reply information.
+          */
+          XGetWidgetInfo(reply,&reply_info);
+          reply_info.raised=False;
+          reply_info.bevel_width--;
+          reply_info.width=windows->widget.width-width-((6*QuantumMargin) >> 1);
+          reply_info.height=height << 1;
+          reply_info.x=width+(QuantumMargin << 1);
+          reply_info.y=action_info.y-reply_info.height-QuantumMargin;
+          /*
+            Initialize scroll information.
+          */
+          XGetWidgetInfo((char *) NULL,&scroll_info);
+          scroll_info.bevel_width--;
+          scroll_info.width=height;
+          scroll_info.height=reply_info.y-up_info.y-(QuantumMargin >> 1);
+          scroll_info.x=reply_info.x+(reply_info.width-scroll_info.width);
+          scroll_info.y=up_info.y-reply_info.bevel_width;
+          scroll_info.raised=False;
+          scroll_info.trough=True;
+          north_info=scroll_info;
+          north_info.raised=True;
+          north_info.width-=(north_info.bevel_width << 1);
+          north_info.height=north_info.width-1;
+          north_info.x+=north_info.bevel_width;
+          north_info.y+=north_info.bevel_width;
+          south_info=north_info;
+          south_info.y=scroll_info.y+scroll_info.height-scroll_info.bevel_width-
+            south_info.height;
+          id=slider_info.id;
+          slider_info=north_info;
+          slider_info.id=id;
+          slider_info.width-=2;
+          slider_info.min_y=north_info.y+north_info.height+north_info.bevel_width+
+            slider_info.bevel_width+2;
+          slider_info.height=
+            scroll_info.height-((slider_info.min_y-scroll_info.y+1) << 1)+2;
+          visible_files=(scroll_info.height-(height >> 3)-3)/((9*height) >> 3);
+          if (files > (int) visible_files)
+            slider_info.height=(visible_files*slider_info.height)/files;
+          slider_info.max_y=south_info.y-south_info.bevel_width-
+            slider_info.bevel_width-2;
+          slider_info.x=scroll_info.x+slider_info.bevel_width+1;
+          slider_info.y=slider_info.min_y;
+          expose_info=scroll_info;
+          expose_info.y=slider_info.y;
+          /*
+            Initialize list information.
+          */
+          XGetWidgetInfo((char *) NULL,&list_info);
+          list_info.raised=False;
+          list_info.bevel_width--;
+          list_info.width=scroll_info.x-reply_info.x-(QuantumMargin >> 1);
+          list_info.height=scroll_info.height;
+          list_info.x=reply_info.x;
+          list_info.y=scroll_info.y;
+          if (!windows->widget.mapped)
+            state|=JumpListState;
+          /*
+            Initialize text information.
+          */
+          *text='\0';
+          XGetWidgetInfo(text,&text_info);
+          text_info.center=False;
+          text_info.width=reply_info.width;
+          text_info.height=height;
+          text_info.x=list_info.x-(QuantumMargin >> 1);
+          text_info.y=QuantumMargin;
+          /*
+            Initialize selection information.
+          */
+          XGetWidgetInfo((char *) NULL,&selection_info);
+          selection_info.center=False;
+          selection_info.width=list_info.width;
+          selection_info.height=(9*height) >> 3;
+          selection_info.x=list_info.x;
+          state&=(~UpdateConfigurationState);
+        }
+      if (state & RedrawWidgetState)
+        {
+          /*
+            Redraw File Browser window.
+          */
+          x=QuantumMargin;
+          y=text_info.y+((text_info.height-height) >> 1)+font_info->ascent;
+          (void) XDrawString(display,windows->widget.id,
+                             windows->widget.annotate_context,x,y,DirectoryText,
+                             Extent(DirectoryText));
+          MagickFormatString(text_info.text,sizeof(text),"%.1024s%.1024s%.1024s",working_directory,
+                             DirectorySeparator,glob_pattern);
+          XDrawWidgetText(display,&windows->widget,&text_info);
+          XDrawBeveledButton(display,&windows->widget,&up_info);
+          XDrawBeveledButton(display,&windows->widget,&home_info);
+          XDrawBeveledMatte(display,&windows->widget,&list_info);
+          XDrawBeveledMatte(display,&windows->widget,&scroll_info);
+          XDrawTriangleNorth(display,&windows->widget,&north_info);
+          XDrawBeveledButton(display,&windows->widget,&slider_info);
+          XDrawTriangleSouth(display,&windows->widget,&south_info);
+          x=QuantumMargin;
+          y=reply_info.y+((reply_info.height-height) >> 1)+font_info->ascent;
+          (void) XDrawString(display,windows->widget.id,
+                             windows->widget.annotate_context,x,y,FilenameText,
+                             Extent(FilenameText));
+          XDrawBeveledMatte(display,&windows->widget,&reply_info);
+          XDrawMatteText(display,&windows->widget,&reply_info);
+          XDrawBeveledButton(display,&windows->widget,&special_info);
+          XDrawBeveledButton(display,&windows->widget,&action_info);
+          XDrawBeveledButton(display,&windows->widget,&cancel_info);
+          XHighlightWidget(display,&windows->widget,BorderOffset,BorderOffset);
+          selection_info.id=(~0);
+          state|=RedrawListState;
+          state&=(~RedrawWidgetState);
+        }
+      if (state & UpdateListState)
+        {
+          char
+            **checklist;
+
+          long
+            number_files;
+
+          /*
+            Update file list.
+          */
+          checklist=ListFiles(working_directory,glob_pattern,&number_files);
+          if (checklist == (char **) NULL)
             {
               /*
-                Move slider up.
+                Reply is a filename, exit.
               */
-              north_info.raised=False;
-              slider_info.id--;
-              state|=RedrawListState;
+              action_info.raised=False;
+              XDrawBeveledButton(display,&windows->widget,&action_info);
               break;
             }
-        if (MatteIsActive(south_info,event.xbutton))
-          if (slider_info.id < files)
+          for (i=0; i < files; i++)
+            MagickFreeMemory(filelist[i]);
+          if (filelist != (char **) NULL)
+            MagickFreeMemory(filelist);
+          filelist=checklist;
+          files=number_files;
+          /*
+            Update file list.
+          */
+          slider_info.height=
+            scroll_info.height-((slider_info.min_y-scroll_info.y+1) << 1)+1;
+          if (files > (int) visible_files)
+            slider_info.height=(visible_files*slider_info.height)/files;
+          slider_info.max_y=south_info.y-south_info.bevel_width-
+            slider_info.bevel_width-2;
+          slider_info.id=0;
+          slider_info.y=slider_info.min_y;
+          expose_info.y=slider_info.y;
+          selection_info.id=(~0);
+          list_info.id=(~0);
+          state|=RedrawListState;
+          /*
+            Redraw directory name & reply.
+          */
+          if (!IsGlob(reply_info.text))
             {
-              /*
-                Move slider down.
-              */
-              south_info.raised=False;
-              slider_info.id++;
-              state|=RedrawListState;
-              break;
-            }
-        if (MatteIsActive(scroll_info,event.xbutton))
-          {
-            /*
-              Move slider.
-            */
-            if (event.xbutton.y < slider_info.y)
-              slider_info.id-=(visible_files-1);
-            else
-              slider_info.id+=(visible_files-1);
-            state|=RedrawListState;
-            break;
-          }
-        if (MatteIsActive(list_info,event.xbutton))
-          {
-            unsigned int
-              id;
-
-            /*
-              User pressed file matte.
-            */
-            id=slider_info.id+(event.xbutton.y-(list_info.y+(height >> 1))+1)/
-              selection_info.height;
-            if ((int) id >= files)
-              break;
-            (void) strlcpy(reply_info.text,filelist[id],MaxTextExtent);
-            reply_info.highlight=False;
-            reply_info.marker=reply_info.text;
-            reply_info.cursor=reply_info.text+Extent(reply_info.text);
-            XDrawMatteText(display,&windows->widget,&reply_info);
-            if ((int) id == list_info.id)
-              {
-                (void) strlcpy(working_directory,reply_info.text,
-                  MaxTextExtent);
-                state|=UpdateListState;
-              }
-            selection_info.id=(~0);
-            list_info.id=id;
-            state|=RedrawListState;
-            break;
-          }
-        if (MatteIsActive(up_info,event.xbutton))
-          {
-            /*
-              User pressed Up button.
-            */
-            up_info.raised=False;
-            XDrawBeveledButton(display,&windows->widget,&up_info);
-            break;
-          }
-        if (MatteIsActive(home_info,event.xbutton))
-          {
-            /*
-              User pressed Home button.
-            */
-            home_info.raised=False;
-            XDrawBeveledButton(display,&windows->widget,&home_info);
-            break;
-          }
-        if (MatteIsActive(special_info,event.xbutton))
-          {
-            /*
-              User pressed Special button.
-            */
-            special_info.raised=False;
-            XDrawBeveledButton(display,&windows->widget,&special_info);
-            break;
-          }
-        if (MatteIsActive(action_info,event.xbutton))
-          {
-            /*
-              User pressed action button.
-            */
-            action_info.raised=False;
-            XDrawBeveledButton(display,&windows->widget,&action_info);
-            break;
-          }
-        if (MatteIsActive(cancel_info,event.xbutton))
-          {
-            /*
-              User pressed Cancel button.
-            */
-            cancel_info.raised=False;
-            XDrawBeveledButton(display,&windows->widget,&cancel_info);
-            break;
-          }
-        if (!MatteIsActive(reply_info,event.xbutton))
-          break;
-        if (event.xbutton.button != Button2)
-          {
-            static Time
-              click_time;
-
-            /*
-              Move text cursor to position of button press.
-            */
-            x=event.xbutton.x-reply_info.x-(QuantumMargin >> 2);
-            for (i=1; i <= Extent(reply_info.marker); i++)
-              if (XTextWidth(font_info,reply_info.marker,i) > x)
-                break;
-            reply_info.cursor=reply_info.marker+i-1;
-            if (event.xbutton.time > (click_time+DoubleClick))
-              reply_info.highlight=False;
-            else
-              {
-                /*
-                  Become the XA_PRIMARY selection owner.
-                */
-                (void) strlcpy(primary_selection,reply_info.text,
-                  MaxTextExtent);
-                (void) XSetSelectionOwner(display,XA_PRIMARY,windows->widget.id,
-                  event.xbutton.time);
-                reply_info.highlight=XGetSelectionOwner(display,XA_PRIMARY) ==
-                  windows->widget.id;
-              }
-            XDrawMatteText(display,&windows->widget,&reply_info);
-            click_time=event.xbutton.time;
-            break;
-          }
-        /*
-          Request primary selection.
-        */
-        (void) XConvertSelection(display,XA_PRIMARY,XA_STRING,XA_STRING,
-          windows->widget.id,event.xbutton.time);
-        break;
-      }
-      case ButtonRelease:
-      {
-        if (!windows->widget.mapped)
-          break;
-        if (!north_info.raised)
-          {
-            /*
-              User released up button.
-            */
-            delay=SuspendTime << 2;
-            north_info.raised=True;
-            XDrawTriangleNorth(display,&windows->widget,&north_info);
-          }
-        if (!south_info.raised)
-          {
-            /*
-              User released down button.
-            */
-            delay=SuspendTime << 2;
-            south_info.raised=True;
-            XDrawTriangleSouth(display,&windows->widget,&south_info);
-          }
-        if (slider_info.active)
-          {
-            /*
-              Stop tracking slider.
-            */
-            slider_info.active=False;
-            break;
-          }
-        if (!up_info.raised)
-          {
-            if (event.xbutton.window == windows->widget.id)
-              if (MatteIsActive(up_info,event.xbutton))
-                {
-                  (void) strlcpy(working_directory,"..",sizeof(working_directory));
-                  state|=UpdateListState;
-                }
-            up_info.raised=True;
-            XDrawBeveledButton(display,&windows->widget,&up_info);
-          }
-        if (!home_info.raised)
-          {
-            if (event.xbutton.window == windows->widget.id)
-              if (MatteIsActive(home_info,event.xbutton))
-                {
-                  (void) strlcpy(working_directory,home_directory,
-                    MaxTextExtent);
-                  state|=UpdateListState;
-                }
-            home_info.raised=True;
-            XDrawBeveledButton(display,&windows->widget,&home_info);
-          }
-        if (!special_info.raised)
-          {
-            if (!anomaly)
-              {
-                char
-                  **formats;
-
-                const MagickInfo
-                  *magick_info;
-
-                ExceptionInfo
-                  exception;
-
-                register const MagickInfo
-                  *p;
-
-                /*
-                  Let user select image format.
-                */
-                GetExceptionInfo(&exception);
-                magick_info=GetMagickInfo("*",&exception);
-                DestroyExceptionInfo(&exception);
-                if (magick_info == (const MagickInfo *) NULL)
-                  break;
-                i=0;
-                for (p=magick_info; p != (MagickInfo *) NULL; p=p->next)
-                  i++;
-                formats=MagickAllocateArray(char **,(i+1),sizeof(char *));
-                if (formats == (char **) NULL)
-                  break;
-                (void) memset(formats,0,(i+1)*sizeof(char *));
-                i=0;
-                for (p=magick_info; p != (MagickInfo *) NULL; p=p->next)
-                {
-                  if (p->stealth)
-                    continue;
-                  if (!p->encoder)
-                    continue;
-                   /* AllocateString does a fatal exit on failed alloc */
-                  formats[i]=AllocateString(p->name);
-                  if (formats[i] != NULL)
-                    LocaleLower((char *) formats[i]);
-                  i++;
-                }
-                formats[i]=(char *) NULL;
-                (void) XDefineCursor(display,windows->widget.id,
-                  windows->widget.busy_cursor);
-                windows->popup.x=windows->widget.x+60;
-                windows->popup.y=windows->widget.y+60;
-                MagickXListBrowserWidget(display,windows,&windows->popup,
-                  (const char **)formats,"Select","Select image format type:",format);
-                MagickXSetCursorState(display,windows,True);
-                (void) XDefineCursor(display,windows->widget.id,
-                  windows->widget.cursor);
-                AppendImageFormat(format,reply_info.text);
-                reply_info.cursor=reply_info.text+Extent(reply_info.text);
-                XDrawMatteText(display,&windows->widget,&reply_info);
-                special_info.raised=True;
-                XDrawBeveledButton(display,&windows->widget,&special_info);
-                for (i=0; formats[i] != (char *) NULL; i++)
-                  MagickFreeMemory(formats[i]);
-                MagickFreeMemory(formats);
-                break;
-              }
-            if (event.xbutton.window == windows->widget.id)
-              if (MatteIsActive(special_info,event.xbutton))
-                {
-                  (void) strlcpy(reply_info.text,"x:",MaxTextExtent);
-                  state|=ExitState;
-                }
-            special_info.raised=True;
-            XDrawBeveledButton(display,&windows->widget,&special_info);
-          }
-        if (!action_info.raised)
-          {
-            if (event.xbutton.window == windows->widget.id)
-              {
-                if (MatteIsActive(action_info,event.xbutton))
-                  {
-                    if (*reply_info.text == '\0')
-                      (void) XBell(display,0);
-                    else
-                      state|=ExitState;
-                  }
-              }
-            action_info.raised=True;
-            XDrawBeveledButton(display,&windows->widget,&action_info);
-          }
-        if (!cancel_info.raised)
-          {
-            if (event.xbutton.window == windows->widget.id)
-              if (MatteIsActive(cancel_info,event.xbutton))
-                {
-                  *reply_info.text='\0';
-                  state|=ExitState;
-                }
-            cancel_info.raised=True;
-            XDrawBeveledButton(display,&windows->widget,&cancel_info);
-          }
-        break;
-      }
-      case ClientMessage:
-      {
-        /*
-          If client window delete message, exit.
-        */
-        if (event.xclient.message_type != windows->wm_protocols)
-          break;
-        if (*event.xclient.data.l == (int) windows->wm_take_focus)
-          {
-            (void) XSetInputFocus(display,event.xclient.window,RevertToParent,
-              event.xclient.data.l[1]);
-            break;
-          }
-        if (*event.xclient.data.l != (int) windows->wm_delete_window)
-          break;
-        if (event.xclient.window == windows->widget.id)
-          {
-            *reply_info.text='\0';
-            state|=ExitState;
-            break;
-          }
-        break;
-      }
-      case ConfigureNotify:
-      {
-        /*
-          Update widget configuration.
-        */
-        if (event.xconfigure.window != windows->widget.id)
-          break;
-        if ((event.xconfigure.width == (int) windows->widget.width) &&
-            (event.xconfigure.height == (int) windows->widget.height))
-          break;
-        windows->widget.width=
-          Max(event.xconfigure.width,(int) windows->widget.min_width);
-        windows->widget.height=
-          Max(event.xconfigure.height,(int) windows->widget.min_height);
-        state|=UpdateConfigurationState;
-        break;
-      }
-      case EnterNotify:
-      {
-        if (event.xcrossing.window != windows->widget.id)
-          break;
-        state&=(~InactiveWidgetState);
-        break;
-      }
-      case Expose:
-      {
-        if (event.xexpose.window != windows->widget.id)
-          break;
-        if (event.xexpose.count != 0)
-          break;
-        state|=RedrawWidgetState;
-        break;
-      }
-      case KeyPress:
-      {
-        static char
-          command[MaxTextExtent];
-
-        static int
-          length;
-
-        static KeySym
-          key_symbol;
-
-        if (event.xkey.window != windows->widget.id)
-          break;
-        /*
-          Respond to a user key press.
-        */
-        length=XLookupString((XKeyEvent *) &event.xkey,command,sizeof(command),
-          &key_symbol,(XComposeStatus *) NULL);
-        *(command+length)='\0';
-        if (AreaIsActive(scroll_info,event.xkey))
-          {
-            /*
-              Move slider.
-            */
-            switch ((int) key_symbol)
-            {
-              case XK_Home:
-              case XK_KP_Home:
-              {
-                slider_info.id=0;
-                break;
-              }
-              case XK_Up:
-              case XK_KP_Up:
-              {
-                slider_info.id--;
-                break;
-              }
-              case XK_Down:
-              case XK_KP_Down:
-              {
-                slider_info.id++;
-                break;
-              }
-              case XK_Prior:
-              case XK_KP_Prior:
-              {
-                slider_info.id-=visible_files;
-                break;
-              }
-              case XK_Next:
-              case XK_KP_Next:
-              {
-                slider_info.id+=visible_files;
-                break;
-              }
-              case XK_End:
-              case XK_KP_End:
-              {
-                slider_info.id=files;
-                break;
-              }
-            }
-            state|=RedrawListState;
-            break;
-          }
-        if ((key_symbol == XK_Return) || (key_symbol == XK_KP_Enter))
-          {
-            /*
-              Read new directory or glob patterm.
-            */
-            if (*reply_info.text == '\0')
-              break;
-            if (IsGlob(reply_info.text))
-              (void) strlcpy(glob_pattern,reply_info.text,MaxTextExtent);
-            else
-              {
-                (void) strlcpy(working_directory,reply_info.text,
-                  MaxTextExtent);
-                if (*working_directory == '~')
-                  ExpandFilename(working_directory);
-              }
-            state|=UpdateListState;
-            break;
-          }
-        if (key_symbol == XK_Control_L)
-          {
-            state|=ControlState;
-            break;
-          }
-        if (state & ControlState)
-          switch ((int) key_symbol)
-          {
-            case XK_u:
-            case XK_U:
-            {
-              /*
-                Erase the entire line of text.
-              */
               *reply_info.text='\0';
               reply_info.cursor=reply_info.text;
-              reply_info.marker=reply_info.text;
-              reply_info.highlight=False;
-              break;
             }
-            default:
-              break;
-          }
-        XEditText(display,&reply_info,key_symbol,command,state);
-        XDrawMatteText(display,&windows->widget,&reply_info);
-        state|=JumpListState;
-        break;
-      }
-      case KeyRelease:
-      {
-        static char
-          command[MaxTextExtent];
-
-        static KeySym
-          key_symbol;
-
-        if (event.xkey.window != windows->widget.id)
-          break;
-        /*
-          Respond to a user key release.
-        */
-        (void) XLookupString((XKeyEvent *) &event.xkey,command,sizeof(command),
-          &key_symbol,(XComposeStatus *) NULL);
-        if (key_symbol == XK_Control_L)
-          state&=(~ControlState);
-        break;
-      }
-      case LeaveNotify:
-      {
-        if (event.xcrossing.window != windows->widget.id)
-          break;
-        state|=InactiveWidgetState;
-        break;
-      }
-      case MapNotify:
-      {
-        mask&=(~CWX);
-        mask&=(~CWY);
-        break;
-      }
-      case MotionNotify:
-      {
-        /*
-          Discard pending button motion events.
-        */
-        while (XCheckMaskEvent(display,ButtonMotionMask,&event));
-        if (slider_info.active)
-          {
-            /*
-              Move slider matte.
-            */
-            slider_info.y=event.xmotion.y-
-              ((slider_info.height+slider_info.bevel_width) >> 1)+1;
-            if (slider_info.y < slider_info.min_y)
-              slider_info.y=slider_info.min_y;
-            if (slider_info.y > slider_info.max_y)
-              slider_info.y=slider_info.max_y;
+          MagickFormatString(text_info.text,sizeof(text),"%.1024s%.1024s%.1024s",working_directory,
+                             DirectorySeparator,glob_pattern);
+          XDrawWidgetText(display,&windows->widget,&text_info);
+          XDrawMatteText(display,&windows->widget,&reply_info);
+          XDrawBeveledMatte(display,&windows->widget,&scroll_info);
+          XDrawTriangleNorth(display,&windows->widget,&north_info);
+          XDrawBeveledButton(display,&windows->widget,&slider_info);
+          XDrawTriangleSouth(display,&windows->widget,&south_info);
+          XHighlightWidget(display,&windows->widget,BorderOffset,BorderOffset);
+          state&=(~UpdateListState);
+        }
+      if (state & JumpListState)
+        {
+          /*
+            Jump scroll to match user filename.
+          */
+          list_info.id=(~0);
+          for (i=0; i < files; i++)
+            if (LocaleCompare(filelist[i],reply) >= 0)
+              {
+                list_info.id=LocaleCompare(filelist[i],reply) == 0 ? i : ~0;
+                break;
+              }
+          if ((i < slider_info.id) || (i >= (int) (slider_info.id+visible_files)))
+            slider_info.id=i-(visible_files >> 1);
+          selection_info.id=(~0);
+          state|=RedrawListState;
+          state&=(~JumpListState);
+        }
+      if (state & RedrawListState)
+        {
+          /*
+            Determine slider id and position.
+          */
+          if (slider_info.id >= (int) (files-visible_files))
+            slider_info.id=(int) (files-visible_files);
+          if ((slider_info.id < 0) || (files <= (int) visible_files))
             slider_info.id=0;
-            if (slider_info.y != slider_info.min_y)
-              slider_info.id=(files*(slider_info.y-slider_info.min_y+1))/
-                (slider_info.max_y-slider_info.min_y+1);
-            state|=RedrawListState;
-            break;
-          }
-        if (state & InactiveWidgetState)
-          break;
-        if (up_info.raised == MatteIsActive(up_info,event.xmotion))
+          slider_info.y=slider_info.min_y;
+          if (files > 0)
+            slider_info.y+=
+              slider_info.id*(slider_info.max_y-slider_info.min_y+1)/files;
+          if (slider_info.id != selection_info.id)
+            {
+              /*
+                Redraw scroll bar and file names.
+              */
+              selection_info.id=slider_info.id;
+              selection_info.y=list_info.y+(height >> 3)+2;
+              for (i=0; i < (int) visible_files; i++)
+                {
+                  selection_info.raised=(slider_info.id+i) != list_info.id;
+                  selection_info.text=(char *) NULL;
+                  if ((slider_info.id+i) < files)
+                    selection_info.text=filelist[slider_info.id+i];
+                  XDrawWidgetText(display,&windows->widget,&selection_info);
+                  selection_info.y+=(int) selection_info.height;
+                }
+              /*
+                Update slider.
+              */
+              if (slider_info.y > expose_info.y)
+                {
+                  expose_info.height=slider_info.y-expose_info.y;
+                  expose_info.y=slider_info.y-expose_info.height-
+                    slider_info.bevel_width-1;
+                }
+              else
+                {
+                  expose_info.height=expose_info.y-slider_info.y;
+                  expose_info.y=slider_info.y+slider_info.height+
+                    slider_info.bevel_width+1;
+                }
+              XDrawTriangleNorth(display,&windows->widget,&north_info);
+              XDrawMatte(display,&windows->widget,&expose_info);
+              XDrawBeveledButton(display,&windows->widget,&slider_info);
+              XDrawTriangleSouth(display,&windows->widget,&south_info);
+              expose_info.y=slider_info.y;
+            }
+          state&=(~RedrawListState);
+        }
+      /*
+        Wait for next event.
+      */
+      if (north_info.raised && south_info.raised)
+        (void) XIfEvent(display,&event,XScreenEvent,(char *) windows);
+      else
+        {
+          /*
+            Brief delay before advancing scroll bar.
+          */
+          MagickXDelay(display,delay);
+          delay=SuspendTime;
+          (void) XCheckIfEvent(display,&event,XScreenEvent,(char *) windows);
+          if (!north_info.raised)
+            if (slider_info.id > 0)
+              {
+                /*
+                  Move slider up.
+                */
+                slider_info.id--;
+                state|=RedrawListState;
+              }
+          if (!south_info.raised)
+            if (slider_info.id < files)
+              {
+                /*
+                  Move slider down.
+                */
+                slider_info.id++;
+                state|=RedrawListState;
+              }
+          if (event.type != ButtonRelease)
+            continue;
+        }
+      switch (event.type)
+        {
+        case ButtonPress:
           {
-            /*
-              Up button status changed.
-            */
-            up_info.raised=!up_info.raised;
-            XDrawBeveledButton(display,&windows->widget,&up_info);
-            break;
-          }
-        if (home_info.raised == MatteIsActive(home_info,event.xmotion))
-          {
-            /*
-              Home button status changed.
-            */
-            home_info.raised=!home_info.raised;
-            XDrawBeveledButton(display,&windows->widget,&home_info);
-            break;
-          }
-        if (special_info.raised == MatteIsActive(special_info,event.xmotion))
-          {
-            /*
-              Grab button status changed.
-            */
-            special_info.raised=!special_info.raised;
-            XDrawBeveledButton(display,&windows->widget,&special_info);
-            break;
-          }
-        if (action_info.raised == MatteIsActive(action_info,event.xmotion))
-          {
-            /*
-              Action button status changed.
-            */
-            action_info.raised=!action_info.raised;
-            XDrawBeveledButton(display,&windows->widget,&action_info);
-            break;
-          }
-        if (cancel_info.raised == MatteIsActive(cancel_info,event.xmotion))
-          {
-            /*
-              Cancel button status changed.
-            */
-            cancel_info.raised=!cancel_info.raised;
-            XDrawBeveledButton(display,&windows->widget,&cancel_info);
-            break;
-          }
-        break;
-      }
-      case SelectionClear:
-      {
-        reply_info.highlight=False;
-        XDrawMatteText(display,&windows->widget,&reply_info);
-        break;
-      }
-      case SelectionNotify:
-      {
-        Atom
-          type;
+            if (MatteIsActive(slider_info,event.xbutton))
+              {
+                /*
+                  Track slider.
+                */
+                slider_info.active=True;
+                break;
+              }
+            if (MatteIsActive(north_info,event.xbutton))
+              if (slider_info.id > 0)
+                {
+                  /*
+                    Move slider up.
+                  */
+                  north_info.raised=False;
+                  slider_info.id--;
+                  state|=RedrawListState;
+                  break;
+                }
+            if (MatteIsActive(south_info,event.xbutton))
+              if (slider_info.id < files)
+                {
+                  /*
+                    Move slider down.
+                  */
+                  south_info.raised=False;
+                  slider_info.id++;
+                  state|=RedrawListState;
+                  break;
+                }
+            if (MatteIsActive(scroll_info,event.xbutton))
+              {
+                /*
+                  Move slider.
+                */
+                if (event.xbutton.y < slider_info.y)
+                  slider_info.id-=(visible_files-1);
+                else
+                  slider_info.id+=(visible_files-1);
+                state|=RedrawListState;
+                break;
+              }
+            if (MatteIsActive(list_info,event.xbutton))
+              {
+                unsigned int
+                  id;
 
-        int
-          format;
+                /*
+                  User pressed file matte.
+                */
+                id=slider_info.id+(event.xbutton.y-(list_info.y+(height >> 1))+1)/
+                  selection_info.height;
+                if ((int) id >= files)
+                  break;
+                (void) strlcpy(reply_info.text,filelist[id],MaxTextExtent);
+                reply_info.highlight=False;
+                reply_info.marker=reply_info.text;
+                reply_info.cursor=reply_info.text+Extent(reply_info.text);
+                XDrawMatteText(display,&windows->widget,&reply_info);
+                if ((int) id == list_info.id)
+                  {
+                    (void) strlcpy(working_directory,reply_info.text,
+                                   MaxTextExtent);
+                    state|=UpdateListState;
+                  }
+                selection_info.id=(~0);
+                list_info.id=id;
+                state|=RedrawListState;
+                break;
+              }
+            if (MatteIsActive(up_info,event.xbutton))
+              {
+                /*
+                  User pressed Up button.
+                */
+                up_info.raised=False;
+                XDrawBeveledButton(display,&windows->widget,&up_info);
+                break;
+              }
+            if (MatteIsActive(home_info,event.xbutton))
+              {
+                /*
+                  User pressed Home button.
+                */
+                home_info.raised=False;
+                XDrawBeveledButton(display,&windows->widget,&home_info);
+                break;
+              }
+            if (MatteIsActive(special_info,event.xbutton))
+              {
+                /*
+                  User pressed Special button.
+                */
+                special_info.raised=False;
+                XDrawBeveledButton(display,&windows->widget,&special_info);
+                break;
+              }
+            if (MatteIsActive(action_info,event.xbutton))
+              {
+                /*
+                  User pressed action button.
+                */
+                action_info.raised=False;
+                XDrawBeveledButton(display,&windows->widget,&action_info);
+                break;
+              }
+            if (MatteIsActive(cancel_info,event.xbutton))
+              {
+                /*
+                  User pressed Cancel button.
+                */
+                cancel_info.raised=False;
+                XDrawBeveledButton(display,&windows->widget,&cancel_info);
+                break;
+              }
+            if (!MatteIsActive(reply_info,event.xbutton))
+              break;
+            if (event.xbutton.button != Button2)
+              {
+                static Time
+                  click_time;
 
-        unsigned char
-          *data;
+                /*
+                  Move text cursor to position of button press.
+                */
+                x=event.xbutton.x-reply_info.x-(QuantumMargin >> 2);
+                for (i=1; i <= Extent(reply_info.marker); i++)
+                  if (XTextWidth(font_info,reply_info.marker,i) > x)
+                    break;
+                reply_info.cursor=reply_info.marker+i-1;
+                if (event.xbutton.time > (click_time+DoubleClick))
+                  reply_info.highlight=False;
+                else
+                  {
+                    /*
+                      Become the XA_PRIMARY selection owner.
+                    */
+                    (void) strlcpy(primary_selection,reply_info.text,
+                                   MaxTextExtent);
+                    (void) XSetSelectionOwner(display,XA_PRIMARY,windows->widget.id,
+                                              event.xbutton.time);
+                    reply_info.highlight=XGetSelectionOwner(display,XA_PRIMARY) ==
+                      windows->widget.id;
+                  }
+                XDrawMatteText(display,&windows->widget,&reply_info);
+                click_time=event.xbutton.time;
+                break;
+              }
+            /*
+              Request primary selection.
+            */
+            (void) XConvertSelection(display,XA_PRIMARY,XA_STRING,XA_STRING,
+                                     windows->widget.id,event.xbutton.time);
+            break;
+          }
+        case ButtonRelease:
+          {
+            if (!windows->widget.mapped)
+              break;
+            if (!north_info.raised)
+              {
+                /*
+                  User released up button.
+                */
+                delay=SuspendTime << 2;
+                north_info.raised=True;
+                XDrawTriangleNorth(display,&windows->widget,&north_info);
+              }
+            if (!south_info.raised)
+              {
+                /*
+                  User released down button.
+                */
+                delay=SuspendTime << 2;
+                south_info.raised=True;
+                XDrawTriangleSouth(display,&windows->widget,&south_info);
+              }
+            if (slider_info.active)
+              {
+                /*
+                  Stop tracking slider.
+                */
+                slider_info.active=False;
+                break;
+              }
+            if (!up_info.raised)
+              {
+                if (event.xbutton.window == windows->widget.id)
+                  if (MatteIsActive(up_info,event.xbutton))
+                    {
+                      (void) strlcpy(working_directory,"..",sizeof(working_directory));
+                      state|=UpdateListState;
+                    }
+                up_info.raised=True;
+                XDrawBeveledButton(display,&windows->widget,&up_info);
+              }
+            if (!home_info.raised)
+              {
+                if (event.xbutton.window == windows->widget.id)
+                  if (MatteIsActive(home_info,event.xbutton))
+                    {
+                      (void) strlcpy(working_directory,home_directory,
+                                     MaxTextExtent);
+                      state|=UpdateListState;
+                    }
+                home_info.raised=True;
+                XDrawBeveledButton(display,&windows->widget,&home_info);
+              }
+            if (!special_info.raised)
+              {
+                if (!anomaly)
+                  {
+                    char
+                      **formats;
 
-        unsigned long
-          after,
-          length;
+                    const MagickInfo
+                      *magick_info;
 
-        /*
-          Obtain response from primary selection.
-        */
-        if (event.xselection.property == (Atom) None)
-          break;
-        status=XGetWindowProperty(display,event.xselection.requestor,
-          event.xselection.property,0L,2047L,True,XA_STRING,&type,&format,
-          &length,&after,&data);
-        if ((status != Success) || (type != XA_STRING) || (format == 32) ||
-            (length == 0))
-          break;
-        if ((Extent(reply_info.text)+length) >= MaxTextExtent)
-          (void) XBell(display,0);
-        else
+                    ExceptionInfo
+                      exception;
+
+                    register const MagickInfo
+                      *p;
+
+                    /*
+                      Let user select image format.
+                    */
+                    GetExceptionInfo(&exception);
+                    magick_info=GetMagickInfo("*",&exception);
+                    DestroyExceptionInfo(&exception);
+                    if (magick_info == (const MagickInfo *) NULL)
+                      break;
+                    i=0;
+                    for (p=magick_info; p != (MagickInfo *) NULL; p=p->next)
+                      i++;
+                    formats=MagickAllocateArray(char **,(i+1),sizeof(char *));
+                    if (formats == (char **) NULL)
+                      break;
+                    (void) memset(formats,0,(i+1)*sizeof(char *));
+                    i=0;
+                    for (p=magick_info; p != (MagickInfo *) NULL; p=p->next)
+                      {
+                        if (p->stealth)
+                          continue;
+                        if (!p->encoder)
+                          continue;
+                        /* AllocateString does a fatal exit on failed alloc */
+                        formats[i]=AllocateString(p->name);
+                        if (formats[i] != NULL)
+                          LocaleLower((char *) formats[i]);
+                        i++;
+                      }
+                    formats[i]=(char *) NULL;
+                    (void) XDefineCursor(display,windows->widget.id,
+                                         windows->widget.busy_cursor);
+                    windows->popup.x=windows->widget.x+60;
+                    windows->popup.y=windows->widget.y+60;
+                    MagickXListBrowserWidget(display,windows,&windows->popup,
+                                             (const char **)formats,"Select","Select image format type:",format);
+                    MagickXSetCursorState(display,windows,True);
+                    (void) XDefineCursor(display,windows->widget.id,
+                                         windows->widget.cursor);
+                    AppendImageFormat(format,reply_info.text);
+                    reply_info.cursor=reply_info.text+Extent(reply_info.text);
+                    XDrawMatteText(display,&windows->widget,&reply_info);
+                    special_info.raised=True;
+                    XDrawBeveledButton(display,&windows->widget,&special_info);
+                    for (i=0; formats[i] != (char *) NULL; i++)
+                      MagickFreeMemory(formats[i]);
+                    MagickFreeMemory(formats);
+                    break;
+                  }
+                if (event.xbutton.window == windows->widget.id)
+                  if (MatteIsActive(special_info,event.xbutton))
+                    {
+                      (void) strlcpy(reply_info.text,"x:",MaxTextExtent);
+                      state|=ExitState;
+                    }
+                special_info.raised=True;
+                XDrawBeveledButton(display,&windows->widget,&special_info);
+              }
+            if (!action_info.raised)
+              {
+                if (event.xbutton.window == windows->widget.id)
+                  {
+                    if (MatteIsActive(action_info,event.xbutton))
+                      {
+                        if (*reply_info.text == '\0')
+                          (void) XBell(display,0);
+                        else
+                          state|=ExitState;
+                      }
+                  }
+                action_info.raised=True;
+                XDrawBeveledButton(display,&windows->widget,&action_info);
+              }
+            if (!cancel_info.raised)
+              {
+                if (event.xbutton.window == windows->widget.id)
+                  if (MatteIsActive(cancel_info,event.xbutton))
+                    {
+                      *reply_info.text='\0';
+                      state|=ExitState;
+                    }
+                cancel_info.raised=True;
+                XDrawBeveledButton(display,&windows->widget,&cancel_info);
+              }
+            break;
+          }
+        case ClientMessage:
           {
             /*
-              Insert primary selection in reply text.
+              If client window delete message, exit.
             */
-            *(data+length)='\0';
-            XEditText(display,&reply_info,(KeySym) XK_Insert,(char *) data,
-              state);
+            if (event.xclient.message_type != windows->wm_protocols)
+              break;
+            if (*event.xclient.data.l == (int) windows->wm_take_focus)
+              {
+                (void) XSetInputFocus(display,event.xclient.window,RevertToParent,
+                                      event.xclient.data.l[1]);
+                break;
+              }
+            if (*event.xclient.data.l != (int) windows->wm_delete_window)
+              break;
+            if (event.xclient.window == windows->widget.id)
+              {
+                *reply_info.text='\0';
+                state|=ExitState;
+                break;
+              }
+            break;
+          }
+        case ConfigureNotify:
+          {
+            /*
+              Update widget configuration.
+            */
+            if (event.xconfigure.window != windows->widget.id)
+              break;
+            if ((event.xconfigure.width == (int) windows->widget.width) &&
+                (event.xconfigure.height == (int) windows->widget.height))
+              break;
+            windows->widget.width=
+              Max(event.xconfigure.width,(int) windows->widget.min_width);
+            windows->widget.height=
+              Max(event.xconfigure.height,(int) windows->widget.min_height);
+            state|=UpdateConfigurationState;
+            break;
+          }
+        case EnterNotify:
+          {
+            if (event.xcrossing.window != windows->widget.id)
+              break;
+            state&=(~InactiveWidgetState);
+            break;
+          }
+        case Expose:
+          {
+            if (event.xexpose.window != windows->widget.id)
+              break;
+            if (event.xexpose.count != 0)
+              break;
+            state|=RedrawWidgetState;
+            break;
+          }
+        case KeyPress:
+          {
+            static char
+              command[MaxTextExtent];
+
+            static int
+              length;
+
+            static KeySym
+              key_symbol;
+
+            if (event.xkey.window != windows->widget.id)
+              break;
+            /*
+              Respond to a user key press.
+            */
+            length=XLookupString((XKeyEvent *) &event.xkey,command,sizeof(command),
+                                 &key_symbol,(XComposeStatus *) NULL);
+            *(command+length)='\0';
+            if (AreaIsActive(scroll_info,event.xkey))
+              {
+                /*
+                  Move slider.
+                */
+                switch ((int) key_symbol)
+                  {
+                  case XK_Home:
+                  case XK_KP_Home:
+                    {
+                      slider_info.id=0;
+                      break;
+                    }
+                  case XK_Up:
+                  case XK_KP_Up:
+                    {
+                      slider_info.id--;
+                      break;
+                    }
+                  case XK_Down:
+                  case XK_KP_Down:
+                    {
+                      slider_info.id++;
+                      break;
+                    }
+                  case XK_Prior:
+                  case XK_KP_Prior:
+                    {
+                      slider_info.id-=visible_files;
+                      break;
+                    }
+                  case XK_Next:
+                  case XK_KP_Next:
+                    {
+                      slider_info.id+=visible_files;
+                      break;
+                    }
+                  case XK_End:
+                  case XK_KP_End:
+                    {
+                      slider_info.id=files;
+                      break;
+                    }
+                  }
+                state|=RedrawListState;
+                break;
+              }
+            if ((key_symbol == XK_Return) || (key_symbol == XK_KP_Enter))
+              {
+                /*
+                  Read new directory or glob patterm.
+                */
+                if (*reply_info.text == '\0')
+                  break;
+                if (IsGlob(reply_info.text))
+                  (void) strlcpy(glob_pattern,reply_info.text,MaxTextExtent);
+                else
+                  {
+                    (void) strlcpy(working_directory,reply_info.text,
+                                   MaxTextExtent);
+                    if (*working_directory == '~')
+                      ExpandFilename(working_directory);
+                  }
+                state|=UpdateListState;
+                break;
+              }
+            if (key_symbol == XK_Control_L)
+              {
+                state|=ControlState;
+                break;
+              }
+            if (state & ControlState)
+              switch ((int) key_symbol)
+                {
+                case XK_u:
+                case XK_U:
+                  {
+                    /*
+                      Erase the entire line of text.
+                    */
+                    *reply_info.text='\0';
+                    reply_info.cursor=reply_info.text;
+                    reply_info.marker=reply_info.text;
+                    reply_info.highlight=False;
+                    break;
+                  }
+                default:
+                  break;
+                }
+            XEditText(display,&reply_info,key_symbol,command,state);
             XDrawMatteText(display,&windows->widget,&reply_info);
             state|=JumpListState;
-            state|=RedrawActionState;
+            break;
           }
-        (void) XFree((void *) data);
-        break;
-      }
-      case SelectionRequest:
-      {
-        XSelectionEvent
-          notify;
+        case KeyRelease:
+          {
+            static char
+              command[MaxTextExtent];
 
-        XSelectionRequestEvent
-          *request;
+            static KeySym
+              key_symbol;
 
-        if (!reply_info.highlight)
+            if (event.xkey.window != windows->widget.id)
+              break;
+            /*
+              Respond to a user key release.
+            */
+            (void) XLookupString((XKeyEvent *) &event.xkey,command,sizeof(command),
+                                 &key_symbol,(XComposeStatus *) NULL);
+            if (key_symbol == XK_Control_L)
+              state&=(~ControlState);
+            break;
+          }
+        case LeaveNotify:
+          {
+            if (event.xcrossing.window != windows->widget.id)
+              break;
+            state|=InactiveWidgetState;
+            break;
+          }
+        case MapNotify:
+          {
+            mask&=(~CWX);
+            mask&=(~CWY);
+            break;
+          }
+        case MotionNotify:
+          {
+            /*
+              Discard pending button motion events.
+            */
+            while (XCheckMaskEvent(display,ButtonMotionMask,&event));
+            if (slider_info.active)
+              {
+                /*
+                  Move slider matte.
+                */
+                slider_info.y=event.xmotion.y-
+                  ((slider_info.height+slider_info.bevel_width) >> 1)+1;
+                if (slider_info.y < slider_info.min_y)
+                  slider_info.y=slider_info.min_y;
+                if (slider_info.y > slider_info.max_y)
+                  slider_info.y=slider_info.max_y;
+                slider_info.id=0;
+                if (slider_info.y != slider_info.min_y)
+                  slider_info.id=(files*(slider_info.y-slider_info.min_y+1))/
+                    (slider_info.max_y-slider_info.min_y+1);
+                state|=RedrawListState;
+                break;
+              }
+            if (state & InactiveWidgetState)
+              break;
+            if (up_info.raised == MatteIsActive(up_info,event.xmotion))
+              {
+                /*
+                  Up button status changed.
+                */
+                up_info.raised=!up_info.raised;
+                XDrawBeveledButton(display,&windows->widget,&up_info);
+                break;
+              }
+            if (home_info.raised == MatteIsActive(home_info,event.xmotion))
+              {
+                /*
+                  Home button status changed.
+                */
+                home_info.raised=!home_info.raised;
+                XDrawBeveledButton(display,&windows->widget,&home_info);
+                break;
+              }
+            if (special_info.raised == MatteIsActive(special_info,event.xmotion))
+              {
+                /*
+                  Grab button status changed.
+                */
+                special_info.raised=!special_info.raised;
+                XDrawBeveledButton(display,&windows->widget,&special_info);
+                break;
+              }
+            if (action_info.raised == MatteIsActive(action_info,event.xmotion))
+              {
+                /*
+                  Action button status changed.
+                */
+                action_info.raised=!action_info.raised;
+                XDrawBeveledButton(display,&windows->widget,&action_info);
+                break;
+              }
+            if (cancel_info.raised == MatteIsActive(cancel_info,event.xmotion))
+              {
+                /*
+                  Cancel button status changed.
+                */
+                cancel_info.raised=!cancel_info.raised;
+                XDrawBeveledButton(display,&windows->widget,&cancel_info);
+                break;
+              }
+            break;
+          }
+        case SelectionClear:
+          {
+            reply_info.highlight=False;
+            XDrawMatteText(display,&windows->widget,&reply_info);
+            break;
+          }
+        case SelectionNotify:
+          {
+            Atom
+              type;
+
+            int
+              format;
+
+            unsigned char
+              *data;
+
+            unsigned long
+              after,
+              length;
+
+            /*
+              Obtain response from primary selection.
+            */
+            if (event.xselection.property == (Atom) None)
+              break;
+            status=XGetWindowProperty(display,event.xselection.requestor,
+                                      event.xselection.property,0L,2047L,True,XA_STRING,&type,&format,
+                                      &length,&after,&data);
+            if ((status != Success) || (type != XA_STRING) || (format == 32) ||
+                (length == 0))
+              break;
+            if ((Extent(reply_info.text)+length) >= MaxTextExtent)
+              (void) XBell(display,0);
+            else
+              {
+                /*
+                  Insert primary selection in reply text.
+                */
+                *(data+length)='\0';
+                XEditText(display,&reply_info,(KeySym) XK_Insert,(char *) data,
+                          state);
+                XDrawMatteText(display,&windows->widget,&reply_info);
+                state|=JumpListState;
+                state|=RedrawActionState;
+              }
+            (void) XFree((void *) data);
+            break;
+          }
+        case SelectionRequest:
+          {
+            XSelectionEvent
+              notify;
+
+            XSelectionRequestEvent
+              *request;
+
+            if (!reply_info.highlight)
+              break;
+            /*
+              Set primary selection.
+            */
+            request=(&(event.xselectionrequest));
+            (void) XChangeProperty(request->display,request->requestor,
+                                   request->property,request->target,8,PropModeReplace,
+                                   (unsigned char *) primary_selection,Extent(primary_selection));
+            notify.type=SelectionNotify;
+            notify.display=request->display;
+            notify.requestor=request->requestor;
+            notify.selection=request->selection;
+            notify.target=request->target;
+            notify.time=request->time;
+            if (request->property == None)
+              notify.property=request->target;
+            else
+              notify.property=request->property;
+            (void) XSendEvent(request->display,request->requestor,False,0,
+                              (XEvent *) &notify);
+          }
+        default:
           break;
-        /*
-          Set primary selection.
-        */
-        request=(&(event.xselectionrequest));
-        (void) XChangeProperty(request->display,request->requestor,
-          request->property,request->target,8,PropModeReplace,
-          (unsigned char *) primary_selection,Extent(primary_selection));
-        notify.type=SelectionNotify;
-        notify.display=request->display;
-        notify.requestor=request->requestor;
-        notify.selection=request->selection;
-        notify.target=request->target;
-        notify.time=request->time;
-        if (request->property == None)
-          notify.property=request->target;
-        else
-          notify.property=request->property;
-        (void) XSendEvent(request->display,request->requestor,False,0,
-          (XEvent *) &notify);
-      }
-      default:
-        break;
-    }
-  } while (!(state & ExitState));
+        }
+    } while (!(state & ExitState));
   MagickXSetCursorState(display,windows,False);
   (void) XWithdrawWindow(display,windows->widget.id,windows->widget.screen);
   MagickXCheckRefreshWindows(display,windows);
@@ -8568,7 +8568,7 @@ unsigned int MagickXPreferencesWidget(Display *display,
         preferences_info[4].raised=!resource_info->quantize_info->dither;
         preferences_info[5].raised=resource_info->colormap != SharedColormap;
         preferences_info[6].raised=!resource_info->use_pixmap;
-        FormatString(cache,CacheButtonText,resource_info->undo_cache);
+        MagickFormatString(cache,sizeof(cache),CacheButtonText,resource_info->undo_cache);
         XGetWidgetInfo(cache,&cache_info);
         cache_info.bevel_width--;
         cache_info.width=QuantumMargin >> 1;
@@ -8640,7 +8640,7 @@ unsigned int MagickXPreferencesWidget(Display *display,
             resource_info->undo_cache<<=1;
             if (resource_info->undo_cache > 256)
               resource_info->undo_cache=1;
-            FormatString(cache,CacheButtonText,resource_info->undo_cache);
+            MagickFormatString(cache,sizeof(cache),CacheButtonText,resource_info->undo_cache);
             cache_info.raised=False;
             XDrawTriangleEast(display,&windows->widget,&cache_info);
             break;

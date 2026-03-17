@@ -56,21 +56,24 @@ Build project fuzzer target::
   python3 infra/helper.py build_fuzzers --sanitizer <address/memory/undefined> \
     --architecture <x86_64/i386> graphicsmagick
 
-  python3 infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick
-  python3 infra/helper.py build_fuzzers --sanitizer memory --architecture x86_64 graphicsmagick
-  python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture x86_64 graphicsmagick
+  Use --clean option in order to remove any existing artifacts, or
+  omit it if intentionally continuing an existing build.
 
-  python3 infra/helper.py build_fuzzers --sanitizer address --architecture i386 graphicsmagick
+  python3 infra/helper.py build_fuzzers --clean --sanitizer address --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers --clean --sanitizer memory --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers --clean --sanitizer undefined --architecture x86_64 graphicsmagick
+
+  python3 infra/helper.py build_fuzzers --clean --sanitizer address --architecture i386 graphicsmagick
   # Following is broken due to missing ASAN library
-  #python3 infra/helper.py build_fuzzers --sanitizer memory --architecture i386 graphicsmagick
-  python3 infra/helper.py build_fuzzers --sanitizer undefined --architecture i386 graphicsmagick
+  #python3 infra/helper.py build_fuzzers --clean --sanitizer memory --architecture i386 graphicsmagick
+  python3 infra/helper.py build_fuzzers --clean --sanitizer undefined --architecture i386 graphicsmagick
 
 Reproduce using local source checkout (mount local sources into the running container)::
 
   python3 infra/helper.py build_fuzzers \
     --sanitizer <address/memory/undefined> graphicsmagick <source_path>
 
-  python3 infra/helper.py build_fuzzers --sanitizer address --architecture x86_64 graphicsmagick <source_path>
+  python3 infra/helper.py build_fuzzers --clean --sanitizer address --architecture x86_64 graphicsmagick <source_path>
   python3 infra/helper.py reproduce graphicsmagick <fuzz_target_name> <testcase_path>
 
 Reproducing bugs::
@@ -79,35 +82,35 @@ Reproducing bugs::
 
 Check the build (this can take very long!)::
 
-  python3 infra/helper.py build_fuzzers --sanitizer <address/memory/undefined> \
+  python3 infra/helper.py build_fuzzers --clean --sanitizer <address/memory/undefined> \
     --engine <libfuzzer/afl/honggfuzz/centipede> --architecture <x86_64/i386> graphicsmagick
 
   python3 infra/helper.py check_build  --sanitizer <address/memory/undefined> \
     --engine <libfuzzer/afl/honggfuzz/centipede> --architecture <x86_64/i386> graphicsmagick \
     <fuzz_target_name>
 
-  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine libfuzzer --sanitizer address   --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine libfuzzer --sanitizer address   --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer memory    --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine libfuzzer --sanitizer memory    --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine libfuzzer --sanitizer memory    --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer undefined --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine libfuzzer --sanitizer undefined --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine libfuzzer --sanitizer undefined --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer coverage --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine libfuzzer --sanitizer coverage --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine libfuzzer --sanitizer coverage --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine afl       --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine afl       --sanitizer address   --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine afl       --sanitizer address   --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine honggfuzz --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine honggfuzz --sanitizer address   --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine honggfuzz --sanitizer address   --architecture x86_64 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
   python3 infra/helper.py check_build    --engine libfuzzer --sanitizer address   --architecture i386 graphicsmagick
 
-  python3 infra/helper.py build_fuzzers  --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
+  python3 infra/helper.py build_fuzzers  --clean --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
   python3 infra/helper.py check_build    --engine centipede --sanitizer address   --architecture x86_64 graphicsmagick
 
 Get a shell into the container and compile::
@@ -214,7 +217,7 @@ With sources under ~/src/libde265::
   rm -rf ~/build/libde265
   mkdir -p ~/build/libde265
   cd ~/build/libde265
-  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=ON ~/src/libde265
+  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=OFF ~/src/libde265
   make -j 8
   make install
 
@@ -397,7 +400,7 @@ Sources come from https://github.com/strukturag/libheif.git
   rm -rf ~/build/libheif
   mkdir -p ~/build/libheif
   cd ~/build/libheif
-  cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER=on -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off -DENABLE_EXPERIMENTAL_FEATURES=on ~/src/libheif
+  cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER=on -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off -DWITH_GEOTIFF=off -DENABLE_EXPERIMENTAL_FEATURES=on ~/src/libheif
   cmake --build . -- -j$(nproc)
   cmake --install .
 

@@ -575,7 +575,7 @@ static Image *ExtractNestedBlob(Image ** image, const ImageInfo * image_info, in
           /* BlobToFile("/tmp/jnx-tile.jpg", blob,alloc_size,exception); */
 
           /* (void) strlcpy(clone_info->filename, (ImgType==BI_JPEG)?"JPEG:":"PNG:", sizeof(clone_info->filename)); */
-          FormatString(clone_info->filename,"%sblob-%px", ImgType==BI_JPEG?"JPEG:":"PNG:", blob);
+          MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"%sblob-%px", ImgType==BI_JPEG?"JPEG:":"PNG:", blob);
           if ((image2 = BlobToImage(clone_info,blob,alloc_size,exception))
               != NULL)
             {

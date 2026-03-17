@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -600,7 +600,7 @@ static const char *ExceptionSeverityToTag(const ExceptionType severity)
 }
 
 MagickExport const char *GetLocaleExceptionMessage(const ExceptionType severity,
-  const char *tag)
+                                                   const char *tag)
 {
   char
     message[MaxTextExtent];
@@ -612,20 +612,21 @@ MagickExport const char *GetLocaleExceptionMessage(const ExceptionType severity,
   if (tag != (char *) NULL)
     {
       /* This is a hack that depends on the fact that tag can never have spaces in
-        them. If a space is found then it means we are being asked to translate a
-        message that has already been translated. A big waste of time. The reason
-        this happens is that messages are translated at the point of an exception
-        and then again when the exception is caught and processed via the default
-        error and warning handlers
+         them. If a space is found then it means we are being asked to translate a
+         message that has already been translated. A big waste of time. The reason
+         this happens is that messages are translated at the point of an exception
+         and then again when the exception is caught and processed via the default
+         error and warning handlers
       */
       if (strrchr(tag, ' '))
         return tag;
-      FormatString(message,"%.1024s%.1024s",ExceptionSeverityToTag(severity),tag);
+      MagickFormatString(message,sizeof(message),"%.1024s%.1024s",
+                         ExceptionSeverityToTag(severity),tag);
       locale_message=GetLocaleMessage(message);
       if (locale_message == message)
         return(tag);
       return(locale_message);
-   }
+    }
   return(tag);
 }
 

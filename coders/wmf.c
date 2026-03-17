@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -318,7 +318,7 @@ static void draw_pattern_push(wmfAPI* API,
   char
     pattern_id[MaxTextExtent];
 
-  FormatString(pattern_id,"brush_%lu",id);
+  MagickFormatString(pattern_id,sizeof(pattern_id),"brush_%lu",id);
   DrawPushPattern(WmfDrawContext,pattern_id,0,0,columns,rows);
 }
 
@@ -545,7 +545,7 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
       char
         size[MaxTextExtent];
 
-      FormatString(size,"%ux%u",bmp_read->width,bmp_read->height);
+      MagickFormatString(size,sizeof(size),"%ux%u",bmp_read->width,bmp_read->height);
       (void) CloneString(&image_info->size,size);
     }
 #if 0
@@ -563,7 +563,7 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
       char
         description[MaxTextExtent];
 
-      FormatString(description,"packed DIB at offset %ld", bmp_read->offset);
+      MagickFormatString(description,sizeof(description),"packed DIB at offset %ld", bmp_read->offset);
       ThrowException2(&ddata->image->exception,CorruptImageError,
                       exception.reason,exception.description);
       DestroyExceptionInfo(&exception);
@@ -643,7 +643,7 @@ static void ipa_device_begin(wmfAPI * API)
 
   DrawSetViewbox(WmfDrawContext, 0, 0, ddata->image->columns, ddata->image->rows);
 
-  FormatString(comment,"Created by %s",
+  MagickFormatString(comment,sizeof(comment),"Created by %s",
                GetMagickVersion((unsigned long *) NULL));
   DrawComment(WmfDrawContext,comment);
 
@@ -693,7 +693,7 @@ static void ipa_device_begin(wmfAPI * API)
           DrawComposite(WmfDrawContext, CopyCompositeOp, 0, 0, image->columns, image->rows, image);
           DrawPopPattern(WmfDrawContext);
           DrawPopDefs(WmfDrawContext);
-          FormatString(pattern_id,"#brush_%lu",ddata->pattern_id);
+          MagickFormatString(pattern_id,sizeof(pattern_id),"#brush_%lu",ddata->pattern_id);
           DrawSetFillPatternURL(WmfDrawContext,pattern_id);
           ++ddata->pattern_id;
 
@@ -1145,7 +1145,7 @@ static void ipa_region_clip(wmfAPI *API, wmfPolyRectangle_t *poly_rect)
       /* Define clip path */
       ddata->clip_path_id++;
       DrawPushDefs(WmfDrawContext);
-      FormatString(clip_path_id,"clip_%lu",ddata->clip_path_id);
+      MagickFormatString(clip_path_id,sizeof(clip_path_id),"clip_%lu",ddata->clip_path_id);
       DrawPushClipPath(WmfDrawContext,clip_path_id);
       DrawPushGraphicContext(WmfDrawContext);
       for (i = 0; i < poly_rect->count; i++)
@@ -1664,7 +1664,7 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
           char
             pattern_id[MaxTextExtent];
 
-          FormatString(pattern_id, "#brush_%lu", ddata->pattern_id);
+          MagickFormatString(pattern_id, sizeof(pattern_id), "#brush_%lu", ddata->pattern_id);
 
           if (brush_apply == BrushApplyStroke)
             DrawSetStrokePatternURL(WmfDrawContext,pattern_id);
@@ -1692,10 +1692,10 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
           *brush_bmp = WMF_BRUSH_BITMAP(brush);
         if (brush_bmp && brush_bmp->data != 0)
           {
-             /*
-               oss-fuzz 482160523 reveals that brush_bmp->data can be non-zero without being set-up by ipa_bmp_read()!
-               It seems that libwmf does not enforce an order of operations.
-             */
+            /*
+              oss-fuzz 482160523 reveals that brush_bmp->data can be non-zero without being set-up by ipa_bmp_read()!
+              It seems that libwmf does not enforce an order of operations.
+            */
 #if 0
             CompositeOperator
               mode;
@@ -1778,7 +1778,7 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
               char
                 pattern_id[MaxTextExtent];
 
-              FormatString(pattern_id, "#brush_%lu", ddata->pattern_id);
+              MagickFormatString(pattern_id, sizeof(pattern_id), "#brush_%lu", ddata->pattern_id);
 
               if (brush_apply == BrushApplyStroke)
                 DrawSetStrokePatternURL(WmfDrawContext,pattern_id);

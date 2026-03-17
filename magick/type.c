@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2019 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -544,33 +544,33 @@ MagickExport unsigned int ListTypeInfo(FILE *file,ExceptionInfo *exception)
   (void) GetTypeInfo("*",exception);
   LockSemaphoreInfo(type_semaphore);
   for (p=type_list; p != (const TypeInfo *) NULL; p=p->next)
-  {
-    if ((p->previous == (TypeInfo *) NULL) ||
-        (LocaleCompare(p->path,p->previous->path) != 0))
-      {
-        if (p->previous != (TypeInfo *) NULL)
-          (void) fprintf(file,"\n");
-        if (p->path != (char *) NULL)
-          (void) fprintf(file,"Path: %.1024s\n\n",p->path);
-        (void) fprintf(file,"%-32.32s %-23.23s %-7.7s %-8s %-3s\n",
-          "Name","Family","Style","Stretch","Weight");
-        (void) fprintf(file,"--------------------------------------------------"
-          "------------------------------\n");
-      }
-    if (p->stealth)
-      continue;
-    name="unknown";
-    if (p->name != (char *) NULL)
-      name=p->name;
-    family="unknown";
-    if (p->family != (char *) NULL)
-      family=p->family;
-    style=StyleTypeToString(p->style);
-    stretch=StretchTypeToString(p->stretch);
-    FormatString(weight,"%lu",p->weight);
-    (void) fprintf(file,"%-32.32s %-23.23s %-7.7s %-9s %-3s\n",
-      name,family,style,stretch,weight);
-  }
+    {
+      if ((p->previous == (TypeInfo *) NULL) ||
+          (LocaleCompare(p->path,p->previous->path) != 0))
+        {
+          if (p->previous != (TypeInfo *) NULL)
+            (void) fprintf(file,"\n");
+          if (p->path != (char *) NULL)
+            (void) fprintf(file,"Path: %.1024s\n\n",p->path);
+          (void) fprintf(file,"%-32.32s %-23.23s %-7.7s %-8s %-3s\n",
+                         "Name","Family","Style","Stretch","Weight");
+          (void) fprintf(file,"--------------------------------------------------"
+                         "------------------------------\n");
+        }
+      if (p->stealth)
+        continue;
+      name="unknown";
+      if (p->name != (char *) NULL)
+        name=p->name;
+      family="unknown";
+      if (p->family != (char *) NULL)
+        family=p->family;
+      style=StyleTypeToString(p->style);
+      stretch=StretchTypeToString(p->stretch);
+      MagickFormatString(weight,sizeof(weight),"%lu",p->weight);
+      (void) fprintf(file,"%-32.32s %-23.23s %-7.7s %-9s %-3s\n",
+                     name,family,style,stretch,weight);
+    }
   (void) fflush(file);
   UnlockSemaphoreInfo(type_semaphore);
   return(True);

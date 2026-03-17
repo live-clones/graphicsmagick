@@ -38,6 +38,19 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-03-16  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/utility.c (FormatString): Deprecate FormatString(), and
+replace all usages with MagickFormatString(), or a suitable
+equivalent.  When ImageMagick was created, the minimum text buffer
+size was declared by MaxTextExtent, which assumed suitable for any
+purpose. FormatString() limits the amount of data written to
+MaxTextExtent-1.  Almost all former FormatString() sites now pass
+the actual buffer size rather than using MaxTextExtent.  This was
+a lot of code edits!</p></li>
+</ul>
+</blockquote>
 <p>2026-03-06  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

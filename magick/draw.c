@@ -1304,12 +1304,12 @@ MagickExport char *DrawGetException(const struct _DrawContext * context,
   if (context->exception.severity != UndefinedException)
     {
       if (context->exception.description)
-        FormatString(buffer,"%.1024s (%.1024s)",
-                     context->exception.reason,
-                     context->exception.description);
+        MagickFormatString(buffer,sizeof(buffer),"%.1024s (%.1024s)",
+                           context->exception.reason,
+                           context->exception.description);
       else
-        FormatString(buffer,"%.1024s",
-                     context->exception.reason);
+        MagickFormatString(buffer,sizeof(buffer),"%.1024s",
+                           context->exception.reason);
       CloneString(&description,buffer);
     }
 
@@ -1776,21 +1776,21 @@ MagickExport void DrawSetFillPatternURL(struct _DrawContext * context, const cha
   assert(context->signature == MagickSignature);
   assert(fill_url != NULL);
 
-  if(fill_url[0] != '#')
+  if (fill_url[0] != '#')
     ThrowDrawException(DrawWarning,NotARelativeURL, fill_url);
 
-  FormatString(pattern,"[%.1024s]",fill_url+1);
+  MagickFormatString(pattern,sizeof(pattern),"[%.1024s]",fill_url+1);
 
   if (GetImageAttribute(context->image,pattern) == (ImageAttribute *) NULL)
     {
-      ThrowDrawException(DrawWarning,URLNotFound, fill_url)
+      ThrowDrawException(DrawWarning,URLNotFound, fill_url);
     }
   else
     {
       char
         pattern_spec[MaxTextExtent];
 
-      FormatString(pattern_spec,"url(%.1024s)",fill_url);
+      MagickFormatString(pattern_spec,sizeof(pattern_spec),"url(%.1024s)",fill_url);
 #if DRAW_BINARY_IMPLEMENTATION
       DrawPatternPath(context->image,CurrentContext,pattern_spec,&CurrentContext->fill_pattern);
 #endif
@@ -2664,7 +2664,7 @@ MagickExport void DrawComposite(struct _DrawContext * context,
       char
         buffer[MaxTextExtent];
 
-      FormatString(buffer,"%" MAGICK_SIZE_T_F "u bytes", (4*blob_length/3+4));
+      MagickFormatString(buffer,sizeof(buffer),"%" MAGICK_SIZE_T_F "u bytes", (4*blob_length/3+4));
       ThrowDrawException(ResourceLimitWarning,MemoryAllocationFailed,buffer)
     }
 
@@ -4241,10 +4241,10 @@ MagickExport void DrawPopPattern(struct _DrawContext * context)
   if( context->pattern_id == NULL )
     ThrowDrawException(DrawWarning,NotCurrentlyPushingPatternDefinition,NULL);
 
-  FormatString(key,"[%.1024s]",context->pattern_id);
+  MagickFormatString(key,sizeof(key),"[%.1024s]",context->pattern_id);
 
   (void) SetImageAttribute(context->image,key,context->mvg+context->pattern_offset);
-  FormatString(geometry,"%lux%lu%+ld%+ld",
+  MagickFormatString(geometry,sizeof(geometry),"%lux%lu%+ld%+ld",
                context->pattern_bounds.width,context->pattern_bounds.height,
                context->pattern_bounds.x,context->pattern_bounds.y);
   (void) SetImageAttribute(context->image,key,geometry);
@@ -4945,7 +4945,7 @@ MagickExport void DrawSetStrokePatternURL(struct _DrawContext * context,
   if(stroke_url[0] != '#')
     ThrowDrawException(DrawWarning, NotARelativeURL, stroke_url);
 
-  FormatString(pattern,"[%.1024s]",stroke_url+1);
+  MagickFormatString(pattern,sizeof(pattern),"[%.1024s]",stroke_url+1);
 
   if (GetImageAttribute(context->image,pattern) == (ImageAttribute *) NULL)
     {
@@ -4956,7 +4956,7 @@ MagickExport void DrawSetStrokePatternURL(struct _DrawContext * context,
       char
         pattern_spec[MaxTextExtent];
 
-      FormatString(pattern_spec,"url(%.1024s)",stroke_url);
+      MagickFormatString(pattern_spec,sizeof(pattern_spec),"url(%.1024s)",stroke_url);
 #if DRAW_BINARY_IMPLEMENTATION
       DrawPatternPath(context->image,CurrentContext,pattern_spec,&CurrentContext->stroke_pattern);
 #endif

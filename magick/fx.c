@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -537,7 +537,7 @@ ColorMatrixImage(Image *image,const unsigned int order,const double *color_matri
           *row_text='\0';
           for (u=0; u < width; u++)
             {
-              FormatString(cell_text,"%#12.4g",*k++);
+              MagickFormatString(cell_text,sizeof(cell_text),"%#12.4g",*k++);
               (void) strlcat(row_text,cell_text,sizeof(row_text));
               if (u%5 == 4)
                 {

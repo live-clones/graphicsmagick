@@ -124,7 +124,7 @@ static unsigned int IsVICAR(const unsigned char *magick,const size_t length)
 %
 */
 static Image *ReadVICARImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                             ExceptionInfo *exception)
 {
   char
     keyword[MaxTextExtent],
@@ -175,91 +175,91 @@ static Image *ReadVICARImage(const ImageInfo *image_info,
   image->columns=0;
   image->rows=0;
   while (isgraph(c) && ((image->columns == 0) || (image->rows == 0)))
-  {
-    if (!isalnum(c))
-      {
-        if ((c=ReadBlobByte(image)) == EOF)
-          break;
-        count++;
-      }
-    else
-      {
-        register char
-          *p;
+    {
+      if (!isalnum(c))
+        {
+          if ((c=ReadBlobByte(image)) == EOF)
+            break;
+          count++;
+        }
+      else
+        {
+          register char
+            *p;
 
-        /*
-          Determine a keyword and its value.
-        */
-        p=keyword;
-        do
-        {
-          if ((p-keyword) < (MaxTextExtent-1))
-            *p++=c;
-          if ((c=ReadBlobByte(image)) == EOF)
+          /*
+            Determine a keyword and its value.
+          */
+          p=keyword;
+          do
+            {
+              if ((p-keyword) < (MaxTextExtent-1))
+                *p++=c;
+              if ((c=ReadBlobByte(image)) == EOF)
+                break;
+              count++;
+            } while (isalnum(c) || (c == '_'));
+          if (EOFBlob(image))
             break;
-          count++;
-        } while (isalnum(c) || (c == '_'));
-        if (EOFBlob(image))
-          break;
-        *p='\0';
-        value_expected=False;
-        while (isspace(c) || (c == '='))
+          *p='\0';
+          value_expected=False;
+          while (isspace(c) || (c == '='))
+            {
+              if (c == '=')
+                value_expected=True;
+              if ((c=ReadBlobByte(image)) == EOF)
+                break;
+              count++;
+            }
+          if (EOFBlob(image))
+            break;
+          if (value_expected == False)
+            continue;
+          p=value;
+          while (isalnum(c))
+            {
+              if ((p-value) < (MaxTextExtent-1))
+                *p++=c;
+              if ((c=ReadBlobByte(image)) == EOF)
+                break;
+              count++;
+            }
+          if (EOFBlob(image))
+            break;
+          *p='\0';
+          /*
+            Assign a value to the specified keyword.
+          */
+          if (LocaleCompare(keyword,"Label_RECORDS") == 0)
+            length=MagickAtoL(value);
+          if (LocaleCompare(keyword,"LBLSIZE") == 0)
+            length=MagickAtoL(value);
+          if (LocaleCompare(keyword,"RECORD_BYTES") == 0)
+            image->columns= MagickAtoL(value);
+          if (LocaleCompare(keyword,"NS") == 0)
+            image->columns= MagickAtoL(value);
+          if (LocaleCompare(keyword,"LINES") == 0)
+            image->rows= MagickAtoL(value);
+          if (LocaleCompare(keyword,"NL") == 0)
+            image->rows= MagickAtoL(value);
+        }
+      while (isspace(c))
         {
-          if (c == '=')
-            value_expected=True;
           if ((c=ReadBlobByte(image)) == EOF)
             break;
           count++;
         }
-        if (EOFBlob(image))
-          break;
-        if (value_expected == False)
-          continue;
-        p=value;
-        while (isalnum(c))
-        {
-          if ((p-value) < (MaxTextExtent-1))
-            *p++=c;
-          if ((c=ReadBlobByte(image)) == EOF)
-            break;
-          count++;
-        }
-        if (EOFBlob(image))
-          break;
-        *p='\0';
-        /*
-          Assign a value to the specified keyword.
-        */
-        if (LocaleCompare(keyword,"Label_RECORDS") == 0)
-          length=MagickAtoL(value);
-        if (LocaleCompare(keyword,"LBLSIZE") == 0)
-          length=MagickAtoL(value);
-        if (LocaleCompare(keyword,"RECORD_BYTES") == 0)
-          image->columns= MagickAtoL(value);
-        if (LocaleCompare(keyword,"NS") == 0)
-          image->columns= MagickAtoL(value);
-        if (LocaleCompare(keyword,"LINES") == 0)
-          image->rows= MagickAtoL(value);
-        if (LocaleCompare(keyword,"NL") == 0)
-          image->rows= MagickAtoL(value);
-      }
-    while (isspace(c))
+      if (EOFBlob(image))
+        break;
+    }
+  if (EOFBlob(image))
+    ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+  while (count < (long) length)
     {
       if ((c=ReadBlobByte(image)) == EOF)
         break;
       count++;
     }
-    if (EOFBlob(image))
-      break;
-  }
-  if (EOFBlob(image))
-    ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-  while (count < (long) length)
-  {
-    if ((c=ReadBlobByte(image)) == EOF)
-      break;
-    count++;
-  }
   if (EOFBlob(image))
     ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
   if ((image->columns == 0) || (image->rows == 0))
@@ -282,22 +282,22 @@ static Image *ReadVICARImage(const ImageInfo *image_info,
   if (scanline == (unsigned char *) NULL)
     ThrowReaderException(CorruptImageError,UnableToReadImageData,image);
   for (y=0; y < (long) image->rows; y++)
-  {
-    if (!SetImagePixelsEx(image,0,y,image->columns,1,exception))
-      break;
-    if (ReadBlob(image,image->columns,scanline) != image->columns)
-      break;
-    if (ImportImagePixelArea(image,GrayQuantum,image->depth,scanline,0,0) ==
-        MagickFail)
-      break;
-    if (!SyncImagePixelsEx(image,exception))
-      break;
-    if (QuantumTick(y,image->rows))
-      if (!MagickMonitorFormatted(y,image->rows,exception,LoadImageText,
-                                  image->filename,
-                                  image->columns,image->rows))
+    {
+      if (!SetImagePixelsEx(image,0,y,image->columns,1,exception))
         break;
-  }
+      if (ReadBlob(image,image->columns,scanline) != image->columns)
+        break;
+      if (ImportImagePixelArea(image,GrayQuantum,image->depth,scanline,0,0) ==
+          MagickFail)
+        break;
+      if (!SyncImagePixelsEx(image,exception))
+        break;
+      if (QuantumTick(y,image->rows))
+        if (!MagickMonitorFormatted(y,image->rows,exception,LoadImageText,
+                                    image->filename,
+                                    image->columns,image->rows))
+          break;
+    }
   MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   if (EOFBlob(image))
     ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
@@ -434,10 +434,11 @@ static unsigned int WriteVICARImage(const ImageInfo *image_info,Image *image)
     Write header.
   */
   (void) memset(header,' ',MaxTextExtent);
-  FormatString(header,"LBLSIZE=%u FORMAT='BYTE' TYPE='IMAGE' BUFSIZE=20000 "
-    "DIM=2 EOL=0 RECSIZE=%lu ORG='BSQ' NL=%lu NS=%lu NB=1 N1=0 N2=0 N3=0 N4=0 "
-    "NBB=0 NLB=0 TASK='GraphicsMagick'",MaxTextExtent,image->columns,image->rows,
-    image->columns);
+  MagickFormatString(header,sizeof(header),
+                     "LBLSIZE=%u FORMAT='BYTE' TYPE='IMAGE' BUFSIZE=20000 "
+                     "DIM=2 EOL=0 RECSIZE=%lu ORG='BSQ' NL=%lu NS=%lu NB=1 N1=0 N2=0 N3=0 N4=0 "
+                     "NBB=0 NLB=0 TASK='GraphicsMagick'",MaxTextExtent,image->columns,image->rows,
+                     image->columns);
   (void) WriteBlob(image,MaxTextExtent,header);
   /*
     Allocate memory for scanline.
@@ -449,18 +450,18 @@ static unsigned int WriteVICARImage(const ImageInfo *image_info,Image *image)
     Write VICAR scanline.
   */
   for (y=0; y < (long) image->rows; y++)
-  {
-    if (!AcquireImagePixels(image,0,y,image->columns,1,&image->exception))
-      break;
-    (void) ExportImagePixelArea(image,GrayQuantum,8,scanline,0,0);
-    (void) WriteBlob(image,image->columns,scanline);
-    if (image->previous == (Image *) NULL)
-      if (QuantumTick(y,image->rows))
-        if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                    SaveImageText,image->filename,
-                                    image->columns,image->rows))
-          break;
-  }
+    {
+      if (!AcquireImagePixels(image,0,y,image->columns,1,&image->exception))
+        break;
+      (void) ExportImagePixelArea(image,GrayQuantum,8,scanline,0,0);
+      (void) WriteBlob(image,image->columns,scanline);
+      if (image->previous == (Image *) NULL)
+        if (QuantumTick(y,image->rows))
+          if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                      SaveImageText,image->filename,
+                                      image->columns,image->rows))
+            break;
+    }
   MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   status &= CloseBlob(image);
   return(status);

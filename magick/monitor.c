@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2021 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -245,7 +245,7 @@ MagickMonitorFormatted(const magick_int64_t quantum,
         text[MaxTextExtent];
 
       va_start(operands,format);
-      FormatStringList(text,format,operands);
+      MagickFormatStringList(text,sizeof(text),format,operands);
       va_end(operands);
       /*
         Serialize calls to the handler so that it will

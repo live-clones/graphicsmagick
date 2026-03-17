@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2025 GraphicsMagick Group */
+/* Copyright (C) 2003-2026 GraphicsMagick Group */
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -174,10 +174,10 @@ WandExport MagickWand *CloneMagickWand(const MagickWand *wand)
   clone_wand=MagickAllocateMemory(MagickWand *,sizeof(MagickWand));
   if (clone_wand == (MagickWand *) NULL)
     MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-      UnableToAllocateImage);
+                      UnableToAllocateImage);
   (void) memset(clone_wand,0,sizeof(MagickWand));
   (void) MagickFormatString(clone_wand->id,MaxTextExtent,"MagickWand-%lu",
-    GetMagickWandId());
+                            GetMagickWandId());
   GetExceptionInfo(&clone_wand->exception);
   CopyException(&clone_wand->exception,&wand->exception);
   clone_wand->image_info=CloneImageInfo(wand->image_info);
@@ -215,7 +215,7 @@ WandExport MagickWand *CloneMagickWand(const MagickWand *wand)
 %
 */
 static MagickWand *CloneMagickWandWithImages(const MagickWand *wand,
-  Image *images)
+                                             Image *images)
 {
   MagickWand
     *clone_wand;
@@ -228,7 +228,7 @@ static MagickWand *CloneMagickWandWithImages(const MagickWand *wand,
                       UnableToAllocateWand);
   (void) memset(clone_wand,0,sizeof(MagickWand));
   (void) MagickFormatString(clone_wand->id,MaxTextExtent,"MagickWand-%lu",
-    GetMagickWandId());
+                            GetMagickWandId());
   GetExceptionInfo(&clone_wand->exception);
   CopyException(&clone_wand->exception,&wand->exception);
   clone_wand->image_info=CloneImageInfo(wand->image_info);
@@ -308,7 +308,9 @@ WandExport unsigned int DestroyMagickWand(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickAdaptiveThresholdImage(MagickWand *wand,
-  const unsigned long width,const unsigned long height,const long offset)
+                                                     const unsigned long width,
+                                                     const unsigned long height,
+                                                     const long offset)
 {
   Image
     *threshold_image;
@@ -318,7 +320,7 @@ WandExport unsigned int MagickAdaptiveThresholdImage(MagickWand *wand,
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
   threshold_image=AdaptiveThresholdImage(wand->image,width,height,offset,
-    &wand->exception);
+                                         &wand->exception);
   if (threshold_image == (Image *) NULL)
     return(False);
   ReplaceImageInList(&wand->image,threshold_image);
@@ -352,7 +354,7 @@ WandExport unsigned int MagickAdaptiveThresholdImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickAddImage(MagickWand *wand,
-  const MagickWand *add_wand)
+                                       const MagickWand *add_wand)
 {
   Image
     *images;
@@ -405,7 +407,7 @@ WandExport unsigned int MagickAddImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickAddNoiseImage(MagickWand *wand,
-  const NoiseType noise_type)
+                                            const NoiseType noise_type)
 {
   Image
     *noise_image;
@@ -449,7 +451,7 @@ WandExport unsigned int MagickAddNoiseImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickAffineTransformImage(MagickWand *wand,
-  const DrawingWand *drawing_wand)
+                                                   const DrawingWand *drawing_wand)
 {
   DrawInfo
     *draw_info;
@@ -465,7 +467,7 @@ WandExport unsigned int MagickAffineTransformImage(MagickWand *wand,
   if (draw_info == (DrawInfo *) NULL)
     return(False);
   affine_image=AffineTransformImage(wand->image,&draw_info->affine,
-    &wand->exception);
+                                    &wand->exception);
   DestroyDrawInfo(draw_info);
   if (affine_image == (Image *) NULL)
     return(False);
@@ -509,8 +511,9 @@ WandExport unsigned int MagickAffineTransformImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickAnnotateImage(MagickWand *wand,
-  const DrawingWand *drawing_wand,const double x,const double y,
-  const double angle,const char *text)
+                                            const DrawingWand *drawing_wand,
+                                            const double x,const double y,
+                                            const double angle,const char *text)
 {
   char
     geometry[MaxTextExtent];
@@ -569,7 +572,7 @@ WandExport unsigned int MagickAnnotateImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickAnimateImages(MagickWand *wand,
-  const char *server_name)
+                                            const char *server_name)
 {
   unsigned int
     status;
@@ -610,7 +613,7 @@ WandExport unsigned int MagickAnimateImages(MagickWand *wand,
 %
 */
 WandExport MagickWand *MagickAppendImages(MagickWand *wand,
-  const unsigned int stack)
+                                          const unsigned int stack)
 {
   Image
     *append_image;
@@ -675,7 +678,7 @@ WandExport MagickWand *MagickAppendImages(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickAutoOrientImage(MagickWand *wand,
-  const OrientationType current_orientation)
+                                              const OrientationType current_orientation)
 {
   Image
     *orient_image;
@@ -765,7 +768,7 @@ WandExport MagickWand *MagickAverageImages(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickBlackThresholdImage(MagickWand *wand,
-  const PixelWand *threshold)
+                                                  const PixelWand *threshold)
 {
   char
     thresholds[MaxTextExtent];
@@ -778,8 +781,8 @@ WandExport unsigned int MagickBlackThresholdImage(MagickWand *wand,
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
   (void) MagickFormatString(thresholds,MaxTextExtent,"%u,%u,%u,%u",
-    PixelGetRedQuantum(threshold),PixelGetGreenQuantum(threshold),
-    PixelGetBlueQuantum(threshold),PixelGetOpacityQuantum(threshold));
+                            PixelGetRedQuantum(threshold),PixelGetGreenQuantum(threshold),
+                            PixelGetBlueQuantum(threshold),PixelGetOpacityQuantum(threshold));
   status=BlackThresholdImage(wand->image,thresholds);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
@@ -818,7 +821,7 @@ WandExport unsigned int MagickBlackThresholdImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickBlurImage(MagickWand *wand,const double radius,
-  const double sigma)
+                                        const double sigma)
 {
   Image
     *blur_image;
@@ -867,8 +870,9 @@ WandExport unsigned int MagickBlurImage(MagickWand *wand,const double radius,
 %
 */
 WandExport unsigned int MagickBorderImage(MagickWand *wand,
-  const PixelWand *bordercolor,const unsigned long width,
-  const unsigned long height)
+                                          const PixelWand *bordercolor,
+                                          const unsigned long width,
+                                          const unsigned long height)
 {
   Image
     *border_image;
@@ -978,7 +982,8 @@ WandExport MagickPassFail MagickCdlImage(MagickWand *wand,const char *cdl)
 %
 */
 WandExport unsigned int MagickCharcoalImage(MagickWand *wand,
-  const double radius,const double sigma)
+                                            const double radius,
+                                            const double sigma)
 {
   Image
     *charcoal_image;
@@ -1029,8 +1034,10 @@ WandExport unsigned int MagickCharcoalImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickChopImage(MagickWand *wand,
-  const unsigned long width,const unsigned long height,const long x,
-  const long y)
+                                        const unsigned long width,
+                                        const unsigned long height,
+                                        const long x,
+                                        const long y)
 {
   Image
     *chop_image;
@@ -1155,7 +1162,8 @@ WandExport unsigned int MagickClipImage(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickClipPathImage(MagickWand *wand,
-  const char *pathname,const unsigned int inside)
+                                            const char *pathname,
+                                            const unsigned int inside)
 {
   unsigned int
     status;
@@ -1253,8 +1261,11 @@ WandExport MagickWand *MagickCoalesceImages(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickColorFloodfillImage(MagickWand *wand,
-  const PixelWand *fill,const double fuzz,const PixelWand *bordercolor,
-  const long x,const long y)
+                                                  const PixelWand *fill,
+                                                  const double fuzz,
+                                                  const PixelWand *bordercolor,
+                                                  const long x,
+                                                  const long y)
 {
   DrawInfo
     *draw_info;
@@ -1272,12 +1283,12 @@ WandExport unsigned int MagickColorFloodfillImage(MagickWand *wand,
   draw_info=CloneDrawInfo(wand->image_info,(DrawInfo *) NULL);
   PixelGetQuantumColor(fill,&draw_info->fill);
   (void) AcquireOnePixelByReference(wand->image,&target,x % wand->image->columns,
-    y % wand->image->rows,&wand->exception);
+                                    y % wand->image->rows,&wand->exception);
   if (bordercolor != (PixelWand *) NULL)
     PixelGetQuantumColor(bordercolor,&target);
   wand->image->fuzz=fuzz;
   status=ColorFloodfillImage(wand->image,draw_info,target,x,y,
-    bordercolor != (PixelWand *) NULL ? FillToBorderMethod : FloodfillMethod);
+                             bordercolor != (PixelWand *) NULL ? FillToBorderMethod : FloodfillMethod);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
   DestroyDrawInfo(draw_info);
@@ -1312,7 +1323,8 @@ WandExport unsigned int MagickColorFloodfillImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickColorizeImage(MagickWand *wand,
-  const PixelWand *colorize,const PixelWand *opacity)
+                                            const PixelWand *colorize,
+                                            const PixelWand *opacity)
 {
   char
     percent_opaque[MaxTextExtent];
@@ -1328,14 +1340,14 @@ WandExport unsigned int MagickColorizeImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) MagickFormatString(percent_opaque,MaxTextExtent,"%g,%g,%g,%g",
-    100.0*PixelGetRedQuantum(colorize)/MaxRGB,
-    100.0*PixelGetGreenQuantum(colorize)/MaxRGB,
-    100.0*PixelGetBlueQuantum(colorize)/MaxRGB,
-    100.0*PixelGetOpacityQuantum(colorize)/MaxRGB);
+  (void) MagickFormatString(percent_opaque,sizeof(percent_opaque),"%g,%g,%g,%g",
+                            100.0*PixelGetRedQuantum(colorize)/MaxRGB,
+                            100.0*PixelGetGreenQuantum(colorize)/MaxRGB,
+                            100.0*PixelGetBlueQuantum(colorize)/MaxRGB,
+                            100.0*PixelGetOpacityQuantum(colorize)/MaxRGB);
   PixelGetQuantumColor(colorize,&target);
   colorize_image=ColorizeImage(wand->image,percent_opaque,target,
-    &wand->exception);
+                               &wand->exception);
   if (colorize_image == (Image *) NULL)
     return(False);
   ReplaceImageInList(&wand->image,colorize_image);
@@ -1539,8 +1551,10 @@ WandExport MagickWand *MagickCompareImages(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickCompositeImage(MagickWand *wand,
-  const MagickWand *composite_wand,const CompositeOperator compose,const long x,
-  const long y)
+                                             const MagickWand *composite_wand,
+                                             const CompositeOperator compose,
+                                             const long x,
+                                             const long y)
 {
   unsigned int
     status;
@@ -1629,7 +1643,8 @@ WandExport unsigned int MagickContrastImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickConvolveImage(MagickWand *wand,
-  const unsigned long order,const double *kernel)
+                                            const unsigned long order,
+                                            const double *kernel)
 {
   Image
     *convolve_image;
@@ -1682,8 +1697,10 @@ WandExport unsigned int MagickConvolveImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickCropImage(MagickWand *wand,
-  const unsigned long width,const unsigned long height,const long x,
-  const long y)
+                                        const unsigned long width,
+                                        const unsigned long height,
+                                        const long x,
+                                        const long y)
 {
   Image
     *crop_image;
@@ -1735,7 +1752,7 @@ WandExport unsigned int MagickCropImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickCycleColormapImage(MagickWand *wand,
-  const long displace)
+                                                 const long displace)
 {
   unsigned int
     status;
@@ -1912,7 +1929,7 @@ WandExport unsigned int MagickDespeckleImage(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickDisplayImage(MagickWand *wand,
-  const char *server_name)
+                                           const char *server_name)
 {
   Image
     *image;
@@ -1962,7 +1979,7 @@ WandExport unsigned int MagickDisplayImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickDisplayImages(MagickWand *wand,
-  const char *server_name)
+                                            const char *server_name)
 {
   unsigned int
     status;
@@ -2002,7 +2019,7 @@ WandExport unsigned int MagickDisplayImages(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickDrawImage(MagickWand *wand,
-  const DrawingWand *drawing_wand)
+                                        const DrawingWand *drawing_wand)
 {
   DrawInfo
     *draw_info;
@@ -2108,7 +2125,7 @@ WandExport unsigned int MagickEdgeImage(MagickWand *wand,const double radius)
 %
 */
 WandExport unsigned int MagickEmbossImage(MagickWand *wand,const double radius,
-  const double sigma)
+                                          const double sigma)
 {
   Image
     *emboss_image;
@@ -2420,8 +2437,11 @@ WandExport unsigned int MagickFlopImage(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickFrameImage(MagickWand *wand,
-  const PixelWand *matte_color,const unsigned long width,
-  const unsigned long height,const long inner_bevel,const long outer_bevel)
+                                         const PixelWand *matte_color,
+                                         const unsigned long width,
+                                         const unsigned long height,
+                                         const long inner_bevel,
+                                         const long outer_bevel)
 {
   Image
     *frame_image;
@@ -2588,7 +2608,7 @@ WandExport unsigned int MagickGammaImage(MagickWand *wand,const double gamma)
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  FormatString(level,"%g",gamma);
+  MagickFormatString(level,sizeof(level),"%g",gamma);
   status=GammaImage(wand->image,level);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
@@ -2952,8 +2972,9 @@ WandExport unsigned int MagickGetImageBackgroundColor(MagickWand *wand,
 %    o y: The chromaticity blue primary y-point.
 %
 */
-WandExport unsigned int MagickGetImageBluePrimary(MagickWand *wand,double *x,
-  double *y)
+WandExport unsigned int MagickGetImageBluePrimary(MagickWand *wand,
+                                                  double *x,
+                                                  double *y)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -2990,7 +3011,7 @@ WandExport unsigned int MagickGetImageBluePrimary(MagickWand *wand,double *x,
 %
 */
 WandExport unsigned int MagickGetImageBorderColor(MagickWand *wand,
-  PixelWand *border_color)
+                                                  PixelWand *border_color)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -3227,7 +3248,9 @@ MagickGetImageChannelExtrema(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickGetImageChannelMean(MagickWand *wand,
-  const ChannelType channel,double *mean,double *standard_deviation)
+                                                  const ChannelType channel,
+                                                  double *mean,
+                                                  double *standard_deviation)
 {
   ImageStatistics
     statistics;
@@ -3328,7 +3351,8 @@ WandExport unsigned int MagickGetImageChannelMean(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickGetImageColormapColor(MagickWand *wand,
-  const unsigned long index,PixelWand *color)
+                                                    const unsigned long index,
+                                                    PixelWand *color)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -3563,7 +3587,8 @@ WandExport unsigned long MagickGetImageDepth(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickGetImageExtrema(MagickWand *wand,
-  unsigned long *min,unsigned long *max)
+                                              unsigned long *min,
+                                              unsigned long *max)
 {
   ImageStatistics
     statistics;
@@ -3852,7 +3877,7 @@ WandExport GravityType MagickGetImageGravity(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickGetImageGreenPrimary(MagickWand *wand,double *x,
-  double *y)
+                                                   double *y)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -3923,7 +3948,7 @@ WandExport unsigned long MagickGetImageHeight(MagickWand *wand)
 %
 */
 WandExport PixelWand **MagickGetImageHistogram(MagickWand *wand,
-  unsigned long *number_colors)
+                                               unsigned long *number_colors)
 {
   HistogramColorPacket
     *histogram;
@@ -3943,10 +3968,10 @@ WandExport PixelWand **MagickGetImageHistogram(MagickWand *wand,
     return((PixelWand **) NULL);
   pixel_wands=NewPixelWands(*number_colors);
   for (i=0; i < (long) *number_colors; i++)
-  {
-    PixelSetQuantumColor(pixel_wands[i],&histogram[i].pixel);
-    PixelSetColorCount(pixel_wands[i],histogram[i].count);
-  }
+    {
+      PixelSetQuantumColor(pixel_wands[i],&histogram[i].pixel);
+      PixelSetColorCount(pixel_wands[i],histogram[i].count);
+    }
   MagickFreeMemory(histogram);
   return(pixel_wands);
 }
@@ -4260,9 +4285,13 @@ WandExport unsigned int MagickGetImagePage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickGetImagePixels(MagickWand *wand,
-  const long x_offset,const long y_offset,const unsigned long columns,
-  const unsigned long rows,const char *map,const StorageType storage,
-  unsigned char *pixels)
+                                             const long x_offset,
+                                             const long y_offset,
+                                             const unsigned long columns,
+                                             const unsigned long rows,
+                                             const char *map,
+                                             const StorageType storage,
+                                             unsigned char *pixels)
 {
   unsigned int
     status;
@@ -4272,7 +4301,7 @@ WandExport unsigned int MagickGetImagePixels(MagickWand *wand,
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
   status=DispatchImage(wand->image,x_offset,y_offset,columns,rows,map,
-    storage,pixels,&wand->exception);
+                       storage,pixels,&wand->exception);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
   return(status);
@@ -4306,7 +4335,8 @@ WandExport unsigned int MagickGetImagePixels(MagickWand *wand,
 %
 */
 WandExport unsigned char *MagickGetImageProfile(MagickWand *wand,
-  const char *name,unsigned long *length)
+                                                const char *name,
+                                                unsigned long *length)
 {
   size_t
     profile_length=0;
@@ -4361,7 +4391,7 @@ WandExport unsigned char *MagickGetImageProfile(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickGetImageRedPrimary(MagickWand *wand,double *x,
-  double *y)
+                                                 double *y)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -4435,7 +4465,7 @@ WandExport RenderingIntent MagickGetImageRenderingIntent(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickGetImageResolution(MagickWand *wand,double *x,
-  double *y)
+                                                 double *y)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -4717,8 +4747,9 @@ WandExport VirtualPixelMethod MagickGetImageVirtualPixelMethod(MagickWand *wand)
 %    o y: The chromaticity white y-point.
 %
 */
-WandExport unsigned int MagickGetImageWhitePoint(MagickWand *wand,double *x,
-  double *y)
+WandExport unsigned int MagickGetImageWhitePoint(MagickWand *wand,
+                                                 double *x,
+                                                 double *y)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -4920,7 +4951,7 @@ WandExport unsigned long MagickGetResourceLimit(const ResourceType type)
 %
 */
 WandExport double *MagickGetSamplingFactors(MagickWand *wand,
-  unsigned long *number_factors)
+                                            unsigned long *number_factors)
 {
   double
     *sampling_factors;
@@ -4939,25 +4970,25 @@ WandExport double *MagickGetSamplingFactors(MagickWand *wand,
     return(sampling_factors);
   i=0;
   for (p=wand->image_info->sampling_factor; p != (char *) NULL; p=strchr(p,','))
-  {
-    while (((int) *p != 0) && ((isspace((int) ((unsigned char) *p)) != 0) ||
-           (*p == ',')))
-      p++;
-    i++;
-  }
+    {
+      while (((int) *p != 0) && ((isspace((int) ((unsigned char) *p)) != 0) ||
+                                 (*p == ',')))
+        p++;
+      i++;
+    }
   sampling_factors=MagickAllocateMemory(double *,(size_t) i*sizeof(double));
   if (sampling_factors == (double *) NULL)
     MagickFatalError(ResourceLimitFatalError,MemoryAllocationFailed,
-      wand->image_info->filename);
+                     wand->image_info->filename);
   i=0;
   for (p=wand->image_info->sampling_factor; p != (char *) NULL; p=strchr(p,','))
-  {
-    while (((int) *p != 0) && ((isspace((int) ((unsigned char) *p)) != 0) ||
-           (*p == ',')))
-      p++;
-    sampling_factors[i]=atof(p);
-    i++;
-  }
+    {
+      while (((int) *p != 0) && ((isspace((int) ((unsigned char) *p)) != 0) ||
+                                 (*p == ',')))
+        p++;
+      sampling_factors[i]=atof(p);
+      i++;
+    }
   *number_factors=(unsigned long) i;
   return(sampling_factors);
 }
@@ -5124,7 +5155,7 @@ WandExport MagickPassFail MagickHaldClutImage(MagickWand *wand,const MagickWand 
 %
 */
 WandExport unsigned int MagickHasColormap(MagickWand *wand,
-  unsigned int *colormap)
+                                          unsigned int *colormap)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -5277,7 +5308,7 @@ WandExport unsigned int MagickImplodeImage(MagickWand *wand,const double amount)
 %
 */
 WandExport unsigned int MagickIsGrayImage(MagickWand *wand,
-  unsigned int *grayimage)
+                                          unsigned int *grayimage)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -5319,7 +5350,7 @@ WandExport unsigned int MagickIsGrayImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickIsMonochromeImage(MagickWand *wand,
-  unsigned int *monochrome)
+                                                unsigned int *monochrome)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -5361,7 +5392,7 @@ WandExport unsigned int MagickIsMonochromeImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickIsOpaqueImage(MagickWand *wand,
-  unsigned int *opaque)
+                                            unsigned int *opaque)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -5406,7 +5437,7 @@ WandExport unsigned int MagickIsOpaqueImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickIsPaletteImage(MagickWand *wand,
-  unsigned int *palette)
+                                             unsigned int *palette)
 {
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
@@ -5495,7 +5526,9 @@ WandExport unsigned int MagickLabelImage(MagickWand *wand,const char *label)
 %
 */
 WandExport unsigned int MagickLevelImage(MagickWand *wand,
-  const double black_point,const double gamma,const double white_point)
+                                         const double black_point,
+                                         const double gamma,
+                                         const double white_point)
 {
   char
     levels[MaxTextExtent];
@@ -5507,8 +5540,8 @@ WandExport unsigned int MagickLevelImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) MagickFormatString(levels,MaxTextExtent,"%g,%g,%g",black_point,
-    white_point,gamma);
+  (void) MagickFormatString(levels,sizeof(levels),"%g,%g,%g",black_point,
+                            white_point,gamma);
   status=LevelImage(wand->image,levels);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
@@ -5557,8 +5590,10 @@ WandExport unsigned int MagickLevelImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickLevelImageChannel(MagickWand *wand,
-  const ChannelType channel,const double black_point,const double gamma,
-  const double white_point)
+                                                const ChannelType channel,
+                                                const double black_point,
+                                                const double gamma,
+                                                const double white_point)
 {
   unsigned int
     status;
@@ -5643,7 +5678,8 @@ WandExport unsigned int MagickMagnifyImage(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickMapImage(MagickWand *wand,
-  const MagickWand *map_wand,const unsigned int dither)
+                                       const MagickWand *map_wand,
+                                       const unsigned int dither)
 {
   unsigned int
     status;
@@ -5699,8 +5735,11 @@ WandExport unsigned int MagickMapImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickMatteFloodfillImage(MagickWand *wand,
-  const Quantum opacity,const double fuzz,const PixelWand *bordercolor,
-  const long x,const long y)
+                                                  const Quantum opacity,
+                                                  const double fuzz,
+                                                  const PixelWand *bordercolor,
+                                                  const long x,
+                                                  const long y)
 {
   DrawInfo
     *draw_info;
@@ -5718,11 +5757,11 @@ WandExport unsigned int MagickMatteFloodfillImage(MagickWand *wand,
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
   draw_info=CloneDrawInfo(wand->image_info,(DrawInfo *) NULL);
   (void) AcquireOnePixelByReference(wand->image,&target,x % wand->image->columns,
-    y % wand->image->rows,&wand->exception);
+                                    y % wand->image->rows,&wand->exception);
   if (bordercolor != (PixelWand *) NULL)
     PixelGetQuantumColor(bordercolor,&target);
   status=MatteFloodfillImage(wand->image,target,opacity,x,y,
-    bordercolor != (PixelWand *) NULL ? FillToBorderMethod : FloodfillMethod);
+                             bordercolor != (PixelWand *) NULL ? FillToBorderMethod : FloodfillMethod);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
   DestroyDrawInfo(draw_info);
@@ -5757,7 +5796,7 @@ WandExport unsigned int MagickMatteFloodfillImage(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickMedianFilterImage(MagickWand *wand,
-  const double radius)
+                                                const double radius)
 {
   Image
     *median_image;
@@ -5845,7 +5884,9 @@ WandExport unsigned int MagickMinifyImage(MagickWand *wand)
 %
 */
 WandExport unsigned int MagickModulateImage(MagickWand *wand,
-  const double brightness,const double saturation,const double hue)
+                                            const double brightness,
+                                            const double saturation,
+                                            const double hue)
 {
   char
     modulate[MaxTextExtent];
@@ -5857,8 +5898,8 @@ WandExport unsigned int MagickModulateImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) MagickFormatString(modulate,MaxTextExtent,"%g,%g,%g",brightness,
-    saturation,hue);
+  (void) MagickFormatString(modulate,sizeof(modulate),"%g,%g,%g",brightness,
+                            saturation,hue);
   status=ModulateImage(wand->image,modulate);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
@@ -5906,8 +5947,11 @@ WandExport unsigned int MagickModulateImage(MagickWand *wand,
 %
 */
 WandExport MagickWand *MagickMontageImage(MagickWand *wand,
-  const DrawingWand *drawing_wand,const char *tile_geometry,
-  const char *thumbnail_geometry,const MontageMode mode,const char *frame)
+                                          const DrawingWand *drawing_wand,
+                                          const char *tile_geometry,
+                                          const char *thumbnail_geometry,
+                                          const MontageMode mode,
+                                          const char *frame)
 {
   char
     *font;
@@ -5927,31 +5971,31 @@ WandExport MagickWand *MagickMontageImage(MagickWand *wand,
     return(False);
   montage_info=CloneMontageInfo(wand->image_info,(MontageInfo *) NULL);
   switch (mode)
-  {
+    {
     case FrameMode:
-    {
-      (void) CloneString(&montage_info->frame,"15x15+3+3");
-      montage_info->shadow=True;
-      break;
-    }
+      {
+        (void) CloneString(&montage_info->frame,"15x15+3+3");
+        montage_info->shadow=True;
+        break;
+      }
     case UnframeMode:
-    {
-      montage_info->frame=(char *) NULL;
-      montage_info->shadow=False;
-      montage_info->border_width=0;
-      break;
-    }
+      {
+        montage_info->frame=(char *) NULL;
+        montage_info->shadow=False;
+        montage_info->border_width=0;
+        break;
+      }
     case ConcatenateMode:
-    {
-      montage_info->frame=(char *) NULL;
-      montage_info->shadow=False;
-      (void) CloneString(&montage_info->geometry,"+0+0");
-      montage_info->border_width=0;
-      break;
-    }
+      {
+        montage_info->frame=(char *) NULL;
+        montage_info->shadow=False;
+        (void) CloneString(&montage_info->geometry,"+0+0");
+        montage_info->border_width=0;
+        break;
+      }
     default:
       break;
-  }
+    }
   font=MagickDrawGetFont(drawing_wand);
   if (font != (char *) NULL)
     {
@@ -7381,7 +7425,7 @@ WandExport unsigned int MagickRemoveImageOption(MagickWand *wand,
 
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
-  (void) MagickFormatString(option,MaxTextExtent,"%.1024s:%.1024s",
+  (void) MagickFormatString(option,sizeof(option),"%.1024s:%.1024s",
     format,key);
   return (RemoveDefinitions(wand->image_info,option) ? True : False);
 }
@@ -9102,7 +9146,7 @@ WandExport unsigned int MagickSetImageOption(MagickWand *wand,
 
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
-  (void) MagickFormatString(option,MaxTextExtent,"%.1024s:%.1024s=%.1024s",
+  (void) MagickFormatString(option,sizeof(option),"%.1024s:%.1024s=%.1024s",
     format,key,value);
   (void) AddDefinitions(wand->image_info,option,&wand->exception);
   return(True);
@@ -9147,21 +9191,22 @@ WandExport unsigned int MagickSetImageOption(MagickWand *wand,
 %
 */
 WandExport unsigned int MagickSetImageOrientation(MagickWand *wand,
-  const OrientationType new_orientation)
+                                                  const OrientationType new_orientation)
 {
   OrientationType orientation;
   char orientation_attribute[MaxTextExtent];
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
   orientation = ((new_orientation > UndefinedOrientation
-    && new_orientation <= LeftBottomOrientation)
-      ? new_orientation
-      : UndefinedOrientation);
-  FormatString(orientation_attribute,"%d",new_orientation);
+                  && new_orientation <= LeftBottomOrientation)
+                 ? new_orientation
+                 : UndefinedOrientation);
+  MagickFormatString(orientation_attribute,sizeof(orientation_attribute),
+                     "%d",new_orientation);
 
   if (wand->images == (Image *) NULL)
-      (void) ThrowException(&wand->exception,WandError,WandContainsNoImages,
-                            wand->id);
+    (void) ThrowException(&wand->exception,WandError,WandContainsNoImages,
+                          wand->id);
 
   (void) SetImageAttribute(wand->image, "EXIF:Orientation", orientation_attribute);
   wand->image->orientation = orientation;
@@ -9803,7 +9848,8 @@ MagickSetResolution(MagickWand *wand,
 
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
-  (void) MagickFormatString(geometry,MaxTextExtent,"%gx%g",x_resolution,y_resolution);
+  (void) MagickFormatString(geometry,sizeof(geometry),"%gx%g",
+                            x_resolution,y_resolution);
   (void) CloneString(&wand->image_info->density,geometry);
   if (wand->image != (Image *) NULL)
     {
@@ -9920,7 +9966,8 @@ WandExport unsigned int MagickSetResourceLimit(const ResourceType type,
 %
 */
 WandExport unsigned int MagickSetSamplingFactors(MagickWand *wand,
-  const unsigned long number_factors,const double *sampling_factors)
+                                                 const unsigned long number_factors,
+                                                 const double *sampling_factors)
 {
   char
     sampling_factor[MaxTextExtent];
@@ -9939,14 +9986,14 @@ WandExport unsigned int MagickSetSamplingFactors(MagickWand *wand,
   if (number_factors == 0)
     return(True);
   for (i=0; i < (long) (number_factors-1); i++)
-  {
-    (void) MagickFormatString(sampling_factor,MaxTextExtent,"%g%c",
-                              sampling_factors[i], i % 2 ?  ',' : 'x');
-    (void) ConcatenateString(&wand->image_info->sampling_factor,
-      sampling_factor);
-  }
-  (void) MagickFormatString(sampling_factor,MaxTextExtent,"%g",
-    sampling_factors[i]);
+    {
+      (void) MagickFormatString(sampling_factor,sizeof(sampling_factor),"%g%c",
+                                sampling_factors[i], i % 2 ?  ',' : 'x');
+      (void) ConcatenateString(&wand->image_info->sampling_factor,
+                               sampling_factor);
+    }
+  (void) MagickFormatString(sampling_factor,sizeof(sampling_factor),"%g",
+                            sampling_factors[i]);
   (void) ConcatenateString(&wand->image_info->sampling_factor,sampling_factor);
   return(True);
 }
@@ -9988,7 +10035,7 @@ WandExport unsigned int MagickSetSize(MagickWand *wand,
 
   assert(wand != (MagickWand *) NULL);
   assert(wand->signature == MagickSignature);
-  (void) MagickFormatString(geometry,MaxTextExtent,"%lux%lu",columns,rows);
+  (void) MagickFormatString(geometry,sizeof(geometry),"%lux%lu",columns,rows);
   (void) CloneString(&wand->image_info->size,geometry);
   return(True);
 }
@@ -10659,7 +10706,7 @@ WandExport unsigned int MagickTintImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) MagickFormatString(percent_opaque,MaxTextExtent,"%g,%g,%g,%g",
+  (void) MagickFormatString(percent_opaque,sizeof(percent_opaque),"%g,%g,%g,%g",
     100.0*PixelGetRedQuantum(tint)/MaxRGB,
     100.0*PixelGetGreenQuantum(tint)/MaxRGB,
     100.0*PixelGetBlueQuantum(tint)/MaxRGB,
@@ -10982,7 +11029,7 @@ WandExport unsigned int MagickWhiteThresholdImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) MagickFormatString(thresholds,MaxTextExtent,"%u,%u,%u,%u",
+  (void) MagickFormatString(thresholds,sizeof(thresholds),"%u,%u,%u,%u",
     PixelGetRedQuantum(threshold),PixelGetGreenQuantum(threshold),
     PixelGetBlueQuantum(threshold),PixelGetOpacityQuantum(threshold));
   status=WhiteThresholdImage(wand->image,thresholds);
@@ -11288,7 +11335,7 @@ WandExport MagickWand *NewMagickWand(void)
     MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
                       UnableToAllocateWand);
   (void) memset(wand,0,sizeof(MagickWand));
-  (void) MagickFormatString(wand->id,MaxTextExtent,"MagickWand-%lu",
+  (void) MagickFormatString(wand->id,sizeof(wand->id),"MagickWand-%lu",
     GetMagickWandId());
   GetExceptionInfo(&wand->exception);
   wand->image_info=CloneImageInfo((ImageInfo *) NULL);

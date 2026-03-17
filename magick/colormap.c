@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -236,8 +236,9 @@ MagickConstrainColormapIndex(Image *image, unsigned int index)
       char
         colormapIndexBuffer[MaxTextExtent];
 
-      FormatString(colormapIndexBuffer,"index %u >= %u colors, %.1024s",
-                   index, image->colors, image->filename);
+      MagickFormatString(colormapIndexBuffer,sizeof(colormapIndexBuffer),
+                         "index %u >= %u colors, %.1024s",
+                         index, image->colors, image->filename);
       errno=0;
       ThrowException(&image->exception,CorruptImageError,
                      InvalidColormapIndex,colormapIndexBuffer);

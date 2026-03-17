@@ -1963,13 +1963,13 @@ static void AddConfigurePath(MagickMap path_map, unsigned int *path_index,
   char
     key[MaxTextExtent];
 
-  FormatString(key,"%u",*path_index);
+  MagickFormatString(key,sizeof(key),"%u",*path_index);
   (void) MagickMapAddEntry(path_map,key,(void *)path,0,exception);
   (*path_index)++;
 }
 
 MagickExport void *GetConfigureBlob(const char *filename,char *path,
-  size_t *length,ExceptionInfo *exception)
+                                    size_t *length,ExceptionInfo *exception)
 {
   MagickMap
     path_map;
@@ -2000,7 +2000,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
     {
       /* MagickMap is a tiny allocation so failure to allocate it is fatal */
       ThrowException3(exception,ResourceLimitFatalError,MemoryAllocationFailed,
-      UnableToAllocateMagickMap);
+                      UnableToAllocateMagickMap);
       return (void *) NULL;
     }
 
@@ -2072,7 +2072,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
         return 0;
       }
 
-    FormatString(path,"%.1024s%s",key_value,DirectorySeparator);
+    MagickFormatString(path,MaxTextExtent,"%.1024s%s",key_value,DirectorySeparator);
     AddConfigurePath(path_map,&path_index,path,exception);
   }
 #  endif /* defined(MSWINDOWS) */
@@ -2090,28 +2090,28 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
     if (magick_home)
       {
 #if defined(POSIX)
-        FormatString(path,"%.1024s/share/%s/",magick_home,
-          MagickShareConfigSubDir);
+        MagickFormatString(path,MaxTextExtent,"%.1024s/share/%s/",magick_home,
+                           MagickShareConfigSubDir);
         AddConfigurePath(path_map,&path_index,path,exception);
 
-        FormatString(path,"%.1024s/lib/%s/",magick_home,
-          MagickLibConfigSubDir);
+        MagickFormatString(path,MaxTextExtent,"%.1024s/lib/%s/",magick_home,
+                           MagickLibConfigSubDir);
         AddConfigurePath(path_map,&path_index,path,exception);
 #else
-        FormatString(path,"%.1024s%s",magick_home,
-          DirectorySeparator);
+        MagickFormatString(path,MaxTextExtent,"%.1024s%s",magick_home,
+                           DirectorySeparator);
         AddConfigurePath(path_map,&path_index,path,exception);
 #endif /* defined(POSIX) */
       }
-    }
+  }
 
   if (getenv("HOME") != (char *) NULL)
     {
       /*
         Search $HOME/.magick.
       */
-      FormatString(path,"%.1024s%s%s",getenv("HOME"),
-        *getenv("HOME") == '/' ? "/.magick" : "",DirectorySeparator);
+      MagickFormatString(path,MaxTextExtent,"%.1024s%s%s",getenv("HOME"),
+                         *getenv("HOME") == '/' ? "/.magick" : "",DirectorySeparator);
       AddConfigurePath(path_map,&path_index,path,exception);
     }
 
@@ -2127,14 +2127,14 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       (void) strlcpy(prefix,SetClientPath((char *) NULL),sizeof(prefix));
       ChopPathComponents(prefix,1);
 
-      FormatString(path,"%.1024s/lib/%s/",prefix,MagickLibConfigSubDir);
+      MagickFormatString(path,MaxTextExtent,"%.1024s/lib/%s/",prefix,MagickLibConfigSubDir);
       AddConfigurePath(path_map,&path_index,path,exception);
 
-      FormatString(path,"%.1024s/share/%s/",prefix,MagickShareConfigSubDir);
+      MagickFormatString(path,MaxTextExtent,"%.1024s/share/%s/",prefix,MagickShareConfigSubDir);
       AddConfigurePath(path_map,&path_index,path,exception);
 #else /* defined(POSIX) */
-      FormatString(path,"%.1024s%s",SetClientPath((char *) NULL),
-        DirectorySeparator);
+      MagickFormatString(path,MaxTextExtent,"%.1024s%s",SetClientPath((char *) NULL),
+                         DirectorySeparator);
       AddConfigurePath(path_map,&path_index,path,exception);
 #endif /* !defined(POSIX) */
     }
@@ -2160,11 +2160,11 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
           if (search_path)
             (void) ConcatenateString(&search_path,list_separator);
           (void) ConcatenateString(&search_path,
-            (const char *) MagickMapDereferenceIterator(path_map_iterator,0));
+                                   (const char *) MagickMapDereferenceIterator(path_map_iterator,0));
         }
 
       (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-         "Searching for file \"%s\" in path \"%s\"",filename,search_path);
+                            "Searching for file \"%s\" in path \"%s\"",filename,search_path);
 
       MagickFreeMemory(search_path);
       MagickMapIterateToFront(path_map_iterator);
@@ -2178,16 +2178,16 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       FILE
         *file;
 
-      FormatString(test_path,"%.1024s%.256s",
-        (const char *)MagickMapDereferenceIterator(path_map_iterator,0),
-        filename);
+      MagickFormatString(test_path,sizeof(test_path),"%.1024s%.256s",
+                         (const char *)MagickMapDereferenceIterator(path_map_iterator,0),
+                         filename);
 
       file=fopen(test_path,"rb");
       if (file )
         {
           if (logging)
             (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-              "Found: %.1024s",test_path);
+                                  "Found: %.1024s",test_path);
           (void) strlcpy(path,test_path,MaxTextExtent);
           (void) MagickFseek(file,0L,SEEK_END);
           *length=MagickFtell(file); /* FIXME: ftell returns long, but size_t may be unsigned */
@@ -2232,7 +2232,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
 #endif /* defined(MSWINDOWS) */
 
   ThrowException(exception,ConfigureError,UnableToAccessConfigureFile,
-    filename);
+                 filename);
 
   return 0;
 }
@@ -2403,7 +2403,7 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                           "Allocated temporary file \"%s\"",unique);
-  FormatString(image->filename,"%.1024s:%.1024s",image->magick,unique);
+  MagickFormatString(image->filename,sizeof(image->filename),"%.1024s:%.1024s",image->magick,unique);
   status=WriteImage(clone_info,image);
   DestroyImageInfo(clone_info);
   if (status == MagickFail)

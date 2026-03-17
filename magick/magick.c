@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1584,8 +1584,8 @@ ListModuleMap(FILE *file,ExceptionInfo *exception)
 MagickExport char *
 MagickToMime(const char *magick)
 {
-   char
-     media[MaxTextExtent];
+  char
+    media[MaxTextExtent];
 
   unsigned int
     i;
@@ -1593,10 +1593,10 @@ MagickToMime(const char *magick)
   static const struct
   {
     const char
-      magick[14],
+    magick[14],
       *media;
   }
-  MediaTypes[] =
+    MediaTypes[] =
     {
       { "apng",  "image/apng" },
       { "avc",   "image/avci" },
@@ -1647,7 +1647,7 @@ MagickToMime(const char *magick)
   for (i=0; i < ArraySize(MediaTypes); i++)
     if (LocaleCompare(MediaTypes[i].magick,magick) == 0)
       return(AllocateString(MediaTypes[i].media));
-  FormatString(media,"image/x-%.1024s",magick);
+  MagickFormatString(media,sizeof(media),"image/x-%.1024s",magick);
   LocaleLower(media+8);
   return(AllocateString(media));
 }

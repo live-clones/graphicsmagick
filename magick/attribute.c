@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -493,21 +493,21 @@ TracePSClippingPath(unsigned char *blob,size_t length,
     return((char *) NULL);
   message=AllocateString((char *) NULL);
 
-  FormatString(message,"/ClipImage {\n");
+  MagickFormatString(message,MaxTextExtent,"/ClipImage {\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"/c {curveto} bind def\n");
+  MagickFormatString(message,MaxTextExtent,"/c {curveto} bind def\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"/l {lineto} bind def\n");
+  MagickFormatString(message,MaxTextExtent,"/l {lineto} bind def\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"/m {moveto} bind def\n");
+  MagickFormatString(message,MaxTextExtent,"/m {moveto} bind def\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"/v {currentpoint 6 2 roll curveto} bind def\n");
+  MagickFormatString(message,MaxTextExtent,"/v {currentpoint 6 2 roll curveto} bind def\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"/y {2 copy curveto} bind def\n");
+  MagickFormatString(message,MaxTextExtent,"/y {2 copy curveto} bind def\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"/z {closepath} bind def\n");
+  MagickFormatString(message,MaxTextExtent,"/z {closepath} bind def\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"newpath\n");
+  MagickFormatString(message,MaxTextExtent,"newpath\n");
   (void) ConcatenateString(&path,message);
 
   knot_count=0;
@@ -569,7 +569,7 @@ TracePSClippingPath(unsigned char *blob,size_t length,
                   }
                 if (!in_subpath)
                   {
-                    FormatString(message,"%.6f %.6f m\n",
+                    MagickFormatString(message,MaxTextExtent,"%.6f %.6f m\n",
                                  point[1].x,point[1].y);
                     for (i=0; i < 3; i++)
                       {
@@ -596,14 +596,14 @@ TracePSClippingPath(unsigned char *blob,size_t length,
                           anchor point. Straight line between anchor
                           points.
                         */
-                        FormatString(message,"%.6f %.6f l\n",
+                        MagickFormatString(message,MaxTextExtent,"%.6f %.6f l\n",
                                      point[1].x,point[1].y);
                       }
                     else if ((last[1].x == last[2].x) &&
                              (last[1].y == last[2].y))
                       {
                         /* First control point equals first anchor point */
-                        FormatString(message,"%.6f %.6f %.6f %.6f v\n",
+                        MagickFormatString(message,MaxTextExtent,"%.6f %.6f %.6f %.6f v\n",
                                      point[0].x,point[0].y,
                                      point[1].x,point[1].y);
                       }
@@ -611,14 +611,14 @@ TracePSClippingPath(unsigned char *blob,size_t length,
                              (point[0].y == point[1].y))
                       {
                         /* Last control point equals last anchor point. */
-                        FormatString(message,"%.6f %.6f %.6f %.6f y\n",
+                        MagickFormatString(message,MaxTextExtent,"%.6f %.6f %.6f %.6f y\n",
                                      last[2].x,last[2].y,
                                      point[1].x,point[1].y);
                       }
                     else
                       {
                         /* The full monty */
-                        FormatString(message,
+                        MagickFormatString(message,MaxTextExtent,
                                      "%.6f %.6f %.6f %.6f %.6f %.6f c\n",
                                      last[2].x,last[2].y,point[0].x,
                                      point[0].y,point[1].x,
@@ -645,26 +645,26 @@ TracePSClippingPath(unsigned char *blob,size_t length,
                         (first[0].x == first[1].x) &&
                         (first[0].y == first[1].y))
                       {
-                        FormatString(message,"%.6f %.6f l z\n",
+                        MagickFormatString(message,MaxTextExtent,"%.6f %.6f l z\n",
                                      first[1].x,first[1].y);
                       }
                     else if ((last[1].x == last[2].x) &&
                              (last[1].y == last[2].y))
                       {
-                        FormatString(message,"%.6f %.6f %.6f %.6f v z\n",
+                        MagickFormatString(message,MaxTextExtent,"%.6f %.6f %.6f %.6f v z\n",
                                      first[0].x,first[0].y,
                                      first[1].x,first[1].y);
                       }
                     else if ((first[0].x == first[1].x) &&
                              (first[0].y == first[1].y))
                       {
-                        FormatString(message,"%.6f %.6f %.6f %.6f y z\n",
+                        MagickFormatString(message,MaxTextExtent,"%.6f %.6f %.6f %.6f y z\n",
                                      last[2].x,last[2].y,
                                      first[1].x,first[1].y);
                       }
                     else
                       {
-                        FormatString(message,
+                        MagickFormatString(message,MaxTextExtent,
                                      "%.6f %.6f %.6f %.6f %.6f %.6f c z\n",
                                      last[2].x,last[2].y,
                                      first[0].x,first[0].y,
@@ -689,9 +689,9 @@ TracePSClippingPath(unsigned char *blob,size_t length,
   /*
     Returns an empty PS path if the path has no knots.
   */
-  FormatString(message,"eoclip\n");
+  MagickFormatString(message,MaxTextExtent,"eoclip\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"} bind def");
+  MagickFormatString(message,MaxTextExtent,"} bind def");
   (void) ConcatenateString(&path,message);
   MagickFreeMemory(message);
   return(path);
@@ -733,15 +733,15 @@ TraceSVGClippingPath(unsigned char *blob,
     return((char *) NULL);
   message=AllocateString((char *) NULL);
 
-  FormatString(message,"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n");
+  MagickFormatString(message,MaxTextExtent,"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"<svg width=\"%lu\" height=\"%lu\">\n",columns,rows);
+  MagickFormatString(message,MaxTextExtent,"<svg width=\"%lu\" height=\"%lu\">\n",columns,rows);
   (void) ConcatenateString(&path,message);
-  FormatString(message,"<g>\n");
+  MagickFormatString(message,MaxTextExtent,"<g>\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"<path style=\"fill:#00000000;stroke:#00000000;");
+  MagickFormatString(message,MaxTextExtent,"<path style=\"fill:#00000000;stroke:#00000000;");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"stroke-width:0;stroke-antialiasing:false\" d=\"\n");
+  MagickFormatString(message,MaxTextExtent,"stroke-width:0;stroke-antialiasing:false\" d=\"\n");
   (void) ConcatenateString(&path,message);
 
   knot_count=0;
@@ -803,7 +803,7 @@ TraceSVGClippingPath(unsigned char *blob,
                   }
                 if (!in_subpath)
                   {
-                    FormatString(message,"M %.6f,%.6f\n",
+                    MagickFormatString(message,MaxTextExtent,"M %.6f,%.6f\n",
                                  point[1].x,point[1].y);
                     for (i=0; i < 3; i++)
                       {
@@ -828,12 +828,12 @@ TraceSVGClippingPath(unsigned char *blob,
                           anchor point. Straight line between anchor
                           points.
                         */
-                        FormatString(message,"L %.6f,%.6f\n",
+                        MagickFormatString(message,MaxTextExtent,"L %.6f,%.6f\n",
                                      point[1].x,point[1].y);
                       }
                     else
                       {
-                        FormatString(message,
+                        MagickFormatString(message,MaxTextExtent,
                                      "C %.6f,%.6f %.6f,%.6f %.6f,%.6f\n",
                                      last[2].x,last[2].y,
                                      point[0].x,point[0].y,
@@ -860,12 +860,12 @@ TraceSVGClippingPath(unsigned char *blob,
                         (first[0].x == first[1].x) &&
                         (first[0].y == first[1].y))
                       {
-                        FormatString(message,
+                        MagickFormatString(message,MaxTextExtent,
                                      "L %.6f,%.6f Z\n",first[1].x,first[1].y);
                       }
                     else
                       {
-                        FormatString(message,
+                        MagickFormatString(message,MaxTextExtent,
                                      "C %.6f,%.6f %.6f,%.6f %.6f,%.6f Z\n",
                                      last[2].x,last[2].y,
                                      first[0].x,first[0].y,
@@ -890,11 +890,11 @@ TraceSVGClippingPath(unsigned char *blob,
   /*
     Returns an empty SVG image if the path has no knots.
   */
-  FormatString(message,"\"/>\n");
+  MagickFormatString(message,MaxTextExtent,"\"/>\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"</g>\n");
+  MagickFormatString(message,MaxTextExtent,"</g>\n");
   (void) ConcatenateString(&path,message);
-  FormatString(message,"</svg>\n");
+  MagickFormatString(message,MaxTextExtent,"</svg>\n");
   (void) ConcatenateString(&path,message);
   MagickFreeMemory(message);
   return(path);
@@ -1567,7 +1567,7 @@ EXIFIfdTagToDescription(unsigned int t, char *tag_description)
     }
 #endif
 
-  FormatString(tag_description,"0x%04X",t);
+  MagickFormatString(tag_description,MaxTextExtent,"0x%04X",t);
   return tag_description;
 }
 
@@ -2343,7 +2343,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                 case EXIF_FMT_SBYTE:
                   {
                     /* 8-bit signed integer */
-                    FormatString(s,"%d",(int) (*(char *) pval));
+                    MagickFormatString(s,sizeof(s),"%d",(int) (*(char *) pval));
                     value=AllocateString(s);
                     break;
                   }
@@ -2367,7 +2367,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                       }
 #if 0
                     printf("format %u, length %u\n",f,n);
-                    FormatString(s,"%ld",(long) (*(unsigned char *) pval));
+                    MagickFormatString(s,sizeof(s),"%ld",(long) (*(unsigned char *) pval));
                     value=AllocateString(s);
 #endif
                     break;
@@ -2383,7 +2383,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                                 (MAGICK_SSIZE_T) (pval-tiffp));
                         goto generate_attribute_failure;
                       }
-                    FormatString(s,"%hd",Read16u(morder,pval));
+                    MagickFormatString(s,sizeof(s),"%hd",Read16u(morder,pval));
                     value=AllocateString(s);
                     break;
                   }
@@ -2398,7 +2398,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                                 (MAGICK_SSIZE_T) (pval-tiffp));
                         goto generate_attribute_failure;
                       }
-                    FormatString(s,"%hu",Read16s(morder,pval));
+                    MagickFormatString(s,sizeof(s),"%hu",Read16s(morder,pval));
                     value=AllocateString(s);
                     break;
                   }
@@ -2418,7 +2418,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                     */
                     if (all || (tag == (int) t))
                       {
-                        FormatString(s,"%u",offset);
+                        MagickFormatString(s,sizeof(s),"%u",offset);
                         value=AllocateString(s);
                       }
                     if (GPS_OFFSET == t)
@@ -2437,7 +2437,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                                 (MAGICK_SSIZE_T) (pval-tiffp));
                         goto generate_attribute_failure;
                       }
-                    FormatString(s,"%d",(int) Read32s(morder,pval));
+                    MagickFormatString(s,sizeof(s),"%d",(int) Read32s(morder,pval));
                     value=AllocateString(s);
                     break;
                   }
@@ -2456,7 +2456,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                                     (MAGICK_SSIZE_T) (pval-tiffp));
                             goto generate_attribute_failure;
                           }
-                        FormatString(s,"%u/%u,%u/%u,%u/%u"
+                        MagickFormatString(s,MaxTextExtent,"%u/%u,%u/%u,%u/%u"
                                      ,(unsigned) Read32u(morder,pval),
                                      (unsigned) Read32u(morder,4+pval)
                                      ,(unsigned) Read32u(morder,8+pval),
@@ -2475,7 +2475,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                                     (MAGICK_SSIZE_T) (pval-tiffp));
                             goto generate_attribute_failure;
                           }
-                        FormatString(s,"%u/%u"
+                        MagickFormatString(s,sizeof(s),"%u/%u"
                                      ,(unsigned) Read32u(morder,pval),
                                      (unsigned) Read32u(morder,4+pval)
                                      );
@@ -2493,7 +2493,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                                                 (MAGICK_SSIZE_T) (pval-tiffp));
                         goto generate_attribute_failure;
                       }
-                    FormatString(s,"%d/%d",(int) Read32s(morder,pval),
+                    MagickFormatString(s,sizeof(s),"%d/%d",(int) Read32s(morder,pval),
                                  (int) Read32s(morder,4+pval));
                     value=AllocateString(s);
                     break;
@@ -2510,7 +2510,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                         goto generate_attribute_failure;
                       }
                     (void) memcpy(&fval,pval,sizeof(fval));
-                    FormatString(s,"%f",(double) fval);
+                    MagickFormatString(s,sizeof(s),"%f",(double) fval);
                     value=AllocateString(s);
                     break;
                   }
@@ -2526,7 +2526,7 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                         goto generate_attribute_failure;
                       }
                     (void) memcpy(&dval,pval,sizeof(dval));
-                    FormatString(s,"%f",dval);
+                    MagickFormatString(s,sizeof(s),"%f",dval);
                     value=AllocateString(s);
                     break;
                   }
@@ -2602,13 +2602,13 @@ GenerateEXIFAttribute(Image *image,const char *specification)
                     case 1:
                       {
                         description=EXIFIfdTagToDescription(t,tag_description);
-                        FormatString(s,"%.1024s=",description);
+                        MagickFormatString(s,sizeof(s),"%.1024s=",description);
                         (void) ConcatenateString(&final,s);
                         break;
                       }
                     case 2:
                       {
-                        FormatString(s,"#%04x=",t);
+                        MagickFormatString(s,sizeof(s),"#%04x=",t);
                         (void) ConcatenateString(&final,s);
                         break;
                       }
@@ -2758,7 +2758,7 @@ GenerateWildcardAttribute(Image *image,const char *key)
 
         if (result != NULL)
           (void) ConcatenateString(&result,"\n");
-        FormatString(s,"%.512s=%.1024s",p->key,p->value);
+        MagickFormatString(s,sizeof(s),"%.512s=%.1024s",p->key,p->value);
         (void) ConcatenateString(&result,s);
       }
 
@@ -2947,7 +2947,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
       {
         if (LocaleNCompare("depth",key,2) == 0)
           {
-            FormatString(attribute,"%u",image->depth);
+            MagickFormatString(attribute,sizeof(attribute),"%u",image->depth);
             break;
           }
         if (LocaleNCompare("directory",key,2) == 0)
@@ -2972,7 +2972,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
       {
         if (LocaleNCompare("group",key,2) == 0)
           {
-            FormatString(attribute,"0x%lx",image_info->group);
+            MagickFormatString(attribute,sizeof(attribute),"0x%lx",image_info->group);
             break;
           }
         break;
@@ -2981,7 +2981,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
       {
         if (LocaleNCompare("height",key,2) == 0)
           {
-            FormatString(attribute,"%lu",
+            MagickFormatString(attribute,sizeof(attribute),"%lu",
                          image->magick_rows ? image->magick_rows : 256L);
             break;
           }
@@ -3024,19 +3024,19 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
               format[MaxTextExtent];
 
             FormatSize(GetBlobSize(image),format);
-            FormatString(attribute,"%.1024s",format);
+            MagickFormatString(attribute,sizeof(attribute),"%.1024s",format);
             break;
           }
         if (LocaleNCompare("scene",key,2) == 0)
           {
-            FormatString(attribute,"%lu",image->scene);
+            MagickFormatString(attribute,sizeof(attribute),"%lu",image->scene);
             if (image_info->subrange != 0)
-              FormatString(attribute,"%lu",image_info->subimage);
+              MagickFormatString(attribute,sizeof(attribute),"%lu",image_info->subimage);
             break;
           }
         if (LocaleNCompare("scenes",key,6) == 0)
           {
-            FormatString(attribute,"%lu",
+            MagickFormatString(attribute,sizeof(attribute),"%lu",
                          (unsigned long) GetImageListLength(image));
             break;
           }
@@ -3064,7 +3064,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
             p=image;
             for (page=1; p->previous != (Image *) NULL; page++)
               p=p->previous;
-            FormatString(attribute,"%u",page);
+            MagickFormatString(attribute,sizeof(attribute),"%u",page);
             break;
           }
         break;
@@ -3086,7 +3086,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
       {
         if (LocaleNCompare("width",key,2) == 0)
           {
-            FormatString(attribute,"%lu",
+            MagickFormatString(attribute,sizeof(attribute),"%lu",
                          image->magick_columns ? image->magick_columns : 256L);
             break;
           }
@@ -3096,7 +3096,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
       {
         if (LocaleNCompare("xresolution",key,2) == 0)
           {
-            FormatString(attribute,"%g",image->x_resolution);
+            MagickFormatString(attribute,sizeof(attribute),"%g",image->x_resolution);
             break;
           }
         break;
@@ -3105,7 +3105,7 @@ GetImageInfoAttribute(const ImageInfo *image_info,const Image *image,
       {
         if (LocaleNCompare("yresolution",key,2) == 0)
           {
-            FormatString(attribute,"%g",image->y_resolution);
+            MagickFormatString(attribute,sizeof(attribute),"%g",image->y_resolution);
             break;
           }
         break;

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2009 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -355,7 +355,7 @@ MagickExport void *GetMagickRegistry(const long id,RegistryType *type,
       char
         description[MaxTextExtent];
 
-      FormatString(description,"id=%ld",id);
+      MagickFormatString(description,sizeof(description),"id=%ld",id);
       ThrowException(exception,RegistryError,UnableToLocateImage,
         description);
     }

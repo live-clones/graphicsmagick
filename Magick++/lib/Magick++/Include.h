@@ -934,7 +934,6 @@ namespace Magick
   using MagickLib::FlattenImages;
   using MagickLib::FlipImage;
   using MagickLib::FlopImage;
-  using MagickLib::FormatString;
   using MagickLib::FrameImage;
   using MagickLib::FrameInfo;
   using MagickLib::GammaImage;

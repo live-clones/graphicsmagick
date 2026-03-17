@@ -19,7 +19,7 @@
           char \
             colormapIndexBuffer[MaxTextExtent]; \
           \
-          FormatString(colormapIndexBuffer, \
+          MagickFormatString(colormapIndexBuffer, sizeof(colormapIndexBuffer), \
                        "index %" MAGICK_SIZE_T_F "u >= %u colors, %.1024s", \
                        (MAGICK_SIZE_T) index, (unsigned int) colors, image->filename); \
           errno=0; \

@@ -825,7 +825,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
 
         if ((value=AccessDefinition(image_info,"jp2",option)) != NULL)
           {
-            FormatString(option_keyval,"%s=%.1024s ",option,value);
+            MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%.1024s ",option,value);
             ConcatenateString(&options,option_keyval);
 
             if (LocaleCompare(option,"max_samples") == 0)
@@ -854,7 +854,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
                               "%" MAGICK_UINTMAX_F "u, max_samples_pixels = %" MAGICK_UINTMAX_F "u",
                               max_samples_rectangle, max_samples_pixels);
 
-        FormatString(option_keyval,"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples*3);
+        MagickFormatString(option_keyval,sizeof(option_keyval),"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples*3);
         ConcatenateString(&options,option_keyval);
       }
 
@@ -1532,13 +1532,13 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
                 rate_specified=MagickTrue;
                 if (rate < 1.0-MagickEpsilon)
                   {
-                    FormatString(option_keyval,"%s=%.1024s ",option,value);
+                    MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%.1024s ",option,value);
                     ConcatenateString(&options,option_keyval);
                   }
               }
             else
               {
-                FormatString(option_keyval,"%s=%.1024s ",option,value);
+                MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%.1024s ",option,value);
                 ConcatenateString(&options,option_keyval);
 
                 /* Setting debug mode seems to require extra assistance */
@@ -1745,7 +1745,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
             number_components;
           target_size=(current_size*rate)+header_size;
           rate=target_size/current_size;
-          FormatString(option_keyval,"%s=%g ","rate",rate);
+          MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%g ","rate",rate);
           ConcatenateString(&options,option_keyval);
         }
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1900,7 +1900,7 @@ static void formatString(Image *ofile, const char *s, int len)
         (void) WriteBlobByte(ofile,*s);
       else
         {
-          FormatString(temp, "&#%d;", c & 255);
+          MagickFormatString(temp, sizeof(temp), "&#%d;", c & 255);
           (void) WriteBlobString(ofile,temp);
         }
       break;
@@ -2079,9 +2079,9 @@ static int formatIPTC(Image *ifile, Image *ofile)
 
     /* now finish up by formatting this binary data into ASCII equivalent */
     if (strlen((char *)readable) != 0)
-      FormatString(temp, "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
+      MagickFormatString(temp, sizeof(temp), "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
     else
-      FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
+      MagickFormatString(temp, sizeof(temp), "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
     if (WriteBlobString(ofile,temp) == 0)
       {
         MagickFreeResourceLimitedMemory(unsigned char *,str);
@@ -2210,9 +2210,9 @@ static int formatIPTCfromBuffer(Image *ofile, char *s, long len)
 
     /* now finish up by formatting this binary data into ASCII equivalent */
     if (strlen((char *)readable) != 0)
-      FormatString(temp, "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
+      MagickFormatString(temp, sizeof(temp), "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
     else
-      FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
+      MagickFormatString(temp, sizeof(temp), "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
     (void) WriteBlobString(ofile,temp);
     formatString( ofile, (char *)str, taglen );
     MagickFreeResourceLimitedMemory(unsigned char *,str);
@@ -2371,9 +2371,9 @@ static int format8BIM(Image *ifile, Image *ofile)
            * ASCII equivalent
            */
           if (strlen((const char *) PString) != 0)
-            FormatString(temp, "8BIM#%d#%s=", ID, PString);
+            MagickFormatString(temp, sizeof(temp), "8BIM#%d#%s=", ID, PString);
           else
-            FormatString(temp, "8BIM#%d=", ID);
+            MagickFormatString(temp, sizeof(temp), "8BIM#%d=", ID);
           (void) WriteBlobString(ofile,temp);
           if (ID == IPTC_ID)
             {

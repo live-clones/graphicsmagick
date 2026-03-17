@@ -2025,7 +2025,7 @@ static unsigned int WritePSDImage(const ImageInfo *image_info,Image *image)
           char
             layer_name[MaxTextExtent];
 
-          FormatString( layer_name, "L%04d", layer_count++ );
+          MagickFormatString( layer_name, sizeof(layer_name), "L%04d", layer_count++ );
           WritePascalString( image, layer_name, 4 );
         }
         tmp_image = tmp_image->next;

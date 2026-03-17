@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -512,7 +512,7 @@ static void NormalizeSamplingFactor(ImageInfo *image_info)
   if (factors[2] == 0)
     vertical=2;
 
-  FormatString(buffer,"%ux%u",horizontal,vertical);
+  MagickFormatString(buffer,sizeof(buffer),"%ux%u",horizontal,vertical);
   (void) CloneString(&image_info->sampling_factor,buffer);
 }
 
@@ -1579,7 +1579,7 @@ static MagickPassFail BatchCommand(int argc, char **argv)
 #endif
   {
     char client_name[MaxTextExtent];
-    FormatString(client_name,"%.1024s %s", argv[0], argv[1]);
+    MagickFormatString(client_name,sizeof(client_name),"%.1024s %s", argv[0], argv[1]);
     (void) SetClientName(client_name);
   }
 #if 1
@@ -2948,7 +2948,7 @@ CompareImageCommand(ImageInfo *image_info,
         if ((maximum_error >= 0.0) && (statistics.combined < maximum_error))
           {
             status &= MagickFail;
-            FormatString(message,"%g",statistics.combined);
+            MagickFormatString(message,sizeof(message),"%g",statistics.combined);
             ThrowException(exception,ImageError,ImageDifferenceExceedsLimit,message);
           }
       }
@@ -2966,7 +2966,7 @@ CompareImageCommand(ImageInfo *image_info,
         if ((maximum_error >= 0.0) && (statistics.combined > maximum_error))
           {
             status &= MagickFail;
-            FormatString(message,"%g > %g",statistics.combined, maximum_error);
+            MagickFormatString(message,sizeof(message),"%g > %g",statistics.combined, maximum_error);
             ThrowException(exception,ImageError,ImageDifferenceExceedsLimit,message);
           }
       }
@@ -3096,8 +3096,8 @@ static void CompareUsage(void)
 %
 */
 static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
-  Image *composite_image,Image *mask_image,CompositeOptions *option_info,
-  ExceptionInfo *exception)
+                                         Image *composite_image,Image *mask_image,CompositeOptions *option_info,
+                                         ExceptionInfo *exception)
 {
   long
     x,
@@ -3123,7 +3123,7 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
           if (!composite_image->matte)
             SetImageOpacity(composite_image,OpaqueOpacity);
           status&=CompositeImage(composite_image,CopyOpacityCompositeOp,
-            mask_image,0,0);
+                                 mask_image,0,0);
           if (status == MagickFail)
             GetImageException(composite_image,exception);
         }
@@ -3138,29 +3138,29 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
           if (!composite_image->matte)
             SetImageOpacity(composite_image,OpaqueOpacity);
           for (y=0; y < (long) composite_image->rows; y++)
-          {
-            q=GetImagePixels(composite_image,0,y,composite_image->columns,1);
-            if (q == (PixelPacket *) NULL)
-              break;
-            for (x=0; x < (long) composite_image->columns; x++)
             {
-              q->opacity=(Quantum)
-                ((((unsigned long) MaxRGB-q->opacity)*option_info->dissolve)/100.0);
-              q++;
+              q=GetImagePixels(composite_image,0,y,composite_image->columns,1);
+              if (q == (PixelPacket *) NULL)
+                break;
+              for (x=0; x < (long) composite_image->columns; x++)
+                {
+                  q->opacity=(Quantum)
+                    ((((unsigned long) MaxRGB-q->opacity)*option_info->dissolve)/100.0);
+                  q++;
+                }
+              if (!SyncImagePixels(composite_image))
+                break;
             }
-            if (!SyncImagePixels(composite_image))
-              break;
-          }
         }
       if (option_info->compose == DisplaceCompositeOp)
         (void) CloneString(&composite_image->geometry,
-          option_info->displace_geometry);
+                           option_info->displace_geometry);
       if (option_info->compose == ModulateCompositeOp)
         (void) CloneString(&composite_image->geometry,
-          option_info->watermark_geometry);
+                           option_info->watermark_geometry);
       if (option_info->compose == ThresholdCompositeOp)
         (void) CloneString(&composite_image->geometry,
-          option_info->unsharp_geometry);
+                           option_info->unsharp_geometry);
       /*
         Composite image.
       */
@@ -3199,11 +3199,11 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
               */
               for (y=0; y < (long) (*image)->rows; y+=composite_image->rows)
                 for (x=0; x < (long) (*image)->columns; x+=composite_image->columns)
-                {
-                  status&=CompositeImage(*image,option_info->compose,
-                    composite_image,x,y);
-                  GetImageException(*image,exception);
-                }
+                  {
+                    status&=CompositeImage(*image,option_info->compose,
+                                           composite_image,x,y);
+                    GetImageException(*image,exception);
+                  }
             }
           else
             {
@@ -3219,15 +3219,16 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
               geometry.x=0;
               geometry.y=0;
               (void) GetGeometry(option_info->geometry,&geometry.x,&geometry.y,
-                &geometry.width,&geometry.height);
-              FormatString(composite_geometry,"%lux%lu%+ld%+ld",
-                composite_image->columns,composite_image->rows,geometry.x,
-                geometry.y);
+                                 &geometry.width,&geometry.height);
+              MagickFormatString(composite_geometry,sizeof(composite_geometry),
+                                 "%lux%lu%+ld%+ld",
+                                 composite_image->columns,composite_image->rows,geometry.x,
+                                 geometry.y);
               (*image)->gravity=option_info->gravity;
               (void) GetImageGeometry(*image,composite_geometry,MagickFalse,
-                &geometry);
+                                      &geometry);
               status&=CompositeImage(*image,option_info->compose,
-                composite_image,geometry.x,geometry.y);
+                                     composite_image,geometry.x,geometry.y);
               GetImageException(*image,exception);
             }
       if (option_info->compose != CopyOpacityCompositeOp)
@@ -6686,7 +6687,7 @@ MagickExport MagickPassFail ConjureImageCommand(ImageInfo *image_info,
     status&=SetImageAttribute(image_info->attributes,"filename",argv[i]);
     if (status == MagickFail)
       MagickFatalError(ImageFatalError,UnableToPersistKey,argv[i]);
-    (void) FormatString(image_info->filename,"msl:%.1024s",argv[i]);
+    MagickFormatString(image_info->filename,sizeof(image_info->filename),"msl:%.1024s",argv[i]);
     image=ReadImage(image_info,exception);
     if (exception->severity > UndefinedException)
       {
@@ -9013,7 +9014,7 @@ static void LiberateArgumentList(const int argc,char **argv)
 %
 */
 MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
-  int argc,char **argv,char **metadata,ExceptionInfo *exception)
+                                          int argc,char **argv,char **metadata,ExceptionInfo *exception)
 {
   char
     *option;
@@ -9057,8 +9058,9 @@ MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
                   char
                     client_name[MaxTextExtent];
 
-                  FormatString(client_name,"%.1024s %s",GetClientName(),
-                               commands[i].command);
+                  MagickFormatString(client_name,sizeof(client_name),
+                                     "%.1024s %s",GetClientName(),
+                                     commands[i].command);
 
                   (void) SetClientName(client_name);
                 }
@@ -9067,7 +9069,8 @@ MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
 
           if (commands[i].command_vector != (CommandVectorHandler) NULL)
             return(commands[i].command_vector)(image_info,argc,argv,
-              commands[i].pass_metadata ? metadata : (char **) NULL,exception);
+                                               commands[i].pass_metadata ?
+                                               metadata : (char **) NULL,exception);
         }
     }
   ThrowException(exception,OptionError,UnrecognizedCommand,option);
@@ -9613,7 +9616,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
                 char
                   message[MaxTextExtent];
 
-                FormatString(message,"%u",elements);
+                MagickFormatString(message,sizeof(message),"%u",elements);
                 ThrowException(&(*image)->exception,OptionError,MatrixIsNotSquare,message);
                 continue;
               }
@@ -10530,7 +10533,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
               {
                 char orientation[MaxTextExtent];
                 (*image)->orientation=StringToOrientationType(argv[++i]);
-                FormatString(orientation,"%d",(*image)->orientation);
+                MagickFormatString(orientation,sizeof(orientation),"%d",(*image)->orientation);
                 (void) SetImageAttribute((*image),"EXIF:Orientation",orientation);
               }
             continue;
@@ -10766,7 +10769,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
                 char
                   message[MaxTextExtent];
 
-                FormatString(message,"%u",elements);
+                MagickFormatString(message,sizeof(message),"%u",elements);
                 ThrowException(&(*image)->exception,OptionError,MatrixIsNotSquare,message);
                 continue;
               }
@@ -10923,7 +10926,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
               flags=GetGeometry(argv[++i],&x,&y,&x_integral_resolution,&y_integral_resolution);
               if (!(flags & HeightValue))
                 y_integral_resolution=x_integral_resolution;
-              FormatString(resample_density,"%lux%lu",x_integral_resolution,y_integral_resolution);
+              MagickFormatString(resample_density,sizeof(resample_density),"%lux%lu",x_integral_resolution,y_integral_resolution);
               x_resolution=x_integral_resolution;
               y_resolution=y_integral_resolution;
             }
@@ -12212,7 +12215,7 @@ LoadAndCacheImageFile(char **filename,long *id,ExceptionInfo *exception)
                   char
                     mpri[MaxTextExtent];
 
-                  FormatString(mpri,"MPRI:%ld",*id);
+                  MagickFormatString(mpri,sizeof(mpri),"MPRI:%ld",*id);
                   MagickFreeMemory(*filename);
                   *filename=AcquireString(mpri);
                   if (*filename != (char *) NULL)
@@ -17397,7 +17400,7 @@ static MagickPassFail VersionCommand(ImageInfo *image_info_ignored,
       default: omp_ver = "?"; break;
       }
     supported=MagickTrue;
-    FormatString(text,"%u \"%s\"",(unsigned int) _OPENMP, omp_ver);
+    MagickFormatString(text,sizeof(text),"%u \"%s\"",(unsigned int) _OPENMP, omp_ver);
   }
 #endif /* defined(HAVE_OPENMP) */
   PrintFeatureTextual("OpenMP", supported, text);
@@ -17639,8 +17642,8 @@ static MagickPassFail RegisterCommand(ImageInfo *image_info,
 
       /* set a pointer to this application as the source for our messages */
       memset(szPathName, 0, MaxTextExtent*sizeof(char));
-      FormatString(szPathName,"%.1024s%s%.1024s",
-                   GetClientPath(),DirectorySeparator,GetClientName());
+      MagickFormatString(szPathName,sizeof(szPathName),"%.1024s%s%.1024s",
+                         GetClientPath(),DirectorySeparator,GetClientName());
       RegSetValueEx(hKey, "EventMessageFile", 0, REG_SZ,
                     (const BYTE *) szPathName,
                     ((DWORD) strlen(szPathName) + 1)*sizeof(char));

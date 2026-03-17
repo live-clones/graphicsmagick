@@ -378,7 +378,7 @@ static unsigned int WriteMTVImage(const ImageInfo *image_info,Image *image)
     /*
       Initialize raster file header.
     */
-    FormatString(buffer,"%lu %lu\n",image->columns,image->rows);
+    MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n",image->columns,image->rows);
     (void) WriteBlobString(image,buffer);
     for (y=0; y < (long) image->rows; y++)
     {

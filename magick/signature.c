@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -235,84 +235,86 @@ MagickExport unsigned int SignatureImage(Image *image)
   message=MagickAllocateResourceLimitedArray(unsigned char *,20,image->columns);
   if (message == (unsigned char *) NULL)
     ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
-      UnableToComputeImageSignature);
+                          UnableToComputeImageSignature);
   /*
     Compute image digital signature.
   */
   GetSignatureInfo(&signature_info);
   for (y=0; y < (long) image->rows; y++)
-  {
-    p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-    if (p == (const PixelPacket *) NULL)
-      break;
-    indexes=AccessImmutableIndexes(image);
-    q=message;
-    for (x=0; x < (long) image->columns; x++)
     {
-      quantum=ScaleQuantumToLong(p->red);
-      *q++=(unsigned char) (quantum >> 24);
-      *q++=(unsigned char) (quantum >> 16);
-      *q++=(unsigned char) (quantum >> 8);
-      *q++=(unsigned char) quantum;
-      quantum=ScaleQuantumToLong(p->green);
-      *q++=(unsigned char) (quantum >> 24);
-      *q++=(unsigned char) (quantum >> 16);
-      *q++=(unsigned char) (quantum >> 8);
-      *q++=(unsigned char) quantum;
-      quantum=ScaleQuantumToLong(p->blue);
-      *q++=(unsigned char) (quantum >> 24);
-      *q++=(unsigned char) (quantum >> 16);
-      *q++=(unsigned char) (quantum >> 8);
-      *q++=(unsigned char) quantum;
-      if (!image->matte)
+      p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+      if (p == (const PixelPacket *) NULL)
+        break;
+      indexes=AccessImmutableIndexes(image);
+      q=message;
+      for (x=0; x < (long) image->columns; x++)
         {
-          if (image->colorspace == CMYKColorspace)
+          quantum=ScaleQuantumToLong(p->red);
+          *q++=(unsigned char) (quantum >> 24);
+          *q++=(unsigned char) (quantum >> 16);
+          *q++=(unsigned char) (quantum >> 8);
+          *q++=(unsigned char) quantum;
+          quantum=ScaleQuantumToLong(p->green);
+          *q++=(unsigned char) (quantum >> 24);
+          *q++=(unsigned char) (quantum >> 16);
+          *q++=(unsigned char) (quantum >> 8);
+          *q++=(unsigned char) quantum;
+          quantum=ScaleQuantumToLong(p->blue);
+          *q++=(unsigned char) (quantum >> 24);
+          *q++=(unsigned char) (quantum >> 16);
+          *q++=(unsigned char) (quantum >> 8);
+          *q++=(unsigned char) quantum;
+          if (!image->matte)
+            {
+              if (image->colorspace == CMYKColorspace)
+                {
+                  quantum=ScaleQuantumToLong(p->opacity);
+                  *q++=(unsigned char) (quantum >> 24);
+                  *q++=(unsigned char) (quantum >> 16);
+                  *q++=(unsigned char) (quantum >> 8);
+                  *q++=(unsigned char) quantum;
+                }
+              quantum=ScaleQuantumToLong(OpaqueOpacity);
+              *q++=(unsigned char) (quantum >> 24);
+              *q++=(unsigned char) (quantum >> 16);
+              *q++=(unsigned char) (quantum >> 8);
+              *q++=(unsigned char) quantum;
+            }
+          else
             {
               quantum=ScaleQuantumToLong(p->opacity);
               *q++=(unsigned char) (quantum >> 24);
               *q++=(unsigned char) (quantum >> 16);
               *q++=(unsigned char) (quantum >> 8);
               *q++=(unsigned char) quantum;
+              if (image->colorspace == CMYKColorspace)
+                {
+                  quantum=ScaleQuantumToLong(indexes[x]);
+                  *q++=(unsigned char) (quantum >> 24);
+                  *q++=(unsigned char) (quantum >> 16);
+                  *q++=(unsigned char) (quantum >> 8);
+                  *q++=(unsigned char) quantum;
+                }
             }
-          quantum=ScaleQuantumToLong(OpaqueOpacity);
-          *q++=(unsigned char) (quantum >> 24);
-          *q++=(unsigned char) (quantum >> 16);
-          *q++=(unsigned char) (quantum >> 8);
-          *q++=(unsigned char) quantum;
+          p++;
         }
-      else
-        {
-          quantum=ScaleQuantumToLong(p->opacity);
-          *q++=(unsigned char) (quantum >> 24);
-          *q++=(unsigned char) (quantum >> 16);
-          *q++=(unsigned char) (quantum >> 8);
-          *q++=(unsigned char) quantum;
-          if (image->colorspace == CMYKColorspace)
-            {
-              quantum=ScaleQuantumToLong(indexes[x]);
-              *q++=(unsigned char) (quantum >> 24);
-              *q++=(unsigned char) (quantum >> 16);
-              *q++=(unsigned char) (quantum >> 8);
-              *q++=(unsigned char) quantum;
-            }
-        }
-      p++;
+      UpdateSignature(&signature_info,message,q-message);
+      if (QuantumTick(y,image->rows))
+        if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                    SignatureImageText,image->filename))
+          break;
     }
-    UpdateSignature(&signature_info,message,q-message);
-    if (QuantumTick(y,image->rows))
-      if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                  SignatureImageText,image->filename))
-        break;
-  }
   FinalizeSignature(&signature_info);
   MagickFreeResourceLimitedMemory(unsigned char *,message);
   /*
     Convert digital signature to a 64 character hex string.
   */
-  FormatString(signature,"%08lx%08lx%08lx%08lx%08lx%08lx%08lx%08lx",
-    signature_info.digest[0],signature_info.digest[1],signature_info.digest[2],
-    signature_info.digest[3],signature_info.digest[4],signature_info.digest[5],
-    signature_info.digest[6],signature_info.digest[7]);
+  MagickFormatString(signature,sizeof(signature),
+                     "%08lx%08lx%08lx%08lx%08lx%08lx%08lx%08lx",
+                     signature_info.digest[0],signature_info.digest[1],
+                     signature_info.digest[2],signature_info.digest[3],
+                     signature_info.digest[4],signature_info.digest[5],
+                     signature_info.digest[6],signature_info.digest[7]);
   (void) SetImageAttribute(image,"signature",(char *) NULL);
   (void) SetImageAttribute(image,"signature",signature);
   return(True);

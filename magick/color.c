@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2015 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -533,8 +533,8 @@ MagickExport HistogramColorPacket *GetColorHistogram(const Image *image,
 %
 */
 MagickExport void GetColorTuple(const PixelPacket *color,
-  const unsigned int depth,const unsigned int matte,const unsigned int hex,
-  char *tuple)
+                                const unsigned int depth,const unsigned int matte,const unsigned int hex,
+                                char *tuple)
 {
   assert(color != (const PixelPacket *) NULL);
   assert(tuple != (char *) NULL);
@@ -542,42 +542,47 @@ MagickExport void GetColorTuple(const PixelPacket *color,
     {
       if (depth <= 8)
         {
-          FormatString(tuple,hex ? "#%02X%02X%02X%02X" : "(%3u,%3u,%3u,%3u)",
-            ScaleQuantumToChar(color->red),ScaleQuantumToChar(color->green),
-            ScaleQuantumToChar(color->blue),ScaleQuantumToChar(color->opacity));
+          MagickFormatString(tuple,MaxTextExtent,
+                             hex ? "#%02X%02X%02X%02X" : "(%3u,%3u,%3u,%3u)",
+                             ScaleQuantumToChar(color->red),ScaleQuantumToChar(color->green),
+                             ScaleQuantumToChar(color->blue),ScaleQuantumToChar(color->opacity));
           return;
         }
       if (depth <= 16)
         {
-          FormatString(tuple,hex ? "#%04X%04X%04X%04X" : "(%5u,%5u,%5u,%5u)",
-            ScaleQuantumToShort(color->red),ScaleQuantumToShort(color->green),
-            ScaleQuantumToShort(color->blue),
-            ScaleQuantumToShort(color->opacity));
+          MagickFormatString(tuple,MaxTextExtent,
+                             hex ? "#%04X%04X%04X%04X" : "(%5u,%5u,%5u,%5u)",
+                             ScaleQuantumToShort(color->red),ScaleQuantumToShort(color->green),
+                             ScaleQuantumToShort(color->blue),
+                             ScaleQuantumToShort(color->opacity));
           return;
         }
-      FormatString(tuple,
-        hex ? "#%08lX%08lX%08lX%08lX" : "(%10lu,%10lu,%10lu,%10lu)",
-        ScaleQuantumToLong(color->red),ScaleQuantumToLong(color->green),
-        ScaleQuantumToLong(color->blue),ScaleQuantumToLong(color->opacity));
+      MagickFormatString(tuple,MaxTextExtent,
+                         hex ? "#%08lX%08lX%08lX%08lX" : "(%10lu,%10lu,%10lu,%10lu)",
+                         ScaleQuantumToLong(color->red),ScaleQuantumToLong(color->green),
+                         ScaleQuantumToLong(color->blue),ScaleQuantumToLong(color->opacity));
       return;
     }
   if (depth <= 8)
     {
-      FormatString(tuple,hex ? "#%02X%02X%02X" : "(%3u,%3u,%3u)",
-        ScaleQuantumToChar(color->red),ScaleQuantumToChar(color->green),
-        ScaleQuantumToChar(color->blue));
+      MagickFormatString(tuple,MaxTextExtent,
+                         hex ? "#%02X%02X%02X" : "(%3u,%3u,%3u)",
+                         ScaleQuantumToChar(color->red),ScaleQuantumToChar(color->green),
+                         ScaleQuantumToChar(color->blue));
       return;
     }
   if (depth <= 16)
     {
-      FormatString(tuple,hex ? "#%04X%04X%04X" : "(%5u,%5u,%5u)",
-        ScaleQuantumToShort(color->red),ScaleQuantumToShort(color->green),
-        ScaleQuantumToShort(color->blue));
+      MagickFormatString(tuple,MaxTextExtent,
+                         hex ? "#%04X%04X%04X" : "(%5u,%5u,%5u)",
+                         ScaleQuantumToShort(color->red),ScaleQuantumToShort(color->green),
+                         ScaleQuantumToShort(color->blue));
       return;
     }
-  FormatString(tuple,hex ? "#%08lX%08lX%08lX" : "(%10lu,%10lu,%10lu)",
-    ScaleQuantumToLong(color->red),ScaleQuantumToLong(color->green),
-    ScaleQuantumToLong(color->blue));
+  MagickFormatString(tuple,MaxTextExtent,
+                     hex ? "#%08lX%08lX%08lX" : "(%10lu,%10lu,%10lu)",
+                     ScaleQuantumToLong(color->red),ScaleQuantumToLong(color->green),
+                     ScaleQuantumToLong(color->blue));
   return;
 }
 

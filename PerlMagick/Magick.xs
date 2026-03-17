@@ -933,7 +933,7 @@ static struct PackageInfo *GetPackageInfo(pTHX_ void *reference,
   SV
     *sv;
 
-  FormatString(message,"%s::Ref%lx_%s",PackageName,(long) reference,
+  MagickFormatString(message,sizeof(message),"%s::Ref%lx_%s",PackageName,(long) reference,
    XS_VERSION);
   sv=perl_get_sv(message,(TRUE | 0x02));
   if (!sv)
@@ -1033,7 +1033,7 @@ static int LookupStr(const char **list,const char *string)
 %
 */
 static void MagickErrorHandler(const ExceptionType severity,const char *reason,
-  const char *description)
+                               const char *description)
 {
   char
     text[MaxTextExtent];
@@ -1041,12 +1041,13 @@ static void MagickErrorHandler(const ExceptionType severity,const char *reason,
   dTHX;  /* perl context */
   dMY_CXT;
   errno=0;
-  FormatString(text,"Exception %d: %.1024s%s%.1024s%s%s%.64s%s",severity,
-    (reason ? GetLocaleExceptionMessage(severity,reason) : "ERROR"),
-    description ? " (" : "",
-    description ? GetLocaleExceptionMessage(severity,description) : "",
-                description ? ")" : "",errno ? " [" : "",errno ? strerror(errno) : "",
-    errno? "]" : "");
+  MagickFormatString(text,sizeof(text),
+                     "Exception %d: %.1024s%s%.1024s%s%s%.64s%s",severity,
+                     (reason ? GetLocaleExceptionMessage(severity,reason) : "ERROR"),
+                     description ? " (" : "",
+                     description ? GetLocaleExceptionMessage(severity,description) : "",
+                     description ? ")" : "",errno ? " [" : "",errno ? strerror(errno) : "",
+                     errno? "]" : "");
   if ((MY_CXT.error_list == NULL) || (MY_CXT.error_jump == NULL))
     {
       /*
@@ -1097,7 +1098,7 @@ static void MagickErrorHandler(const ExceptionType severity,const char *reason,
 */
 
 static void MagickWarningHandler(const ExceptionType severity,
-  const char *reason,const char *description)
+                                 const char *reason,const char *description)
 {
   char
     text[MaxTextExtent];
@@ -1107,12 +1108,13 @@ static void MagickWarningHandler(const ExceptionType severity,
   errno=0;
   if (!reason)
     return;
-  FormatString(text,"Exception %d: %.1024s%s%.1024s%s%s%.64s%s",severity,
-    (reason ? GetLocaleExceptionMessage(severity,reason) : "WARNING"),
-    description ? " (" : "",
-    description ? GetLocaleExceptionMessage(severity,description) : "",
-    description ? ")" : "",errno ? " [" : "",errno ? strerror(errno) : "",
-    errno? "]" : "");
+  MagickFormatString(text,sizeof(text),
+                     "Exception %d: %.1024s%s%.1024s%s%s%.64s%s",severity,
+                     (reason ? GetLocaleExceptionMessage(severity,reason) : "WARNING"),
+                     description ? " (" : "",
+                     description ? GetLocaleExceptionMessage(severity,description) : "",
+                     description ? ")" : "",errno ? " [" : "",errno ? strerror(errno) : "",
+                     errno? "]" : "");
   if (MY_CXT.error_list == NULL)
     {
       /*
@@ -1158,7 +1160,7 @@ static void MagickWarningHandler(const ExceptionType severity,
 %
 */
 static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
-  const char *attribute,SV *sval)
+                         const char *attribute,SV *sval)
 {
   DoublePixelPacket
     pixel;
@@ -1179,800 +1181,800 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
 
   GetExceptionInfo(&exception);
   switch (*attribute)
-  {
+    {
     case 'A':
     case 'a':
-    {
-      if (LocaleCompare(attribute,"adjoin") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->adjoin=sp != 0;
-          return;
-        }
-      if (LocaleCompare(attribute,"antialias") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            {
-              info->image_info->antialias=sp != 0;
-              info->draw_info->text_antialias=sp != 0;
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"authenticate") == 0)
-        {
-          if (info)
-            (void) CloneString(&info->image_info->authenticate,SvPV(sval,na));
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"adjoin") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->adjoin=sp != 0;
+            return;
+          }
+        if (LocaleCompare(attribute,"antialias") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              {
+                info->image_info->antialias=sp != 0;
+                info->draw_info->text_antialias=sp != 0;
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"authenticate") == 0)
+          {
+            if (info)
+              (void) CloneString(&info->image_info->authenticate,SvPV(sval,na));
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'B':
     case 'b':
-    {
-      if (LocaleCompare(attribute,"background") == 0)
-        {
-          (void) QueryColorDatabase(SvPV(sval,na),&target_color,
-            image ? &image->exception : &exception);
-          if (info)
-            info->image_info->background_color=target_color;
-          for ( ; image; image=image->next)
-            image->background_color=target_color;
-          return;
-        }
-      if (LocaleCompare(attribute,"blue-primary") == 0)
-        {
-          for ( ; image; image=image->next)
-            (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
-              &image->chromaticity.blue_primary.x,
-              &image->chromaticity.blue_primary.y);
-          return;
-        }
-      if (LocaleCompare(attribute,"bordercolor") == 0)
-        {
-          (void) QueryColorDatabase(SvPV(sval,na),&target_color,
-            image ? &image->exception : &exception);
-          if (info)
-            {
-              info->image_info->border_color=target_color;
-              info->draw_info->border_color=target_color;
-            }
-          for ( ; image; image=image->next)
-            image->border_color=target_color;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"background") == 0)
+          {
+            (void) QueryColorDatabase(SvPV(sval,na),&target_color,
+                                      image ? &image->exception : &exception);
+            if (info)
+              info->image_info->background_color=target_color;
+            for ( ; image; image=image->next)
+              image->background_color=target_color;
+            return;
+          }
+        if (LocaleCompare(attribute,"blue-primary") == 0)
+          {
+            for ( ; image; image=image->next)
+              (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
+                            &image->chromaticity.blue_primary.x,
+                            &image->chromaticity.blue_primary.y);
+            return;
+          }
+        if (LocaleCompare(attribute,"bordercolor") == 0)
+          {
+            (void) QueryColorDatabase(SvPV(sval,na),&target_color,
+                                      image ? &image->exception : &exception);
+            if (info)
+              {
+                info->image_info->border_color=target_color;
+                info->draw_info->border_color=target_color;
+              }
+            for ( ; image; image=image->next)
+              image->border_color=target_color;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'C':
     case 'c':
-    {
-      if (LocaleCompare(attribute,"cache-threshold") == 0)
-        {
-          SetMagickResourceLimit(MemoryResource,SvIV(sval));
-          SetMagickResourceLimit(MapResource,2*SvIV(sval));
-          return;
-        }
-      if (LocaleCompare(attribute,"clip-mask") == 0)
-        {
-          Image
-            *clip_mask;
-
-          clip_mask=SetupList(aTHX_ SvRV(sval),&info,(SV ***) NULL);
-          for ( ; image; image=image->next)
-            SetImageClipMask(image,clip_mask);
-          return;
-        }
-      if (LocaleNCompare(attribute,"colormap",8) == 0)
-        {
-          for ( ; image; image=image->next)
+      {
+        if (LocaleCompare(attribute,"cache-threshold") == 0)
           {
-            int
-              i;
-
-            if (image->storage_class == DirectClass)
-              continue;
-            i=0;
-            (void) sscanf(attribute,"%*[^[][%d",&i);
-            if (i > (long) image->colors)
-              i%=image->colors;
-            if (strchr(SvPV(sval,na),',') == 0)
-              QueryColorDatabase(SvPV(sval,na),image->colormap+i,
-                image ? &image->exception : &exception);
-            else
-              {
-                color=image->colormap+i;
-                pixel.red=color->red;
-                pixel.green=color->green;
-                pixel.blue=color->blue;
-                (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf%*[,/]%lf",&pixel.red,
-                  &pixel.green,&pixel.blue);
-                color->red=(Quantum) ((pixel.red < 0) ? 0 :
-                  (pixel.red > MaxRGB) ? MaxRGB : pixel.red+0.5);
-                color->green=(Quantum) ((pixel.green < 0) ? 0 :
-                  (pixel.green > MaxRGB) ? MaxRGB : pixel.green+0.5);
-                color->blue=(Quantum) ((pixel.blue < 0) ? 0 :
-                  (pixel.blue > MaxRGB) ? MaxRGB : pixel.blue+0.5);
-              }
+            SetMagickResourceLimit(MemoryResource,SvIV(sval));
+            SetMagickResourceLimit(MapResource,2*SvIV(sval));
+            return;
           }
-          return;
-        }
-      if (LocaleCompare(attribute,"colorspace") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(ColorspaceTypes,SvPV(sval,na)) :
-            SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedColorspace,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->colorspace=(ColorspaceType) sp;
-          for ( ; image; image=image->next)
-            TransformColorspace(image,(ColorspaceType) sp);
-          return;
-        }
-      if (LocaleCompare(attribute,"compression") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(CompressionTypes,SvPV(sval,na)) :
-            SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedImageCompression,
-                SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->compression=(CompressionType) sp;
-          for ( ; image; image=image->next)
-            image->compression=(CompressionType) sp;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+        if (LocaleCompare(attribute,"clip-mask") == 0)
+          {
+            Image
+              *clip_mask;
+
+            clip_mask=SetupList(aTHX_ SvRV(sval),&info,(SV ***) NULL);
+            for ( ; image; image=image->next)
+              SetImageClipMask(image,clip_mask);
+            return;
+          }
+        if (LocaleNCompare(attribute,"colormap",8) == 0)
+          {
+            for ( ; image; image=image->next)
+              {
+                int
+                  i;
+
+                if (image->storage_class == DirectClass)
+                  continue;
+                i=0;
+                (void) sscanf(attribute,"%*[^[][%d",&i);
+                if (i > (long) image->colors)
+                  i%=image->colors;
+                if (strchr(SvPV(sval,na),',') == 0)
+                  QueryColorDatabase(SvPV(sval,na),image->colormap+i,
+                                     image ? &image->exception : &exception);
+                else
+                  {
+                    color=image->colormap+i;
+                    pixel.red=color->red;
+                    pixel.green=color->green;
+                    pixel.blue=color->blue;
+                    (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf%*[,/]%lf",&pixel.red,
+                                  &pixel.green,&pixel.blue);
+                    color->red=(Quantum) ((pixel.red < 0) ? 0 :
+                                          (pixel.red > MaxRGB) ? MaxRGB : pixel.red+0.5);
+                    color->green=(Quantum) ((pixel.green < 0) ? 0 :
+                                            (pixel.green > MaxRGB) ? MaxRGB : pixel.green+0.5);
+                    color->blue=(Quantum) ((pixel.blue < 0) ? 0 :
+                                           (pixel.blue > MaxRGB) ? MaxRGB : pixel.blue+0.5);
+                  }
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"colorspace") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(ColorspaceTypes,SvPV(sval,na)) :
+              SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedColorspace,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->colorspace=(ColorspaceType) sp;
+            for ( ; image; image=image->next)
+              TransformColorspace(image,(ColorspaceType) sp);
+            return;
+          }
+        if (LocaleCompare(attribute,"compression") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(CompressionTypes,SvPV(sval,na)) :
+              SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedImageCompression,
+                            SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->compression=(CompressionType) sp;
+            for ( ; image; image=image->next)
+              image->compression=(CompressionType) sp;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'D':
     case 'd':
-    {
-      if (LocaleCompare(attribute,"debug") == 0)
-        {
-          SetLogEventMask(SvPV(sval,na));
-          return;
-        }
-      if (LocaleCompare(attribute,"delay") == 0)
-        {
-          for ( ; image; image=image->next)
-            image->delay=SvIV(sval);
-          return;
-        }
-      if (LocaleCompare(attribute,"disk-limit") == 0)
-        {
-          SetMagickResourceLimit(DiskResource,SvIV(sval));
-          return;
-        }
-      if (LocaleCompare(attribute,"density") == 0)
-        {
-          if (!IsGeometry(SvPV(sval,na)))
-            {
-              MagickError(OptionError,MissingGeometry,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            {
-              (void) CloneString(&info->image_info->density,SvPV(sval,na));
-              (void) CloneString(&info->draw_info->density,SvPV(sval,na));
-            }
-          for ( ; image; image=image->next)
+      {
+        if (LocaleCompare(attribute,"debug") == 0)
           {
-            int
-              count;
-
-            count=sscanf(info->image_info->density,"%lfx%lf",
-              &image->x_resolution,&image->y_resolution);
-            if (count != 2)
-              image->y_resolution=image->x_resolution;
+            SetLogEventMask(SvPV(sval,na));
+            return;
           }
-          return;
-        }
-      if (LocaleCompare(attribute,"depth") == 0)
-        {
-          if (info)
-            info->image_info->depth=SvIV(sval);
-          for ( ; image; image=image->next)
-            SetImageDepth(image,SvIV(sval));
-          return;
-        }
-      if (LocaleCompare(attribute,"dispose") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(DisposeTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            sp=SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedDisposeMethod,
-                SvPV(sval,na));
-              return;
-            }
-          for ( ; image; image=image->next)
-            image->dispose=(DisposeType) sp;
-          return;
-        }
-      if (LocaleCompare(attribute,"dither") == 0)
-        {
-          if (info)
-            {
-              sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) :
-                SvIV(sval);
-              if (sp < 0)
-                {
-                  MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-                  return;
-                }
-              info->image_info->dither=sp != 0;
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"display") == 0)
-        {
+        if (LocaleCompare(attribute,"delay") == 0)
+          {
+            for ( ; image; image=image->next)
+              image->delay=SvIV(sval);
+            return;
+          }
+        if (LocaleCompare(attribute,"disk-limit") == 0)
+          {
+            SetMagickResourceLimit(DiskResource,SvIV(sval));
+            return;
+          }
+        if (LocaleCompare(attribute,"density") == 0)
+          {
+            if (!IsGeometry(SvPV(sval,na)))
+              {
+                MagickError(OptionError,MissingGeometry,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              {
+                (void) CloneString(&info->image_info->density,SvPV(sval,na));
+                (void) CloneString(&info->draw_info->density,SvPV(sval,na));
+              }
+            for ( ; image; image=image->next)
+              {
+                int
+                  count;
+
+                count=sscanf(info->image_info->density,"%lfx%lf",
+                             &image->x_resolution,&image->y_resolution);
+                if (count != 2)
+                  image->y_resolution=image->x_resolution;
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"depth") == 0)
+          {
+            if (info)
+              info->image_info->depth=SvIV(sval);
+            for ( ; image; image=image->next)
+              SetImageDepth(image,SvIV(sval));
+            return;
+          }
+        if (LocaleCompare(attribute,"dispose") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(DisposeTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              sp=SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedDisposeMethod,
+                            SvPV(sval,na));
+                return;
+              }
+            for ( ; image; image=image->next)
+              image->dispose=(DisposeType) sp;
+            return;
+          }
+        if (LocaleCompare(attribute,"dither") == 0)
+          {
+            if (info)
+              {
+                sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) :
+                  SvIV(sval);
+                if (sp < 0)
+                  {
+                    MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                    return;
+                  }
+                info->image_info->dither=sp != 0;
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"display") == 0)
+          {
           display:
-          if (info)
-            {
-              (void) CloneString(&info->image_info->server_name,SvPV(sval,na));
-              (void) CloneString(&info->draw_info->server_name,SvPV(sval,na));
-            }
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+            if (info)
+              {
+                (void) CloneString(&info->image_info->server_name,SvPV(sval,na));
+                (void) CloneString(&info->draw_info->server_name,SvPV(sval,na));
+              }
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'E':
     case 'e':
-    {
-      if (LocaleCompare(attribute,"endian") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(EndianTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedEndianType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->endian=(EndianType) sp;
-          for ( ; image; image=image->next)
-            image->endian=(EndianType) sp;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"endian") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(EndianTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedEndianType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->endian=(EndianType) sp;
+            for ( ; image; image=image->next)
+              image->endian=(EndianType) sp;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'F':
     case 'f':
-    {
-      if (LocaleCompare(attribute,"filename") == 0)
-        {
-          if (info)
-            (void) MagickStrlCpy(info->image_info->filename,SvPV(sval,na),
-                                 sizeof(info->image_info->filename));
-          for ( ; image; image=image->next)
-            (void) MagickStrlCpy(image->filename,SvPV(sval,na),sizeof(image->filename));
-          return;
-        }
-      if (LocaleCompare(attribute,"file") == 0)
-        {
-          if (info)
-            info->image_info->file=PerlIO_findFILE(IoIFP(sv_2io(sval)));
-          return;
-        }
-      if (LocaleCompare(attribute,"fill") == 0)
-        {
-          if (info)
-            {
-              (void) QueryColorDatabase(SvPV(sval,na),&info->draw_info->fill,
-                image ? &image->exception : &exception);
-              (void) QueryColorDatabase(SvPV(sval,na),&info->image_info->pen,
-                image ? &image->exception : &exception);
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"font") == 0)
-        {
-          if (info)
-            {
-              (void) CloneString(&info->image_info->font,SvPV(sval,na));
-              (void) CloneString(&info->draw_info->font,SvPV(sval,na));
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"fuzz") == 0)
-        {
-          if (info)
-            info->image_info->fuzz=SvNV(sval);
-          for ( ; image; image=image->next)
-            image->fuzz=SvNV(sval);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"filename") == 0)
+          {
+            if (info)
+              (void) MagickStrlCpy(info->image_info->filename,SvPV(sval,na),
+                                   sizeof(info->image_info->filename));
+            for ( ; image; image=image->next)
+              (void) MagickStrlCpy(image->filename,SvPV(sval,na),sizeof(image->filename));
+            return;
+          }
+        if (LocaleCompare(attribute,"file") == 0)
+          {
+            if (info)
+              info->image_info->file=PerlIO_findFILE(IoIFP(sv_2io(sval)));
+            return;
+          }
+        if (LocaleCompare(attribute,"fill") == 0)
+          {
+            if (info)
+              {
+                (void) QueryColorDatabase(SvPV(sval,na),&info->draw_info->fill,
+                                          image ? &image->exception : &exception);
+                (void) QueryColorDatabase(SvPV(sval,na),&info->image_info->pen,
+                                          image ? &image->exception : &exception);
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"font") == 0)
+          {
+            if (info)
+              {
+                (void) CloneString(&info->image_info->font,SvPV(sval,na));
+                (void) CloneString(&info->draw_info->font,SvPV(sval,na));
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"fuzz") == 0)
+          {
+            if (info)
+              info->image_info->fuzz=SvNV(sval);
+            for ( ; image; image=image->next)
+              image->fuzz=SvNV(sval);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'G':
     case 'g':
-    {
-      if (LocaleCompare(attribute,"gamma") == 0)
-        {
-          for ( ; image; image=image->next)
-            image->gamma=SvNV(sval);
-          return;
-        }
-      if (LocaleCompare(attribute,"gravity") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(GravityTypes,SvPV(sval,na)) :
-            SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedGravityType,SvPV(sval,na));
-              return;
-            }
-          for ( ; image; image=image->next)
-            image->gravity=(GravityType) sp;
-          return;
-        }
-      if (LocaleCompare(attribute,"green-primary") == 0)
-        {
-          for ( ; image; image=image->next)
-            (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
-              &image->chromaticity.green_primary.x,
-              &image->chromaticity.green_primary.y);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"gamma") == 0)
+          {
+            for ( ; image; image=image->next)
+              image->gamma=SvNV(sval);
+            return;
+          }
+        if (LocaleCompare(attribute,"gravity") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(GravityTypes,SvPV(sval,na)) :
+              SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedGravityType,SvPV(sval,na));
+                return;
+              }
+            for ( ; image; image=image->next)
+              image->gravity=(GravityType) sp;
+            return;
+          }
+        if (LocaleCompare(attribute,"green-primary") == 0)
+          {
+            for ( ; image; image=image->next)
+              (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
+                            &image->chromaticity.green_primary.x,
+                            &image->chromaticity.green_primary.y);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'I':
     case 'i':
-    {
-      if (LocaleNCompare(attribute,"index",5) == 0)
-        {
-          long
-            index;
-
-          IndexPacket
-            *indexes;
-
-          register PixelPacket
-            *p;
-
-          for ( ; image; image=image->next)
+      {
+        if (LocaleNCompare(attribute,"index",5) == 0)
           {
-            if (image->storage_class != PseudoClass)
-              continue;
-            x=0;
-            y=0;
-            (void) sscanf(attribute,"%*[^[][%ld%*[,/]%ld",&x,&y);
-            p=GetImagePixels(image,(long) (x % image->columns),
-              (long) (y % image->rows),1,1);
-            if (p == (PixelPacket *) NULL)
-              break;
-            indexes=AccessMutableIndexes(image);
-            (void) sscanf(SvPV(sval,na),"%ld",&index);
-            if ((index >= 0) && (index < (long) image->colors))
-              *indexes=(IndexPacket) index;
-            (void) SyncImagePixels(image);
+            long
+              index;
+
+            IndexPacket
+              *indexes;
+
+            register PixelPacket
+              *p;
+
+            for ( ; image; image=image->next)
+              {
+                if (image->storage_class != PseudoClass)
+                  continue;
+                x=0;
+                y=0;
+                (void) sscanf(attribute,"%*[^[][%ld%*[,/]%ld",&x,&y);
+                p=GetImagePixels(image,(long) (x % image->columns),
+                                 (long) (y % image->rows),1,1);
+                if (p == (PixelPacket *) NULL)
+                  break;
+                indexes=AccessMutableIndexes(image);
+                (void) sscanf(SvPV(sval,na),"%ld",&index);
+                if ((index >= 0) && (index < (long) image->colors))
+                  *indexes=(IndexPacket) index;
+                (void) SyncImagePixels(image);
+              }
+            return;
           }
-          return;
-        }
-      if (LocaleCompare(attribute,"iterations") == 0)
-        {
-  iterations:
-          for ( ; image; image=image->next)
-            image->iterations=SvIV(sval);
-          return;
-        }
-      if (LocaleCompare(attribute,"interlace") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(InterlaceTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedInterlaceType,
-                SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->interlace=(InterlaceType) sp;
-          for ( ; image; image=image->next)
-            image->interlace=(InterlaceType) sp;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+        if (LocaleCompare(attribute,"iterations") == 0)
+          {
+          iterations:
+            for ( ; image; image=image->next)
+              image->iterations=SvIV(sval);
+            return;
+          }
+        if (LocaleCompare(attribute,"interlace") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(InterlaceTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedInterlaceType,
+                            SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->interlace=(InterlaceType) sp;
+            for ( ; image; image=image->next)
+              image->interlace=(InterlaceType) sp;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'L':
     case 'l':
-    {
-      if (LocaleCompare(attribute,"loop") == 0)
-        goto iterations;
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"loop") == 0)
+          goto iterations;
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'M':
     case 'm':
-    {
-      if (LocaleCompare(attribute,"magick") == 0)
-        {
-          if (info)
-            {
-              ExceptionInfo
-                exception;
+      {
+        if (LocaleCompare(attribute,"magick") == 0)
+          {
+            if (info)
+              {
+                ExceptionInfo
+                  exception;
 
-              GetExceptionInfo(&exception);
-              FormatString(info->image_info->filename,"%.1024s:",SvPV(sval,na));
-              SetImageInfo(info->image_info,SETMAGICK_WRITE,&exception);
-              if (*info->image_info->magick == '\0')
-                MagickError(OptionError,UnrecognizedImageFormat,
-                  info->image_info->filename);
-              else
-                for ( ; image; image=image->next)
-                  (void) MagickStrlCpy(image->magick,info->image_info->magick,
-                                       sizeof(image->magick));
-              DestroyExceptionInfo(&exception);
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"map-limit") == 0)
-        {
-          SetMagickResourceLimit(MapResource,SvIV(sval));
-          return;
-        }
-      if (LocaleCompare(attribute,"mattecolor") == 0)
-        {
-          (void) QueryColorDatabase(SvPV(sval,na),&target_color,
-            image ? &image->exception : &exception);
-          if (info)
-            info->image_info->matte_color=target_color;
-          for ( ; image; image=image->next)
-            image->matte_color=target_color;
-          return;
-        }
-      if (LocaleCompare(attribute,"matte") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          for ( ; image; image=image->next)
-            image->matte=sp != 0;
-          return;
-        }
-      if (LocaleCompare(attribute,"memory-limit") == 0)
-        {
-          SetMagickResourceLimit(MemoryResource,SvIV(sval));
-          return;
-        }
-      if (LocaleCompare(attribute,"monochrome") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->monochrome=sp != 0;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+                GetExceptionInfo(&exception);
+                MagickFormatString(info->image_info->filename,sizeof(info->image_info->filename),"%.1024s:",SvPV(sval,na));
+                SetImageInfo(info->image_info,SETMAGICK_WRITE,&exception);
+                if (*info->image_info->magick == '\0')
+                  MagickError(OptionError,UnrecognizedImageFormat,
+                              info->image_info->filename);
+                else
+                  for ( ; image; image=image->next)
+                    (void) MagickStrlCpy(image->magick,info->image_info->magick,
+                                         sizeof(image->magick));
+                DestroyExceptionInfo(&exception);
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"map-limit") == 0)
+          {
+            SetMagickResourceLimit(MapResource,SvIV(sval));
+            return;
+          }
+        if (LocaleCompare(attribute,"mattecolor") == 0)
+          {
+            (void) QueryColorDatabase(SvPV(sval,na),&target_color,
+                                      image ? &image->exception : &exception);
+            if (info)
+              info->image_info->matte_color=target_color;
+            for ( ; image; image=image->next)
+              image->matte_color=target_color;
+            return;
+          }
+        if (LocaleCompare(attribute,"matte") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            for ( ; image; image=image->next)
+              image->matte=sp != 0;
+            return;
+          }
+        if (LocaleCompare(attribute,"memory-limit") == 0)
+          {
+            SetMagickResourceLimit(MemoryResource,SvIV(sval));
+            return;
+          }
+        if (LocaleCompare(attribute,"monochrome") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->monochrome=sp != 0;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'P':
     case 'p':
-    {
-      if (LocaleCompare(attribute,"page") == 0)
-        {
-          char
-            *geometry;
-
-          geometry=GetPageGeometry(SvPV(sval,na));
-          if (info)
-            (void) CloneString(&info->image_info->page,geometry);
-          for ( ; image; image=image->next)
-            (void) GetImageGeometry(image,geometry,False,&image->page);
-          MagickFreeMemory(geometry);
-          return;
-        }
-      if (LocaleCompare(attribute,"pen") == 0)
-        {
-          if (info)
-            {
-              (void) QueryColorDatabase(SvPV(sval,na),&info->draw_info->fill,
-                                        image ? &image->exception : &exception);
-              (void) QueryColorDatabase(SvPV(sval,na),&info->image_info->pen,
-                                        image ? &image->exception : &exception);
-            }
-          return;
-        }
-      if (LocaleNCompare(attribute,"pixel",5) == 0)
-        {
-          register PixelPacket
-            *p;
-
-          for ( ; image; image=image->next)
+      {
+        if (LocaleCompare(attribute,"page") == 0)
           {
-            x=0;
-            y=0;
-            (void) sscanf(attribute,"%*[^[][%ld%*[,/]%ld",&x,&y);
-            p=GetImagePixels(image,(long) (x % image->columns),
-              (long) (y % image->rows),1,1);
-            if (p == (PixelPacket *) NULL)
-              break;
-            image->storage_class=DirectClass;
-            if (strchr(SvPV(sval,na),',') == 0)
-              QueryColorDatabase(SvPV(sval,na),p,
-                image ? &image->exception : &exception);
-            else
-              {
-                pixel.red=p->red;
-                pixel.green=p->green;
-                pixel.blue=p->blue;
-                pixel.opacity=p->opacity;
-                (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf%*[,/]%lf%*[,/]%lf",
-                  &pixel.red,&pixel.green,&pixel.blue,&pixel.opacity);
-                p->red=(Quantum) ((pixel.red < 0) ? 0 :
-                  (pixel.red > MaxRGB) ? MaxRGB : pixel.red+0.5);
-                p->green=(Quantum) ((pixel.green < 0) ? 0 :
-                  (pixel.green > MaxRGB) ? MaxRGB : pixel.green+0.5);
-                p->blue=(Quantum) ((pixel.blue < 0) ? 0 :
-                  (pixel.blue > MaxRGB) ? MaxRGB : pixel.blue+0.5);
-                p->opacity=(Quantum) ((pixel.opacity < 0) ? 0 :
-                  (pixel.opacity > MaxRGB) ? MaxRGB : pixel.opacity+0.5);
-              }
-            (void) SyncImagePixels(image);
+            char
+              *geometry;
+
+            geometry=GetPageGeometry(SvPV(sval,na));
+            if (info)
+              (void) CloneString(&info->image_info->page,geometry);
+            for ( ; image; image=image->next)
+              (void) GetImageGeometry(image,geometry,False,&image->page);
+            MagickFreeMemory(geometry);
+            return;
           }
-          return;
-        }
-      if (LocaleCompare(attribute,"pointsize") == 0)
-        {
-          if (info)
-            {
-              (void) sscanf(SvPV(sval,na),"%lf",&info->image_info->pointsize);
-              (void) sscanf(SvPV(sval,na),"%lf",&info->draw_info->pointsize);
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"preview") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(PreviewTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->preview_type=(PreviewType) sp;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+        if (LocaleCompare(attribute,"pen") == 0)
+          {
+            if (info)
+              {
+                (void) QueryColorDatabase(SvPV(sval,na),&info->draw_info->fill,
+                                          image ? &image->exception : &exception);
+                (void) QueryColorDatabase(SvPV(sval,na),&info->image_info->pen,
+                                          image ? &image->exception : &exception);
+              }
+            return;
+          }
+        if (LocaleNCompare(attribute,"pixel",5) == 0)
+          {
+            register PixelPacket
+              *p;
+
+            for ( ; image; image=image->next)
+              {
+                x=0;
+                y=0;
+                (void) sscanf(attribute,"%*[^[][%ld%*[,/]%ld",&x,&y);
+                p=GetImagePixels(image,(long) (x % image->columns),
+                                 (long) (y % image->rows),1,1);
+                if (p == (PixelPacket *) NULL)
+                  break;
+                image->storage_class=DirectClass;
+                if (strchr(SvPV(sval,na),',') == 0)
+                  QueryColorDatabase(SvPV(sval,na),p,
+                                     image ? &image->exception : &exception);
+                else
+                  {
+                    pixel.red=p->red;
+                    pixel.green=p->green;
+                    pixel.blue=p->blue;
+                    pixel.opacity=p->opacity;
+                    (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf%*[,/]%lf%*[,/]%lf",
+                                  &pixel.red,&pixel.green,&pixel.blue,&pixel.opacity);
+                    p->red=(Quantum) ((pixel.red < 0) ? 0 :
+                                      (pixel.red > MaxRGB) ? MaxRGB : pixel.red+0.5);
+                    p->green=(Quantum) ((pixel.green < 0) ? 0 :
+                                        (pixel.green > MaxRGB) ? MaxRGB : pixel.green+0.5);
+                    p->blue=(Quantum) ((pixel.blue < 0) ? 0 :
+                                       (pixel.blue > MaxRGB) ? MaxRGB : pixel.blue+0.5);
+                    p->opacity=(Quantum) ((pixel.opacity < 0) ? 0 :
+                                          (pixel.opacity > MaxRGB) ? MaxRGB : pixel.opacity+0.5);
+                  }
+                (void) SyncImagePixels(image);
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"pointsize") == 0)
+          {
+            if (info)
+              {
+                (void) sscanf(SvPV(sval,na),"%lf",&info->image_info->pointsize);
+                (void) sscanf(SvPV(sval,na),"%lf",&info->draw_info->pointsize);
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"preview") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(PreviewTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->preview_type=(PreviewType) sp;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'Q':
     case 'q':
-    {
-      if (LocaleCompare(attribute,"quality") == 0)
-        {
-          if (info)
-            info->image_info->quality=SvIV(sval);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"quality") == 0)
+          {
+            if (info)
+              info->image_info->quality=SvIV(sval);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'R':
     case 'r':
-    {
-      if (LocaleCompare(attribute,"red-primary") == 0)
-        {
-          for ( ; image; image=image->next)
-            (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
-              &image->chromaticity.red_primary.x,
-              &image->chromaticity.red_primary.y);
-          return;
-        }
-      if (LocaleCompare(attribute,"render") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(IntentTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedIntentType,SvPV(sval,na));
-              return;
-            }
-         for ( ; image; image=image->next)
-           image->rendering_intent=(RenderingIntent) sp;
-         return;
-       }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"red-primary") == 0)
+          {
+            for ( ; image; image=image->next)
+              (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
+                            &image->chromaticity.red_primary.x,
+                            &image->chromaticity.red_primary.y);
+            return;
+          }
+        if (LocaleCompare(attribute,"render") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(IntentTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedIntentType,SvPV(sval,na));
+                return;
+              }
+            for ( ; image; image=image->next)
+              image->rendering_intent=(RenderingIntent) sp;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'S':
     case 's':
-    {
-      if (LocaleCompare(attribute,"sampling-factor") == 0)
-        {
-          if (!IsGeometry(SvPV(sval,na)))
-            {
-              MagickError(OptionError,MissingGeometry,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            (void) CloneString(&info->image_info->sampling_factor,
-              SvPV(sval,na));
-          return;
-        }
-      if (LocaleCompare(attribute,"scene") == 0)
-        {
-          for ( ; image; image=image->next)
-            image->scene=SvIV(sval);
-          return;
-        }
-      if (LocaleCompare(attribute,"subimage") == 0)
-        {
-          if (info)
-            info->image_info->subimage=SvIV(sval);
-          return;
-        }
-      if (LocaleCompare(attribute,"subrange") == 0)
-        {
-          if (info)
-            info->image_info->subrange=SvIV(sval);
-          return;
-        }
-      if (LocaleCompare(attribute,"server") == 0)
-        goto display;
-      if (LocaleCompare(attribute,"size") == 0)
-        {
-          if (info)
-            {
-              if (!IsGeometry(SvPV(sval,na)))
-                {
-                  MagickError(OptionError,MissingGeometry,SvPV(sval,na));
-                  return;
-                }
-              (void) CloneString(&info->image_info->size,SvPV(sval,na));
-            }
-          return;
-        }
-      if (LocaleCompare(attribute,"stroke") == 0)
-        {
-          if (info)
-            (void) QueryColorDatabase(SvPV(sval,na),&info->draw_info->stroke,
-              image ? &image->exception : &exception);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"sampling-factor") == 0)
+          {
+            if (!IsGeometry(SvPV(sval,na)))
+              {
+                MagickError(OptionError,MissingGeometry,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              (void) CloneString(&info->image_info->sampling_factor,
+                                 SvPV(sval,na));
+            return;
+          }
+        if (LocaleCompare(attribute,"scene") == 0)
+          {
+            for ( ; image; image=image->next)
+              image->scene=SvIV(sval);
+            return;
+          }
+        if (LocaleCompare(attribute,"subimage") == 0)
+          {
+            if (info)
+              info->image_info->subimage=SvIV(sval);
+            return;
+          }
+        if (LocaleCompare(attribute,"subrange") == 0)
+          {
+            if (info)
+              info->image_info->subrange=SvIV(sval);
+            return;
+          }
+        if (LocaleCompare(attribute,"server") == 0)
+          goto display;
+        if (LocaleCompare(attribute,"size") == 0)
+          {
+            if (info)
+              {
+                if (!IsGeometry(SvPV(sval,na)))
+                  {
+                    MagickError(OptionError,MissingGeometry,SvPV(sval,na));
+                    return;
+                  }
+                (void) CloneString(&info->image_info->size,SvPV(sval,na));
+              }
+            return;
+          }
+        if (LocaleCompare(attribute,"stroke") == 0)
+          {
+            if (info)
+              (void) QueryColorDatabase(SvPV(sval,na),&info->draw_info->stroke,
+                                        image ? &image->exception : &exception);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'T':
     case 't':
-    {
-      if (LocaleCompare(attribute,"tile") == 0)
-        {
-          if (info)
-            (void) CloneString(&info->image_info->tile,SvPV(sval,na));
-          return;
-        }
-      if (LocaleCompare(attribute,"texture") == 0)
-        {
-          if (info)
-            (void) CloneString(&info->image_info->texture,SvPV(sval,na));
-          return;
-        }
-      if (LocaleCompare(attribute,"type") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(ImageTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->type=(ImageType) sp;
-          for ( ; image; image=image->next)
-            SetImageType(image,(ImageType) sp);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"tile") == 0)
+          {
+            if (info)
+              (void) CloneString(&info->image_info->tile,SvPV(sval,na));
+            return;
+          }
+        if (LocaleCompare(attribute,"texture") == 0)
+          {
+            if (info)
+              (void) CloneString(&info->image_info->texture,SvPV(sval,na));
+            return;
+          }
+        if (LocaleCompare(attribute,"type") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(ImageTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->type=(ImageType) sp;
+            for ( ; image; image=image->next)
+              SetImageType(image,(ImageType) sp);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'U':
     case 'u':
-    {
-      if (LocaleCompare(attribute,"units") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(ResolutionTypes,SvPV(sval,na)) :
-            SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,MissingType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->units=(ResolutionType) sp;
-          for ( ; image; image=image->next)
-            image->units=(ResolutionType) sp;
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"units") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(ResolutionTypes,SvPV(sval,na)) :
+              SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,MissingType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->units=(ResolutionType) sp;
+            for ( ; image; image=image->next)
+              image->units=(ResolutionType) sp;
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'V':
     case 'v':
-    {
-      if (LocaleCompare(attribute,"verbose") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
-              return;
-            }
-          if (info)
-            info->image_info->verbose=sp != 0;
-          return;
-        }
-      if (LocaleCompare(attribute,"view") == 0)
-        {
-          if (info)
-            (void) CloneString(&info->image_info->view,SvPV(sval,na));
-          return;
-        }
-      if (LocaleCompare(attribute,"virtual-pixel") == 0)
-        {
-          sp=SvPOK(sval) ? LookupStr(VirtualPixelMethods,SvPV(sval,na)) :
-            SvIV(sval);
-          if (sp < 0)
-            {
-              MagickError(OptionError,UnrecognizedVirtualPixelMethod,
-                SvPV(sval,na));
-              return;
-            }
-          for ( ; image; image=image->next)
-            SetImageVirtualPixelMethod(image,(VirtualPixelMethod) sp);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"verbose") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(BooleanTypes,SvPV(sval,na)) : SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedType,SvPV(sval,na));
+                return;
+              }
+            if (info)
+              info->image_info->verbose=sp != 0;
+            return;
+          }
+        if (LocaleCompare(attribute,"view") == 0)
+          {
+            if (info)
+              (void) CloneString(&info->image_info->view,SvPV(sval,na));
+            return;
+          }
+        if (LocaleCompare(attribute,"virtual-pixel") == 0)
+          {
+            sp=SvPOK(sval) ? LookupStr(VirtualPixelMethods,SvPV(sval,na)) :
+              SvIV(sval);
+            if (sp < 0)
+              {
+                MagickError(OptionError,UnrecognizedVirtualPixelMethod,
+                            SvPV(sval,na));
+                return;
+              }
+            for ( ; image; image=image->next)
+              SetImageVirtualPixelMethod(image,(VirtualPixelMethod) sp);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     case 'W':
     case 'w':
-    {
-      if (LocaleCompare(attribute,"white-point") == 0)
-        {
-          for ( ; image; image=image->next)
-            (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
-              &image->chromaticity.white_point.x,
-              &image->chromaticity.white_point.y);
-          return;
-        }
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
-    }
+      {
+        if (LocaleCompare(attribute,"white-point") == 0)
+          {
+            for ( ; image; image=image->next)
+              (void) sscanf(SvPV(sval,na),"%lf%*[,/]%lf",
+                            &image->chromaticity.white_point.x,
+                            &image->chromaticity.white_point.y);
+            return;
+          }
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     default:
-    {
-      MagickError(OptionError,UnrecognizedAttribute,attribute);
-      break;
+      {
+        MagickError(OptionError,UnrecognizedAttribute,attribute);
+        break;
+      }
     }
-  }
   DestroyExceptionInfo(&exception);
   if (image == (Image *) NULL)
     MagickError(OptionError,UnrecognizedAttribute,attribute);
@@ -2721,7 +2723,7 @@ Average(ref)
     av_push(av,sv_bless(rv,hv));
     SvREFCNT_dec(sv);
     info=GetPackageInfo(aTHX_ (void *) av,info);
-    FormatString(info->image_info->filename,"average-%.*s",MaxTextExtent-9,
+    MagickFormatString(info->image_info->filename,sizeof(info->image_info->filename),"average-%.*s",MaxTextExtent-9,
       ((p=strrchr(image->filename,'/')) ? p+1 : image->filename));
     (void) MagickStrlCpy(image->filename,info->image_info->filename,sizeof(image->filename));
     SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception);
@@ -3125,7 +3127,7 @@ DESTROY(ref)
         /*
           Array (AV *) reference
         */
-        FormatString(message,"%s::Ref%lx_%s",PackageName,(long) reference,
+        MagickFormatString(message,sizeof(message),"%s::Ref%lx_%s",PackageName,(long) reference,
           XS_VERSION);
         sv=perl_get_sv(message,FALSE);
         if (sv)
@@ -3331,7 +3333,7 @@ Flatten(ref)
     av_push(av,sv_bless(rv,hv));
     SvREFCNT_dec(sv);
     info=GetPackageInfo(aTHX_ (void *) av,info);
-    FormatString(info->image_info->filename,"average-%.*s",MaxTextExtent-9,
+    MagickFormatString(info->image_info->filename,sizeof(info->image_info->filename),"average-%.*s",MaxTextExtent-9,
       ((p=strrchr(image->filename,'/')) ? p+1 : image->filename));
     (void) MagickStrlCpy(image->filename,info->image_info->filename,sizeof(image->filename));
     SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception);
@@ -3454,7 +3456,7 @@ Get(ref,...)
               if (!image)
                 break;
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(color,"%u,%u,%u,%u",image->background_color.red,
+              MagickFormatString(color,sizeof(color),"%u,%u,%u,%u",image->background_color.red,
                 image->background_color.green,image->background_color.blue,
                 image->background_color.opacity);
 #else
@@ -3504,7 +3506,7 @@ Get(ref,...)
             {
               if (!image)
                 break;
-              FormatString(color,"%g,%g",image->chromaticity.blue_primary.x,
+              MagickFormatString(color,sizeof(color),"%g,%g",image->chromaticity.blue_primary.x,
                 image->chromaticity.blue_primary.y);
               s=newSVpv(color,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
@@ -3515,7 +3517,7 @@ Get(ref,...)
               if (!image)
                 break;
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(color,"%u,%u,%u,%u",image->border_color.red,
+              MagickFormatString(color,sizeof(color),"%u,%u,%u,%u",image->border_color.red,
                 image->border_color.green,image->border_color.blue,
                 image->border_color.opacity);
 #else
@@ -3605,7 +3607,7 @@ Get(ref,...)
               if (j > (long) image->colors)
                 j%=image->colors;
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(color,"%u,%u,%u,%u",image->colormap[j].red,
+              MagickFormatString(color,sizeof(color),"%u,%u,%u,%u",image->colormap[j].red,
                 image->colormap[j].green,image->colormap[j].blue,
                 image->colormap[j].opacity);
 #else
@@ -3647,7 +3649,7 @@ Get(ref,...)
 
               if (!image)
                 break;
-              FormatString(geometry,"%gx%g",image->x_resolution,
+              MagickFormatString(geometry,sizeof(geometry),"%gx%g",image->x_resolution,
                 image->y_resolution);
               s=newSVpv(geometry,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
@@ -3759,9 +3761,9 @@ Get(ref,...)
                 break;
               /* Value duplicated in info->image_info->pen */
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(color,"%u,%u,%u,%u",info->draw_info->fill.red,
-                           info->draw_info->fill.green,info->draw_info->fill.blue,
-                           info->draw_info->fill.opacity);
+              MagickFormatString(color,sizeof(color),"%u,%u,%u,%u",info->draw_info->fill.red,
+                                 info->draw_info->fill.green,info->draw_info->fill.blue,
+                                 info->draw_info->fill.opacity);
 #else
               (void) QueryColorname(image, &info->draw_info->fill,AllCompliance,
                                     color,&image->exception);
@@ -3860,8 +3862,8 @@ Get(ref,...)
             {
               if (!image)
                 break;
-              FormatString(color,"%g,%g",image->chromaticity.green_primary.x,
-                image->chromaticity.green_primary.y);
+              MagickFormatString(color,sizeof(color),"%g,%g",image->chromaticity.green_primary.x,
+                                 image->chromaticity.green_primary.y);
               s=newSVpv(color,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
               continue;
@@ -3925,7 +3927,7 @@ Get(ref,...)
               (void) AcquireImagePixels(image,(long) (x % image->columns),
                                         (long) (y % image->rows),1,1,&image->exception);
               indexes=AccessImmutableIndexes(image);
-              FormatString(name,"%u",*indexes);
+              MagickFormatString(name,sizeof(name),"%u",*indexes);
               s=newSVpv(name,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
               continue;
@@ -4030,7 +4032,7 @@ Get(ref,...)
               if (!image)
                 break;
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(color,"%u,%u,%u,%u",image->matte_color.red,
+              MagickFormatString(color,sizeof(color),"%u,%u,%u,%u",image->matte_color.red,
                 image->matte_color.green,image->matte_color.blue,
                 image->matte_color.opacity);
 #else
@@ -4071,7 +4073,7 @@ Get(ref,...)
                     char
                       geometry[MaxTextExtent];
 
-                    FormatString(geometry,"%lux%lu%+ld%+ld",image->page.width,
+                    MagickFormatString(geometry,sizeof(geometry),"%lux%lu%+ld%+ld",image->page.width,
                       image->page.height,image->page.x,image->page.y);
                     s=newSVpv(geometry,0);
                   }
@@ -4098,7 +4100,7 @@ Get(ref,...)
               (void) AcquireOnePixelByReference(image,&pixel,(long) (x % image->columns),
                 (long) (y % image->rows),&image->exception);
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(name,"%u,%u,%u,%u",pixel.red,pixel.green,pixel.blue,
+              MagickFormatString(name,sizeof(name),"%u,%u,%u,%u",pixel.red,pixel.green,pixel.blue,
                 pixel.opacity);
 #else
               (void) QueryColorname(image, &pixel,AllCompliance,
@@ -4163,7 +4165,7 @@ Get(ref,...)
             {
               if (!image)
                 break;
-              FormatString(color,"%g,%g",image->chromaticity.red_primary.x,
+              MagickFormatString(color,sizeof(color),"%g,%g",image->chromaticity.red_primary.x,
                 image->chromaticity.red_primary.y);
               s=newSVpv(color,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
@@ -4243,9 +4245,9 @@ Get(ref,...)
               if (!info)
                 break;
 #if MAGICK_COMMA_DELIM_COLORS
-              FormatString(color,"%u,%u,%u,%u",info->draw_info->stroke.red,
-                           info->draw_info->stroke.green,info->draw_info->stroke.blue,
-                           info->draw_info->stroke.opacity);
+              MagickFormatString(color,sizeof(color),"%u,%u,%u,%u",info->draw_info->stroke.red,
+                                 info->draw_info->stroke.green,info->draw_info->stroke.blue,
+                                 info->draw_info->stroke.opacity);
 #else
               (void) QueryColorname(image, &info->draw_info->stroke,AllCompliance,
                                     color,&image->exception);
@@ -4361,8 +4363,8 @@ Get(ref,...)
             {
               if (!image)
                 break;
-              FormatString(color,"%g,%g",image->chromaticity.white_point.x,
-                image->chromaticity.white_point.y);
+              MagickFormatString(color,sizeof(color),"%g,%g",image->chromaticity.white_point.x,
+                                 image->chromaticity.white_point.y);
               s=newSVpv(color,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
               continue;
@@ -4903,7 +4905,7 @@ Mogrify(ref,...)
                     if ((al->int_reference < 0) &&
                         ((al->int_reference=SvIV(sv)) <= 0))
                       {
-                        FormatString(message,"invalid %.60s value",pp->method);
+                        MagickFormatString(message,sizeof(message),"invalid %.60s value",pp->method);
                         MagickError(OptionError,message,attribute);
                         goto continue_outer_loop;
                       }
@@ -4932,7 +4934,7 @@ Mogrify(ref,...)
       {
         default:
         {
-          FormatString(message,"%ld",(long) ix);
+          MagickFormatString(message,sizeof(message),"%ld",(long) ix);
           MagickError(OptionError,UnrecognizedPerlMagickMethod,message);
           goto ReturnIt;
         }
@@ -5355,7 +5357,7 @@ Mogrify(ref,...)
                 argument_list[9].int_reference=0;
               if (!attribute_flag[10])
                 argument_list[10].int_reference=0;
-              FormatString(message,"%+ld%+ld",argument_list[9].int_reference,
+              MagickFormatString(message,sizeof(message),"%+ld%+ld",argument_list[9].int_reference,
                 argument_list[10].int_reference);
               (void) CloneString(&draw_info->geometry,message);
             }
@@ -5618,7 +5620,7 @@ Mogrify(ref,...)
           /*
             Composite image.
           */
-          FormatString(composite_geometry,"%lux%lu%+ld%+ld",
+          MagickFormatString(composite_geometry,sizeof(composite_geometry),"%lux%lu%+ld%+ld",
             composite_image->columns,composite_image->rows,geometry.x,
             geometry.y);
           /*flags=*/GetImageGeometry(image,composite_geometry,False,&geometry);
@@ -5826,7 +5828,7 @@ Mogrify(ref,...)
             argument_list[3].double_reference=1.0;
           if (!attribute_flag[0])
             {
-              FormatString(message,"%g,%g,%g",
+              MagickFormatString(message,sizeof(message),"%g,%g,%g",
                 argument_list[1].double_reference,
                 argument_list[2].double_reference,
                 argument_list[3].double_reference);
@@ -5889,7 +5891,7 @@ Mogrify(ref,...)
             argument_list[2].double_reference=100.0;
           if (!attribute_flag[3])
             argument_list[3].double_reference=100.0;
-          FormatString(message,"%g,%g,%g",
+          MagickFormatString(message,sizeof(message),"%g,%g,%g",
             argument_list[1].double_reference,
             argument_list[2].double_reference,
             argument_list[3].double_reference);
@@ -6285,7 +6287,7 @@ Mogrify(ref,...)
             argument_list[3].double_reference=MaxRGB;
           if (!attribute_flag[0])
             {
-              FormatString(message,"%g,%g,%g",
+              MagickFormatString(message,sizeof(message),"%g,%g,%g",
                 argument_list[1].double_reference,
                 argument_list[2].double_reference,
                 argument_list[3].double_reference);
@@ -7241,11 +7243,11 @@ Ping(ref,...)
       EXTEND(sp,(SSize_t)4*count);
       for (next=image; next; next=next->next)
       {
-        FormatString(message,"%lu",next->columns);
+        MagickFormatString(message,sizeof(message),"%lu",next->columns);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%lu",next->rows);
+        MagickFormatString(message,sizeof(message),"%lu",next->rows);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%lu",(unsigned long) GetBlobSize(next));
+        MagickFormatString(message,sizeof(message),"%lu",(unsigned long) GetBlobSize(next));
         PUSHs(sv_2mortal(newSVpv(message,0)));
         PUSHs(sv_2mortal(newSVpv(next->magick,0)));
       }
@@ -7334,13 +7336,13 @@ QueryColor(ref,...)
           PUSHs(&sv_undef);
           continue;
         }
-      FormatString(message,"%u",color.red);
+      MagickFormatString(message,sizeof(message),"%u",color.red);
       PUSHs(sv_2mortal(newSVpv(message,0)));
-      FormatString(message,"%u",color.green);
+      MagickFormatString(message,sizeof(message),"%u",color.green);
       PUSHs(sv_2mortal(newSVpv(message,0)));
-      FormatString(message,"%u",color.blue);
+      MagickFormatString(message,sizeof(message),"%u",color.blue);
       PUSHs(sv_2mortal(newSVpv(message,0)));
-      FormatString(message,"%u",color.opacity);
+      MagickFormatString(message,sizeof(message),"%u",color.opacity);
       PUSHs(sv_2mortal(newSVpv(message,0)));
     }
     DestroyExceptionInfo(&exception);
@@ -7492,7 +7494,7 @@ QueryFont(ref,...)
         PUSHs(sv_2mortal(newSVpv(type_info->family,0)));
       PUSHs(sv_2mortal(newSVpv(StyleTypes[(long) type_info->style],0)));
       PUSHs(sv_2mortal(newSVpv(StretchTypes[(long) type_info->stretch],0)));
-      FormatString(message,"%lu",type_info->weight);
+      MagickFormatString(message,sizeof(message),"%lu",type_info->weight);
       PUSHs(sv_2mortal(newSVpv(message,0)));
       if (type_info->encoding == (char *) NULL)
         PUSHs(&sv_undef);
@@ -7753,7 +7755,7 @@ QueryFontMetrics(ref,...)
     if (draw_info->geometry == (char *) NULL)
       {
         draw_info->geometry=AllocateString((char *) NULL);
-        FormatString(draw_info->geometry,"%g,%g",x,y);
+        MagickFormatString(draw_info->geometry,MaxTextExtent,"%g,%g",x,y);
       }
     status=GetTypeMetrics(image,draw_info,&metrics);
     (void) CatchImageException(image);
@@ -7761,19 +7763,19 @@ QueryFontMetrics(ref,...)
       PUSHs(&sv_undef);
     else
       {
-        FormatString(message,"%g",metrics.pixels_per_em.x);
+        MagickFormatString(message,sizeof(message),"%g",metrics.pixels_per_em.x);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%g",metrics.pixels_per_em.y);
+        MagickFormatString(message,sizeof(message),"%g",metrics.pixels_per_em.y);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%g",metrics.ascent);
+        MagickFormatString(message,sizeof(message),"%g",metrics.ascent);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%g",metrics.descent);
+        MagickFormatString(message,sizeof(message),"%g",metrics.descent);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%g",metrics.width);
+        MagickFormatString(message,sizeof(message),"%g",metrics.width);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%g",metrics.height);
+        MagickFormatString(message,sizeof(message),"%g",metrics.height);
         PUSHs(sv_2mortal(newSVpv(message,0)));
-        FormatString(message,"%g",metrics.max_advance);
+        MagickFormatString(message,sizeof(message),"%g",metrics.max_advance);
         PUSHs(sv_2mortal(newSVpv(message,0)));
       }
     DestroyDrawInfo(draw_info);

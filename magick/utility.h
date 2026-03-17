@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2025 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
   Copyright 1991-1999 E. I. du Pont de Nemours and Company
 
@@ -86,7 +86,7 @@ extern MagickExport const char
   *SetClientPath(const char *);
 
 extern MagickExport double
-  StringToDouble(const char *,const double);
+  StringToDouble(const char *,const double); /* FIXME: Eliminate use and deprecate */
 
 extern MagickExport int
   GetGeometry(const char *,long *,long *,unsigned long *,unsigned long *),
@@ -144,8 +144,8 @@ extern MagickExport void
   SetGeometry(const Image *,RectangleInfo *);
 
 extern MagickExport size_t
-  FormatString(char *string,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3),
-  FormatStringList(char *string,const char *format,va_list operands) MAGICK_FUNC_PRINTF_FORMAT(2,0),
+  FormatString(char *string,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3) MAGICK_FUNC_DEPRECATED, /* FIXME: Update code to use MagickFormatString() and deprecate */
+  FormatStringList(char *string,const char *format,va_list operands) MAGICK_FUNC_PRINTF_FORMAT(2,0) MAGICK_FUNC_DEPRECATED, /* Use MagickFormatStringList() instead */
   MagickFormatString(char *string,const size_t length,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(3,4),
   MagickFormatStringList(char *string,const size_t length,const char *format,va_list operands) MAGICK_FUNC_PRINTF_FORMAT(3,0);
 

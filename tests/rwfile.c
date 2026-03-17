@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2025 GraphicsMagick Group
+ * Copyright (C) 2003-2026 GraphicsMagick Group
  * Copyright (C) 2003 ImageMagick Studio
  * Copyright 1991-1999 E. I. du Pont de Nemours and Company
  *
@@ -332,7 +332,7 @@ int main ( int argc, char **argv )
       /*
        * Specify original image size (WIDTHxHEIGHT) if format requires it
        */
-      FormatString( size, "%lux%lu", original->columns, original->rows );
+      MagickFormatString( size, sizeof(size), "%lux%lu", original->columns, original->rows );
     }
   if (IgnoreExtensionTreatment == magick_info->extension_treatment)
     {

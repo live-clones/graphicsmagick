@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -126,7 +126,7 @@ static Image *ReadPlasmaImage(const ImageInfo *image_info,
   clone_info=CloneImageInfo(image_info);
   clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
-  (void) FormatString(clone_info->filename,"gradient:%.1024s",
+  (void) MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"gradient:%.1024s",
     image_info->filename);
   image=ReadImage(clone_info,exception);
   DestroyImageInfo(clone_info);

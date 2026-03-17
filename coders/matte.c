@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -195,7 +195,8 @@ static unsigned int WriteMATTEImage(const ImageInfo *image_info,Image *image)
                                     image->columns,image->rows))
           break;
   }
-  (void) FormatString(matte_image->filename,"MIFF:%.1024s",image->filename);
+  (void) MagickFormatString(matte_image->filename,sizeof(matte_image->filename),
+                            "MIFF:%.1024s",image->filename);
   status=WriteImage(image_info,matte_image);
   DestroyImage(matte_image);
   return(status);

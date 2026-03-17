@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2025 GraphicsMagick Group */
+/* Copyright (C) 2003-2026 GraphicsMagick Group */
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -513,15 +513,15 @@ WandExport char *PixelGetColorAsString(const PixelWand *wand)
 
   assert(wand != (const PixelWand *) NULL);
   assert(wand->signature == MagickSignature);
-  (void) FormatString(color,"%u,%u,%u",
+  (void) MagickFormatString(color,sizeof(color),"%u,%u,%u",
     (Quantum) (MaxRGB*wand->pixel.red+0.5),
     (Quantum) (MaxRGB*wand->pixel.green+0.5),
     (Quantum) (MaxRGB*wand->pixel.blue+0.5));
   if (wand->colorspace == CMYKColorspace)
-    (void) FormatString(color,"%.1024s,%u",color,
+    (void) MagickFormatString(color,sizeof(color),"%.1024s,%u",color,
       (Quantum) (MaxRGB*wand->pixel.index+0.5));
   if (wand->matte != False)
-    (void) FormatString(color,"%.1024s,%u",color,
+    (void) MagickFormatString(color,sizeof(color),"%.1024s,%u",color,
       (Quantum) (MaxRGB*wand->pixel.opacity+0.5));
   return(AcquireString(color));
 }

@@ -192,12 +192,13 @@ MagickExport MagickPassFail CdlImage(Image *image,const char *cdl)
   param.blueslope=AbsoluteValue(param.blueslope);
   param.bluepower=AbsoluteValue(param.bluepower);
 
-  FormatString(progress_message,
-               "[%%s] cdl %g/%g/%g/%g/%g/%g/%g/%g/%g/%g image...",
-               param.redslope,param.redoffset,param.redpower,
-               param.greenslope,param.greenoffset,param.greenpower,
-               param.blueslope,param.blueoffset,param.bluepower,
-               param.saturation);
+  MagickFormatString(progress_message,
+                     sizeof(progress_message),
+                     "[%%s] cdl %g/%g/%g/%g/%g/%g/%g/%g/%g/%g image...",
+                     param.redslope,param.redoffset,param.redpower,
+                     param.greenslope,param.greenoffset,param.greenpower,
+                     param.blueslope,param.blueoffset,param.bluepower,
+                     param.saturation);
 
   if (!IsRGBCompatibleColorspace(image->colorspace))
     if (TransformColorspace(image,RGBColorspace) == MagickFail)
@@ -221,11 +222,11 @@ MagickExport MagickPassFail CdlImage(Image *image,const char *cdl)
           for (i=0; i <= (long) MaxMap; i++)
             {
               lut[i].red=CdlQuantum((Quantum) i,param.redslope,param.redoffset,
-                                       param.redpower,param.saturation);
+                                    param.redpower,param.saturation);
               lut[i].green=CdlQuantum((Quantum) i,param.greenslope,param.greenoffset,
-                                         param.greenpower,param.saturation);
+                                      param.greenpower,param.saturation);
               lut[i].blue=CdlQuantum((Quantum) i,param.blueslope,param.blueoffset,
-                                        param.bluepower,param.saturation);
+                                     param.bluepower,param.saturation);
             }
           param.lut=lut;
         }

@@ -270,7 +270,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U8(member)) \
     { \
-      FormatString(buffer,"%u",(unsigned int) member); \
+      MagickFormatString(buffer,sizeof(buffer),"%u",(unsigned int) member); \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -282,7 +282,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U32(member)) \
     { \
-      FormatString(buffer,"%u",member); \
+      MagickFormatString(buffer,sizeof(buffer),"%u",member);    \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -294,7 +294,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_R32(member)) \
     { \
-      FormatString(buffer,"%g",member.f); \
+      MagickFormatString(buffer,sizeof(buffer),"%g",member.f);  \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -306,7 +306,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_S32(member)) \
     { \
-      FormatString(buffer,"%d",member); \
+      MagickFormatString(buffer,sizeof(buffer),"%d",member);    \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \

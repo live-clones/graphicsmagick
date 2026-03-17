@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -155,7 +155,7 @@ static void LogICONFile(const IconFile *icon_file)
 %
 */
 static Image *ReadIconImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                            ExceptionInfo *exception)
 {
   IconFile
     icon_file;
@@ -211,166 +211,166 @@ static Image *ReadIconImage(const ImageInfo *image_info,
   data_alloc_size=0;
   data=(unsigned char *) NULL;
   for (i=0; i < icon_file.count; i++)
-  {
-    /* 0 - 255, 0 means 256! */
-    icon_file.directory[i].width=ReadBlobByte(image);
-    /* 0 - 255, 0 means 256! */
-    icon_file.directory[i].height=ReadBlobByte(image);
-    icon_file.directory[i].colors=ReadBlobByte(image);
-    icon_file.directory[i].reserved=ReadBlobByte(image);
-    icon_file.directory[i].planes=ReadBlobLSBShort(image);
-    icon_file.directory[i].bits_per_pixel=ReadBlobLSBShort(image);
-    icon_file.directory[i].size=ReadBlobLSBLong(image);
-    icon_file.directory[i].offset=ReadBlobLSBLong(image);
-    if (EOFBlob(image))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    if (image->logging)
-      LogICONDirEntry(i,&icon_file.directory[i]);
-    if (
-        /*
-          Restrict allocation size
-        */
-        (icon_file.directory[i].size < 20) ||
-        (icon_file.directory[i].size > 256+256*256*2*4) ||
+    {
+      /* 0 - 255, 0 means 256! */
+      icon_file.directory[i].width=ReadBlobByte(image);
+      /* 0 - 255, 0 means 256! */
+      icon_file.directory[i].height=ReadBlobByte(image);
+      icon_file.directory[i].colors=ReadBlobByte(image);
+      icon_file.directory[i].reserved=ReadBlobByte(image);
+      icon_file.directory[i].planes=ReadBlobLSBShort(image);
+      icon_file.directory[i].bits_per_pixel=ReadBlobLSBShort(image);
+      icon_file.directory[i].size=ReadBlobLSBLong(image);
+      icon_file.directory[i].offset=ReadBlobLSBLong(image);
+      if (EOFBlob(image))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      if (image->logging)
+        LogICONDirEntry(i,&icon_file.directory[i]);
+      if (
+          /*
+            Restrict allocation size
+          */
+          (icon_file.directory[i].size < 20) ||
+          (icon_file.directory[i].size > 256+256*256*2*4) ||
 
-        /*
-          planes
+          /*
+            planes
 
-          In ICO format (1): Specifies color planes. Should be 0 or 1.
+            In ICO format (1): Specifies color planes. Should be 0 or 1.
 
-          In CUR format (2): Specifies the horizontal coordinates of
-          the hotspot in number of pixels from the left.
-        */
-        ((icon_file.resource_type == 1) &&
-         (icon_file.directory[i].planes != 0) &&
-         (icon_file.directory[i].planes != 1)) ||
-        /*
-          bits_per_pixel
+            In CUR format (2): Specifies the horizontal coordinates of
+            the hotspot in number of pixels from the left.
+          */
+          ((icon_file.resource_type == 1) &&
+           (icon_file.directory[i].planes != 0) &&
+           (icon_file.directory[i].planes != 1)) ||
+          /*
+            bits_per_pixel
 
-          In ICO format (1): Specifies bits per pixel.
+            In ICO format (1): Specifies bits per pixel.
 
-          In CUR format (2): Specifies the vertical coordinates of the
-          hotspot in number of pixels from the top.
-         */
-        ((icon_file.resource_type == 1) &&
-         ((icon_file.directory[i].bits_per_pixel >= 8) &&
-          (icon_file.directory[i].colors != 0))) ||
+            In CUR format (2): Specifies the vertical coordinates of the
+            hotspot in number of pixels from the top.
+          */
+          ((icon_file.resource_type == 1) &&
+           ((icon_file.directory[i].bits_per_pixel >= 8) &&
+            (icon_file.directory[i].colors != 0))) ||
 
-        (icon_file.directory[i].size == 0) ||
-        (icon_file.directory[i].offset == 0))
-      ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-    data_alloc_size=Max(data_alloc_size,icon_file.directory[i].size);
-  }
+          (icon_file.directory[i].size == 0) ||
+          (icon_file.directory[i].offset == 0))
+        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+      data_alloc_size=Max(data_alloc_size,icon_file.directory[i].size);
+    }
   data=MagickAllocateResourceLimitedMemory(unsigned char *,data_alloc_size);
   if (data == (unsigned char *) NULL)
     ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
   for (i=0; i < icon_file.count; i++)
-  {
-    /*
-      Verify and read icons
-    */
-    Image
-      *icon_image;
+    {
+      /*
+        Verify and read icons
+      */
+      Image
+        *icon_image;
 
-    ImageInfo
-      *read_info;
+      ImageInfo
+        *read_info;
 
-    char
-      dib_size[MaxTextExtent],
-      format[MaxTextExtent];
+      char
+        dib_size[MaxTextExtent],
+        format[MaxTextExtent];
 
-    size_t
-      count;
+      size_t
+        count;
 
-    if (SeekBlob(image,icon_file.directory[i].offset,SEEK_SET) !=
-        (magick_off_t) icon_file.directory[i].offset)
-      {
-        if (image->logging)
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "Failed to seek to offset %u",
-                                icon_file.directory[i].offset);
-        MagickFreeResourceLimitedMemory(unsigned char *,data);
-        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-      }
-    if ((count=ReadBlob(image,icon_file.directory[i].size,data)) != icon_file.directory[i].size)
-      {
-        if (image->logging)
+      if (SeekBlob(image,icon_file.directory[i].offset,SEEK_SET) !=
+          (magick_off_t) icon_file.directory[i].offset)
+        {
+          if (image->logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Failed to seek to offset %u",
+                                  icon_file.directory[i].offset);
+          MagickFreeResourceLimitedMemory(unsigned char *,data);
+          ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+        }
+      if ((count=ReadBlob(image,icon_file.directory[i].size,data)) != icon_file.directory[i].size)
+        {
+          if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Read %" MAGICK_SIZE_T_F  "u bytes from blob"
                                   " (expected %" MAGICK_SIZE_T_F  "u bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) icon_file.directory[i].size);
-        MagickFreeResourceLimitedMemory(unsigned char *,data);
-        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-      }
-    format[0]='\0';
-    if (memcmp(data,"\050\000\000\000",4) == 0)
-      (void) strlcpy(format,"ICODIB",sizeof(format));
-    else if (memcmp(data,"\211PNG\r\n\032\n",8) == 0)
-      (void) strlcpy(format,"PNG",sizeof(format));
-    if (format[0] == '\0')
-      {
-        MagickFreeResourceLimitedMemory(unsigned char *,data);
-        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-      }
-    if (image->logging)
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Reading icon using %s format",
-                            format);
-    icon_image=(Image *) NULL;
-    read_info=CloneImageInfo(image_info);
-    if (read_info != (const ImageInfo *) NULL)
-      {
-        (void) strlcpy(read_info->magick,format,MaxTextExtent);
-        (void) strlcpy(read_info->filename,format,MaxTextExtent);
-        (void) strlcat(read_info->filename,":",MaxTextExtent);
-        FormatString(dib_size,"%ux%u",
-                     icon_file.directory[i].width == 0 ? 256 :
-                     icon_file.directory[i].width,
-                     icon_file.directory[i].height == 0 ? 256 :
-                     icon_file.directory[i].height);
-        (void) CloneString(&read_info->size,dib_size);
-        icon_image=BlobToImage(read_info,data,icon_file.directory[i].size,exception);
-        DestroyImageInfo(read_info);
-        read_info=(ImageInfo *) NULL;
-      }
-    if (icon_image == (Image *) NULL)
-      {
-        MagickFreeResourceLimitedMemory(unsigned char *,data);
-        DestroyImageList(image);
-        return((Image *) NULL);
-      }
-    DestroyBlob(icon_image);
-    icon_image->blob=ReferenceBlob(image->blob);
-    icon_image->scene=i;
-    (void) strlcpy(icon_image->magick,image_info->magick,
-                   sizeof(icon_image->magick));
-    ReplaceImageInList(&image,icon_image);
-    StopTimer(&image->timer);
+          MagickFreeResourceLimitedMemory(unsigned char *,data);
+          ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+        }
+      format[0]='\0';
+      if (memcmp(data,"\050\000\000\000",4) == 0)
+        (void) strlcpy(format,"ICODIB",sizeof(format));
+      else if (memcmp(data,"\211PNG\r\n\032\n",8) == 0)
+        (void) strlcpy(format,"PNG",sizeof(format));
+      if (format[0] == '\0')
+        {
+          MagickFreeResourceLimitedMemory(unsigned char *,data);
+          ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+        }
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Reading icon using %s format",
+                              format);
+      icon_image=(Image *) NULL;
+      read_info=CloneImageInfo(image_info);
+      if (read_info != (const ImageInfo *) NULL)
+        {
+          (void) strlcpy(read_info->magick,format,MaxTextExtent);
+          (void) strlcpy(read_info->filename,format,MaxTextExtent);
+          (void) strlcat(read_info->filename,":",MaxTextExtent);
+          MagickFormatString(dib_size,sizeof(dib_size),"%ux%u",
+                             icon_file.directory[i].width == 0 ? 256 :
+                             icon_file.directory[i].width,
+                             icon_file.directory[i].height == 0 ? 256 :
+                             icon_file.directory[i].height);
+          (void) CloneString(&read_info->size,dib_size);
+          icon_image=BlobToImage(read_info,data,icon_file.directory[i].size,exception);
+          DestroyImageInfo(read_info);
+          read_info=(ImageInfo *) NULL;
+        }
+      if (icon_image == (Image *) NULL)
+        {
+          MagickFreeResourceLimitedMemory(unsigned char *,data);
+          DestroyImageList(image);
+          return((Image *) NULL);
+        }
+      DestroyBlob(icon_image);
+      icon_image->blob=ReferenceBlob(image->blob);
+      icon_image->scene=i;
+      (void) strlcpy(icon_image->magick,image_info->magick,
+                     sizeof(icon_image->magick));
+      ReplaceImageInList(&image,icon_image);
+      StopTimer(&image->timer);
 
-    /*
-      Proceed to next image.
-    */
-    if (image_info->subrange != 0)
-      if (image->scene >= (image_info->subimage+image_info->subrange-1))
-        break;
-    if (i < (long) (icon_file.count-1))
-      {
-        /*
-          Allocate next image structure.
-        */
-        AllocateNextImage(image_info,image);
-        if (image->next == (Image *) NULL)
-          {
-            DestroyImageList(image);
-            return((Image *) NULL);
-          }
-        image=SyncNextImageInList(image);
-        if (!MagickMonitorFormatted(TellBlob(image),GetBlobSize(image),exception,
-                                    LoadImagesText,image->filename))
+      /*
+        Proceed to next image.
+      */
+      if (image_info->subrange != 0)
+        if (image->scene >= (image_info->subimage+image_info->subrange-1))
           break;
-      }
-  } /* for (i=0; i < icon_file.count; i++) */
+      if (i < (long) (icon_file.count-1))
+        {
+          /*
+            Allocate next image structure.
+          */
+          AllocateNextImage(image_info,image);
+          if (image->next == (Image *) NULL)
+            {
+              DestroyImageList(image);
+              return((Image *) NULL);
+            }
+          image=SyncNextImageInList(image);
+          if (!MagickMonitorFormatted(TellBlob(image),GetBlobSize(image),exception,
+                                      LoadImagesText,image->filename))
+            break;
+        }
+    } /* for (i=0; i < icon_file.count; i++) */
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);

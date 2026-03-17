@@ -3661,7 +3661,7 @@ ImportViewPixelArea(ViewInfo *view,
           (quantum_size == 64)))))
     {
       char quantum_size_str[MaxTextExtent];
-      FormatString(quantum_size_str,"%u",quantum_size);
+      MagickFormatString(quantum_size_str,sizeof(quantum_size_str),"%u",quantum_size);
       status=0;
       ThrowException(&GetCacheViewImage(view)->exception,CoderError,
                      UnsupportedBitsPerSample,quantum_size_str);

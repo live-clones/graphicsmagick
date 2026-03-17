@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2009-2024 GraphicsMagick Group
+% Copyright (C) 2009-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -338,7 +338,7 @@ static Image *ReadCALSImage(const ImageInfo *image_info,ExceptionInfo *exception
   CloseBlob(image);
   DestroyImage(image);
   clone_info=CloneImageInfo((ImageInfo *) NULL);
-  FormatString(clone_info->filename,"tiff:%.1024s",filename);
+  MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"tiff:%.1024s",filename);
   image=ReadImage(clone_info,exception);
   (void) LiberateTemporaryFile(filename);
   DestroyImageInfo(clone_info);
@@ -498,16 +498,16 @@ static MagickPassFail WriteCALSImage(const ImageInfo *image_info,Image *image)
       orx=0;
       ory=270;
   }
-  FormatString(buffer,"rorient: %03d,%03d",orx,ory);
+  MagickFormatString(buffer,sizeof(buffer),"rorient: %03d,%03d",orx,ory);
   WriteCALSRecord(image,buffer);
   /* pixel counts based on columns/rows of input */
-  FormatString(buffer,"rpelcnt: %06ld,%06ld",image->columns,image->rows);
+  MagickFormatString(buffer,sizeof(buffer),"rpelcnt: %06ld,%06ld",image->columns,image->rows);
   WriteCALSRecord(image,buffer);
   /* density based on input density or default of 200 */
   density=200;
   if (image_info->density != (char *) NULL)
     (void) GetGeometry(image_info->density,&sans,&sans,&density,&density);
-  FormatString(buffer,"rdensty: %04ld",density);
+  MagickFormatString(buffer,sizeof(buffer),"rdensty: %04ld",density);
   WriteCALSRecord(image,buffer);
   WriteCALSRecord(image,"notes: NONE");
 

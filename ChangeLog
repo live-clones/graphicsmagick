@@ -1,3 +1,14 @@
+2026-03-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/utility.c (FormatString): Deprecate FormatString(), and
+        replace all usages with MagickFormatString(), or a suitable
+        equivalent.  When ImageMagick was created, the minimum text buffer
+        size was declared by MaxTextExtent, which assumed suitable for any
+        purpose. FormatString() limits the amount of data written to
+        MaxTextExtent-1.  Almost all former FormatString() sites now pass
+        the actual buffer size rather than using MaxTextExtent.  This was
+        a lot of code edits!
+
 2026-03-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.

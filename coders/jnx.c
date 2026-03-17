@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2012-2025 GraphicsMagick Group
+% Copyright (C) 2012-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -151,14 +151,14 @@ ExtractTileJPG(Image * image, const ImageInfo * image_info,
                   if ((image->rows == 0) || (image->columns == 0))
                     DeleteImageFromList(&image);
 
-                  FormatString(img_label_str, "%.20g;%.20g",
-                               (double) TileInfo->TileBounds.NorthEast.lat*180.0/0x7FFFFFFF,
-                               (double) TileInfo->TileBounds.NorthEast.lon*180.0/0x7FFFFFFF);
+                  MagickFormatString(img_label_str, sizeof(img_label_str), "%.20g;%.20g",
+                                     (double) TileInfo->TileBounds.NorthEast.lat*180.0/0x7FFFFFFF,
+                                     (double) TileInfo->TileBounds.NorthEast.lon*180.0/0x7FFFFFFF);
                   SetImageAttribute(image2, "jnx:northeast", img_label_str);
 
-                  FormatString(img_label_str, "%.20g;%.20g",
-                               (double) TileInfo->TileBounds.SouthWest.lat*180.0/0x7FFFFFFF,
-                               (double) TileInfo->TileBounds.SouthWest.lon*180.0/0x7FFFFFFF);
+                  MagickFormatString(img_label_str, sizeof(img_label_str), "%.20g;%.20g",
+                                     (double) TileInfo->TileBounds.SouthWest.lat*180.0/0x7FFFFFFF,
+                                     (double) TileInfo->TileBounds.SouthWest.lon*180.0/0x7FFFFFFF);
                   SetImageAttribute(image2, "jnx:southwest", img_label_str);
 
                   AppendImageToList(&image, image2);
