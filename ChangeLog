@@ -1,3 +1,9 @@
+2026-03-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (png_write_raw_profile): Detect and report an
+        excessively large profile, and other unexpected conditions.
+        Addresses SourceForge issue #765 "CVE-2026-30883".
+
 2026-03-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/utility.c (FormatString): Deprecate FormatString(), and
