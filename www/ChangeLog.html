@@ -38,6 +38,25 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-03-19  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/png.c (WriteOneJNGImage): Properly handle and report the
+case where ImageToBlob() returns NULL.
+(WriteMNGImage): MNG only supports a color palette up to 256
+colors. Addresses SourceForge issue #764 &quot;CVE-2026-28690&quot;.
+Replace most ImageMagick-compatibility macro names with native
+names.</p></li>
+</ul>
+</blockquote>
+<p>2026-03-17  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/png.c (png_write_raw_profile): Detect and report an
+excessively large profile, and other unexpected conditions.
+Addresses SourceForge issue #765 &quot;CVE-2026-30883&quot;.</p></li>
+</ul>
+</blockquote>
 <p>2026-03-16  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
