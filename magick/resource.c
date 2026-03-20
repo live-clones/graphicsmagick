@@ -98,7 +98,7 @@ static ResourceInfo resource_info[] =
   {
    { "",       "",  "",                    0, 0,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
    { "disk",   "B", "MAGICK_LIMIT_DISK",   0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
-   { "files",  "",  "MAGICK_LIMIT_FILES",  0, 32,   256,                    0, SummationLimit, 0 },
+   { "files",  "",  "MAGICK_LIMIT_FILES",  0, 0,    256,                    0, SummationLimit, 0 },
    { "map",    "B", "MAGICK_LIMIT_MAP",    0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
    { "memory", "B", "MAGICK_LIMIT_MEMORY", 0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
    { "pixels", "P", "MAGICK_LIMIT_PIXELS", 0, 1,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
@@ -853,7 +853,7 @@ MagickExport void LiberateMagickResource(const ResourceType type,
 #if defined(DEBUG_MAGICK_RESOURCES) && DEBUG_MAGICK_RESOURCES
             if (!(info->value >= info->minimum))
               (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
-                                    "%s resource"
+                                    "ANOMALY: %s resource"
                                     " value=%" MAGICK_INTMAX_F "d,"
                                     " minimum=%" MAGICK_INTMAX_F "d",
                                     info->name, info->value, info->minimum);
