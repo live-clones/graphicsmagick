@@ -1,3 +1,19 @@
+2026-03-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Build Freetype after JXL. Use JXL
+        build for Brotli dependency. Enable similar FreeType configure
+        options as Freetype's own oss-fuzz build uses now.
+
+        * magick/annotate.c (RenderFreetype): Assure that pointer
+        variables which should be initialized upon success by FreeType
+        functions are initialized with a null pointer.  Verify that
+        pointer is no longer null before using it. Trust but verify.
+
+2026-03-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/resource.c (resource_info): Minimum limit for 'files'
+        limit must be 0.
+
 2026-03-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/png.c (WriteOneJNGImage): Properly handle and report the

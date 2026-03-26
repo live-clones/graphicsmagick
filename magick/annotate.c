@@ -1091,7 +1091,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     ft_status;
 
   FT_Face
-    face;
+    face = (FT_Face) 0;
 
   FT_Library
     library;
@@ -1168,7 +1168,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     ft_status=FT_New_Face(library,draw_info->font,0,&face);
   else
     ft_status=FT_New_Face(library,draw_info->font+1,0,&face);
-  if (ft_status != 0)
+  if ((ft_status != 0) || (face == (FT_Face) 0))
     {
       (void) FT_Done_FreeType(library);
       ThrowBinaryException(TypeError,UnableToReadFont,draw_info->font)

@@ -529,40 +529,6 @@ then
     )
 fi
 
-# Build freetype
-# PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static freetype2 --libs
-#    -L/work/lib -lfreetype -lpng16 -lm -lz
-#
-# Disable 'harfbuzz' to avoid compilation error of autofit module due
-# to "use of undeclared identifier 'RTLD_DEFAULT'".
-if ($enable_freetype) && [ -d "${SRC}"/freetype ]
-then
-    printf "\n\n=== Building freetype...\n"
-    (
-        FREETYPE_SRC="${SRC}"/freetype
-        FREETYPE_BUILD="${BUILD}"/freetype
-
-        rm -rf "${FREETYPE_BUILD}"
-        mkdir -p "${FREETYPE_BUILD}"
-
-        cd "${FREETYPE_SRC}"
-        ./autogen.sh
-
-        cd "${FREETYPE_BUILD}"
-        "${FREETYPE_SRC}"/configure \
-                         CPPFLAGS="-I${WORK}/include" \
-                         CFLAGS="${CFLAGS} -fPIC" \
-                         LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
-                         --disable-shared \
-                         --enable-freetype-config \
-                         --enable-static \
-                         --without-harfbuzz \
-                         --prefix="${WORK}"
-        make -j"$(nproc)"
-        make install
-    )
-fi
-
 if ($enable_jxl) && [ -d "${SRC}"/libjxl ]
 then
     # Build libjxl
@@ -607,13 +573,64 @@ then
         # libjxl claims to require libjxl_cms, but does not build/install one!
         #sed -i 's/ libjxl_cms//' ./lib/libjxl.pc
 
+        printf "Installing libjxl...\n"
         make install
-        cp third_party/brotli/*.a "${WORK}"/lib
-        cp third_party/brotli/*.pc "${WORK}"/lib/pkgconfig
+        (
+            printf "Installing brotli...\n"
+            cd third_party/brotli
+            make install
+            #cp third_party/brotli/*.a "${WORK}"/lib
+            #cp third_party/brotli/*.pc "${WORK}"/lib/pkgconfig
+        )
         printf "==================\n"
         printf "JXL version info\n"
         "${WORK}"/bin/cjxl --version
         printf "==================\n"
+    )
+fi
+
+# Build freetype
+# PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static freetype2 --libs
+#    -L/work/lib -lfreetype -lpng16 -lm -lz
+#
+# See freetype2-testing/fuzzing/scripts and freetype2-testing/fuzzing/scripts/build/freetype.sh
+#
+# Freetype build may depend on bzip2, brotli, zlib, and libpng:
+# configure --enable-static --disable-shared --with-brotli --with-bzip2 --with-zlib --with-png --without-harfbuzz
+# Uses env BZIP2_CFLAGS, BZIP2_LIBS, BROTLI_CFLAGS, BROTLI_LIBS, ZLIB_CFLAGS, ZLIB_LIBS, LIBPNG_CFLAGS, LIBPNG_LIBS
+#
+# Disable 'harfbuzz' to avoid compilation error of autofit module due
+# to "use of undeclared identifier 'RTLD_DEFAULT'".
+if ($enable_freetype) && [ -d "${SRC}"/freetype ]
+then
+    printf "\n\n=== Building freetype...\n"
+    (
+        FREETYPE_SRC="${SRC}"/freetype
+        FREETYPE_BUILD="${BUILD}"/freetype
+
+        rm -rf "${FREETYPE_BUILD}"
+        mkdir -p "${FREETYPE_BUILD}"
+
+        cd "${FREETYPE_SRC}"
+        ./autogen.sh
+
+        cd "${FREETYPE_BUILD}"
+        # --with-brotli --with-bzip2 --with-zlib --with-png --without-harfbuzz
+        "${FREETYPE_SRC}"/configure \
+                         CPPFLAGS="-I${WORK}/include" \
+                         CFLAGS="${CFLAGS} -fPIC" \
+                         LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
+                         --enable-static \
+                         --disable-shared \
+                         --with-brotli \
+                         --with-bzip2 \
+                         --with-zlib \
+                         --with-png \
+                         --without-harfbuzz \
+                         --enable-freetype-config \
+                         --prefix="${WORK}"
+        make -j"$(nproc)"
+        make install
     )
 fi
 
