@@ -44,6 +44,7 @@
 #include "magick/color.h"
 #include "magick/color_lookup.h"
 #include "magick/composite.h"
+#include "magick/confirm_access.h"
 #include "magick/constitute.h"
 #include "magick/gem.h"
 #include "magick/log.h"
@@ -1148,11 +1149,28 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
   magick_code_point_t
     *text;
 
+  const char
+    *font;
+
   MagickPassFail
     status=MagickPass;
 
-  if (draw_info->font == (char *) NULL)
+  if ((draw_info->font == (char *) NULL) ||
+      (draw_info->font[0] == '\0') ||
+      ((draw_info->font[0] == '@') && (draw_info->font[1] == '\0')))
     ThrowBinaryException(TypeError,FontNotSpecified,image->filename);
+
+  if (draw_info->font[0] != '@')
+    font=draw_info->font;
+  else
+    font=draw_info->font+1;
+
+  /*
+    Verify if file is allowed to be accessed.
+  */
+  if (MagickConfirmAccess(FileReadConfirmAccessMode,font,
+                          &image->exception) == MagickFail)
+      return MagickFail;
 
   glyph.image=(FT_Glyph) 0;
   last_glyph.image=(FT_Glyph) 0;
@@ -1164,10 +1182,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
   if (ft_status)
     ThrowBinaryException(TypeError,UnableToInitializeFreetypeLibrary,
                          draw_info->font);
-  if (*draw_info->font != '@')
-    ft_status=FT_New_Face(library,draw_info->font,0,&face);
-  else
-    ft_status=FT_New_Face(library,draw_info->font+1,0,&face);
+  ft_status=FT_New_Face(library,font,0,&face);
   if ((ft_status != 0) || (face == (FT_Face) 0))
     {
       (void) FT_Done_FreeType(library);

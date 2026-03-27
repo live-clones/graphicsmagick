@@ -1,3 +1,9 @@
+2026-03-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/annotate.c (RenderFreetype): Add more validations for
+        draw_info->font. Use MagickConfirmAccess() to verify that font
+        file name is allowed to be read.
+
 2026-03-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Build Freetype after JXL. Use JXL
