@@ -986,7 +986,6 @@ MagickExport void ThrowException(ExceptionInfo *exception,
   MagickFreeMemory(exception->module);
   MagickFreeMemory(exception->function);
   exception->line=0UL;
-  exception->signature=0UL;
   UnlockSemaphoreInfo(error_semaphore);
   return;
 }

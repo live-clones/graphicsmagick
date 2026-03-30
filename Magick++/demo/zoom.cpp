@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 
 using namespace std;
 using namespace Magick;
@@ -44,6 +45,46 @@ static int ParseError (int position, char **argv)
   return Usage(argv);
 }
 
+static MagickPassFail
+ConfirmAccess(const ConfirmAccessMode mode,
+              const char *path,
+              MagickLib::ExceptionInfo *exception)
+{
+  MagickPassFail
+    status = MagickPass;
+
+  unsigned int
+    i;
+
+  static const char *
+    banned_files[] =
+    {
+      "/etc/passwd",
+      "/etc/shadow",
+      NULL
+    };
+
+  if ((mode == FileReadConfirmAccessMode) ||
+      (mode == FileWriteConfirmAccessMode))
+
+    {
+      i=0;
+      while (banned_files[i] != (const char *) NULL)
+        {
+          if (strcmp(banned_files[i],path) == 0)
+            {
+              ThrowException(exception,FileOpenError,"Access denied by policy",path);
+              status = MagickFail;
+              break;
+            }
+          i++;
+        }
+    }
+
+  return(status);
+}
+
+
 int main(int argc,char **argv)
 {
   // Initialize/Deinitialize GraphicsMagick (scope based)
@@ -51,6 +92,8 @@ int main(int argc,char **argv)
 
   if ( argc < 2 )
     return Usage(argv);
+
+  (void) MagickSetConfirmAccessHandler(ConfirmAccess);
 
   enum ResizeAlgorithm
   {

@@ -1,3 +1,18 @@
+2026-03-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/utils.cc (MagickFuzzerConfirmAccess): Deny access to
+        some security-sensitive files.
+
+        * Magick++/demo/zoom.cpp (ConfirmAccess): Add a sample access
+        confirmation handler.
+
+        * Magick++/lib/Magick++/Include.h: Add access confirmation
+        functions and enumerations to Magick++ namespace.
+
+        * magick/error.c (ThrowException): Remove the set of
+        exception->signature to zero.  This long-standing bug was not
+        noticed since implementation code uses ThrowLoggedException().
+
 2026-03-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/annotate.c (RenderFreetype): Add more validations for

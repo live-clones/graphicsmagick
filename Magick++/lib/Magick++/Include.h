@@ -755,6 +755,19 @@ namespace Magick
   using MagickLib::LogMethod;
   using MagickLib::LogOutputType;
 
+  // Access confirmation functions and enumerations
+  using MagickLib::ConfirmAccessMode;
+  using MagickLib::ConfirmAccessHandler;
+  using MagickLib::MagickConfirmAccess;
+  using MagickLib::MagickSetConfirmAccessHandler;
+  using MagickLib::UndefinedConfirmAccessMode;
+  using MagickLib::FileExecuteConfirmAccessMode; /* Path is to be opened for execution */
+  using MagickLib::FileReadConfirmAccessMode;    /* Path is to be opened for read */
+  using MagickLib::FileWriteConfirmAccessMode;   /* Path is to be opened for write */
+  using MagickLib::URLGetFTPConfirmAccessMode;   /* ftp:// URL get */
+  using MagickLib::URLGetFileConfirmAccessMode;  /* file:// URL get */
+  using MagickLib::URLGetHTTPConfirmAccessMode;   /* http:// URL get */
+
 #if defined(MAGICK_IMPLEMENTATION)
   //
   // GraphicsMagick symbols used in implementation code
