@@ -350,6 +350,7 @@ namespace Magick
   using MagickLib::NativeEndian;
 
   // Exception types
+  using MagickLib::ExceptionInfo; // FIXME: Need a better solution!
   using MagickLib::ExceptionType;
   using MagickLib::UndefinedException;
   using MagickLib::EventException;
@@ -936,7 +937,6 @@ namespace Magick
   using MagickLib::EmbossImage;
   using MagickLib::EnhanceImage;
   using MagickLib::EqualizeImage;
-  using MagickLib::ExceptionInfo;
   using MagickLib::ExceptionType;
   using MagickLib::ExecuteModuleProcess;
   using MagickLib::ExportImagePixelArea;

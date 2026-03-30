@@ -48,7 +48,7 @@ static int ParseError (int position, char **argv)
 static MagickPassFail
 ConfirmAccess(const ConfirmAccessMode mode,
               const char *path,
-              MagickLib::ExceptionInfo *exception)
+              Magick::ExceptionInfo *exception)
 {
   MagickPassFail
     status = MagickPass;

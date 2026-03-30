@@ -10,9 +10,9 @@
   Deny access to some security-sensitive files.
 */
 static MagickPassFail
-MagickFuzzerConfirmAccess(const ConfirmAccessMode mode,
+MagickFuzzerConfirmAccess(const Magick::ConfirmAccessMode mode,
                           const char *path,
-                          MagickLib::ExceptionInfo *exception)
+                          Magick::ExceptionInfo *exception)
 {
   MagickPassFail
     status = MagickPass;
@@ -28,8 +28,8 @@ MagickFuzzerConfirmAccess(const ConfirmAccessMode mode,
       NULL
     };
 
-  if ((mode == FileReadConfirmAccessMode) ||
-      (mode == FileWriteConfirmAccessMode))
+  if ((mode == Magick::FileReadConfirmAccessMode) ||
+      (mode == Magick::FileWriteConfirmAccessMode))
 
     {
       i=0;
@@ -37,7 +37,7 @@ MagickFuzzerConfirmAccess(const ConfirmAccessMode mode,
         {
           if (strcmp(banned_files[i],path) == 0)
             {
-              ThrowException(exception,FileOpenError,"Access denied by policy",path);
+              ThrowException(exception,Magick::FileOpenError,"Access denied by policy",path);
               status = MagickFail;
               break;
             }
