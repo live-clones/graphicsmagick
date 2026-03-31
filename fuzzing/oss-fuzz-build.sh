@@ -1409,6 +1409,7 @@ MARKER
        zip -rj "${OUT}"/"${CPREFIX}"TGA"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.tga
        zip -rj "${OUT}"/"${CPREFIX}"TIFF"${CSUFFIX}".zip "${SRC}"/libtiff/test/images/*.tiff "${SRC}"/graphicsmagick/PerlMagick/t/tiff/*.tif*
        zip -rj "${OUT}"/"${CPREFIX}"TOPOL"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/topol*
+       zip -rj "${OUT}"/"${CPREFIX}"TTF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/ttf/*
        zip -rj "${OUT}"/"${CPREFIX}"WBMP"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.wbmp
        zip -rj "${OUT}"/"${CPREFIX}"WMF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/wmf/*
        zip -rj "${OUT}"/"${CPREFIX}"WPG"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.wpg
