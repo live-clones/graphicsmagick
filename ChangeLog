@@ -1,3 +1,10 @@
+2026-03-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/utils.cc (LLVMFuzzerInitialize): Remove the
+        MagickFuzzerConfirmAccess code which was added yesterday.
+
+        * fuzzing/oss-fuzz-build.sh: Add a tiny TTF corpus.
+
 2026-03-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/utils.cc (MagickFuzzerConfirmAccess): Deny access to

@@ -6,48 +6,6 @@
 
 #if USE_DYNAMIC_INITIALIZATION
 
-/*
-  Deny access to some security-sensitive files.
-*/
-static MagickPassFail
-MagickFuzzerConfirmAccess(const Magick::ConfirmAccessMode mode,
-                          const char *path,
-                          Magick::ExceptionInfo *exception)
-{
-  MagickPassFail
-    status = MagickPass;
-
-  unsigned int
-    i;
-
-  static const char *
-    banned_files[] =
-    {
-      "/etc/passwd",
-      "/etc/shadow",
-      NULL
-    };
-
-  if ((mode == Magick::FileReadConfirmAccessMode) ||
-      (mode == Magick::FileWriteConfirmAccessMode))
-
-    {
-      i=0;
-      while (banned_files[i] != (const char *) NULL)
-        {
-          if (strcmp(banned_files[i],path) == 0)
-            {
-              ThrowException(exception,Magick::FileOpenError,"Access denied by policy",path);
-              status = MagickFail;
-              break;
-            }
-          i++;
-        }
-    }
-
-  return(status);
-}
-
 // A custom fuzzer initialization function
 extern "C" int LLVMFuzzerInitialize(int *argcp,char ***argvp) {
   int argc = *argcp;
@@ -80,8 +38,6 @@ extern "C" int LLVMFuzzerInitialize(int *argcp,char ***argvp) {
   MagickLib::SetMagickResourceLimit(MagickLib::ReadResource, 900000);
   MagickLib::SetMagickResourceLimit(MagickLib::WriteResource, 1118720);
   MagickLib::SetMagickResourceLimit(MagickLib::ImagesResource, 1024);
-
-  MagickLib::MagickSetConfirmAccessHandler(MagickFuzzerConfirmAccess);
 
   return 0;
 }
