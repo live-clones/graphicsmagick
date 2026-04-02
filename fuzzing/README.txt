@@ -43,7 +43,7 @@ Optionally remove the existing build directory (in git checkout):
 
   sudo rm -rf build
 
-Optionally remove the existing project image::
+Remove the existing project image::
 
   docker image rm gcr.io/oss-fuzz/graphicsmagick
 
@@ -131,6 +131,32 @@ Copy fuzzing build script into running container (given simultaneous shell sessi
   Then use 'compile 2>&1 | tee build.log'.  This executes
   /src/build.sh while in the initial "/src/graphicsmagick" directory
   but does some other things as well.
+
+Debugging issues
+------------------------------------------------------
+
+See https://google.github.io/oss-fuzz/advanced-topics/debugging/
+
+While in oss-fuzz directory (outside of container), Copy Testcase to Build Output::
+
+  cp /path/to/testcase build/out/graphicsmagick/
+
+Inside Container:
+  cd /out/
+  /work/build/graphicsmagick/utilities/gm convert MVG:/out/clusterfuzz-testcase-minimized-coder_MVG_fuzzer-4505211980021760 info:-
+
+Launch Debugger Container:
+
+Run the specialized base-runner-debug container using the helper
+script.  This compiles a whole lot of stuff and starts a new container.
+
+From the host, the source code is under
+"build/work/graphicsmagick/build". It does not seem to be available in the debug container. If the location was known, then the 'gdb' 'directory' command could be used to specify the top of the tree.
+
+  python3 infra/helper.py shell base-runner-debug
+
+  gdb -args /out/graphicsmagick/coder_MVG_fuzzer /out/graphicsmagick/clusterfuzz-testcase-minimized-coder_MVG_fuzzer-4505211980021760
+  (gdb) run
 
 Discover Projects Using Ubuntu 24.04 Baseline And MSan
 ------------------------------------------------------
