@@ -1244,6 +1244,7 @@ fi
         "${GM_SOURCE}"/configure \
         CPPFLAGS="-DEXPERIMENTAL_EXIF_TAGS=1 -I${WORK}/include" \
         CFLAGS="${CFLAGS}" \
+        CXXFLAGS="${CXXFLAGS}" \
         LDFLAGS="${LDFLAGS:-} -L${WORK}/lib" \
         LIBS="${EXTRA_LIBS}" \
         --prefix="${WORK}" \
