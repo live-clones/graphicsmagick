@@ -38,6 +38,19 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-04-02  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/display.c (MagickXImageWindowCommand): Assure that the
+'delta' buffer will not overflow if the user keeps a numeric key
+depressed. Reset the buffer and transformed results if more than
+10 digits have been collected, or the value fails to convert to an
+integer. Addresses SourceForge issue &quot;#766 CVE-2026-33535&quot;.</p></li>
+<li><p>fuzzing/oss-fuzz-build.sh (BUILD): Explicitly pass CXXFLAGS from
+build script to GraphicsMagick configure.</p></li>
+<li><p>fuzzing/README.txt: Add some notes about debugging issues.</p></li>
+</ul>
+</blockquote>
 <p>2026-03-31  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

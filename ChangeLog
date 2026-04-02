@@ -1,3 +1,16 @@
+2026-04-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/display.c (MagickXImageWindowCommand): Assure that the
+        'delta' buffer will not overflow if the user keeps a numeric key
+        depressed. Reset the buffer and transformed results if more than
+        10 digits have been collected, or the value fails to convert to an
+        integer. Addresses SourceForge issue "#766 CVE-2026-33535".
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Explicitly pass CXXFLAGS from
+        build script to GraphicsMagick configure.
+
+        * fuzzing/README.txt: Add some notes about debugging issues.
+
 2026-03-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/utils.cc (LLVMFuzzerInitialize): Remove the

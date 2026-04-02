@@ -6424,15 +6424,34 @@ static CommandType MagickXImageWindowCommand(Display *display,
 
   if ((key_symbol >= XK_0) && (key_symbol <= XK_9))
     {
+      /*
+        Collect up to 10 digits from the user and store the integer
+        result (if any) in resource_info->quantum.
+      */
+      size_t
+        length;
+
       if (!((last_symbol >= XK_0) && (last_symbol <= XK_9)))
         {
-          *delta='\0';
+          delta[0]='\0';
           resource_info->quantum=1;
         }
       last_symbol=key_symbol;
-      delta[strlen(delta)+1]='\0';
-      delta[strlen(delta)]=Digits[key_symbol-XK_0];
-      resource_info->quantum=MagickAtoI(delta);
+      length=strlen(delta);
+      /* INT_MAX is 2147483647, which is 10 digits */
+      if (length < 10 /* MaxTextExtent-1 */)
+        {
+          delta[length]=Digits[key_symbol-XK_0];
+          delta[length+1]='\0';
+        }
+      if (MagickAtoIChk(delta,&resource_info->quantum) == MagickFail)
+        {
+          /*
+            Reset to initial state on error.
+          */
+          delta[0]='\0';
+          resource_info->quantum=1;
+        }
       return(NullCommand);
     }
   last_symbol=key_symbol;
