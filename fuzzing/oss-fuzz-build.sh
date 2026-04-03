@@ -626,6 +626,7 @@ then
                          --with-bzip2 \
                          --with-zlib \
                          --with-png \
+                         --without-hvf \
                          --without-harfbuzz \
                          --enable-freetype-config \
                          --prefix="${WORK}"

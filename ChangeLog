@@ -1,3 +1,26 @@
+2026-04-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/ps3.c (WritePS3Image): Check that Postscript dimensions
+        are within resource limits.  Only enable for oss-fuzz at the
+        moment.
+
+        * coders/ps2.c (WritePS2Image): Check that Postscript dimensions
+        are within resource limits.  Only enable for oss-fuzz at the
+        moment.
+
+        * coders/ps.c (ReadPSImage): Check that Postscript dimensions are
+        within resource limits.  Only enable for oss-fuzz at the moment.
+        (WritePSImage): Check that Postscript dimensions are within
+        resource limits.  Only enable for oss-fuzz at the moment.
+
+        * fuzzing/utils.cc (LLVMFuzzerInitialize): Allow overriding the
+        logging event mask using the MAGICK_DEBUG environment variable.
+
+        * magick/magick.c (InitializeMagickEx): Add more details in
+        comments.
+
+        * magick/render.c (DrawImage): Code formatting fix.
+
 2026-04-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/display.c (MagickXImageWindowCommand): Assure that the
