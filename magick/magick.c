@@ -1305,17 +1305,17 @@ InitializeMagickEx(const char *path, unsigned int options,
 #endif /* defined(MSWINDOWS) */
   if (!(options & MAGICK_OPT_NO_SIGNAL_HANDER))
     InitializeMagickSignalHandlers(); /* Signal handlers */
-  InitializeTemporaryFiles();       /* Temporary files */
-  InitializeMagickResources();      /* Resources */
-  InitializeMagickRegistry();       /* Image/blob registry */
-  InitializeConstitute();           /* Constitute semaphore */
+  InitializeTemporaryFiles();       /* Temporary files (semaphore only) */
+  InitializeMagickResources();      /* Resources (semaphore+calculations) */
+  InitializeMagickRegistry();       /* Image/blob registry (semaphore+vars only) */
+  InitializeConstitute();           /* Constitute (semaphore only) */
   InitializeMagickInfoList();       /* Coder registrations + modules */
   /*InitializeMagicInfo();*/        /* File format detection */
-  InitializeTypeInfo();             /* Font information */
-  InitializeDelegateInfo();         /* External delegate information */
-  InitializeColorInfo();            /* Color database */
-  InitializeMagickMonitor();        /* Progress monitor */
-  MagickInitializeCommandInfo();    /* Command parser */
+  InitializeTypeInfo();             /* Font information (semaphore only) */
+  InitializeDelegateInfo();         /* External delegate information (semaphore only) */
+  InitializeColorInfo();            /* Color database (semaphore only) */
+  InitializeMagickMonitor();        /* Progress monitor (semaphore only) */
+  MagickInitializeCommandInfo();    /* Command parser (semaphore only) */
 
   /* Let's log the three important setting as we exit this routine */
   (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
