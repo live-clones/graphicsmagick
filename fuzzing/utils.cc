@@ -14,7 +14,8 @@ extern "C" int LLVMFuzzerInitialize(int *argcp,char ***argvp) {
   Magick::InitializeMagick(exe_path);
 
   // Trace exception events to help diagnose issues.
-  MagickLib::SetLogEventMask("exception");
+  if (MagickLib::SetLogEventMask(NULL) == MagickLib::NoEventsMask)
+    MagickLib::SetLogEventMask("exception");
 
   // Oss-fuzz itself (ASAN/UBSAN) seems to require memory and
   // the memory limit may be total virtual memory and not based
@@ -53,7 +54,8 @@ public:
     Magick::InitializeMagick(nullptr);
 
     // Trace exception events to help diagnose issues.
-    MagickLib::SetLogEventMask("exception");
+    if (MagickLib::SetLogEventMask(NULL) == MagickLib::NoEventsMask)
+      MagickLib::SetLogEventMask("exception");
 
     // Oss-fuzz itself (ASAN/UBSAN) seems to require memory and
     // the memory limit may be total virtual memory and not based
