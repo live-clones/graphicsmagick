@@ -523,6 +523,15 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
       geometry.width=(unsigned long) (x_scale+0.5);
       y_scale=(geometry.height*dy_resolution)/y_resolution;
       geometry.height=(unsigned long) (y_scale+0.5);
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+      /*
+        Enforce maximum Postscript dimensions to avoid denial of service
+      */
+      if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
+        ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+      if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
+        ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+#endif /* if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
       if (page == 1)
         {
           /*
