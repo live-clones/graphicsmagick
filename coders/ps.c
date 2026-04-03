@@ -309,12 +309,23 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (image_info->page != (char *) NULL)
     (void) GetGeometry(image_info->page,&page.x,&page.y,&page.width,
                        &page.height);
-  MagickFormatString(geometry,sizeof(geometry),"%lux%lu",
-                     (unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5),
-                     (unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5));
+  width=(unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5);
+  height=(unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5);
+  MagickFormatString(geometry,sizeof(geometry),"%lux%lu",width,height);
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Page geometry: %s",geometry);
+
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+  /*
+    Enforce dimension limits to avoid denial of service
+  */
+  if (AcquireMagickResource(WidthResource,width) != MagickPass)
+    ThrowReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+  if (AcquireMagickResource(HeightResource,height) != MagickPass)
+    ThrowReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+#endif /* if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
+
   ThrowReaderExceptionOnFOpFailure(ferror(file),1);
   ThrowReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
   ThrowReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
@@ -801,13 +812,24 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
               y_resolution *= 2.54;
             }
         }
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Postscript Resolution: %gx%g DPI",
-                            x_resolution,y_resolution);
       x_scale=(geometry.width*dx_resolution)/x_resolution;
       geometry.width=(unsigned long) (x_scale+0.5);
       y_scale=(geometry.height*dy_resolution)/y_resolution;
       geometry.height=(unsigned long) (y_scale+0.5);
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Postscript Resolution: %gx%g DPI (geometry %lux%lu)",
+                            x_resolution,y_resolution,geometry.width,geometry.height);
+
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+      /*
+        Enforce maximum Postscript dimensions to avoid denial of service
+      */
+      if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
+        ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+      if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
+        ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+#endif /* if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
+
       if (page == 1)
         {
           /*
