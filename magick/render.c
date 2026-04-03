@@ -2816,8 +2816,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     {
       MagickFreeResourceLimitedMemory(char *, primitive);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
-                            UnableToDrawOnImage)
-        }
+                            UnableToDrawOnImage);
+    }
 
   /* Set up to manage growing the PrimitiveInfo array */
   PIMgr.pp_PrimitiveInfo = &primitive_info;
