@@ -1857,7 +1857,7 @@ DrawClipPath(Image *image,const DrawInfo *draw_info, const char *name)
         }
 
       MagickFreeMemory(clone_info->extra->clip_path);
-      if ((status &= DrawImage(image_clip_mask,clone_info)) == MagickFail)
+      if ((status &= DrawImage(image_clip_mask,clone_info)) == MagickFail) /* FIXME: oss-fuzz 499125828 recursive call + leak */
         {
           /* Copy exception into base image */
           if (image_clip_mask->exception.severity > image->exception.severity)
@@ -2664,10 +2664,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     geometry[MaxTextExtent],
     name[MaxTextExtent],
     pattern[MaxTextExtent],
-    *original_primitive,
-    *primitive,
+    *original_primitive = (char *) NULL,
+    *primitive = (char *) NULL,
     *q,
-    *token;
+    *token = (char *) NULL;
 
   double
     angle,
@@ -2675,12 +2675,12 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     points_length;  /* primitive_extent is now a size_t */
 
   DrawInfo
-    **graphic_context;
+    **graphic_context = (DrawInfo **) NULL;
 
   long
     j,
     k,
-    n;
+    n=0;
 
   PointInfo
     point;
@@ -2756,19 +2756,23 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   assert(draw_info != (DrawInfo *) NULL);
   assert(draw_info->signature == MagickSignature);
   assert(draw_info->primitive != (char *) NULL);
-  /*
-    Check for DrawImage recursion
-  */
-  if (DrawImageRecurseIn(image) == MagickFail)
-    return MagickFail;
 
   if (*draw_info->primitive == '\0')
     return(MagickFail);
 
+  /*
+    Check for DrawImage recursion
+  */
+  if (DrawImageRecurseIn(image) == MagickFail)
+    {
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Drawing recursion detected!");
+      return MagickFail;
+    }
+
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"begin draw-image");
 
   if ((status &= SetImageType(image,TrueColorType)) != MagickPass)
-    return(MagickFail);
+    goto draw_image_done;
 
   /*
     Read primitive from file if supplied primitive starts with '@' and
@@ -2777,46 +2781,46 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   if ((*draw_info->primitive == '@') &&
       (DrawImageGetCurrentRecurseLevel(image) == 1))
     {
-      original_primitive=(char *)
-        FileToBlob(draw_info->primitive+1,&length,&image->exception);
+      original_primitive=(char *) FileToBlob(draw_info->primitive+1,&length,&image->exception);
     }
   else
     {
       original_primitive=draw_info->primitive;
     }
   if (original_primitive == (char *) NULL)
-    return(MagickFail);
-
+    {
+      status=MagickFail;
+      goto draw_image_done;
+    }
 
   if (getenv("MAGICK_SKIP_RENDERING") != NULL)
     {
-      if (original_primitive != draw_info->primitive)
-        MagickFreeMemory(original_primitive);
-      return MagickPass;
+      status=MagickPass;
+      goto draw_image_done;
     }
 
   primitive_extent=strlen(original_primitive);
   primitive = MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
   if (primitive == (char *) NULL)
     {
-      if (original_primitive != draw_info->primitive)
-        MagickFreeMemory(original_primitive);
-      return(MagickFail);
+      ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
+                      UnableToDrawOnImage);
+      status=MagickFail;
+      goto draw_image_done;
     }
   (void) memcpy(primitive, original_primitive, primitive_extent+1);
   if (original_primitive != draw_info->primitive)
     MagickFreeMemory(original_primitive);
 
-  n=0;
   /*
     Allocate primitive info memory.
   */
-  graphic_context=MagickAllocateResourceLimitedMemory(DrawInfo **,sizeof(DrawInfo *));
+  graphic_context=MagickAllocateResourceLimitedClearedArray(DrawInfo **,n+1,sizeof(DrawInfo *));
   if (graphic_context == (DrawInfo **) NULL)
     {
-      MagickFreeResourceLimitedMemory(char *, primitive);
-      ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
-                            UnableToDrawOnImage);
+      ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
+      status=MagickFail;
+      goto draw_image_done;
     }
 
   /* Set up to manage growing the PrimitiveInfo array */
@@ -2825,17 +2829,15 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   PIMgr.StoreStartingAt = 0;
   PIMgr.p_Exception = &image->exception;
 
-  if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass)
+  if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass) /* FIXME: oss-fuzz 499125828 leak */
     {
-      MagickFreeResourceLimitedMemory(char *, primitive);
-      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
-      return MagickFail;
+      status=MagickFail;
+      goto draw_image_done;
     }
   if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
     {
-      MagickFreeResourceLimitedMemory(char *,primitive);
-      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
-      return MagickFail;
+      status=MagickFail;
+      goto draw_image_done;
     }
   graphic_context[n]=CloneDrawInfo((ImageInfo *) NULL,draw_info);
   /* next two lines: don't need copy of primitive, just a buffer of the same size */
@@ -2843,11 +2845,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   token_max_length=primitive_extent;
   if (token == (char *) NULL)
     {
-      DestroyDrawInfo(graphic_context[n]);
-      graphic_context[n]=(DrawInfo *) NULL;
-      MagickFreeResourceLimitedMemory(char *, primitive);
-      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
-      return MagickFail;
+      status=MagickFail;
+      goto draw_image_done;
     }
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
   xTextCurrent = yTextCurrent = 0.0;  /* initialize current text position */
@@ -3889,14 +3888,13 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     DrawInfo** new_graphic_context;
                     n++; /* Yes, this increment before alloc must be here! */
                     new_graphic_context=
-                      MagickReallocateResourceLimitedArray(DrawInfo**,graphic_context,
-                                                           ((size_t) n+1),sizeof(DrawInfo *));
-                    if (graphic_context == (DrawInfo **) NULL)
+                      MagickReallocateResourceLimitedClearedArray(DrawInfo**,graphic_context,
+                                                                  ((size_t) n+1),sizeof(DrawInfo *));
+                    if (new_graphic_context == (DrawInfo **) NULL)
                       {
-                        for ( ; n >= 0; n--)
-                          DestroyDrawInfo(graphic_context[n]);
                         ThrowException3(&image->exception,ResourceLimitError,
-                                        MemoryAllocationFailed,UnableToDrawOnImage);
+                                       MemoryAllocationFailed,UnableToDrawOnImage);
+                        status=MagickFail;
                         break;
                       }
                     graphic_context=new_graphic_context;
@@ -5015,6 +5013,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       if (status == MagickFail)
         break;
     }
+
+  /* All function returns past "begin draw-image" pass through here */
+ draw_image_done:
+
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"end draw-image");
   /*
     Free resources.
@@ -5022,10 +5024,15 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   DrawImageRecurseOut(image);
   MagickFreeResourceLimitedMemory(char *,token);
   MagickFreeResourceLimitedMemory(PrimitiveInfo *,primitive_info);
+  if (original_primitive != draw_info->primitive)
+    MagickFreeResourceLimitedMemory(char *,original_primitive);
   MagickFreeResourceLimitedMemory(char *,primitive);
-  for ( ; n >= 0; n--)
-    DestroyDrawInfo(graphic_context[n]);
-  MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
+  if (graphic_context != (DrawInfo **) NULL)
+    {
+      for ( ; n >= 0; n--)
+        DestroyDrawInfo(graphic_context[n]);
+      MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
+    }
   if ((status == MagickFail) &&
       (image->exception.severity < ErrorException))
     ThrowBinaryException(DrawError,NonconformingDrawingPrimitiveDefinition,
