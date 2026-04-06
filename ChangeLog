@@ -1,3 +1,12 @@
+2026-04-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImageFrame): Scale each channel based on
+        the value reported by heif_image_get_bits_per_pixel_range() for
+        the channel.  Support channel_bits_per_pixel_range() values up to
+        32 in case libheif produces such values.
+        (ReadHEIFImageFrame): Separate getting the sample from scaling the
+        sample.
+
 2026-04-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/render.c (DrawImage): All function returns past "begin

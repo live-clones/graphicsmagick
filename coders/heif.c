@@ -1341,46 +1341,62 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
                     {
+                      uint32_t
+                        sample = 0;
+
                       Quantum
                         quantum=0;
 
+                      /*
+                        Get sample
+                      */
+                      switch(channel_bits_per_pixel[channel_index])
+                        {
+                        case 8:
+                          sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
+                          break;
+                        case 16:
+                          sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          break;
+                        case 32:
+                          sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          break;
+                        }
+
+                      /*
+                        Scale sample to quantum
+                      */
                       if (channel_bits_per_pixel_range[channel_index] == 8)
                         {
-                          uint8_t sample = *line[channel_index].u8;
-                          line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 8)
                         {
-                          uint8_t sample = *line[channel_index].u8;
-                          line[channel_index].u8++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] == 16)
                         {
-                          uint16_t sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
                           quantum=ScaleShortToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 16)
                         {
-                          uint16_t sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] == 32)
                         {
-                          uint32_t sample = *line[channel_index].u32;
-                          line[channel_index].u32++;
                           quantum=ScaleLongToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 32)
                         {
-                           uint32_t sample = *line[channel_index].u32;
-                          line[channel_index].u32++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
 
+                      /*
+                        Assign quantum to PixelPacket
+                      */
                       switch (channel_index)
                         {
                         case 0:
@@ -1503,46 +1519,62 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
                     {
+                      uint32_t
+                        sample = 0;
+
                       Quantum
                         quantum=0;
 
+                      /*
+                        Get sample
+                      */
+                      switch(channel_bits_per_pixel[channel_index])
+                        {
+                        case 8:
+                          sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
+                          break;
+                        case 16:
+                          sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          break;
+                        case 32:
+                          sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          break;
+                        }
+
+                      /*
+                        Scale sample to quantum
+                      */
                       if (channel_bits_per_pixel_range[channel_index] == 8)
                         {
-                          uint8_t sample = *line[channel_index].u8;
-                          line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 8)
                         {
-                          uint8_t sample = *line[channel_index].u8;
-                          line[channel_index].u8++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] == 16)
                         {
-                          uint16_t sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
                           quantum=ScaleShortToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 16)
                         {
-                          uint16_t sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] == 32)
                         {
-                          uint32_t sample = *line[channel_index].u32;
-                          line[channel_index].u32++;
                           quantum=ScaleLongToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 32)
                         {
-                           uint32_t sample = *line[channel_index].u32;
-                          line[channel_index].u32++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
 
+                      /*
+                        Assign quantum to PixelPacket
+                      */
                       switch (channel_index)
                         {
                         case 0:
@@ -1667,46 +1699,62 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
                     {
+                      uint32_t
+                        sample = 0;
+
                       Quantum
                         quantum=0;
 
+                      /*
+                        Get sample
+                      */
+                      switch(channel_bits_per_pixel[channel_index])
+                        {
+                        case 8:
+                          sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
+                          break;
+                        case 16:
+                          sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          break;
+                        case 32:
+                          sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          break;
+                        }
+
+                      /*
+                        Scale sample to quantum
+                      */
                       if (channel_bits_per_pixel_range[channel_index] == 8)
                         {
-                          uint8_t sample = *line[channel_index].u8;
-                          line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 8)
                         {
-                          uint8_t sample = *line[channel_index].u8;
-                          line[channel_index].u8++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] == 16)
                         {
-                          uint16_t sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
                           quantum=ScaleShortToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 16)
                         {
-                          uint16_t sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] == 32)
                         {
-                          uint32_t sample = *line[channel_index].u32;
-                          line[channel_index].u32++;
                           quantum=ScaleLongToQuantum(sample);
                         }
                       else if (channel_bits_per_pixel_range[channel_index] < 32)
                         {
-                           uint32_t sample = *line[channel_index].u32;
-                          line[channel_index].u32++;
                           quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
 
+                      /*
+                        Assign quantum to PixelPacket
+                      */
                       switch (channel_index)
                         {
                         case 0:
