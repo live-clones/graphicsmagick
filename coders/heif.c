@@ -1234,6 +1234,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     {
       const uint8_t *u8;
       const uint16_t *u16;
+      const uint32_t *u32;
     } magick_plane_t;
 
     const char *
@@ -1274,9 +1275,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           int
             channel_bits_per_pixel_range[4];
 
+          unsigned long
+            channel_max_value_given_bits[4];
+
           unsigned int
             channel_index,
-            max_value_given_bits,
             num_channels;
 
           enum heif_channel heif_channel;
@@ -1306,9 +1309,10 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
               channel_bits_per_pixel[channel_index] = heif_image_get_bits_per_pixel(heif_image,
-                                                             heif_channel);
+                                                                                    heif_channel);
               channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                         heif_channel);
+                                                                                                heif_channel);
+              channel_max_value_given_bits[channel_index] = MaxValueGivenBits(channel_bits_per_pixel_range[channel_index]);
               if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
                 image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               if (image->logging)
@@ -1318,7 +1322,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                       channel_bits_per_pixel_range[channel_index],
                                       channel_bits_per_pixel[channel_index]);
             }
-          max_value_given_bits=MaxValueGivenBits(image->depth);
 
           /* Transfer pixels to image, using row stride to find start of each row. */
           if (image->logging)
@@ -1338,24 +1341,46 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                 {
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
                     {
-                      uint16_t
-                        sample;
-
                       Quantum
-                        quantum;
+                        quantum=0;
 
-                      if (channel_bits_per_pixel_range[channel_index] > 8)
+                      if (channel_bits_per_pixel_range[channel_index] == 8)
                         {
-                          sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
-                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                        }
-                      else
-                        {
-                          sample = *line[channel_index].u8;
+                          uint8_t sample = *line[channel_index].u8;
                           line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
+                      else if (channel_bits_per_pixel_range[channel_index] < 8)
+                        {
+                          uint8_t sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] == 16)
+                        {
+                          uint16_t sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          quantum=ScaleShortToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 16)
+                        {
+                          uint16_t sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] == 32)
+                        {
+                          uint32_t sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          quantum=ScaleLongToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 32)
+                        {
+                           uint32_t sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+
                       switch (channel_index)
                         {
                         case 0:
@@ -1411,9 +1436,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           int
             channel_bits_per_pixel_range[4];
 
+          unsigned long
+            channel_max_value_given_bits[4];
+
           unsigned int
             channel_index,
-            max_value_given_bits,
             num_channels=0;
 
           enum heif_channel
@@ -1444,9 +1471,10 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
               channel_bits_per_pixel[channel_index] = heif_image_get_bits_per_pixel(heif_image,
-                                                             heif_channel);
+                                                                                    heif_channel);
               channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                         heif_channel);
+                                                                                                heif_channel);
+              channel_max_value_given_bits[channel_index] = MaxValueGivenBits(channel_bits_per_pixel_range[channel_index]);
               if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
                 image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               if (image->logging)
@@ -1456,7 +1484,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                       channel_bits_per_pixel_range[channel_index],
                                       channel_bits_per_pixel[channel_index]);
             }
-          max_value_given_bits=MaxValueGivenBits(image->depth);
 
           /* Transfer pixels to image, using row stride to find start of each row. */
           if (image->logging)
@@ -1477,23 +1504,45 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
                     {
                       Quantum
-                        quantum;
+                        quantum=0;
 
-                      uint16_t
-                        sample;
-
-                      if (channel_bits_per_pixel_range[channel_index] > 8)
+                      if (channel_bits_per_pixel_range[channel_index] == 8)
                         {
-                          sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
-                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                        }
-                      else
-                        {
-                          sample = *line[channel_index].u8;
+                          uint8_t sample = *line[channel_index].u8;
                           line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
                         }
+                      else if (channel_bits_per_pixel_range[channel_index] < 8)
+                        {
+                          uint8_t sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] == 16)
+                        {
+                          uint16_t sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          quantum=ScaleShortToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 16)
+                        {
+                          uint16_t sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] == 32)
+                        {
+                          uint32_t sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          quantum=ScaleLongToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 32)
+                        {
+                           uint32_t sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+
                       switch (channel_index)
                         {
                         case 0:
@@ -1549,9 +1598,11 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           int
             channel_bits_per_pixel_range[2];
 
+          unsigned long
+            channel_max_value_given_bits[2];
+
           unsigned int
             channel_index,
-            max_value_given_bits,
             num_channels;
 
           enum heif_channel heif_channel;
@@ -1583,9 +1634,10 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
               channel_bits_per_pixel[channel_index] = heif_image_get_bits_per_pixel(heif_image,
-                                                             heif_channel);
+                                                                                    heif_channel);
               channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
-                                                                         heif_channel);
+                                                                                                heif_channel);
+              channel_max_value_given_bits[channel_index] = MaxValueGivenBits(channel_bits_per_pixel_range[channel_index]);
               if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
                 image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               heif_channel_str = HEIF_channel_to_string(heif_channel);
@@ -1596,7 +1648,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                       channel_bits_per_pixel_range[channel_index],
                                       channel_bits_per_pixel[channel_index]);
             }
-          max_value_given_bits=MaxValueGivenBits(image->depth);
 
           /* Transfer pixels to image, using row stride to find start of each row. */
           if (image->logging)
@@ -1617,22 +1668,43 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   for (channel_index = 0; channel_index < num_channels; channel_index++)
                     {
                       Quantum
-                        quantum;
+                        quantum=0;
 
-                      uint16_t
-                        sample;
-
-                      if (channel_bits_per_pixel_range[channel_index] > 8)
+                      if (channel_bits_per_pixel_range[channel_index] == 8)
                         {
-                          sample = *line[channel_index].u16;
-                          line[channel_index].u16++;
-                          quantum=ScaleAnyToQuantum(sample,max_value_given_bits);
-                        }
-                      else
-                        {
-                          sample = *line[channel_index].u8;
+                          uint8_t sample = *line[channel_index].u8;
                           line[channel_index].u8++;
                           quantum=ScaleCharToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 8)
+                        {
+                          uint8_t sample = *line[channel_index].u8;
+                          line[channel_index].u8++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] == 16)
+                        {
+                          uint16_t sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          quantum=ScaleShortToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 16)
+                        {
+                          uint16_t sample = *line[channel_index].u16;
+                          line[channel_index].u16++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] == 32)
+                        {
+                          uint32_t sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          quantum=ScaleLongToQuantum(sample);
+                        }
+                      else if (channel_bits_per_pixel_range[channel_index] < 32)
+                        {
+                           uint32_t sample = *line[channel_index].u32;
+                          line[channel_index].u32++;
+                          quantum=ScaleAnyToQuantum(sample,channel_max_value_given_bits[channel_index]);
                         }
 
                       switch (channel_index)
