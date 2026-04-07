@@ -39,7 +39,7 @@ Pull the latest Docker images::
 
   $ python3 infra/helper.py pull_images
 
-Optionally remove the existing build directory (in git checkout):
+Remove the existing build directory (in git checkout):
 
   sudo rm -rf build
 

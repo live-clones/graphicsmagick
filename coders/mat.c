@@ -1467,6 +1467,11 @@ skip_reading_current:
   }
 
 END_OF_READING:
+  if (image2!=NULL)
+    {
+      if (image2!=image)
+        DeleteImageFromList(&image2);
+    }
   MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
   CloseBlob(image);
 

@@ -1,3 +1,10 @@
+2026-04-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/mat.c (ReadMATImage): Make sure that 'image2' gets
+        freed. Addresses oss-fuzz 480506472
+        "graphicsmagick:coder_MAT_fuzzer: Indirect-leak in
+        ___interceptor_malloc".
+
 2026-04-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (ReadHEIFImageFrame): Scale each channel based on
