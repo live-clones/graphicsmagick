@@ -1,5 +1,8 @@
 2026-04-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/heif.c (ReadHEIFImageFrame): Use planar mode for RGB(A)
+        until interleaved mode is implemented.
+
         * coders/mat.c (ReadMATImage): Make sure that 'image2' gets
         freed. Addresses oss-fuzz 480506472
         "graphicsmagick:coder_MAT_fuzzer: Indirect-leak in

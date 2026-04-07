@@ -1072,6 +1072,10 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     /* Upscale chroma if necessary */
     if ((heif_chroma_decode == heif_chroma_420) || (heif_chroma_decode == heif_chroma_422))
       heif_chroma_decode=heif_chroma_444;
+    /* Use planar mode until interleaved is implemented */
+    else if (heif_colorspace_decode == heif_colorspace_RGB
+             /* heif_chroma_decode != heif_chroma_monochrome */)
+      heif_chroma_decode=heif_chroma_444;
 
     /* FIXME: Add control over whether to return original YBbCr or RGB */
 #if 1
