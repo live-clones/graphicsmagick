@@ -2,6 +2,9 @@
 
         * coders/heif.c (ReadHEIFImageFrame): Add code to read interleaved
         format. Depths greater than 8 are not working correctly yet.
+        (ReadHEIFImageFrame): Interleaved reading is fixed now.  Enable it
+        by default for extensive testing. However, interleaved is not
+        faster than planar.
 
 2026-04-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

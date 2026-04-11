@@ -42,7 +42,10 @@
 <blockquote>
 <ul class="simple">
 <li><p>coders/heif.c (ReadHEIFImageFrame): Add code to read interleaved
-format. Depths greater than 8 are not working correctly yet.</p></li>
+format. Depths greater than 8 are not working correctly yet.
+(ReadHEIFImageFrame): Interleaved reading is fixed now.  Enable it
+by default for extensive testing. However, interleaved is not
+faster than planar.</p></li>
 </ul>
 </blockquote>
 <p>2026-04-07  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>

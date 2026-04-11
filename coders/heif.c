@@ -68,7 +68,7 @@
 #endif /* if defined(HAVE_LIBHEIF_HEIF_SEQUENCES_H) */
 
 /* Set to 1 to enable RGB(A) decode in interleaved format */
-#define HEIF_SUPPORT_INTERLEAVED 0
+#define HEIF_SUPPORT_INTERLEAVED 1
 
 /*
   Libheif added LIBHEIF_MAKE_VERSION in 1.14.0 (October 31, 2021).
@@ -1657,6 +1657,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                 row_stride;
 
               unsigned long
+                max_value_given_bits,
                 x,
                 y;
 
@@ -1682,6 +1683,9 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                                              heif_channel);
               bits_per_pixel_range = heif_image_get_bits_per_pixel_range(heif_image,
                                                                          heif_channel);
+
+              max_value_given_bits = MaxValueGivenBits(bits_per_pixel_range);
+
               pixels.u8 = heif_image_get_plane_readonly2(heif_image,
                                                          heif_channel,
                                                          &row_stride);
@@ -1696,7 +1700,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
 
-              /* interleaved row stride 1536 (8 bits in 24 bit quantum) */
+              /* interleaved row stride 1536 (8 bits in 24 bit packet) */
               /* interleaved row stride 3072 (16 bit samples in 48 bit packet) */
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1705,7 +1709,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                       bits_per_pixel_range,
                                       bits_per_pixel);
 
-              /* FIXME: TODO */
               if (bits_per_pixel_range <= 8)
                 {
                   const uint8_t
@@ -1720,16 +1723,34 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                           HEIFReadImageFrameCleanup();
                           return MagickFail;
                         }
-                      for (x=0; x < image->columns; x++)
+                      if (bits_per_pixel_range == 8)
                         {
-                          SetRedSample(q,ScaleCharToQuantum(*p++));
-                          SetGreenSample(q,ScaleCharToQuantum(*p++));
-                          SetBlueSample(q,ScaleCharToQuantum(*p++));
-                          if (matte)
-                            SetOpacitySample(q,MaxRGB-ScaleCharToQuantum(*p++));
-                          else
-                            SetOpacitySample(q,OpaqueOpacity);
-                          q++;
+                          for (x=0; x < image->columns; x++)
+                            {
+                              SetRedSample(q,ScaleCharToQuantum(*p++));
+                              SetGreenSample(q,ScaleCharToQuantum(*p++));
+                              SetBlueSample(q,ScaleCharToQuantum(*p++));
+                              if (matte)
+                                SetOpacitySample(q,MaxRGB-ScaleCharToQuantum(*p++));
+                              else
+                                SetOpacitySample(q,OpaqueOpacity);
+                              q++;
+                            }
+                        }
+                      else
+                        {
+                          /* Maybe this case will never happen */
+                          for (x=0; x < image->columns; x++)
+                            {
+                              SetRedSample(q,ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              SetGreenSample(q,ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              SetBlueSample(q,ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              if (matte)
+                                SetOpacitySample(q,MaxRGB-ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              else
+                                SetOpacitySample(q,OpaqueOpacity);
+                              q++;
+                            }
                         }
                       if (!SyncImagePixelsEx(image,exception))
                         {
@@ -1743,25 +1764,45 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   const uint16_t
                     *p;
 
+                  const size_t
+                    row_stride_uint16 = row_stride/sizeof(uint16_t);
+
                   for (y=0; y < image->rows; y++)
                     {
-                      p=pixels.u16+y*row_stride;
+                      p=pixels.u16+y*row_stride_uint16;
                       q=SetImagePixelsEx(image,0,y,image->columns,1,exception);
                       if (q == (PixelPacket *) NULL)
                         {
                           HEIFReadImageFrameCleanup();
                           return MagickFail;
                         }
-                      for (x=0; x < image->columns; x++)
+                      if (bits_per_pixel_range == 16)
                         {
-                          SetRedSample(q,ScaleShortToQuantum(*p++));
-                          SetGreenSample(q,ScaleShortToQuantum(*p++));
-                          SetBlueSample(q,ScaleShortToQuantum(*p++));
-                          if (matte)
-                            SetOpacitySample(q,MaxRGB-ScaleShortToQuantum(*p++));
-                          else
-                            SetOpacitySample(q,OpaqueOpacity);
-                          q++;
+                          for (x=0; x < image->columns; x++)
+                            {
+                              SetRedSample(q,ScaleShortToQuantum(*p++));
+                              SetGreenSample(q,ScaleShortToQuantum(*p++));
+                              SetBlueSample(q,ScaleShortToQuantum(*p++));
+                              if (matte)
+                                SetOpacitySample(q,MaxRGB-ScaleShortToQuantum(*p++));
+                              else
+                                SetOpacitySample(q,OpaqueOpacity);
+                              q++;
+                            }
+                        }
+                      else
+                        {
+                          for (x=0; x < image->columns; x++)
+                            {
+                              SetRedSample(q,ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              SetGreenSample(q,ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              SetBlueSample(q,ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              if (matte)
+                                SetOpacitySample(q,MaxRGB-ScaleAnyToQuantum(*p++,max_value_given_bits));
+                              else
+                                SetOpacitySample(q,OpaqueOpacity);
+                              q++;
+                            }
                         }
                       if (!SyncImagePixelsEx(image,exception))
                         {
