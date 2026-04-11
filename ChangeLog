@@ -1,3 +1,8 @@
+2026-04-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImageFrame): Add code to read interleaved
+        format. Depths greater than 8 are not working correctly yet.
+
 2026-04-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (ReadHEIFImageFrame): Use planar mode for RGB(A)
