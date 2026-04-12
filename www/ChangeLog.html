@@ -41,6 +41,10 @@
 <p>2026-04-12  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/pcd.c (DecodeImage): Correct loop initialization to
+prevent out of bounds read. Similar to ImageMagick commit 5204a16
+which addresses ImageMagick security advisory GHSA-wrhr-rf8j-r842.
+Much thanks to Petr Gajdos for bringing this to my attention.</p></li>
 <li><p>coders/heif.c (ReadHEIFImageFrame): MaxValueGivenBits() returns
 0 on error, such as when the input value is negative. Throw an
 exception in this case. Addresses Coverity issue 503157
