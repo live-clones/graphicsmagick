@@ -1526,6 +1526,14 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                   channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
                                                                                                     heif_channel);
                   channel_max_value_given_bits[channel_index] = MaxValueGivenBits(channel_bits_per_pixel_range[channel_index]);
+                  if (0 == channel_max_value_given_bits[channel_index])
+                    {
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "MaxValueGivenBits(%d) returned 0!",
+                                            channel_bits_per_pixel_range[channel_index]);
+                      ThrowHEIFThrowReadImageFrameException(CorruptImageError,
+                                                            AnErrorHasOccurredReadingFromFile, image);
+                    }
                   if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
                     image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
                   if (image->logging)
@@ -1686,16 +1694,24 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
 
               max_value_given_bits = MaxValueGivenBits(bits_per_pixel_range);
 
+              if (0 == max_value_given_bits)
+                {
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "MaxValueGivenBits(%d) returned 0!",
+                                        bits_per_pixel_range);
+                  ThrowHEIFThrowReadImageFrameException(CorruptImageError,
+                                                        AnErrorHasOccurredReadingFromFile, image);
+                }
+
               pixels.u8 = heif_image_get_plane_readonly2(heif_image,
                                                          heif_channel,
                                                          &row_stride);
 
               if (pixels.u8 == (const uint8_t*) NULL)
                 {
-                  if (image->logging)
-                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                          "heif_image_get_plane_readonly2() returned NULL"
-                                          " (channel %s)!",heif_channel_str);
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "heif_image_get_plane_readonly2() returned NULL"
+                                        " (channel %s)!",heif_channel_str);
                   ThrowHEIFThrowReadImageFrameException(CorruptImageError,
                                                         AnErrorHasOccurredReadingFromFile, image);
                 }
@@ -1878,6 +1894,14 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
               channel_bits_per_pixel_range[channel_index] = heif_image_get_bits_per_pixel_range(heif_image,
                                                                                                 heif_channel);
               channel_max_value_given_bits[channel_index] = MaxValueGivenBits(channel_bits_per_pixel_range[channel_index]);
+              if (0 == channel_max_value_given_bits[channel_index])
+                {
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "MaxValueGivenBits(%d) returned 0!",
+                                        channel_bits_per_pixel_range[channel_index]);
+                  ThrowHEIFThrowReadImageFrameException(CorruptImageError,
+                                                        AnErrorHasOccurredReadingFromFile, image);
+                }
               if ((int) image->depth < channel_bits_per_pixel_range[channel_index])
                 image->depth=(unsigned int) channel_bits_per_pixel_range[channel_index];
               heif_channel_str = HEIF_channel_to_string(heif_channel);
