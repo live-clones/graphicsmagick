@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to March 6, 2026.</p>
+<p>This file was last updated to reflect changes up to April 12, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -117,20 +117,34 @@ all targets.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
+<li><p>JNG writer: Properly handle and report the case where ImageToBlob()returns NULL.</p></li>
+<li><p>MNG writer: Enforce that MNG only supports a color palette up to 256
+colors (ImageMagick CVE-2026-28690).</p></li>
+<li><p>MagickXImageWindowCommand(): Assure that static buffer does not
+overflow if the user keeps a numeric key depressed (ImageMagick
+CVE-2026-33535).</p></li>
+<li><p>PCD: Prevent an out of bounds read (ImageMagick security advisory
+GHSA-wrhr-rf8j-r842).</p></li>
+<li><p>PNG writer: Detect and report an excessively large profile, an other
+unexpected conditions (ImageMagick CVE-2026-30883).</p></li>
+<li><p>RenderFreetype(): Use MagickConfirmAccess() to verify that font file
+name is allowed to be read.</p></li>
 <li><p>TIFF EXIF IFD writer: Detect and prevent infinite looping (EXIF IFD
 writer code may be excluded by the -DEXPERIMENTAL_EXIF_TAGS=0
 define).</p></li>
 <li><p>TIFF EXIF IFD writer: Only transfer tags from EXIF and GPS IFDs. Do
 not transfer tags from the main IFDs.</p></li>
-<li><p>YUV: Fix validation of 'sampling-factor' argument. This is known as
-ImageMagick CVE-2026-25799. Given that the argument normally comes
-from a user (rather than an input file) this seems to be a minor
-security issue at most.</p></li>
+<li><p>YUV: Fix validation of 'sampling-factor' argument. (ImageMagick
+CVE-2026-25799). Given that the argument normally comes from a user
+(rather than an input file) this seems to be a minor security issue
+at most.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
 <li><p>ColorFloodfillImage(): Disable OpenMP since it was observed to
 create corrupt images.</p></li>
+<li><p>DrawImage(): Fix memory leak which might occur under severe
+conditions.</p></li>
 <li><p>Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
 been present since 2003!</p></li>
 <li><p>Magick++: If monochrome is disabled, then clear the image
@@ -139,6 +153,9 @@ is_monochrome flag if it is set.</p></li>
 destructor.</p></li>
 <li><p>JP2: Fix a bug which caused lossless compression to not be engaged
 by '-define jp2:rate=1.0'.</p></li>
+<li><p>JPEG: Allow writing CMYK JPEG without specifically requesting it
+(SourceForge issue #768).  This fixes a regression introduced in the
+last release.</p></li>
 <li><p>ModuleAliases: Added a mapping from magick &quot;MPRI&quot; to module
 &quot;MPR&quot;. This missing mapping caused the &quot;MPRI&quot; coder to not work for
 non-module builds. As a result, the 'mogrify' &quot;hald-clut&quot;, &quot;map&quot;,
@@ -176,7 +193,7 @@ frame.</p></li>
 as 'static' which were accidentally left visible.</p></li>
 <li><p>PerlMagick: PerlMagick is now &quot;const correct&quot; and data which could
 be const is now declared as such.</p></li>
-<li><p>MAT: Fix a memory leak.</p></li>
+<li><p>MAT: Fix memory leaks.</p></li>
 <li><p>XPM/PICON: Verify that the expected number of pixels were
 transferred to the image.</p></li>
 </ul>
@@ -188,6 +205,10 @@ setting the default background color.</p></li>
 empty drawing context.</p></li>
 <li><p>Wand API: The wand/drawing_wand.c functions which duplicate code in
 magick/draw.c are gutted and replaced with calls into magick/draw.c.</p></li>
+<li><p>Magick++: Add access confirmation functions and enumerations to
+Magick namespace so that file/URL access confirmation functions may
+be used.  A sample implementation is included in the 'zoom' demo
+program.</p></li>
 </ul>
 <p>New Features:</p>
 <ul class="simple">
@@ -196,9 +217,9 @@ files which lack a newline character at the end of the last
 line.</p></li>
 <li><p>HEIF (HEIC, AVCI, AVIF, MP4, etc.): Memory limits and many more
 libheif resource limits are now applied/available. Support reading
-multiple image frames. Deduce file type by consulting
-libheif. Support reading HEIF image from an in-memory BLOB, or
-memory mapped file.</p></li>
+multiple image frames. Support arbitrary image depths up to 16
+bits. Deduce file type by consulting libheif. Support reading HEIF
+image from an in-memory BLOB, or memory mapped file.</p></li>
 <li><p>The 'convert' and 'mogrify' subcommands now support -remap, which is
 equivalent to -map.  This is to improve compatibility with
 ImageMagick, which changed from -map to -remap some time after the
@@ -234,6 +255,17 @@ original memory upon a reallocation failure.</p></li>
 <li><p>Rendering (-draw/MVG): The default image canvas color is now the
 background color (default white), which may be
 transparent. Previously, the image was always set to opaque.</p></li>
+</ul>
+<p>General Implementation Improvements:</p>
+<ul class="simple">
+<li><p>FormatString(): Deprecate FormatString(), and replace all usages
+with MagickFormatString(), or a suitable equivalent. Code previously
+depended on many string buffers being allocated with size
+'MaxTextExtent' to avoid buffer overflow. The updates result in
+MagickFormatString() being passed the actual underlying buffer size
+in most cases (except for when the API design prevents it).  This
+allows underlying buffer sizes to be optimially-sized, but that has
+not been done yet.</p></li>
 </ul>
 <p>Build Changes:</p>
 <ul class="simple">

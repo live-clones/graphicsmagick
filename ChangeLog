@@ -1,5 +1,7 @@
 2026-04-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * coders/jpeg.c (WriteJPEGImage): Allow writing CMYK JPEG without
         specifically requesting it. Both RGB and CMYK should be allowed.
         Addresses SourceForge issue #768 "CMYK JPEG written out as
