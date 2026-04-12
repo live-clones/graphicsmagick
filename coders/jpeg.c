@@ -2884,15 +2884,18 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
     }
 
   /*
-    This writer expects an RGB-compatible colorspace. If the current
-    colorspace is not RGB-compatible, then convert it to RGB.
+    This writer expects an RGB-compatible or CMYK colorspace. If the
+    current colorspace is not compatible with those, then convert it
+    to RGB.
 
     Convert RGB-compatible colorspaces (e.g. CineonLog) to RGB by
     default.  User can still override it by explicitly specifying the
     desired colorspace.
   */
   if (((UndefinedColorspace == image_info->colorspace) &&
-       (!IsRGBCompatibleColorspace(image->colorspace))) ||
+       (!IsRGBCompatibleColorspace(image->colorspace) &&
+        !IsCMYKColorspace(image->colorspace)))
+       ||
       ((IsRGBCompatibleColorspace(image->colorspace) &&
         !IsRGBColorspace(image->colorspace))))
     {

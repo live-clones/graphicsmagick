@@ -1,5 +1,11 @@
 2026-04-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/jpeg.c (WriteJPEGImage): Allow writing CMYK JPEG without
+        specifically requesting it. Both RGB and CMYK should be allowed.
+        Addresses SourceForge issue #768 "CMYK JPEG written out as
+        RGB". This bug was added by Mercurial changeset 67af31d0d1a2 on
+        October 28, 2025.
+
         * coders/pcd.c (DecodeImage): Correct loop initialization to
         prevent out of bounds read. Similar to ImageMagick commit 5204a16
         which addresses ImageMagick security advisory GHSA-wrhr-rf8j-r842.
