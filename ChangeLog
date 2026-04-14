@@ -1,3 +1,11 @@
+2026-04-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImageFrame): Support both RGB interleaved
+        and planar decode modes at once. Use the
+        heif:interleaved-rgb-decode=yes/no define to select which mode is
+        used. Influences how libheif presents the decoded image to
+        GraphicsMagick, but the final result is the same.
+
 2026-04-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.

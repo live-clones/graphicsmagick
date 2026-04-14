@@ -40,6 +40,24 @@
 *   o Support reading sequences (requires 1.20).
 *
 *   o Write HEIF (HEIC, AVIF, more?)
+*
+* Definitions influencing the reader:
+*
+*  heif:ignore-transformations=yes/no (default no)
+*
+*    Determines if libheif will automatically rotate the image if it is not
+*    right-side up.
+*
+*  heif:preserve-colorspace=yes/no (default no)
+*
+*    If image is stored in YCbCr, then return original YCbCr, but without the
+*    benefit of applying an associated HEIF color profile.
+*
+*  heif:interleaved-rgb-decode=yes/no (default no)
+*
+*    RGB decoding can be done using individual planes (e.g. R, G, B, A), or
+*    in an interleaved RGB(A) format.  This option controls libheif's image
+*    decoding, but should not produce any change in the final result.
 */
 
 #include "magick/studio.h"
@@ -1079,8 +1097,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     enum heif_chroma heif_chroma_decode=preferred_chroma;
     enum heif_colorspace heif_colorspace_decode=preferred_colorspace;
 
-    /* FIXME: Add control over whether to return original YBbCr or RGB */
-#if 1
+    /* Influence whether to return original YBbCr or RGB */
     if (heif_colorspace_decode == heif_colorspace_YCbCr)
       {
         const char *string_value;
@@ -1089,12 +1106,9 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           Use heif:preserve-colorspace=true or
           heif:preserve-colorspace=1 to return the image in the
           original colorspace.  This prevents the conversion of a
-          YCbCr image to RGB.  GraphicsMagick will usually
-          automatically convert a YCbCr image to RGB when necessary but explicit
-          conversion to RGB colorspace may sometimes be
-          necessary. Preserving the original colorspace is useful in
-          case YCbCr is needed, or to avoid quality loss when the
-          output will be in YCbCr.
+          YCbCr image to RGB.  Note that libheif may automatically
+          apply a color profile when converting a YCbCr image to RGB,
+          and requesting original YCbCr defeats that.
         */
         if ((string_value = AccessDefinition(image_info,"heif","preserve-colorspace")))
           {
@@ -1105,47 +1119,67 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           }
         if (preserve_colorspace == MagickFalse)
           heif_colorspace_decode=heif_colorspace_RGB;
-      }
-#endif
 
-    /* Upscale chroma if necessary */
-    if ((heif_chroma_decode == heif_chroma_420) || (heif_chroma_decode == heif_chroma_422))
-      heif_chroma_decode=heif_chroma_444;
-#if HEIF_SUPPORT_INTERLEAVED
-    else if (heif_colorspace_decode == heif_colorspace_RGB)
-      {
-        if (image->matte)
+
+        /* Upscale chroma if necessary */
+        if ((heif_chroma_decode == heif_chroma_420) || (heif_chroma_decode == heif_chroma_422))
           {
-            if (bits_per_pixel > 8)
+            heif_chroma_decode=heif_chroma_444;
+          }
+      }
+    if (heif_colorspace_decode == heif_colorspace_RGB)
+      {
+        const char *string_value;
+        MagickBool interleaved_decode = MagickFalse;
+
+        if ((string_value = AccessDefinition(image_info,"heif","interleaved-rgb-decode")))
+          {
+            if ((LocaleCompare(string_value,"true") == 0) ||
+                (LocaleCompare(string_value,"yes") == 0) ||
+                (LocaleCompare(string_value,"1") == 0))
+              interleaved_decode = MagickTrue;
+          }
+
+        if (interleaved_decode)
+          {
+            /* Use interleaved mode */
+            if (image->matte)
               {
+                if (bits_per_pixel > 8)
+                  {
 #if defined(WORDS_BIGENDIAN)
-                heif_chroma_decode=heif_chroma_interleaved_RRGGBBAA_BE;
+                    heif_chroma_decode=heif_chroma_interleaved_RRGGBBAA_BE;
 #else
-                heif_chroma_decode=heif_chroma_interleaved_RRGGBBAA_LE;
+                    heif_chroma_decode=heif_chroma_interleaved_RRGGBBAA_LE;
 #endif /* if defined(WORDS_BIGENDIAN) */
+                  }
+                else
+                  {
+                    heif_chroma_decode=heif_chroma_interleaved_RGBA;
+                  }
               }
             else
-              heif_chroma_decode=heif_chroma_interleaved_RGBA;
+              {
+                if (bits_per_pixel > 8)
+                  {
+#if defined(WORDS_BIGENDIAN)
+                    heif_chroma_decode=heif_chroma_interleaved_RRGGBB_BE;
+#else
+                    heif_chroma_decode=heif_chroma_interleaved_RRGGBB_LE;
+#endif/* if defined(WORDS_BIGENDIAN) */
+                  }
+                else
+                  {
+                    heif_chroma_decode=heif_chroma_interleaved_RGB;
+                  }
+              }
           }
         else
           {
-            if (bits_per_pixel > 8)
-              {
-#if defined(WORDS_BIGENDIAN)
-                heif_chroma_decode=heif_chroma_interleaved_RRGGBB_BE;
-#else
-                heif_chroma_decode=heif_chroma_interleaved_RRGGBB_LE;
-#endif/* if defined(WORDS_BIGENDIAN) */
-              }
-            else
-              heif_chroma_decode=heif_chroma_interleaved_RGB;
+            /* Use planar mode */
+            heif_chroma_decode=heif_chroma_444;
           }
       }
-#else
-    /* Use planar mode until interleaved is implemented */
-    else if (heif_colorspace_decode == heif_colorspace_RGB)
-      heif_chroma_decode=heif_chroma_444;
-#endif /* if HEIF_SUPPORT_INTERLEAVED */
 
     if (image->logging && IsEventLogged(CoderEvent))
       {
@@ -1636,7 +1670,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  done!");
             } /* heif_chroma_444 */
-#if HEIF_SUPPORT_INTERLEAVED
           else
             {
               /*
@@ -1828,7 +1861,6 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                     }
                 }
             }
-#endif /* if HEIF_SUPPORT_INTERLEAVED */
           break;
         } /* case heif_colorspace_RGB */
       case heif_colorspace_monochrome:
