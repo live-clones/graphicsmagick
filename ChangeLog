@@ -1,3 +1,8 @@
+2026-04-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (RegisterHEIFImage): Provide codec descriptions
+        when registering HEIF subformats.
+
 2026-04-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (ReadHEIFImageFrame): Support both RGB interleaved

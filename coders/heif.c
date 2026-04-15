@@ -2483,6 +2483,41 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 %      RegisterHEIFImage(void)
 %
 */
+static void GetHEIFDecoders(heif_compression_format compression_format,
+                            char *output_str,
+                            const size_t sizeof_output_str)
+{
+  const char
+    *decoder_description;
+
+  int
+    decoder_count,
+    decoder_index;
+
+#define MAX_HEIF_DECODERS 20
+
+  /* heif_compression_format is declared in libheif/api/libheif/heif_context.h */
+  const heif_decoder_descriptor
+    *out_decoders[MAX_HEIF_DECODERS];
+
+  decoder_count = heif_get_decoder_descriptors(compression_format,
+                                               out_decoders,
+                                               MAX_HEIF_DECODERS);
+  if (decoder_count > 0)
+    {
+      (void) strlcpy(output_str,"Decoders: ", sizeof_output_str);
+      for (decoder_index = 0 ; decoder_index < decoder_count; decoder_index++)
+        {
+          decoder_description = heif_decoder_descriptor_get_name(out_decoders[decoder_index]);
+          if (decoder_description != (const char *) NULL)
+            {
+              if (decoder_index != 0)
+                (void) strlcat(output_str,"; ",sizeof_output_str);
+              (void) strlcat(output_str,decoder_description,sizeof_output_str);
+            }
+        }
+    }
+}
 ModuleExport void RegisterHEIFImage(void)
 {
 #if defined(HasHEIF)
@@ -2495,28 +2530,43 @@ ModuleExport void RegisterHEIFImage(void)
   MagickInfo
     *entry;
 
-  unsigned int
-    heif_major,
-    heif_minor,
-    heif_revision;
+  /* Get version information */
+  {
+    unsigned int
+      heif_major,
+      heif_minor,
+      heif_revision;
 
-  int encoder_version=heif_get_version_number();
-  heif_major=(encoder_version >> 16) & 0xff;
-  heif_minor=(encoder_version >> 8) & 0xff;
-  heif_revision=encoder_version & 0xff;
-  *version='\0';
-  (void) snprintf(version, sizeof(version),
-                  "heif v%u.%u.%u", heif_major,
-                  heif_minor, heif_revision);
+    int
+      encoder_version;
+
+    encoder_version=heif_get_version_number();
+    heif_major=(encoder_version >> 16) & 0xff;
+    heif_minor=(encoder_version >> 8) & 0xff;
+    heif_revision=encoder_version & 0xff;
+    *version='\0';
+    (void) snprintf(version, sizeof(version),
+                    "heif v%u.%u.%u", heif_major,
+                    heif_minor, heif_revision);
+  }
+
+  /* heif_compression_format is declared in libheif/api/libheif/heif_context.h */
 
   /* AVCI (H.264) */
   if (heif_have_decoder_for_format(heif_compression_AVC)/* || */
       /* heif_have_encoder_for_format(heif_compression_AVC) */)
     {
+      static char
+        AVCNote[64] = "";
+
+      GetHEIFDecoders(heif_compression_AVC,AVCNote,sizeof(AVCNote));
+
       entry=SetMagickInfo("AVCI");
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
       entry->description="Advanced Video Coding Image Format";
+      if (AVCNote[0] != '\0')
+        entry->note=AVCNote;
       entry->adjoin=MagickFalse;
       entry->seekable_stream=need_seekable_stream;
       if (*version != '\0')
@@ -2531,10 +2581,16 @@ ModuleExport void RegisterHEIFImage(void)
   if (heif_have_decoder_for_format(heif_compression_AV1)/* || */
       /* heif_have_encoder_for_format(heif_compression_AV1) */)
     {
+      static char
+        AV1Note[64] = "";
+
+      GetHEIFDecoders(heif_compression_AV1,AV1Note,sizeof(AV1Note));
       entry=SetMagickInfo("AVIF");
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
       entry->description="AV1 Image Format";
+      if (AV1Note[0] != '\0')
+        entry->note=AV1Note;
       entry->adjoin=MagickFalse;
       entry->seekable_stream=need_seekable_stream;
       if (*version != '\0')
@@ -2549,27 +2605,43 @@ ModuleExport void RegisterHEIFImage(void)
     This entry is used for anything which looks like HEIF, but is not
     one of our directly supported subformats.
   */
-  entry=SetMagickInfo("HEIF");
-  entry->decoder=(DecoderHandler) ReadHEIFImage;
-  entry->magick=(MagickHandler) IsHEIF;
-  entry->description="High Efficiency Image Format";
-  entry->adjoin=MagickFalse;
-  entry->seekable_stream=need_seekable_stream;
-  if (*version != '\0')
-    entry->version=version;
-  entry->module="HEIF";
-  entry->coder_class=PrimaryCoderClass;
-  entry->extension_treatment=ObeyExtensionTreatment;
-  (void) RegisterMagickInfo(entry);
+  {
+    static char
+      HEIFNote[256] = "";
+
+    GetHEIFDecoders(heif_compression_undefined,HEIFNote,sizeof(HEIFNote));
+
+    entry=SetMagickInfo("HEIF");
+    entry->decoder=(DecoderHandler) ReadHEIFImage;
+    entry->magick=(MagickHandler) IsHEIF;
+    entry->description="High Efficiency Image Format";
+    if (HEIFNote[0] != '\0')
+      entry->note=HEIFNote;
+    entry->adjoin=MagickFalse;
+    entry->seekable_stream=need_seekable_stream;
+    if (*version != '\0')
+      entry->version=version;
+    entry->module="HEIF";
+    entry->coder_class=PrimaryCoderClass;
+    entry->extension_treatment=ObeyExtensionTreatment;
+    (void) RegisterMagickInfo(entry);
+  }
 
   /* HEIC (H.265) / heif_compression_HEVC */
   if (heif_have_decoder_for_format(heif_compression_HEVC) /* || */
       /* heif_have_encoder_for_format(heif_compression_HEVC) */)
     {
+      static char
+        HEVCNote[64] = "";
+
+      GetHEIFDecoders(heif_compression_AV1,HEVCNote,sizeof(HEVCNote));
+
       entry=SetMagickInfo("HEIC");
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
       entry->description="High-Efficiency Image Codec in HEIF";
+      if (HEVCNote[0] != '\0')
+        entry->note=HEVCNote;
       entry->adjoin=MagickFalse;
       entry->seekable_stream=need_seekable_stream;
       if (*version != '\0')
@@ -2584,6 +2656,8 @@ ModuleExport void RegisterHEIFImage(void)
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
       entry->description="MPEG-4 Part 14 in HEIF";
+      if (HEVCNote[0] != '\0')
+        entry->note=HEVCNote;
       entry->adjoin=MagickFalse;
       entry->seekable_stream=need_seekable_stream;
       if (*version != '\0')
@@ -2614,10 +2688,18 @@ ModuleExport void RegisterHEIFImage(void)
       heif_have_decoder_for_format(heif_compression_AVC) ||
       heif_have_decoder_for_format(heif_compression_AV1))
     {
+      static char
+        MP4Note[256] = "";
+
+      /* FIXME: Needs to handle all MP4 codecs */
+      GetHEIFDecoders(heif_compression_AVC,MP4Note,sizeof(MP4Note));
+
       entry=SetMagickInfo("MP4");
       entry->decoder=(DecoderHandler) ReadHEIFImage;
       entry->magick=(MagickHandler) IsHEIF;
       entry->description="MP4 video container (HVEC, AVC, or AV1 compression)";
+      if (MP4Note[0] != '\0')
+        entry->note=MP4Note;
       entry->adjoin=MagickFalse;
       entry->seekable_stream=need_seekable_stream;
       if (*version != '\0')
