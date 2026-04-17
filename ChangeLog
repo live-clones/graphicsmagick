@@ -1,5 +1,14 @@
 2026-04-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/image.c (SetImageType): Return status is now contingent
+        on the success of the operations performed.
+        (AppendImages): Return status is now contingent
+        on the success of the operations performed.
+        (ClipPathImage): Return status is now contingent
+        on the success of the operations performed.
+        (CompositePathImage): Return status is now contingent
+        on the success of the operations performed.
+
         * magick/render.c (DrawImage): Assure that 'keyword' is
         initialized. Add a trace prior to early return.
 
