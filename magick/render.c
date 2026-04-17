@@ -2757,6 +2757,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   assert(draw_info->signature == MagickSignature);
   assert(draw_info->primitive != (char *) NULL);
 
+  keyword[0]='\0';
+
   if (*draw_info->primitive == '\0')
     return(MagickFail);
 
@@ -2772,7 +2774,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"begin draw-image");
 
   if ((status &= SetImageType(image,TrueColorType)) != MagickPass)
-    goto draw_image_done;
+    {
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+      goto draw_image_done;
+    }
 
   /*
     Read primitive from file if supplied primitive starts with '@' and
@@ -2790,12 +2795,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   if (original_primitive == (char *) NULL)
     {
       status=MagickFail;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
 
   if (getenv("MAGICK_SKIP_RENDERING") != NULL)
     {
       status=MagickPass;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit without error");
       goto draw_image_done;
     }
 
@@ -2806,6 +2813,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
                       UnableToDrawOnImage);
       status=MagickFail;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
   (void) memcpy(primitive, original_primitive, primitive_extent+1);
@@ -2820,6 +2828,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     {
       ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
       status=MagickFail;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
 
@@ -2832,11 +2841,13 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass) /* FIXME: oss-fuzz 499125828 leak */
     {
       status=MagickFail;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
   if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
     {
       status=MagickFail;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
   graphic_context[n]=CloneDrawInfo((ImageInfo *) NULL,draw_info);
@@ -2846,6 +2857,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   if (token == (char *) NULL)
     {
       status=MagickFail;
+      (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
   defsPushCount = 0;  /* not inside of <defs> ... </defs> */
@@ -5034,7 +5046,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
       MagickFreeResourceLimitedMemory(DrawInfo **,graphic_context);
     }
   if ((status == MagickFail) &&
-      (image->exception.severity < ErrorException))
+      (image->exception.severity < ErrorException) &&
+      (keyword[0] != '\0'))
     ThrowBinaryException(DrawError,NonconformingDrawingPrimitiveDefinition,
                          keyword);
   return(status);

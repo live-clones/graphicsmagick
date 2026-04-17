@@ -1,3 +1,17 @@
+2026-04-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawImage): Assure that 'keyword' is
+        initialized. Add a trace prior to early return.
+
+2026-04-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Add more HEIF samples to oss-fuzz
+        corpus.
+
+        * PerlMagick/t/heif/: Add more HEIF samples.
+
+        * www/index.rst: Fix broken oss-fuzz open bugs link.
+
 2026-04-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (RegisterHEIFImage): Provide codec descriptions

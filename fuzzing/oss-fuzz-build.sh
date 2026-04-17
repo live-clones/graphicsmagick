@@ -1019,6 +1019,7 @@ then
             -DWITH_OPENJPH_ENCODER_PLUGIN=off \
             -DWITH_OpenJPEG_DECODER="$(tv_on_off $enable_openjpeg)" \
             -DWITH_OpenJPEG_ENCODER="$(tv_on_off $enable_openjpeg)" \
+            -DWITH_OpenJPEG_ENCODER_PLUGIN=off \
             -DWITH_RAV1E=off \
             -DWITH_SvtEnc=off \
             -DWITH_UNCOMPRESSED_CODEC=on \
@@ -1380,7 +1381,7 @@ MARKER
        zip -rj "${OUT}"/"${CPREFIX}"DIB"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.dib
        zip -rj "${OUT}"/"${CPREFIX}"FITS"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.fits
        zip -rj "${OUT}"/"${CPREFIX}"GIF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.gif
-       zip -rj "${OUT}"/"${CPREFIX}"HEIF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/heif/*.* "${SRC}"/libheif/fuzzing/data/corpus/*.heic
+       zip -rj "${OUT}"/"${CPREFIX}"HEIF"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/heif/*.* "${SRC}"/libheif/fuzzing/data/corpus/*.heic "${SRC}"/libheif/fuzzing/data/corpus/*.heif
        zip -rj "${OUT}"/"${CPREFIX}"ICO"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/*.ico
        zip -rj "${OUT}"/"${CPREFIX}"JBIG"${CSUFFIX}".zip "${SRC}"/jbigkit/examples/*.jbg "${SRC}"/graphicsmagick/PerlMagick/t/jbig/*.jbig
        zip -rj "${OUT}"/"${CPREFIX}"JNG"${CSUFFIX}".zip "${SRC}"/graphicsmagick/PerlMagick/t/jng/*

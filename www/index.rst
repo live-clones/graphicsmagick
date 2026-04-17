@@ -72,8 +72,8 @@ of 286K physical lines (according to David A. Wheeler's `SLOCCount`_)
 of source code in the base package, it provides a robust and efficient
 collection of tools and libraries which support reading, writing, and
 manipulating an image in over 92 major formats including important
-formats like AVIF, DPX, GIF, HEIC, JPEG, JPEG-2000, JXL, PNG, PDF,
-PNM, TIFF, and WebP.
+formats like AVIF, DPX, GIF, HEIC, HEIF, JPEG, JPEG-2000, JXL, PNG,
+PDF, PNM, TIFF, and WebP.
 
 Image processing is multi-threaded using OpenMP_ (`read about OpenMP
 in GraphicsMagick`_) so that CPU-bound tasks scale linearly as
@@ -128,7 +128,7 @@ other popular software:
 
   * GM suffers from fewer security issues and exploits than ImageMagick.
 
-  * GM participates in Google's `oss-fuzz`_ project since 2018 (see `oss-fuzz open issues`).
+  * GM participates in Google's `oss-fuzz`_ project since 2018 (see `oss-fuzz open issues`_).
 
   * GM `valgrind`_'s 100% clean (memcheck and helgrind).
 
