@@ -534,6 +534,8 @@ static unsigned int WriteXBMImage(const ImageInfo *image_info,Image *image)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   if (TransformColorspace(image,RGBColorspace) == MagickFail)
     ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
   /*
     Write X bitmap header.
   */
@@ -549,7 +551,6 @@ static unsigned int WriteXBMImage(const ImageInfo *image_info,Image *image)
   /*
     Convert MIFF to X bitmap pixels.
   */
-  (void) SetImageType(image,BilevelType);
   polarity=(PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2));
   if (image->colors == 2)
     polarity=(PixelIntensityToQuantum(&image->colormap[0]) <

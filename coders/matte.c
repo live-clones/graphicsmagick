@@ -158,16 +158,17 @@ static unsigned int WriteMATTEImage(const ImageInfo *image_info,Image *image)
   register PixelPacket
     *q;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   if (!image->matte)
     ThrowWriterException(CoderError,ImageDoesNotHaveAMatteChannel,image);
-  matte_image=
-    CloneImage(image,image->columns,image->rows,True,&image->exception);
+  matte_image=CloneImage(image,image->columns,image->rows,True,&image->exception);
   if (matte_image == (Image *) NULL)
-    return(False);
-  (void) (void) SetImageType(matte_image,TrueColorType);
+    return(MagickFail);
+  if (SetImageType(matte_image,TrueColorType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
+
   /*
     Convert image to matte pixels.
   */

@@ -615,6 +615,9 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
       ThrowException(&image->exception,DrawError,UnableToFloodFillImageDueToClipMask,image->filename);
       return(MagickFail);
     }
+  status &= SetImageType(image,TrueColorMatteType);
+  if (status == MagickFail)
+    return status;
   /*
     Allocate segment stack.
   */
@@ -625,7 +628,6 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
   /*
     Push initial segment on stack.
   */
-  (void) SetImageType(image,TrueColorMatteType);
   x=x_offset;
   y=y_offset;
   start=0;

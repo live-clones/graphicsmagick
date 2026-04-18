@@ -141,7 +141,7 @@ MagickExport Image *AdaptiveThresholdImage(const Image * image,
     is_grayscale = image->is_grayscale;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   const MagickBool
     matte = ((image->matte)
@@ -174,8 +174,12 @@ MagickExport Image *AdaptiveThresholdImage(const Image * image,
     return ((Image *) NULL);
   if (is_monochrome)
     return threshold_image;
-  (void) SetImageType(threshold_image, TrueColorType);
-  status = MagickPass;
+  status &= SetImageType(threshold_image, TrueColorType);
+  if (status == MagickFail)
+    {
+      DestroyImage(threshold_image);
+      return ((Image *) NULL);
+    }
 
 #if 0
   fprintf(stderr,"overflow_mask=%lx\n",overflow_mask);
@@ -1168,7 +1172,7 @@ ChannelThresholdPixels(void *mutable_data,         /* User provided mutable data
 
 #define ChannelThresholdImageText "[%s] Channel threshold..."
 MagickExport MagickPassFail ChannelThresholdImage(Image *image,
-  const char *threshold)
+                                                  const char *threshold)
 {
   DoublePixelPacket
     double_threshold;
@@ -1244,15 +1248,17 @@ MagickExport MagickPassFail ChannelThresholdImage(Image *image,
   if (options.opacity_enabled)
     options.thresholds.opacity = RoundDoubleToQuantum(double_threshold.opacity);
 
-  (void) SetImageType(image,TrueColorType);
+  status &= SetImageType(image,TrueColorType);
+  if (status == MagickFail)
+    return status;
 
-  status=PixelIterateMonoModify(ChannelThresholdPixels,
-                                NULL,
-                                ChannelThresholdImageText,
-                                NULL,&options,
-                                0,0,image->columns,image->rows,
-                                image,
-                                &image->exception);
+  status &= PixelIterateMonoModify(ChannelThresholdPixels,
+                                   NULL,
+                                   ChannelThresholdImageText,
+                                   NULL,&options,
+                                   0,0,image->columns,image->rows,
+                                   image,
+                                   &image->exception);
 
   if (is_grayscale && options.red_enabled && options.green_enabled && options.blue_enabled)
     {

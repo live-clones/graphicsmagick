@@ -90,7 +90,7 @@ static unsigned int
 %
 %  The format of the Huffman2DEncodeImage method is:
 %
-%      unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
+%      MagickPassFail Huffman2DEncodeImage(const ImageInfo *image_info,
 %        Image *image)
 %
 %  A description of each parameter follows:
@@ -103,8 +103,8 @@ static unsigned int
 %    o image: The image.
 %
 */
-static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
-  Image *image)
+static MagickPassFail Huffman2DEncodeImage(const ImageInfo *image_info,
+                                           Image *image)
 {
   char
     filename[MaxTextExtent];
@@ -147,13 +147,18 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
   assert(image->signature == MagickSignature);
   huffman_image=CloneImage(image,0,0,True,&image->exception);
   if (huffman_image == (Image *) NULL)
-    return(False);
-  (void) SetImageType(huffman_image,BilevelType);
+    return MagickFail;
+  if (SetImageType(huffman_image,BilevelType) == MagickFail)
+    {
+      CopyException(&image->exception,&huffman_image->exception);
+      DestroyImage(huffman_image);
+      return MagickFail;
+    }
   if(!AcquireTemporaryFileName(filename))
     {
       DestroyImage(huffman_image);
       ThrowBinaryException(FileOpenError,UnableToCreateTemporaryFile,
-        filename);
+                           filename);
     }
   MagickFormatString(huffman_image->filename,sizeof(huffman_image->filename),"tiff:%s",filename);
   clone_info=CloneImageInfo(image_info);
@@ -164,14 +169,14 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
   status=WriteImage(clone_info,huffman_image);
   DestroyImageInfo(clone_info);
   DestroyImage(huffman_image);
-  if (status == False)
-    return(False);
+  if (status == MagickFail)
+    return(MagickFail);
   tiff=TIFFOpen(filename,"rb");
   if (tiff == (TIFF *) NULL)
     {
       (void) LiberateTemporaryFile(filename);
       ThrowBinaryException(FileOpenError,UnableToOpenFile,
-        image_info->filename)
+                           image_info->filename);
     }
   /*
     Allocate raw strip buffer.
@@ -187,29 +192,29 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
       TIFFClose(tiff);
       (void) LiberateTemporaryFile(filename);
       ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
-        (char *) NULL)
+                           (char *) NULL);
     }
   /*
     Compress runlength encoded to 2D Huffman pixels.
   */
   (void) TIFFGetFieldDefaulted(tiff,TIFFTAG_FILLORDER,&fillorder);
   for (i=0; i < (long) TIFFNumberOfStrips(tiff); i++)
-  {
-    Ascii85Initialize(image);
-    count=TIFFReadRawStrip(tiff,(uint32) i,buffer,(long) byte_count[i]);
-    if (fillorder == FILLORDER_LSB2MSB)
-      TIFFReverseBits(buffer,count);
-    for (j=0; j < count; j++)
-      Ascii85Encode(image,(unsigned long) buffer[j]);
-    Ascii85Flush(image);
-  }
+    {
+      Ascii85Initialize(image);
+      count=TIFFReadRawStrip(tiff,(uint32) i,buffer,(long) byte_count[i]);
+      if (fillorder == FILLORDER_LSB2MSB)
+        TIFFReverseBits(buffer,count);
+      for (j=0; j < count; j++)
+        Ascii85Encode(image,(unsigned long) buffer[j]);
+      Ascii85Flush(image);
+    }
   MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   TIFFClose(tiff);
   (void) LiberateTemporaryFile(filename);
-  return(True);
+  return(MagickPass);
 }
 #else
-static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
+static MagickPassFail Huffman2DEncodeImage(const ImageInfo *image_info,
   Image *image)
 {
   ARG_NOT_USED(image_info);
@@ -308,7 +313,7 @@ ModuleExport void UnregisterPS2Image(void)
 %
 %  The format of the WritePS2Image method is:
 %
-%      unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
+%      MagickPassFail WritePS2Image(const ImageInfo *image_info,Image *image)
 %
 %  A description of each parameter follows:
 %
@@ -322,7 +327,7 @@ ModuleExport void UnregisterPS2Image(void)
 %
 %
 */
-static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
+static MagickPassFail WritePS2Image(const ImageInfo *image_info,Image *image)
 {
   char
     buffer[MaxTextExtent],
@@ -406,7 +411,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
   assert(image->signature == MagickSignature);
   image_list_length=GetImageListLength(image);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   compression=image->compression;
   if (image_info->compression != UndefinedCompression)
@@ -915,7 +920,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                 if (!status)
                   {
                     CloseBlob(image);
-                    return(False);
+                    return(MagickFail);
                   }
                 break;
               }
@@ -945,7 +950,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                                                         SaveImageText,
                                                         image->filename,
                                                         image->columns,image->rows);
-                          if (status == False)
+                          if (status == MagickFail)
                             break;
                         }
                   }
@@ -1033,7 +1038,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                                                           SaveImageText,
                                                           image->filename,
                                                           image->columns,image->rows);
-                            if (status == False)
+                            if (status == MagickFail)
                               break;
                           }
                     }
@@ -1044,7 +1049,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                   if (!status)
                     {
                       CloseBlob(image);
-                      return(False);
+                      return(MagickFail);
                     }
                   MagickFreeResourceLimitedMemory(unsigned char *,pixels);
                   break;
@@ -1093,7 +1098,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                                                           SaveImageText,
                                                           image->filename,
                                                           image->columns,image->rows);
-                            if (status == False)
+                            if (status == MagickFail)
                               break;
                           }
                     }
@@ -1158,7 +1163,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                                                           SaveImageText,
                                                           image->filename,
                                                           image->columns,image->rows);
-                            if (status == False)
+                            if (status == MagickFail)
                               break;
                           }
                     }
@@ -1170,7 +1175,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                   if (!status)
                     {
                       CloseBlob(image);
-                      return(False);
+                      return(MagickFail);
                     }
                   break;
                 }
@@ -1197,7 +1202,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
                                                           SaveImageText,
                                                           image->filename,
                                                           image->columns,image->rows);
-                            if (status == False)
+                            if (status == MagickFail)
                               break;
                           }
                     }
@@ -1231,7 +1236,7 @@ static unsigned int WritePS2Image(const ImageInfo *image_info,Image *image)
       status=MagickMonitorFormatted(scene++,image_list_length,
                                     &image->exception,SaveImagesText,
                                     image->filename);
-      if (status == False)
+      if (status == MagickFail)
         break;
     } while (image_info->adjoin);
   if (image_info->adjoin)

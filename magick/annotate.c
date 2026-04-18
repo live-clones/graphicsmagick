@@ -1697,6 +1697,9 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   unsigned int
     identity;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Render label with a Postscript font.
   */
@@ -1760,7 +1763,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"ps:%.1024s",filename);
   (void) CloneString(&clone_info->page,geometry);
   if (draw_info->density != (char *) NULL)
-    (void) CloneString(&clone_info->density,draw_info->density);
+    status &= CloneString(&clone_info->density,draw_info->density);
   clone_info->antialias=draw_info->text_antialias;
   annotate_image=ReadImage(clone_info,&image->exception);
   if (image->exception.severity != UndefinedException)
@@ -1769,7 +1772,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   DestroyImageInfo(clone_info);
   (void) LiberateTemporaryFile(filename);
   if (annotate_image == (Image *) NULL)
-    return(False);
+    return(MagickFail);
   resolution.x=72.0;
   resolution.y=72.0;
   if (draw_info->density != (char *) NULL)
@@ -1782,7 +1785,9 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
         resolution.y=resolution.x;
     }
   if (!identity)
-    TransformImage(&annotate_image,"0x0",(char *) NULL);
+    {
+      status &= TransformImage(&annotate_image,"0x0",(char *) NULL);
+    }
   else
     {
       RectangleInfo
@@ -1794,7 +1799,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
       crop_info.y=(long) ceil((resolution.y/72.0)*extent.y/8.0-0.5);
       MagickFormatString(geometry,sizeof(geometry),"%lux%lu%+ld%+ld",crop_info.width,
         crop_info.height,crop_info.x,crop_info.y);
-      TransformImage(&annotate_image,geometry,(char *) NULL);
+      status &= TransformImage(&annotate_image,geometry,(char *) NULL);
     }
   metrics->pixels_per_em.x=(resolution.y/72.0)*
     ExpandAffine(&draw_info->affine)*draw_info->pointsize;
@@ -1813,7 +1818,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   if (!draw_info->render)
     {
       DestroyImage(annotate_image);
-      return(True);
+      return(MagickPass);
     }
   if (draw_info->fill.opacity != TransparentOpacity)
     {
@@ -1823,7 +1828,11 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
       /*
         Render fill color.
       */
-      (void) SetImageType(annotate_image,TrueColorMatteType);
+      if ((status &= SetImageType(annotate_image,TrueColorMatteType)) == MagickFail)
+        {
+          DestroyImage(annotate_image);
+          return(MagickFail);
+        }
       fill_color=draw_info->fill;
       pattern=draw_info->fill_pattern;
       for (y=0; y < (long) annotate_image->rows; y++)
@@ -1834,7 +1843,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
         for (x=0; x < (long) annotate_image->columns; x++)
         {
           if (pattern != (Image *) NULL)
-            (void) AcquireOnePixelByReference(pattern,&fill_color,
+            status &= AcquireOnePixelByReference(pattern,&fill_color,
               (long) (x-pattern->tile_info.x) % pattern->columns,
               (long) (y-pattern->tile_info.y) % pattern->rows,
               &image->exception);
@@ -1846,15 +1855,15 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
           q->blue=fill_color.blue;
           q++;
         }
-        if (!SyncImagePixels(annotate_image))
+        if ((status &= SyncImagePixels(annotate_image)) == MagickFail)
           break;
       }
-      (void) CompositeImage(image,OverCompositeOp,annotate_image,(long)
+      status &= CompositeImage(image,OverCompositeOp,annotate_image,(long)
         ceil(offset->x-0.5),(long) ceil(offset->y-(metrics->ascent+
         metrics->descent)-0.5));
     }
   DestroyImage(annotate_image);
-  return(MagickPass);
+  return(status);
 }
 
 /*

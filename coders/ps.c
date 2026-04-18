@@ -175,7 +175,9 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
     *next_image;
 
   int
-    c,
+    c;
+
+  MagickPassFail
     status;
 
   unsigned int
@@ -216,7 +218,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   image=AllocateImage(image_info);
   status=OpenBlob(image_info,image,ReadBinaryBlobMode,exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   /*
     Open temporary output file.
@@ -704,7 +706,7 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
     bit,
     byte;
 
-  unsigned int
+  MagickPassFail
     status;
 
   unsigned long
@@ -900,12 +902,19 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
               */
               preview_image=CloneImage(image,0,0,True,&image->exception);
               if (preview_image == (Image *) NULL)
-                ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                                     image);
+                {
+                  CloseBlob(image);
+                  return MagickFail;
+                }
               /*
                 Dump image as bitmap.
               */
-              (void) SetImageType(preview_image,BilevelType);
+              if ((status &= SetImageType(preview_image,BilevelType)) == MagickFail)
+                {
+                  DestroyImage(preview_image);
+                  CloseBlob(image);
+                  return MagickFail;
+                }
               polarity=
                 PixelIntensityToQuantum(&preview_image->colormap[0]) < (MaxRGB/2);
               if (preview_image->colors == 2)
@@ -1352,7 +1361,11 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
               */
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                     "Writing image as monochrome bitmap...");
-              (void) SetImageType(image,BilevelType);
+              if ((status &= SetImageType(image,BilevelType)) == MagickFail)
+                {
+                  CloseBlob(image);
+                  return MagickFail;
+                }
               count=0;
               bp=buffer;
               for (y=0; y < (long) image->rows; y++)

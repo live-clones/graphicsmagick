@@ -10186,7 +10186,7 @@ static unsigned int WriteMNGImage(const ImageInfo *image_info,Image *image)
     chunk_length=0;
 #endif
 
-  unsigned int
+  MagickPassFail
     status;
 
   volatile unsigned int
@@ -10356,9 +10356,9 @@ static unsigned int WriteMNGImage(const ImageInfo *image_info,Image *image)
                 {
                   p->colors=0;
                   if (p->matte)
-                    (void) SetImageType(p,PaletteMatteType);
+                    status &= SetImageType(p,PaletteMatteType);
                   else
-                    (void) SetImageType(p,PaletteType);
+                    status &= SetImageType(p,PaletteType);
                 }
             }
           if (!mng_info->adjoin)

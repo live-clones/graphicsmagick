@@ -155,8 +155,8 @@ ModuleExport void UnregisterHISTOGRAMImage(void)
 %
 %
 */
-static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
-                                        Image *image)
+static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
+                                          Image *image)
 {
 #define HistogramDensity  "256x200"
 
@@ -175,10 +175,10 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   long
     *blue,
     *green,
-    maximum,
     *red;
 
   long
+    maximum,
     y;
 
   RectangleInfo
@@ -194,8 +194,8 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
     *q,
     *r;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   size_t
     length;
@@ -207,7 +207,7 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  (void) SetImageDepth(image,image->depth);
+  status &= SetImageDepth(image,image->depth);
   SetGeometry(image,&geometry);
   if (image_info->density == (char *) NULL)
     (void) GetMagickGeometry(HistogramDensity,&geometry.x,&geometry.y,
@@ -219,7 +219,13 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
                              &image->exception);
   if (histogram_image == (Image *) NULL)
     ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-  (void) SetImageType(histogram_image,TrueColorType);
+  status &= SetImageType(histogram_image,TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(&image->exception,&histogram_image->exception);
+      DestroyImage(histogram_image);
+      return status;
+    }
   /*
     Allocate histogram count arrays.
   */

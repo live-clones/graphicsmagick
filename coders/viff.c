@@ -1310,7 +1310,11 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
               /*
                 Convert PseudoClass image to a VIFF monochrome image.
               */
-              (void) SetImageType(image,BilevelType);
+              if (SetImageType(image,BilevelType) == MagickFail)
+                {
+                  MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
+                  ThrowWriterException(CoderError,UnableToSetImageType,image);
+                }
               polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
               if (image->colors == 2)
                 polarity=PixelIntensityToQuantum(&image->colormap[0]) <

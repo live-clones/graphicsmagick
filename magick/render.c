@@ -1436,7 +1436,10 @@ DrawAffineImage(Image *image,const Image *composite,
   /*
     Affine transform image.
   */
-  (void) SetImageType(image,TrueColorType);
+  status &= SetImageType(image,TrueColorType);
+  if (status == MagickFail)
+    return status;
+
   edge.x1=min.x;
   edge.y1=min.y;
   edge.x2=max.x;
@@ -2765,7 +2768,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   /*
     Check for DrawImage recursion
   */
-  if (DrawImageRecurseIn(image) == MagickFail)
+  if (DrawImageRecurseIn(image) == MagickFail) /* Already throws exception */
     {
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Drawing recursion detected!");
       return MagickFail;
@@ -2794,6 +2797,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     }
   if (original_primitive == (char *) NULL)
     {
+      ThrowException3(&image->exception,DrawError,NonconformingDrawingPrimitiveDefinition,UnableToDrawOnImage);
       status=MagickFail;
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;

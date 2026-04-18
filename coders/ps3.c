@@ -109,21 +109,22 @@ static unsigned int
 %
 %  The format of the Huffman2DEncodeImage method is:
 %
-%      unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
+%      MagickPassFail Huffman2DEncodeImage(const ImageInfo *image_info,
 %        Image *image)
 %
 %  A description of each parameter follows:
 %
-%    o status:  Method Huffman2DEncodeImage returns True if all the pixels are
-%      compressed without error, otherwise False.
+%    o status:  Method Huffman2DEncodeImage returns MagickPass if all the pixels are
+%      compressed without error, otherwise MagickFail.
 %
 %    o image_info: The image info..
 %
 %    o image: The image.
 %
 */
-static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
-                                            Image *image, unsigned char **pixels, size_t *length)
+static MagickPassFail SerializeHuffman2DImage(const ImageInfo *image_info,
+                                              Image *image, unsigned char **pixels,
+                                              size_t *length)
 {
   char
     filename[MaxTextExtent];
@@ -165,14 +166,14 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  if(!AcquireTemporaryFileName(filename))
+  if (!AcquireTemporaryFileName(filename))
     {
       ThrowBinaryException(FileOpenError,UnableToCreateTemporaryFile,
-                           filename)
-        }
+                           filename);
+    }
   huffman_image=CloneImage(image,0,0,True,&image->exception);
   if (huffman_image == (Image *) NULL)
-    return(False);
+    return(MagickFail);
   /*
     TODO: If (image, then) huffman_image->compression is JPEG, huffman_image
     is changed to DirectClass in WriteTIFFImage and the huffman_image ends up
@@ -181,8 +182,12 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
     huffman_image->compression here:
   */
   huffman_image->compression=Group4Compression;
-
-  (void) SetImageType(huffman_image,BilevelType);
+  if (SetImageType(huffman_image,BilevelType) == MagickFail)
+    {
+      CopyException(&image->exception,&huffman_image->exception);
+      DestroyImage(huffman_image);
+      return MagickFail;
+    }
   MagickFormatString(huffman_image->filename,sizeof(huffman_image->filename),"tiff:%s",filename);
   clone_info=CloneImageInfo(image_info);
   clone_info->compression=Group4Compression;
@@ -192,10 +197,10 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
   status=WriteImage(clone_info,huffman_image);
   DestroyImageInfo(clone_info);
   DestroyImage(huffman_image);
-  if (status == False)
+  if (status == MagickFail)
     {
       (void) LiberateTemporaryFile(filename);
-      return(False);
+      return(MagickFail);
     }
   tiff=TIFFOpen(filename,"rb");
   if (tiff == (TIFF *) NULL)
@@ -221,8 +226,8 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
       TIFFClose(tiff);
       (void) LiberateTemporaryFile(filename);
       ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
-                           (char *) NULL)
-        }
+                           (char *) NULL);
+    }
   *pixels=MagickAllocateResourceLimitedMemory(unsigned char *,*length);
   if (*pixels == (unsigned char *) NULL)
     {
@@ -230,8 +235,8 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
       TIFFClose(tiff);
       (void) LiberateTemporaryFile(filename);
       ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
-                           (char *) NULL)
-        }
+                           (char *) NULL);
+    }
 
   (void) TIFFGetFieldDefaulted(tiff,TIFFTAG_FILLORDER,&fillorder);
   p=(*pixels);
@@ -246,10 +251,10 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
   MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   TIFFClose(tiff);
   (void) LiberateTemporaryFile(filename);
-  return(True);
+  return(MagickPass);
 }
 
-static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
+static MagickPassFail Huffman2DEncodeImage(const ImageInfo *image_info,
   Image *image)
 {
   size_t
@@ -271,19 +276,19 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
 
   status=SerializeHuffman2DImage(image_info,image,&pixels,&length);
   if (!status)
-    return False;
+    return MagickFail;
 
   Ascii85Initialize(image);
   for (i=0; i < length; i++)
     Ascii85Encode(image,(unsigned long) pixels[i]);
   Ascii85Flush(image);
   MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-  return(True);
+  return(MagickPass);
 }
 
 #else
 
-static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
+static MagickPassFail SerializeHuffman2DImage(const ImageInfo *image_info,
   Image *image, unsigned char **pixels, size_t *length)
 {
   ARG_NOT_USED(image_info);
@@ -293,7 +298,7 @@ static unsigned int SerializeHuffman2DImage(const ImageInfo *image_info,
   assert(image->signature == MagickSignature);
   ThrowBinaryException(MissingDelegateError,TIFFLibraryIsNotAvailable,image->filename)
 }
-static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
+static MagickPassFail Huffman2DEncodeImage(const ImageInfo *image_info,
   Image *image)
 {
   ARG_NOT_USED(image_info);
@@ -318,7 +323,7 @@ static unsigned int Huffman2DEncodeImage(const ImageInfo *image_info,
 %
 %  The format of the JPEGEncodeImage method is:
 %
-%      unsigned int JPEGEncodeImage(const ImageInfo *image_info,
+%      MagickPassFail JPEGEncodeImage(const ImageInfo *image_info,
 %        Image *image)
 %
 %  A description of each parameter follows:
@@ -422,7 +427,7 @@ ModuleExport void RegisterPS3Image(void)
 %
 %  The format of the SerializePseudoClassImage method is:
 %
-%       unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
+%       MagickPassFail SerializePseudoClassImage(const ImageInfo *image_info,
 %         Image *image, unsigned char **pixels, size_t *length)
 %
 %  A description of each parameter follows:
@@ -437,8 +442,9 @@ ModuleExport void RegisterPS3Image(void)
 %    o length: the length of the pixels memory area.
 %
 */
-static unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
-                                              Image *image, unsigned char **pixels, size_t *length)
+static MagickPassFail SerializePseudoClassImage(const ImageInfo *image_info,
+                                              Image *image, unsigned char **pixels,
+                                              size_t *length)
 {
   long
     x,
@@ -458,7 +464,7 @@ static unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  status=True;
+  status=MagickPass;
   *length=MagickArraySize(image->columns,image->rows);
   *pixels=MagickAllocateResourceLimitedMemory(unsigned char *, *length);
   if (*pixels == (unsigned char *) NULL)
@@ -478,11 +484,11 @@ static unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
             status=MagickMonitorFormatted(y,image->rows,&image->exception,
                                           SaveImageText,image->filename,
                                           image->columns,image->rows);
-            if (status == False)
+            if (status == MagickFail)
               break;
           }
     }
-  if (status == False)
+  if (status == MagickFail)
     MagickFreeResourceLimitedMemory(unsigned char *,*pixels);
   return(status);
 }
@@ -502,7 +508,7 @@ static unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
 %
 %  The format of the SerializeMultiChannelImage method is:
 %
-%       unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
+%       MagickPassFail SerializeMultiChannelImage(const ImageInfo *image_info,
 %         Image *image, unsigned char **pixels, size_t *length)
 %
 %  A description of each parameter follows:
@@ -518,8 +524,9 @@ static unsigned int SerializePseudoClassImage(const ImageInfo *image_info,
 %    o length: the length of the pixels memory area.
 %
 */
-static unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
-                                               Image *image, unsigned char **pixels, size_t *length)
+static MagickPassFail SerializeMultiChannelImage(const ImageInfo *image_info,
+                                                 Image *image, unsigned char **pixels,
+                                                 size_t *length)
 {
   long
     x,
@@ -536,7 +543,7 @@ static unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  status=True;
+  status=MagickPass;
   *length=(size_t) (image->colorspace == CMYKColorspace ? 4U : 3U)*MagickArraySize(image->columns,image->rows);
   *pixels=MagickAllocateResourceLimitedMemory(unsigned char *, *length);
   if (*pixels == (unsigned char *) NULL)
@@ -571,11 +578,11 @@ static unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
             status=MagickMonitorFormatted(y,image->rows,&image->exception,
                                           SaveImageText,image->filename,
                                           image->columns,image->rows);
-            if (status == False)
+            if (status == MagickFail)
               break;
           }
     }
-  if (status == False)
+  if (status == MagickFail)
     MagickFreeResourceLimitedMemory(unsigned char *,*pixels);
   return(status);
 }
@@ -596,7 +603,7 @@ static unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
 %
 %  The format of the SerializeSingleChannelImage method is:
 %
-%       unsigned int SerializeSingleChannelImage(const ImageInfo *image_info,
+%       MagickPassFail SerializeSingleChannelImage(const ImageInfo *image_info,
 %         Image *image, unsigned char **pixels, size_t *length)
 %
 %  A description of each parameter follows:
@@ -614,9 +621,9 @@ static unsigned int SerializeMultiChannelImage(const ImageInfo *image_info,
 %    o length: the length of the pixels memory area.
 %
 */
-static unsigned int SerializeSingleChannelImage(const ImageInfo *image_info,
-                                                Image *image,unsigned char **pixels,
-                                                size_t *length)
+static MagickPassFail SerializeSingleChannelImage(const ImageInfo *image_info,
+                                                  Image *image,unsigned char **pixels,
+                                                  size_t *length)
 {
   unsigned long
     x,
@@ -641,7 +648,7 @@ static unsigned int SerializeSingleChannelImage(const ImageInfo *image_info,
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  status=True;
+  status=MagickPass;
   pack=IsMonochromeImage(image,&image->exception) ? 8 : 1;
   /* Padded columns are padded to byte boundary */
   padded_columns=((image->columns+pack-1)/pack)*pack;
@@ -689,11 +696,11 @@ static unsigned int SerializeSingleChannelImage(const ImageInfo *image_info,
                                           &image->exception,SaveImageText,
                                           image->filename,
                                           image->columns,image->rows);
-            if (status == False)
+            if (status == MagickFail)
               break;
           }
     }
-  if (status == False)
+  if (status == MagickFail)
     MagickFreeResourceLimitedMemory(unsigned char *,*pixels);
   return(status);
 }
@@ -740,12 +747,12 @@ ModuleExport void UnregisterPS3Image(void)
 %
 %  The format of the WritePS3MaskImage method is:
 %
-%      unsigned int WritePS3MaskImage(const ImageInfo *image_info,Image *image)
+%      MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image)
 %
 %  A description of each parameter follows:
 %
 %    o status: Method WritePS3MaskImage return True if the mask is printed.
-%      False is returned on errors like out-of-memory.
+%      MagickFail is returned on errors like out-of-memory.
 %
 %    o image_info: Specifies a pointer to a ImageInfo structure.
 %
@@ -759,12 +766,12 @@ typedef struct WriteByteHookInfo_
     *image;
 } WriteByteHookInfo;
 
-static unsigned int MaskWriteByteHook(Image *mask_image,
+static MagickPassFail MaskWriteByteHook(Image *mask_image,
                                       const magick_uint8_t code, void *info)
 {
   ARG_NOT_USED(mask_image);
   Ascii85Encode(((WriteByteHookInfo *)info)->image, (unsigned long)code);
-  return(True);
+  return(MagickPass);
 }
 
 static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image)
@@ -856,7 +863,12 @@ static MagickPassFail WritePS3MaskImage(const ImageInfo *image_info,Image *image
       DestroyImage(mask_image);
       return(MagickFail);
     }
-  (void) SetImageType(mask_image, BilevelType);
+  if (SetImageType(mask_image, BilevelType) == MagickFail)
+    {
+      CopyException(&image->exception,&mask_image->exception);
+      DestroyImage(mask_image);
+      return MagickFail;
+    }
   mask_image->matte=False;
 
   /* Only lossless compressions for the mask */
@@ -1260,7 +1272,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
   assert(image->signature == MagickSignature);
   image_list_length=GetImageListLength(image);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   compression=image->compression;
   if (image_info->compression != UndefinedCompression)
@@ -1551,7 +1563,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
 
           attribute=GetImageAttribute(image,clip_mask->magick_filename);
           if (attribute == (const ImageAttribute *) NULL)
-            return(False);
+            return(MagickFail);
           (void) WriteBlobString(image,attribute->value);
           (void) WriteBlobByte(image,'\n');
         }
@@ -1570,7 +1582,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
         if (!WritePS3MaskImage(image_info, image))
           {
             CloseBlob(image);
-            return(False);
+            return(MagickFail);
           }
 
       /*
@@ -1623,7 +1635,13 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
 
       /* Compression seems to take precedence over anything */
       if (compression == FaxCompression)
-        (void) SetImageType(image, BilevelType);
+        {
+          if (SetImageType(image, BilevelType) == MagickFail)
+            {
+              CloseBlob(image);
+              return MagickFail;
+            }
+        }
 
       /* Showpage for non-EPS. */
       (void) WriteBlobString(image,
@@ -1720,7 +1738,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
                 if (!status)
                   {
                     CloseBlob(image);
-                    return(False);
+                    return(MagickFail);
                   }
                 Ascii85Initialize(image);
                 switch (compression)
@@ -1788,7 +1806,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
                 if (!status)
                   {
                     CloseBlob(image);
-                    return(False);
+                    return(MagickFail);
                   }
                 Ascii85Initialize(image);
                 switch (compression)
@@ -1864,7 +1882,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
             if (!status)
               {
                 CloseBlob(image);
-                return(False);
+                return(MagickFail);
               }
             Ascii85Initialize(image);
             switch (compression)
@@ -1895,7 +1913,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
       if (!status)
         {
           CloseBlob(image);
-          return(False);
+          return(MagickFail);
         }
 
       /* Update BeginData now that we know the data size */
@@ -1925,7 +1943,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
       status=MagickMonitorFormatted(scene,image_list_length,
                                     &image->exception,SaveImagesText,
                                     image->filename);
-      if (status == False)
+      if (status == MagickFail)
         break;
       scene++;
     } while (image_info->adjoin);
@@ -1967,7 +1985,7 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
 %
 %  The format of the ZLIBEncode2Image method is:
 %
-%      unsigned int ZLIBEncode2Image(Image *image,const size_t length,
+%      MagickPassFail ZLIBEncode2Image(Image *image,const size_t length,
 %        const unsigned long quality,unsigned char *pixels,
 %        WriteByteHook write_byte,void *info)
 %
@@ -2004,9 +2022,12 @@ static void ZLIBFreeFunc(voidpf opaque, voidpf address)
   MagickFree(address);
 }
 
-static unsigned int ZLIBEncode2Image(Image *image,const size_t length,
-                                     const unsigned long quality,unsigned char *pixels,WriteByteHook write_byte,
-                                     void *info)
+static MagickPassFail ZLIBEncode2Image(Image *image,
+                                       const size_t length,
+                                       const unsigned long quality,
+                                       unsigned char *pixels,
+                                       WriteByteHook write_byte,
+                                       void *info)
 {
   int
     status;
@@ -2059,9 +2080,9 @@ static unsigned int ZLIBEncode2Image(Image *image,const size_t length,
   return(!status);
 }
 #else
-static unsigned int ZLIBEncode2Image(Image *image,const size_t length,
-                                     const unsigned long quality,unsigned char *pixels,WriteByteHook write_byte,
-                                     void *info)
+static MagickPassFail ZLIBEncode2Image(Image *image,const size_t length,
+                                       const unsigned long quality,unsigned char *pixels,WriteByteHook write_byte,
+                                       void *info)
 {
   ARG_NOT_USED(length);
   ARG_NOT_USED(quality);
@@ -2072,6 +2093,6 @@ static unsigned int ZLIBEncode2Image(Image *image,const size_t length,
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   ThrowBinaryException(MissingDelegateError,ZipLibraryIsNotAvailable,image->filename);
-  return(False);
+  return(MagickFail);
 }
 #endif

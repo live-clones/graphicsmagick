@@ -2344,6 +2344,9 @@ MagickXDrawImage(Display *display,const MagickXPixelInfo *pixel,
   XImage
     *draw_ximage;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Initialize drawd image.
   */
@@ -2480,8 +2483,8 @@ MagickXDrawImage(Display *display,const MagickXPixelInfo *pixel,
   x=0;
   y=0;
   (void) XParseGeometry(draw_info->geometry,&x,&y,&width,&height);
-  (void) AcquireOnePixelByReference(image,&draw_image->background_color,x,y,&image->exception);
-  (void) SetImageType(draw_image,TrueColorMatteType);
+  status &= AcquireOnePixelByReference(image,&draw_image->background_color,x,y,&image->exception);
+  status &= SetImageType(draw_image,TrueColorMatteType);
   for (y=0; y < (long) draw_image->rows; y++)
     {
       q=SetImagePixels(draw_image,0,y,draw_image->columns,1);
@@ -2511,7 +2514,7 @@ MagickXDrawImage(Display *display,const MagickXPixelInfo *pixel,
             }
           q++;
         }
-      if (!SyncImagePixels(draw_image))
+      if ((status &= SyncImagePixels(draw_image)) == MagickFail)
         break;
     }
   XDestroyImage(draw_ximage);
@@ -7754,9 +7757,6 @@ MagickXMakeStandardColormap(Display *display,
   Colormap
     colormap;
 
-  int
-    status;
-
   register IndexPacket
     *indexes;
 
@@ -7777,6 +7777,9 @@ MagickXMakeStandardColormap(Display *display,
     color,
     *colors,
     *p;
+
+  MagickPassFail
+    status = MagickPass;
 
   assert(display != (Display *) NULL);
   assert(visual_info != (XVisualInfo *) NULL);
@@ -7838,7 +7841,7 @@ MagickXMakeStandardColormap(Display *display,
               }
             MagickXGetPixelPacket(display,visual_info,map_info,resource_info,image,
               pixel);
-            (void) SetImageType(image,TrueColorType);
+            status &= SetImageType(image,TrueColorType);
             DestroyImage(map_image);
           }
       if (IsEventLogged(X11Event))

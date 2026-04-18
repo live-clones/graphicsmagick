@@ -3093,6 +3093,9 @@ static unsigned int MagickXColorEditImage(Display *display,
   XEvent
     event;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Map Command widget.
   */
@@ -3473,14 +3476,14 @@ static unsigned int MagickXColorEditImage(Display *display,
                 /*
                   Update color information using point algorithm.
                 */
-                (void) SetImageType(*image,TrueColorType);
+                status &= SetImageType(*image,TrueColorType);
                 q=GetImagePixels(*image,x_offset,y_offset,1,1);
                 if (q == (PixelPacket *) NULL)
                   break;
                 q->red=ScaleShortToQuantum(color.red);
                 q->green=ScaleShortToQuantum(color.green);
                 q->blue=ScaleShortToQuantum(color.blue);
-                (void) SyncImagePixels(*image);
+                status &= SyncImagePixels(*image);
                 break;
               }
             case ReplaceMethod:
@@ -3561,7 +3564,7 @@ static unsigned int MagickXColorEditImage(Display *display,
                 /*
                   Update color information using reset algorithm.
                 */
-                (void) SetImageType(*image,TrueColorType);
+                status &= SetImageType(*image,TrueColorType);
                 for (y=0; y < (long) (*image)->rows; y++)
                   {
                     q=SetImagePixels(*image,0,y,(*image)->columns,1);
@@ -3574,7 +3577,7 @@ static unsigned int MagickXColorEditImage(Display *display,
                         q->blue=ScaleShortToQuantum(color.blue);
                         q++;
                       }
-                    if (!SyncImagePixels(*image))
+                    if ((status &= SyncImagePixels(*image)) != MagickPass)
                       break;
                   }
                 break;
@@ -3689,6 +3692,9 @@ static unsigned int MagickXCompositeImage(Display *display,
 
   XEvent
     event;
+
+  MagickPassFail
+    status = MagickPass;
 
   /*
     Request image file name from user.
@@ -4104,7 +4110,7 @@ static unsigned int MagickXCompositeImage(Display *display,
       SetImageOpacity(composite_image,OpaqueOpacity);
       opacity=(Quantum) (ScaleQuantumToChar(MaxRGB)-
                          ((long) ScaleQuantumToChar(MaxRGB)*blend)/100);
-      (void) SetImageType(image,TrueColorMatteType);
+      status &= SetImageType(image,TrueColorMatteType);
       for (y=0; y < (long) image->rows; y++)
         {
           q=GetImagePixels(image,0,y,image->columns,1);
@@ -4115,7 +4121,7 @@ static unsigned int MagickXCompositeImage(Display *display,
               q->opacity=opacity;
               q++;
             }
-          if (!SyncImagePixels(image))
+          if ((status &= SyncImagePixels(image)) == MagickFail)
             break;
         }
     }
@@ -4417,6 +4423,9 @@ static unsigned int MagickXCropImage(Display *display,MagickXResourceInfo *resou
 
   XEvent
     event;
+
+  MagickPassFail
+    status = MagickPass;
 
   /*
     Map Command widget.
@@ -5073,7 +5082,7 @@ static unsigned int MagickXCropImage(Display *display,MagickXResourceInfo *resou
   /*
     Cut image.
   */
-  (void) SetImageType(image,TrueColorMatteType);
+  status &= SetImageType(image,TrueColorMatteType);
   for (y=0; y < (long) crop_info.height; y++)
     {
       q=GetImagePixels(image,crop_info.x,y+crop_info.y,crop_info.width,1);
@@ -5084,7 +5093,7 @@ static unsigned int MagickXCropImage(Display *display,MagickXResourceInfo *resou
           q->opacity=TransparentOpacity;
           q++;
         }
-      if (!SyncImagePixels(image))
+      if ((status &= SyncImagePixels(image)) != MagickPass)
         break;
     }
   /*
@@ -9123,6 +9132,9 @@ static unsigned int MagickXMatteEditImage(Display *display,
   XEvent
     event;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Map Command widget.
   */
@@ -9488,7 +9500,7 @@ static unsigned int MagickXMatteEditImage(Display *display,
           if ((x_offset >= (int) (*image)->columns) ||
               (y_offset >= (int) (*image)->rows))
             continue;
-          (void) SetImageType(*image,TrueColorMatteType);
+          status &= SetImageType(*image,TrueColorMatteType);
           switch (method)
             {
             case PointMethod:
@@ -9524,7 +9536,7 @@ static unsigned int MagickXMatteEditImage(Display *display,
                           q->opacity=(Quantum) MagickAtoL(matte);
                         q++;
                       }
-                    if (!SyncImagePixels(*image))
+                    if ((status &= SyncImagePixels(*image)) == MagickFail)
                       break;
                   }
                 break;
@@ -9545,8 +9557,8 @@ static unsigned int MagickXMatteEditImage(Display *display,
                     target.green=ScaleShortToQuantum(border_color.green);
                     target.blue=ScaleShortToQuantum(border_color.blue);
                   }
-                (void) MatteFloodfillImage(*image,target,MagickAtoI(matte),x_offset,
-                                           y_offset,method);
+                status &= MatteFloodfillImage(*image,target,MagickAtoI(matte),x_offset,
+                                              y_offset,method);
                 break;
               }
             case ResetMethod:
@@ -9554,7 +9566,7 @@ static unsigned int MagickXMatteEditImage(Display *display,
                 /*
                   Update matte information using reset algorithm.
                 */
-                (void) SetImageType(*image,TrueColorType);
+                status &= SetImageType(*image,TrueColorType);
                 for (y=0; y < (long) (*image)->rows; y++)
                   {
                     q=SetImagePixels(*image,0,y,(*image)->columns,1);
@@ -9565,7 +9577,7 @@ static unsigned int MagickXMatteEditImage(Display *display,
                         q->opacity=(Quantum) MagickAtoL(matte);
                         q++;
                       }
-                    if (!SyncImagePixels(*image))
+                    if ((status &= SyncImagePixels(*image)) == MagickFail)
                       break;
                   }
                 if (MagickAtoL(matte) == OpaqueOpacity)

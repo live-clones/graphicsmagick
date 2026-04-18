@@ -398,7 +398,8 @@ static unsigned int WriteWBMPImage(const ImageInfo *image_info,Image *image)
   /*
     Convert image to a bi-level image.
   */
-  (void) SetImageType(image,BilevelType);
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
   polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
   if (image->colors == 2)
     polarity=PixelIntensityToQuantum(&image->colormap[0]) <

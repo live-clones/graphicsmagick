@@ -593,8 +593,7 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
     number_scenes;
 
   unsigned int
-    coalesce,
-    status;
+    coalesce;
 
   unsigned int
     height,
@@ -617,6 +616,9 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
 
   XWindowAttributes
     window_attributes;
+
+  MagickPassFail
+    status = MagickPass;
 
   /*
     Determine target window.
@@ -649,8 +651,8 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
   window_attributes.width=XDisplayWidth(display,XDefaultScreen(display));
   window_attributes.height=XDisplayHeight(display,XDefaultScreen(display));
   (void) strlcpy(visual_type,"default",sizeof(visual_type));
-  status=XGetWindowAttributes(display,window_info.id,&window_attributes);
-  if (status != False)
+  status &= XGetWindowAttributes(display,window_info.id,&window_attributes);
+  if (status != MagickFail)
     MagickFormatString(visual_type,sizeof(visual_type),visual_type,"0x%lx",
                        XVisualIDFromVisual(window_attributes.visual));
   if (visual_info == (XVisualInfo *) NULL)
@@ -770,7 +772,7 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
       if ((resource_info->map_type != (char *) NULL) ||
           (visual_info->klass == TrueColor) ||
           (visual_info->klass == DirectColor))
-        (void) SetImageType(image_list[scene],TrueColorType);
+        status &= SetImageType(image_list[scene],TrueColorType);
       if ((display_image->columns < image_list[scene]->columns) &&
           (display_image->rows < image_list[scene]->rows))
         display_image=image_list[scene];
@@ -778,7 +780,7 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
   if ((resource_info->map_type != (char *) NULL) ||
       (visual_info->klass == TrueColor) ||
       (visual_info->klass == DirectColor))
-    (void) SetImageType(display_image,TrueColorType);
+    status &= SetImageType(display_image,TrueColorType);
   MagickXMakeStandardColormap(display,visual_info,&resources,display_image,map_info,
                               &pixel);
   /*
@@ -820,9 +822,9 @@ MagickExport void MagickXAnimateBackgroundImage(Display *display,
   window_info.height=(unsigned int) height;
   window_info.x=(int) x;
   window_info.y=(int) y;
-  status=MagickXMakeImage(display,&resources,&window_info,image_list[0],
-                          window_info.width,window_info.height);
-  if (status == False)
+  status &= MagickXMakeImage(display,&resources,&window_info,image_list[0],
+                             window_info.width,window_info.height);
+  if (status == MagickFail)
     MagickFatalError(XServerFatalError,UnableToCreateXImage,(char *) NULL);
   window_info.x=0;
   window_info.y=0;
@@ -1165,9 +1167,6 @@ MagickXAnimateImages(Display *display,
     **image_list,
     *nexus;
 
-  int
-    status;
-
   unsigned int
     iterations;
 
@@ -1253,6 +1252,9 @@ MagickXAnimateImages(Display *display,
 
   XWMHints
     *manager_hints;
+
+  MagickPassFail
+    status = MagickPass;
 
   assert(images != (Image *) NULL);
   assert(images->signature == MagickSignature);
@@ -1417,7 +1419,7 @@ MagickXAnimateImages(Display *display,
       if ((resource_info->map_type != (char *) NULL) ||
           (visual_info->klass == TrueColor) ||
           (visual_info->klass == DirectColor))
-        (void) SetImageType(image_list[scene],TrueColorType);
+        status &= SetImageType(image_list[scene],TrueColorType);
       if ((display_image->columns < image_list[scene]->columns) &&
           (display_image->rows < image_list[scene]->rows))
         display_image=image_list[scene];

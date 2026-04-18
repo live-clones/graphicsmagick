@@ -169,8 +169,8 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
     unicode = 0,
     iso_11548_1 = 0;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   register const IndexPacket
     *indexes;
@@ -187,11 +187,15 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
   unsigned long
     y;
 
+  assert(image_info != (const ImageInfo *) NULL);
+  assert(image != (Image *) NULL);
+
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
+
   /*
     Open output image file.
   */
-  assert(image_info != (const ImageInfo *) NULL);
-  assert(image != (Image *) NULL);
   if (LocaleCompare(image_info->magick,"UBRL") == 0)
     unicode=1;
   else if (LocaleCompare(image_info->magick,"UBRL6") == 0)
@@ -233,7 +237,6 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
       (void) WriteBlobString(image,buffer);
       (void) WriteBlobString(image,"\n");
     }
-  (void) SetImageType(image,BilevelType);
   polarity=PixelIntensityToQuantum(&image->colormap[0]) >= (MaxRGB/2);
   if (image->colors == 2)
     polarity=PixelIntensityToQuantum(&image->colormap[0]) >=

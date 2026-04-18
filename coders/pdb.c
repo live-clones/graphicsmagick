@@ -880,12 +880,15 @@ static unsigned int WritePDBImage(const ImageInfo *image_info,Image *image)
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    return MagickFail;
+  if (SetImageType(image,GrayscaleType) == MagickFail)
+    return MagickFail;
+
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowPDBWriterException(FileOpenError,UnableToOpenFile,image);
-  if (TransformColorspace(image,RGBColorspace) == MagickFail)
-    ThrowPDBWriterException(CoderError,UnableToTransformColorspace,image);
-  (void) SetImageType(image,GrayscaleType);
   bits_per_pixel=image->depth;
   if (GetImageType(image,&image->exception) == BilevelType)
     bits_per_pixel=1;

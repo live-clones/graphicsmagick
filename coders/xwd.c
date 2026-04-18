@@ -1012,7 +1012,8 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
     XWD does not support more than 256 colors.
   */
   if ((image->storage_class == PseudoClass) && (image->colors > 256))
-    SetImageType(image,TrueColorType);
+    if (SetImageType(image,TrueColorType) == MagickFail)
+      ThrowWriterException(CoderError,UnableToSetImageType,image);
 
   /*
     Compute required allocation sizes

@@ -1118,7 +1118,11 @@ static unsigned int WriteSUNImage(const ImageInfo *image_info,Image *image)
           if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Writing SUN monochrome frame %lu...",image->scene);
-          (void) SetImageType(image,BilevelType);
+          if (SetImageType(image,BilevelType) == MagickFail)
+            {
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+              ThrowWriterException(CoderError,UnableToSetImageType,image);
+            }
           polarity=PixelIntensityToQuantum(&image->colormap[0]) > (MaxRGB/2);
           if (image->colors == 2)
             polarity=PixelIntensityToQuantum(&image->colormap[0]) >

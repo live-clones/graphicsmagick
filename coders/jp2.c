@@ -1476,7 +1476,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowJP2WriterException(FileOpenError,UnableToOpenFile,image);
 
   /*
@@ -1489,7 +1489,10 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
     PGX format requires a grayscale representation
   */
   if (strcmp("PGX",image_info->magick) == 0)
-    (void) SetImageType(image,GrayscaleType);
+    {
+      if (SetImageType(image,GrayscaleType) == MagickFail)
+        ThrowWriterException(CoderError,UnableToSetImageType,image);
+    }
 
   /*
     Analyze image to be written.

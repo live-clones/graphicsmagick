@@ -288,7 +288,7 @@ static unsigned int WriteMONOImage(const ImageInfo *image_info,Image *image)
     byte,
     polarity;
 
-  unsigned int
+  MagickPassFail
     status;
 
   /*
@@ -299,14 +299,16 @@ static unsigned int WriteMONOImage(const ImageInfo *image_info,Image *image)
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   if (TransformColorspace(image,RGBColorspace) == MagickFail)
     ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Convert image to a bi-level image.
   */
-  (void) SetImageType(image,BilevelType);
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
+
   polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
   if (image->colors == 2)
     polarity=PixelIntensityToQuantum(&image->colormap[0]) <

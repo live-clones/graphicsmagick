@@ -3831,7 +3831,8 @@ void Magick::Image::type ( const Magick::ImageType type_)
 {
   modifyImage();
   options()->type( type_ );
-  SetImageType( image(), type_ );
+  if (SetImageType( image(), type_ ) == MagickFail)
+    throwImageException();
 }
 
 void Magick::Image::verbose ( const bool verboseFlag_ )

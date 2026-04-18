@@ -1232,7 +1232,8 @@ static unsigned int WriteXPMImage(const ImageInfo *image_info,Image *image)
               break;
           }
         }
-      (void) SetImageType(image,PaletteType);
+      if (SetImageType(image,PaletteType) == MagickFail)
+        ThrowWriterException(CoderError,UnableToSetImageType,image);
     }
   colors=image->colors;
   if (transparent)

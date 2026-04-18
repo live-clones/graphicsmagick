@@ -114,7 +114,14 @@ static Image *ReadTILEImage(const ImageInfo *image_info,
     Adapt tile image to desired image type.
   */
   if (image_info->type != UndefinedType)
-    (void) SetImageType(tile_image,image_info->type);
+    if (SetImageType(tile_image,image_info->type) == MagickFail)
+      {
+        CopyException(exception,&tile_image->exception);
+        ThrowException(exception,CoderError,UnableToSetImageType,
+                       tile_image->filename);
+        DestroyImage(tile_image);
+        return (Image *) NULL;
+      }
 
   /*
     Create tiled canvas image.

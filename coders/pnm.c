@@ -1660,7 +1660,9 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
     x;
 
   unsigned int
-    scene,
+    scene;
+
+  MagickPassFail
     status;
 
   size_t
@@ -1835,7 +1837,9 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
             /*
               Convert image to a PBM ASCII image.
             */
-            (void) SetImageType(image,BilevelType);
+            status &= SetImageType(image,BilevelType);
+            if ((status &= SetImageType(image,BilevelType)) == MagickFail)
+              ThrowWriterException(CoderError,UnableToSetImageType,image);
             polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
             if (image->colors == 2)
               polarity=PixelIntensityToQuantum(&image->colormap[0]) <
@@ -2129,14 +2133,15 @@ static unsigned int WritePNMImage(const ImageInfo *image_info,Image *image)
                   Make sure image is of desired type.
                 */
                 if (UndefinedType != image_info->type)
-                  SetImageType(image,image_info->type);
+                  if ((status &= SetImageType(image,image_info->type)) == MagickFail)
+                    ThrowWriterException(CoderError,UnableToSetImageType,image);
 
                 /*
                   Analyze the image to get its characteristics.
                 */
-                if (!GetImageCharacteristics(image,&characteristics,
-                                             (OptimizeType == image_info->type),
-                                             &image->exception))
+                if ((status &= GetImageCharacteristics(image,&characteristics,
+                                                       (OptimizeType == image_info->type),
+                                                       &image->exception)) == MagickFail)
                   {
                     CloseBlob(image);
                     return MagickFail;

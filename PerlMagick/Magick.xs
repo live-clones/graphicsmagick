@@ -1890,7 +1890,10 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
             if (info)
               info->image_info->type=(ImageType) sp;
             for ( ; image; image=image->next)
-              SetImageType(image,(ImageType) sp);
+              if (SetImageType(image,(ImageType) sp) == MagickFail)
+                {
+                  /* FIXME: Explicitly report error? */
+                }
             return;
           }
         MagickError(OptionError,UnrecognizedAttribute,attribute);
@@ -5611,7 +5614,10 @@ Mogrify(ref,...)
           if (attribute_flag[10])
             {
               mask_image=argument_list[10].image_reference;
-              SetImageType(composite_image,TrueColorMatteType);
+              if (SetImageType(composite_image,TrueColorMatteType) == MagickFail)
+                {
+                  /* FIXME: Explicitly report error? */
+                }
               if (!composite_image->matte)
                 SetImageOpacity(composite_image,OpaqueOpacity);
               (void) CompositeImage(composite_image,CopyOpacityCompositeOp,

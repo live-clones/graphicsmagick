@@ -169,7 +169,9 @@ MagickExport MagickPassFail  CycleColormapImage(Image *image,const int amount)
 {
   unsigned int
     is_grayscale,
-    is_monochrome,
+    is_monochrome;
+
+  MagickPassFail
     status = MagickPass;
 
   PixelIteratorOptions
@@ -180,16 +182,18 @@ MagickExport MagickPassFail  CycleColormapImage(Image *image,const int amount)
   is_grayscale=image->is_grayscale;
   is_monochrome=image->is_monochrome;
   if (image->storage_class == DirectClass)
-    (void) SetImageType(image,PaletteType);
+    status &= SetImageType(image,PaletteType);
+  if (status == MagickFail)
+    return status;
 
   InitializePixelIteratorOptions(&options,&image->exception);
 #if defined(HAVE_OPENMP) && defined(DisableSlowOpenMP)
   options.max_threads=1;
 #endif
-  status=PixelIterateMonoModify(CycleColormapCallBack,&options,
-                                CycleColormapImageText,
-                                NULL,&amount,0,0,image->columns,image->rows,
-                                image,&image->exception);
+  status &= PixelIterateMonoModify(CycleColormapCallBack,&options,
+                                   CycleColormapImageText,
+                                   NULL,&amount,0,0,image->columns,image->rows,
+                                   image,&image->exception);
   image->is_grayscale=is_grayscale;
   image->is_monochrome=is_monochrome;
   return(status);

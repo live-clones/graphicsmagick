@@ -230,7 +230,12 @@ static unsigned int WriteUILImage(const ImageInfo *image_info,Image *image)
                 }
             }
         }
-      (void) SetImageType(image,PaletteType);
+      if (SetImageType(image,PaletteType) == MagickFail)
+        {
+          if (matte_image != (unsigned char *) NULL)
+            MagickFreeResourceLimitedMemory(unsigned char *,matte_image);
+          ThrowWriterException(CoderError,UnableToSetImageType,image);
+        }
       colors=image->colors;
       if (transparent)
         {

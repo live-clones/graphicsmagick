@@ -1,3 +1,8 @@
+2026-04-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * (SetImageType): Assure that callers of SetImageType() do check
+        and report errors reported by it.
+
 2026-04-17  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/image.c (SetImageType): Return status is now contingent

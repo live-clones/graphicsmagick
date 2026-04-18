@@ -1228,7 +1228,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
 {
   MagickPassFail
-    status;
+    status = MagickPass;
 
   JxlEncoder
     *jxl_encoder = NULL;
@@ -1276,7 +1276,10 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
   */
   if ((image_info->type != UndefinedType) &&
       (image_info->type != OptimizeType))
-    (void) SetImageType(image,image_info->type);
+    {
+      if (SetImageType(image,image_info->type) == MagickFail)
+        ThrowWriterException(CoderError,UnableToSetImageType,image);
+    }
   else if (!IsCMYKColorspace(image->colorspace) &&
            (!IsRGBColorspace(image->colorspace)))
     {

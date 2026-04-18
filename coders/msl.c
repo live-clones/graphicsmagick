@@ -2831,18 +2831,21 @@ MSLStartElement(void *context,const xmlChar *name,
                         }
                       else if (LocaleCompare(keyword, "colorspace") == 0)
                         {
+                          ImageType image_type = UndefinedType;
                           if (LocaleCompare(value, "CMYK") == 0)
-                            (void) SetImageType( msl_info->image[n],
-                                                 ColorSeparationType );
+                            image_type = ColorSeparationType;
                           else if (LocaleCompare(value, "Gray") == 0)
-                            (void) SetImageType( msl_info->image[n],
-                                                 GrayscaleType );
+                            image_type = GrayscaleType;
                           else if (LocaleCompare(value, "RGB") == 0)
-                            (void) SetImageType( msl_info->image[n],
-                                                 TrueColorType );
+                            image_type = TrueColorType;
                           else
                             ThrowException(msl_info->exception,OptionError,
                                            UnrecognizedColorspace,keyword);
+
+                          if (UndefinedType != image_type)
+                            if (SetImageType( msl_info->image[n],image_type) == MagickFail)
+                              CopyException(msl_info->exception, &msl_info->image[n]->exception);
+
                           break;
                         }
                       ThrowException(msl_info->exception,OptionError,

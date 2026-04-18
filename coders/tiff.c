@@ -4405,9 +4405,15 @@ WriteGROUP4RAWImage(const ImageInfo *image_info,Image *image)
 
   huffman_image=CloneImage(image,0,0,True,&image->exception);
   if (huffman_image == (Image *) NULL)
-    return(False);
+    return(MagickFail);
 
-  (void) SetImageType(huffman_image,BilevelType);
+  if (SetImageType(huffman_image,BilevelType) == MagickFail)
+    {
+      CopyException(&image->exception,&huffman_image->exception);
+      DestroyImage(huffman_image);
+      return MagickFail;
+    }
+
   MagickFormatString(huffman_image->filename,sizeof(huffman_image->filename),"tiff:%s",temporary_filename);
   clone_info=CloneImageInfo((const ImageInfo *) NULL);
 /*   clone_info->blob=0; */
@@ -5699,7 +5705,13 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
       if ((image_info->type != UndefinedType) &&
           (image_info->type != OptimizeType))
         {
-          (void) SetImageType(image,image_info->type);
+          if (SetImageType(image,image_info->type) == MagickFail)
+            {
+              ThrowException(&image->exception,CoderError,UnableToSetImageType,
+                             image->filename);
+              status=MagickFail;
+              break;
+            }
         }
       else if (!IsCMYKColorspace(image->colorspace) &&
                (!IsRGBColorspace(image->colorspace)))
