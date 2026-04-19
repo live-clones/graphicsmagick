@@ -128,17 +128,30 @@ static unsigned int IsPS(const unsigned char *magick,const size_t length)
 %
 */
 #if defined(HasGS)
-#define ThrowReaderExceptionOnFOpFailure(Op,DoClose)                    \
+#define ThrowPsReaderExceptionOnFOpFailure(Op,DoClose)                    \
   {                                                                     \
-    if (Op)                                                             \
-      {                                                                 \
-        if ((DoClose) != 0)                                             \
+  if (Op)                                                               \
+    {                                                                   \
+      if ((DoClose) != 0)                                               \
+        {                                                               \
           (void) fclose(file);                                          \
-        (void) LiberateTemporaryFile(postscript_filename);              \
-        ThrowReaderException(CorruptImageError,                         \
-                             AnErrorHasOccurredWritingToFile,           \
-                             image);                                    \
-      }                                                                 \
+          file = (FILE *) NULL;                                         \
+        }                                                               \
+      (void) LiberateTemporaryFile(postscript_filename);                \
+      ThrowReaderException(CorruptImageError,                           \
+                           AnErrorHasOccurredWritingToFile,             \
+                           image);                                      \
+    }                                                                   \
+  }
+#define ThrowPsReaderException(code,reason,image)                   \
+  {                                                                 \
+    if (file != (FILE *) NULL)                                      \
+      {                                                             \
+        (void) fclose(file);                                        \
+        file = (FILE *) NULL;                                       \
+      }                                                             \
+    (void) LiberateTemporaryFile(postscript_filename);              \
+    ThrowReaderException(code,reason,image);                        \
   }
 
 static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
@@ -168,7 +181,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
     filesize;
 
   FILE
-    *file;
+    *file = (FILE *) NULL;
 
   Image
     *image,
@@ -268,7 +281,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
       c=ReadBlobByte(image);
       if (c == EOF)
         break;
-      ThrowReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
+      ThrowPsReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
       *p++=c;
       if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
         continue;
@@ -326,21 +339,21 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
       pixels;
 
     if (AcquireMagickResource(WidthResource,width) != MagickPass)
-      ThrowReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+      ThrowPsReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
     if (AcquireMagickResource(HeightResource,height) != MagickPass)
-      ThrowReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+      ThrowPsReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
     pixels=(magick_uint64_t)width*height;
     if ((0 == pixels) || (pixels/width != height) ||
         (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
-      ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+      ThrowPsReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   }
 
-  ThrowReaderExceptionOnFOpFailure(ferror(file),1);
-  ThrowReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
-  ThrowReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
-  ThrowReaderExceptionOnFOpFailure(ferror(file),1);
-  ThrowReaderExceptionOnFOpFailure(fclose(file),0);
-  ThrowReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
+  ThrowPsReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowPsReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
+  ThrowPsReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
+  ThrowPsReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowPsReaderExceptionOnFOpFailure(fclose(file),0);
+  ThrowPsReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
   filesize=GetBlobSize(image);
   DestroyImage(image);
   image=(Image *) NULL;

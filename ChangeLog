@@ -1,5 +1,14 @@
 2026-04-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/ps.c (ReadPSImage): Fix Coverity 503217 "RESOURCE_LEAK"
+        regarding 'file' not being closed. This issue is in new code.
+
+        * magick/fx.c (MorphImages): Fix new compilation warning regarding
+        'status'.
+
+        * magick/command.c (MogrifyImage): Fix new compilation warning
+        regarding 'status'.
+
         * coders/ps.c (WritePSImage): Enforce that width and height
         dimensions, and total pixels, passed to Ghostscript are within
         the same limits as specified for GraphicsMagick.
