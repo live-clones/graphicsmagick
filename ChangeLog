@@ -1,3 +1,21 @@
+2026-04-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/ps.c (WritePSImage): Enforce that width and height
+        dimensions, and total pixels, passed to Ghostscript are within
+        the same limits as specified for GraphicsMagick.
+
+        * coders/ps3.c (WritePS3Image): Enforce that width and height
+        dimensions, and total pixels, passed to Ghostscript are within
+        the same limits as specified for GraphicsMagick.
+
+        * coders/ps2.c (WritePS2Image): Enforce that width and height
+        dimensions, and total pixels, passed to Ghostscript are within
+        the same limits as specified for GraphicsMagick.
+
+        * coders/ps.c (ReadPSImage): Enforce that width and height
+        dimensions, and total pixels, obtained from Ghostscript are within
+        the same limits as specified for GraphicsMagick.
+
 2026-04-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * (SetImageType): Assure that callers of SetImageType() do check

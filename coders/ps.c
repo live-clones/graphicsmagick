@@ -318,15 +318,22 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Page geometry: %s",geometry);
 
-#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
   /*
     Enforce dimension limits to avoid denial of service
   */
-  if (AcquireMagickResource(WidthResource,width) != MagickPass)
-    ThrowReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
-  if (AcquireMagickResource(HeightResource,height) != MagickPass)
-    ThrowReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
-#endif /* if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
+  {
+    magick_uint64_t
+      pixels;
+
+    if (AcquireMagickResource(WidthResource,width) != MagickPass)
+      ThrowReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+    if (AcquireMagickResource(HeightResource,height) != MagickPass)
+      ThrowReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+    pixels=(magick_uint64_t)width*height;
+    if ((0 == pixels) || (pixels/width != height) ||
+        (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+      ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+  }
 
   ThrowReaderExceptionOnFOpFailure(ferror(file),1);
   ThrowReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
@@ -822,15 +829,22 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
                             "Postscript Resolution: %gx%g DPI (geometry %lux%lu)",
                             x_resolution,y_resolution,geometry.width,geometry.height);
 
-#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
       /*
         Enforce maximum Postscript dimensions to avoid denial of service
       */
-      if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
-        ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
-      if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
-        ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
-#endif /* if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
+      {
+        magick_uint64_t
+          pixels;
+
+        if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
+          ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+        if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
+          ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+        pixels=(magick_uint64_t)geometry.width*geometry.height;
+        if ((0 == pixels) || (pixels/geometry.width != geometry.height) ||
+            (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+          ThrowWriterException(ResourceLimitError,ImagePixelLimitExceeded,image);
+      }
 
       if (page == 1)
         {
