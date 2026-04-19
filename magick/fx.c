@@ -969,7 +969,7 @@ MagickExport Image *MorphImages(const Image *image,
                                  morph_images,0,0,exception);
       DestroyImage(morph_image);
     }
-    if (i < (long) number_frames)
+    if ((i < (long) number_frames) || (MagickFail == status))
       break;
     /*
       Clone last frame in sequence.
@@ -987,7 +987,7 @@ MagickExport Image *MorphImages(const Image *image,
   }
   while (morph_images->previous != (Image *) NULL)
     morph_images=morph_images->previous;
-  if (next->next != (Image *) NULL)
+  if ((MagickFail == status) || (next->next != (Image *) NULL))
     {
       DestroyImageList(morph_images);
       return((Image *) NULL);
