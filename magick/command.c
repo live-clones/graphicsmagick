@@ -9204,7 +9204,7 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
     matte;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   /*
     Verify option length.
@@ -11638,6 +11638,10 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
   */
   DestroyDrawInfo(draw_info);
   DestroyImageInfo(clone_info);
+  if ((MagickFail == status) &&
+      (*image)->exception.severity == UndefinedException)
+    (void) LogMagickEvent(ExceptionEvent,GetMagickModule(),
+                          "Error status reported but no thrown exception!");
   return((*image)->exception.severity == UndefinedException);
 }
 
