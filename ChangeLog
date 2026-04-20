@@ -1,3 +1,7 @@
+2026-04-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c: Compilation fixes for older libheif.
+
 2026-04-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/ps.c (ReadPSImage): Fix Coverity 503217 "RESOURCE_LEAK"

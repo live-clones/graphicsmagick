@@ -797,7 +797,7 @@ static const char *HEIF_colorspace_to_string(const enum heif_colorspace c)
     case heif_colorspace_nonvisual:
       s = "nonvisual";
       break;
-#if LIBHEIF_HAVE_VERSION(1,21,2) /* FIXME: Should be 1,21,3 */
+#if LIBHEIF_HAVE_VERSION(1,21,3)
       /* Git commit cb6e524 added heif_colorspace_filter_array on 2/24/26 */
     case heif_colorspace_filter_array:
       s = "filter_array";
@@ -829,7 +829,7 @@ static ColorspaceType HEIF_colorspace_to_ColorspaceType(const enum heif_colorspa
     case heif_colorspace_nonvisual:
       t = UndefinedColorspace;
       break;
-#if LIBHEIF_HAVE_VERSION(1,21,2) /* FIXME: Should be 1,21,3 */
+#if LIBHEIF_HAVE_VERSION(1,21,3)
     case heif_colorspace_filter_array:
       t = UndefinedColorspace;
       break;
@@ -2034,7 +2034,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
         break;
       case heif_colorspace_nonvisual:
         /* No visual channels */
-#if LIBHEIF_HAVE_VERSION(1,21,2) /* FIXME: Should be 1,21,3 */
+#if LIBHEIF_HAVE_VERSION(1,21,3)
         /* Git commit cb6e524 added heif_colorspace_filter_array on 2/24/26 */
       case heif_colorspace_filter_array:
 #endif /* if LIBHEIF_HAVE_VERSION(1,21,3) */
@@ -2483,7 +2483,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 %      RegisterHEIFImage(void)
 %
 */
-static void GetHEIFDecoders(heif_compression_format compression_format,
+static void GetHEIFDecoders(enum heif_compression_format compression_format,
                             char *output_str,
                             const size_t sizeof_output_str)
 {
