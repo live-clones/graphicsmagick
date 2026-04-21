@@ -1,3 +1,8 @@
+2026-04-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac (PSDelegateDefault): Change native_win32_build
+        PSDelegateDefault to 'gswin64c.exe'
+
 2026-04-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c: Compilation fixes for older libheif.

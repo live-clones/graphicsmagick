@@ -33969,11 +33969,21 @@ MPEGDecodeDelegateDefault='mpeg2decode'
 MPEGEncodeDelegateDefault='mpeg2encode'
 MVDelegateDefault='mv'
 if test "$with_gs" = 'yes' ; then
-   if test "$native_win32_build" = 'yes' ; then
-      PSDelegateDefault='gswin32c'
-   else
-      PSDelegateDefault='gs'
-   fi
+  if test "$native_win32_build" = 'yes' ; then
+    # Modern Ghostcript provides gsdll64.dll/gswin64c.exe and the
+    # DLL is found via the Windows Registry.  Use of the DLL
+    # requires that GraphicsMagick build type (32/64) be the same.
+    #
+    # FIXME: MSYS2 provides its own gswin64c.exe via a package but
+    # also blocks the Windows default path which would include
+    # gswin64c.exe for a formally installed Ghostscript. If we want to
+    # build GraphicsMagick using the MSYS2 toolchain, but also use a
+    # formally installed Ghostscript DLL + fonts then something more
+    # needs to be done.
+    PSDelegateDefault='gswin64c.exe'
+  else
+    PSDelegateDefault='gs'
+  fi
 else
    PSDelegateDefault='false'
 fi
