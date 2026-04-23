@@ -1,3 +1,8 @@
+2026-04-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/tiff.c: Add support for LERC compression. Update
+        Magick++, PerlMagick, and TclMagick to be able to access it.
+
 2026-04-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * configure.ac (PSDelegateDefault): Change native_win32_build

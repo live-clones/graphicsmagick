@@ -607,6 +607,9 @@ MagickExport const char* CompressionTypeToString(const CompressionType compressi
     case WebPCompression:
       compression_string="WebP";
       break;
+    case LERCCompression:
+      compression_string="LERC";
+      break;
     }
   return compression_string;
 }
@@ -658,6 +661,8 @@ MagickExport CompressionType StringToCompressionType(const char *option)
     compression_type=ZSTDCompression;
   else if (LocaleCompare("WebP",option) == 0)
     compression_type=WebPCompression;
+  else if (LocaleCompare("LERC",option) == 0)
+    compression_type=LERCCompression;
 
   return compression_type;
 }

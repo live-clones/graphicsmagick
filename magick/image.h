@@ -253,7 +253,8 @@ typedef enum
   JBIG1Compression,             /* ISO/IEC std 11544 / ITU-T rec T.82 */
   JBIG2Compression,             /* ISO/IEC std 14492 / ITU-T rec T.88 */
   ZSTDCompression,              /* Facebook's Zstandard compression */
-  WebPCompression               /* Google's WebP compression */
+  WebPCompression,              /* Google's WebP compression */
+  LERCCompression               /* ESRI's Limited Error Raster Compression */
 } CompressionType;
 
 typedef enum

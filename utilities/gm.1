@@ -1,4 +1,4 @@
-.TH gm 1 "2026/01/16" "GraphicsMagick"
+.TH gm 1 "2026/04/23" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1764,6 +1764,50 @@ TIFF file.  This is useful in order to be able to read files which
 which otherwise fail to read due to problems with TIFF tags.  Note
 that some TIFF tags are required in order to be able to read the image
 data at all.
+
+.in 15
+.in 15
+.B "tiff:lerc-maxzerror=<value>"
+.in 20
+ \fR
+.in 20
+When LERC compression is selected (via `-compress lerc`),
+specifies the maximum allowable floating point error for lossy
+compression (e.g. 0.5). The default compression value is 0 (lossless).
+
+.in 15
+.in 15
+.B "tiff:lerc-compression={1|deflate|zip|2|zstd}"
+.in 20
+ \fR
+.in 20
+After LERC compression has taken place, an optional second
+compression pass using Deflate or Zstd compression may be performed.
+Specify a value of 1, deflate, or zip, to use Deflate compression, or
+2 or zstd, to use Zstd compression.  The argument is case-insensitive.
+
+.in 15
+.in 15
+.B "tiff:lerc-zip-quality=<value>"
+.in 20
+ \fR
+.in 20
+When LERC compression is enabled, and a second-pass compression
+using Deflate has been selected, provide a value in the range of 1 to
+12 to indicate the Deflate compression level (larger is more
+compression). The default level for Deflate compression is 6.
+
+.in 15
+.in 15
+.B "tiff:lerc-zstd-level=<value>"
+.in 20
+ \fR
+.in 20
+When LERC compression is enabled, and a second-pass compression
+using Zstd has been selected, provide a value in the range of 1 and 19
+(or 22 using a lot more memory) to indicate the Zstd compression level
+(larger is more compression). The default level for Zstd compression
+is 3.
 
 .in 15
 .in 15

@@ -1076,6 +1076,10 @@ static int wandObjCmd(
         /* These enumerations are introduced by GraphicsMagick 1.3.31 */
         , "zstd",   "webp"
 #endif /* MagickLibInterfaceNewest > 21 */
+#if MagickLibInterfaceNewest > 29
+        /* These enumerations are introduced by GraphicsMagick 1.3.47 */
+        , "lerc"
+#endif /* MagickLibInterfaceNewest > 29 */
         ,(char *) NULL
     };
     static CompressionType compressTypes[] = {
@@ -1092,6 +1096,10 @@ static int wandObjCmd(
         /* These enumerations are introduced by GraphicsMagick 1.3.31 */
         ,ZSTDCompression,         WebPCompression
 #endif /* MagickLibInterfaceNewest > 21 */
+#if MagickLibInterfaceNewest > 29
+        /* These enumerations are introduced by GraphicsMagick 1.3.47 */
+        ,LERCCompression
+#endif /* MagickLibInterfaceNewest > 29 */
 
     };
     static CONST char *disposeNames[] = {

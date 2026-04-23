@@ -326,6 +326,7 @@ namespace Magick
   using MagickLib::Group3Compression;
   using MagickLib::Group4Compression;
   using MagickLib::JPEGCompression;
+  using MagickLib::LosslessJPEGCompression;
   using MagickLib::LZWCompression;
   using MagickLib::RLECompression;
   using MagickLib::ZipCompression;
@@ -335,6 +336,7 @@ namespace Magick
   using MagickLib::JBIG2Compression;
   using MagickLib::ZSTDCompression;
   using MagickLib::WebPCompression;
+  using MagickLib::LERCCompression;
 
   using MagickLib::DisposeType;
   using MagickLib::UndefinedDispose;

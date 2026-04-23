@@ -1491,6 +1491,35 @@ that some TIFF tags are required in order to be able to read the image
 data at all.
 </dd>
 
+<dt>tiff:lerc-maxzerror=<value></dt>
+<dd>When LERC compression is selected (via `-compress lerc`),
+specifies the maximum allowable floating point error for lossy
+compression (e.g. 0.5). The default compression value is 0 (lossless).
+</dd>
+
+<dt>tiff:lerc-compression={1|deflate|zip|2|zstd}</dt>
+<dd>After LERC compression has taken place, an optional second
+compression pass using Deflate or Zstd compression may be performed.
+Specify a value of 1, deflate, or zip, to use Deflate compression, or
+2 or zstd, to use Zstd compression.  The argument is case-insensitive.
+</dd>
+
+<dt>tiff:lerc-zip-quality=<value></dt>
+<dd>When LERC compression is enabled, and a second-pass compression
+using Deflate has been selected, provide a value in the range of 1 to
+12 to indicate the Deflate compression level (larger is more
+compression). The default level for Deflate compression is 6.
+</dd>
+
+<dt>tiff:lerc-zstd-level=<value></dt>
+
+<dd>When LERC compression is enabled, and a second-pass compression
+using Zstd has been selected, provide a value in the range of 1 and 19
+(or 22 using a lot more memory) to indicate the Zstd compression level
+(larger is more compression). The default level for Zstd compression
+is 3.
+</dd>
+
 <dt>tiff:photometric={minisblack|miniswhite}</dt>
 <dd>For grayscale and bilevel images, GraphicsMagick normally chooses
 the photometric based on bit depth and compression.  If the

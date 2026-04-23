@@ -431,7 +431,8 @@ void ExtensionTagsInitialize(void)
 */
 static MagickBool
 CompressionSupported(const CompressionType compression,
-                     char *compression_name)
+                     char *compression_name,
+                     const size_t sizeof_compression_name)
 {
   uint16
     compress_tag;
@@ -441,7 +442,7 @@ CompressionSupported(const CompressionType compression,
 
   status = MagickFalse;
   compress_tag=COMPRESSION_NONE;
-  strlcpy(compression_name,"Undefined",MaxTextExtent);
+  strlcpy(compression_name,"Undefined",sizeof_compression_name);
 
   /*
     This switch statement should match all the values of CompressionType.
@@ -450,24 +451,24 @@ CompressionSupported(const CompressionType compression,
     {
     case UndefinedCompression:
       {
-        strlcpy(compression_name,"Undefined",MaxTextExtent);
+        strlcpy(compression_name,"Undefined",sizeof_compression_name);
         break;
       }
     case NoCompression:
       {
-        strlcpy(compression_name,"No",MaxTextExtent);
+        strlcpy(compression_name,"No",sizeof_compression_name);
         compress_tag=COMPRESSION_NONE;
         status=MagickTrue;
         break;
       }
     case BZipCompression:
       {
-        strlcpy(compression_name,"BZip",MaxTextExtent);
+        strlcpy(compression_name,"BZip",sizeof_compression_name);
         break;
       }
     case FaxCompression:
       {
-        strlcpy(compression_name,"Group3 FAX",MaxTextExtent);
+        strlcpy(compression_name,"Group3 FAX",sizeof_compression_name);
 #if defined(COMPRESSION_CCITTFAX3)
         compress_tag=COMPRESSION_CCITTFAX3;
         status=MagickTrue;
@@ -476,7 +477,7 @@ CompressionSupported(const CompressionType compression,
       }
     case Group4Compression:
       {
-        strlcpy(compression_name,"Group4 FAX",MaxTextExtent);
+        strlcpy(compression_name,"Group4 FAX",sizeof_compression_name);
 #if defined(COMPRESSION_CCITTFAX4)
         compress_tag=COMPRESSION_CCITTFAX4;
         status=MagickTrue;
@@ -485,7 +486,7 @@ CompressionSupported(const CompressionType compression,
       }
     case JBIG1Compression:
       {
-        strlcpy(compression_name,"JBIG",MaxTextExtent);
+        strlcpy(compression_name,"JBIG",sizeof_compression_name);
 #if defined(COMPRESSION_JBIG)
         compress_tag=COMPRESSION_JBIG;
         status=MagickTrue;
@@ -494,12 +495,12 @@ CompressionSupported(const CompressionType compression,
       }
     case JBIG2Compression:
       {
-        strlcpy(compression_name,"JBIG2",MaxTextExtent);
+        strlcpy(compression_name,"JBIG2",sizeof_compression_name);
         break;
       }
     case JPEGCompression:
       {
-        strlcpy(compression_name,"JPEG",MaxTextExtent);
+        strlcpy(compression_name,"JPEG",sizeof_compression_name);
 #if defined(COMPRESSION_JPEG)
         compress_tag=COMPRESSION_JPEG;
         status=MagickTrue;
@@ -508,17 +509,26 @@ CompressionSupported(const CompressionType compression,
       }
     case JPEG2000Compression:
       {
-        strlcpy(compression_name,"JPEG2000",MaxTextExtent);
+        strlcpy(compression_name,"JPEG2000",sizeof_compression_name);
+        break;
+      }
+    case LERCCompression:
+      {
+        strlcpy(compression_name,"LERC",sizeof_compression_name);
+#if defined(COMPRESSION_LERC)
+        compress_tag=COMPRESSION_LERC;
+        status=MagickTrue;
+#endif
         break;
       }
     case LosslessJPEGCompression:
       {
-        strlcpy(compression_name,"Lossless JPEG",MaxTextExtent);
+        strlcpy(compression_name,"Lossless JPEG",sizeof_compression_name);
         break;
       }
     case LZMACompression:
       {
-        strlcpy(compression_name,"LZMA",MaxTextExtent);
+        strlcpy(compression_name,"LZMA",sizeof_compression_name);
 #if defined(COMPRESSION_LZMA)
         compress_tag=COMPRESSION_LZMA;
         status=MagickTrue;
@@ -527,7 +537,7 @@ CompressionSupported(const CompressionType compression,
       }
     case LZWCompression:
       {
-        strlcpy(compression_name,"LZW",MaxTextExtent);
+        strlcpy(compression_name,"LZW",sizeof_compression_name);
 #if defined(COMPRESSION_LZW)
         compress_tag=COMPRESSION_LZW;
         status=MagickTrue;
@@ -536,7 +546,7 @@ CompressionSupported(const CompressionType compression,
       }
     case RLECompression:
       {
-        strlcpy(compression_name,"Macintosh RLE (Packbits)",MaxTextExtent);
+        strlcpy(compression_name,"Macintosh RLE (Packbits)",sizeof_compression_name);
 #if defined(COMPRESSION_PACKBITS)
         compress_tag=COMPRESSION_PACKBITS;
         status=MagickTrue;
@@ -545,7 +555,7 @@ CompressionSupported(const CompressionType compression,
       }
     case WebPCompression:
       {
-        strlcpy(compression_name,"WebP",MaxTextExtent);
+        strlcpy(compression_name,"WebP",sizeof_compression_name);
 #if defined(COMPRESSION_WEBP)
         compress_tag=COMPRESSION_WEBP;
         status=MagickTrue;
@@ -554,7 +564,7 @@ CompressionSupported(const CompressionType compression,
       }
     case ZipCompression:
       {
-        strlcpy(compression_name,"Adobe Deflate",MaxTextExtent);
+        strlcpy(compression_name,"Adobe Deflate",sizeof_compression_name);
 #if defined(COMPRESSION_ADOBE_DEFLATE)
         compress_tag=COMPRESSION_ADOBE_DEFLATE;
         status=MagickTrue;
@@ -563,7 +573,7 @@ CompressionSupported(const CompressionType compression,
       }
     case ZSTDCompression:
       {
-        strlcpy(compression_name,"Zstandard",MaxTextExtent);
+        strlcpy(compression_name,"Zstandard",sizeof_compression_name);
 #if defined(COMPRESSION_ZSTD)
         compress_tag=COMPRESSION_ZSTD;
         status=MagickTrue;
@@ -700,6 +710,11 @@ CompressionTagToString(unsigned int compress_tag)
 #if defined(COMPRESSION_WEBP)
     case COMPRESSION_WEBP:
       result="WebP";
+      break;
+#endif
+#if defined(COMPRESSION_LERC)
+    case COMPRESSION_LERC:
+      result="LERC";
       break;
 #endif
   }
@@ -5607,7 +5622,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
         char
           compression_name[MaxTextExtent];
 
-        if (CompressionSupported(compression,compression_name) != MagickTrue)
+        if (CompressionSupported(compression,compression_name,sizeof(compression_name)) != MagickTrue)
           {
             compression=NoCompression;
             if (logging)
@@ -5692,6 +5707,13 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
             break;
           }
 #endif /* defined(COMPRESSION_WEBP) */
+#if defined(COMPRESSION_LERC)
+        case LERCCompression:
+          {
+            compress_tag=COMPRESSION_LERC;
+            break;
+          }
+#endif /* defined(COMPRESSION_LERC) */
         default:
           {
             compress_tag=COMPRESSION_NONE;
@@ -6543,6 +6565,89 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "TIFFTAG_WEBP_LOSSLESS: %d", lossless);
                   (void) TIFFSetField(tiff,TIFFTAG_WEBP_LOSSLESS,lossless);
+                }
+            }
+            break;
+          }
+#endif /* defined(COMPRESSION_WEBP) */
+#if defined(COMPRESSION_LERC)
+        case COMPRESSION_LERC:
+          {
+            /*
+              TIFFTAG_LERC_MAXZERROR is used to define the maximum
+              allowed error (precision loss) when compressing data
+              using LERC. It specifies the maximum absolute difference
+              allowed between the original and compressed pixel
+              values.
+             */
+            {
+              const char *str_value;
+              if ((str_value=AccessDefinition(image_info,"tiff","lerc-maxzerror")) != NULL)
+                {
+                  double max_z_error;
+                  if (MagickAtoFChk(str_value,&max_z_error) != MagickFail)
+                    {
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "TIFFTAG_LERC_MAXZERROR: %f", max_z_error);
+                      (void) TIFFSetField(tiff,TIFFTAG_LERC_MAXZERROR,max_z_error);
+                    }
+                }
+            }
+
+            /*
+              TIFFTAG_LERC_ADD_COMPRESSION adds a secondary (followup)
+              compression algorithm for LERC.
+            */
+            {
+              const char *str_value;
+              if ((str_value=AccessDefinition(image_info,"tiff","lerc-compression")) != NULL)
+                {
+                  if ((LocaleCompare(str_value,"NONE") == 0) ||
+                      (LocaleCompare(str_value,"0") == 0))
+                    {
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "TIFFTAG_LERC_ADD_COMPRESSION: none");
+                      (void) TIFFSetField(tiff,TIFFTAG_LERC_ADD_COMPRESSION,LERC_ADD_COMPRESSION_NONE);
+                    }
+                  else if ((LocaleCompare(str_value,"DEFLATE") == 0) ||
+                           (LocaleCompare(str_value,"ZIP") == 0) ||
+                           (LocaleCompare(str_value,"1") == 0))
+                    {
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "TIFFTAG_LERC_ADD_COMPRESSION: deflate");
+                      (void) TIFFSetField(tiff,TIFFTAG_LERC_ADD_COMPRESSION,LERC_ADD_COMPRESSION_DEFLATE);
+                      /* TIFFTAG_ZIPQUALITY (-1 or 1-12) */
+                      if ((str_value=AccessDefinition(image_info,"tiff","lerc-zip-quality")) != NULL)
+                        {
+                          int int_value = -1;
+                          if ((MagickAtoIChk(str_value,&int_value) != MagickFail) &&
+                              ((-1 == int_value) || (int_value <= 12 && int_value >= 0)))
+                            {
+                              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                                    "TIFFTAG_ZIPQUALITY: %d", int_value);
+                              (void) TIFFSetField(tiff,TIFFTAG_ZIPQUALITY,int_value);
+                            }
+                        }
+                    }
+                  else if ((LocaleCompare(str_value,"ZSTD") == 0) ||
+                           (LocaleCompare(str_value,"2") == 0))
+                    {
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "TIFFTAG_LERC_ADD_COMPRESSION: zstd");
+                      (void) TIFFSetField(tiff,TIFFTAG_LERC_ADD_COMPRESSION,LERC_ADD_COMPRESSION_ZSTD);
+                      /* TIFFTAG_ZSTD_LEVEL (1-22) */
+                      if ((str_value=AccessDefinition(image_info,"tiff","lerc-zstd-level")) != NULL)
+                        {
+                          int int_value = -1;
+                          if ((MagickAtoIChk(str_value,&int_value) != MagickFail) &&
+                              (int_value <= 22 && int_value >= 1))
+                            {
+                              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                                    "TIFFTAG_ZSTD_LEVEL: %d", int_value);
+                              (void) TIFFSetField(tiff,TIFFTAG_ZSTD_LEVEL,int_value);
+                            }
+                        }
+                    }
                 }
             }
             break;
