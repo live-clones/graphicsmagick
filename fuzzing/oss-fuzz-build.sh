@@ -55,7 +55,9 @@ enable_jbig=true
 enable_jpeg=true
 enable_jxl=true
 enable_lcms=true
+enable_lerc=true
 enable_libde265=true
+enable_libdeflate=true
 enable_libwmf=true
 enable_libzip=true
 enable_openh264=true
@@ -406,7 +408,62 @@ then
     )
 fi
 
-# FXIME: Add libdeflate, and libdeflate build here
+# Build libdeflate
+if ($enable_libdeflate) && [ -d "${SRC}"/libdeflate ]
+then
+    printf "\n\n=== Building libdeflate...\n"
+    (
+        LIBDEFLATE_SRC="${SRC}"/libdeflate
+        LIBDEFLATE_BUILD="${BUILD}"/libdeflate
+
+        rm -rf "${LIBDEFLATE_BUILD}"
+        mkdir -p "${LIBDEFLATE_BUILD}"
+        cd "${LIBDEFLATE_BUILD}"
+
+        cmake -G "Unix Makefiles" \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_C_COMPILER="${CC}" \
+              -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+              -DCMAKE_INSTALL_PREFIX="${WORK}" \
+              -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+              -DBUILD_SHARED_LIBS=OFF \
+              -DBUILD_STATIC_LIBS=ON \
+              "${LIBDEFLATE_SRC}"
+        make clean
+        make -j"$(nproc)"
+        make install
+    )
+fi
+
+# Build Lerc
+# FIXME: Libtiff fails to find lerc_decode in -lLerc because it is missing standard C++ library symbols
+# /work/lib/pkgconfig/Lerc.pc says "-lstdc++"
+if ($enable_lerc) && [ -d "${SRC}"/lerc ]
+then
+    printf "\n\n=== Building lerc...\n"
+    (
+        LERC_SRC="${SRC}"/lerc
+        LERC_BUILD="${BUILD}"/lerc
+
+        rm -rf "${LERC_BUILD}"
+        mkdir -p "${LERC_BUILD}"
+        cd "${LERC_BUILD}"
+
+        cmake -G "Unix Makefiles" \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_CXX_COMPILER="${CXX}" \
+              -DCMAKE_CXX_FLAGS="${CXXFLAGS} -fPIC" \
+              -DCMAKE_C_COMPILER="${CC}" \
+              -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
+              -DCMAKE_INSTALL_PREFIX="${WORK}" \
+              -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+              -DBUILD_SHARED_LIBS=OFF \
+              "${LERC_SRC}"
+        make clean
+        make -j"$(nproc)"
+        make install
+    )
+fi
 
 # Build OpenJPEG
 if ($enable_openjpeg) && [ -d "${SRC}"/openjpeg ]
@@ -439,6 +496,8 @@ fi
 # Build libtiff
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static libtiff-4 --libs
 #  -L/work/lib -L/usr/local/lib -L/work/lib -ltiff -lwebp -lzstd -llzma -ljpeg -lz -lm -lwebp -lm -lsharpyuv -lm -lzstd -pthread -llzma -pthread -lpthread -ljpeg -lz
+#
+# Force LIBS=-lc++ so that test for C++ library Lerc works
 if ($enable_tiff) && [ -d "${SRC}"/libtiff ]
 then
     printf "\n\n=== Building libtiff...\n"
@@ -471,7 +530,8 @@ then
                           --disable-tests \
                           --enable-static \
                           --enable-tools \
-                          --prefix="${WORK}"
+                          --prefix="${WORK}" \
+                          LIBS=-lc++
             make -j"$(nproc)"
             make install
 
@@ -494,6 +554,12 @@ then
         fi
     )
 fi
+
+# FIXME: Build PROJ
+# Geotiff requies PROJ from https://proj4.org/ and this is not yet in Dockerfile!
+
+# FIXME: Build geotiff
+# Uses either autoconf or cmake
 
 # Build liblcms2
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static lcms2 --libs
@@ -1156,7 +1222,7 @@ then
                        --disable-shared \
                        --enable-static \
                        CPPFLAGS="-I${WORK}/include" \
-                       CFLAGS="${CFLAGS} -fPIC" \
+                       CFLAGS="${CFLAGS} -fno-inline -fPIC" \
                        LDFLAGS="${LDFLAGS:-} -L${WORK}/lib"
         make clean
         make -j"$(nproc)"

@@ -193,7 +193,7 @@ Jasper
   rm -rf ~/build/jasper
   mkdir -p ~/build/jasper
   cd ~/build/jasper
-  cmake -G "Unix Makefiles" -H"$SRC/jasper" \
+  cmake -G "Unix Makefiles" -H${HOME}/src/jasper \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_CXX_COMPILER=g++ \
               -DCMAKE_CXX_FLAGS='-O -g' \
@@ -226,6 +226,28 @@ Jasper
               -DJAS_INCLUDE_RAS_CODEC=true \
               ~/src/jasper
   make -j"$(nproc)"
+  make install
+
+Lerc
+++++
+
+Sources come from https://github.com/Esri/lerc
+
+  rm -rf ~/build/lerc
+  mkdir -p ~/build/lerc
+  cd ~/build/lerc
+  cmake -G "Unix Makefiles" \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER=g++ \
+              -DCMAKE_CXX_FLAGS='-O -g' \
+              -DCMAKE_C_COMPILER=gcc \
+              -DCMAKE_C_FLAGS='-O -g' \
+              -DCMAKE_INSTALL_RPATH='/usr/local/lib'\
+              -DCMAKE_INSTALL_PREFIX=/usr/local \
+              -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+              -DBUILD_SHARED_LIBS=on \
+              ~/src/lerc
+  make -j 8
   make install
 
 Building libheif (and dependencies) for development
