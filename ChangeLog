@@ -1,3 +1,8 @@
+2026-04-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Use -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
+        to disable building libdeflate shared library.
+
 2026-04-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Include Lerc and libdeflate in

@@ -426,8 +426,7 @@ then
               -DCMAKE_C_FLAGS="${CFLAGS} -fPIC" \
               -DCMAKE_INSTALL_PREFIX="${WORK}" \
               -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
-              -DBUILD_SHARED_LIBS=OFF \
-              -DBUILD_STATIC_LIBS=ON \
+              -DLIBDEFLATE_BUILD_SHARED_LIB=OFF \
               "${LIBDEFLATE_SRC}"
         make clean
         make -j"$(nproc)"
