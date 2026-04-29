@@ -438,6 +438,47 @@ Project is at https://github.com/aous72/OpenJPH
   cmake --build . -- -j$(nproc)
   cmake --install .
 
+PROJ
+++++
+
+PROJ is needed by Geotiff, which may eventually be used by libheif.
+
+Project page is at https://proj4.org/
+
+Sources come from https://github.com/OSGeo/PROJ.git
+
+  rm -rf ~/build/PROJ
+  mkdir -p ~/build/PROJ
+  cd ~/build/PROJ
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/PROJ
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+Geotiff
++++++++
+
+Geotiff is part of libheif's CMakePresets.json but it is not yet supported by CMakeLists.txt
+
+Sources come from https://github.com/OSGeo/libgeotiff.git
+
+  cd ~/src/libgeotiff/libgeotiff
+
+  Using the Autoconf support:
+
+  ./autogen.sh
+  rm -rf ~/build/libgeotiff
+  mkdir -p ~/build/libgeotiff
+  cd ~/build/libgeotiff
+  ~/src/libgeotiff/libgeotiff/configure --with-zip=yes --with-jpeg=/usr/local --with-libtiff=/usr/local --prefix=/usr/local CC=gcc CXX=g++ CPPFLAGS='-I/usr/local/include' CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'
+  make -j$(nproc)
+  make install
+
+  Using the cmake support
+
+  cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TIFF=on -DWITH_ZLIB=on -DWITH_JPEG=on -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/libgeotiff/libgeotiff
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
 libheif
 +++++++
 
@@ -484,6 +525,6 @@ Sources come from https://github.com/caolanm/libwmf
         --enable-shared \
         --enable-static \
         CC=gcc-13 CXX=g++-13 \
-        CPPFLAGS="-I/usr/local/include" \
+        CPPFLAGS='-I/usr/local/include' \
         CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' \
         LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'

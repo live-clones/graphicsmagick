@@ -1,5 +1,8 @@
 2026-04-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * fuzzing/README.txt: Add some notes for building PROJ and
+        libgeotiff, which may eventually be used by libheif.
+
         * coders/heif.c (ReadHEIFImage): Fully trace libheif heif_error
         code, subcode, and message.
 

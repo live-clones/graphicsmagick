@@ -554,12 +554,6 @@ then
     )
 fi
 
-# FIXME: Build PROJ
-# Geotiff requies PROJ from https://proj4.org/ and this is not yet in Dockerfile!
-
-# FIXME: Build geotiff
-# Uses either autoconf or cmake
-
 # Build liblcms2
 # PKG_CONFIG_PATH=/work/lib/pkgconfig:/usr/lib/pkgconfig pkg-config --static lcms2 --libs
 #    -L/work/lib -llcms2 -lm -lpthread
