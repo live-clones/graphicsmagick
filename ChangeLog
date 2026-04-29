@@ -1,3 +1,8 @@
+2026-04-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImage): Fully trace libheif heif_error
+        code, subcode, and message.
+
 2026-04-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Use -DLIBDEFLATE_BUILD_SHARED_LIB=OFF

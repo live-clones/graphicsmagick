@@ -1036,8 +1036,8 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_image_handle_get_preferred_decoding_colorspace() reports error \"%s\"",
-                              heif_status.message);
+                              "heif_image_handle_get_preferred_decoding_colorspace() reports error %d, suberror %d, message \"%s\"",
+                              heif_status.code, heif_status.subcode, heif_status.message);
       ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
   if (image->logging)
@@ -1192,8 +1192,8 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
           {
             if (image->logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "heif_image_handle_get_image_tiling() reports error \"%s\"",
-                                    heif_status.message);
+                                    "heif_image_handle_get_image_tiling() reports error %d, suberror %d, message \"%s\"",
+                                    heif_status.code, heif_status.subcode, heif_status.message);
             ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
           }
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1244,15 +1244,18 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
                                   heif_colorspace_decode, /* Chose preferred colorspace */
                                   heif_chroma_decode,
                                   decode_options);
+    if (heif_status.code != heif_error_Ok)
+      {
+        if (image->logging)
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "heif_decode_image() reports error %d, suberror %d, message \"%s\"",
+                                heif_status.code, heif_status.subcode, heif_status.message);
+      }
   }
   if (heif_status.code == heif_error_Memory_allocation_error)
     ThrowHEIFThrowReadImageFrameException(ResourceLimitError,MemoryAllocationFailed,image);
   if (heif_status.code != heif_error_Ok)
     {
-      if (image->logging)
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_decode_image() reports error \"%s\"",
-                              heif_status.message);
       ThrowHEIFThrowReadImageFrameException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
   if (heif_image == (struct heif_image *) NULL)
@@ -2281,8 +2284,10 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
           }
         else
           {
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Failed to read compatible HEIF brands!");
+            if (image->logging)
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "heif_list_compatible_brands() reports error %d, suberror %d, message \"%s\"",
+                                    heif_status.code, heif_status.subcode, heif_status.message);
           }
         heif_free_list_of_compatible_brands(brands);
       }
@@ -2319,8 +2324,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_context_read_from_memory_without_copy() reports error \"%s\"",
-                              heif_status.message);
+                              "heif_context_read_from_memory_without_copy() reports error %d, suberror %d, message \"%s\"",
+                              heif_status.code, heif_status.subcode, heif_status.message);
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
 
@@ -2352,8 +2357,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_context_get_primary_image_ID() reports error \"%s\"",
-                              heif_status.message);
+                              "heif_context_get_primary_image_ID() reports error %d, suberror %d, message \"%s\"",
+                              heif_status.code, heif_status.subcode, heif_status.message);
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
   if (image->logging)
@@ -2368,8 +2373,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
     {
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "heif_context_get_image_handle() reports error \"%s\"",
-                              heif_status.message);
+                              "heif_context_get_image_handle() reports error %d, suberror %d, message \"%s\"",
+                              heif_status.code, heif_status.subcode, heif_status.message);
       ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
     }
 
@@ -2426,8 +2431,8 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
             {
               if (image->logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                      "heif_context_get_image_handle() reports error \"%s\"",
-                                      heif_status.message);
+                                      "heif_context_get_image_handle() reports error %d, suberror %d, message \"%s\"",
+                                      heif_status.code, heif_status.subcode, heif_status.message);
               ThrowHEIFReaderException(CorruptImageError, AnErrorHasOccurredReadingFromFile, image);
             }
 
