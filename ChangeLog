@@ -1,3 +1,9 @@
+2026-05-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/dcm.c (DCM_RLE_ReadShort): Fix bit shift for 16-bit
+        short.  Addresses SourceForge issue #769 "Incorrect bit shift in
+        DCM_RLE_ReadShort() corrupts 16-bit DICOM RLE data".
+
 2026-04-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/README.txt: Add some notes for building PROJ and

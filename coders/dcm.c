@@ -6079,7 +6079,7 @@ static magick_uint8_t DCM_RLE_ReadByte(Image *image, DicomStream *dcm)
 
 static magick_uint16_t DCM_RLE_ReadShort(Image *image, DicomStream *dcm)
 {
-  return (((magick_uint16_t) DCM_RLE_ReadByte(image,dcm) << 4) |
+  return (((magick_uint16_t) DCM_RLE_ReadByte(image,dcm) << 8) |
           (magick_uint16_t) DCM_RLE_ReadByte(image,dcm));
 }
 
