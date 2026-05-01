@@ -3885,7 +3885,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
                      &sampling_factor_vertical);
       if (factors != 2)
         sampling_factor_vertical=sampling_factor_horizontal;
-      if ((sampling_factor_horizontal != 1) && (sampling_factor_horizontal != 2) &&
+      if ((sampling_factor_horizontal != 1) && (sampling_factor_horizontal != 2) ||
           (sampling_factor_vertical != 1) && (sampling_factor_vertical != 2))
         ThrowDPXWriterException(OptionError,UnsupportedSamplingFactor,
                                 image);

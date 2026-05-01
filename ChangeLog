@@ -1,5 +1,10 @@
 2026-05-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/dpx.c (WriteDPXImage): Report an error if either sampling
+        factor case fails, not only if both sampling factor cases
+        fails. Addresses SourceForge issue #771 "Division by zero in
+        WriteDPXImage due to incorrect AND/OR in sampling factor".
+
         * coders/xcf.c (ReadXCFImage): Report an error if there are no layers.
         (ReadOneLayer): Constrain outLayer->opacity to 255. Addresses
         SourceForge issue #770 "XCF coder: two unsigned integer overflows
