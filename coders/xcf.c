@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -1746,6 +1746,10 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
       first_layer = image_info->subimage;
       num_layers = number_layers;
+
+      if (number_layers == 0)
+        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+
       /* subrange==0 means read all the images */
       if( image_info->subrange > 0UL && image_info->subrange < number_layers )
         num_layers = image_info->subrange;

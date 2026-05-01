@@ -1,5 +1,10 @@
 2026-05-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/xcf.c (ReadXCFImage): Report an error if there are no layers.
+        (ReadOneLayer): Constrain outLayer->opacity to 255. Addresses
+        SourceForge issue #770 "XCF coder: two unsigned integer overflows
+        from missing input validation".
+
         * coders/dcm.c (DCM_RLE_ReadShort): Fix bit shift for 16-bit
         short.  Addresses SourceForge issue #769 "Incorrect bit shift in
         DCM_RLE_ReadShort() corrupts 16-bit DICOM RLE data".

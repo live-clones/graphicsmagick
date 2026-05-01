@@ -41,6 +41,10 @@
 <p>2026-05-01  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/xcf.c (ReadXCFImage): Report an error if there are no layers.
+(ReadOneLayer): Constrain outLayer-&gt;opacity to 255. Addresses
+SourceForge issue #770 &quot;XCF coder: two unsigned integer overflows
+from missing input validation&quot;.</p></li>
 <li><p>coders/dcm.c (DCM_RLE_ReadShort): Fix bit shift for 16-bit
 short.  Addresses SourceForge issue #769 &quot;Incorrect bit shift in
 DCM_RLE_ReadShort() corrupts 16-bit DICOM RLE data&quot;.</p></li>
