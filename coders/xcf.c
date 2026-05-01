@@ -1131,6 +1131,8 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
           break;
         case PROP_OPACITY:
           outLayer->opacity = ReadBlobMSBLong(image);
+          if (outLayer->opacity > 255)
+            outLayer->opacity = 255;
           break;
         case PROP_VISIBLE:
           outLayer->visible = ReadBlobMSBLong(image);
