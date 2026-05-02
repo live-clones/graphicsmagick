@@ -1,3 +1,9 @@
+2026-05-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/jpeg.c (ReadJPEGImage): For a depth of 12 or 16,
+        components 1, and storage_class PseudoClass, assign pixel indexes
+        directly without any scaling.
+
 2026-05-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/dpx.c (WriteDPXImage): Report an error if either sampling

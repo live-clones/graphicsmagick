@@ -1946,9 +1946,10 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
 #if defined(HAVE_JPEG16_READ_SCANLINES) && HAVE_JPEG16_READ_SCANLINES
                 case 16:
                   {
+                    image->is_grayscale=MagickTrue;
                     for (x=0; x < (long) image->columns; x++)
                     {
-                      index=(IndexPacket) ScaleQuantumToIndex((ScaleShortToQuantum(jpeg_pixels.t.j16[x])));
+                      index=(IndexPacket) jpeg_pixels.t.j16[x];
                       VerifyColormapIndex(status,image,index);
                       if (status == MagickFail)
                         break;
@@ -1961,12 +1962,10 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
 #if defined(HAVE_JPEG12_READ_SCANLINES) && HAVE_JPEG12_READ_SCANLINES
                 case 12:
                   {
-                    const unsigned int
-                      scale_short = 65535U/MAXJ12SAMPLE;
-
+                    image->is_grayscale=MagickTrue;
                     for (x=0; x < (long) image->columns; x++)
                     {
-                      index=(IndexPacket) ScaleQuantumToIndex((ScaleShortToQuantum(scale_short*((unsigned short)jpeg_pixels.t.j12[x]))));
+                      index=(IndexPacket) jpeg_pixels.t.j12[x];
                       VerifyColormapIndex(status,image,index);
                       if (status == MagickFail)
                         break;
@@ -1978,6 +1977,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
 #endif /* if defined(HAVE_JPEG12_READ_SCANLINES) && HAVE_JPEG12_READ_SCANLINES */
                 default:
                   {
+                    image->is_grayscale=MagickTrue;
                     for (x=0; x < (long) image->columns; x++)
                       {
                         index=(IndexPacket) (GETJSAMPLE(jpeg_pixels.t.j[x]));
