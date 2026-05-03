@@ -48,6 +48,7 @@ apt install autoconf-archive
 
 enable_aom=true
 enable_bzip2=true
+enable_dav1d=true
 enable_freetype=true
 enable_heif=true
 enable_jasper=true
@@ -895,6 +896,35 @@ then
         )
     fi
 
+    # Build dav1d, a fast AV1 decoder
+    if ($enable_dav1d) && [ -d "${SRC}"/dav1d ]
+    then
+        (
+            printf "\n\n=== Building dav1d...\n"
+
+            DAV1D_SRC="${SRC}"/dav1d
+            DAV1D_BUILD="${BUILD}/dav1d"
+
+            rm -rf "${DAV1D_BUILD}"
+            mkdir -p "${DAV1D_BUILD}"
+            #cd "${DAV1D_BUILD}"
+            # See https://mesonbuild.com/Commands.html
+            cd "${DAV1D_SRC}"
+            meson setup \
+                  --default-library=static \
+                  --buildtype=release \
+                  --prefix "${WORK}" \
+                  -D enable_tools=false \
+                  -D enable_tests=false \
+                  -D enable_asm=false \
+                   "${DAV1D_BUILD}"
+            # meson configure <builddir> -D<option>=<value>
+            meson compile -C "${DAV1D_BUILD}"
+            # meson test -C <builddir>
+            meson install -C "${DAV1D_BUILD}"
+        )
+    fi
+
     # Build OpenJPH
     if ($enable_openjph) && [ -d "${SRC}"/OpenJPH ]
     then
@@ -1064,7 +1094,7 @@ then
             -DENABLE_MULTITHREADING_SUPPORT=on \
             -DWITH_AOM_DECODER="$(tv_on_off $enable_aom)" \
             -DWITH_AOM_ENCODER="$(tv_on_off $enable_aom)" \
-            -DWITH_DAV1D=off \
+            -DWITH_DAV1D="$(tv_on_off $enable_dav1d)" \
             -DWITH_EXAMPLES=off \
             -DWITH_FFMPEG_DECODER=off \
             -DWITH_JPEG_DECODER="$(tv_on_off $enable_jpeg)" \

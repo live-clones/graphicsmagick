@@ -1,3 +1,8 @@
+2026-05-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Include dav1d in the oss-fuzz
+        build.
+
 2026-05-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/jpeg.c (ReadJPEGImage): For a depth of 12 or 16,
