@@ -2,6 +2,10 @@
 
         * NEWS.txt: Update the news.
 
+        * magick/describe.c (DescribeImage): Avoid a heap write overflow
+        while parsing the image directory.  This is a very old bug!  Bug
+        report and proposed solution by '007bsd'.
+
 2026-05-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh (BUILD): Include dav1d in the oss-fuzz

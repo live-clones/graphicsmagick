@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -863,10 +863,12 @@ MagickExport MagickPassFail DescribeImage(Image *image,FILE *file,
         {
           q=p;
           while ((*q != '\n') && (*q != '\0') &&
-                 ((size_t) (q-p) < sizeof(image_info->filename)))
+                 ((size_t) (q-p+1) < sizeof(image_info->filename)))
             q++;
           (void) strncpy(image_info->filename,p,q-p);
           image_info->filename[q-p]='\0';
+          if (*q == '\0')
+            break;
           p=q;
           (void) fprintf(file,"    %.1024s",image_info->filename);
           handler=SetWarningHandler((WarningHandler) NULL);

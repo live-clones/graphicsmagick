@@ -76,6 +76,9 @@ Security Fixes:
 * XCF: Report an error if there are no layers. Fix two unsigned
   integer overflow cases.
 
+* DescribeImage(): Avoid heap write overflow while parsing the image
+  directory.
+
 Bug fixes:
 
 * ColorFloodfillImage(): Disable OpenMP since it was observed to
