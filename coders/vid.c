@@ -156,8 +156,8 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (list == (char **) NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image)
-        }
+      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+    }
   list[0]=(char *) AllocateString((char *) NULL);
   (void) strlcpy(list[0],image_info->filename,MaxTextExtent);
   number_files=1;
@@ -166,8 +166,8 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if ((status == False) || (number_files == 0))
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image)
-        }
+      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+    }
   DestroyImage(image);
   image=(Image *) NULL;
   /*
@@ -227,8 +227,8 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (image == (Image *) NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image)
-        }
+      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image);
+    }
   while (image->previous != (Image *) NULL)
     image=image->previous;
   /*
@@ -242,8 +242,8 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (montage_image == (Image *) NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image)
-        }
+      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image);
+    }
   DestroyImageList(image);
   LiberateVIDLists();
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
