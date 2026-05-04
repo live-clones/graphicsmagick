@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to April 12, 2026.</p>
+<p>This file was last updated to reflect changes up to May 4, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -117,7 +117,10 @@ all targets.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
-<li><p>JNG writer: Properly handle and report the case where ImageToBlob()returns NULL.</p></li>
+<li><p>DPX: Fix subsampling validation logic which was failing due to
+incorrect logic. This avoids a divide by zero possibility.</p></li>
+<li><p>JNG writer: Properly handle and report the case where
+ImageToBlob()returns NULL.</p></li>
 <li><p>MNG writer: Enforce that MNG only supports a color palette up to 256
 colors (ImageMagick CVE-2026-28690).</p></li>
 <li><p>MagickXImageWindowCommand(): Assure that static buffer does not
@@ -138,11 +141,19 @@ not transfer tags from the main IFDs.</p></li>
 CVE-2026-25799). Given that the argument normally comes from a user
 (rather than an input file) this seems to be a minor security issue
 at most.</p></li>
+<li><p>PS, PS2, PS3: Enforce that width and height dimensions, and total
+pixels, to/from Ghostscript are within the same limits as specified
+for GraphicsMagick.  This helps avoid Ghostscript-based denial of
+service opportunities.</p></li>
+<li><p>XCF: Report an error if there are no layers. Fix two unsigned
+integer overflow cases.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
 <li><p>ColorFloodfillImage(): Disable OpenMP since it was observed to
 create corrupt images.</p></li>
+<li><p>DCM/DICOM: Fix bit shift for 16-bit short, which corrupted results
+for some images.</p></li>
 <li><p>DrawImage(): Fix memory leak which might occur under severe
 conditions.</p></li>
 <li><p>Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
@@ -156,6 +167,7 @@ by '-define jp2:rate=1.0'.</p></li>
 <li><p>JPEG: Allow writing CMYK JPEG without specifically requesting it
 (SourceForge issue #768).  This fixes a regression introduced in the
 last release.</p></li>
+<li><p>JPEG: For components == 1 (gray), fix reading PseudoClass images.</p></li>
 <li><p>ModuleAliases: Added a mapping from magick &quot;MPRI&quot; to module
 &quot;MPR&quot;. This missing mapping caused the &quot;MPRI&quot; coder to not work for
 non-module builds. As a result, the 'mogrify' &quot;hald-clut&quot;, &quot;map&quot;,
@@ -196,6 +208,8 @@ be const is now declared as such.</p></li>
 <li><p>MAT: Fix memory leaks.</p></li>
 <li><p>XPM/PICON: Verify that the expected number of pixels were
 transferred to the image.</p></li>
+<li><p>SetImageType(): Assure that callers of SetImageType() do check for
+its failure, and return appropriate status.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
@@ -220,6 +234,10 @@ libheif resource limits are now applied/available. Support reading
 multiple image frames. Support arbitrary image depths up to 16
 bits. Deduce file type by consulting libheif. Support reading HEIF
 image from an in-memory BLOB, or memory mapped file.</p></li>
+<li><p>HEIF (HEIC, AVCI, AVIF, MP4, etc.): Support both RGB interleaved and
+planar decode modes at once. Use the
+heif:interleaved-rgb-decode=yes/no define to select which mode is
+used.</p></li>
 <li><p>The 'convert' and 'mogrify' subcommands now support -remap, which is
 equivalent to -map.  This is to improve compatibility with
 ImageMagick, which changed from -map to -remap some time after the
@@ -242,6 +260,9 @@ reference-counted &quot;Image&quot; handles.</p></li>
 <li><p>WBMP: Support alternate file extensions &quot;WBM&quot; and &quot;WBP&quot;.</p></li>
 <li><p>OSS-Fuzz: The oss-fuzz build script is completely re-written and
 supports building almost all of the available library dependencies.</p></li>
+<li><p>TIFF: Added support for LERC compression in TIFF reader and writer,
+as welll as update Magick++, PerlMagick, and TclMagick to be able to
+access it.</p></li>
 </ul>
 <p>Behavior Changes:</p>
 <ul class="simple">
@@ -271,6 +292,8 @@ not been done yet.</p></li>
 <ul class="simple">
 <li><p>It is now supported to build the C code using C++.</p></li>
 <li><p>PerlMagick can be built with C++.</p></li>
+<li><p>The native Windows build using the configure script, (e.g. MinGW,
+MSYS2) now searches for 'gswin64c.exe' rather than 'gswin32c.exe'.</p></li>
 </ul>
 <p>Windows Delegate Updates/Additions:</p>
 <ul class="simple">

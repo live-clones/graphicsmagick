@@ -1,3 +1,7 @@
+2026-05-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
 2026-05-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh (BUILD): Include dav1d in the oss-fuzz
