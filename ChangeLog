@@ -1,3 +1,10 @@
+2026-05-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh (BUILD): Pass --libdir=lib to meson so
+        that its library is installed to the expected directory.  This
+        issue was causing libheif not to be included in the build, as well
+        as many bogus oss-fuzz reports about libheif issues being fixed.
+
 2026-05-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.

@@ -914,13 +914,15 @@ then
                   --default-library=static \
                   --buildtype=release \
                   --prefix "${WORK}" \
+                  --libdir=lib \
                   -D enable_tools=false \
                   -D enable_tests=false \
                   -D enable_asm=false \
                    "${DAV1D_BUILD}"
             # meson configure <builddir> -D<option>=<value>
-            meson compile -C "${DAV1D_BUILD}"
+            meson compile --verbose -C "${DAV1D_BUILD}"
             # meson test -C <builddir>
+            # Installs to /work/lib/x86_64-linux-gnu
             meson install -C "${DAV1D_BUILD}"
         )
     fi
