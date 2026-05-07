@@ -228,7 +228,7 @@ GetUserSpaceCoordinateValue(const SVGInfo *svg_info,
 
   assert(string != (const char *) NULL);
   p=(char *) string;
-  (void) MagickGetToken(p,&p,token,MaxTextExtent);
+  (void) MagickGetToken(p,&p,token,sizeof(token));
   if ((MagickAtoFChk(token,&value) == MagickFail) ||
       (((positive) && value < 0.0)))
     {
@@ -250,7 +250,7 @@ GetUserSpaceCoordinateValue(const SVGInfo *svg_info,
       beta=value-svg_info->view_box.height;
       return(sqrt(alpha*alpha+beta*beta)/sqrt(2.0)/100.0);
     }
-  (void) MagickGetToken(p,&p,token,MaxTextExtent);
+  (void) MagickGetToken(p,&p,token,sizeof(token));
   if (LocaleNCompare(token,"cm",2) == 0)
     return(72.0*svg_info->scale[0]/2.54*value);
   if (LocaleNCompare(token,"em",2) == 0)
@@ -552,27 +552,27 @@ SVGProcessTransformString(const SVGInfo *svg_info,char const *TransformString)
                 if (LocaleCompare(keyword,"matrix") == 0)
                   {
                     p=(char *) value;
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     affine.sx=MagickAtoF(token);
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     if (*token == ',')
-                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                      (void) MagickGetToken(p,&p,token,sizeof(token));
                     affine.rx=MagickAtoF(token);
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     if (*token == ',')
-                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                      (void) MagickGetToken(p,&p,token,sizeof(token));
                     affine.ry=MagickAtoF(token);
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     if (*token == ',')
-                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                      (void) MagickGetToken(p,&p,token,sizeof(token));
                     affine.sy=MagickAtoF(token);
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     if (*token == ',')
-                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                      (void) MagickGetToken(p,&p,token,sizeof(token));
                     affine.tx=MagickAtoF(token);
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     if (*token == ',')
-                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                      (void) MagickGetToken(p,&p,token,sizeof(token));
                     affine.ty=MagickAtoF(token);
                     break;
                   }
@@ -869,7 +869,7 @@ SVGStartElement(void *context,const xmlChar *name,
             {
               if (LocaleCompare(keyword,"id") == 0)
                 {
-                  (void) strlcpy(id,value,MaxTextExtent);
+                  (void) strlcpy(id,value,sizeof(id));
                   /* track elements inside <defs> that have an "id" */
                   if  ( (svg_info->defsPushCount > 0)
                     && (svg_info->idLevelInsideDefs == 0)   /* do not allow nested "id" elements for now */
@@ -1259,9 +1259,9 @@ SVGStartElement(void *context,const xmlChar *name,
                   char * pClassNames = (char * ) value;
                   do
                     {
-                      (void) MagickGetToken(pClassNames,&pClassNames,token,MaxTextExtent);
+                      (void) MagickGetToken(pClassNames,&pClassNames,token,sizeof(token));
                       if  ( *token == ',' )
-                        (void) MagickGetToken(pClassNames,&pClassNames,token,MaxTextExtent);
+                        (void) MagickGetToken(pClassNames,&pClassNames,token,sizeof(token));
                       if  ( *token != '\0' )
                         MVGPrintf(svg_info->file,"class '%s'\n",token);
                   }
@@ -1319,7 +1319,7 @@ SVGStartElement(void *context,const xmlChar *name,
                   if  ( IsTextOrTSpan )
                     {
                       char * pUnit;
-                      (void) MagickGetToken(value,&pUnit,token,MaxTextExtent);
+                      (void) MagickGetToken(value,&pUnit,token,sizeof(token));
                       if  ( *pUnit && ((LocaleNCompare(pUnit,"em",2) == 0) || (LocaleNCompare(pUnit,"ex",2) == 0)) )
                         MVGPrintf(svg_info->file,"textdx %s\n",value);  /* postpone interpretation of "em" or "ex" until we know point size */
                       else
@@ -1335,7 +1335,7 @@ SVGStartElement(void *context,const xmlChar *name,
                   if  ( IsTextOrTSpan )
                     {
                       char * pUnit;
-                      (void) MagickGetToken(value,&pUnit,token,MaxTextExtent);
+                      (void) MagickGetToken(value,&pUnit,token,sizeof(token));
                       if  ( *pUnit && ((LocaleNCompare(pUnit,"em",2) == 0) || (LocaleNCompare(pUnit,"ex",2) == 0)) )
                         MVGPrintf(svg_info->file,"textdy %s\n",value);  /* postpone interpretation of "em" or "ex" until we know point size */
                       else
@@ -1453,27 +1453,27 @@ SVGStartElement(void *context,const xmlChar *name,
                                 if (LocaleCompare(keyword,"matrix") == 0)
                                   {
                                     p=(char *) value;
-                                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                    (void) MagickGetToken(p,&p,token,sizeof(token));
                                     affine.sx=MagickAtoF(value);
-                                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                    (void) MagickGetToken(p,&p,token,sizeof(token));
                                     if (*token == ',')
-                                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                      (void) MagickGetToken(p,&p,token,sizeof(token));
                                     affine.rx=MagickAtoF(token);
-                                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                    (void) MagickGetToken(p,&p,token,sizeof(token));
                                     if (*token == ',')
-                                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                      (void) MagickGetToken(p,&p,token,sizeof(token));
                                     affine.ry=MagickAtoF(token);
-                                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                    (void) MagickGetToken(p,&p,token,sizeof(token));
                                     if (*token == ',')
-                                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                      (void) MagickGetToken(p,&p,token,sizeof(token));
                                     affine.sy=MagickAtoF(token);
-                                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                    (void) MagickGetToken(p,&p,token,sizeof(token));
                                     if (*token == ',')
-                                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                      (void) MagickGetToken(p,&p,token,sizeof(token));
                                     affine.tx=MagickAtoF(token);
-                                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                    (void) MagickGetToken(p,&p,token,sizeof(token));
                                     if (*token == ',')
-                                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                                      (void) MagickGetToken(p,&p,token,sizeof(token));
                                     affine.ty=MagickAtoF(token);
                                     break;
                                   }
@@ -1819,7 +1819,7 @@ SVGStartElement(void *context,const xmlChar *name,
                                 {
                                   /* only do this if background was specified inside <svg ... */
                                   if  ( LocaleCompare((const char *)name,"svg") == 0 )
-                                    strlcpy(svg_element_background_color,value,MaxTextExtent);
+                                    strlcpy(svg_element_background_color,value,sizeof(svg_element_background_color));
                                   break;
                                 }
                                 break;
@@ -2104,19 +2104,19 @@ SVGStartElement(void *context,const xmlChar *name,
               if (LocaleCompare(keyword,"viewBox") == 0)
                 {
                   p=(char *) value;
-                  (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                  (void) MagickGetToken(p,&p,token,sizeof(token));
                   svg_info->view_box.x=MagickAtoF(token);
-                  (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                  (void) MagickGetToken(p,&p,token,sizeof(token));
                   if (*token == ',')
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                   svg_info->view_box.y=MagickAtoF(token);
-                  (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                  (void) MagickGetToken(p,&p,token,sizeof(token));
                   if (*token == ',')
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                   svg_info->view_box.width=MagickAtoF(token);
-                  (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                  (void) MagickGetToken(p,&p,token,sizeof(token));
                   if (*token == ',')
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                   svg_info->view_box.height=MagickAtoF(token);
                   if (svg_info->view_box.width < 0.0 ||
                       svg_info->view_box.height < 0.0)
@@ -3368,7 +3368,7 @@ SVGWarning(void *context,const char *format,...)
 #if !defined(HAVE_VSNPRINTF)
   (void) vsprintf(reason,format,operands);
 #else
-  (void) vsnprintf(reason,MaxTextExtent,format,operands);
+  (void) vsnprintf(reason,sizeof(reason),format,operands);
 #endif
   ThrowException2(svg_info->exception,CoderWarning,reason,(char *) NULL);
   va_end(operands);
@@ -3405,7 +3405,7 @@ SVGError(void *context,const char *format,...)
 #if !defined(HAVE_VSNPRINTF)
   (void) vsprintf(reason,format,operands);
 #else
-  (void) vsnprintf(reason,MaxTextExtent,format,operands);
+  (void) vsnprintf(reason,sizeof(reason),format,operands);
 #endif
   ThrowException2(svg_info->exception,CoderError,reason,(char *) NULL);
   va_end(operands);
@@ -3592,7 +3592,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
       */
 
       parser->_private=(SVGInfo *) &svg_info;
-      while ((n=ReadBlob(image,MaxTextExtent-1,message)) != 0)
+      while ((n=ReadBlob(image,sizeof(message)-1,message)) != 0)
         {
           message[n]='\0';
           /* fprintf(stderr,"SVG: %s\n", message); */
@@ -3667,7 +3667,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
       image=ReadImage(clone_info,exception);
       DestroyImageInfo(clone_info);
       if (image != (Image *) NULL)
-        (void) strlcpy(image->filename,image_info->filename,MaxTextExtent);
+        (void) strlcpy(image->filename,image_info->filename,sizeof(image->filename));
     }
   /*
     Add/update image attributes
@@ -4097,7 +4097,7 @@ WriteSVGImage(const ImageInfo *image_info,Image *image)
       /*
         Interpret graphic primitive.
       */
-      MagickGetToken(q,&q,keyword,MaxTextExtent);
+      MagickGetToken(q,&q,keyword,sizeof(keyword));
       if (*keyword == '\0')
         break;
       if (*keyword == '#')
@@ -4455,9 +4455,9 @@ WriteSVGImage(const ImageInfo *image_info,Image *image)
                 if (LocaleCompare("gradient",token) == 0)
                   {
                     MagickGetToken(q,&q,token,token_max_length);
-                    (void) strlcpy(name,token,MaxTextExtent);
+                    (void) strlcpy(name,token,sizeof(token));
                     MagickGetToken(q,&q,token,token_max_length);
-                    (void) strlcpy(type,token,MaxTextExtent);
+                    (void) strlcpy(type,token,sizeof(token));
                     MagickGetToken(q,&q,token,token_max_length);
                     svg_info.segment.x1=MagickAtoF(token);
                     svg_info.element.cx=MagickAtoF(token);
@@ -4509,7 +4509,7 @@ WriteSVGImage(const ImageInfo *image_info,Image *image)
                 if (LocaleCompare("pattern",token) == 0)
                   {
                     MagickGetToken(q,&q,token,token_max_length);
-                    (void) strlcpy(name,token,MaxTextExtent);
+                    (void) strlcpy(name,token,sizeof(token));
                     MagickGetToken(q,&q,token,token_max_length);
                     svg_info.bounds.x=MagickAtoF(token);
                     MagickGetToken(q,&q,token,token_max_length);
@@ -4592,7 +4592,7 @@ WriteSVGImage(const ImageInfo *image_info,Image *image)
                   color[MaxTextExtent];
 
                 MagickGetToken(q,&q,token,token_max_length);
-                (void) strlcpy(color,token,MaxTextExtent);
+                (void) strlcpy(color,token,sizeof(color));
                 MagickGetToken(q,&q,token,token_max_length);
                 MagickFormatString(message,sizeof(message),
                                    "  <stop offset=\"%s\" stop-color=\"%s\" />\n",token,color);
@@ -4621,9 +4621,9 @@ WriteSVGImage(const ImageInfo *image_info,Image *image)
                       k;
 
                     p=q;
-                    (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                    (void) MagickGetToken(p,&p,token,sizeof(token));
                     for (k=0; IsPoint(token); k++)
-                      (void) MagickGetToken(p,&p,token,MaxTextExtent);
+                      (void) MagickGetToken(p,&p,token,sizeof(token));
                     (void) WriteBlobString(image,"stroke-dasharray:");
                     for (j=0; j < k; j++)
                       {
