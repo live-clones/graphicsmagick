@@ -1520,6 +1520,12 @@ Return HEIF (e.g. HEIC/AVIF) image without any transformations
 default value is true, but is otherwise false. When
 ignore-transformations is false, identify may be much slower.
 </dd>
+<dt>heif:interleaved-rgb-decode={true|false}</dt>
+<dd>
+Requests that libheif return pixels in interleaved representation
+rather than in a planar representation. This should have no influence
+on the decoded result, but the performance may be different.
+</dd>
 <dt>heif:preserve-colorspace={true|false}</dt>
 <dd> Return HEIF image in its original colorspace.  This allows an
 image to be returned in the original YCbCr colorspace rather than RGB.

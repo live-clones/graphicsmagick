@@ -1,4 +1,4 @@
-.TH gm 1 "2026/04/23" "GraphicsMagick"
+.TH gm 1 "2026/05/07" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1317,6 +1317,17 @@ Return HEIF (e.g. HEIC/AVIF) image without any transformations
 (e.g. rotation) applied.  In 'ping' mode (the identify default) the
 default value is true, but is otherwise false. When
 ignore-transformations is false, identify may be much slower.
+
+.in 15
+.in 15
+.B "heif:interleaved-rgb-decode={true|false}"
+.in 20
+ \fR
+.in 20
+
+Requests that libheif return pixels in interleaved representation
+rather than in a planar representation. This should have no influence
+on the decoded result, but the performance may be different.
 
 .in 15
 .in 15

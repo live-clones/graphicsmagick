@@ -1,3 +1,8 @@
+2026-05-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * doc/options.imdoc: Document -define
+        heif:interleaved-rgb-decode={true|false}.
+
 2026-05-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh (BUILD): Pass --libdir=lib to meson so
