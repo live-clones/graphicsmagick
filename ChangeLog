@@ -1,3 +1,10 @@
+2026-05-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/svg.c (ReadSVGImage): Add validations for element id
+        syntax.  Reject invalid attribute values which contain single
+        quotes so they are not passed into the MVG.  Much thanks to Guanni
+        Qu for the heads-up about this problem.
+
 2026-05-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/svg.c: Use sizeof() to evaluate and pass size of

@@ -1295,6 +1295,12 @@ text value does not convert to integer
 .
 
 MessageId       = +1
+SymbolicName    = DrawErrorInvalidElementIdentifier
+Language        = English
+invalid element identifier
+.
+
+MessageId       = +1
 SymbolicName    = DrawErrorInvalidPrimitiveArgument
 Language        = English
 invalid primitive argument
@@ -1310,6 +1316,12 @@ MessageId       = +1
 SymbolicName    = DrawErrorPrimitiveArithmeticOverflow
 Language        = English
 primitive arithmetic overflow
+.
+
+MessageId       = +1
+SymbolicName    = DrawErrorTextStringTruncation
+Language        = English
+string truncation (length exceeds limit)
 .
 
 MessageId       = +1

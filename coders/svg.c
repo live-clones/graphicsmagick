@@ -684,6 +684,80 @@ SVGProcessTransformString(const SVGInfo *svg_info,char const *TransformString)
 
 }/*SVGProcessTransformString*/
 
+/*
+  Validate that 'id' represents a valid ID in  XML 1.0 (which SVG 1.1/2 uses)
+
+  All SVG documents are written using UTF-8 encoding.
+
+  IDs are restricted to letters, digits, and a limited set of
+  punctuation marks (hyphen, underscore, period). Spaces should also
+  be avoided.
+
+  Key Rules for XML Element Names:
+
+    Starting Character: Must begin with a letter, an underscore (_),
+    or a colon (:).
+
+    Remaining Characters: Can contain letters, digits, hyphens (-),
+    underscores (_), colons (:), or periods (.).
+
+    Case-Sensitivity: XML element names are strictly
+    case-sensitive. For example, <Book> and <book> are treated as two
+    different elements.
+
+    Reserved Prefixes: Names cannot start with the letters xml, XML,
+    Xml, etc., as they are strictly reserved for XML standardization
+    purposes (e.g., xml:lang).
+
+*/
+static MagickPassFail
+SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
+{
+   MagickPassFail
+     status = MagickPass;
+
+   /* Cannot be empty */
+   if (id_size == 0)
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+   /* Must begin with a letter, an underscore (_), or a colon (:) */
+   else if (!(isalpha(id[0]) || ('_' == id[0]) || (':' == id[0])))
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+   /* Names cannot start with the letters xml, XML, Xml, etc., but some files use this! */
+   else if ((id_size >= 3) && (LocaleNCompare(id,"XML",3) == 0))
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+   /* The ' and " characters are not allowed */
+   else if (strchr(id,'\'') != NULL)
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+   else if (strchr(id,'\"') != NULL)
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+
+   if (MagickPass != status)
+     {
+       id[0]='\0';
+     }
+
+   return status;
+}
 
 static void
 SVGStartElement(void *context,const xmlChar *name,
@@ -817,6 +891,15 @@ SVGStartElement(void *context,const xmlChar *name,
       {
         keyword=(const char *) attributes[i];
         value=(const char *) attributes[i+1];
+
+        if (strchr(value,'\'') != NULL)
+          {
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Skipping keyword '%s' due to quoted value (%s)\n",
+                                  keyword, value);
+            continue;
+          }
+
         switch (*keyword)
           {
           case 'C':
@@ -869,7 +952,14 @@ SVGStartElement(void *context,const xmlChar *name,
             {
               if (LocaleCompare(keyword,"id") == 0)
                 {
-                  (void) strlcpy(id,value,sizeof(id));
+                  if (strlcpy(id,value,sizeof(id)) >= sizeof(id))
+                    {
+                      ThrowException(svg_info->exception,DrawError,
+                                     TextStringTruncation,id);
+                      break;
+                    }
+                  if (SVGValidateElementId(svg_info,id,sizeof(id)) == MagickFail)
+                    break;
                   /* track elements inside <defs> that have an "id" */
                   if  ( (svg_info->defsPushCount > 0)
                     && (svg_info->idLevelInsideDefs == 0)   /* do not allow nested "id" elements for now */
@@ -1375,22 +1465,7 @@ SVGStartElement(void *context,const xmlChar *name,
                 }
               if (LocaleCompare(keyword,"font-family") == 0)
                 {
-                  /*
-                    Deal with Adobe Illustrator 10.0 which double-quotes
-                    font-family.  Maybe we need a generalized solution for
-                    this.
-                  */
-                  int value_length;
-                  if ((value[0] == '\'') && ((value_length=(int) strlen(value)) > 2)
-                      && (value[value_length-1] == '\''))
-                    {
-                      MVGPrintf(svg_info->file,"font-family '%.*s'\n",
-                                (int)(value_length-2),value+1);
-                    }
-                  else
-                    {
-                      MVGPrintf(svg_info->file,"font-family '%s'\n",value);
-                    }
+                  MVGPrintf(svg_info->file,"font-family '%s'\n",value);
                   break;
                 }
               if (LocaleCompare(keyword,"font-stretch") == 0)
@@ -1969,8 +2044,7 @@ SVGStartElement(void *context,const xmlChar *name,
                                   }
                                 if (LocaleCompare(keyword,"stroke-linejoin") == 0)
                                   {
-                                    MVGPrintf(svg_info->file,"stroke-linejoin '%s'\n",
-                                              value);
+                                    MVGPrintf(svg_info->file,"stroke-linejoin '%s'\n",value);
                                     break;
                                   }
                                 if (LocaleCompare(keyword,"stroke-miterlimit") == 0)
@@ -2577,6 +2651,14 @@ void    ProcessStyleClassDefs (
     {/*pClassDef loop*/
 
       ElementValue * pEV;
+      if (strchr(pClassDef->pName,'\'') != NULL)
+        {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Skipping: class due to quoted pName (%s)\n",
+                                pClassDef->pName);
+          continue;
+        }
+
       MVGPrintf(svg_info->file,"push class '%s'\n",pClassDef->pName);
       /* NOTE: we allow class definitions that are empty */
       for  ( pEV = pClassDef->ElementValueHead.pNext; pEV; pEV = pEV->pNext )
@@ -2584,6 +2666,15 @@ void    ProcessStyleClassDefs (
 
           char * keyword = pEV->pKeyword;
           char * value = pEV->pValue;
+
+          if (strchr(value,'\'') != NULL)
+            {
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "Skipping keyword '%s' due to quoted value (%s)\n",
+                                    keyword, value);
+              continue;
+            }
+
           /* switch below was copied/pasted from elsewhere and modified */
           switch (*keyword)
             {/*keyword*/
@@ -2629,23 +2720,7 @@ void    ProcessStyleClassDefs (
                   }
                 if (LocaleCompare(keyword,"font-family") == 0)
                   {
-                    /*
-                      Deal with Adobe Illustrator 10.0 which double-quotes
-                      font-family.  Maybe we need a generalized solution for
-                      this.
-                    */
-                    size_t n;
-                    if  ( (value[0] == '\'') && (value[(n = (strlen(value)-1))] == '\'') )
-                      {
-                        size_t i;
-                        FILE * fp = svg_info->file;
-                        MVGPrintf(fp,"font-family '");
-                        for(i = 1; i < n; i++)
-                          fputc(value[i],fp);
-                        MVGPrintf(fp,"'\n");
-                      }
-                    else
-                      MVGPrintf(svg_info->file,"font-family '%s'\n",value);
+                    MVGPrintf(svg_info->file,"font-family '%s'\n",value);
                     break;
                   }
                 if (LocaleCompare(keyword,"font-stretch") == 0)

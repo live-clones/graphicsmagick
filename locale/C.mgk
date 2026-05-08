@@ -736,6 +736,12 @@
       <Message name="UnableToFloodFillImageDueToClipMask">
         unable to flood-fill image with clip mask
       </Message>
+      <Message name="InvalidElementIdentifier">
+        invalid element identifier
+      </Message>
+      <Message name="TextStringTruncation">
+        string truncation (length exceeds limit)
+      </Message>
     </Error>
     <FatalError>
       <Message name="Default">
