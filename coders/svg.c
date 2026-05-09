@@ -730,6 +730,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
                       InvalidElementIdentifier,id);
        status=MagickFail;
      }
+#if 0
    /* Names cannot start with the letters xml, XML, Xml, etc., but some files use this! */
    else if ((id_size >= 3) && (LocaleNCompare(id,"XML",3) == 0))
      {
@@ -737,6 +738,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
                       InvalidElementIdentifier,id);
        status=MagickFail;
      }
+#endif
    /* The ' and " characters are not allowed */
    else if (strchr(id,'\'') != NULL)
      {
@@ -890,13 +892,21 @@ SVGStartElement(void *context,const xmlChar *name,
            (attributes[i] != (const xmlChar *) NULL); i+=2)
       {
         keyword=(const char *) attributes[i];
-        value=(const char *) attributes[i+1];
+        value=(const char *) attributes[i+1]; /* value can be very long! */
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "    %.1024s: %.1024s",keyword,value);
+
+        /*
+          FIXME: Adobe Illustrator 10.0 adds extra quotes around
+          'font-family' argument.  Should we be concerned about that?
+         */
 
         if (strchr(value,'\'') != NULL)
           {
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Skipping keyword '%s' due to quoted value (%s)\n",
+                                  "Skipping attribute '%s' due to quoted value (%s)\n",
                                   keyword, value);
+            ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
             continue;
           }
 
@@ -1328,6 +1338,21 @@ SVGStartElement(void *context,const xmlChar *name,
         value=(const char *) attributes[i+1];
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "    %.1024s = %.1024s",keyword,value);
+
+        /*
+          FIXME: Adobe Illustrator 10.0 adds extra quotes around
+          'font-family' argument.  Should we be concerned about that?
+         */
+
+        if (strchr(value,'\'') != NULL)
+          {
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "Skipping attribute '%s' due to quoted value (%s)\n",
+                                  keyword, value);
+            ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
+            continue;
+          }
+
         switch (*keyword)
           {
           case 'A':
@@ -1354,7 +1379,7 @@ SVGStartElement(void *context,const xmlChar *name,
                         (void) MagickGetToken(pClassNames,&pClassNames,token,sizeof(token));
                       if  ( *token != '\0' )
                         MVGPrintf(svg_info->file,"class '%s'\n",token);
-                  }
+                    }
                   while  ( *token != '\0' );
                   break;
                 }/*"class=classname"*/
@@ -1885,6 +1910,21 @@ SVGStartElement(void *context,const xmlChar *name,
                           value=(char *) tokens[j+1];
                           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                                 "    %.1024s: %.1024s",keyword,value);
+
+                          /*
+                            FIXME: Adobe Illustrator 10.0 adds extra quotes around
+                            'font-family' argument.  Should we be concerned about that?
+                          */
+
+                          if (strchr(value,'\'') != NULL)
+                            {
+                              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                                    "Skipping style attribute '%s' due to quoted value (%s)\n",
+                                                    keyword, value);
+                              ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
+                              continue;
+                            }
+
                           switch (*keyword)
                             {
                             case 'B':
@@ -2651,11 +2691,19 @@ void    ProcessStyleClassDefs (
     {/*pClassDef loop*/
 
       ElementValue * pEV;
+      if (pClassDef->pName[0] == '\0')
+        {
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Skipping: class due to empty pName\n");
+          ThrowException(svg_info->exception,DrawError,InvalidClassName,pClassDef->pName);
+          continue;
+        }
       if (strchr(pClassDef->pName,'\'') != NULL)
         {
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "Skipping: class due to quoted pName (%s)\n",
                                 pClassDef->pName);
+          ThrowException(svg_info->exception,DrawError,InvalidClassName,pClassDef->pName);
           continue;
         }
 
@@ -2666,12 +2714,20 @@ void    ProcessStyleClassDefs (
 
           char * keyword = pEV->pKeyword;
           char * value = pEV->pValue;
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "    %.1024s: %.1024s",keyword,value);
+
+          /*
+            FIXME: Adobe Illustrator 10.0 adds extra quotes around
+            'font-family' argument.  Should we be concerned about that?
+          */
 
           if (strchr(value,'\'') != NULL)
             {
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Skipping keyword '%s' due to quoted value (%s)\n",
-                                    keyword, value);
+                                    "Skipping class '%s' keyword '%s' due to quoted value (%s)\n",
+                                    pClassDef->pName, keyword, value);
+              ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
               continue;
             }
 

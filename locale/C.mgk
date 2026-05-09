@@ -736,6 +736,12 @@
       <Message name="UnableToFloodFillImageDueToClipMask">
         unable to flood-fill image with clip mask
       </Message>
+      <Message name="InvalidClassName">
+        invalid class name
+      </Message>
+      <Message name="InvalidAttributeArgument">
+        invalid attribute argument
+      </Message>
       <Message name="InvalidElementIdentifier">
         invalid element identifier
       </Message>

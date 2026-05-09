@@ -1295,6 +1295,18 @@ text value does not convert to integer
 .
 
 MessageId       = +1
+SymbolicName    = DrawErrorInvalidAttributeArgument
+Language        = English
+invalid attribute argument
+.
+
+MessageId       = +1
+SymbolicName    = DrawErrorInvalidClassName
+Language        = English
+invalid class name
+.
+
+MessageId       = +1
 SymbolicName    = DrawErrorInvalidElementIdentifier
 Language        = English
 invalid element identifier
