@@ -2608,7 +2608,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
   status &= MagickAddSizeT(p_PIMgr->StoreStartingAt, Needed, &NeedAllocCount); /* + Needed */
   status &= MagickAddSizeT(NeedAllocCount, 100, &NeedAllocCount); /* +100 for headroom */
 
-  if (status != MagickPass)
+  if (status == MagickFail)
     ThrowException3(p_PIMgr->p_Exception,DrawError,ArithmeticOverflow,UnableToDrawOnImage);
 
   /* Check if we have exceeded primitive info allocation hard limit */
@@ -2760,6 +2760,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   assert(draw_info->signature == MagickSignature);
   assert(draw_info->primitive != (char *) NULL);
 
+  /*
+    gdb notes for setting a watchpoint for 'status' variable change
+    from MagickPass to MagickFail:
+
+    set $prev_val = status
+    watch status if $prev_val == 1 && status == 0 && ($prev_val = status, 1)
+  */
+
   keyword[0]='\0';
 
   if (*draw_info->primitive == '\0')
@@ -2768,7 +2776,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   /*
     Check for DrawImage recursion
   */
-  if (DrawImageRecurseIn(image) == MagickFail) /* Already throws exception */
+  if ((status &= DrawImageRecurseIn(image)) == MagickFail) /* Already throws exception */
     {
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Drawing recursion detected!");
       return MagickFail;
@@ -2776,7 +2784,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"begin draw-image");
 
-  if ((status &= SetImageType(image,TrueColorType)) != MagickPass)
+  if ((status &= SetImageType(image,TrueColorType)) == MagickFail)
     {
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
@@ -2816,8 +2824,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     {
       ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
                       UnableToDrawOnImage);
-      status=MagickFail;
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+      status=MagickFail;
       goto draw_image_done;
     }
   (void) memcpy(primitive, original_primitive, primitive_extent+1);
@@ -2831,8 +2839,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   if (graphic_context == (DrawInfo **) NULL)
     {
       ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
-      status=MagickFail;
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+      status=MagickFail;
       goto draw_image_done;
     }
 
@@ -2842,15 +2850,13 @@ DrawImage(Image *image,const DrawInfo *draw_info)
   PIMgr.StoreStartingAt = 0;
   PIMgr.p_Exception = &image->exception;
 
-  if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) != MagickPass) /* FIXME: oss-fuzz 499125828 leak */
+  if ((status &= PrimitiveInfoRealloc(&PIMgr,6553)) == MagickFail) /* FIXME: oss-fuzz 499125828 leak */
     {
-      status=MagickFail;
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
-  if (QueryColorDatabase("black",&start_color,&image->exception) != MagickPass)
+  if ((status &= QueryColorDatabase("black",&start_color,&image->exception)) == MagickFail)
     {
-      status=MagickFail;
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
       goto draw_image_done;
     }
@@ -2950,7 +2956,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     /* sx */
                     if (MagickGetToken(q,&q,token,token_max_length) < 1)
                       break;
-                    if (MagickAtoFChk(token,&affine.sx) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&affine.sx)) == MagickFail)
                       break;
                     /* rx */
                     if (MagickGetToken(q,&q,token,token_max_length) < 1)
@@ -2958,7 +2964,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (*token == ',')
                       if (MagickGetToken(q,&q,token,token_max_length) < 1)
                         break;
-                    if (MagickAtoFChk(token,&affine.rx) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&affine.rx)) == MagickFail)
                       break;
                     /* ry */
                     if (MagickGetToken(q,&q,token,token_max_length) < 1)
@@ -2966,7 +2972,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (*token == ',')
                       if (MagickGetToken(q,&q,token,token_max_length) < 1)
                         break;
-                    if (MagickAtoFChk(token,&affine.ry) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&affine.ry)) == MagickFail)
                       break;
                     /* sy */
                     if (MagickGetToken(q,&q,token,token_max_length) < 1)
@@ -2974,7 +2980,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (*token == ',')
                       if (MagickGetToken(q,&q,token,token_max_length) < 1)
                         break;
-                    if (MagickAtoFChk(token,&affine.sy) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&affine.sy)) == MagickFail)
                       break;
                     /* tx */
                     if (MagickGetToken(q,&q,token,token_max_length) < 1)
@@ -2982,7 +2988,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (*token == ',')
                       if (MagickGetToken(q,&q,token,token_max_length) < 1)
                         break;
-                    if (MagickAtoFChk(token,&affine.tx) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&affine.tx)) == MagickFail)
                       break;
                     /* ty */
                     if (MagickGetToken(q,&q,token,token_max_length) < 1)
@@ -2990,12 +2996,13 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (*token == ',')
                       if (MagickGetToken(q,&q,token,token_max_length) < 1)
                         break;
-                    if (MagickAtoFChk(token,&affine.ty) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&affine.ty)) == MagickFail)
                       break;
                     affine_args_good=MagickTrue;
                   } while (0);
                 if (affine_args_good != MagickTrue)
                   {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     status=MagickFail;
                   }
                 break;
@@ -3016,6 +3023,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 primitive_type=BezierPrimitive;
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3037,13 +3045,20 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     status=MagickFail;
                     break;
                   }
-                (void) CloneString(&graphic_context[n]->extra->clip_path,token);
-                if (DrawClipPath(image,graphic_context[n],
-                                 graphic_context[n]->extra->clip_path) == MagickFail)
-                  status=MagickFail;
+                if ((status &= CloneString(&graphic_context[n]->extra->clip_path,token)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
+                if ((status &= DrawClipPath(image,graphic_context[n],
+                                            graphic_context[n]->extra->clip_path)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 break;
               }
             if (LocaleCompare("clip-rule",keyword) == 0)
@@ -3059,6 +3074,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     graphic_context[n]->fill_rule=NonZeroRule;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -3085,6 +3101,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     affine.ty=draw_info->bounds.y1;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -3098,6 +3115,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 primitive_type=ColorPrimitive;
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3127,6 +3145,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     graphic_context[n]->decorate=LineThroughDecoration;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -3149,9 +3168,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   MagickGetToken() now returns 0 and an empty token.
                 */
                 MagickGetToken(q,&q,token,token_max_length);
-                (void) CloneString(&graphic_context[n]->encoding,token);
+                if ((status &= CloneString(&graphic_context[n]->encoding,token)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3166,10 +3190,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 MagickFormatString(pattern,sizeof(pattern),"[MVG:%.1024s]",token);
                 if (GetImageAttribute(image,pattern) != (ImageAttribute *) NULL)
                   {
-                    if (DrawPatternPath(image,draw_info,token,
-                                        &graphic_context[n]->fill_pattern) != MagickPass)
+                    if ((status &= DrawPatternPath(image,draw_info,token,
+                                                   &graphic_context[n]->fill_pattern)) == MagickFail) /* Fails for MasterBathroom7.svg */
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                   }
@@ -3178,9 +3202,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
                     /* when setting new fill color, try to preserve fill-opacity */
                     Quantum FillOpacityOld = graphic_context[n]->fill.opacity;
-                    if (QueryColorDatabase(token,&graphic_context[n]->fill,&image->exception) != MagickPass)
+                    if ((status &= QueryColorDatabase(token,&graphic_context[n]->fill,&image->exception)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     if (graphic_context[n]->fill.opacity != TransparentOpacity)
@@ -3192,7 +3216,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                           {
                             Quantum FillOpacity = FillOpacityPending ?
                               MaxRGB - (Quantum) (MaxRGBDouble * FillOpacitySaved + 0.5) : graphic_context[n]->fill.opacity;
-                            graphic_context[n]->fill.opacity = MaxRGB - (Quantum)((double)(MaxRGB - FillOpacity) * (double)(MaxRGB - graphic_context[n]->opacity) / MaxRGBDouble + 0.5);
+                            graphic_context[n]->fill.opacity =
+                              MaxRGB - (Quantum)((double)(MaxRGB - FillOpacity) *
+                                                 (double)(MaxRGB - graphic_context[n]->opacity) / MaxRGBDouble + 0.5);
                           }
                         FillOpacityPending = MagickFalse;
 
@@ -3214,6 +3240,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     graphic_context[n]->fill_rule=NonZeroRule;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -3224,9 +3251,14 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
                   break;    /* if drawing clip path, ignore changes to fill opacity */
                 factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
-                if ((MagickAtoFChk(token,&opacity) != MagickPass) ||
-                    (opacity < 0.0))
+                if ((status &= MagickAtoFChk(token,&opacity)) == MagickFail)
                   {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
+                if (opacity < 0.0)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     status=MagickFail;
                     break;
                   }
@@ -3250,7 +3282,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("font",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                (void) CloneString(&graphic_context[n]->font,token);
+                if ((status &= CloneString(&graphic_context[n]->font,token)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 if (LocaleCompare("none",token) == 0)
                   MagickFreeMemory(graphic_context[n]->font);
                 break;
@@ -3258,16 +3293,18 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("font-family",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                (void) CloneString(&graphic_context[n]->family,token);
+                if ((status &= CloneString(&graphic_context[n]->family,token)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 break;
               }
             if (LocaleCompare("font-size",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&graphic_context[n]->pointsize)
-                    != MagickPass)
+                if ((status &= MagickAtoFChk(token,&graphic_context[n]->pointsize)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                   }
                 break;
               }
@@ -3313,6 +3350,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               {
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     status=MagickFail;
                     break;
                   }
@@ -3332,10 +3370,13 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   }
                 else if (LocaleCompare(token,"normal") == 0)
                   graphic_context[n]->weight=400;
-                else if (MagickAtoULChk(token,&graphic_context[n]->weight) != MagickPass)
-                  status=MagickFail;
+                else if ((status &= MagickAtoULChk(token,&graphic_context[n]->weight)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3354,6 +3395,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 graphic_context[n]->gravity=StringToGravityType(token);
                 if (ForgetGravity != graphic_context[n]->gravity)
                   break;
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -3369,7 +3411,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 MagickGetToken(q,&q,token,token_max_length);
                 graphic_context[n]->compose=StringToCompositeOperator(token);
                 if (UndefinedCompositeOp == graphic_context[n]->compose)
-                  status=MagickFail;
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    status=MagickFail;
+                  }
                 break;
               }
             status=MagickFail;
@@ -3383,6 +3428,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 primitive_type=LinePrimitive;
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3396,12 +3442,20 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 */
                 if (MagickGetToken(q,&q,token,token_max_length) < 1)
                   {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     status=MagickFail;
                     break;
                   }
-                (void) CloneString(&graphic_context[n]->extra->composite_path,token);
-                status &= DrawCompositeMask(image,graphic_context[n],
-                                            graphic_context[n]->extra->composite_path);
+                if ((status &= CloneString(&graphic_context[n]->extra->composite_path,token)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
+                if ((status &= DrawCompositeMask(image,graphic_context[n],
+                                                 graphic_context[n]->extra->composite_path)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 break;
               }
             if (LocaleCompare("matte",keyword) == 0)
@@ -3409,6 +3463,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 primitive_type=MattePrimitive;
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3427,9 +3482,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
                   break;    /* if drawing clip path, ignore changes to group/global opacity */
                 factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
-                if (MagickAtoFChk(token,&opacity) != MagickPass)
+                if ((status &= MagickAtoFChk(token,&opacity)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     break;
                   }
                 opacity *= factor;
@@ -3473,6 +3528,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   }/*stroke color != 'none'*/
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3520,6 +3576,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (n <= 0)
                       {
                         ThrowException(&image->exception,DrawError,UnbalancedGraphicContextPushPop,token);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3545,6 +3602,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   break;
                 if (LocaleCompare("pattern",token) == 0)
                   break;
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -3557,7 +3615,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (nq != NULL)
                       q=nq;
                     else
-                      status=MagickFail;
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        status=MagickFail;
+                      }
                     break;
                   }
                 if (LocaleCompare("clip-path",token) == 0)
@@ -3569,7 +3630,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     size_t ExtractedLength;
                     char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"clip-path",image,&ExtractedLength); /* NULLED */
                     if  ( (ExtractedLength == 0) || (nq == NULL) )
-                      status=MagickFail;
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        status=MagickFail;
+                      }
                     else
                       q=nq;
                     break;
@@ -3593,36 +3657,36 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     MagickGetToken(q,&q,token,token_max_length);
                     (void) strlcpy(type,token,MaxTextExtent);
                     MagickGetToken(q,&q,token,token_max_length);
-                    if (MagickAtoFChk(token,&segment.x1) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&segment.x1)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     MagickGetToken(q,&q,token,token_max_length);
 
                     if (*token == ',')
                       MagickGetToken(q,&q,token,token_max_length);
-                    if (MagickAtoFChk(token,&segment.y1) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&segment.y1)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     MagickGetToken(q,&q,token,token_max_length);
 
                     if (*token == ',')
                       MagickGetToken(q,&q,token,token_max_length);
-                    if (MagickAtoFChk(token,&segment.x2) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&segment.x2)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     MagickGetToken(q,&q,token,token_max_length);
 
                     if (*token == ',')
                       MagickGetToken(q,&q,token,token_max_length);
-                    if (MagickAtoFChk(token,&segment.y2) != MagickPass)
+                    if ((status &= MagickAtoFChk(token,&segment.y2)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     if (LocaleCompare(type,"radial") == 0)
@@ -3643,6 +3707,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                       }
                     if ((q == NULL) || (p == NULL) || (q-4 < p))
                       {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3665,7 +3730,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     */
                     gradient_width=Max(AbsoluteValue(bounds.x2-bounds.x1+1),1);
                     gradient_height=Max(AbsoluteValue(bounds.y2-bounds.y1+1),1);
-                    if (AcquireMagickResource(WidthResource,gradient_width) != MagickPass)
+                    if ((status &= AcquireMagickResource(WidthResource,gradient_width)) == MagickFail)
                       {
                         char resource_str[MaxTextExtent];
                         const magick_int64_t width_resource_limit = GetMagickResourceLimit(WidthResource);
@@ -3673,10 +3738,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                            "%" MAGICK_INTMAX_F "d", (magick_intmax_t) width_resource_limit);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelWidthLimitExceeded,resource_str);
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
-                    if (AcquireMagickResource(HeightResource,gradient_height) != MagickPass)
+                    if ((status &= AcquireMagickResource(HeightResource,gradient_height)) == MagickFail)
                       {
                         char resource_str[MaxTextExtent];
                         const magick_int64_t hight_resource_limit = GetMagickResourceLimit(HeightResource);
@@ -3684,11 +3749,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                            "%" MAGICK_INTMAX_F "d", (magick_intmax_t) hight_resource_limit);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelHeightLimitExceeded,resource_str);
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
-                    if (AcquireMagickResource(PixelsResource,(magick_uint64_t) gradient_width*gradient_height)
-                        != MagickPass)
+                    if ((status &= AcquireMagickResource(PixelsResource,(magick_uint64_t) gradient_width*gradient_height))
+                        == MagickFail)
                       {
                         char resource_str[MaxTextExtent];
                         const magick_int64_t pixels_resource_limit = GetMagickResourceLimit(PixelsResource);
@@ -3696,7 +3761,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                            "%" MAGICK_INTMAX_F "d", (magick_intmax_t) pixels_resource_limit);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelLimitExceeded,resource_str);
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     /*
@@ -3712,6 +3777,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                            gradient_width,gradient_height);
                         ThrowException(&image->exception,DrawError,
                                        UnreasonableGradientSize,gradient_size_str);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3736,7 +3802,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                       {
                         char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"id",image,0);
                         if (nq == NULL)
-                          status=MagickFail;
+                          {
+                            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                            status=MagickFail;
+                          }
                         else
                           q=nq;
                         break;
@@ -3752,7 +3821,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     size_t ExtractedLength;
                     char *nq = ExtractTokensBetweenPushPop(q,token,token_max_length,"mask",image,&ExtractedLength);
                     if  ( (ExtractedLength == 0) || (nq == NULL) )
-                      status=MagickFail;
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        status=MagickFail;
+                      }
                     else
                       q=nq;
                     break;
@@ -3769,60 +3841,66 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     MagickGetToken(q,&q,token,token_max_length);
                     (void) strlcpy(name,token,MaxTextExtent);
                     MagickGetToken(q,&q,token,token_max_length);
-                    if (MagickAtoFChk(token,&ordinate) == MagickFail)
+                    if ((status &= MagickAtoFChk(token,&ordinate)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     dval=ceil(ordinate-0.5);
                     if ((dval < DTOLONG_MIN) || (dval > DTOLONG_MAX) ||
-                        (AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval)) != MagickPass))
+                        ((status &= AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval))) == MagickFail))
                       {
                         char resource_str[MaxTextExtent];
                         MagickFormatString(resource_str,sizeof(resource_str),"pattern x ordinate (%g)", ordinate);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelWidthLimitExceeded,resource_str);
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     bounds.x=(long) dval;
                     MagickGetToken(q,&q,token,token_max_length);
                     if (*token == ',')
                       MagickGetToken(q,&q,token,token_max_length);
-                    if (MagickAtoFChk(token,&ordinate) == MagickFail)
+                    if ((status &= MagickAtoFChk(token,&ordinate)) == MagickFail)
                       {
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     dval=ceil(ordinate-0.5);
                     if ((dval < DTOLONG_MIN) || (dval > DTOLONG_MAX) ||
-                        (AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval)) != MagickPass))
+                        ((status &= AcquireMagickResource(WidthResource,AbsoluteValue((magick_int64_t) dval))) == MagickFail))
                       {
                         char resource_str[MaxTextExtent];
                         MagickFormatString(resource_str,sizeof(resource_str),"pattern x ordinate (%g)", ordinate);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelHeightLimitExceeded,resource_str);
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     bounds.y=(long) dval;
                     MagickGetToken(q,&q,token,token_max_length);
                     if (*token == ',')
                       MagickGetToken(q,&q,token,token_max_length);
-                    if ((MagickAtoFChk(token,&ordinate) == MagickFail) ||
-                        (ordinate < 0.0))
+                    if ((status &= MagickAtoFChk(token,&ordinate)) == MagickFail)
                       {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        break;
+                      }
+                    if (ordinate < 0.0)
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
                     dval=floor(ordinate+0.5);
                     if ((dval > DTOLONG_MAX) ||
-                        (AcquireMagickResource(WidthResource,(magick_int64_t) dval) != MagickPass))
+                        ((status &= AcquireMagickResource(WidthResource,(magick_int64_t) dval)) == MagickFail))
                       {
                         char resource_str[MaxTextExtent];
                         MagickFormatString(resource_str,sizeof(resource_str),"pattern width (%g)", ordinate);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelWidthLimitExceeded,resource_str);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3830,33 +3908,39 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     MagickGetToken(q,&q,token,token_max_length);
                     if (*token == ',')
                       MagickGetToken(q,&q,token,token_max_length);
-                    if ((MagickAtoFChk(token,&ordinate) == MagickFail) ||
-                        (ordinate < 0.0))
+                    if ((status &= MagickAtoFChk(token,&ordinate)) == MagickFail)
                       {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        break;
+                      }
+                    if (ordinate < 0.0)
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
                     dval=floor(ordinate+0.5);
                     if ((dval > DTOLONG_MAX) ||
-                        (AcquireMagickResource(WidthResource,(magick_int64_t) dval) != MagickPass))
+                        ((status &= AcquireMagickResource(WidthResource,(magick_int64_t) dval)) == MagickFail))
                       {
                         char resource_str[MaxTextExtent];
                         MagickFormatString(resource_str,sizeof(resource_str),"pattern height (%g)", ordinate);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelHeightLimitExceeded,resource_str);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
                     bounds.height=(unsigned long) dval;
-                    if (AcquireMagickResource(PixelsResource,(magick_uint64_t) bounds.width*bounds.height)
-                        != MagickPass)
+                    if ((status &= AcquireMagickResource(PixelsResource,(magick_uint64_t) bounds.width*bounds.height))
+                        == MagickFail)
                       {
                         char resource_str[MaxTextExtent];
                         MagickFormatString(resource_str,sizeof(resource_str),
                                            "pattern dimensions %lux%lu", bounds.width,bounds.height);
                         ThrowException(&image->exception,ResourceLimitError,
                                        ImagePixelLimitExceeded,resource_str);
-                        status=MagickFail;
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         break;
                       }
                     if ((bounds.width == 0) || (bounds.height == 0))
@@ -3866,6 +3950,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                            "pattern dimensions %lux%lu", bounds.width,bounds.height);
                         ThrowException(&image->exception,DrawError,
                                        InvalidPrimitiveArgument,resource_str);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3881,6 +3966,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                       }
                     if ((q == NULL) || (p == NULL) || (q-4 < p))
                       {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3909,7 +3995,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (new_graphic_context == (DrawInfo **) NULL)
                       {
                         ThrowException3(&image->exception,ResourceLimitError,
-                                       MemoryAllocationFailed,UnableToDrawOnImage);
+                                        MemoryAllocationFailed,UnableToDrawOnImage);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         break;
                       }
@@ -3920,6 +4007,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                       {
                         ThrowException3(&image->exception,ResourceLimitError,
                                         MemoryAllocationFailed,UnableToDrawOnImage);
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        status=MagickFail;
                         break;
                       }
                     FillOpacityPending = StrokeOpacityPending = MagickFalse;
@@ -3932,9 +4021,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     graphic_context[n]->render = (defsPushCount > 0) ? 0 : 1;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3949,9 +4040,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("rotate",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&angle) != MagickPass)
+                if ((status &= MagickAtoFChk(token,&angle)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     break;
                   }
                 affine.sx=cos(DegreesToRadians(fmod(angle,360.0)));
@@ -3965,6 +4056,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 primitive_type=RoundRectanglePrimitive;
                 break;
               }
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -3974,24 +4066,26 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("scale",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&affine.sx) != MagickPass)
+                if ((status &= MagickAtoFChk(token,&affine.sx)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     break;
                   }
                 MagickGetToken(q,&q,token,token_max_length);
                 if (*token == ',')
                   MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&affine.sy) != MagickPass)
-                  status=MagickFail;
+                if ((status &= MagickAtoFChk(token,&affine.sy)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 break;
               }
             if (LocaleCompare("skewX",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&angle) != MagickPass)
+                if ((status &= MagickAtoFChk(token,&angle)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     break;
                   }
                 affine.ry=tan(DegreesToRadians(fmod(angle,360.0)));
@@ -4000,9 +4094,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("skewY",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&angle) != MagickPass)
+                if ((status &= MagickAtoFChk(token,&angle)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     break;
                   }
                 affine.rx=tan(DegreesToRadians(fmod(angle,360.0)));
@@ -4015,7 +4109,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 
                 MagickGetToken(q,&q,token,token_max_length);
                 if ((status &= QueryColorDatabase(token,&stop_color,&image->exception)) == MagickFail)
-                  break;
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 (void) GradientImage(image,&start_color,&stop_color);
                 start_color=stop_color;
                 MagickGetToken(q,&q,token,token_max_length);
@@ -4031,7 +4128,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   {
                     if ((status &= DrawPatternPath(image,draw_info,token,
                                                    &graphic_context[n]->stroke_pattern)) == MagickFail)
-                      break;
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        break;
+                      }
                   }
                 else
                   {/*stroke color, not pattern*/
@@ -4039,7 +4139,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     /* when setting new stroke color, try to preserve stroke-opacity */
                     Quantum StrokeOpacityOld = graphic_context[n]->stroke.opacity;
                     if ((status &= QueryColorDatabase(token,&graphic_context[n]->stroke,&image->exception)) == MagickFail)
-                      break;
+                      {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                        break;
+                      }
                     if (graphic_context[n]->stroke.opacity != TransparentOpacity)
                       {/*stroke color != 'none'*/
 
@@ -4060,10 +4163,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("stroke-antialias",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoUIChk(token,&graphic_context[n]->stroke_antialias)
-                    != MagickPass)
+                if ((status &= MagickAtoUIChk(token,&graphic_context[n]->stroke_antialias)) == MagickFail)
                   {
-                    status=MagickFail;
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                   }
                 break;
               }
@@ -4089,6 +4191,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                       MagickAllocateClearedArray(double *,((size_t) 2*x+2),sizeof(double));
                     if (graphic_context[n]->dash_pattern == (double *) NULL)
                       {
+                        (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                         status=MagickFail;
                         ThrowException3(&image->exception,ResourceLimitError,
                                         MemoryAllocationFailed,UnableToDrawOnImage);
@@ -4099,10 +4202,15 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                         MagickGetToken(q,&q,token,token_max_length);
                         if (*token == ',')
                           MagickGetToken(q,&q,token,token_max_length);
-                        if ((MagickAtoFChk(token,&graphic_context[n]->dash_pattern[j])
-                             == MagickFail) ||
-                            (graphic_context[n]->dash_pattern[j] < 0.0))
-                          status=MagickFail;
+                        if ((status &= MagickAtoFChk(token,&graphic_context[n]->dash_pattern[j])) == MagickFail)
+                          {
+                            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                          }
+                        if (graphic_context[n]->dash_pattern[j] < 0.0)
+                          {
+                            (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                            status=MagickFail;
+                          }
                       }
                     if (status == MagickFail)
                       {
@@ -4122,9 +4230,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if (LocaleCompare("stroke-dashoffset",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&graphic_context[n]->dash_offset)
-                    == MagickFail)
-                  status=MagickFail;
+                if ((status &= MagickAtoFChk(token,&graphic_context[n]->dash_offset)) == MagickFail)
+                  {
+                    (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                  }
                 break;
               }
             if (LocaleCompare("stroke-linecap",keyword) == 0)
@@ -4145,6 +4254,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     graphic_context[n]->linecap=SquareCap;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4166,15 +4276,23 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     graphic_context[n]->linejoin=RoundJoin;
                     break;
                   }
+                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
             if (LocaleCompare("stroke-miterlimit",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                if ((MagickAtoULChk(token,&graphic_context[n]->miterlimit)
-                     != MagickPass) || (graphic_context[n]->miterlimit < 1))
-                  status=MagickFail;
+                if ((status &= MagickAtoULChk(token,&graphic_context[n]->miterlimit)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
+                if (graphic_context[n]->miterlimit < 1)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    status=MagickFail;
+                  }
                 break;
               }
             if (LocaleCompare("stroke-opacity",keyword) == 0)
@@ -4184,9 +4302,15 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
                   break;    /* if drawing clip path, ignore changes to stroke opacity */
                 factor=strchr(token,'%') != (char *) NULL ? 0.01 : 1.0;
-                if ((MagickAtoFChk(token,&opacity) != MagickPass) ||
-                    opacity < 0.0)
+                if ((status &= MagickAtoFChk(token,&opacity)) == MagickFail)
                   {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    status=MagickFail;
+                    break;
+                  }
+                if (opacity < 0.0)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     status=MagickFail;
                     break;
                   }
@@ -4212,10 +4336,16 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 MagickGetToken(q,&q,token,token_max_length);
                 if  ( IsDrawInfoSVGCompliantClippingPath(graphic_context[n]) )
                   break;    /* if drawing clip path, ignore changes to stroke width */
-                if ((MagickAtoFChk(token,&graphic_context[n]->stroke_width)
-                     == MagickFail) ||
-                    (graphic_context[n]->stroke_width < 0.0))
-                  status=MagickFail;
+                if ((status &= MagickAtoFChk(token,&graphic_context[n]->stroke_width)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
+                if (graphic_context[n]->stroke_width < 0.0)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    status=MagickFail;
+                  }
                 break;
               }
             if (LocaleCompare("svg-compliant",keyword) == 0)
@@ -4223,14 +4353,15 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 /* mark the DrawInfo as being drawn SVG compliant or not */
                 unsigned int SVGCompliant;
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoUIChk(token,&SVGCompliant) != MagickPass)
+                if ((status &= MagickAtoUIChk(token,&SVGCompliant)) == MagickFail)
                   {
-                    status=MagickFail;
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                   }
                 else
                   SetDrawInfoSVGCompliant(graphic_context[n],SVGCompliant?MagickTrue:MagickFalse);
                 break;
               }
+            LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -4253,9 +4384,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               {/*textdx*/
                 double value;
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&value);
-                if (status == MagickFail)
-                  break;
+                if ((status &= MagickAtoFChk(token,&value)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 /* value may be specified using "em" or "ex" units */
                 if (LocaleNCompare(q,"em",2) == 0)
                   {
@@ -4274,9 +4407,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               {/*textdy*/
                 double value;
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&value);
-                if (status == MagickFail)
-                  break;
+                if ((status &= MagickAtoFChk(token,&value)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 /* value may be specified using "em" or "ex" units */
                 if (LocaleNCompare(q,"em",2) == 0)
                   {
@@ -4312,9 +4447,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 affine.ty = yTextCurrent;
                 /* rotation angle */
                 MagickGetToken(q,&q,token,token_max_length);
-                if (MagickAtoFChk(token,&angle) != MagickPass)
+                if ((status &= MagickAtoFChk(token,&angle)) == MagickFail)
                   {
-                    status=MagickFail;
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                     break;
                   }
                 affine.sx=cos(DegreesToRadians(fmod(angle,360.0)));
@@ -4327,7 +4462,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               {
                 double value;
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&value);
+                if ((status &= MagickAtoFChk(token,&value)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 xTextCurrent = value;
                 break;
               }
@@ -4335,7 +4474,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               {
                 double value;
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&value);
+                if ((status &= MagickAtoFChk(token,&value)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 yTextCurrent = value;
                 break;
               }
@@ -4363,25 +4506,40 @@ DrawImage(Image *image,const DrawInfo *draw_info)
               }
             if (LocaleCompare("text-antialias",keyword) == 0)
               {
+                unsigned int value;
                 MagickGetToken(q,&q,token,token_max_length);
-                graphic_context[n]->text_antialias=MagickAtoI(token);
+                if ((status &= MagickAtoUIChk(token,&value)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
+                graphic_context[n]->text_antialias = value;
                 break;
               }
             if (LocaleCompare("text-undercolor",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= QueryColorDatabase(token,&graphic_context[n]->undercolor,
-                                             &image->exception);
+                if ((status &= QueryColorDatabase(token,&graphic_context[n]->undercolor,
+                                                  &image->exception)) == MagickFail)
+                  LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 break;
               }
             if (LocaleCompare("translate",keyword) == 0)
               {
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&affine.tx);
+                if ((status &= MagickAtoFChk(token,&affine.tx)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 MagickGetToken(q,&q,token,token_max_length);
                 if (*token == ',')
                   MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&affine.ty);
+                if ((status &= MagickAtoFChk(token,&affine.ty)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 break;
               }
             status=MagickFail;
@@ -4398,6 +4556,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                                    &status,MagickTrue/*UndefAttrIsError*/);
                 break;
               }
+            LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
@@ -4411,19 +4570,35 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                   viewbox_columns,
                   viewbox_rows;
                 MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&viewbox.x1);
+                if ((status &= MagickAtoFChk(token,&viewbox.x1)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 MagickGetToken(q,&q,token,token_max_length);
                 if (*token == ',')
                   MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&viewbox.y1);
+                if ((status &= MagickAtoFChk(token,&viewbox.y1)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 MagickGetToken(q,&q,token,token_max_length);
                 if (*token == ',')
                   MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&viewbox.x2);
+                if ((status &= MagickAtoFChk(token,&viewbox.x2)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 MagickGetToken(q,&q,token,token_max_length);
                 if (*token == ',')
                   MagickGetToken(q,&q,token,token_max_length);
-                status &= MagickAtoFChk(token,&viewbox.y2);
+                if ((status &= MagickAtoFChk(token,&viewbox.y2)) == MagickFail)
+                  {
+                    LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                    break;
+                  }
                 viewbox_columns=(unsigned long) (viewbox.x2-viewbox.x1+0.5);
                 viewbox_rows=(unsigned long) (viewbox.y2-viewbox.y1+0.5);
 #if 0
@@ -4439,17 +4614,22 @@ DrawImage(Image *image,const DrawInfo *draw_info)
 #endif
                 break;
               }
+            LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
         default:
           {
+            LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
             status=MagickFail;
             break;
           }
         }
       if (status == MagickFail)
-        break;
+        {
+          LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+          break;
+        }
       if ((affine.sx != 1.0) || (affine.rx != 0.0) || (affine.ry != 0.0) ||
           (affine.sy != 1.0) || (affine.tx != 0.0) || (affine.ty != 0.0))
         {
@@ -4486,15 +4666,19 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           if (!IsPoint(q))
             break;
           MagickGetToken(q,&q,token,token_max_length);
-          status &= MagickAtoFChk(token,&point.x);
-          if (status == MagickFail)
-            break;
+          if ((status &= MagickAtoFChk(token,&point.x)) == MagickFail)
+            {
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+              break;
+            }
           MagickGetToken(q,&q,token,token_max_length);
           if (*token == ',')
             MagickGetToken(q,&q,token,token_max_length);
-          status &= MagickAtoFChk(token,&point.y);
-          if (status == MagickFail)
-            break;
+          if ((status &= MagickAtoFChk(token,&point.y)) == MagickFail)
+            {
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+              break;
+            }
           MagickGetToken(q,(char **) NULL,token,token_max_length);
           if (*token == ',')
             MagickGetToken(q,&q,token,token_max_length);
@@ -4509,11 +4693,17 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           if (i < number_points)
             continue;
           /* Array is full; double the array size */
-          if ((status &= PrimitiveInfoRealloc(&PIMgr,number_points)) != MagickPass)
-            break;
+          if ((status &= PrimitiveInfoRealloc(&PIMgr,number_points)) == MagickFail)
+            {
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+              break;
+            }
         }
       if (status == MagickFail)
-        break;
+        {
+          LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+          break;
+        }
       /*
         Special handling when using textc with character rotation; see comments
         above near "textr".
@@ -4656,7 +4846,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         }
 
       if (status == MagickFail)
-        break;
+        {
+          LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+          break;
+        }
 
       if ((i+points_length) >= number_points)
         {
@@ -4665,6 +4858,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           if (new_number_points > (double) PRIMITIVE_INFO_POINTS_MAX)
             {
               /* new_number_points too big */
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
               status=MagickFail;
               ThrowException3(&image->exception,ResourceLimitError,
                               MemoryAllocationFailed,UnableToDrawOnImage);
@@ -4673,9 +4867,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           new_number_points_size_t = (size_t) new_number_points;
 
           PIMgr.StoreStartingAt = i;  /* should already be this value; just bein' sure */
-          if (PrimitiveInfoRealloc(&PIMgr,new_number_points_size_t-number_points) == MagickFail)
+          if ((status &= PrimitiveInfoRealloc(&PIMgr,new_number_points_size_t-number_points)) == MagickFail)
             {
-              status=MagickFail;
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
               break;
             }
         }
@@ -4688,9 +4882,9 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         TraceLine(), TraceRectangle(), etc.) have enough space, we make sure there are at
         least 100 elements available.
       */
-      if (PrimitiveInfoRealloc(&PIMgr,100) == MagickFail)
+      if ((status &= PrimitiveInfoRealloc(&PIMgr,100)) == MagickFail)
         {
-          status=MagickFail;
+          LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
           break;
         }
 
@@ -4708,7 +4902,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                 break;
               }
             if ((status &= TracePoint(primitive_info+j,primitive_info[j].point)) == MagickFail)
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4716,12 +4913,16 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates != 2)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
             if ((status &= TraceLine(primitive_info+j,primitive_info[j].point,
                                      primitive_info[j+1].point)) == MagickFail)
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4732,6 +4933,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if (primitive_info[j].coordinates != 2)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4740,6 +4942,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if ((primitive_info[j+1].point.x - primitive_info[j].point.x) < 0.0)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4748,13 +4951,17 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if ((primitive_info[j+1].point.y - primitive_info[j].point.y) < 0.0)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
             if ((status &= TraceRectangle(primitive_info+j,
                                           /*start*/primitive_info[j].point,
                                           /*end*/primitive_info[j+1].point)) == MagickFail)
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4765,6 +4972,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if (primitive_info[j].coordinates != 3)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4773,6 +4981,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if ((primitive_info[j+2].point.x < 0.0) || (primitive_info[j+2].point.y < 0.0))
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4781,6 +4990,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if ((primitive_info[j+1].point.x - primitive_info[j].point.x) < 0.0)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4789,6 +4999,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if ((primitive_info[j+1].point.y - primitive_info[j].point.y) < 0.0)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4797,7 +5008,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                                /*start*/primitive_info[j].point,
                                                /*end*/primitive_info[j+1].point,
                                                /*arc*/primitive_info[j+2].point)) == MagickFail)
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4811,7 +5025,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             PIMgr.StoreStartingAt=j;
             if ((status &= TraceArc(&PIMgr,primitive_info[j].point,
                                     primitive_info[j+1].point,primitive_info[j+2].point)) == MagickFail)
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4819,6 +5036,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates != 3)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4828,6 +5046,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             if ((primitive_info[j+1].point.x < 0.0) ||
                 (primitive_info[j+1].point.y < 0.0))
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4836,7 +5055,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                                         /*start*/primitive_info[j].point, /*centerX,centerY*/
                                         /*stop*/primitive_info[j+1].point, /*radiusX,radiusY*/
                                         /*degrees*/primitive_info[j+2].point)) == MagickFail) /*arcStart,arcEnd*/
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4844,13 +5066,17 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates != 2)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
             PIMgr.StoreStartingAt=j;
             if ((status &= TraceCircle(&PIMgr,primitive_info[j].point,
                                        primitive_info[j+1].point)) == MagickFail)
-              break;
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4859,6 +5085,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             /* the SVG spec does not prohibit polylines containing a single point */
             if (primitive_info[j].coordinates < 1)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4871,6 +5098,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
             */
             if (primitive_info[j].coordinates < 3)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4885,12 +5113,16 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates < 3)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
             PIMgr.StoreStartingAt=j;
-            if ((status &= TraceBezier(&PIMgr,primitive_info[j].coordinates)) != MagickPass)
-              break;
+            if ((status &= TraceBezier(&PIMgr,primitive_info[j].coordinates)) == MagickFail)
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+primitive_info[j].coordinates);
             break;
           }
@@ -4898,8 +5130,11 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             size_t number_coordinates=0;
             PIMgr.StoreStartingAt=j;
-            if ((status &= TracePath(image,&PIMgr,token, &number_coordinates)) != MagickPass)
-              break;
+            if ((status &= TracePath(image,&PIMgr,token, &number_coordinates)) == MagickFail)
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                break;
+              }
             PIMgr.StoreStartingAt=i=(long) (j+number_coordinates);
             break;
           }
@@ -4908,6 +5143,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates != 1)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4928,6 +5164,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates != 1)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4958,6 +5195,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (primitive_info[j].coordinates != 2)
               {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                 status=MagickFail;
                 break;
               }
@@ -4971,7 +5209,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         break;
       (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",(int) (q-p),p);
       if (status == MagickFail)
-        break;
+        {
+          LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+          break;
+        }
       assert(i < number_points); /* FIXME: This assertion may be hit (oss-fuzz 459618468) if +100 "headroom" not provided */
       primitive_info[i].primitive=UndefinedPrimitive;
       if (i == 0)
@@ -5004,28 +5245,35 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           if ((n != 0) && (graphic_context[n]->extra->clip_path != (char *) NULL) &&
               (LocaleCompare(graphic_context[n]->extra->clip_path,
                              graphic_context[n-1]->extra->clip_path) != 0))
-            if (DrawClipPath(image,graphic_context[n],
-                             graphic_context[n]->extra->clip_path) == MagickFail)
-              status=MagickFail;
+            if ((status &= DrawClipPath(image,graphic_context[n],
+                                        graphic_context[n]->extra->clip_path)) == MagickFail)
+              {
+                LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+              }
           if ((n != 0) && (graphic_context[n]->extra->composite_path != (char *) NULL) &&
               (LocaleCompare(graphic_context[n]->extra->composite_path,
                              graphic_context[n-1]->extra->composite_path) != 0))
             {
-              if (DrawCompositeMask(image,graphic_context[n],
-                                    graphic_context[n]->extra->composite_path) == MagickFail)
-                status=MagickFail;
+              if ((status &= DrawCompositeMask(image,graphic_context[n],
+                                               graphic_context[n]->extra->composite_path)) == MagickFail)
+                {
+                  LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                }
             }
-          if (DrawPrimitive(image,graphic_context[n],primitive_info)
-              == MagickFail)
-            status=MagickFail;
+          if ((status &= DrawPrimitive(image,graphic_context[n],primitive_info)) == MagickFail)
+            {
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+            }
         }
       if (primitive_info->text != (char *) NULL)
         MagickFreeMemory(primitive_info->text);
-      if (MagickMonitorFormatted(q-primitive,
-                                 (magick_uint64_t) primitive_extent,
-                                 &image->exception,
-                                 RenderImageText,image->filename) == MagickFail)
-        status=MagickFail;
+      if ((status &= MagickMonitorFormatted(q-primitive,
+                                            (magick_uint64_t) primitive_extent,
+                                            &image->exception,
+                                            RenderImageText,image->filename)) == MagickFail)
+        {
+          LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+        }
       if (status == MagickFail)
         break;
     }
@@ -7022,7 +7270,7 @@ TraceBezier(PrimitiveInfoMgr *p_PIMgr,
   p=primitive_info;
   for (i=0; i < control_points; i++)
   {
-    if ((status=TracePoint(p,points[i])) != MagickPass)
+    if ((status=TracePoint(p,points[i])) == MagickFail)
       goto trace_bezier_done;
     p+=p->coordinates;
   }
@@ -7187,7 +7435,7 @@ TraceLine(PrimitiveInfo *primitive_info,const PointInfo start,
 */
 #define MagickTracePathAtoF(str,value,status)                   \
   do {                                                          \
-    if (MagickAtoFChk(str,value) != MagickPass)                 \
+    if ((*(status) &= MagickAtoFChk(str,value)) == MagickFail)     \
       {                                                         \
         ThrowException(&image->exception,DrawError,FloatValueConversionError,str); \
         *(status)=MagickFail;                                        \
@@ -7197,7 +7445,7 @@ TraceLine(PrimitiveInfo *primitive_info,const PointInfo start,
 
 #define MagickTracePathAtoI(str,value,status)                \
   do {                                                       \
-    if (MagickAtoIChk(str,value) != MagickPass)              \
+    if ((*(status) &= MagickAtoIChk(str,value)) == MagickFail)  \
       {                                                      \
         ThrowException(&image->exception,DrawError,IntegerValueConversionError,str); \
         *(status)=MagickFail;                                        \
@@ -7205,9 +7453,9 @@ TraceLine(PrimitiveInfo *primitive_info,const PointInfo start,
       }                                                      \
   } while(0)
 
-#define MagickTracePathAtoUI(str,value,status)                     \
+#define MagickTracePathAtoUI(str,value,status)               \
   do {                                                       \
-    if (MagickAtoUIChk(str,value) != MagickPass)              \
+    if ((*(status) &= MagickAtoUIChk(str,value)) == MagickFail) \
       {                                                      \
         ThrowException(&image->exception,DrawError,IntegerValueConversionError,str); \
         *(status)=MagickFail;                                           \
@@ -7342,7 +7590,7 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
             goto trace_path_done;
           end.x=attribute == 'A' ? x : point.x+x;
           end.y=attribute == 'A' ? y : point.y+y;
-          if ((status &= TraceArcPath(p_PIMgr,point,end,arc,angle,large_arc,sweep)) != MagickPass)
+          if ((status &= TraceArcPath(p_PIMgr,point,end,arc,angle,large_arc,sweep)) == MagickFail)
             goto trace_path_done;
           q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
           p_PIMgr->StoreStartingAt += q->coordinates;
@@ -7387,7 +7635,7 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
             break;
           for (i=0; i < 4; i++)
             (q+i)->point=points[i];
-          if ((status &= TraceBezier(p_PIMgr,4)) != MagickPass)
+          if ((status &= TraceBezier(p_PIMgr,4)) == MagickFail)
             goto trace_path_done;
           q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
           p_PIMgr->StoreStartingAt += q->coordinates;
@@ -7416,11 +7664,11 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
           /* make sure we have at least 100 elements available */
           if ((p_PIMgr->StoreStartingAt + 100) > *p_PIMgr->p_AllocCount)
             {
-              if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) != MagickPass)
+              if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) == MagickFail)
                 goto trace_path_done; /* FIXME: How to return useful error? */
               q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
             }
-          if ((status &= TracePoint(q,point)) != MagickPass)
+          if ((status &= TracePoint(q,point)) == MagickFail)
             goto trace_path_done;
           p_PIMgr->StoreStartingAt += q->coordinates;
           q+=q->coordinates;
@@ -7455,11 +7703,11 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
           /* make sure we have at least 100 elements available */
           if ((p_PIMgr->StoreStartingAt + 100) > *p_PIMgr->p_AllocCount)
           {
-            if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) != MagickPass)
+            if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) == MagickFail)
               goto trace_path_done;
             q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
           }
-          if ((status &= TracePoint(q,point)) != MagickPass)
+          if ((status &= TracePoint(q,point)) == MagickFail)
             goto trace_path_done;
           p_PIMgr->StoreStartingAt += q->coordinates;
           q+=q->coordinates;
@@ -7506,11 +7754,11 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
           /* make sure we have at least 100 elements available */
           if ((p_PIMgr->StoreStartingAt + 100) > *p_PIMgr->p_AllocCount)
             {
-              if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) != MagickPass)
+              if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) == MagickFail)
                 goto trace_path_done; /* FIXME: How to return useful error? */
                q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
             }
-          if ((status &= TracePoint(q,point)) != MagickPass)
+          if ((status &= TracePoint(q,point)) == MagickFail)
             goto trace_path_done;
           p_PIMgr->StoreStartingAt += q->coordinates;
           q+=q->coordinates;
@@ -7557,7 +7805,7 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
           }
           for (i=0; i < 3; i++)
             (q+i)->point=points[i];
-          if ((status &= TraceBezier(p_PIMgr,3)) != MagickPass)
+          if ((status &= TraceBezier(p_PIMgr,3)) == MagickFail)
             goto trace_path_done;
           q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;
           p_PIMgr->StoreStartingAt += q->coordinates;
@@ -7615,7 +7863,7 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
             }
           for (i=0; i < 4; i++)
             (q+i)->point=points[i];
-          if ((status &= TraceBezier(p_PIMgr,4)) != MagickPass)
+          if ((status &= TraceBezier(p_PIMgr,4)) == MagickFail)
             goto trace_path_done;
           q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;
           p_PIMgr->StoreStartingAt += q->coordinates;
@@ -7672,7 +7920,7 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
             }
           for (i=0; i < 3; i++)
             (q+i)->point=points[i];
-          if ((status &= TraceBezier(p_PIMgr,3)) != MagickPass)
+          if ((status &= TraceBezier(p_PIMgr,3)) == MagickFail)
             goto trace_path_done;
           q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;
           p_PIMgr->StoreStartingAt += q->coordinates;
@@ -7705,11 +7953,11 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
           /* make sure we have at least 100 elements available */
           if ((p_PIMgr->StoreStartingAt + 100) > *p_PIMgr->p_AllocCount)
             {
-              if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) != MagickPass)
+              if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) == MagickFail)
                 goto trace_path_done;
               q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
             }
-          if ((status &= TracePoint(q,point)) != MagickPass)
+          if ((status &= TracePoint(q,point)) == MagickFail)
             goto trace_path_done;
           p_PIMgr->StoreStartingAt += q->coordinates;
           q+=q->coordinates;
@@ -7731,7 +7979,7 @@ TracePath(Image *image,PrimitiveInfoMgr *p_PIMgr,const char *path,size_t *number
         /* make sure we have at least 100 elements available */
         if ((p_PIMgr->StoreStartingAt + 100) > *p_PIMgr->p_AllocCount)
           {
-            if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) != MagickPass)
+            if ((status &= PrimitiveInfoRealloc(p_PIMgr,100)) == MagickFail)
               goto trace_path_done;
             q = *pp_PrimitiveInfo + p_PIMgr->StoreStartingAt;  /* base address might have changed */
           }

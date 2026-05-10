@@ -3795,6 +3795,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
       MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"mvg:%.1024s",filename);
       if (clone_info->density != (char *) NULL)
         MagickFreeMemory(clone_info->density);
+      /* ReadImage() -> ReadMVGImage() -> DrawImage() */
       image=ReadImage(clone_info,exception);
       DestroyImageInfo(clone_info);
       if (image != (Image *) NULL)
