@@ -2306,6 +2306,15 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
       }
     } /* if (image->logging) */
 
+#if LIBHEIF_HAVE_VERSION(1,15,0)
+  /* Specify the maximum number of tile decoding threads used by libheif (default 4). */
+  {
+    uint32_t decoding_threads = 4;
+    MagickAttributeToU32(image_info,"heif","tile-threads",decoding_threads);
+    heif_context_set_max_decoding_threads(heif,decoding_threads);
+  }
+#endif /* LIBHEIF_HAVE_VERSION(1,15,0) */
+
   /*
     Allow the user to enable transformations (e.g. the image might be rotated).
   */

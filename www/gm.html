@@ -1530,6 +1530,14 @@ on the decoded result, but the performance may be different.
 <dd> Return HEIF image in its original colorspace.  This allows an
 image to be returned in the original YCbCr colorspace rather than RGB.
 </dd>
+<dt>heif:tile-threads=number</dt>
+<dd>
+If a HEIF image is comprised of multiple tiles, each tile may be
+decoded by one thread, and several tiles may be decoded at once by
+using more threads.  The maximum reasonable value is the minimum of
+the number of CPU cores available, or the number of tiles in the HEIF
+file, whichever is smaller.  The default is 4.
+</dd>
 <dt>heif:max-image-size-pixels=number</dt>
 <dd>
 An image may be comprised of many pixels. If there are a huge number of
