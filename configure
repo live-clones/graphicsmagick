@@ -32098,6 +32098,12 @@ then :
   printf "%s\n" "#define HAVE_TIFFSWABARRAYOFTRIPLES 1" >>confdefs.h
 
 fi
+ac_fn_c_check_func "$LINENO" "TIFFOpenOptionsSetMaxCumulatedMemAlloc" "ac_cv_func_TIFFOpenOptionsSetMaxCumulatedMemAlloc"
+if test "x$ac_cv_func_TIFFOpenOptionsSetMaxCumulatedMemAlloc" = xyes
+then :
+  printf "%s\n" "#define HAVE_TIFFOPENOPTIONSSETMAXCUMULATEDMEMALLOC 1" >>confdefs.h
+
+fi
 
         fi
     else

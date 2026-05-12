@@ -2914,7 +2914,8 @@ if test "$with_tiff" != 'no' ; then
                             TIFFSetErrorHandlerExt \
                             TIFFSetTagExtender \
                             TIFFSetWarningHandlerExt \
-                            TIFFSwabArrayOfTriples])
+                            TIFFSwabArrayOfTriples \
+                            TIFFOpenOptionsSetMaxCumulatedMemAlloc])
         fi
     else
         AC_MSG_RESULT([no])

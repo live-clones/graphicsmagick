@@ -1,5 +1,11 @@
 2026-05-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/tiff.c (ReadTIFFImage): Only use
+        TIFFOpenOptionsSetMaxCumulatedMemAlloc() if it is available.
+
+        * configure.ac: Check for TIFFOpenOptionsSetMaxCumulatedMemAlloc()
+        in libtiff, which was added in v4.7.0.
+
         * coders/heif.c (ReadHEIFImage): If OpenMP is available, then the
         default for libheif tile decoding threads is the same as the
         number of OpenMP threads, otherwise it is 4.

@@ -390,6 +390,10 @@
 /* Define to 1 if you have the 'TIFFMergeFieldInfo' function. */
 #undef HAVE_TIFFMERGEFIELDINFO
 
+/* Define to 1 if you have the 'TIFFOpenOptionsSetMaxCumulatedMemAlloc'
+   function. */
+#undef HAVE_TIFFOPENOPTIONSSETMAXCUMULATEDMEMALLOC
+
 /* Define to 1 if you have the 'TIFFSetErrorHandlerExt' function. */
 #undef HAVE_TIFFSETERRORHANDLEREXT
 

@@ -2108,24 +2108,23 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       memory_maximum_limit;
 
     tmsize_t
-      max_single_mem_alloc,
-      max_cumulated_mem_alloc;
+      max_single_mem_alloc;
 
     TIFFOpenOptions *open_options = TIFFOpenOptionsAlloc();
     /*
       TIFFOpenOptionsSetMaxSingleMemAlloc(TIFFOpenOptions *opts,
-                                        tmsize_t max_single_mem_alloc);
+                                             tmsize_t max_single_mem_alloc);
       TIFFOpenOptionsSetMaxCumulatedMemAlloc(TIFFOpenOptions *opts,
-                                           tmsize_t max_cumulated_mem_alloc);
+                                             tmsize_t max_cumulated_mem_alloc);
       TIFFOpenOptionsSetWarnAboutUnknownTags(TIFFOpenOptions *opts,
-                                           int warn_about_unknown_tags);
+                                             int warn_about_unknown_tags);
       TIFFOpenOptionsSetErrorHandlerExtR(TIFFOpenOptions *opts,
-                                       TIFFErrorHandlerExtR handler,
-                                       void *errorhandler_user_data);
-      TIFFOpenOptionsSetWarningHandlerExtR(TIFFOpenOptions *opts,
                                          TIFFErrorHandlerExtR handler,
-                                         void *warnhandler_user_data);
-     */
+                                         void *errorhandler_user_data);
+      TIFFOpenOptionsSetWarningHandlerExtR(TIFFOpenOptions *opts,
+                                           TIFFErrorHandlerExtR handler,
+                                           void *warnhandler_user_data);
+    */
     TIFFOpenOptionsSetErrorHandlerExtR(open_options, TIFFReadErrorsHandlerExtR, (void *) exception);
     TIFFOpenOptionsSetWarningHandlerExtR(open_options,
                                          (CheckThrowWarnings(image_info) ?
@@ -2134,9 +2133,16 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
     memory_maximum_limit=GetMagickResourceLimit(MemoryResource);
     memory_consumed=GetMagickResource(MemoryResource);
     max_single_mem_alloc=((memory_maximum_limit-memory_consumed)/8); /* FIXME: Support configuring ratio? */
-    TIFFOpenOptionsSetMaxSingleMemAlloc(open_options, max_single_mem_alloc);
-    max_cumulated_mem_alloc=((memory_maximum_limit-memory_consumed)/4); /* FIXME: Support configuring ratio? */
-    TIFFOpenOptionsSetMaxCumulatedMemAlloc(open_options, max_cumulated_mem_alloc);
+    TIFFOpenOptionsSetMaxSingleMemAlloc(open_options, max_single_mem_alloc); /* Added in v4.5.0 */
+#if defined(HAVE_TIFFOPENOPTIONSSETMAXCUMULATEDMEMALLOC)
+    {
+      tmsize_t
+        max_cumulated_mem_alloc;
+
+      max_cumulated_mem_alloc=((memory_maximum_limit-memory_consumed)/4); /* FIXME: Support configuring ratio? */
+      TIFFOpenOptionsSetMaxCumulatedMemAlloc(open_options, max_cumulated_mem_alloc); /* Added in v4.7.0 */
+    }
+#endif /* if defined(HAVE_TIFFOPENOPTIONSSETMAXCUMULATEDMEMALLOC) */
     tiff=TIFFClientOpenExt(image->filename,"rb",(thandle_t) &client_data,
                            TIFFReadBlob,TIFFWriteBlob,TIFFSeekBlob,TIFFCloseBlob,
                            TIFFGetBlobSize,TIFFMapBlob,TIFFUnmapBlob,
@@ -2511,7 +2517,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       /*
         Deal with files which are marked as unspecified alpha, but
         they should be unassociated alpha.
-       */
+      */
       if (((extra_samples == 1) && (sample_info[0] == EXTRASAMPLE_UNSPECIFIED)) &&
           (
            ((samples_per_pixel == 2) && ((PHOTOMETRIC_MINISWHITE == photometric) || (PHOTOMETRIC_MINISBLACK == photometric))) ||
@@ -2608,28 +2614,28 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
           uint32 tag;
           const char name[14];
         } text_tags[] =
-            {
-             { TIFFTAG_ARTIST, "artist" },
-             { TIFFTAG_COPYRIGHT, "copyright" },
-             { TIFFTAG_DATETIME, "timestamp" },
-             { TIFFTAG_DOCUMENTNAME, "document" },
-             { TIFFTAG_HOSTCOMPUTER, "hostcomputer" },
-             { TIFFTAG_IMAGEDESCRIPTION, "comment" },
-             { TIFFTAG_MAKE, "make" },
-             { TIFFTAG_MODEL, "model" },
-             { TIFFTAG_PAGENAME, "label" },
-             { TIFFTAG_SOFTWARE, "software" },
+          {
+            { TIFFTAG_ARTIST, "artist" },
+            { TIFFTAG_COPYRIGHT, "copyright" },
+            { TIFFTAG_DATETIME, "timestamp" },
+            { TIFFTAG_DOCUMENTNAME, "document" },
+            { TIFFTAG_HOSTCOMPUTER, "hostcomputer" },
+            { TIFFTAG_IMAGEDESCRIPTION, "comment" },
+            { TIFFTAG_MAKE, "make" },
+            { TIFFTAG_MODEL, "model" },
+            { TIFFTAG_PAGENAME, "label" },
+            { TIFFTAG_SOFTWARE, "software" },
 #if 1
-             /*
-               These three cause TIFFFieldWithTag() to return NULL and
-               therefore produce "TIFF Warning: Warning, unknown tag" exceptions
-               while reading!
-              */
-             { TIFFTAG_OPIIMAGEID, "imageid" },
-             { 33423, "kodak-33423" },
-             { 36867, "kodak-36867" }
+            /*
+              These three cause TIFFFieldWithTag() to return NULL and
+              therefore produce "TIFF Warning: Warning, unknown tag" exceptions
+              while reading!
+            */
+            { TIFFTAG_OPIIMAGEID, "imageid" },
+            { 33423, "kodak-33423" },
+            { 36867, "kodak-36867" }
 #endif
-            };
+          };
 
         for (i = 0; i < ArraySize(text_tags); i++)
           {
