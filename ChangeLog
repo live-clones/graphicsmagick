@@ -1,3 +1,9 @@
+2026-05-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c (ReadHEIFImage): If OpenMP is available, then the
+        default for libheif tile decoding threads is the same as the
+        number of OpenMP threads, otherwise it is 4.
+
 2026-05-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c (ReadHEIFImage): Add support for -define

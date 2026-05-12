@@ -1,4 +1,4 @@
-.TH gm 1 "2026/05/11" "GraphicsMagick"
+.TH gm 1 "2026/05/12" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1349,7 +1349,8 @@ If a HEIF image is comprised of multiple tiles, each tile may be
 decoded by one thread, and several tiles may be decoded at once by
 using more threads.  The maximum reasonable value is the minimum of
 the number of CPU cores available, or the number of tiles in the HEIF
-file, whichever is smaller.  The default is 4.
+file, whichever is smaller.  If OpenMP is available, the default is
+the number of OpenMP threads, otherwise the default is 4.
 
 .in 15
 .in 15
