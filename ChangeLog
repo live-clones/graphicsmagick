@@ -1,3 +1,15 @@
+2026-05-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * wand/wand_symbols.h: Update GraphicsMagick Wand library symbol
+        remapping. Only the Copyright banner date is changed.
+
+        * magick/symbols.h: Update GraphicsMagick main library symbol
+        remapping. GetColorInfoArray() and GetColorInfo() are removed from
+        the mapping given that they are implementation functions now
+        declared as static.  New functions added to remapping are
+        DrawClearException(), DrawCloneContext(), DrawGetException(), and
+        DrawNewContext().
+
 2026-05-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/tiff.c (ReadTIFFImage): Only use

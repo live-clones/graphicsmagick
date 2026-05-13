@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012-2025 GraphicsMagick Group
+  Copyright (C) 2012-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -184,7 +184,9 @@
 #define DrawArc GmDrawArc
 #define DrawBezier GmDrawBezier
 #define DrawCircle GmDrawCircle
+#define DrawClearException GmDrawClearException
 #define DrawClipPath GmDrawClipPath
+#define DrawCloneContext GmDrawCloneContext
 #define DrawColor GmDrawColor
 #define DrawComment GmDrawComment
 #define DrawComposite GmDrawComposite
@@ -194,6 +196,7 @@
 #define DrawGetClipPath GmDrawGetClipPath
 #define DrawGetClipRule GmDrawGetClipRule
 #define DrawGetClipUnits GmDrawGetClipUnits
+#define DrawGetException GmDrawGetException
 #define DrawGetFillColor GmDrawGetFillColor
 #define DrawGetFillOpacity GmDrawGetFillOpacity
 #define DrawGetFillRule GmDrawGetFillRule
@@ -222,6 +225,7 @@
 #define DrawInfoGetCompositePath GmDrawInfoGetCompositePath
 #define DrawLine GmDrawLine
 #define DrawMatte GmDrawMatte
+#define DrawNewContext GmDrawNewContext
 #define DrawPathClose GmDrawPathClose
 #define DrawPathCurveToAbsolute GmDrawPathCurveToAbsolute
 #define DrawPathCurveToQuadraticBezierAbsolute GmDrawPathCurveToQuadraticBezierAbsolute
@@ -346,8 +350,6 @@
 #define GetClientName GmGetClientName
 #define GetClientPath GmGetClientPath
 #define GetColorHistogram GmGetColorHistogram
-#define GetColorInfoArray GmGetColorInfoArray
-#define GetColorInfo GmGetColorInfo
 #define GetColorList GmGetColorList
 #define GetColorTuple GmGetColorTuple
 #define GetConfigureBlob GmGetConfigureBlob
