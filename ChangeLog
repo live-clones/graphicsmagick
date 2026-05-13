@@ -1,5 +1,7 @@
 2026-05-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * GraphicsMagick 1.3.47 was released!
+
         * NEWS.txt: Update the news.
 
         * wand/wand_symbols.h: Update GraphicsMagick Wand library symbol
