@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to May 4, 2026.</p>
+<p>This file was last updated to reflect changes up to May 13, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -145,6 +145,8 @@ at most.</p></li>
 pixels, to/from Ghostscript are within the same limits as specified
 for GraphicsMagick.  This helps avoid Ghostscript-based denial of
 service opportunities.</p></li>
+<li><p>SVG: Add validations for element id syntax.  Reject invalid
+attribute values which contain single quotes.</p></li>
 <li><p>XCF: Report an error if there are no layers. Fix two unsigned
 integer overflow cases.</p></li>
 <li><p>DescribeImage(): Avoid heap write overflow while parsing the image
@@ -240,6 +242,9 @@ image from an in-memory BLOB, or memory mapped file.</p></li>
 planar decode modes at once. Use the
 heif:interleaved-rgb-decode=yes/no define to select which mode is
 used.</p></li>
+<li><p>HEIF (HEIC, AVCI, AVIF, MP4, etc.): Add support for -define
+heif:tile-threads=number to specify how many tiles may be decoded at
+once.</p></li>
 <li><p>The 'convert' and 'mogrify' subcommands now support -remap, which is
 equivalent to -map.  This is to improve compatibility with
 ImageMagick, which changed from -map to -remap some time after the

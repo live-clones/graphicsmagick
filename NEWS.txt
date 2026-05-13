@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to May 4, 2026.
+This file was last updated to reflect changes up to May 13, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -72,6 +72,9 @@ Security Fixes:
   pixels, to/from Ghostscript are within the same limits as specified
   for GraphicsMagick.  This helps avoid Ghostscript-based denial of
   service opportunities.
+
+* SVG: Add validations for element id syntax.  Reject invalid
+  attribute values which contain single quotes.
 
 * XCF: Report an error if there are no layers. Fix two unsigned
   integer overflow cases.
@@ -195,6 +198,10 @@ New Features:
   planar decode modes at once. Use the
   heif:interleaved-rgb-decode=yes/no define to select which mode is
   used.
+
+* HEIF (HEIC, AVCI, AVIF, MP4, etc.): Add support for -define
+  heif:tile-threads=number to specify how many tiles may be decoded at
+  once.
 
 * The 'convert' and 'mogrify' subcommands now support -remap, which is
   equivalent to -map.  This is to improve compatibility with
