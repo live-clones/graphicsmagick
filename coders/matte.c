@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -157,16 +158,17 @@ static unsigned int WriteMATTEImage(const ImageInfo *image_info,Image *image)
   register PixelPacket
     *q;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   if (!image->matte)
     ThrowWriterException(CoderError,ImageDoesNotHaveAMatteChannel,image);
-  matte_image=
-    CloneImage(image,image->columns,image->rows,True,&image->exception);
+  matte_image=CloneImage(image,image->columns,image->rows,True,&image->exception);
   if (matte_image == (Image *) NULL)
-    return(False);
-  (void) (void) SetImageType(matte_image,TrueColorType);
+    return(MagickFail);
+  if (SetImageType(matte_image,TrueColorType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
+
   /*
     Convert image to matte pixels.
   */
@@ -194,7 +196,8 @@ static unsigned int WriteMATTEImage(const ImageInfo *image_info,Image *image)
                                     image->columns,image->rows))
           break;
   }
-  (void) FormatString(matte_image->filename,"MIFF:%.1024s",image->filename);
+  (void) MagickFormatString(matte_image->filename,sizeof(matte_image->filename),
+                            "MIFF:%.1024s",image->filename);
   status=WriteImage(image_info,matte_image);
   DestroyImage(matte_image);
   return(status);

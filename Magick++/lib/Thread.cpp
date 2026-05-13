@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999, 2000, 2001, 2002
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Implementation of thread support
 //
@@ -11,11 +11,12 @@
 #include "Magick++/Thread.h"
 #include "Magick++/Exception.h"
 
+#include <iostream>
 #include <string.h>
 
 // Default constructor
 Magick::MutexLock::MutexLock(void)
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   // POSIX threads
   : _mutex()
 {
@@ -58,24 +59,25 @@ Magick::MutexLock::MutexLock(void)
 // Destructor
 Magick::MutexLock::~MutexLock(void)
 {
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   int sysError;
   if ( (sysError = ::pthread_mutex_destroy( &_mutex )) == 0 )
     return;
-  throwExceptionExplicit( OptionError, "mutex destruction failed",
-                          strerror(sysError) );
+  std::cerr << "Magick::MutexLock::~MutexLock: mutex destruction failed! "
+    "(" << strerror(sysError) << ")." << std::endl;
 #endif
 #if defined(_MT) && defined(_VISUALC_)
   if ( ::CloseHandle(_mutex.id) != 0 )
     return;
-  throwExceptionExplicit( OptionError, "mutex destruction failed" );
+  std::cerr << "Magick::MutexLock::~MutexLock: mutex destruction failed!"
+            << std::endl;
 #endif
 }
 
 // Lock mutex
 void Magick::MutexLock::lock(void)
 {
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   int sysError;
   if ( (sysError = ::pthread_mutex_lock( &_mutex )) == 0)
     return;
@@ -109,16 +111,16 @@ void Magick::MutexLock::lock(void)
 // Unlock mutex
 void Magick::MutexLock::unlock(void)
 {
-#if defined(HasPTHREADS)
+#if defined(HAVE_PTHREAD)
   int sysError;
   if ( (sysError = ::pthread_mutex_unlock( &_mutex )) == 0)
     return;
-  throwExceptionExplicit( OptionError, "mutex unlock failed",
-                          strerror(sysError) );
+  std::cerr << "Magick::MutexLock::unlock: mutex unlock failed! "
+    "(" << strerror(sysError) << ")." << std::endl;
 #endif
 #if defined(_MT) && defined(_VISUALC_)
   if ( ReleaseSemaphore(_mutex.id, 1, NULL) == TRUE )
     return;
-  throwExceptionExplicit( OptionError, "mutex unlock failed" );
+  std::cerr << "Magick::MutexLock::unlock: mutex unlock failed! " << std::endl;
 #endif
 }

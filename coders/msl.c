@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -60,6 +60,7 @@
 #include "magick/texture.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)
@@ -1537,8 +1538,8 @@ MSLStartElement(void *context,const xmlChar *name,
             /* process image */
             {
               char gamma[MaxTextExtent + 1];
-              FormatString( gamma, "%3.6f/%3.6f/%3.6f/",
-                            gammaRed, gammaGreen, gammaBlue);
+              MagickFormatString( gamma, sizeof(gamma), "%3.6f/%3.6f/%3.6f/",
+                                  gammaRed, gammaGreen, gammaBlue);
 
               (void) GammaImage ( msl_info->image[n], gamma );
             }
@@ -1565,7 +1566,7 @@ MSLStartElement(void *context,const xmlChar *name,
                     {
                       if (LocaleCompare(keyword,"height") == 0)
                         {
-                          FormatString(value,"%ld",msl_info->image[n]->rows);
+                          MagickFormatString(value,MaxTextExtent,"%ld",msl_info->image[n]->rows);
                           (void) SetImageAttribute(msl_info->attributes[n],
                                                    key,NULL);
                           (void) SetImageAttribute(msl_info->attributes[n],
@@ -1581,8 +1582,8 @@ MSLStartElement(void *context,const xmlChar *name,
                     {
                       if (LocaleCompare(keyword,"width") == 0)
                         {
-                          FormatString(value,"%ld",
-                                       msl_info->image[n]->columns);
+                          MagickFormatString(value,MaxTextExtent,"%ld",
+                                             msl_info->image[n]->columns);
                           (void) SetImageAttribute(msl_info->attributes[n],
                                                    key,NULL);
                           (void) SetImageAttribute(msl_info->attributes[n],
@@ -1617,11 +1618,11 @@ MSLStartElement(void *context,const xmlChar *name,
                 msl_info->group_info = new_group_info;
               }
             else
-            {
-              msl_info->nGroups--;
-              MagickFatalError3(ResourceLimitFatalError,
-                      MemoryAllocationFailed,UnableToAllocateImage);
-            }
+              {
+                msl_info->nGroups--;
+                MagickFatalError3(ResourceLimitFatalError,
+                                  MemoryAllocationFailed,UnableToAllocateImage);
+              }
             break;
           }
         ThrowException(msl_info->exception,OptionError,
@@ -2094,7 +2095,7 @@ MSLStartElement(void *context,const xmlChar *name,
                       Remove profile named <keyword> from the image.
                     */
                     (void) ProfileImage(msl_info->image[n],keyword,
-                      (unsigned char *) NULL,0,True);
+                                        (unsigned char *) NULL,0,True);
                   }
                 else
                   {
@@ -2126,20 +2127,21 @@ MSLStartElement(void *context,const xmlChar *name,
 
                     /*
                       FIXME: Next three lines replace:
-                       clone_info->client_data=(void *) &(msl_info->image[n]->iptc_profile);
+                      clone_info->client_data=(void *) &(msl_info->image[n]->iptc_profile);
                     */
-                    profile_info.name="IPTC";
+                    profile_info.name=AcquireString("IPTC"); /* FIXME: Is this okay? */
                     profile_info.info=(unsigned char *) GetImageProfile(msl_info->image[n],profile_info.name,
-                                                                      &profile_info.length);
+                                                                        &profile_info.length);
                     clone_info->client_data=&profile_info;
 
                     (void) strlcpy(clone_info->filename,value,MaxTextExtent);
                     profile_image=ReadImage(clone_info,&(msl_info->image[n]->exception));
+                    MagickFreeMemory(profile_info.name);
                     if (profile_image == (Image *) NULL)
                       {
                         (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                             "Failed to load profile from file \"%s\"",
-                                             clone_info->filename);
+                                              "Failed to load profile from file \"%s\"",
+                                              clone_info->filename);
                       }
                     else
                       {
@@ -2151,11 +2153,11 @@ MSLStartElement(void *context,const xmlChar *name,
                                                &profile_length) != MagickFail)
                           {
                             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                                 "Adding %s profile to image",profile_name);
+                                                  "Adding %s profile to image",profile_name);
                             if ((LocaleCompare(profile_name,"ICC") == 0) ||
                                 (LocaleCompare(profile_name,"ICM") == 0))
                               (void) ProfileImage(msl_info->image[n],profile_name,(unsigned char *) profile_data,
-                                                    profile_length,True);
+                                                  profile_length,True);
                             else
                               (void) SetImageProfile(msl_info->image[n],profile_name,profile_data,profile_length);
                           }
@@ -2164,9 +2166,9 @@ MSLStartElement(void *context,const xmlChar *name,
                         profile_image=(Image *) NULL;
                         clone_info->client_data=client_data;
                       }
-                MagickFreeMemory(value);
+                    MagickFreeMemory(value);
+                  }
               }
-            }
             DestroyImageInfo(clone_info);
             break;
           }
@@ -2829,18 +2831,21 @@ MSLStartElement(void *context,const xmlChar *name,
                         }
                       else if (LocaleCompare(keyword, "colorspace") == 0)
                         {
+                          ImageType image_type = UndefinedType;
                           if (LocaleCompare(value, "CMYK") == 0)
-                            (void) SetImageType( msl_info->image[n],
-                                                 ColorSeparationType );
+                            image_type = ColorSeparationType;
                           else if (LocaleCompare(value, "Gray") == 0)
-                            (void) SetImageType( msl_info->image[n],
-                                                 GrayscaleType );
+                            image_type = GrayscaleType;
                           else if (LocaleCompare(value, "RGB") == 0)
-                            (void) SetImageType( msl_info->image[n],
-                                                 TrueColorType );
+                            image_type = TrueColorType;
                           else
                             ThrowException(msl_info->exception,OptionError,
                                            UnrecognizedColorspace,keyword);
+
+                          if (UndefinedType != image_type)
+                            if (SetImageType( msl_info->image[n],image_type) == MagickFail)
+                              CopyException(msl_info->exception, &msl_info->image[n]->exception);
+
                           break;
                         }
                       ThrowException(msl_info->exception,OptionError,
@@ -3647,7 +3652,7 @@ MSLStartElement(void *context,const xmlChar *name,
             {
               char thresholds[MaxTextExtent];
 
-              FormatString(thresholds,"%g",threshold);
+              MagickFormatString(thresholds,sizeof(thresholds),"%g",threshold);
               (void) ChannelThresholdImage(msl_info->image[n], thresholds);
               break;
             }
@@ -4222,7 +4227,7 @@ ProcessMSLScript(const ImageInfo *image_info,Image **image,
   MagickFreeMemory(msl_info.draw_info);
   MagickFreeMemory(msl_info.attributes);
   MagickFreeMemory(msl_info.image);
-  MagickFreeResourceLimitedMemory(msl_info.group_info);
+  MagickFreeResourceLimitedMemory(MSLGroupInfo *,msl_info.group_info);
 
   CloseBlob(msl_image);
   /*

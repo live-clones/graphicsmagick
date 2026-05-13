@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -68,6 +68,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Define declarations.
@@ -849,8 +850,8 @@ GetPalmPaletteGivenBits(const unsigned int bits,
 */
 #define ThrowPALMReaderException(code_,reason_,image_) \
 do { \
-  MagickFreeResourceLimitedMemory(one_row); \
-  MagickFreeResourceLimitedMemory(lastrow); \
+  MagickFreeResourceLimitedMemory(unsigned char *,one_row);     \
+  MagickFreeResourceLimitedMemory(unsigned char *, lastrow);      \
   ThrowReaderException(code_,reason_,image_); \
 } while (0);
 static Image *ReadPALMImage(const ImageInfo *image_info,
@@ -902,8 +903,8 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
   /*
     Open image file.
   */
-  one_row=(unsigned char*) NULL;
-  lastrow=(unsigned char*) NULL;
+  one_row=(unsigned char *) NULL;
+  lastrow=(unsigned char *) NULL;
 
   (void) memset(&palm_header,0,sizeof(palm_header));
   image=AllocateImage(image_info);
@@ -1054,7 +1055,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
               /* unsigned int r, g, b; */
               (void) ReadBlobByte(image);
               index=(image->colors-1) - i;
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               image->colormap[index].red = ScaleCharToQuantum(ReadBlobByte(image));
               image->colormap[index].green = ScaleCharToQuantum(ReadBlobByte(image));
               image->colormap[index].blue = ScaleCharToQuantum(ReadBlobByte(image));
@@ -1200,7 +1201,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
               if ((unsigned int) (ptr - one_row) >= palm_header.bytes_per_row)
                 ThrowPALMReaderException(CorruptImageError,CorruptImage,image);
               index =(IndexPacket) (mask - (((*ptr) & (mask << bit)) >> bit));
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               indexes[x] = index;
               *q++ = image->colormap[index];
               if (!bit)
@@ -1228,7 +1229,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
       if (image->storage_class == PseudoClass)
         {
           index = mask - palm_header.transparent_index;
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Index %u rgb(%u,%u,%u) set transparent",
@@ -1253,8 +1254,8 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
         }
     }
 
-  MagickFreeResourceLimitedMemory(one_row);
-  MagickFreeResourceLimitedMemory(lastrow);
+  MagickFreeResourceLimitedMemory(unsigned char *,one_row);
+  MagickFreeResourceLimitedMemory(unsigned char *,lastrow);
   CloseBlob(image);
   StopTimer(&image->timer);
   return(image);
@@ -1469,7 +1470,10 @@ OptimizePALMImage(const ImageInfo *image_info,
             Make sure that image is in an RGB type space.
           */
           if (TransformColorspace(palm_image,RGBColorspace) == MagickFail)
-            break;
+            {
+              ThrowException(CoderError,UnableToTransformColorspace,image);
+              break;
+            }
 
           /*
             Map optimize image to colormap without dithering.
@@ -1561,7 +1565,10 @@ OptimizePALMImage(const ImageInfo *image_info,
                 Make sure that image is in an RGB type space.
               */
               if (TransformColorspace(palm_image,RGBColorspace) == MagickFail)
-                break;
+                {
+                  ThrowException(CoderError,UnableToTransformColorspace,image);
+                  break;
+                }
 
               GetQuantizeInfo(&quantize_info);
               quantize_info.number_colors=256;
@@ -1620,9 +1627,11 @@ OptimizePALMImage(const ImageInfo *image_info,
           /*
             Make sure that image is in an RGB type space.
           */
-          if (!TransformColorspace(palm_image,RGBColorspace))
-            break;
-
+          if (TransformColorspace(palm_image,RGBColorspace) == MagickFail)
+            {
+              ThrowException(CoderError,UnableToTransformColorspace,image);
+              break;
+            }
 
           if (palm_image->storage_class == PseudoClass)
             {

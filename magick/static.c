@@ -219,9 +219,7 @@ static const struct
   STATICM("X",RegisterXImage,UnregisterXImage),
 #endif /* defined(HasX11) */
   STATICM("XBM",RegisterXBMImage,UnregisterXBMImage),
-#if !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
   STATICM("XC",RegisterXCImage,UnregisterXCImage),
-#endif /* if !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
   STATICM("XCF",RegisterXCFImage,UnregisterXCFImage),
   STATICM("XPM",RegisterXPMImage,UnregisterXPMImage),
 #if defined(_VISUALC_)

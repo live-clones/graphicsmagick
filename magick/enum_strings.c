@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2008-2022 GraphicsMagick Group
+% Copyright (C) 2008-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -113,6 +113,8 @@ MagickExport ChannelType StringToChannelType(const char *option)
   else if (LocaleCompare("Yellow",option) == 0)
     channel=YellowChannel;
   else if (LocaleCompare("Opacity",option) == 0)
+    channel=OpacityChannel;
+  else if (LocaleCompare("Alpha",option) == 0) /* ImageMagick compatibility */
     channel=OpacityChannel;
   else if (LocaleCompare("Black",option) == 0)
     channel=BlackChannel;
@@ -460,6 +462,7 @@ MagickExport CompositeOperator StringToCompositeOperator(const char *option)
         { CopyGreenCompositeOp, "CopyGreen" },
         { CopyBlueCompositeOp, "CopyBlue" },
         { CopyOpacityCompositeOp, "CopyOpacity" },
+        { CopyOpacityCompositeOp, "CopyAlpha" }, /* ImageMagick compatibility */
         { ClearCompositeOp, "Clear" },
         { DissolveCompositeOp, "Dissolve" },
         { DisplaceCompositeOp, "Displace" },
@@ -604,6 +607,9 @@ MagickExport const char* CompressionTypeToString(const CompressionType compressi
     case WebPCompression:
       compression_string="WebP";
       break;
+    case LERCCompression:
+      compression_string="LERC";
+      break;
     }
   return compression_string;
 }
@@ -655,6 +661,8 @@ MagickExport CompressionType StringToCompressionType(const char *option)
     compression_type=ZSTDCompression;
   else if (LocaleCompare("WebP",option) == 0)
     compression_type=WebPCompression;
+  else if (LocaleCompare("LERC",option) == 0)
+    compression_type=LERCCompression;
 
   return compression_type;
 }
@@ -1076,7 +1084,7 @@ MagickExport InterlaceType StringToInterlaceType(const char *option)
 */
 MagickExport const char *MapModeToString(MapMode map_mode)
 {
-  char
+  const char
     *mode_string="?";
 
   switch (map_mode)
@@ -1099,7 +1107,7 @@ MagickExport const char *MapModeToString(MapMode map_mode)
 */
 MagickExport const char *MetricTypeToString(MetricType metric)
 {
-  char
+  const char
     *metric_string="Undefined";
 
   switch (metric)
@@ -1155,7 +1163,7 @@ MagickExport MetricType StringToMetricType(const char *option)
 */
 MagickExport const char *NoiseTypeToString(NoiseType noise_type)
 {
-  char
+  const char
     *noise_string="Undefined";
 
   switch (noise_type)
@@ -1666,6 +1674,8 @@ MagickExport ResourceType StringToResourceType(const char *option)
     resource_type=ReadResource;
   else if (LocaleCompare("Write",option) == 0)
     resource_type=WriteResource;
+  else if (LocaleCompare("Images",option) == 0)
+    resource_type=ImagesResource;
   return resource_type;
 }
 

@@ -1,4 +1,4 @@
-.TH gm 1 "2025/10/28" "GraphicsMagick"
+.TH gm 1 "2026/05/12" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1313,7 +1313,21 @@ in the writer.
  \fR
 .in 20
 
-Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) applied.
+Return HEIF (e.g. HEIC/AVIF) image without any transformations
+(e.g. rotation) applied.  In 'ping' mode (the identify default) the
+default value is true, but is otherwise false. When
+ignore-transformations is false, identify may be much slower.
+
+.in 15
+.in 15
+.B "heif:interleaved-rgb-decode={true|false}"
+.in 20
+ \fR
+.in 20
+
+Requests that libheif return pixels in interleaved representation
+rather than in a planar representation. This should have no influence
+on the decoded result, but the performance may be different.
 
 .in 15
 .in 15
@@ -1323,6 +1337,20 @@ Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) a
 .in 20
  Return HEIF image in its original colorspace.  This allows an
 image to be returned in the original YCbCr colorspace rather than RGB.
+
+.in 15
+.in 15
+.B "heif:tile-threads=number"
+.in 20
+ \fR
+.in 20
+
+If a HEIF image is comprised of multiple tiles, each tile may be
+decoded by one thread, and several tiles may be decoded at once by
+using more threads.  The maximum reasonable value is the minimum of
+the number of CPU cores available, or the number of tiles in the HEIF
+file, whichever is smaller.  If OpenMP is available, the default is
+the number of OpenMP threads, otherwise the default is 4.
 
 .in 15
 .in 15
@@ -1610,6 +1638,27 @@ are not.
 
 .in 15
 .in 15
+.B "jxl:effort=<integer>"
+.in 20
+ \fR
+.in 20
+Encoder effort. Higher values allow more computation, generally achieving
+smaller output at same quality. For lossy encoding, higher effort should
+achieve more accurate quality. Please refer to libjxl source code (or
+documentation) for 'JXL_ENC_FRAME_SETTING_EFFORT'.
+
+.in 15
+.in 15
+.B "jxl:decodingspeed=<integer>"
+.in 20
+ \fR
+.in 20
+Decoding speed. Higher values improve decode speed at the expense of
+quality or density. Please refer to libjxl source code (or documentation)
+for 'JXL_ENC_FRAME_SETTING_DECODING_SPEED'.
+
+.in 15
+.in 15
 .B "pcl:fit-to-page"
 .in 20
  \fR
@@ -1740,6 +1789,50 @@ TIFF file.  This is useful in order to be able to read files which
 which otherwise fail to read due to problems with TIFF tags.  Note
 that some TIFF tags are required in order to be able to read the image
 data at all.
+
+.in 15
+.in 15
+.B "tiff:lerc-maxzerror=<value>"
+.in 20
+ \fR
+.in 20
+When LERC compression is selected (via `-compress lerc`),
+specifies the maximum allowable floating point error for lossy
+compression (e.g. 0.5). The default compression value is 0 (lossless).
+
+.in 15
+.in 15
+.B "tiff:lerc-compression={1|deflate|zip|2|zstd}"
+.in 20
+ \fR
+.in 20
+After LERC compression has taken place, an optional second
+compression pass using Deflate or Zstd compression may be performed.
+Specify a value of 1, deflate, or zip, to use Deflate compression, or
+2 or zstd, to use Zstd compression.  The argument is case-insensitive.
+
+.in 15
+.in 15
+.B "tiff:lerc-zip-quality=<value>"
+.in 20
+ \fR
+.in 20
+When LERC compression is enabled, and a second-pass compression
+using Deflate has been selected, provide a value in the range of 1 to
+12 to indicate the Deflate compression level (larger is more
+compression). The default level for Deflate compression is 6.
+
+.in 15
+.in 15
+.B "tiff:lerc-zstd-level=<value>"
+.in 20
+ \fR
+.in 20
+When LERC compression is enabled, and a second-pass compression
+using Zstd has been selected, provide a value in the range of 1 and 19
+(or 22 using a lot more memory) to indicate the Zstd compression level
+(larger is more compression). The default level for Zstd compression
+is 3.
 
 .in 15
 .in 15
@@ -3218,20 +3311,21 @@ interface works similar to Photoshop's "Image->Adjustments->Levels..."
 "Input Levels" interface.
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 
 By default, resource limits are estimated based on the available
 resources and capabilities of the system. The resource limits are
 \fBDisk\fP, maximum total disk space consumed; \fBFile\fP, maximum
-number of file descriptors allowed to be open at once; \fBMap\fP,
-maximum total number of file bytes which may be memory mapped;
-\fBMemory\fP, maximum total number of bytes of heap memory used for
-image storage; \fBPixels\fP, maximum absolute image size (per image);
-\fBWidth\fP, maximum image pixels width; \fBHeight\fP, maximum image
-pixels height; \fBRead\fP, maximum number of uncompressed bytes to
-read; \fBWrite\fP maximum number of uncompressed bytes to write; and
-\fBThreads\fP, the maximum number of worker threads to use per OpenMP
-thread team.
+number of file descriptors allowed to be open at once; \fBImages\fP,
+maximum images allowed to be handled by the whole program at one time;
+\fBMap\fP, maximum total number of file bytes which may be memory
+mapped; \fBMemory\fP, maximum total number of bytes of heap memory
+used for image storage; \fBPixels\fP, maximum absolute image size
+(per image); \fBWidth\fP, maximum image pixels width; \fBHeight\fP,
+maximum image pixels height; \fBRead\fP, maximum number of
+uncompressed bytes to read; \fBWrite\fP maximum number of
+uncompressed bytes to write; and \fBThreads\fP, the maximum number of
+worker threads to use per OpenMP thread team.
 
 The \fBDisk\fP and \fBMap\fP resource limits are used to decide if
 (for a given image) the decoded image ("pixel cache") should be stored
@@ -4427,6 +4521,23 @@ offset:
   0.0 0.0 0.0 0.0 1.0
 .fi
 .TP
+.B "-map \fI<filename>"\fP
+\fRchoose a particular set of colors from this image
+
+[\fIconvert\fP or \fImogrify\fP]
+
+By default, color reduction chooses an optimal set of colors that best
+represent the original image. Alternatively, you can choose a particular
+set of colors from an image file with this option.
+
+Use
+\fB+map\fP to reduce
+all images in the image sequence that follows to a single optimal set of colors
+that best represent all the images.  The sequence of images
+is terminated by the appearance of any option.
+If the \fB+map\fP
+option appears after all of the input images, all images are mapped.
+.TP
 .B "-red-primary \fI<x>,<y>"\fP
 \fRred chromaticity primary point
 .TP
@@ -5577,7 +5688,7 @@ Options, above.
 \fRthe type of interlacing scheme
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -6189,7 +6300,7 @@ Options, above.
 \fRthe type of interlacing scheme
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -6373,7 +6484,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -7398,7 +7509,7 @@ Options, above.
 \fRadjust the level of image contrast
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-list \fI<type>"\fP
 \fRthe type of list
@@ -7507,6 +7618,9 @@ Options, above.
 .TP
 .B "-recolor \fI<matrix>"\fP
 \fRapply a color translation matrix to image channels
+.TP
+.B "-map \fI<filename>"\fP
+\fRchoose a particular set of colors from this image
 .TP
 .B "-red-primary \fI<x>,<y>"\fP
 \fRred chromaticity primary point
@@ -7916,7 +8030,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -9929,7 +10043,7 @@ Options, above.
 \fRthe type of interlacing scheme
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -10079,7 +10193,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log
@@ -10390,7 +10504,7 @@ Options, above.
 \fRadjust the level of image contrast
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-linewidth"
 \fRthe line width for subsequent draw operations
@@ -10493,6 +10607,9 @@ Options, above.
 .TP
 .B "-recolor \fI<matrix>"\fP
 \fRapply a color translation matrix to image channels
+.TP
+.B "-map \fI<filename>"\fP
+\fRchoose a particular set of colors from this image
 .TP
 .B "-red-primary \fI<x>,<y>"\fP
 \fRred chromaticity primary point
@@ -10860,7 +10977,7 @@ Options, above.
 \fRassign a label to an image
 .TP
 .B "-limit \fI<type> <value>"\fP
-\fRDisk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
+\fRDisk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit
 .TP
 .B "-log \fI<string>"\fP
 \fRSpecify format for debug log

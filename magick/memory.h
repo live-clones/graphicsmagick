@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2023 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -20,14 +20,9 @@ typedef void *(*MagickReallocFunc)(void *ptr, size_t size);
 
 extern MagickExport void
    MagickAllocFunctions(MagickFreeFunc free_func,MagickMallocFunc malloc_func,MagickReallocFunc realloc_func),
-  *MagickCloneMemory(void *destination,const void *source,const size_t size) MAGICK_FUNC_NONNULL,
    MagickFree(void *memory),
-   MagickFreeAligned(void *memory),
   *MagickMalloc(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1),
-  *MagickMallocAligned(const size_t alignment, const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
-  *MagickMallocCleared(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1),
-  *MagickRealloc(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
-  *MagickReallocStd(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2);
+  *MagickRealloc(void *memory,const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2);
 
 #if defined(MAGICK_IMPLEMENTATION)
 #include "magick/memory-private.h"

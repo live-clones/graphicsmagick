@@ -1,12 +1,12 @@
 /*
-  Copyright (C) 2003-2024 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
   package; otherwise see http://www.graphicsmagick.org/www/Copyright.html.
 
-  ImageMagick Coder Registration Methods.
+  GraphicsMagick Coder Registration Methods.
 */
 #ifndef _MAGICK_STATIC_H
 #define _MAGICK_STATIC_H
@@ -15,7 +15,6 @@
 extern "C" {
 #endif
 
-#if !defined(BuildMagickModules)
 extern ModuleExport void
   RegisterAAIImage(void),
   RegisterARTImage(void),
@@ -314,10 +313,8 @@ extern ModuleExport void
   UnregisterXWDImage(void),
   UnregisterYUVImage(void);
 
-extern unsigned int
+extern ModuleExport MagickPassFail
   AnalyzeImage(Image **,const int,char**);
-
-#endif /* !defined(BuildMagickModules) */
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

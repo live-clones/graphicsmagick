@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -43,6 +43,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,7 +85,7 @@
 
 #define ThrowRLAReaderException(code_,reason_,image_) \
 do { \
-  MagickFreeResourceLimitedMemory(scanlines); \
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,scanlines); \
   ThrowReaderException(code_,reason_,image_); \
 } while (0);
 static Image *ReadRLAImage(const ImageInfo *image_info,ExceptionInfo *exception)
@@ -710,7 +711,7 @@ static Image *ReadRLAImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (EOFBlob(image))
     ThrowRLAReaderException(CorruptImageError,UnexpectedEndOfFile,image);
   CloseBlob(image);
-  MagickFreeResourceLimitedMemory(scanlines);
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,scanlines);
   StopTimer(&image->timer);
   return(image);
 }

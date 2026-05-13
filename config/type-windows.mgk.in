@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+    Mappings for Windows XP font file names (from 2002!)
+-->
 <typemap>
   <type
     name="Arial"

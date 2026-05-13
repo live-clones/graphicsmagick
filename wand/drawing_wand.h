@@ -1,6 +1,8 @@
-/* Copyright (C) 2003-2009 GraphicsMagick Group */
+/* Copyright (C) 2003-2026 GraphicsMagick Group */
 /*
-  ImageMagick Drawing Wand API.
+  GraphicsMagick Drawing Wand API.
+
+  Originates from code written by Bob Friesenhahn in 2002.
 */
 #ifndef _MAGICK_DRAWING_WAND_H
 #define _MAGICK_DRAWING_WAND_H
@@ -12,6 +14,17 @@ extern "C" {
 #include "wand/wand_symbols.h"
 #include "wand/pixel_wand.h"
 
+  /*
+    ImageMagick decided to move my magick/draw.h and magick/draw.c simplified
+    drawing API functions to wand so they are no longer in the core
+    library. But GraphicsMagick did not remove magick/draw.h or magick/draw.c
+    from its core library.  Due to this, macros are used to rename API
+    function names to have a "magick" prefix for Wand so that they do not
+    collide with those from magick/draw.h.
+
+    This means that magick/draw.h should not be included after this header!
+  */
+#if !defined(MAGICK_EXCLUDE_DRAWING_WAND_MACROS)
 #undef CloneDrawingWand
 #define CloneDrawingWand MagickCloneDrawingWand
 #undef DestroyDrawingWand
@@ -239,167 +252,169 @@ extern "C" {
 #undef NewDrawingWand
 #define NewDrawingWand MagickNewDrawingWand
 
-typedef struct _DrawingWand
+#endif /* if !defined(MAGICK_EXCLUDE_DRAWING_WAND_MACROS) */
+
+typedef struct _DrawContext
   DrawingWand;
 
 extern WandExport char
-  *DrawGetClipPath(const DrawingWand *),
-  *DrawGetException(const DrawingWand *,ExceptionType *),
-  *DrawGetFont(const DrawingWand *),
-  *DrawGetFontFamily(const DrawingWand *),
-  *DrawGetTextEncoding(const DrawingWand *);
+  *MagickDrawGetClipPath(const DrawingWand *),
+  *MagickDrawGetException(const DrawingWand *,ExceptionType *),
+  *MagickDrawGetFont(const DrawingWand *),
+  *MagickDrawGetFontFamily(const DrawingWand *),
+  *MagickDrawGetTextEncoding(const DrawingWand *);
 
 extern WandExport ClipPathUnits
-  DrawGetClipUnits(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetClipUnits(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport DecorationType
-  DrawGetTextDecoration(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetTextDecoration(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport double
-  DrawGetFillOpacity(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawGetFontSize(const DrawingWand *) MAGICK_FUNC_PURE,
-  *DrawGetStrokeDashArray(const DrawingWand *,unsigned long *),
-  DrawGetStrokeDashOffset(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawGetStrokeOpacity(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawGetStrokeWidth(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetFillOpacity(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawGetFontSize(const DrawingWand *) MAGICK_FUNC_PURE,
+  *MagickDrawGetStrokeDashArray(const DrawingWand *,unsigned long *),
+  MagickDrawGetStrokeDashOffset(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawGetStrokeOpacity(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawGetStrokeWidth(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport DrawInfo
-  *DrawPeekGraphicContext(const DrawingWand *);
+  *MagickDrawPeekGraphicContext(const DrawingWand *);
 
 extern WandExport DrawingWand
-  *CloneDrawingWand(const DrawingWand *drawing_wand),
-  *DrawAllocateWand(const DrawInfo *,Image *) MAGICK_ATTRIBUTE ((deprecated)),
-  *NewDrawingWand(void);
+  *MagickCloneDrawingWand(const DrawingWand *drawing_wand),
+  *MagickDrawAllocateWand(const DrawInfo *,Image *) MAGICK_ATTRIBUTE ((deprecated)),
+  *MagickNewDrawingWand(void);
 
 extern WandExport FillRule
-  DrawGetClipRule(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawGetFillRule(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetClipRule(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawGetFillRule(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport GravityType
-  DrawGetGravity(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetGravity(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport LineCap
-  DrawGetStrokeLineCap(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetStrokeLineCap(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport LineJoin
-  DrawGetStrokeLineJoin(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetStrokeLineJoin(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport StretchType
-  DrawGetFontStretch(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetFontStretch(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport StyleType
-  DrawGetFontStyle(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetFontStyle(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport unsigned int
-  DrawClearException(DrawingWand *),
-  DrawGetStrokeAntialias(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawGetTextAntialias(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawRender(const DrawingWand *) MAGICK_ATTRIBUTE ((deprecated)); /* Use MagickDrawImage() instead */
+  MagickDrawClearException(DrawingWand *),
+  MagickDrawGetStrokeAntialias(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawGetTextAntialias(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawRender(const DrawingWand *) MAGICK_ATTRIBUTE ((deprecated)); /* Use MagickDrawImage() instead */
 
 extern WandExport unsigned long
-  DrawGetFontWeight(const DrawingWand *) MAGICK_FUNC_PURE,
-  DrawGetStrokeMiterLimit(const DrawingWand *) MAGICK_FUNC_PURE;
+  MagickDrawGetFontWeight(const DrawingWand *) MAGICK_FUNC_PURE,
+  MagickDrawGetStrokeMiterLimit(const DrawingWand *) MAGICK_FUNC_PURE;
 
 extern WandExport void
-  DrawAffine(DrawingWand *,const AffineMatrix *),
-  DrawAnnotation(DrawingWand *,const double,const double,const unsigned char *),
-  DrawArc(DrawingWand *,const double,const double,const double,const double,
+  MagickDrawAffine(DrawingWand *,const AffineMatrix *),
+  MagickDrawAnnotation(DrawingWand *,const double,const double,const unsigned char *),
+  MagickDrawArc(DrawingWand *,const double,const double,const double,const double,
     const double,const double),
-  DrawBezier(DrawingWand *,const unsigned long,const PointInfo *),
-  DrawCircle(DrawingWand *,const double,const double,const double,const double),
-  DrawColor(DrawingWand *,const double,const double,const PaintMethod),
-  DrawComment(DrawingWand *,const char *),
-  DestroyDrawingWand(DrawingWand *),
-  DrawEllipse(DrawingWand *,const double,const double,const double,const double,
+  MagickDrawBezier(DrawingWand *,const unsigned long,const PointInfo *),
+  MagickDrawCircle(DrawingWand *,const double,const double,const double,const double),
+  MagickDrawColor(DrawingWand *,const double,const double,const PaintMethod),
+  MagickDrawComment(DrawingWand *,const char *),
+  MagickDestroyDrawingWand(DrawingWand *),
+  MagickDrawEllipse(DrawingWand *,const double,const double,const double,const double,
     const double,const double),
-  DrawComposite(DrawingWand *,const CompositeOperator,const double,const double,
+  MagickDrawComposite(DrawingWand *,const CompositeOperator,const double,const double,
     const double,const double,const Image *),
-  DrawGetFillColor(const DrawingWand *,PixelWand *),
-  DrawGetStrokeColor(const DrawingWand *,PixelWand *),
-  DrawGetTextUnderColor(const DrawingWand *,PixelWand *),
-  DrawLine(DrawingWand *,const double, const double,const double,const double),
-  DrawMatte(DrawingWand *,const double,const double,const PaintMethod),
-  DrawPathClose(DrawingWand *),
-  DrawPathCurveToAbsolute(DrawingWand *,const double,const double,const double,
+  MagickDrawGetFillColor(const DrawingWand *,PixelWand *),
+  MagickDrawGetStrokeColor(const DrawingWand *,PixelWand *),
+  MagickDrawGetTextUnderColor(const DrawingWand *,PixelWand *),
+  MagickDrawLine(DrawingWand *,const double, const double,const double,const double),
+  MagickDrawMatte(DrawingWand *,const double,const double,const PaintMethod),
+  MagickDrawPathClose(DrawingWand *),
+  MagickDrawPathCurveToAbsolute(DrawingWand *,const double,const double,const double,
     const double,const double,const double),
-  DrawPathCurveToRelative(DrawingWand *,const double,const double,const double,
+  MagickDrawPathCurveToRelative(DrawingWand *,const double,const double,const double,
     const double,const double, const double),
-  DrawPathCurveToQuadraticBezierAbsolute(DrawingWand *,const double,
+  MagickDrawPathCurveToQuadraticBezierAbsolute(DrawingWand *,const double,
     const double,const double,const double),
-  DrawPathCurveToQuadraticBezierRelative(DrawingWand *,const double,
+  MagickDrawPathCurveToQuadraticBezierRelative(DrawingWand *,const double,
     const double,const double,const double),
-  DrawPathCurveToQuadraticBezierSmoothAbsolute(DrawingWand *,const double,
+  MagickDrawPathCurveToQuadraticBezierSmoothAbsolute(DrawingWand *,const double,
     const double),
-  DrawPathCurveToQuadraticBezierSmoothRelative(DrawingWand *,const double,
+  MagickDrawPathCurveToQuadraticBezierSmoothRelative(DrawingWand *,const double,
     const double),
-  DrawPathCurveToSmoothAbsolute(DrawingWand *,const double,const double,
+  MagickDrawPathCurveToSmoothAbsolute(DrawingWand *,const double,const double,
     const double,const double),
-  DrawPathCurveToSmoothRelative(DrawingWand *,const double,const double,
+  MagickDrawPathCurveToSmoothRelative(DrawingWand *,const double,const double,
     const double,const double),
-  DrawPathEllipticArcAbsolute(DrawingWand *,const double,const double,
+  MagickDrawPathEllipticArcAbsolute(DrawingWand *,const double,const double,
     const double,unsigned int,unsigned int,const double,const double),
-  DrawPathEllipticArcRelative(DrawingWand *,const double,const double,
+  MagickDrawPathEllipticArcRelative(DrawingWand *,const double,const double,
     const double,unsigned int,unsigned int,const double,const double),
-  DrawPathFinish(DrawingWand *),
-  DrawPathLineToAbsolute(DrawingWand *,const double,const double),
-  DrawPathLineToRelative(DrawingWand *,const double,const double),
-  DrawPathLineToHorizontalAbsolute(DrawingWand *,const double),
-  DrawPathLineToHorizontalRelative(DrawingWand *,const double),
-  DrawPathLineToVerticalAbsolute(DrawingWand *,const double),
-  DrawPathLineToVerticalRelative(DrawingWand *,const double),
-  DrawPathMoveToAbsolute(DrawingWand *,const double,const double),
-  DrawPathMoveToRelative(DrawingWand *,const double,const double),
-  DrawPathStart(DrawingWand *),
-  DrawPoint(DrawingWand *,const double,const double),
-  DrawPolygon(DrawingWand *,const unsigned long,const PointInfo *),
-  DrawPolyline(DrawingWand *,const unsigned long,const PointInfo *),
-  DrawPopClipPath(DrawingWand *),
-  DrawPopDefs(DrawingWand *),
-  DrawPopGraphicContext(DrawingWand *),
-  DrawPopPattern(DrawingWand *),
-  DrawPushClipPath(DrawingWand *,const char *),
-  DrawPushDefs(DrawingWand *),
-  DrawPushGraphicContext(DrawingWand *),
-  DrawPushPattern(DrawingWand *,const char *,const double,const double,
+  MagickDrawPathFinish(DrawingWand *),
+  MagickDrawPathLineToAbsolute(DrawingWand *,const double,const double),
+  MagickDrawPathLineToRelative(DrawingWand *,const double,const double),
+  MagickDrawPathLineToHorizontalAbsolute(DrawingWand *,const double),
+  MagickDrawPathLineToHorizontalRelative(DrawingWand *,const double),
+  MagickDrawPathLineToVerticalAbsolute(DrawingWand *,const double),
+  MagickDrawPathLineToVerticalRelative(DrawingWand *,const double),
+  MagickDrawPathMoveToAbsolute(DrawingWand *,const double,const double),
+  MagickDrawPathMoveToRelative(DrawingWand *,const double,const double),
+  MagickDrawPathStart(DrawingWand *),
+  MagickDrawPoint(DrawingWand *,const double,const double),
+  MagickDrawPolygon(DrawingWand *,const unsigned long,const PointInfo *),
+  MagickDrawPolyline(DrawingWand *,const unsigned long,const PointInfo *),
+  MagickDrawPopClipPath(DrawingWand *),
+  MagickDrawPopDefs(DrawingWand *),
+  MagickDrawPopGraphicContext(DrawingWand *),
+  MagickDrawPopPattern(DrawingWand *),
+  MagickDrawPushClipPath(DrawingWand *,const char *),
+  MagickDrawPushDefs(DrawingWand *),
+  MagickDrawPushGraphicContext(DrawingWand *),
+  MagickDrawPushPattern(DrawingWand *,const char *,const double,const double,
     const double,const double),
-  DrawRectangle(DrawingWand *,const double,const double,const double,
+  MagickDrawRectangle(DrawingWand *,const double,const double,const double,
     const double),
-  DrawRotate(DrawingWand *,const double),
-  DrawRoundRectangle(DrawingWand *,double,double,double,double,double,double),
-  DrawScale(DrawingWand *,const double,const double),
-  DrawSetClipPath(DrawingWand *,const char *),
-  DrawSetClipRule(DrawingWand *,const FillRule),
-  DrawSetClipUnits(DrawingWand *,const ClipPathUnits),
-  DrawSetFillColor(DrawingWand *,const PixelWand *),
-  DrawSetFillOpacity(DrawingWand *,const double),
-  DrawSetFillRule(DrawingWand *,const FillRule),
-  DrawSetFillPatternURL(DrawingWand *,const char *),
-  DrawSetFont(DrawingWand *,const char *),
-  DrawSetFontFamily(DrawingWand *,const char *),
-  DrawSetFontSize(DrawingWand *,const double),
-  DrawSetFontStretch(DrawingWand *,const StretchType),
-  DrawSetFontStyle(DrawingWand *,const StyleType),
-  DrawSetFontWeight(DrawingWand *,const unsigned long),
-  DrawSetGravity(DrawingWand *,const GravityType),
-  DrawSkewX(DrawingWand *,const double),
-  DrawSkewY(DrawingWand *,const double),
-  DrawSetStrokeAntialias(DrawingWand *,const unsigned int),
-  DrawSetStrokeColor(DrawingWand *,const PixelWand *),
-  DrawSetStrokeDashArray(DrawingWand *,const unsigned long,const double *),
-  DrawSetStrokeDashOffset(DrawingWand *,const double dashoffset),
-  DrawSetStrokeLineCap(DrawingWand *,const LineCap),
-  DrawSetStrokeLineJoin(DrawingWand *,const LineJoin),
-  DrawSetStrokeMiterLimit(DrawingWand *,const unsigned long),
-  DrawSetStrokeOpacity(DrawingWand *, const double),
-  DrawSetStrokePatternURL(DrawingWand *,const char *),
-  DrawSetStrokeWidth(DrawingWand *,const double),
-  DrawSetTextAntialias(DrawingWand *,const unsigned int),
-  DrawSetTextDecoration(DrawingWand *,const DecorationType),
-  DrawSetTextEncoding(DrawingWand *,const char *),
-  DrawSetTextUnderColor(DrawingWand *,const PixelWand *),
-  DrawSetViewbox(DrawingWand *,unsigned long,unsigned long,unsigned long,
+  MagickDrawRotate(DrawingWand *,const double),
+  MagickDrawRoundRectangle(DrawingWand *,double,double,double,double,double,double),
+  MagickDrawScale(DrawingWand *,const double,const double),
+  MagickDrawSetClipPath(DrawingWand *,const char *),
+  MagickDrawSetClipRule(DrawingWand *,const FillRule),
+  MagickDrawSetClipUnits(DrawingWand *,const ClipPathUnits),
+  MagickDrawSetFillColor(DrawingWand *,const PixelWand *),
+  MagickDrawSetFillOpacity(DrawingWand *,const double),
+  MagickDrawSetFillRule(DrawingWand *,const FillRule),
+  MagickDrawSetFillPatternURL(DrawingWand *,const char *),
+  MagickDrawSetFont(DrawingWand *,const char *),
+  MagickDrawSetFontFamily(DrawingWand *,const char *),
+  MagickDrawSetFontSize(DrawingWand *,const double),
+  MagickDrawSetFontStretch(DrawingWand *,const StretchType),
+  MagickDrawSetFontStyle(DrawingWand *,const StyleType),
+  MagickDrawSetFontWeight(DrawingWand *,const unsigned long),
+  MagickDrawSetGravity(DrawingWand *,const GravityType),
+  MagickDrawSkewX(DrawingWand *,const double),
+  MagickDrawSkewY(DrawingWand *,const double),
+  MagickDrawSetStrokeAntialias(DrawingWand *,const unsigned int),
+  MagickDrawSetStrokeColor(DrawingWand *,const PixelWand *),
+  MagickDrawSetStrokeDashArray(DrawingWand *,const unsigned long,const double *),
+  MagickDrawSetStrokeDashOffset(DrawingWand *,const double dashoffset),
+  MagickDrawSetStrokeLineCap(DrawingWand *,const LineCap),
+  MagickDrawSetStrokeLineJoin(DrawingWand *,const LineJoin),
+  MagickDrawSetStrokeMiterLimit(DrawingWand *,const unsigned long),
+  MagickDrawSetStrokeOpacity(DrawingWand *, const double),
+  MagickDrawSetStrokePatternURL(DrawingWand *,const char *),
+  MagickDrawSetStrokeWidth(DrawingWand *,const double),
+  MagickDrawSetTextAntialias(DrawingWand *,const unsigned int),
+  MagickDrawSetTextDecoration(DrawingWand *,const DecorationType),
+  MagickDrawSetTextEncoding(DrawingWand *,const char *),
+  MagickDrawSetTextUnderColor(DrawingWand *,const PixelWand *),
+  MagickDrawSetViewbox(DrawingWand *,unsigned long,unsigned long,unsigned long,
     unsigned long),
-  DrawTranslate(DrawingWand *,const double,const double);
+  MagickDrawTranslate(DrawingWand *,const double,const double);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

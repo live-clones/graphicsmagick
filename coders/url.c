@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -43,6 +43,7 @@
 #include "magick/magick.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)
@@ -173,7 +174,7 @@ static Image *ReadURLImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
   else
     {
-      clone_info->blob=(void *) NULL;
+      clone_info->blob=(_BlobInfoPtr_) NULL;
       clone_info->length=0;
       file=AcquireTemporaryFileStream(clone_info->filename,BinaryFileIOMode);
       if (file == (FILE *) NULL)

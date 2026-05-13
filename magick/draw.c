@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -89,18 +89,17 @@ typedef enum
   PathMoveToOperation                           /* M|m (x y)+ */
 } PathOperation;
 
-typedef enum
-{
-  DefaultPathMode,
-  AbsolutePathMode,
-  RelativePathMode
-} PathMode;
-
 struct _DrawContext
 {
   /* Support structures */
+  ExceptionInfo
+    exception;
+
   Image
     *image;
+
+  MagickBool
+    own_image;          /* If true, then we own the image. */
 
   /* MVG output string and housekeeping */
   char
@@ -141,7 +140,7 @@ struct _DrawContext
   PathOperation
     path_operation;
 
-  PathMode
+  DrawPathMode
     path_mode;
 
   /* Structure unique signature */
@@ -154,187 +153,187 @@ struct _DrawContext
 struct _DrawVTable
 {
   void (*DrawAnnotation)
-    (DrawContext context, const double x, const double y,
+    (struct _DrawContext * context, const double x, const double y,
      const unsigned char *text);
   void (*DrawArc)
-    (DrawContext context, const double sx, const double sy,
+    (struct _DrawContext * context, const double sx, const double sy,
      const double ex, const double ey, const double sd, const double ed);
   void (*DrawBezier)
-    (DrawContext context, const unsigned long num_coords, const PointInfo *coordinates);
+    (struct _DrawContext * context, const unsigned long num_coords, const PointInfo *coordinates);
   void (*DrawCircle)
-    (DrawContext context, const double ox, const double oy,
+    (struct _DrawContext * context, const double ox, const double oy,
      const double px, const double py);
   void (*DrawColor)
-    (DrawContext context, const double x, const double y,
+    (struct _DrawContext * context, const double x, const double y,
      const PaintMethod paintMethod);
   void (*DrawComment)
-    (DrawContext context,const char* comment);
+    (struct _DrawContext * context,const char* comment);
   void (*DrawDestroyContext)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawEllipse)
-    (DrawContext context, const double ox, const double oy,
+    (struct _DrawContext * context, const double ox, const double oy,
      const double rx, const double ry, const double start, const double end);
   void (*DrawComposite)
-    (DrawContext context, const CompositeOperator composite_operator,
+    (struct _DrawContext * context, const CompositeOperator composite_operator,
      const double x, const double y, const double width, const double height,
      const Image * image );
   void (*DrawLine)
-    (DrawContext context, const double sx, const double sy,
+    (struct _DrawContext * context, const double sx, const double sy,
      const double ex, const double ey);
   void (*DrawMatte)
-    (DrawContext context, const double x, const double y,
+    (struct _DrawContext * context, const double x, const double y,
      const PaintMethod paint_method);
   void (*DrawPathClose)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPathCurveToAbsolute)
-    (DrawContext context, const double x1, const double y1,
+    (struct _DrawContext * context, const double x1, const double y1,
      const double x2, const double y2, const double x, const double y);
   void (*DrawPathCurveToRelative)
-    (DrawContext context, const double x1, const double y1,
+    (struct _DrawContext * context, const double x1, const double y1,
      const double x2, const double y2, const double x, const double y);
   void (*DrawPathCurveToQuadraticBezierAbsolute)
-    (DrawContext context, const double x1, const double y1,
+    (struct _DrawContext * context, const double x1, const double y1,
      const double x, const double y);
   void (*DrawPathCurveToQuadraticBezierRelative)
-    (DrawContext context, const double x1, const double y1,
+    (struct _DrawContext * context, const double x1, const double y1,
      const double x, const double y);
   void (*DrawPathCurveToQuadraticBezierSmoothAbsolute)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPathCurveToQuadraticBezierSmoothRelative)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPathCurveToSmoothAbsolute)
-    (DrawContext context, const double x2, const double y2,
+    (struct _DrawContext * context, const double x2, const double y2,
      const double x, const double y);
   void (*DrawPathCurveToSmoothRelative)
-    (DrawContext context, const double x2, const double y2,
+    (struct _DrawContext * context, const double x2, const double y2,
      const double x, const double y);
   void (*DrawPathEllipticArcAbsolute)
-    (DrawContext context, const double rx, const double ry,
+    (struct _DrawContext * context, const double rx, const double ry,
      const double x_axis_rotation, unsigned int large_arc_flag,
      unsigned int sweep_flag, const double x, const double y);
   void (*DrawPathEllipticArcRelative)
-    (DrawContext context, const double rx, const double ry,
+    (struct _DrawContext * context, const double rx, const double ry,
      const double x_axis_rotation, unsigned int large_arc_flag,
      unsigned int sweep_flag, const double x, const double y);
   void (*DrawPathFinish)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPathLineToAbsolute)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPathLineToRelative)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPathLineToHorizontalAbsolute)
-    (DrawContext context, const double x);
+    (struct _DrawContext * context, const double x);
   void (*DrawPathLineToHorizontalRelative)
-    (DrawContext context, const double x);
+    (struct _DrawContext * context, const double x);
   void (*DrawPathLineToVerticalAbsolute)
-    (DrawContext context, const double y);
+    (struct _DrawContext * context, const double y);
   void (*DrawPathLineToVerticalRelative)
-    (DrawContext context, const double y);
+    (struct _DrawContext * context, const double y);
   void (*DrawPathMoveToAbsolute)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPathMoveToRelative)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPathStart)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPoint)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawPolygon)
-    (DrawContext context, const unsigned long num_coords, const PointInfo * coordinates);
+    (struct _DrawContext * context, const unsigned long num_coords, const PointInfo * coordinates);
   void (*DrawPolyline)
-    (DrawContext context, const unsigned long num_coords, const PointInfo * coordinates);
+    (struct _DrawContext * context, const unsigned long num_coords, const PointInfo * coordinates);
   void (*DrawPopClipPath)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPopDefs)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPopGraphicContext)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPopPattern)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPushClipPath)
-    (DrawContext context, const char *clip_path_id);
+    (struct _DrawContext * context, const char *clip_path_id);
   void (*DrawPushDefs)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPushGraphicContext)
-    (DrawContext context);
+    (struct _DrawContext * context);
   void (*DrawPushPattern)
-    (DrawContext context, const char *pattern_id,
+    (struct _DrawContext * context, const char *pattern_id,
      const double x, const double y, const double width, const double height);
   void (*DrawRectangle)
-    (DrawContext context, const double x1, const double y1,
+    (struct _DrawContext * context, const double x1, const double y1,
      const double x2, const double y2);
   void (*DrawRoundRectangle)
-    (DrawContext context, double x1, double y1,
+    (struct _DrawContext * context, double x1, double y1,
      double x2, double y2, double rx, double ry);
   void (*DrawAffine)
-    (DrawContext context, const AffineMatrix *affine);
+    (struct _DrawContext * context, const AffineMatrix *affine);
   void (*DrawSetClipPath)
-    (DrawContext context, const char *clip_path);
+    (struct _DrawContext * context, const char *clip_path);
   void (*DrawSetClipRule)
-    (DrawContext context, const FillRule fill_rule);
+    (struct _DrawContext * context, const FillRule fill_rule);
   void (*DrawSetClipUnits)
-    (DrawContext context, const ClipPathUnits clip_units);
+    (struct _DrawContext * context, const ClipPathUnits clip_units);
   void (*DrawSetFillColor)
-    (DrawContext context, const PixelPacket * fill_color);
+    (struct _DrawContext * context, const PixelPacket * fill_color);
   void (*DrawSetFillOpacity)
-    (DrawContext context, const double fill_opacity);
+    (struct _DrawContext * context, const double fill_opacity);
   void (*DrawSetFillRule)
-    (DrawContext context, const FillRule fill_rule);
+    (struct _DrawContext * context, const FillRule fill_rule);
   void (*DrawSetFillPatternURL)
-    (DrawContext context, const char* fill_url);
+    (struct _DrawContext * context, const char* fill_url);
   void (*DrawSetFont)
-    (DrawContext context, const char *font_name);
+    (struct _DrawContext * context, const char *font_name);
   void (*DrawSetFontFamily)
-    (DrawContext context, const char *font_family);
+    (struct _DrawContext * context, const char *font_family);
   void (*DrawSetFontSize)
-    (DrawContext context, const double font_pointsize);
+    (struct _DrawContext * context, const double font_pointsize);
   void (*DrawSetFontStretch)
-    (DrawContext context, const StretchType font_stretch);
+    (struct _DrawContext * context, const StretchType font_stretch);
   void (*DrawSetFontStyle)
-    (DrawContext context, const StyleType font_style);
+    (struct _DrawContext * context, const StyleType font_style);
   void (*DrawSetFontWeight)
-    (DrawContext context, const unsigned long font_weight);
+    (struct _DrawContext * context, const unsigned long font_weight);
   void (*DrawSetGravity)
-    (DrawContext context, const GravityType gravity);
+    (struct _DrawContext * context, const GravityType gravity);
   void (*DrawRotate)
-    (DrawContext context, const double degrees);
+    (struct _DrawContext * context, const double degrees);
   void (*DrawScale)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawSkewX)
-    (DrawContext context, const double degrees);
+    (struct _DrawContext * context, const double degrees);
   void (*DrawSkewY)
-    (DrawContext context, const double degrees);
+    (struct _DrawContext * context, const double degrees);
 /*   void (*DrawSetStopColor) */
-/*     (DrawContext context, const PixelPacket * color, const double offset); */
+/*     (struct _DrawContext * context, const PixelPacket * color, const double offset); */
   void (*DrawSetStrokeAntialias)
-    (DrawContext context, const unsigned int true_false);
+    (struct _DrawContext * context, const unsigned int true_false);
   void (*DrawSetStrokeColor)
-    (DrawContext context, const PixelPacket * stroke_color);
+    (struct _DrawContext * context, const PixelPacket * stroke_color);
   void (*DrawSetStrokeDashArray)
-    (DrawContext context,const double *dasharray);
+    (struct _DrawContext * context,const double *dasharray);
   void (*DrawSetStrokeDashOffset)
-    (DrawContext context,const double dashoffset);
+    (struct _DrawContext * context,const double dashoffset);
   void (*DrawSetStrokeLineCap)
-    (DrawContext context, const LineCap linecap);
+    (struct _DrawContext * context, const LineCap linecap);
   void (*DrawSetStrokeLineJoin)
-    (DrawContext context, const LineJoin linejoin);
+    (struct _DrawContext * context, const LineJoin linejoin);
   void (*DrawSetStrokeMiterLimit)
-    (DrawContext context,const unsigned long miterlimit);
+    (struct _DrawContext * context,const unsigned long miterlimit);
   void (*DrawSetStrokeOpacity)
-    (DrawContext context, const double opacity);
+    (struct _DrawContext * context, const double opacity);
   void (*DrawSetStrokePatternURL)
-    (DrawContext context, const char* stroke_url);
+    (struct _DrawContext * context, const char* stroke_url);
   void (*DrawSetStrokeWidth)
-    (DrawContext context, const double width);
+    (struct _DrawContext * context, const double width);
   void (*DrawSetTextAntialias)
-    (DrawContext context, const unsigned int true_false);
+    (struct _DrawContext * context, const unsigned int true_false);
   void (*DrawSetTextDecoration)
-    (DrawContext context, const DecorationType decoration);
+    (struct _DrawContext * context, const DecorationType decoration);
   void (*DrawSetTextUnderColor)
-    (DrawContext context, const PixelPacket * color);
+    (struct _DrawContext * context, const PixelPacket * color);
   void (*DrawTranslate)
-    (DrawContext context, const double x, const double y);
+    (struct _DrawContext * context, const double x, const double y);
   void (*DrawSetViewbox)
-    (DrawContext context, unsigned long x1, unsigned long y1,
+    (struct _DrawContext * context, unsigned long x1, unsigned long y1,
      unsigned long x2, unsigned long y2);
 };
 #endif
@@ -343,19 +342,19 @@ struct _DrawVTable
   Forward declarations.
 */
 static int
-  MvgPrintf(DrawContext context, const char *format, ...) MAGICK_FUNC_PRINTF_FORMAT(2, 3),
-  MvgAutoWrapPrintf(DrawContext context, const char *format, ...) MAGICK_FUNC_PRINTF_FORMAT(2, 3);
+  MvgPrintf(struct _DrawContext * context, const char *format, ...) MAGICK_FUNC_PRINTF_FORMAT(2, 3),
+  MvgAutoWrapPrintf(struct _DrawContext * context, const char *format, ...) MAGICK_FUNC_PRINTF_FORMAT(2, 3);
 static void
-  MvgAppendColor(DrawContext context, const PixelPacket *color);
+  MvgAppendColor(struct _DrawContext * context, const PixelPacket *color);
 
 
 /* "Printf" for MVG commands */
-static int MvgPrintf(DrawContext context, const char *format, ...)
+static int MvgPrintf(struct _DrawContext * context, const char *format, ...)
 {
   const size_t
     alloc_size = MaxTextExtent * 20; /* 40K */
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   /* Allocate initial memory */
@@ -467,7 +466,7 @@ static int MvgPrintf(DrawContext context, const char *format, ...)
 }
 
 /* "Printf" for MVG commands, with autowrap at 78 characters */
-static int MvgAutoWrapPrintf(DrawContext context, const char *format, ...)
+static int MvgAutoWrapPrintf(struct _DrawContext * context, const char *format, ...)
 {
   va_list
     argp;
@@ -508,7 +507,7 @@ static int MvgAutoWrapPrintf(DrawContext context, const char *format, ...)
   return formatted_length;
 }
 
-static void MvgAppendColor(DrawContext context, const PixelPacket *color)
+static void MvgAppendColor(struct _DrawContext * context, const PixelPacket *color)
 {
   if(color->red == 0U && color->green == 0U && color->blue == 0U &&
      color->opacity == TransparentOpacity)
@@ -526,7 +525,7 @@ static void MvgAppendColor(DrawContext context, const PixelPacket *color)
     }
 }
 
-static void MvgAppendPointsCommand(DrawContext context, const char* command,
+static void MvgAppendPointsCommand(struct _DrawContext * context, const char* command,
                                    const unsigned long num_coords,
                                    const PointInfo * coordinates)
 {
@@ -546,9 +545,9 @@ static void MvgAppendPointsCommand(DrawContext context, const char* command,
   (void) MvgPrintf(context, "\n");
 }
 
-static void AdjustAffine(DrawContext context, const AffineMatrix *affine)
+static void AdjustAffine(struct _DrawContext * context, const AffineMatrix *affine)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   if ((affine->sx != 1.0) || (affine->rx != 0.0) || (affine->ry != 0.0) ||
@@ -597,14 +596,14 @@ static void AdjustAffine(DrawContext context, const AffineMatrix *affine)
 %    o text: text to draw
 %
 */
-MagickExport void DrawAnnotation(DrawContext context,
+MagickExport void DrawAnnotation(struct _DrawContext * context,
                                  const double x, const double y,
                                  const unsigned char *text)
 {
   char
     *escaped_text;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(text != (const unsigned char *) NULL);
 
@@ -642,9 +641,9 @@ MagickExport void DrawAnnotation(DrawContext context,
 %    o affine: Affine matrix parameters
 %
 */
-MagickExport void DrawAffine(DrawContext context, const AffineMatrix *affine)
+MagickExport void DrawAffine(struct _DrawContext * context, const AffineMatrix *affine)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(affine != (const AffineMatrix *)NULL);
 
@@ -682,20 +681,30 @@ MagickExport void DrawAffine(DrawContext context, const AffineMatrix *affine)
 %    o image: The image to draw on.
 %
 */
-MagickExport DrawContext DrawAllocateContext(const DrawInfo *draw_info,
-                                             Image *image)
+MagickExport struct _DrawContext * DrawAllocateContext(const DrawInfo *draw_info,
+                                                       Image *image)
 {
-  DrawContext
-    context;
+  struct _DrawContext
+    *context;
 
   /* Allocate initial drawing context */
-  context = MagickAllocateMemory(DrawContext,sizeof(struct _DrawContext));
-  if(context == (DrawContext) NULL)
+  context = MagickAllocateMemory(struct _DrawContext *,sizeof(struct _DrawContext));
+  if(context == (struct _DrawContext *) NULL)
     MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
       UnableToAllocateDrawContext);
 
   /* Support structures */
-  context->image = image;
+  GetExceptionInfo(&context->exception);
+  if (image == (Image *) NULL)
+    {
+      context->image=AllocateImage((const ImageInfo *) NULL);
+      context->own_image=MagickTrue;
+    }
+  else
+    {
+      context->image=image;
+      context->own_image=MagickFalse;
+    }
 
   /* MVG output string and housekeeping */
   context->mvg = NULL;
@@ -719,14 +728,14 @@ MagickExport DrawContext DrawAllocateContext(const DrawInfo *draw_info,
     {
       ThrowException3(&context->image->exception,ResourceLimitError,
         MemoryAllocationFailed,UnableToDrawOnImage);
-      return (DrawContext) NULL;
+      return (struct _DrawContext *) NULL;
     }
   CurrentContext=CloneDrawInfo((ImageInfo*)NULL,draw_info);
   if(CurrentContext == (DrawInfo*) NULL)
     {
       ThrowException3(&context->image->exception,ResourceLimitError,
         MemoryAllocationFailed,UnableToDrawOnImage);
-      return (DrawContext) NULL;
+      return (struct _DrawContext *) NULL;
     }
 
   context->filter_off = False;
@@ -742,6 +751,155 @@ MagickExport DrawContext DrawAllocateContext(const DrawInfo *draw_info,
   context->signature = MagickSignature;
 
   return context;
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   D r a w C l o n e C o n t e x t                                           %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  DrawCloneContext() replicates (deep copy) an existing drawing context.
+%
+%  The format of the DrawCloneContext method is:
+%
+%      DrawContext DrawCloneContext(DrawContext)
+%
+%  A description of each parameter follows:
+%
+%    o context: Existing drawing context (DrawContext)
+%
+*/
+MagickExport struct _DrawContext * DrawCloneContext(const struct _DrawContext *context)
+{
+  struct _DrawContext
+    *clone_context;
+
+  ExceptionInfo
+    exeption_info;
+
+  assert(context != (struct _DrawContext *) NULL);
+  assert(context->signature == MagickSignature);
+
+  clone_context = MagickAllocateMemory(struct _DrawContext *,sizeof(struct _DrawContext));
+  if (clone_context == (struct _DrawContext *) NULL)
+    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
+                      UnableToAllocateDrawContext);
+
+  GetExceptionInfo(&exeption_info);
+
+  /* Copy full structure (including pointers) */
+  (void) memcpy(clone_context,context,sizeof(*clone_context));
+
+  /* Clear pointers/values which require allocations/assignment */
+  clone_context->image=(Image *) NULL;
+  clone_context->mvg=(char *) NULL;
+  clone_context->pattern_id=(char *) NULL;
+  clone_context->graphic_context=(DrawInfo **) NULL;
+  clone_context->index=0;
+
+  if (context->image != (Image *) NULL)
+    {
+      if (clone_context->own_image &&
+          clone_context->image != (Image *) NULL)
+        DestroyImage(clone_context->image);
+      clone_context->image=CloneImage(context->image,0,0,MagickTrue,
+                                      &exeption_info);
+      clone_context->own_image=MagickTrue;
+      if (clone_context->image == (Image *) NULL)
+        goto draw_clone_context_fail;
+    }
+
+  if (context->mvg != (char *) NULL)
+    {
+      clone_context->mvg=MagickAllocateMemory(char *,context->mvg_alloc);
+      if (clone_context->mvg == (char *) NULL)
+        {
+          ThrowException3(&exeption_info,
+                          ResourceLimitError,
+                          MemoryAllocationFailed,
+                          UnableToCloneDrawingContext);
+          goto draw_clone_context_fail;
+        }
+      (void) memcpy(clone_context->mvg,context->mvg,context->mvg_length+1);
+    }
+
+  if (context->pattern_id != (char *) NULL)
+    {
+      clone_context->pattern_id=AcquireString(context->pattern_id);
+      if (clone_context->pattern_id == (char *) NULL)
+        {
+          ThrowException3(&exeption_info,
+                          ResourceLimitError,
+                          MemoryAllocationFailed,
+                          UnableToCloneDrawingContext);
+          goto draw_clone_context_fail;
+        }
+    }
+
+  if (context->graphic_context != (DrawInfo **) NULL)
+    {
+      clone_context->graphic_context=MagickAllocateArray(DrawInfo **,
+                                                      (size_t) context->index+1,
+                                                      sizeof(DrawInfo *));
+      if (clone_context->graphic_context == (DrawInfo **) NULL)
+        {
+          ThrowException3(&exeption_info,
+                          ResourceLimitError,
+                          MemoryAllocationFailed,
+                          UnableToCloneDrawingContext);
+          goto draw_clone_context_fail;
+        }
+      (void) memset(clone_context->graphic_context,0,
+                    ((size_t) context->index+1)*sizeof(DrawInfo *));
+
+      for (clone_context->index=0; clone_context->index <= context->index; clone_context->index++)
+        {
+          clone_context->graphic_context[clone_context->index]=
+            CloneDrawInfo((ImageInfo*)NULL,context->graphic_context[clone_context->index]);
+          if (clone_context->graphic_context[clone_context->index] == (DrawInfo*) NULL)
+            {
+              ThrowException3(&exeption_info,
+                              ResourceLimitError,
+                              MemoryAllocationFailed,
+                              UnableToCloneDrawingContext);
+              goto draw_clone_context_fail;
+            }
+        }
+      clone_context->index=context->index;
+    }
+
+  return clone_context;
+
+ draw_clone_context_fail:
+
+  if (clone_context->image != (Image *) NULL)
+    DestroyImage(clone_context->image);
+  MagickFreeMemory(clone_context->mvg);
+  MagickFreeMemory(clone_context->pattern_id);
+  if (clone_context->graphic_context != (DrawInfo **) NULL)
+    {
+      unsigned int index;
+      for ( index=0; index <= clone_context->index ; index++)
+        {
+          if (clone_context->graphic_context[index] != (DrawInfo*) NULL)
+            DestroyDrawInfo(clone_context->graphic_context[index]);
+          clone_context->graphic_context[index]=(DrawInfo*) NULL;
+        }
+      MagickFreeMemory(clone_context->graphic_context);
+    }
+  (void) memset(clone_context,0,sizeof(*clone_context));
+  MagickFreeMemory(clone_context);
+
+  /* No place to report exception, but it may be logged. */
+  DestroyExceptionInfo(&exeption_info);
+
+  return clone_context;
 }
 
 /*
@@ -782,12 +940,12 @@ MagickExport DrawContext DrawAllocateContext(const DrawInfo *draw_info,
 %    o ed: ending degrees of rotation
 %
 */
-MagickExport void DrawArc(DrawContext context,
+MagickExport void DrawArc(struct _DrawContext * context,
                           const double sx, const double sy,
                           const double ex, const double ey,
                           const double sd, const double ed)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   (void) MvgPrintf(context, "arc %g,%g %g,%g %g,%g\n",
@@ -821,10 +979,10 @@ MagickExport void DrawArc(DrawContext context,
 %    o coordinates: coordinates
 %
 */
-MagickExport void DrawBezier(DrawContext context, const unsigned long num_coords,
+MagickExport void DrawBezier(struct _DrawContext * context, const unsigned long num_coords,
                              const PointInfo *coordinates)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(coordinates != (const PointInfo *) NULL);
 
@@ -862,13 +1020,42 @@ MagickExport void DrawBezier(DrawContext context, const unsigned long num_coords
 %    o py: perimeter y ordinate
 %
 */
-MagickExport void DrawCircle(DrawContext context, const double ox,
+MagickExport void DrawCircle(struct _DrawContext * context, const double ox,
                              const double oy, const double px, const double py)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   (void) MvgPrintf(context, "circle %g,%g %g,%g\n", ox, oy, px, py);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   D r a w C l e a r E x c e p t i o n                                       %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  DrawClearException() clears any exception from the drawing context.
+%
+%  The format of the DrawClearException method is:
+%
+%      MagickPassFail DrawClearException(DrawContext context)
+%
+%  A description of each parameter follows:
+%
+%    o drawing_wand: The drawing wand.
+%
+*/
+MagickExport MagickBool DrawClearException(struct _DrawContext * context)
+{
+  DestroyExceptionInfo(&context->exception);
+  GetExceptionInfo(&context->exception);
+  return MagickPass;
 }
 
 /*
@@ -894,10 +1081,10 @@ MagickExport void DrawCircle(DrawContext context, const double ox,
 %    o context: drawing context
 %
 */
-MagickExport char *DrawGetClipPath(DrawContext context)
+MagickExport char *DrawGetClipPath(const struct _DrawContext * context)
 {
   char * pClipPath;
-  assert(context != (DrawContext)NULL);
+  assert(context != (const struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   pClipPath = *DrawInfoGetClipPath(CurrentContext);
@@ -933,10 +1120,10 @@ MagickExport char *DrawGetClipPath(DrawContext context)
 %    o clip_path: name of clipping path to associate with image
 %
 */
-MagickExport void DrawSetClipPath(DrawContext context, const char *clip_path)
+MagickExport void DrawSetClipPath(struct _DrawContext * context, const char *clip_path)
 {
   char ** ppClipPath,*pClipPath;
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(clip_path != (const char *) NULL);
 
@@ -973,16 +1160,16 @@ MagickExport void DrawSetClipPath(DrawContext context, const char *clip_path)
 %
 %  The format of the DrawGetClipRule method is:
 %
-%     FillRule DrawGetClipRule(DrawContext context)
+%     FillRule DrawGetClipRule(DrawContext * context)
 %
 %  A description of each parameter follows:
 %
 %    o context: drawing context
 %
 */
-MagickExport FillRule DrawGetClipRule(DrawContext context)
+MagickExport FillRule DrawGetClipRule(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (const struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->fill_rule;
@@ -1013,13 +1200,13 @@ MagickExport FillRule DrawGetClipRule(DrawContext context)
 %    o fill_rule: fill rule (EvenOddRule or NonZeroRule)
 %
 */
-MagickExport void DrawSetClipRule(DrawContext context,
+MagickExport void DrawSetClipRule(struct _DrawContext * context,
                                   const FillRule fill_rule)
 {
   const char
     *p = NULL;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   if(context->filter_off || (CurrentContext->fill_rule != fill_rule))
@@ -1065,12 +1252,68 @@ MagickExport void DrawSetClipRule(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport ClipPathUnits DrawGetClipUnits(DrawContext context)
+MagickExport ClipPathUnits DrawGetClipUnits(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->clip_units;
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%   D r a w G e t E x c e p t i o n                                           %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  DrawGetException() obtains error information associated with the last
+%  exception (if any).  If an exception occurred, an allocated text string
+%  is returned which contains a description of the exception.  This
+%  string should be deallocated once it is no longer needed.
+%
+%  The format of the DrawGetException method is:
+%
+%      char *DrawGetException(DrawContext context,
+%                             ExceptionType *severity)
+%
+%  A description of each parameter follows:
+%
+%    o context: drawing context
+%
+%    o severity: Enumeration of last thrown exception.
+%
+*/
+MagickExport char *DrawGetException(const struct _DrawContext * context,
+                                    ExceptionType *severity)
+{
+  char
+    buffer[MaxTextExtent],
+    *description=(char *) NULL;
+
+  assert(context != (const struct _DrawContext *)NULL);
+  assert(context->signature == MagickSignature);
+  assert(context->exception.signature == MagickSignature);
+
+  buffer[0]='\0';
+  *severity=context->exception.severity;
+  if (context->exception.severity != UndefinedException)
+    {
+      if (context->exception.description)
+        MagickFormatString(buffer,sizeof(buffer),"%.1024s (%.1024s)",
+                           context->exception.reason,
+                           context->exception.description);
+      else
+        MagickFormatString(buffer,sizeof(buffer),"%.1024s",
+                           context->exception.reason);
+      CloneString(&description,buffer);
+    }
+
+  return description;
 }
 
 /*
@@ -1098,13 +1341,13 @@ MagickExport ClipPathUnits DrawGetClipUnits(DrawContext context)
 %    o clip_units: units to use (UserSpace, UserSpaceOnUse, or ObjectBoundingBox)
 %
 */
-MagickExport void DrawSetClipUnits(DrawContext context,
+MagickExport void DrawSetClipUnits(struct _DrawContext * context,
                                    const ClipPathUnits clip_units)
 {
   const char
     *p = NULL;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   if(context->filter_off || (CurrentContext->clip_units != clip_units))
@@ -1182,14 +1425,14 @@ MagickExport void DrawSetClipUnits(DrawContext context,
 %    o paintMethod: paint method
 %
 */
-MagickExport void DrawColor(DrawContext context,
+MagickExport void DrawColor(struct _DrawContext * context,
                             const double x, const double y,
                             const PaintMethod paintMethod)
 {
   const char
     *p = NULL;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   switch (paintMethod)
@@ -1239,7 +1482,7 @@ MagickExport void DrawColor(DrawContext context,
 %    o comment: comment text
 %
 */
-MagickExport void DrawComment(DrawContext context,const char* comment)
+MagickExport void DrawComment(struct _DrawContext * context,const char* comment)
 {
   /* FIXME: should handle multi-line comments by inserting # before
      new lines */
@@ -1270,10 +1513,20 @@ MagickExport void DrawComment(DrawContext context,const char* comment)
 %    o context: drawing context to destroy
 %
 */
-MagickExport void DrawDestroyContext(DrawContext context)
+MagickExport void DrawDestroyContext(struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
+
+  (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                        "Destroying drawing context %p...", context);
+
+  DestroyExceptionInfo(&context->exception);
+
+  if ((context->image != (Image*) NULL) &&
+      (context->own_image == MagickTrue))
+    DestroyImage(context->image);
+  context->image=(Image *) NULL;
 
   /* Path operation support */
   context->path_operation = PathDefaultOperation;
@@ -1285,10 +1538,14 @@ MagickExport void DrawDestroyContext(DrawContext context)
   /* Graphic context */
   for ( ; context->index != 0; context->index--)
     {
-      DestroyDrawInfo(CurrentContext);
+      if (CurrentContext->primitive == context->mvg)
+        CurrentContext->primitive = (char *) NULL;
+      DestroyDrawInfo(CurrentContext); /* Frees MVG as draw_info->primitive */
       CurrentContext = (DrawInfo*) NULL;
     }
-  DestroyDrawInfo(CurrentContext);
+  if (CurrentContext->primitive == context->mvg)
+    CurrentContext->primitive = (char *) NULL;
+  DestroyDrawInfo(CurrentContext); /* Frees MVG as draw_info->primitive */
   CurrentContext = (DrawInfo*) NULL;
   MagickFreeMemory(context->graphic_context);
 
@@ -1312,6 +1569,9 @@ MagickExport void DrawDestroyContext(DrawContext context)
   /* Context itself */
   context->signature = 0;
   MagickFreeMemory(context);
+    (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                        " done destroy drawing context %p...", context);
+
 }
 
 /*
@@ -1351,12 +1611,12 @@ MagickExport void DrawDestroyContext(DrawContext context)
 %    o end: ending rotation in degrees
 %
 */
-MagickExport void DrawEllipse(DrawContext context,
+MagickExport void DrawEllipse(struct _DrawContext * context,
                               const double ox, const double oy,
                               const double rx, const double ry,
                               const double start, const double end)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   (void) MvgPrintf(context, "ellipse %g,%g %g,%g %g,%g\n",
@@ -1384,9 +1644,9 @@ MagickExport void DrawEllipse(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport PixelPacket DrawGetFillColor(DrawContext context)
+MagickExport PixelPacket DrawGetFillColor(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (const struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->fill;
@@ -1417,14 +1677,14 @@ MagickExport PixelPacket DrawGetFillColor(DrawContext context)
 %    o fill_color: fill color
 %
 */
-MagickExport void DrawSetFillColor(DrawContext context,
+MagickExport void DrawSetFillColor(struct _DrawContext * context,
                                    const PixelPacket *fill_color)
 {
   PixelPacket
     *current_fill,
     new_fill;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(fill_color != (const PixelPacket *) NULL);
 
@@ -1470,7 +1730,7 @@ MagickExport void DrawSetFillColor(DrawContext context,
 %    o fill_color: fill color
 %
 */
-MagickExport void DrawSetFillColorString(DrawContext context,
+MagickExport void DrawSetFillColorString(struct _DrawContext * context,
                                          const char* fill_color)
 {
   PixelPacket
@@ -1507,30 +1767,30 @@ MagickExport void DrawSetFillColorString(DrawContext context,
 %    o fill_url: URL to use to obtain fill pattern.
 %
 */
-MagickExport void DrawSetFillPatternURL(DrawContext context, const char* fill_url)
+MagickExport void DrawSetFillPatternURL(struct _DrawContext * context, const char* fill_url)
 {
   char
     pattern[MaxTextExtent];
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(fill_url != NULL);
 
-  if(fill_url[0] != '#')
+  if (fill_url[0] != '#')
     ThrowDrawException(DrawWarning,NotARelativeURL, fill_url);
 
-  FormatString(pattern,"[%.1024s]",fill_url+1);
+  MagickFormatString(pattern,sizeof(pattern),"[%.1024s]",fill_url+1);
 
   if (GetImageAttribute(context->image,pattern) == (ImageAttribute *) NULL)
     {
-      ThrowDrawException(DrawWarning,URLNotFound, fill_url)
+      ThrowDrawException(DrawWarning,URLNotFound, fill_url);
     }
   else
     {
       char
         pattern_spec[MaxTextExtent];
 
-      FormatString(pattern_spec,"url(%.1024s)",fill_url);
+      MagickFormatString(pattern_spec,sizeof(pattern_spec),"url(%.1024s)",fill_url);
 #if DRAW_BINARY_IMPLEMENTATION
       DrawPatternPath(context->image,CurrentContext,pattern_spec,&CurrentContext->fill_pattern);
 #endif
@@ -1565,9 +1825,9 @@ MagickExport void DrawSetFillPatternURL(DrawContext context, const char* fill_ur
 %    o context: drawing context
 %
 */
-MagickExport double DrawGetFillOpacity(DrawContext context)
+MagickExport double DrawGetFillOpacity(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (const struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return (((double)(MaxRGB-CurrentContext->fill.opacity))/MaxRGB);
@@ -1598,7 +1858,7 @@ MagickExport double DrawGetFillOpacity(DrawContext context)
 %    o fill_opacity: fill opacity
 %
 */
-MagickExport void DrawSetFillOpacity(DrawContext context,
+MagickExport void DrawSetFillOpacity(struct _DrawContext * context,
                                      const double fill_opacity)
 {
   Quantum
@@ -1607,7 +1867,7 @@ MagickExport void DrawSetFillOpacity(DrawContext context,
   double
     validated_opacity;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   validated_opacity=(fill_opacity < 0.0 ? 0.0 : (fill_opacity > 1.0 ? 1.0 : fill_opacity));
@@ -1641,9 +1901,9 @@ MagickExport void DrawSetFillOpacity(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport FillRule DrawGetFillRule(DrawContext context)
+MagickExport FillRule DrawGetFillRule(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (const struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->fill_rule;
@@ -1673,7 +1933,7 @@ MagickExport FillRule DrawGetFillRule(DrawContext context)
 %    o fill_rule: fill rule (EvenOddRule or NonZeroRule)
 %
 */
-MagickExport void DrawSetFillRule(DrawContext context,
+MagickExport void DrawSetFillRule(struct _DrawContext * context,
                                   const FillRule fill_rule)
 {
   const char
@@ -1726,9 +1986,9 @@ MagickExport void DrawSetFillRule(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport char *DrawGetFont(DrawContext context)
+MagickExport char *DrawGetFont(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   if (CurrentContext->font != (char *) NULL)
@@ -1762,7 +2022,7 @@ MagickExport char *DrawGetFont(DrawContext context)
 %    o font_name: font name
 %
 */
-MagickExport void DrawSetFont(DrawContext context, const char *font_name)
+MagickExport void DrawSetFont(struct _DrawContext * context, const char *font_name)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -1801,9 +2061,9 @@ MagickExport void DrawSetFont(DrawContext context, const char *font_name)
 %
 %    o context: drawing context
 */
-MagickExport char *DrawGetFontFamily(DrawContext context)
+MagickExport char *DrawGetFontFamily(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   if (CurrentContext->family != NULL)
@@ -1836,7 +2096,7 @@ MagickExport char *DrawGetFontFamily(DrawContext context)
 %    o font_family: font family
 %
 */
-MagickExport void DrawSetFontFamily(DrawContext context,
+MagickExport void DrawSetFontFamily(struct _DrawContext * context,
                                     const char *font_family)
 {
   assert(context != (DrawContext)NULL);
@@ -1875,9 +2135,9 @@ MagickExport void DrawSetFontFamily(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport double DrawGetFontSize(DrawContext context)
+MagickExport double DrawGetFontSize(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->pointsize;
@@ -1907,7 +2167,7 @@ MagickExport double DrawGetFontSize(DrawContext context)
 %    o pointsize: text pointsize
 %
 */
-MagickExport void DrawSetFontSize(DrawContext context,
+MagickExport void DrawSetFontSize(struct _DrawContext * context,
                                   const double pointsize)
 {
   assert(context != (DrawContext)NULL);
@@ -1943,9 +2203,9 @@ MagickExport void DrawSetFontSize(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport StretchType DrawGetFontStretch(DrawContext context)
+MagickExport StretchType DrawGetFontStretch(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->stretch;
@@ -1980,7 +2240,7 @@ MagickExport StretchType DrawGetFontStretch(DrawContext context)
 %                    ExtraExpandedStretch, UltraExpandedStretch, AnyStretch)
 %
 */
-MagickExport void DrawSetFontStretch(DrawContext context,
+MagickExport void DrawSetFontStretch(struct _DrawContext * context,
                                      const StretchType font_stretch)
 {
   const char
@@ -2053,9 +2313,9 @@ MagickExport void DrawSetFontStretch(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport StyleType DrawGetFontStyle(DrawContext context)
+MagickExport StyleType DrawGetFontStyle(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->style;
@@ -2086,7 +2346,7 @@ MagickExport StyleType DrawGetFontStyle(DrawContext context)
 %    o style: font style (NormalStyle, ItalicStyle, ObliqueStyle, AnyStyle)
 %
 */
-MagickExport void DrawSetFontStyle(DrawContext context,
+MagickExport void DrawSetFontStyle(struct _DrawContext * context,
                                    const StyleType style)
 {
   const char
@@ -2141,9 +2401,9 @@ MagickExport void DrawSetFontStyle(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport unsigned long DrawGetFontWeight(DrawContext context)
+MagickExport unsigned long DrawGetFontWeight(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->weight;
@@ -2174,7 +2434,7 @@ MagickExport unsigned long DrawGetFontWeight(DrawContext context)
 %    o font_weight: font weight (valid range 100-900)
 %
 */
-MagickExport void DrawSetFontWeight(DrawContext context,
+MagickExport void DrawSetFontWeight(struct _DrawContext * context,
                                     const unsigned long font_weight)
 {
   assert(context != (DrawContext)NULL);
@@ -2209,9 +2469,9 @@ MagickExport void DrawSetFontWeight(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport GravityType DrawGetGravity(DrawContext context)
+MagickExport GravityType DrawGetGravity(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->gravity;
@@ -2245,7 +2505,7 @@ MagickExport GravityType DrawGetGravity(DrawContext context)
 %               SouthEastGravity)
 %
 */
-MagickExport void DrawSetGravity(DrawContext context,
+MagickExport void DrawSetGravity(struct _DrawContext * context,
                                  const GravityType gravity)
 {
   const char
@@ -2341,7 +2601,7 @@ MagickExport void DrawSetGravity(DrawContext context,
 %    o image: Image to composite
 %
 */
-MagickExport void DrawComposite(DrawContext context,
+MagickExport void DrawComposite(struct _DrawContext * context,
                                 const CompositeOperator composite_operator,
                                 const double x, const double y,
                                 const double width, const double height,
@@ -2404,7 +2664,7 @@ MagickExport void DrawComposite(DrawContext context,
       char
         buffer[MaxTextExtent];
 
-      FormatString(buffer,"%" MAGICK_SIZE_T_F "u bytes", (4*blob_length/3+4));
+      MagickFormatString(buffer,sizeof(buffer),"%" MAGICK_SIZE_T_F "u bytes", (4*blob_length/3+4));
       ThrowDrawException(ResourceLimitWarning,MemoryAllocationFailed,buffer)
     }
 
@@ -2473,7 +2733,7 @@ MagickExport void DrawComposite(DrawContext context,
 %    o ey: ending y ordinate
 %
 */
-MagickExport void DrawLine(DrawContext context,
+MagickExport void DrawLine(struct _DrawContext * context,
                            const double sx, const double sy,
                            const double ex, const double ey)
 {
@@ -2521,7 +2781,7 @@ MagickExport void DrawLine(DrawContext context,
 %    o paint_method:
 %
 */
-MagickExport void DrawMatte(DrawContext context,
+MagickExport void DrawMatte(struct _DrawContext * context,
                             const double x, const double y,
                             const PaintMethod paint_method)
 {
@@ -2559,6 +2819,33 @@ MagickExport void DrawMatte(DrawContext context,
 %                                                                             %
 %                                                                             %
 %                                                                             %
+%   D r a w N e w C o n t e x t                                               %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  DrawNewContext() allocates an initial drawing context which is an
+%  opaque handle required by the remaining drawing methods. This is
+%  is similar to DrawAllocateContext() except that a default image and
+%  draw_info are provided.
+%
+%  The format of the DrawNewContext method is:
+%
+%      DrawContext DrawNewContext(void)
+%
+*/
+MagickExport struct _DrawContext * DrawNewContext(void)
+{
+  return DrawAllocateContext((const DrawInfo *) NULL,
+                             (Image *) NULL);
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
 %   D r a w P a t h C l o s e                                                 %
 %                                                                             %
 %                                                                             %
@@ -2579,7 +2866,7 @@ MagickExport void DrawMatte(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport void DrawPathClose(DrawContext context)
+MagickExport void DrawPathClose(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -2628,8 +2915,8 @@ MagickExport void DrawPathClose(DrawContext context)
 %    o y: y ordinate of the end of the curve
 %
 */
-static void DrawPathCurveTo(DrawContext context,
-                            const PathMode mode,
+static void DrawPathCurveTo(struct _DrawContext * context,
+                            const DrawPathMode mode,
                             const double x1, const double y1,
                             const double x2, const double y2,
                             const double x, const double y)
@@ -2650,7 +2937,7 @@ static void DrawPathCurveTo(DrawContext context,
     (void) MvgAutoWrapPrintf(context, " %g,%g %g,%g %g,%g",
                       x1, y1, x2, y2, x, y);
 }
-MagickExport void DrawPathCurveToAbsolute(DrawContext context,
+MagickExport void DrawPathCurveToAbsolute(struct _DrawContext * context,
                                           const double x1, const double y1,
                                           const double x2, const double y2,
                                           const double x, const double y)
@@ -2702,7 +2989,7 @@ MagickExport void DrawPathCurveToAbsolute(DrawContext context,
 %    o y: y ordinate of the end of the curve
 %
 */
-MagickExport void DrawPathCurveToRelative(DrawContext context,
+MagickExport void DrawPathCurveToRelative(struct _DrawContext * context,
                                           const double x1, const double y1,
                                           const double x2, const double y2,
                                           const double x, const double y)
@@ -2750,8 +3037,8 @@ MagickExport void DrawPathCurveToRelative(DrawContext context,
 %    o y: y ordinate of final point
 %
 */
-static void DrawPathCurveToQuadraticBezier(DrawContext context,
-                                           const PathMode mode,
+static void DrawPathCurveToQuadraticBezier(struct _DrawContext * context,
+                                           const DrawPathMode mode,
                                            const double x1, double y1,
                                            const double x, const double y)
 {
@@ -2769,7 +3056,7 @@ static void DrawPathCurveToQuadraticBezier(DrawContext context,
   else
     (void) MvgAutoWrapPrintf(context, " %g,%g %g,%g", x1, y1, x, y);
 }
-MagickExport void DrawPathCurveToQuadraticBezierAbsolute(DrawContext context,
+MagickExport void DrawPathCurveToQuadraticBezierAbsolute(struct _DrawContext * context,
                                                          const double x1,
                                                          const double y1,
                                                          const double x,
@@ -2818,7 +3105,7 @@ MagickExport void DrawPathCurveToQuadraticBezierAbsolute(DrawContext context,
 %    o y: y ordinate of final point
 %
 */
-MagickExport void DrawPathCurveToQuadraticBezierRelative(DrawContext context,
+MagickExport void DrawPathCurveToQuadraticBezierRelative(struct _DrawContext * context,
                                                          const double x1,
                                                          const double y1,
                                                          const double x,
@@ -2870,8 +3157,8 @@ MagickExport void DrawPathCurveToQuadraticBezierRelative(DrawContext context,
 %    o y: y ordinate of final point
 %
 */
-static void DrawPathCurveToQuadraticBezierSmooth(DrawContext context,
-                                                 const PathMode mode,
+static void DrawPathCurveToQuadraticBezierSmooth(struct _DrawContext * context,
+                                                 const DrawPathMode mode,
                                                  const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -2991,7 +3278,7 @@ MagickExport void DrawPathCurveToQuadraticBezierSmoothRelative(DrawContext
 %
 %
 */
-static void DrawPathCurveToSmooth(DrawContext context, const PathMode mode,
+static void DrawPathCurveToSmooth(struct _DrawContext * context, const DrawPathMode mode,
                                   const double x2, const double y2,
                                   const double x, const double y)
 {
@@ -3009,7 +3296,7 @@ static void DrawPathCurveToSmooth(DrawContext context, const PathMode mode,
   else
     (void) MvgAutoWrapPrintf(context, " %g,%g %g,%g", x2, y2, x, y);
 }
-MagickExport void DrawPathCurveToSmoothAbsolute(DrawContext context,
+MagickExport void DrawPathCurveToSmoothAbsolute(struct _DrawContext * context,
                                                 const double x2, const double y2,
                                                 const double x, const double y)
 {
@@ -3062,7 +3349,7 @@ MagickExport void DrawPathCurveToSmoothAbsolute(DrawContext context,
 %
 %
 */
-MagickExport void DrawPathCurveToSmoothRelative(DrawContext context,
+MagickExport void DrawPathCurveToSmoothRelative(struct _DrawContext * context,
                                                 const double x2, const double y2,
                                                 const double x, const double y)
 {
@@ -3122,7 +3409,7 @@ MagickExport void DrawPathCurveToSmoothRelative(DrawContext context,
 %
 %
 */
-static void DrawPathEllipticArc(DrawContext context, const PathMode mode,
+static void DrawPathEllipticArc(struct _DrawContext * context, const DrawPathMode mode,
                                 const double rx, const double ry,
                                 const double x_axis_rotation,
                                 unsigned int large_arc_flag,
@@ -3145,7 +3432,7 @@ static void DrawPathEllipticArc(DrawContext context, const PathMode mode,
     (void) MvgAutoWrapPrintf(context, " %g,%g %g %u %u %g,%g", rx, ry,
                       x_axis_rotation, large_arc_flag, sweep_flag, x, y);
 }
-MagickExport void DrawPathEllipticArcAbsolute(DrawContext context,
+MagickExport void DrawPathEllipticArcAbsolute(struct _DrawContext * context,
                                               const double rx, const double ry,
                                               const double x_axis_rotation,
                                               unsigned int large_arc_flag,
@@ -3208,7 +3495,7 @@ MagickExport void DrawPathEllipticArcAbsolute(DrawContext context,
 %                  clock-wise rotation
 %
 */
-MagickExport void DrawPathEllipticArcRelative(DrawContext context,
+MagickExport void DrawPathEllipticArcRelative(struct _DrawContext * context,
                                               const double rx, const double ry,
                                               const double x_axis_rotation,
                                               unsigned int large_arc_flag,
@@ -3241,7 +3528,7 @@ MagickExport void DrawPathEllipticArcRelative(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport void DrawPathFinish(DrawContext context)
+MagickExport void DrawPathFinish(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3280,8 +3567,8 @@ MagickExport void DrawPathFinish(DrawContext context)
 %    o y: target y ordinate
 %
 */
-static void DrawPathLineTo(DrawContext context,
-                           const PathMode mode,
+static void DrawPathLineTo(struct _DrawContext * context,
+                           const DrawPathMode mode,
                            const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3298,7 +3585,7 @@ static void DrawPathLineTo(DrawContext context,
   else
     (void) MvgAutoWrapPrintf(context, " %g,%g", x, y);
 }
-MagickExport void DrawPathLineToAbsolute(DrawContext context,
+MagickExport void DrawPathLineToAbsolute(struct _DrawContext * context,
                                          const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3336,7 +3623,7 @@ MagickExport void DrawPathLineToAbsolute(DrawContext context,
 %    o y: target y ordinate
 %
 */
-MagickExport void DrawPathLineToRelative(DrawContext context,
+MagickExport void DrawPathLineToRelative(struct _DrawContext * context,
                                          const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3373,8 +3660,8 @@ MagickExport void DrawPathLineToRelative(DrawContext context,
 %
 */
 
-static void DrawPathLineToHorizontal(DrawContext context,
-                                     const PathMode mode, const double x)
+static void DrawPathLineToHorizontal(struct _DrawContext * context,
+                                     const DrawPathMode mode, const double x)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3390,7 +3677,7 @@ static void DrawPathLineToHorizontal(DrawContext context,
   else
     (void) MvgAutoWrapPrintf(context, " %g", x);
 }
-MagickExport void DrawPathLineToHorizontalAbsolute(DrawContext context,
+MagickExport void DrawPathLineToHorizontalAbsolute(struct _DrawContext * context,
                                                    const double x)
 {
   assert(context != (DrawContext)NULL);
@@ -3425,7 +3712,7 @@ MagickExport void DrawPathLineToHorizontalAbsolute(DrawContext context,
 %    o x: target x ordinate
 %
 */
-MagickExport void DrawPathLineToHorizontalRelative(DrawContext context,
+MagickExport void DrawPathLineToHorizontalRelative(struct _DrawContext * context,
                                                    const double x)
 {
   DrawPathLineToHorizontal(context, RelativePathMode, x);
@@ -3458,7 +3745,7 @@ MagickExport void DrawPathLineToHorizontalRelative(DrawContext context,
 %    o y: target y ordinate
 %
 */
-static void DrawPathLineToVertical(DrawContext context, const PathMode mode,
+static void DrawPathLineToVertical(struct _DrawContext * context, const DrawPathMode mode,
                                    const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3475,7 +3762,7 @@ static void DrawPathLineToVertical(DrawContext context, const PathMode mode,
   else
     (void) MvgAutoWrapPrintf(context, " %g", y);
 }
-MagickExport void DrawPathLineToVerticalAbsolute(DrawContext context,
+MagickExport void DrawPathLineToVerticalAbsolute(struct _DrawContext * context,
                                                  const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3511,7 +3798,7 @@ MagickExport void DrawPathLineToVerticalAbsolute(DrawContext context,
 %    o y: target y ordinate
 %
 */
-MagickExport void DrawPathLineToVerticalRelative(DrawContext context,
+MagickExport void DrawPathLineToVerticalRelative(struct _DrawContext * context,
                                                  const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3548,8 +3835,9 @@ MagickExport void DrawPathLineToVerticalRelative(DrawContext context,
 %    o y: target y ordinate
 %
 */
- static void DrawPathMoveTo(DrawContext context, const PathMode mode,
-                           const double x, const double y)
+ static void DrawPathMoveTo(struct _DrawContext * context,
+                            const DrawPathMode mode,
+                            const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3566,7 +3854,7 @@ MagickExport void DrawPathLineToVerticalRelative(DrawContext context,
     (void) MvgAutoWrapPrintf(context, " %g,%g", x, y);
 }
 
-MagickExport void DrawPathMoveToAbsolute(DrawContext context, const double x,
+MagickExport void DrawPathMoveToAbsolute(struct _DrawContext * context, const double x,
                                          const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3604,7 +3892,7 @@ MagickExport void DrawPathMoveToAbsolute(DrawContext context, const double x,
 %    o y: target y ordinate
 %
 */
-MagickExport void DrawPathMoveToRelative(DrawContext context,
+MagickExport void DrawPathMoveToRelative(struct _DrawContext * context,
                                          const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3639,7 +3927,7 @@ MagickExport void DrawPathMoveToRelative(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport void DrawPathStart(DrawContext context)
+MagickExport void DrawPathStart(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3666,14 +3954,14 @@ MagickExport void DrawPathStart(DrawContext context)
 %
 %  The format of the DrawPeekGraphicContext method is:
 %
-%      DrawInfo *DrawPeekGraphicContext(const DrawContext context)
+%      DrawInfo *DrawPeekGraphicContext(DrawContext context)
 %
 %  A description of each parameter follows:
 %
 %    o context: drawing context
 %
 */
-MagickExport DrawInfo *DrawPeekGraphicContext(const DrawContext context)
+MagickExport DrawInfo *DrawPeekGraphicContext(const struct _DrawContext * context)
 {
   DrawInfo
     *draw_info;
@@ -3713,7 +4001,7 @@ MagickExport DrawInfo *DrawPeekGraphicContext(const DrawContext context)
 %    o y: target y coordinate
 %
 */
-MagickExport void DrawPoint(DrawContext context,
+MagickExport void DrawPoint(struct _DrawContext * context,
                             const double x, const double y)
 {
   assert(context != (DrawContext)NULL);
@@ -3751,7 +4039,7 @@ MagickExport void DrawPoint(DrawContext context,
 %    o coordinates: coordinate array
 %
 */
-MagickExport void DrawPolygon(DrawContext context,
+MagickExport void DrawPolygon(struct _DrawContext * context,
                               const unsigned long num_coords,
                               const PointInfo * coordinates)
 {
@@ -3790,7 +4078,7 @@ MagickExport void DrawPolygon(DrawContext context,
 %    o coordinates: coordinate array
 %
 */
-MagickExport void DrawPolyline(DrawContext context,
+MagickExport void DrawPolyline(struct _DrawContext * context,
                                const unsigned long num_coords,
                                const PointInfo * coordinates)
 {
@@ -3822,7 +4110,7 @@ MagickExport void DrawPolyline(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport void DrawPopClipPath(DrawContext context)
+MagickExport void DrawPopClipPath(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3854,7 +4142,7 @@ MagickExport void DrawPopClipPath(DrawContext context)
 %    o context: drawing context
 %
 */
-MagickExport void DrawPopDefs(DrawContext context)
+MagickExport void DrawPopDefs(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3889,7 +4177,7 @@ MagickExport void DrawPopDefs(DrawContext context)
 %    o context: drawing context
 %
 */
-MagickExport void DrawPopGraphicContext(DrawContext context)
+MagickExport void DrawPopGraphicContext(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -3941,7 +4229,7 @@ MagickExport void DrawPopGraphicContext(DrawContext context)
 %    o context: drawing context
 %
 */
-MagickExport void DrawPopPattern(DrawContext context)
+MagickExport void DrawPopPattern(struct _DrawContext * context)
 {
   char
     geometry[MaxTextExtent],
@@ -3953,10 +4241,10 @@ MagickExport void DrawPopPattern(DrawContext context)
   if( context->pattern_id == NULL )
     ThrowDrawException(DrawWarning,NotCurrentlyPushingPatternDefinition,NULL);
 
-  FormatString(key,"[%.1024s]",context->pattern_id);
+  MagickFormatString(key,sizeof(key),"[%.1024s]",context->pattern_id);
 
   (void) SetImageAttribute(context->image,key,context->mvg+context->pattern_offset);
-  FormatString(geometry,"%lux%lu%+ld%+ld",
+  MagickFormatString(geometry,sizeof(geometry),"%lux%lu%+ld%+ld",
                context->pattern_bounds.width,context->pattern_bounds.height,
                context->pattern_bounds.x,context->pattern_bounds.y);
   (void) SetImageAttribute(context->image,key,geometry);
@@ -4003,7 +4291,7 @@ MagickExport void DrawPopPattern(DrawContext context)
 %      later use.
 %
 */
-MagickExport void DrawPushClipPath(DrawContext context,
+MagickExport void DrawPushClipPath(struct _DrawContext * context,
                                    const char *clip_path_id)
 {
   assert(context != (DrawContext)NULL);
@@ -4038,7 +4326,7 @@ MagickExport void DrawPushClipPath(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport void DrawPushDefs(DrawContext context)
+MagickExport void DrawPushDefs(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -4072,7 +4360,7 @@ MagickExport void DrawPushDefs(DrawContext context)
 %    o context: drawing context
 %
 */
-MagickExport void DrawPushGraphicContext(DrawContext context)
+MagickExport void DrawPushGraphicContext(struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -4132,7 +4420,7 @@ MagickExport void DrawPushGraphicContext(DrawContext context)
 %    o height: height of pattern space
 %
 */
-MagickExport void DrawPushPattern(DrawContext context,
+MagickExport void DrawPushPattern(struct _DrawContext * context,
                                   const char *pattern_id,
                                   const double x, const double y,
                                   const double width, const double height)
@@ -4191,7 +4479,7 @@ MagickExport void DrawPushPattern(DrawContext context,
 %    o y2: y ordinate of second coordinate
 %
 */
-MagickExport void DrawRectangle(DrawContext context,
+MagickExport void DrawRectangle(struct _DrawContext * context,
                                 const double x1, const double y1,
                                 const double x2, const double y2)
 {
@@ -4215,14 +4503,14 @@ MagickExport void DrawRectangle(DrawContext context,
 %
 %  The format of the DrawRender method is:
 %
-%      int DrawRender(const DrawContext context)
+%      int DrawRender(DrawContext context)
 %
 %  A description of each parameter follows:
 %
 %    o context: drawing context
 %
 */
-MagickExport int DrawRender(const DrawContext context)
+MagickExport int DrawRender(const struct _DrawContext * context)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -4263,7 +4551,7 @@ MagickExport int DrawRender(const DrawContext context)
 %    o degrees: degrees of rotation
 %
 */
-MagickExport void DrawRotate(DrawContext context, const double degrees)
+MagickExport void DrawRotate(struct _DrawContext * context, const double degrees)
 {
   AffineMatrix
     affine;
@@ -4320,7 +4608,7 @@ MagickExport void DrawRotate(DrawContext context, const double degrees)
 %    o ry: radius of corner in vertical direction
 %
 */
-MagickExport void DrawRoundRectangle(DrawContext context,
+MagickExport void DrawRoundRectangle(struct _DrawContext * context,
                                      double x1, double y1,
                                      double x2, double y2,
                                      double rx, double ry)
@@ -4359,7 +4647,7 @@ MagickExport void DrawRoundRectangle(DrawContext context,
 %    o y: vertical scale factor
 %
 */
-MagickExport void DrawScale(DrawContext context,
+MagickExport void DrawScale(struct _DrawContext * context,
                                const double x, const double y)
 {
   AffineMatrix
@@ -4401,7 +4689,7 @@ MagickExport void DrawScale(DrawContext context,
 %    o degrees: number of degrees to skew the coordinates
 %
 */
-MagickExport void DrawSkewX(DrawContext context, const double degrees)
+MagickExport void DrawSkewX(struct _DrawContext * context, const double degrees)
 {
   AffineMatrix
     affine;
@@ -4441,7 +4729,7 @@ MagickExport void DrawSkewX(DrawContext context, const double degrees)
 %    o degrees: number of degrees to skew the coordinates
 %
 */
-MagickExport void DrawSkewY(DrawContext context, const double degrees)
+MagickExport void DrawSkewY(struct _DrawContext * context, const double degrees)
 {
   AffineMatrix
     affine;
@@ -4487,7 +4775,7 @@ MagickExport void DrawSkewY(DrawContext context, const double degrees)
 %
 */
 /* This is gradient stuff so it shouldn't be supported yet */
-MagickExport void DrawSetStopColor(DrawContext context,
+MagickExport void DrawSetStopColor(struct _DrawContext * context,
                                    const PixelPacket * stop_color,
                                    const double offset)
 {
@@ -4524,9 +4812,9 @@ MagickExport void DrawSetStopColor(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport PixelPacket DrawGetStrokeColor(DrawContext context)
+MagickExport PixelPacket DrawGetStrokeColor(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->stroke;
@@ -4557,7 +4845,7 @@ MagickExport PixelPacket DrawGetStrokeColor(DrawContext context)
 %    o stroke_color: stroke color
 %
 */
-MagickExport void DrawSetStrokeColor(DrawContext context,
+MagickExport void DrawSetStrokeColor(struct _DrawContext * context,
                                      const PixelPacket * stroke_color)
 {
   PixelPacket
@@ -4610,7 +4898,7 @@ MagickExport void DrawSetStrokeColor(DrawContext context,
 %    o stroke_color: stroke color
 %
 */
-MagickExport void DrawSetStrokeColorString(DrawContext context,
+MagickExport void DrawSetStrokeColorString(struct _DrawContext * context,
                                            const char* stroke_color)
 {
   PixelPacket
@@ -4644,7 +4932,7 @@ MagickExport void DrawSetStrokeColorString(DrawContext context,
 %    o stroke_url: URL specifying pattern ID (e.g. "#pattern_id")
 %
 */
-MagickExport void DrawSetStrokePatternURL(DrawContext context,
+MagickExport void DrawSetStrokePatternURL(struct _DrawContext * context,
                                           const char* stroke_url)
 {
   char
@@ -4657,7 +4945,7 @@ MagickExport void DrawSetStrokePatternURL(DrawContext context,
   if(stroke_url[0] != '#')
     ThrowDrawException(DrawWarning, NotARelativeURL, stroke_url);
 
-  FormatString(pattern,"[%.1024s]",stroke_url+1);
+  MagickFormatString(pattern,sizeof(pattern),"[%.1024s]",stroke_url+1);
 
   if (GetImageAttribute(context->image,pattern) == (ImageAttribute *) NULL)
     {
@@ -4668,7 +4956,7 @@ MagickExport void DrawSetStrokePatternURL(DrawContext context,
       char
         pattern_spec[MaxTextExtent];
 
-      FormatString(pattern_spec,"url(%.1024s)",stroke_url);
+      MagickFormatString(pattern_spec,sizeof(pattern_spec),"url(%.1024s)",stroke_url);
 #if DRAW_BINARY_IMPLEMENTATION
       DrawPatternPath(context->image,CurrentContext,pattern_spec,&CurrentContext->stroke_pattern);
 #endif
@@ -4704,9 +4992,9 @@ MagickExport void DrawSetStrokePatternURL(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport unsigned int DrawGetStrokeAntialias(DrawContext context)
+MagickExport unsigned int DrawGetStrokeAntialias(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->stroke_antialias;
@@ -4740,7 +5028,7 @@ MagickExport unsigned int DrawGetStrokeAntialias(DrawContext context)
 %    o stroke_antialias: set to false (zero) to disable antialiasing
 %
 */
-MagickExport void DrawSetStrokeAntialias(DrawContext context,
+MagickExport void DrawSetStrokeAntialias(struct _DrawContext * context,
                                          const unsigned int stroke_antialias)
 {
   assert(context != (DrawContext)NULL);
@@ -4771,7 +5059,8 @@ MagickExport void DrawSetStrokeAntialias(DrawContext context,
 %
 %  The format of the DrawGetStrokeDashArray method is:
 %
-%      double *DrawGetStrokeDashArray(DrawContext context,unsigned long *num_elems)
+%      double *DrawGetStrokeDashArray(DrawContext context,
+%                                     unsigned long *num_elems)
 %
 %  A description of each parameter follows:
 %
@@ -4780,7 +5069,7 @@ MagickExport void DrawSetStrokeAntialias(DrawContext context,
 %    o number_elements: address to place number of elements in dash array
 %
 % */
-MagickExport double *DrawGetStrokeDashArray(DrawContext context,
+MagickExport double *DrawGetStrokeDashArray(const struct _DrawContext * context,
                                             unsigned long *number_elements)
 {
   register const double
@@ -4796,7 +5085,7 @@ MagickExport double *DrawGetStrokeDashArray(DrawContext context,
     i,
     n = 0;
 
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
   assert(number_elements != (unsigned long *)NULL);
 
@@ -4856,7 +5145,7 @@ MagickExport double *DrawGetStrokeDashArray(DrawContext context,
 %    o dasharray: dash array values
 %
 % */
-MagickExport void DrawSetStrokeDashArray(DrawContext context,
+MagickExport void DrawSetStrokeDashArray(struct _DrawContext * context,
                                          const unsigned long num_elems,
                                          const double *dasharray)
 {
@@ -4972,9 +5261,9 @@ MagickExport void DrawSetStrokeDashArray(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport double DrawGetStrokeDashOffset(DrawContext context)
+MagickExport double DrawGetStrokeDashOffset(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->dash_offset;
@@ -5006,7 +5295,7 @@ MagickExport double DrawGetStrokeDashOffset(DrawContext context)
 %    o dash_offset: dash offset
 %
 */
-MagickExport void DrawSetStrokeDashOffset(DrawContext context,
+MagickExport void DrawSetStrokeDashOffset(struct _DrawContext * context,
                                           const double dash_offset)
 {
   assert(context != (DrawContext)NULL);
@@ -5045,9 +5334,9 @@ MagickExport void DrawSetStrokeDashOffset(DrawContext context,
 %    o context: drawing context
 %
 % */
-MagickExport LineCap DrawGetStrokeLineCap(DrawContext context)
+MagickExport LineCap DrawGetStrokeLineCap(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->linecap;
@@ -5080,7 +5369,7 @@ MagickExport LineCap DrawGetStrokeLineCap(DrawContext context)
 %    o linecap: linecap style
 %
 % */
-MagickExport void DrawSetStrokeLineCap(DrawContext context,
+MagickExport void DrawSetStrokeLineCap(struct _DrawContext * context,
                                        const LineCap linecap)
 {
   assert(context != (DrawContext)NULL);
@@ -5138,9 +5427,9 @@ MagickExport void DrawSetStrokeLineCap(DrawContext context,
 %    o context: drawing context
 %
 % */
-MagickExport LineJoin DrawGetStrokeLineJoin(DrawContext context)
+MagickExport LineJoin DrawGetStrokeLineJoin(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->linejoin;
@@ -5173,7 +5462,7 @@ MagickExport LineJoin DrawGetStrokeLineJoin(DrawContext context)
 %    o linejoin: line join style
 %
 % */
-MagickExport void DrawSetStrokeLineJoin(DrawContext context,
+MagickExport void DrawSetStrokeLineJoin(struct _DrawContext * context,
                                         const LineJoin linejoin)
 {
   assert(context != (DrawContext)NULL);
@@ -5232,9 +5521,9 @@ MagickExport void DrawSetStrokeLineJoin(DrawContext context,
 %    o context: drawing context
 %
 % */
-MagickExport unsigned long DrawGetStrokeMiterLimit(DrawContext context)
+MagickExport unsigned long DrawGetStrokeMiterLimit(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->miterlimit;
@@ -5269,7 +5558,7 @@ MagickExport unsigned long DrawGetStrokeMiterLimit(DrawContext context)
 %    o miterlimit: miter limit
 %
 % */
-MagickExport void DrawSetStrokeMiterLimit(DrawContext context,
+MagickExport void DrawSetStrokeMiterLimit(struct _DrawContext * context,
                                           const unsigned long miterlimit)
 {
   assert(context != (DrawContext)NULL);
@@ -5304,9 +5593,9 @@ MagickExport void DrawSetStrokeMiterLimit(DrawContext context,
 %
 %    o context: drawing context
 */
-MagickExport double DrawGetStrokeOpacity(DrawContext context)
+MagickExport double DrawGetStrokeOpacity(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return (((double)(MaxRGB-CurrentContext->stroke.opacity))/MaxRGB);
@@ -5337,7 +5626,7 @@ MagickExport double DrawGetStrokeOpacity(DrawContext context)
 %    o stroke_opacity: stroke opacity.  The value 1.0 is opaque.
 %
 */
-MagickExport void DrawSetStrokeOpacity(DrawContext context,
+MagickExport void DrawSetStrokeOpacity(struct _DrawContext * context,
                                        const double stroke_opacity)
 {
   Quantum
@@ -5382,9 +5671,9 @@ MagickExport void DrawSetStrokeOpacity(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport double DrawGetStrokeWidth(DrawContext context)
+MagickExport double DrawGetStrokeWidth(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->stroke_width;
@@ -5415,7 +5704,7 @@ MagickExport double DrawGetStrokeWidth(DrawContext context)
 %    o stroke_width: stroke width
 %
 */
-MagickExport void DrawSetStrokeWidth(DrawContext context,
+MagickExport void DrawSetStrokeWidth(struct _DrawContext * context,
                                      const double stroke_width)
 {
   assert(context != (DrawContext)NULL);
@@ -5453,9 +5742,9 @@ MagickExport void DrawSetStrokeWidth(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport unsigned int DrawGetTextAntialias(DrawContext context)
+MagickExport unsigned int DrawGetTextAntialias(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->text_antialias;
@@ -5488,7 +5777,7 @@ MagickExport unsigned int DrawGetTextAntialias(DrawContext context)
 %                      antialiasing.
 %
 */
-MagickExport void DrawSetTextAntialias(DrawContext context,
+MagickExport void DrawSetTextAntialias(struct _DrawContext * context,
                                        const unsigned int text_antialias)
 {
   assert(context != (DrawContext)NULL);
@@ -5525,9 +5814,9 @@ MagickExport void DrawSetTextAntialias(DrawContext context,
 %    o context: drawing context
 %
 */
-MagickExport DecorationType DrawGetTextDecoration(DrawContext context)
+MagickExport DecorationType DrawGetTextDecoration(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->decorate;
@@ -5560,7 +5849,7 @@ MagickExport DecorationType DrawGetTextDecoration(DrawContext context)
 %                                    OverlineDecoration, or LineThroughDecoration
 %
 */
-MagickExport void DrawSetTextDecoration(DrawContext context,
+MagickExport void DrawSetTextDecoration(struct _DrawContext * context,
                                         const DecorationType decoration)
 {
   const char
@@ -5618,9 +5907,9 @@ MagickExport void DrawSetTextDecoration(DrawContext context,
 %    o context: drawing context
 %
 % */
-MagickExport char *DrawGetTextEncoding(DrawContext context)
+MagickExport char *DrawGetTextEncoding(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   if (CurrentContext->encoding != (char *)NULL)
@@ -5658,7 +5947,7 @@ MagickExport char *DrawGetTextEncoding(DrawContext context)
 %    o encoding: character string specifying text encoding
 %
 */
-MagickExport void DrawSetTextEncoding(DrawContext context, const char* encoding)
+MagickExport void DrawSetTextEncoding(struct _DrawContext * context, const char* encoding)
 {
   assert(context != (DrawContext)NULL);
   assert(context->signature == MagickSignature);
@@ -5696,9 +5985,9 @@ MagickExport void DrawSetTextEncoding(DrawContext context, const char* encoding)
 %    o context: drawing context
 %
 */
-MagickExport PixelPacket DrawGetTextUnderColor(DrawContext context)
+MagickExport PixelPacket DrawGetTextUnderColor(const struct _DrawContext * context)
 {
-  assert(context != (DrawContext)NULL);
+  assert(context != (struct _DrawContext *)NULL);
   assert(context->signature == MagickSignature);
 
   return CurrentContext->undercolor;
@@ -5730,7 +6019,7 @@ MagickExport PixelPacket DrawGetTextUnderColor(DrawContext context)
 %    o under_color: text under color
 %
 */
-MagickExport void DrawSetTextUnderColor(DrawContext context,
+MagickExport void DrawSetTextUnderColor(struct _DrawContext * context,
                                         const PixelPacket *under_color)
 {
   assert(context != (DrawContext)NULL);
@@ -5772,7 +6061,7 @@ MagickExport void DrawSetTextUnderColor(DrawContext context,
 %    o under_color: text under color
 %
 */
-MagickExport void DrawSetTextUnderColorString(DrawContext context,
+MagickExport void DrawSetTextUnderColorString(struct _DrawContext * context,
                                               const char* under_color)
 {
   PixelPacket
@@ -5800,7 +6089,7 @@ MagickExport void DrawSetTextUnderColorString(DrawContext context,
 %  The format of the DrawTranslate method is:
 %
 %      void DrawTranslate(DrawContext context,
-%                            const double x, const double y)
+%                         const double x, const double y)
 %
 %  A description of each parameter follows:
 %
@@ -5811,8 +6100,8 @@ MagickExport void DrawSetTextUnderColorString(DrawContext context,
 %    o y: new y ordinate for coordinate system origin
 %
 */
-MagickExport void DrawTranslate(DrawContext context,
-                                   const double x, const double y)
+MagickExport void DrawTranslate(struct _DrawContext * context,
+                                const double x, const double y)
 {
   AffineMatrix
     affine;
@@ -5864,7 +6153,7 @@ MagickExport void DrawTranslate(DrawContext context,
 %    o y2: bottom y ordinate
 %
 */
-MagickExport void DrawSetViewbox(DrawContext context,
+MagickExport void DrawSetViewbox(struct _DrawContext * context,
                                  unsigned long x1, unsigned long y1,
                                  unsigned long x2, unsigned long y2)
 {

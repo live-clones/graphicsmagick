@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -44,6 +44,7 @@
 #include "magick/magick.h"
 #include "magick/paint.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -235,8 +236,9 @@ static unsigned int WriteHTMLImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   CloseBlob(image);
-  (void) TransformColorspace(image,RGBColorspace);
   *url='\0';
   if ((LocaleCompare(image_info->magick,"FTP") == 0) ||
       (LocaleCompare(image_info->magick,"HTTP") == 0))
@@ -285,24 +287,24 @@ static unsigned int WriteHTMLImage(const ImageInfo *image_info,Image *image)
       (void) WriteBlobString(image,"<head>\n");
       attribute=GetImageAttribute(image,"label");
       if (attribute != (const ImageAttribute *) NULL)
-        FormatString(buffer,"<title>%.1024s</title>\n",attribute->value);
+        MagickFormatString(buffer,sizeof(buffer),"<title>%.1024s</title>\n",attribute->value);
       else
         {
           GetPathComponent(filename,BasePath,basename);
-          FormatString(buffer,"<title>%.1024s</title>\n",basename);
+          MagickFormatString(buffer,sizeof(buffer),"<title>%.1024s</title>\n",basename);
         }
       (void) WriteBlobString(image,buffer);
       (void) WriteBlobString(image,"</head>\n");
       (void) WriteBlobString(image,"<body>\n");
       (void) WriteBlobString(image,"<center>\n");
-      FormatString(buffer,"<h1>%.1024s</h1>\n",image->filename);
+      MagickFormatString(buffer,sizeof(buffer),"<h1>%.1024s</h1>\n",image->filename);
       (void) WriteBlobString(image,buffer);
       (void) WriteBlobString(image,"<br><br>\n");
       (void) strlcpy(filename,image->filename,MaxTextExtent);
       AppendImageFormat("gif",filename);
-      FormatString(buffer,
-        "<img ismap usemap=\"#%.1024s\" src=\"%.1024s\" border=0>\n",
-        mapname,filename);
+      MagickFormatString(buffer,sizeof(buffer),
+                         "<img ismap usemap=\"#%.1024s\" src=\"%.1024s\" border=0>\n",
+                         mapname,filename);
       (void) WriteBlobString(image,buffer);
       /*
         Determine the size and location of each image tile.
@@ -311,21 +313,21 @@ static unsigned int WriteHTMLImage(const ImageInfo *image_info,Image *image)
       if (image->montage != (char *) NULL)
         {
           (void) GetGeometry(image->montage,&geometry.x,&geometry.y,
-            &geometry.width,&geometry.height);
+                             &geometry.width,&geometry.height);
           (void) GetMagickGeometry(image->montage,&geometry.x,&geometry.y,
-            &geometry.width,&geometry.height);
+                                   &geometry.width,&geometry.height);
         }
       /*
         Write an image map.
       */
-      FormatString(buffer,"<map name=\"%.1024s\">\n",mapname);
+      MagickFormatString(buffer,sizeof(buffer),"<map name=\"%.1024s\">\n",mapname);
       (void) WriteBlobString(image,buffer);
-      FormatString(buffer,"  <area href=\"%.1024s",url);
+      MagickFormatString(buffer,sizeof(buffer),"  <area href=\"%.1024s",url);
       (void) WriteBlobString(image,buffer);
       if (image->directory == (char *) NULL)
         {
-          FormatString(buffer,"%.1024s\" shape=rect coords=\"0,0,%lu,%lu\">\n",
-            image->filename,geometry.width-1,geometry.height-1);
+          MagickFormatString(buffer,sizeof(buffer),"%.1024s\" shape=rect coords=\"0,0,%lu,%lu\">\n",
+                             image->filename,geometry.width-1,geometry.height-1);
           (void) WriteBlobString(image,buffer);
         }
       else
@@ -334,13 +336,13 @@ static unsigned int WriteHTMLImage(const ImageInfo *image_info,Image *image)
             (void) WriteBlobByte(image,*p);
           else
             {
-              FormatString(buffer,"\" shape=rect coords=\"%ld,%ld,%ld,%ld\">\n",
-                geometry.x,geometry.y,geometry.x+(long) geometry.width-1,
-                geometry.y+(long) geometry.height-1);
+              MagickFormatString(buffer,sizeof(buffer),"\" shape=rect coords=\"%ld,%ld,%ld,%ld\">\n",
+                                 geometry.x,geometry.y,geometry.x+(long) geometry.width-1,
+                                 geometry.y+(long) geometry.height-1);
               (void) WriteBlobString(image,buffer);
               if (*(p+1) != '\0')
                 {
-                  FormatString(buffer,"  <area href=%.1024s\"",url);
+                  MagickFormatString(buffer,sizeof(buffer),"  <area href=%.1024s\"",url);
                   (void) WriteBlobString(image,buffer);
                 }
               geometry.x+=geometry.width;
@@ -401,21 +403,21 @@ static unsigned int WriteHTMLImage(const ImageInfo *image_info,Image *image)
   if (image->montage != (char *) NULL)
     {
       (void) GetGeometry(image->montage,&geometry.x,&geometry.y,
-        &geometry.width,&geometry.height);
+                         &geometry.width,&geometry.height);
       (void) GetMagickGeometry(image->montage,&geometry.x,&geometry.y,
-        &geometry.width,&geometry.height);
+                               &geometry.width,&geometry.height);
     }
   /*
     Write an image map.
   */
-  FormatString(buffer,"<map name=\"%.1024s\">\n",mapname);
+  MagickFormatString(buffer,sizeof(buffer),"<map name=\"%.1024s\">\n",mapname);
   (void) WriteBlobString(image,buffer);
-  FormatString(buffer,"  <area href=\"%.1024s",url);
+  MagickFormatString(buffer,sizeof(buffer),"  <area href=\"%.1024s",url);
   (void) WriteBlobString(image,buffer);
   if (image->directory == (char *) NULL)
     {
-      FormatString(buffer,"%.1024s\" shape=rect coords=\"0,0,%lu,%lu\">\n",
-        image->filename,geometry.width-1,geometry.height-1);
+      MagickFormatString(buffer,sizeof(buffer),"%.1024s\" shape=rect coords=\"0,0,%lu,%lu\">\n",
+                         image->filename,geometry.width-1,geometry.height-1);
       (void) WriteBlobString(image,buffer);
     }
   else
@@ -424,13 +426,13 @@ static unsigned int WriteHTMLImage(const ImageInfo *image_info,Image *image)
         (void) WriteBlobByte(image,*p);
       else
         {
-          FormatString(buffer,"\" shape=rect coords=\"%ld,%ld,%ld,%ld\">\n",
-            geometry.x,geometry.y,geometry.x+(long) geometry.width-1,
-            geometry.y+(long) geometry.height-1);
+          MagickFormatString(buffer,sizeof(buffer),"\" shape=rect coords=\"%ld,%ld,%ld,%ld\">\n",
+                             geometry.x,geometry.y,geometry.x+(long) geometry.width-1,
+                             geometry.y+(long) geometry.height-1);
           (void) WriteBlobString(image,buffer);
           if (*(p+1) != '\0')
             {
-              FormatString(buffer,"  <area href=%.1024s\"",url);
+              MagickFormatString(buffer,sizeof(buffer),"  <area href=%.1024s\"",url);
               (void) WriteBlobString(image,buffer);
             }
           geometry.x+=geometry.width;

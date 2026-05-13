@@ -44,7 +44,7 @@
 #
 #
 
-# Copyright (C) 2004-2020 GraphicsMagick Group
+# Copyright (C) 2004-2025 GraphicsMagick Group
 
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -4507,6 +4507,7 @@ RST2HTML_TARGETS = \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
 	$(WWWDIR)/ChangeLog-2024.html \
+	$(WWWDIR)/ChangeLog-2025.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -4631,6 +4632,7 @@ WWW_HTML_FILES = \
 	$(WWWDIR)/ChangeLog-2022.html \
 	$(WWWDIR)/ChangeLog-2023.html \
 	$(WWWDIR)/ChangeLog-2024.html \
+	$(WWWDIR)/ChangeLog-2025.html \
 	$(WWWDIR)/ChangeLog.html \
 	$(WWWDIR)/Changes.html \
 	$(WWWDIR)/Copyright.html \
@@ -11178,6 +11180,7 @@ magick-install-data-local:
 	$(INSTALL_HEADER) magick/magick_config_api.h $(DESTDIR)$(magickincdir)/magick_config.h
 magick-uninstall-local:
 	rm -f $(DESTDIR)$(magickincdir)/magick_config.h
+# FIXME: Need to install www/images/patterns
 install-data-html:
 	$(mkinstalldirs) $(DESTDIR)$(htmldir)
 	@for dir in $(DOCDIRS) ; do \
@@ -11216,6 +11219,10 @@ uninstall-data-html:
 @MAINTAINER_MODE_TRUE@$(top_srcdir)/www/ChangeLog.rst: $(top_srcdir)/ChangeLog
 @MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
 @MAINTAINER_MODE_TRUE@	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog' < $^ > $@
+
+@MAINTAINER_MODE_TRUE@$(top_srcdir)/www/ChangeLog-2025.rst: $(top_srcdir)/ChangeLog.2025
+@MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
+@MAINTAINER_MODE_TRUE@	$(CHANGELOG2RST) 'GraphicsMagick ChangeLog - 2025' < $^ > $@
 
 @MAINTAINER_MODE_TRUE@$(top_srcdir)/www/ChangeLog-2024.rst: $(top_srcdir)/ChangeLog.2024
 @MAINTAINER_MODE_TRUE@	@printf "Updating $@ ...\n"
@@ -11449,7 +11456,8 @@ $(top_srcdir)/$(PERLMAGICK)/Magick.pm : $(PERLMAGICK)/Magick.pm
 @WITH_PERL_TRUE@	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 @WITH_PERL_TRUE@	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 @WITH_PERL_TRUE@	rm -f Makefile.old PerlMagick ; \
-@WITH_PERL_TRUE@	rm -f t/output* t/jng/*_tmp.jng t/*/output* )
+@WITH_PERL_TRUE@	rm -f t/output* t/jng/*_tmp.jng t/*/output* ; \
+@WITH_PERL_TRUE@	find . -type l -exec rm -f {} + ) ;
 @WITH_PERL_TRUE@	rm -f perl-sources
 
 @WITH_PERL_TRUE@distclean-perl: clean-perl

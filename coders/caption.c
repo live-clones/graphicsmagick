@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -39,6 +39,7 @@
 #include "magick/magick.h"
 #include "magick/render.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,7 +136,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
         Read caption from file.
       */
       (void) strlcpy(image->filename,image_info->filename+1,MaxTextExtent);
-      caption=FileToBlob(image->filename,&length,exception);
+      caption=(char *) FileToBlob(image->filename,&length,exception);
       if (caption == (char *) NULL)
         ThrowCAPTIONException(FileOpenError,UnableToOpenFile,image);
     }
@@ -179,7 +180,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
     Draw caption.
   */
   (void) CloneString(&draw_info->text,caption);
-  FormatString(geometry,"+%g+%g",metrics.max_advance/4,metrics.ascent);
+  MagickFormatString(geometry,sizeof(geometry),"+%g+%g",metrics.max_advance/4,metrics.ascent);
   draw_info->geometry=AllocateString(geometry);
   (void) AnnotateImage(image,draw_info);
   DestroyDrawInfo(draw_info);

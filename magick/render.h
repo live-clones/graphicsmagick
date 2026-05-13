@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2020 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -349,6 +349,7 @@ extern MagickExport MagickPassFail
   AnnotateImage(Image *,const DrawInfo *),
   DrawAffineImage(Image *,const Image *,const AffineMatrix *),
   DrawClipPath(Image *,const DrawInfo *,const char *),
+  DrawCompositeMask(Image *image,const DrawInfo *draw_info, const char *name),
   DrawImage(Image *,const DrawInfo *),
   DrawPatternPath(Image *,const DrawInfo *,const char *,Image **),
   GetTypeMetrics(Image *,const DrawInfo *,TypeMetric *);

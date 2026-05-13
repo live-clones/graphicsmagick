@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2025 GraphicsMagick Group */
+/* Copyright (C) 2003-2026 GraphicsMagick Group */
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -17,7 +17,7 @@
 %                         W   W  A   A  N   N  DDDD                           %
 %                                                                             %
 %                                                                             %
-%                   ImageMagick Image Vector Drawing Methods                  %
+%                 GraphicsMagick Image Vector Drawing Methods                 %
 %                                                                             %
 %                              Software Design                                %
 %                              Bob Friesenhahn                                %
@@ -51,15 +51,16 @@
 %  ImageMagick Studio.                                                        %
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 */
 
 /*
   Include declarations.
 */
+#define MAGICK_EXCLUDE_DRAWING_WAND_MACROS 1
 #include "magick/studio.h"
 #include "magick/attribute.h"
 #include "magick/blob.h"
+#include "magick/draw.h"
 #include "magick/enum_strings.h"
 #include "magick/error.h"
 #include "magick/gem.h"
@@ -74,303 +75,15 @@
   Define declarations.
 */
 #define CurrentContext  (drawing_wand->graphic_context[drawing_wand->index])
-#define WandColorMatch(p,q) (((p)->red == (q)->red) && \
-  ((p)->green == (q)->green) && ((p)->blue == (q)->blue) && \
-  ((p)->opacity == (q)->opacity))
 
 /*
   Typedef declarations.
 */
-typedef enum
-{
-  PathDefaultOperation,
-  PathCloseOperation,                        /* Z|z (none) */
-  PathCurveToOperation,                      /* C|c (x1 y1 x2 y2 x y)+ */
-  PathCurveToQuadraticBezierOperation,       /* Q|q (x1 y1 x y)+ */
-  PathCurveToQuadraticBezierSmoothOperation, /* T|t (x y)+ */
-  PathCurveToSmoothOperation,                /* S|s (x2 y2 x y)+ */
-  PathEllipticArcOperation,                  /* A|a (rx ry x-axis-rotation large-arc-flag sweep-flag x y)+ */
-  PathLineToHorizontalOperation,             /* H|h x+ */
-  PathLineToOperation,                       /* L|l (x y)+ */
-  PathLineToVerticalOperation,               /* V|v y+ */
-  PathMoveToOperation                        /* M|m (x y)+ */
-} PathOperation;
-
-typedef enum
-{
-  DefaultPathMode,
-  AbsolutePathMode,
-  RelativePathMode
-} PathMode;
-
-struct _DrawingWand
-{
-  /* Support structures */
-  ExceptionInfo
-    exception;
-
-  Image
-    *image;
-
-  MagickBool
-    own_image;          /* If true, then we own the image. */
-
-  /* MVG output string and housekeeping */
-  char
-    *mvg;               /* MVG data */
-
-  size_t
-    mvg_alloc,          /* total allocated memory */
-    mvg_length;         /* total MVG length */
-
-  unsigned int
-    mvg_width;          /* current line length */
-
-  /* Pattern support */
-  char
-    *pattern_id;
-
-  RectangleInfo
-    pattern_bounds;
-
-  size_t
-    pattern_offset;
-
-  /* Graphic drawing_wand */
-  int
-    index;              /* array index */
-
-  DrawInfo
-    **graphic_context;
-
-  int
-    filter_off;         /* true if not filtering attributes */
-
-  /* Pretty-printing depth */
-  unsigned int
-    indent_depth;       /* number of left-hand pad characters */
-
-  /* Path operation support */
-  PathOperation
-    path_operation;
-
-  PathMode
-    path_mode;
-
-  /* Structure unique signature */
-  unsigned long
-    signature;
-};
 
 /*
   Forward declarations.
 */
-static int
-  MvgPrintf(DrawingWand *drawing_wand, const char *format, ...)
-#if defined(__GNUC__)
-MAGICK_ATTRIBUTE ((format (printf, 2, 3)))
-#endif
-,
-  MvgAutoWrapPrintf(DrawingWand *drawing_wand, const char *format, ...)
-#if defined(__GNUC__)
-MAGICK_ATTRIBUTE ((format (printf, 2, 3)))
-#endif
-;
-static void
-  MvgAppendColor(DrawingWand *drawing_wand, const PixelPacket *color);
 
-
-/* "Printf" for MVG commands */
-static int MvgPrintf(DrawingWand *drawing_wand,const char *format,...)
-{
-  const size_t
-    alloc_size=20*MaxTextExtent; /* 40K */
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->mvg == (char*) NULL)
-    {
-      drawing_wand->mvg=MagickAllocateMemory(char *,alloc_size);
-      if ( drawing_wand->mvg == (char*) NULL )
-        {
-          ThrowException3(&drawing_wand->exception,
-            ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
-          return(-1);
-        }
-
-      drawing_wand->mvg_alloc=alloc_size;
-      drawing_wand->mvg_length=0;
-      if (drawing_wand->mvg == 0)
-        {
-          ThrowException3(&drawing_wand->exception,
-            ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
-          return(-1);
-        }
-    }
-  if (drawing_wand->mvg_alloc < (drawing_wand->mvg_length + MaxTextExtent * 10))
-    {
-      size_t realloc_size=drawing_wand->mvg_alloc + alloc_size;
-
-      MagickReallocMemory(char *,drawing_wand->mvg,realloc_size);
-      if (drawing_wand->mvg == NULL)
-        {
-          ThrowException3(&drawing_wand->exception,
-            ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
-          return -1;
-        }
-      drawing_wand->mvg_alloc=realloc_size;
-    }
-  {
-    ssize_t
-      formatted_length;
-
-    va_list
-      argp;
-
-    while (drawing_wand->mvg_width < drawing_wand->indent_depth)
-    {
-      drawing_wand->mvg[drawing_wand->mvg_length]=' ';
-      drawing_wand->mvg_length++;
-      drawing_wand->mvg_width++;
-    }
-    drawing_wand->mvg[drawing_wand->mvg_length]=0;
-
-    /*
-      According to C99, vsnprintf() returns the number of formatted
-      bytes which WOULD have been written (not including trailing
-      '\0') if there was sufficient space available.  If an output
-      error occurs, then a negative value is returned.
-
-      Under Linux glibc 2.0.6 and earlier, -1 is returned when the
-      output has been truncated.
-    */
-    {
-      size_t
-                space_available;
-
-      space_available=drawing_wand->mvg_alloc-drawing_wand->mvg_length-1;
-      formatted_length = -1;
-      if (space_available > 0)
-        {
-
-          va_start(argp, format);
-#if defined(HAVE_VSNPRINTF)
-          formatted_length=vsnprintf(drawing_wand->mvg+drawing_wand->mvg_length,
-                                     (size_t) space_available,format,argp);
-#else
-          formatted_length=vsprintf(drawing_wand->mvg+drawing_wand->mvg_length,
-                                    format,argp);
-#endif
-          va_end(argp);
-        }
-      if ((formatted_length < 0) || ((size_t) formatted_length > space_available))
-        {
-          ThrowException(&drawing_wand->exception,DrawError,
-                         UnableToPrint,format);
-        }
-      else
-        {
-          drawing_wand->mvg_length+=formatted_length;
-          drawing_wand->mvg_width+=formatted_length;
-        }
-    }
-    drawing_wand->mvg[drawing_wand->mvg_length]=0;
-    if ((drawing_wand->mvg_length > 1) &&
-        (drawing_wand->mvg[drawing_wand->mvg_length-1] == '\n'))
-      drawing_wand->mvg_width=0;
-    assert((drawing_wand->mvg_length+1) < drawing_wand->mvg_alloc);
-    return formatted_length;
-  }
-}
-
-static int MvgAutoWrapPrintf(DrawingWand *drawing_wand,const char *format,...)
-{
-  char
-    buffer[MaxTextExtent];
-
-  int
-    formatted_length;
-
-  va_list
-    argp;
-
-  va_start(argp,format);
-#if defined(HAVE_VSNPRINTF)
-  formatted_length=vsnprintf(buffer,sizeof(buffer)-1,format,argp);
-#else
-  formatted_length=vsprintf(buffer,format,argp);
-#endif
-  va_end(argp);
-  buffer[sizeof(buffer)-1]=0;
-  if (formatted_length < 0)
-    {
-      ThrowException(&drawing_wand->exception,DrawError,
-                     UnableToPrint,format);
-    }
-  else
-    {
-      if (((drawing_wand->mvg_width + formatted_length) > 78) &&
-          (buffer[formatted_length-1] != '\n'))
-        (void) MvgPrintf(drawing_wand, "\n");
-      (void) MvgPrintf(drawing_wand,"%s",buffer);
-    }
-  return(formatted_length);
-}
-
-static void MvgAppendColor(DrawingWand *drawing_wand, const PixelPacket *color)
-{
-  if (color->red == 0U && color->green == 0U && color->blue == 0U &&
-      color->opacity == TransparentOpacity)
-    (void) MvgPrintf(drawing_wand,"none");
-  else
-    {
-      char
-        tuple[MaxTextExtent];
-
-      GetColorTuple(color,QuantumDepth,MagickTrue,MagickTrue,tuple);
-      (void) MvgPrintf(drawing_wand,"%.1024s",tuple);
-    }
-}
-
-static void MvgAppendPointsCommand(DrawingWand *drawing_wand,
-  char *command,const unsigned long number_coordinates,const PointInfo *coordinates)
-{
-  const PointInfo
-    *coordinate;
-
-  size_t
-    i;
-
-  (void) MvgPrintf(drawing_wand, "%s", command);
-  for (i=number_coordinates, coordinate=coordinates; i; i--)
-    {
-      (void) MvgAutoWrapPrintf(drawing_wand," %g,%g",coordinate->x,coordinate->y);
-      coordinate++;
-    }
-  (void) MvgPrintf(drawing_wand, "\n");
-}
-
-static void AdjustAffine(DrawingWand *drawing_wand,const AffineMatrix *affine)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((affine->sx != 1.0) || (affine->rx != 0.0) || (affine->ry != 0.0) ||
-      (affine->sy != 1.0) || (affine->tx != 0.0) || (affine->ty != 0.0))
-    {
-      AffineMatrix
-        current;
-
-      current=CurrentContext->affine;
-      CurrentContext->affine.sx=current.sx*affine->sx+current.ry*affine->rx;
-      CurrentContext->affine.rx=current.rx*affine->sx+current.sy*affine->rx;
-      CurrentContext->affine.ry=current.sx*affine->ry+current.ry*affine->sy;
-      CurrentContext->affine.sy=current.rx*affine->ry+current.sy*affine->sy;
-      CurrentContext->affine.tx=current.sx*affine->tx+current.ry*affine->ty+
-        current.tx;
-      CurrentContext->affine.ty=current.rx*affine->tx+current.sy*affine->ty+
-        current.ty;
-    }
-}
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -395,105 +108,9 @@ static void AdjustAffine(DrawingWand *drawing_wand,const AffineMatrix *affine)
 %    o drawing_wand: The drawing wand to copy
 %
 */
-WandExport DrawingWand *CloneDrawingWand(const DrawingWand *drawing_wand)
+WandExport DrawingWand *MagickCloneDrawingWand(const DrawingWand *drawing_wand)
 {
-  DrawingWand
-    *clone_wand;
-
-  ExceptionInfo
-    exeption_info;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-
-  clone_wand=MagickAllocateMemory(DrawingWand *,sizeof(*clone_wand));
-  if (clone_wand == (DrawingWand *) NULL)
-    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-                      UnableToAllocateDrawingWand);
-
-  GetExceptionInfo(&exeption_info);
-  (void) memcpy(clone_wand,drawing_wand,sizeof(*clone_wand));
-  GetExceptionInfo(&clone_wand->exception);
-  clone_wand->image=(Image *) NULL;
-  clone_wand->mvg=(char *) NULL;
-  clone_wand->pattern_id=(char *) NULL;
-  clone_wand->graphic_context=(DrawInfo **) NULL;
-
-  clone_wand->own_image=MagickTrue;
-  if (drawing_wand->image != (Image *) NULL)
-    {
-      clone_wand->image=CloneImage(drawing_wand->image,0,0,MagickTrue,
-                                   &exeption_info);
-      if (clone_wand->image == (Image *) NULL)
-        goto clone_drawing_wand_fail;
-    }
-
-  if (drawing_wand->mvg)
-    {
-      clone_wand->mvg=MagickAllocateMemory(char *,drawing_wand->mvg_alloc);
-      if (clone_wand->mvg == (char *) NULL)
-        {
-          ThrowException3(&exeption_info,ResourceLimitError,
-                          MemoryAllocationFailed,UnableToCloneDrawingWand);
-          goto clone_drawing_wand_fail;
-        }
-      (void) memcpy(clone_wand->mvg,drawing_wand->mvg,drawing_wand->mvg_length+1);
-    }
-
-  if (drawing_wand->pattern_id != (const char *) NULL)
-    clone_wand->pattern_id=AllocateString(drawing_wand->pattern_id);
-
-  if (drawing_wand->graphic_context != (DrawInfo **) NULL)
-    {
-      clone_wand->graphic_context=MagickAllocateArray(DrawInfo **,
-                                                      (size_t) drawing_wand->index+1,
-                                                      sizeof(DrawInfo *));
-      if (clone_wand->graphic_context == (DrawInfo **) NULL)
-        {
-          ThrowException3(&exeption_info,ResourceLimitError,
-                          MemoryAllocationFailed,UnableToCloneDrawingWand);
-          goto clone_drawing_wand_fail;
-        }
-      (void) memset(clone_wand->graphic_context,0,
-                    ((size_t) drawing_wand->index+1)*sizeof(DrawInfo *));
-
-      for (clone_wand->index=0; clone_wand->index <= drawing_wand->index; clone_wand->index++)
-        {
-          clone_wand->graphic_context[clone_wand->index]=
-            CloneDrawInfo((ImageInfo*)NULL,drawing_wand->graphic_context[clone_wand->index]);
-          if (clone_wand->graphic_context[clone_wand->index] == (DrawInfo*) NULL)
-            {
-              ThrowException3(&exeption_info,ResourceLimitError,
-                              MemoryAllocationFailed,UnableToCloneDrawingWand);
-              goto clone_drawing_wand_fail;
-            }
-        }
-      clone_wand->index=drawing_wand->index;
-    }
-
-  return(clone_wand);
-
-clone_drawing_wand_fail:
-
-  if (clone_wand->image != (Image *) NULL)
-    DestroyImage(clone_wand->image);
-  MagickFreeMemory(clone_wand->mvg);
-  MagickFreeMemory(clone_wand->pattern_id);
-  if (clone_wand->graphic_context != (DrawInfo **) NULL)
-    {
-      for ( ; clone_wand->index >= 0; clone_wand->index--)
-        {
-          if (clone_wand->graphic_context[clone_wand->index] != (DrawInfo*) NULL)
-            DestroyDrawInfo(clone_wand->graphic_context[clone_wand->index]);
-          clone_wand->graphic_context[clone_wand->index]=(DrawInfo*) NULL;
-        }
-      MagickFreeMemory(clone_wand->graphic_context);
-    }
-  (void) memset(clone_wand,0,sizeof(*clone_wand));
-  MagickFreeMemory(clone_wand);
-  /* No place to report exception, but it may be logged. */
-  DestroyExceptionInfo(&exeption_info);
-  return(clone_wand);
+  return DrawCloneContext(drawing_wand);
 }
 
 /*
@@ -520,34 +137,9 @@ clone_drawing_wand_fail:
 %    o drawing_wand: The drawing wand to destroy.
 %
 */
-WandExport void DestroyDrawingWand(DrawingWand *drawing_wand)
+WandExport void MagickDestroyDrawingWand(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-
-  DestroyExceptionInfo(&drawing_wand->exception);
-
-  if ((drawing_wand->image != (Image*) NULL) &&
-      (drawing_wand->own_image == MagickTrue))
-    DestroyImage(drawing_wand->image);
-
-  MagickFreeMemory(drawing_wand->mvg);
-
-  MagickFreeMemory(drawing_wand->pattern_id);
-
-  if (drawing_wand->graphic_context != (DrawInfo **) NULL)
-    {
-      for ( ; drawing_wand->index >= 0; drawing_wand->index--)
-        {
-          if (drawing_wand->graphic_context[drawing_wand->index] != (DrawInfo*) NULL)
-            DestroyDrawInfo(drawing_wand->graphic_context[drawing_wand->index]);
-          drawing_wand->graphic_context[drawing_wand->index]=(DrawInfo*) NULL;
-        }
-      MagickFreeMemory(drawing_wand->graphic_context);
-    }
-
-  (void) memset(drawing_wand,0,sizeof(*drawing_wand));
-  MagickFreeMemory(drawing_wand);
+  DrawDestroyContext(drawing_wand);
 }
 
 /*
@@ -579,18 +171,10 @@ WandExport void DestroyDrawingWand(DrawingWand *drawing_wand)
 %    o text: text to draw
 %
 */
-WandExport void DrawAnnotation(DrawingWand *drawing_wand,const double x,
+WandExport void MagickDrawAnnotation(DrawingWand *drawing_wand,const double x,
   const double y,const unsigned char *text)
 {
-  char
-    *escaped_text;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(text != (const unsigned char *) NULL);
-  escaped_text=EscapeString((const char*)text,'\'');
-  (void) MvgPrintf(drawing_wand,"text %g,%g '%s'\n",x,y,escaped_text);
-  MagickFreeMemory(escaped_text);
+  DrawAnnotation(drawing_wand,x,y,text);
 }
 
 /*
@@ -619,15 +203,10 @@ WandExport void DrawAnnotation(DrawingWand *drawing_wand,const double x,
 %    o affine: Affine matrix parameters
 %
 */
-WandExport void DrawAffine(DrawingWand *drawing_wand,
+WandExport void MagickDrawAffine(DrawingWand *drawing_wand,
   const AffineMatrix *affine)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(affine != (const AffineMatrix *)NULL);
-  AdjustAffine(drawing_wand,affine );
-  (void) MvgPrintf(drawing_wand,"affine %.6g,%.6g,%.6g,%.6g,%.6g,%.6g\n",affine->sx,
-    affine->rx,affine->ry,affine->sy,affine->tx,affine->ty);
+  DrawAffine(drawing_wand,affine);
 }
 
 /*
@@ -646,34 +225,19 @@ WandExport void DrawAffine(DrawingWand *drawing_wand,
 %
 %  The format of the DrawAllocateWand method is:
 %
-%      DrawingWand DrawAllocateWand(const DrawInfo *draw_info,Image *image)
+%      DrawingWand *DrawAllocateWand(const DrawInfo *draw_info,Image *image)
 %
 %  A description of each parameter follows:
 %
 %    o draw_info: Initial drawing defaults. Set to NULL to use
-%                 ImageMagick defaults.
+%                 GraphicsMagick defaults.
 %
 %    o image: The image to draw on.
 %
 */
-WandExport DrawingWand *DrawAllocateWand(const DrawInfo *draw_info,Image *image)
+WandExport DrawingWand *MagickDrawAllocateWand(const DrawInfo *draw_info,Image *image)
 {
-  DrawingWand
-    *drawing_wand;
-
-  drawing_wand=NewDrawingWand();
-  if (draw_info != (const DrawInfo *) NULL)
-    {
-      DestroyDrawInfo(CurrentContext);
-      CurrentContext=CloneDrawInfo((ImageInfo *) NULL,draw_info);
-    }
-  if (image != (Image *) NULL)
-    {
-      DestroyImage(drawing_wand->image);
-      drawing_wand->own_image=MagickFalse;
-    }
-  drawing_wand->image=image;
-  return drawing_wand;
+  return DrawAllocateContext(draw_info,image);
 }
 
 /*
@@ -712,14 +276,11 @@ WandExport DrawingWand *DrawAllocateWand(const DrawInfo *draw_info,Image *image)
 %    o ed: ending degrees of rotation
 %
 */
-WandExport void DrawArc(DrawingWand *drawing_wand,const double sx,
+WandExport void MagickDrawArc(DrawingWand *drawing_wand,const double sx,
   const double sy,const double ex,const double ey,const double sd,
   const double ed)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"arc %g,%g %g,%g %g,%g\n",sx,sy,ex,ey,
-    sd,ed);
+  DrawArc(drawing_wand,sx,sy,ex,ey,sd,ed);
 }
 
 /*
@@ -749,13 +310,10 @@ WandExport void DrawArc(DrawingWand *drawing_wand,const double sx,
 %    o coordinates: coordinates
 %
 */
-WandExport void DrawBezier(DrawingWand *drawing_wand,
+WandExport void MagickDrawBezier(DrawingWand *drawing_wand,
   const unsigned long number_coordinates,const PointInfo *coordinates)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(coordinates != (const PointInfo *) NULL);
-  MvgAppendPointsCommand(drawing_wand,"bezier",number_coordinates,coordinates);
+  DrawBezier(drawing_wand,number_coordinates,coordinates);
 }
 
 /*
@@ -789,12 +347,10 @@ WandExport void DrawBezier(DrawingWand *drawing_wand,
 %    o py: perimeter y ordinate
 %
 */
-WandExport void DrawCircle(DrawingWand *drawing_wand,const double ox,
+WandExport void MagickDrawCircle(DrawingWand *drawing_wand,const double ox,
   const double oy,const double px,const double py)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand, "circle %g,%g %g,%g\n",ox,oy,px,py);
+  DrawCircle(drawing_wand,ox,oy,px,py);
 }
 
 /*
@@ -810,20 +366,18 @@ WandExport void DrawCircle(DrawingWand *drawing_wand,const double ox,
 %
 %  DrawClearException() clears any existing exception from the drawing wand.
 %
-%  The format of the DrawGetException method is:
+%  The format of the DrawClearException method is:
 %
-%      MagickPassFail DrawClearException(DrawingWand *drawing_wand)
+%      PassFail DrawClearException(DrawingWand *drawing_wand)
 %
 %  A description of each parameter follows:
 %
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport MagickBool DrawClearException(DrawingWand *drawing_wand)
+WandExport MagickBool MagickDrawClearException(DrawingWand *drawing_wand)
 {
-  DestroyExceptionInfo(&drawing_wand->exception);
-  GetExceptionInfo(&drawing_wand->exception);
-  return MagickPass;
+  return DrawClearException(drawing_wand);
 }
 
 /*
@@ -849,15 +403,9 @@ WandExport MagickBool DrawClearException(DrawingWand *drawing_wand)
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport char *DrawGetClipPath(const DrawingWand *drawing_wand)
+WandExport char *MagickDrawGetClipPath(const DrawingWand *drawing_wand)
 {
-  char * pClipPath ;
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  pClipPath = *DrawInfoGetClipPath(CurrentContext);
-  if (pClipPath != (char *) NULL)
-    return((char *) AcquireString(pClipPath));
-  return((char *) NULL);
+  return DrawGetClipPath(drawing_wand);
 }
 
 /*
@@ -886,23 +434,10 @@ WandExport char *DrawGetClipPath(const DrawingWand *drawing_wand)
 %    o clip_path: name of clipping path to associate with image
 %
 */
-WandExport void DrawSetClipPath(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetClipPath(DrawingWand *drawing_wand,
   const char *clip_path)
 {
-  char **ppClipPath,*pClipPath;
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(clip_path != (const char *) NULL);
-  pClipPath = *(ppClipPath = DrawInfoGetClipPath(CurrentContext));
-  if ((pClipPath == NULL) || drawing_wand->filter_off ||
-      LocaleCompare(pClipPath,clip_path) != 0)
-    {
-      (void) CloneString(ppClipPath,clip_path);
-      if (*ppClipPath == (char*)NULL)
-        ThrowException3(&drawing_wand->exception,ResourceLimitError,
-          MemoryAllocationFailed,UnableToDrawOnImage);
-      (void) MvgPrintf(drawing_wand,"clip-path url(#%s)\n",clip_path);
-    }
+  DrawSetClipPath(drawing_wand,clip_path);
 }
 
 /*
@@ -928,11 +463,9 @@ WandExport void DrawSetClipPath(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport FillRule DrawGetClipRule(const DrawingWand *drawing_wand)
+WandExport FillRule MagickDrawGetClipRule(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->fill_rule);
+  return DrawGetClipRule(drawing_wand);
 }
 
 /*
@@ -959,31 +492,10 @@ WandExport FillRule DrawGetClipRule(const DrawingWand *drawing_wand)
 %    o fill_rule: fill rule (EvenOddRule or NonZeroRule)
 %
 */
-WandExport void DrawSetClipRule(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetClipRule(DrawingWand *drawing_wand,
   const FillRule fill_rule)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->fill_rule != fill_rule))
-    {
-      CurrentContext->fill_rule=fill_rule;
-      switch (fill_rule)
-      {
-        case EvenOddRule:
-          p="evenodd";
-          break;
-        case NonZeroRule:
-          p="nonzero";
-          break;
-        default:
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand, "clip-rule %s\n", p);
-    }
+  DrawSetClipRule(drawing_wand,fill_rule);
 }
 
 /*
@@ -1008,11 +520,9 @@ WandExport void DrawSetClipRule(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport ClipPathUnits DrawGetClipUnits(const DrawingWand *drawing_wand)
+WandExport ClipPathUnits MagickDrawGetClipUnits(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->clip_units);
+  return  DrawGetClipUnits(drawing_wand);
 }
 
 /*
@@ -1043,33 +553,10 @@ WandExport ClipPathUnits DrawGetClipUnits(const DrawingWand *drawing_wand)
 %    o severity: Enumeration corresponding to last thrown exception.
 %
 */
-WandExport char *DrawGetException(const DrawingWand *drawing_wand,
-                                  ExceptionType *severity)
+WandExport char *MagickDrawGetException(const DrawingWand *drawing_wand,
+                                        ExceptionType *severity)
 {
-  char
-    buffer[MaxTextExtent],
-    *description;
-
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(drawing_wand->exception.signature == MagickSignature);
-
-  description=(char *) NULL;
-  buffer[0]='\0';
-  *severity=drawing_wand->exception.severity;
-  if (drawing_wand->exception.severity != UndefinedException)
-    {
-      if (drawing_wand->exception.description)
-        FormatString(buffer,"%.1024s (%.1024s)",
-                     drawing_wand->exception.reason,
-                     drawing_wand->exception.description);
-      else
-        FormatString(buffer,"%.1024s",
-                     drawing_wand->exception.reason);
-      CloneString(&description,buffer);
-    }
-
-  return(description);
+  return DrawGetException(drawing_wand,severity);
 }
 
 /*
@@ -1097,45 +584,10 @@ WandExport char *DrawGetException(const DrawingWand *drawing_wand,
 %    o clip_units: units to use (UserSpace, UserSpaceOnUse, or ObjectBoundingBox)
 %
 */
-WandExport void DrawSetClipUnits(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetClipUnits(DrawingWand *drawing_wand,
   const ClipPathUnits clip_units)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->clip_units != clip_units))
-    {
-      CurrentContext->clip_units=clip_units;
-      if ( clip_units == ObjectBoundingBox )
-        {
-          AffineMatrix
-            affine;
-
-          IdentityAffine(&affine);
-          affine.sx=CurrentContext->bounds.x2;
-          affine.sy=CurrentContext->bounds.y2;
-          affine.tx=CurrentContext->bounds.x1;
-          affine.ty=CurrentContext->bounds.y1;
-          AdjustAffine( drawing_wand, &affine );
-        }
-
-      switch (clip_units)
-      {
-        case UserSpace:
-          p="userSpace";
-          break;
-        case UserSpaceOnUse:
-          p="userSpaceOnUse";
-          break;
-        case ObjectBoundingBox:
-          p="objectBoundingBox";
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand, "clip-units %s\n", p);
-    }
+  return DrawSetClipUnits(drawing_wand,clip_units);
 }
 
 /*
@@ -1176,34 +628,10 @@ $      border color.
 %    o paintMethod: paint method
 %
 */
-WandExport void DrawColor(DrawingWand *drawing_wand,const double x,
+WandExport void MagickDrawColor(DrawingWand *drawing_wand,const double x,
   const double y,const PaintMethod paintMethod)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  switch (paintMethod)
-  {
-    case PointMethod:
-      p="point";
-      break;
-    case ReplaceMethod:
-      p="replace";
-      break;
-    case FloodfillMethod:
-      p="floodfill";
-      break;
-    case FillToBorderMethod:
-      p="filltoborder";
-      break;
-    case ResetMethod:
-      p="reset";
-      break;
-  }
-  if (p != NULL)
-    (void) MvgPrintf(drawing_wand, "color %g,%g %s\n", x, y, p);
+  return DrawColor(drawing_wand,x,y,paintMethod);
 }
 
 /*
@@ -1230,9 +658,9 @@ WandExport void DrawColor(DrawingWand *drawing_wand,const double x,
 %    o comment: comment text
 %
 */
-WandExport void DrawComment(DrawingWand *drawing_wand,const char* comment)
+WandExport void MagickDrawComment(DrawingWand *drawing_wand,const char* comment)
 {
-  (void) MvgPrintf(drawing_wand,"#%s\n",comment);
+  return DrawComment(drawing_wand,comment);
 }
 
 /*
@@ -1271,14 +699,11 @@ WandExport void DrawComment(DrawingWand *drawing_wand,const char* comment)
 %    o end: ending rotation in degrees
 %
 */
-WandExport void DrawEllipse(DrawingWand *drawing_wand,const double ox,
+WandExport void MagickDrawEllipse(DrawingWand *drawing_wand,const double ox,
   const double oy,const double rx,const double ry,const double start,
   const double end)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"ellipse %g,%g %g,%g %g,%g\n",ox,oy,rx,ry,
-    start,end);
+  return DrawEllipse(drawing_wand,ox,oy,rx,ry,start,end);
 }
 
 /*
@@ -1306,12 +731,11 @@ WandExport void DrawEllipse(DrawingWand *drawing_wand,const double ox,
 %    o fill_color: Return the fill color.
 %
 */
-WandExport void DrawGetFillColor(const DrawingWand *drawing_wand,
+WandExport void MagickDrawGetFillColor(const DrawingWand *drawing_wand,
   PixelWand *fill_color)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  PixelSetQuantumColor(fill_color,&CurrentContext->fill);
+  PixelPacket fill=DrawGetFillColor(drawing_wand);
+  PixelSetQuantumColor(fill_color,&fill);
 }
 
 /*
@@ -1339,29 +763,16 @@ WandExport void DrawGetFillColor(const DrawingWand *drawing_wand,
 %    o fill_wand: fill wand.
 %
 */
-WandExport void DrawSetFillColor(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFillColor(DrawingWand *drawing_wand,
   const PixelWand *fill_wand)
 {
   PixelPacket
-    *current_fill,
-    fill_color,
-    new_fill;
+    fill_color;
 
   assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
   assert(fill_wand != (const PixelWand *) NULL);
   PixelGetQuantumColor(fill_wand,&fill_color);
-  new_fill=fill_color;
-  if (new_fill.opacity != TransparentOpacity)
-    new_fill.opacity=CurrentContext->opacity;
-  current_fill=&CurrentContext->fill;
-  if (drawing_wand->filter_off || !WandColorMatch(current_fill,&new_fill))
-    {
-      CurrentContext->fill=new_fill;
-      (void) MvgPrintf(drawing_wand,"fill '");
-      MvgAppendColor(drawing_wand,&fill_color);
-      (void) MvgPrintf(drawing_wand,"'\n");
-    }
+  DrawSetFillColor(drawing_wand,&fill_color);
 }
 
 /*
@@ -1392,35 +803,10 @@ WandExport void DrawSetFillColor(DrawingWand *drawing_wand,
 %    o fill_url: URL to use to obtain fill pattern.
 %
 */
-WandExport void DrawSetFillPatternURL(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFillPatternURL(DrawingWand *drawing_wand,
   const char* fill_url)
 {
-  char
-    pattern[MaxTextExtent];
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(fill_url != NULL);
-  if (fill_url[0] != '#')
-    ThrowException(&drawing_wand->exception,DrawWarning,
-      NotARelativeURL,fill_url);
-  (void) MagickFormatString(pattern,MaxTextExtent,"[%.1024s]",fill_url+1);
-  if (GetImageAttribute(drawing_wand->image,pattern) == (ImageAttribute *) NULL)
-    {
-      ThrowException(&drawing_wand->exception,DrawWarning,
-        URLNotFound,fill_url);
-    }
-  else
-    {
-      char
-        pattern_spec[MaxTextExtent];
-
-      (void) MagickFormatString(pattern_spec,MaxTextExtent,"url(%.1024s)",
-        fill_url);
-      if (CurrentContext->fill.opacity != TransparentOpacity)
-        CurrentContext->fill.opacity=CurrentContext->opacity;
-      (void) MvgPrintf(drawing_wand,"fill %s\n",pattern_spec);
-    }
+  DrawSetFillPatternURL(drawing_wand,fill_url);
 }
 
 /*
@@ -1446,11 +832,9 @@ WandExport void DrawSetFillPatternURL(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport double DrawGetFillOpacity(const DrawingWand *drawing_wand)
+WandExport double MagickDrawGetFillOpacity(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return((double) CurrentContext->opacity/MaxRGB);
+  return DrawGetFillOpacity(drawing_wand);
 }
 
 /*
@@ -1479,21 +863,10 @@ WandExport double DrawGetFillOpacity(const DrawingWand *drawing_wand)
 %    o fill_opacity: fill opacity
 %
 */
-WandExport void DrawSetFillOpacity(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFillOpacity(DrawingWand *drawing_wand,
   const double fill_opacity)
 {
-  Quantum
-    opacity;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  opacity=(Quantum)
-    ((double) MaxRGB*(1.0-(fill_opacity <= 1.0 ? fill_opacity : 1.0 ))+0.5);
-  if (drawing_wand->filter_off || (CurrentContext->opacity != opacity))
-    {
-      CurrentContext->opacity=opacity;
-      (void) MvgPrintf(drawing_wand,"fill-opacity %g\n",fill_opacity);
-    }
+  DrawSetFillOpacity(drawing_wand,fill_opacity);
 }
 
 /*
@@ -1517,11 +890,9 @@ WandExport void DrawSetFillOpacity(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport FillRule DrawGetFillRule(const DrawingWand *drawing_wand)
+WandExport FillRule MagickDrawGetFillRule(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->fill_rule);
+  return DrawGetFillRule(drawing_wand);
 }
 
 /*
@@ -1548,31 +919,10 @@ WandExport FillRule DrawGetFillRule(const DrawingWand *drawing_wand)
 %    o fill_rule: fill rule (EvenOddRule or NonZeroRule)
 %
 */
-WandExport void DrawSetFillRule(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFillRule(DrawingWand *drawing_wand,
   const FillRule fill_rule)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->fill_rule != fill_rule))
-    {
-      CurrentContext->fill_rule=fill_rule;
-      switch (fill_rule)
-      {
-        case EvenOddRule:
-          p="evenodd";
-          break;
-        case NonZeroRule:
-          p="nonzero";
-          break;
-        default:
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand,"fill-rule %s\n",p);
-    }
+  DrawSetFillRule(drawing_wand,fill_rule);
 }
 
 /*
@@ -1598,13 +948,9 @@ WandExport void DrawSetFillRule(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport char *DrawGetFont(const DrawingWand *drawing_wand)
+WandExport char *MagickDrawGetFont(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (CurrentContext->font != (char *) NULL)
-    return(AcquireString(CurrentContext->font));
-  return((char *) NULL);
+  return DrawGetFont(drawing_wand);
 }
 
 /*
@@ -1632,20 +978,9 @@ WandExport char *DrawGetFont(const DrawingWand *drawing_wand)
 %    o font_name: font name
 %
 */
-WandExport void DrawSetFont(DrawingWand *drawing_wand,const char *font_name)
+WandExport void MagickDrawSetFont(DrawingWand *drawing_wand,const char *font_name)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(font_name != (const char *) NULL);
-  if (drawing_wand->filter_off || (CurrentContext->font == NULL) ||
-     LocaleCompare(CurrentContext->font,font_name) != 0)
-    {
-      (void) CloneString(&CurrentContext->font,font_name);
-      if (CurrentContext->font == (char*)NULL)
-        ThrowException3(&drawing_wand->exception,ResourceLimitError,
-          MemoryAllocationFailed,UnableToDrawOnImage);
-      (void) MvgPrintf(drawing_wand,"font '%s'\n",font_name);
-    }
+  DrawSetFont(drawing_wand,font_name);
 }
 
 /*
@@ -1670,13 +1005,9 @@ WandExport void DrawSetFont(DrawingWand *drawing_wand,const char *font_name)
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport char *DrawGetFontFamily(const DrawingWand *drawing_wand)
+WandExport char *MagickDrawGetFontFamily(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (CurrentContext->family != NULL)
-    return(AcquireString(CurrentContext->family));
-  return((char *) NULL);
+  return DrawGetFontFamily(drawing_wand);
 }
 
 /*
@@ -1703,21 +1034,10 @@ WandExport char *DrawGetFontFamily(const DrawingWand *drawing_wand)
 %    o font_family: font family
 %
 */
-WandExport void DrawSetFontFamily(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFontFamily(DrawingWand *drawing_wand,
   const char *font_family)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(font_family != (const char *) NULL);
-  if (drawing_wand->filter_off || (CurrentContext->family == NULL) ||
-     LocaleCompare(CurrentContext->family,font_family) != 0)
-    {
-      (void) CloneString(&CurrentContext->family,font_family);
-      if (CurrentContext->family == (char *) NULL)
-        ThrowException3(&drawing_wand->exception,ResourceLimitError,
-          MemoryAllocationFailed,UnableToDrawOnImage);
-      (void) MvgPrintf(drawing_wand,"font-family '%s'\n",font_family);
-    }
+  DrawSetFontFamily(drawing_wand,font_family);
 }
 
 /*
@@ -1741,11 +1061,9 @@ WandExport void DrawSetFontFamily(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport double DrawGetFontSize(const DrawingWand *drawing_wand)
+WandExport double MagickDrawGetFontSize(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->pointsize);
+  return DrawGetFontSize(drawing_wand);
 }
 
 /*
@@ -1772,17 +1090,10 @@ WandExport double DrawGetFontSize(const DrawingWand *drawing_wand)
 %    o pointsize: text pointsize
 %
 */
-WandExport void DrawSetFontSize(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFontSize(DrawingWand *drawing_wand,
   const double pointsize)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off ||
-     (AbsoluteValue(CurrentContext->pointsize-pointsize) > MagickEpsilon))
-    {
-      CurrentContext->pointsize=pointsize;
-      (void) MvgPrintf(drawing_wand,"font-size %g\n",pointsize);
-    }
+  DrawSetFontSize(drawing_wand,pointsize);
 }
 
 /*
@@ -1806,11 +1117,9 @@ WandExport void DrawSetFontSize(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport StretchType DrawGetFontStretch(const DrawingWand *drawing_wand)
+WandExport StretchType MagickDrawGetFontStretch(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->stretch);
+  return DrawGetFontStretch(drawing_wand);
 }
 
 /*
@@ -1842,53 +1151,10 @@ WandExport StretchType DrawGetFontStretch(const DrawingWand *drawing_wand)
 %                    ExtraExpandedStretch, UltraExpandedStretch, AnyStretch)
 %
 */
-WandExport void DrawSetFontStretch(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFontStretch(DrawingWand *drawing_wand,
   const StretchType font_stretch)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->stretch != font_stretch))
-    {
-      CurrentContext->stretch=font_stretch;
-      switch (font_stretch)
-      {
-        case NormalStretch:
-          p="normal";
-          break;
-        case UltraCondensedStretch:
-          p="ultra-condensed";
-          break;
-        case ExtraCondensedStretch:
-          p="extra-condensed";
-          break;
-        case CondensedStretch:
-          p="condensed";
-          break;
-        case SemiCondensedStretch:
-          p="semi-condensed";
-          break;
-        case SemiExpandedStretch:
-          p="semi-expanded";
-          break;
-        case ExpandedStretch:
-          p="expanded";
-          break;
-        case ExtraExpandedStretch:
-          p="extra-expanded";
-          break;
-        case UltraExpandedStretch:
-          p="ultra-expanded";
-          break;
-        case AnyStretch:
-          p="all";
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand,"font-stretch '%s'\n",p);
-    }
+  DrawSetFontStretch(drawing_wand,font_stretch);
 }
 
 /*
@@ -1912,11 +1178,9 @@ WandExport void DrawSetFontStretch(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport StyleType DrawGetFontStyle(const DrawingWand *drawing_wand)
+WandExport StyleType MagickDrawGetFontStyle(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->style);
+  return DrawGetFontStyle(drawing_wand);
 }
 
 /*
@@ -1944,35 +1208,10 @@ WandExport StyleType DrawGetFontStyle(const DrawingWand *drawing_wand)
 %    o style: font style (NormalStyle, ItalicStyle, ObliqueStyle, AnyStyle)
 %
 */
-WandExport void DrawSetFontStyle(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFontStyle(DrawingWand *drawing_wand,
   const StyleType style)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->style != style))
-    {
-      CurrentContext->style=style;
-      switch (style)
-      {
-        case NormalStyle:
-          p="normal";
-          break;
-        case ItalicStyle:
-          p="italic";
-          break;
-        case ObliqueStyle:
-          p="oblique";
-          break;
-        case AnyStyle:
-          p="all";
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand, "font-style '%s'\n", p);
-    }
+  DrawSetFontStyle(drawing_wand,style);
 }
 
 /*
@@ -1996,11 +1235,9 @@ WandExport void DrawSetFontStyle(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport unsigned long DrawGetFontWeight(const DrawingWand *drawing_wand)
+WandExport unsigned long MagickDrawGetFontWeight(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->weight);
+  return DrawGetFontWeight(drawing_wand);
 }
 
 /*
@@ -2028,16 +1265,10 @@ WandExport unsigned long DrawGetFontWeight(const DrawingWand *drawing_wand)
 %    o font_weight: font weight (valid range 100-900)
 %
 */
-WandExport void DrawSetFontWeight(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetFontWeight(DrawingWand *drawing_wand,
   const unsigned long font_weight)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->weight != font_weight))
-    {
-      CurrentContext->weight=font_weight;
-      (void) MvgPrintf(drawing_wand,"font-weight %lu\n",font_weight);
-    }
+  DrawSetFontWeight(drawing_wand,font_weight);
 }
 
 /*
@@ -2062,11 +1293,9 @@ WandExport void DrawSetFontWeight(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport GravityType DrawGetGravity(const DrawingWand *drawing_wand)
+WandExport GravityType MagickDrawGetGravity(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->gravity);
+  return DrawGetGravity(drawing_wand);
 }
 
 /*
@@ -2097,55 +1326,10 @@ WandExport GravityType DrawGetGravity(const DrawingWand *drawing_wand)
 %               SouthEastGravity)
 %
 */
-WandExport void DrawSetGravity(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetGravity(DrawingWand *drawing_wand,
   const GravityType gravity)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->gravity != gravity))
-    {
-      CurrentContext->gravity=gravity;
-      switch (gravity)
-      {
-        case NorthWestGravity:
-          p="NorthWest";
-          break;
-        case NorthGravity:
-          p="North";
-          break;
-        case NorthEastGravity:
-          p="NorthEast";
-          break;
-        case WestGravity:
-          p="West";
-          break;
-        case CenterGravity:
-          p="Center";
-          break;
-        case EastGravity:
-          p="East";
-          break;
-        case SouthWestGravity:
-          p="SouthWest";
-          break;
-        case SouthGravity:
-          p="South";
-          break;
-        case SouthEastGravity:
-          p="SouthEast";
-          break;
-        case StaticGravity:
-        case ForgetGravity:
-          {
-          }
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand,"gravity %s\n",p);
-    }
+  DrawSetGravity(drawing_wand,gravity);
 }
 
 /*
@@ -2189,93 +1373,12 @@ WandExport void DrawSetGravity(DrawingWand *drawing_wand,
 %    o image: Image to composite
 %
 */
-WandExport void DrawComposite(DrawingWand *drawing_wand,
+WandExport void MagickDrawComposite(DrawingWand *drawing_wand,
   const CompositeOperator composite_operator,const double x,const double y,
   const double width,const double height,const Image *image)
 
 {
-  ImageInfo
-    *image_info;
-
-  Image
-    *clone_image;
-
-  char
-    *media_type=NULL,
-    *base64=NULL;
-
-  const char
-    *mode=NULL;
-
-  unsigned char
-    *blob=(unsigned char *) NULL;
-
-  size_t
-    blob_length=2048,
-    encoded_length=0;
-
-  MonitorHandler
-    handler;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(image != (Image *) NULL);
-  assert(width != 0);
-  assert(height != 0);
-  assert(*image->magick != '\0');
-  clone_image=CloneImage(image,0,0,MagickTrue,&drawing_wand->exception);
-  if (!clone_image)
-    return;
-  image_info=CloneImageInfo((ImageInfo*)NULL);
-  if (!image_info)
-    ThrowException3(&drawing_wand->exception,ResourceLimitError,
-      MemoryAllocationFailed,UnableToDrawOnImage);
-  handler=SetMonitorHandler((MonitorHandler) NULL);
-  blob=(unsigned char*) ImageToBlob( image_info,clone_image,&blob_length,
-    &drawing_wand->exception);
-  (void) SetMonitorHandler(handler);
-  DestroyImageInfo(image_info);
-  DestroyImageList(clone_image);
-  if (!blob)
-    return;
-  base64=Base64Encode(blob,blob_length,&encoded_length);
-  MagickFreeMemory(blob);
-  if (!base64)
-    {
-      char
-        buffer[MaxTextExtent];
-
-      (void) MagickFormatString(buffer,MaxTextExtent,"%"
-                                MAGICK_SIZE_T_F "u bytes",
-        (4*blob_length/3+4));
-      ThrowException(&drawing_wand->exception,ResourceLimitWarning,
-        MemoryAllocationFailed,buffer);
-    }
-  mode=CompositeOperatorToString(composite_operator);
-  media_type=MagickToMime(image->magick);
-  if (media_type != NULL)
-    {
-      char
-        *str;
-
-      int
-        remaining;
-
-      (void) MvgPrintf(drawing_wand,"image %s %g,%g %g,%g 'data:%s;base64,\n",
-        mode,x,y,width,height,media_type);
-      remaining=(int) encoded_length;
-      str=base64;
-      while ( remaining > 0 )
-      {
-        (void) MvgPrintf(drawing_wand,"%.76s", str);
-        remaining -= 76;
-        str += 76;
-        if (remaining > 0)
-          (void) MvgPrintf(drawing_wand,"\n");
-      }
-      (void) MvgPrintf(drawing_wand,"'\n");
-    }
-  MagickFreeMemory(base64);
-  MagickFreeMemory(media_type);
+  DrawComposite(drawing_wand,composite_operator,x,y,width,height,image);
 }
 
 /*
@@ -2310,12 +1413,10 @@ WandExport void DrawComposite(DrawingWand *drawing_wand,
 %    o ey: ending y ordinate
 %
 */
-WandExport void DrawLine(DrawingWand *drawing_wand,const double sx,
+WandExport void MagickDrawLine(DrawingWand *drawing_wand,const double sx,
   const double sy,const double ex,const double ey)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"line %g,%g %g,%g\n",sx,sy,ex,ey);
+  DrawLine(drawing_wand,sx,sy,ex,ey);
 }
 
 /*
@@ -2357,34 +1458,10 @@ WandExport void DrawLine(DrawingWand *drawing_wand,const double sx,
 %    o paint_method:
 %
 */
-WandExport void DrawMatte(DrawingWand *drawing_wand,const double x,
+WandExport void MagickDrawMatte(DrawingWand *drawing_wand,const double x,
   const double y,const PaintMethod paint_method)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  switch (paint_method)
-  {
-    case PointMethod:
-      p="point";
-      break;
-    case ReplaceMethod:
-      p="replace";
-      break;
-    case FloodfillMethod:
-      p="floodfill";
-      break;
-    case FillToBorderMethod:
-      p="filltoborder";
-      break;
-    case ResetMethod:
-      p="reset";
-      break;
-  }
-  if (p != NULL)
-    (void) MvgPrintf(drawing_wand,"matte %g,%g %s\n",x,y,p);
+  DrawMatte(drawing_wand,x,y,paint_method);
 }
 
 /*
@@ -2412,12 +1489,9 @@ WandExport void DrawMatte(DrawingWand *drawing_wand,const double x,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPathClose(DrawingWand *drawing_wand)
+WandExport void MagickDrawPathClose(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgAutoWrapPrintf(drawing_wand,"%s",
-    drawing_wand->path_mode == AbsolutePathMode ? "Z" : "z");
+  DrawPathClose(drawing_wand);
 }
 
 /*
@@ -2461,32 +1535,18 @@ WandExport void DrawPathClose(DrawingWand *drawing_wand)
 %
 */
 
-static void DrawPathCurveTo(DrawingWand *drawing_wand,const PathMode mode,
-  const double x1,const double y1,const double x2,const double y2,
-  const double x,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathCurveToOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathCurveToOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand, "%c%g,%g %g,%g %g,%g",
-        mode == AbsolutePathMode ? 'C' : 'c',x1,y1,x2,y2,x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g %g,%g %g,%g",
-      x1,y1,x2,y2,x,y);
-}
+/* static void MagickDrawPathCurveTo(DrawingWand *drawing_wand,const DrawPathMode mode, */
+/*   const double x1,const double y1,const double x2,const double y2, */
+/*   const double x,const double y) */
+/* { */
+/*   DrawPathCurveToRelative(drawing_wand,mode,x1,y1,x2,y2,x,y); */
+/* } */
 
-WandExport void DrawPathCurveToAbsolute(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathCurveToAbsolute(DrawingWand *drawing_wand,
   const double x1,const double y1,const double x2,const double y2,
   const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveTo(drawing_wand,AbsolutePathMode,x1,y1,x2,y2,x,y);
+  DrawPathCurveToAbsolute(drawing_wand,x1,y1,x2,y2,x,y);
 }
 
 /*
@@ -2529,13 +1589,11 @@ WandExport void DrawPathCurveToAbsolute(DrawingWand *drawing_wand,
 %    o y: y ordinate of the end of the curve
 %
 */
-WandExport void DrawPathCurveToRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathCurveToRelative(DrawingWand *drawing_wand,
   const double x1,const double y1,const double x2,const double y2,
   const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveTo(drawing_wand,RelativePathMode,x1,y1,x2,y2,x,y);
+  DrawPathCurveToRelative(drawing_wand,x1,y1,x2,y2,x,y);
 }
 
 /*
@@ -2573,30 +1631,17 @@ WandExport void DrawPathCurveToRelative(DrawingWand *drawing_wand,
 %
 */
 
-static void DrawPathCurveToQuadraticBezier(DrawingWand *drawing_wand,
-  const PathMode mode,const double x1,double y1,const double x,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathCurveToQuadraticBezierOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathCurveToQuadraticBezierOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand, "%c%g,%g %g,%g",
-        mode == AbsolutePathMode ? 'Q' : 'q',x1,y1,x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g %g,%g",x1,y1,x,y);
-}
+/* static void MagickDrawPathCurveToQuadraticBezier(DrawingWand *drawing_wand, */
+/*   const DrawPathMode mode,const double x1,double y1,const double x,const double y) */
+/* { */
+/*   DrawPathCurveToQuadraticBezierRelative(drawing_wand,mode,x1,y1,x,y); */
+/* } */
 
-WandExport void DrawPathCurveToQuadraticBezierAbsolute(
+WandExport void MagickDrawPathCurveToQuadraticBezierAbsolute(
   DrawingWand *drawing_wand,const double x1,const double y1,const double x,
   const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveToQuadraticBezier(drawing_wand,AbsolutePathMode,x1,y1,x,y);
+  DrawPathCurveToQuadraticBezierAbsolute(drawing_wand,x1,y1,x,y);
 }
 
 /*
@@ -2633,13 +1678,11 @@ WandExport void DrawPathCurveToQuadraticBezierAbsolute(
 %    o y: y ordinate of final point
 %
 */
-WandExport void DrawPathCurveToQuadraticBezierRelative(
+WandExport void MagickDrawPathCurveToQuadraticBezierRelative(
   DrawingWand *drawing_wand,const double x1,const double y1,const double x,
   const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveToQuadraticBezier(drawing_wand,RelativePathMode,x1,y1,x,y);
+  DrawPathCurveToQuadraticBezierRelative(drawing_wand,x1,y1,x,y);
 }
 
 /*
@@ -2681,29 +1724,16 @@ WandExport void DrawPathCurveToQuadraticBezierRelative(
 %
 */
 
-static void DrawPathCurveToQuadraticBezierSmooth(DrawingWand *drawing_wand,
-  const PathMode mode,const double x,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathCurveToQuadraticBezierSmoothOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathCurveToQuadraticBezierSmoothOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand, "%c%g,%g",
-        mode == AbsolutePathMode ? 'T' : 't',x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g",x,y);
-}
+/* static void MagickDrawPathCurveToQuadraticBezierSmooth(DrawingWand *drawing_wand, */
+/*   const DrawPathMode mode,const double x,const double y) */
+/* { */
+/*   DrawPathCurveToQuadraticBezierSmoothRelative(drawing_wand,mode,x,y); */
+/* } */
 
-WandExport void DrawPathCurveToQuadraticBezierSmoothAbsolute(
+WandExport void MagickDrawPathCurveToQuadraticBezierSmoothAbsolute(
   DrawingWand *drawing_wand,const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveToQuadraticBezierSmooth(drawing_wand,AbsolutePathMode,x,y);
+  DrawPathCurveToQuadraticBezierSmoothAbsolute(drawing_wand,x,y);
 }
 
 /*
@@ -2745,10 +1775,10 @@ WandExport void DrawPathCurveToQuadraticBezierSmoothAbsolute(
 %
 %
 */
-WandExport void DrawPathCurveToQuadraticBezierSmoothRelative(
+WandExport void MagickDrawPathCurveToQuadraticBezierSmoothRelative(
   DrawingWand *drawing_wand,const double x,const double y)
 {
-  DrawPathCurveToQuadraticBezierSmooth(drawing_wand,RelativePathMode,x,y);
+  DrawPathCurveToQuadraticBezierSmoothRelative(drawing_wand,x,y);
 }
 
 /*
@@ -2793,29 +1823,17 @@ WandExport void DrawPathCurveToQuadraticBezierSmoothRelative(
 %
 %
 */
-static void DrawPathCurveToSmooth(DrawingWand *drawing_wand,const PathMode mode,
-  const double x2,const double y2,const double x,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathCurveToSmoothOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathCurveToSmoothOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand,"%c%g,%g %g,%g",
-        mode == AbsolutePathMode ? 'S' : 's',x2,y2,x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g %g,%g",x2,y2,x,y);
-}
+/* static void MagickDrawPathCurveToSmooth(DrawingWand *drawing_wand, */
+/*   const DrawPathMode mode,const double x2,const double y2, */
+/*   const double x,const double y) */
+/* { */
+/*   DrawPathCurveToSmoothRelative(drawing_wand,mode,x2,y2,x,y); */
+/* } */
 
-WandExport void DrawPathCurveToSmoothAbsolute(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathCurveToSmoothAbsolute(DrawingWand *drawing_wand,
   const double x2,const double y2,const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveToSmooth(drawing_wand,AbsolutePathMode,x2,y2,x,y);
+  DrawPathCurveToSmoothAbsolute(drawing_wand,x2,y2,x,y);
 }
 
 /*
@@ -2860,12 +1878,10 @@ WandExport void DrawPathCurveToSmoothAbsolute(DrawingWand *drawing_wand,
 %
 %
 */
-WandExport void DrawPathCurveToSmoothRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathCurveToSmoothRelative(DrawingWand *drawing_wand,
   const double x2,const double y2,const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathCurveToSmooth(drawing_wand,RelativePathMode,x2,y2,x,y);
+  DrawPathCurveToSmoothRelative(drawing_wand,x2,y2,x,y);
 }
 
 /*
@@ -2916,37 +1932,22 @@ WandExport void DrawPathCurveToSmoothRelative(DrawingWand *drawing_wand,
 %
 %
 */
+/* static void MagickDrawPathEllipticArc(DrawingWand *drawing_wand, const DrawPathMode mode, */
+/*   const double rx,const double ry,const double x_axis_rotation, */
+/*   unsigned int large_arc_flag,unsigned int sweep_flag,const double x, */
+/*   const double y) */
+/* { */
+/*   DrawPathEllipticArcRelative(drawing_wand,mode,rx,ry,x_axis_rotation,large_arc_flag, */
+/*                       sweep_flag,x,y); */
+/* } */
 
-static void DrawPathEllipticArc(DrawingWand *drawing_wand, const PathMode mode,
+WandExport void MagickDrawPathEllipticArcAbsolute(DrawingWand *drawing_wand,
   const double rx,const double ry,const double x_axis_rotation,
   unsigned int large_arc_flag,unsigned int sweep_flag,const double x,
   const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathEllipticArcOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathEllipticArcOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand, "%c%g,%g %g %u %u %g,%g",
-        mode == AbsolutePathMode ? 'A' : 'a',rx,ry,x_axis_rotation,
-        large_arc_flag,sweep_flag,x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g %g %u %u %g,%g",rx,ry,
-      x_axis_rotation,large_arc_flag,sweep_flag,x,y);
-}
-
-WandExport void DrawPathEllipticArcAbsolute(DrawingWand *drawing_wand,
-  const double rx,const double ry,const double x_axis_rotation,
-  unsigned int large_arc_flag,unsigned int sweep_flag,const double x,
-  const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathEllipticArc(drawing_wand,AbsolutePathMode,rx,ry,x_axis_rotation,
-    large_arc_flag,sweep_flag,x,y);
+  DrawPathEllipticArcAbsolute(drawing_wand,rx,ry,x_axis_rotation,large_arc_flag,
+                              sweep_flag,x,y);
 }
 
 /*
@@ -2996,13 +1997,13 @@ WandExport void DrawPathEllipticArcAbsolute(DrawingWand *drawing_wand,
 %                  clock-wise rotation
 %
 */
-WandExport void DrawPathEllipticArcRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathEllipticArcRelative(DrawingWand *drawing_wand,
   const double rx,const double ry,const double x_axis_rotation,
   unsigned int large_arc_flag,unsigned int sweep_flag,const double x,
   const double y)
 {
-  DrawPathEllipticArc(drawing_wand,RelativePathMode,rx,ry,x_axis_rotation,
-    large_arc_flag,sweep_flag,x,y);
+  DrawPathEllipticArcRelative(drawing_wand,rx,ry,x_axis_rotation,
+                              large_arc_flag,sweep_flag,x,y);
 }
 
 /*
@@ -3027,13 +2028,9 @@ WandExport void DrawPathEllipticArcRelative(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPathFinish(DrawingWand *drawing_wand)
+WandExport void MagickDrawPathFinish(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"'\n");
-  drawing_wand->path_operation=PathDefaultOperation;
-  drawing_wand->path_mode=DefaultPathMode;
+  DrawPathFinish(drawing_wand);
 }
 
 /*
@@ -3064,30 +2061,16 @@ WandExport void DrawPathFinish(DrawingWand *drawing_wand)
 %    o y: target y ordinate
 %
 */
-static void DrawPathLineTo(DrawingWand *drawing_wand,const PathMode mode,
+/* static void MagickDrawPathLineTo(DrawingWand *drawing_wand,const DrawPathMode mode, */
+/*   const double x,const double y) */
+/* { */
+/*   DrawPathLineToRelative(drawing_wand,mode,x,y); */
+/* } */
+
+WandExport void MagickDrawPathLineToAbsolute(DrawingWand *drawing_wand,
   const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-
-  if ((drawing_wand->path_operation != PathLineToOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathLineToOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand,"%c%g,%g",
-        mode == AbsolutePathMode ? 'L' : 'l',x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g",x,y);
-}
-
-WandExport void DrawPathLineToAbsolute(DrawingWand *drawing_wand,
-  const double x,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathLineTo(drawing_wand,AbsolutePathMode,x,y);
+  DrawPathLineToAbsolute(drawing_wand,x,y);
 }
 
 /*
@@ -3119,12 +2102,10 @@ WandExport void DrawPathLineToAbsolute(DrawingWand *drawing_wand,
 %    o y: target y ordinate
 %
 */
-WandExport void DrawPathLineToRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathLineToRelative(DrawingWand *drawing_wand,
   const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathLineTo(drawing_wand,RelativePathMode,x,y);
+  DrawPathLineToRelative(drawing_wand,x,y);
 }
 
 /*
@@ -3155,29 +2136,16 @@ WandExport void DrawPathLineToRelative(DrawingWand *drawing_wand,
 %
 */
 
-static void DrawPathLineToHorizontal(DrawingWand *drawing_wand,
-  const PathMode mode,const double x)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathLineToHorizontalOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathLineToHorizontalOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand,"%c%g",
-        mode == AbsolutePathMode ? 'H' : 'h',x);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g",x);
-}
+/* static void MagickDrawPathLineToHorizontal(DrawingWand *drawing_wand, */
+/*   const DrawPathMode mode,const double x) */
+/* { */
+/*   DrawPathLineToHorizontalRelative(drawing_wand,mode,x); */
+/* } */
 
-WandExport void DrawPathLineToHorizontalAbsolute(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathLineToHorizontalAbsolute(DrawingWand *drawing_wand,
   const double x)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathLineToHorizontal(drawing_wand,AbsolutePathMode,x);
+  DrawPathLineToHorizontalAbsolute(drawing_wand,x);
 }
 
 /*
@@ -3207,10 +2175,10 @@ WandExport void DrawPathLineToHorizontalAbsolute(DrawingWand *drawing_wand,
 %    o x: target x ordinate
 %
 */
-WandExport void DrawPathLineToHorizontalRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathLineToHorizontalRelative(DrawingWand *drawing_wand,
   const double x)
 {
-  DrawPathLineToHorizontal(drawing_wand,RelativePathMode,x);
+  DrawPathLineToHorizontalRelative(drawing_wand,x);
 }
 
 /*
@@ -3241,29 +2209,16 @@ WandExport void DrawPathLineToHorizontalRelative(DrawingWand *drawing_wand,
 %
 */
 
-static void DrawPathLineToVertical(DrawingWand *drawing_wand,
-  const PathMode mode,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathLineToVerticalOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathLineToVerticalOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand,"%c%g",
-        mode == AbsolutePathMode ? 'V' : 'v',y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g",y);
-}
+/* static void MagickDrawPathLineToVertical(DrawingWand *drawing_wand, */
+/*   const DrawPathMode mode,const double y) */
+/* { */
+/*   DrawPathLineToVerticalRelative(drawing_wand,mode,y); */
+/* } */
 
-WandExport void DrawPathLineToVerticalAbsolute(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathLineToVerticalAbsolute(DrawingWand *drawing_wand,
   const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathLineToVertical(drawing_wand,AbsolutePathMode,y);
+  DrawPathLineToVerticalAbsolute(drawing_wand,y);
 }
 
 /*
@@ -3293,12 +2248,10 @@ WandExport void DrawPathLineToVerticalAbsolute(DrawingWand *drawing_wand,
 %    o y: target y ordinate
 %
 */
-WandExport void DrawPathLineToVerticalRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathLineToVerticalRelative(DrawingWand *drawing_wand,
   const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathLineToVertical(drawing_wand,RelativePathMode,y);
+  DrawPathLineToVerticalRelative(drawing_wand,y);
 }
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3329,29 +2282,16 @@ WandExport void DrawPathLineToVerticalRelative(DrawingWand *drawing_wand,
 %    o y: target y ordinate
 %
 */
-static void DrawPathMoveTo(DrawingWand *drawing_wand,const PathMode mode,
-  const double x,const double y)
-{
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if ((drawing_wand->path_operation != PathMoveToOperation) ||
-      (drawing_wand->path_mode != mode))
-    {
-      drawing_wand->path_operation=PathMoveToOperation;
-      drawing_wand->path_mode=mode;
-      (void) MvgAutoWrapPrintf(drawing_wand,"%c%g,%g",
-        mode == AbsolutePathMode ? 'M' : 'm',x,y);
-    }
-  else
-    (void) MvgAutoWrapPrintf(drawing_wand," %g,%g",x,y);
-}
+/* static void MagickDrawPathMoveTo(DrawingWand *drawing_wand,const DrawPathMode mode, */
+/*   const double x,const double y) */
+/* { */
+/*   DrawPathMoveToRelative(drawing_wand,mode,x,y); */
+/* } */
 
-WandExport void DrawPathMoveToAbsolute(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathMoveToAbsolute(DrawingWand *drawing_wand,
   const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathMoveTo(drawing_wand,AbsolutePathMode,x,y);
+  DrawPathMoveToAbsolute(drawing_wand,x,y);
 }
 
 /*
@@ -3383,12 +2323,10 @@ WandExport void DrawPathMoveToAbsolute(DrawingWand *drawing_wand,
 %    o y: target y ordinate
 %
 */
-WandExport void DrawPathMoveToRelative(DrawingWand *drawing_wand,
+WandExport void MagickDrawPathMoveToRelative(DrawingWand *drawing_wand,
   const double x,const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  DrawPathMoveTo(drawing_wand,RelativePathMode,x,y);
+  DrawPathMoveToRelative(drawing_wand,x,y);
 }
 
 /*
@@ -3417,13 +2355,9 @@ WandExport void DrawPathMoveToRelative(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPathStart(DrawingWand *drawing_wand)
+WandExport void MagickDrawPathStart(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"path '");
-  drawing_wand->path_operation=PathDefaultOperation;
-  drawing_wand->path_mode=DefaultPathMode;
+  DrawPathStart(drawing_wand);
 }
 
 /*
@@ -3437,7 +2371,9 @@ WandExport void DrawPathStart(DrawingWand *drawing_wand)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  DrawPeekGraphicContext() returns the current graphic drawing_wand.
+%  DrawPeekGraphicContext() returns a copy of the the DrawInfo structure at
+%  the head of the drawing context stack. The user is responsible for
+%  deallocating the returned object using DestroyDrawInfo.
 %
 %  The format of the DrawPeekGraphicContext method is:
 %
@@ -3448,17 +2384,16 @@ WandExport void DrawPathStart(DrawingWand *drawing_wand)
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport DrawInfo *DrawPeekGraphicContext(const DrawingWand *drawing_wand)
+WandExport DrawInfo *MagickDrawPeekGraphicContext(const DrawingWand *drawing_wand)
 {
-  DrawInfo
-    *draw_info;
+  /*
+    FIXME: The Wand API user should not need to use a function outside
+    of the wand API for cleanup.  An alternative is to return a const
+    pointer and advise the user that the returned pointer may become
+    obsolete.
+  */
 
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  draw_info=CloneDrawInfo((ImageInfo *) NULL,CurrentContext);
-  (void) CloneString(&draw_info->primitive,drawing_wand->mvg);
-  return(draw_info);
-}
+  return DrawPeekGraphicContext(drawing_wand);}
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3487,12 +2422,10 @@ WandExport DrawInfo *DrawPeekGraphicContext(const DrawingWand *drawing_wand)
 %    o y: target y coordinate
 %
 */
-WandExport void DrawPoint(DrawingWand *drawing_wand,const double x,
+WandExport void MagickDrawPoint(DrawingWand *drawing_wand,const double x,
   const double y)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"point %g,%g\n",x,y);
+  DrawPoint(drawing_wand,x,y);
 }
 
 /*
@@ -3523,12 +2456,10 @@ WandExport void DrawPoint(DrawingWand *drawing_wand,const double x,
 %    o coordinates: coordinate array
 %
 */
-WandExport void DrawPolygon(DrawingWand *drawing_wand,
+WandExport void MagickDrawPolygon(DrawingWand *drawing_wand,
   const unsigned long number_coordinates,const PointInfo *coordinates)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  MvgAppendPointsCommand(drawing_wand,"polygon",number_coordinates,coordinates);
+  DrawPolygon(drawing_wand,number_coordinates,coordinates);
 }
 
 /*
@@ -3559,13 +2490,10 @@ WandExport void DrawPolygon(DrawingWand *drawing_wand,
 %    o coordinates: coordinate array
 %
 */
-WandExport void DrawPolyline(DrawingWand *drawing_wand,
+WandExport void MagickDrawPolyline(DrawingWand *drawing_wand,
   const unsigned long number_coordinates,const PointInfo *coordinates)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  MvgAppendPointsCommand(drawing_wand,"polyline",number_coordinates,
-    coordinates);
+  DrawPolyline(drawing_wand,number_coordinates,coordinates);
 }
 
 /*
@@ -3590,13 +2518,9 @@ WandExport void DrawPolyline(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPopClipPath(DrawingWand *drawing_wand)
+WandExport void MagickDrawPopClipPath(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->indent_depth > 0)
-    drawing_wand->indent_depth--;
-  (void) MvgPrintf(drawing_wand,"pop clip-path\n");
+  DrawPopClipPath(drawing_wand);
 }
 
 /*
@@ -3621,13 +2545,9 @@ WandExport void DrawPopClipPath(DrawingWand *drawing_wand)
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPopDefs(DrawingWand *drawing_wand)
+WandExport void MagickDrawPopDefs(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->indent_depth > 0)
-    drawing_wand->indent_depth--;
-  (void) MvgPrintf(drawing_wand,"pop defs\n");
+  DrawPopDefs(drawing_wand);
 }
 
 /*
@@ -3655,25 +2575,9 @@ WandExport void DrawPopDefs(DrawingWand *drawing_wand)
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPopGraphicContext(DrawingWand *drawing_wand)
+WandExport void MagickDrawPopGraphicContext(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->index <= 0)
-    {
-      ThrowException(&drawing_wand->exception,DrawError,
-        UnbalancedGraphicContextPushPop,NULL);
-    }
-  else
-    {
-      /* Destroy clip path if not same in preceding drawing_wand */
-      DestroyDrawInfo(CurrentContext);
-      CurrentContext=(DrawInfo*)NULL;
-      drawing_wand->index--;
-      if (drawing_wand->indent_depth > 0)
-        drawing_wand->indent_depth--;
-      (void) MvgPrintf(drawing_wand,"pop graphic-context\n");
-    }
+  DrawPopGraphicContext(drawing_wand);
 }
 
 /*
@@ -3698,36 +2602,9 @@ WandExport void DrawPopGraphicContext(DrawingWand *drawing_wand)
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPopPattern(DrawingWand *drawing_wand)
+WandExport void MagickDrawPopPattern(DrawingWand *drawing_wand)
 {
-  char
-    geometry[MaxTextExtent],
-    key[MaxTextExtent];
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->pattern_id == NULL)
-    ThrowException(&drawing_wand->exception,DrawWarning,
-      NotCurrentlyPushingPatternDefinition,NULL);
-  (void) MagickFormatString(key,MaxTextExtent,"[%.1024s]",
-    drawing_wand->pattern_id);
-  (void) SetImageAttribute(drawing_wand->image,key,
-    drawing_wand->mvg+drawing_wand->pattern_offset);
-  (void) MagickFormatString(geometry,MaxTextExtent,"%lux%lu%+ld%+ld",
-    drawing_wand->pattern_bounds.width,drawing_wand->pattern_bounds.height,
-    drawing_wand->pattern_bounds.x,drawing_wand->pattern_bounds.y);
-  (void) SetImageAttribute(drawing_wand->image,key,geometry);
-  MagickFreeMemory(drawing_wand->pattern_id);
-  drawing_wand->pattern_id=NULL;
-  drawing_wand->pattern_offset=0;
-  drawing_wand->pattern_bounds.x=0;
-  drawing_wand->pattern_bounds.y=0;
-  drawing_wand->pattern_bounds.width=0;
-  drawing_wand->pattern_bounds.height=0;
-  drawing_wand->filter_off=MagickFalse;
-  if (drawing_wand->indent_depth > 0)
-    drawing_wand->indent_depth--;
-  (void) MvgPrintf(drawing_wand,"pop pattern\n");
+  DrawPopPattern(drawing_wand);
 }
 
 /*
@@ -3757,14 +2634,10 @@ WandExport void DrawPopPattern(DrawingWand *drawing_wand)
 %      later use.
 %
 */
-WandExport void DrawPushClipPath(DrawingWand *drawing_wand,
+WandExport void MagickDrawPushClipPath(DrawingWand *drawing_wand,
   const char *clip_path_id)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(clip_path_id != (const char *) NULL);
-  (void) MvgPrintf(drawing_wand,"push clip-path %s\n",clip_path_id);
-  drawing_wand->indent_depth++;
+  DrawPushClipPath(drawing_wand,clip_path_id);
 }
 
 /*
@@ -3791,12 +2664,9 @@ WandExport void DrawPushClipPath(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPushDefs(DrawingWand *drawing_wand)
+WandExport void MagickDrawPushDefs(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"push defs\n");
-  drawing_wand->indent_depth++;
+  DrawPushDefs(drawing_wand);
 }
 
 /*
@@ -3825,24 +2695,9 @@ WandExport void DrawPushDefs(DrawingWand *drawing_wand)
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport void DrawPushGraphicContext(DrawingWand *drawing_wand)
+WandExport void MagickDrawPushGraphicContext(DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  drawing_wand->index++;
-  MagickReallocMemory(DrawInfo **,drawing_wand->graphic_context,
-                      MagickArraySize((size_t) drawing_wand->index+1,sizeof(DrawInfo *)));
-  if (drawing_wand->graphic_context == (DrawInfo **) NULL)
-    {
-      drawing_wand->index--;
-      ThrowException3(&drawing_wand->exception,ResourceLimitError,
-                      MemoryAllocationFailed,UnableToDrawOnImage);
-      return;
-    }
-  CurrentContext=CloneDrawInfo((ImageInfo *) NULL,
-    drawing_wand->graphic_context[drawing_wand->index-1]);
-  (void) MvgPrintf(drawing_wand,"push graphic-context\n");
-  drawing_wand->indent_depth++;
+  DrawPushGraphicContext(drawing_wand);
 }
 
 /*
@@ -3883,26 +2738,11 @@ WandExport void DrawPushGraphicContext(DrawingWand *drawing_wand)
 %    o height: height of pattern space
 %
 */
-WandExport void DrawPushPattern(DrawingWand *drawing_wand,
+WandExport void MagickDrawPushPattern(DrawingWand *drawing_wand,
   const char *pattern_id,const double x,const double y,const double width,
   const double height)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(pattern_id != (const char *) NULL);
-  if (drawing_wand->pattern_id != NULL)
-    ThrowException(&drawing_wand->exception,DrawError,
-      AlreadyPushingPatternDefinition,drawing_wand->pattern_id);
-  drawing_wand->filter_off=MagickTrue;
-  (void) MvgPrintf(drawing_wand,"push pattern %s %g,%g %g,%g\n",pattern_id,
-    x,y,width,height);
-  drawing_wand->indent_depth++;
-  drawing_wand->pattern_id=AcquireString(pattern_id);
-  drawing_wand->pattern_bounds.x=(long) ceil(x-0.5);
-  drawing_wand->pattern_bounds.y=(long) ceil(y-0.5);
-  drawing_wand->pattern_bounds.width=(unsigned long) (width+0.5);
-  drawing_wand->pattern_bounds.height=(unsigned long) (height+0.5);
-  drawing_wand->pattern_offset=drawing_wand->mvg_length;
+  DrawPushPattern(drawing_wand,pattern_id,x,y,width,height);
 }
 
 /*
@@ -3935,12 +2775,10 @@ WandExport void DrawPushPattern(DrawingWand *drawing_wand,
 %    o y2: y ordinate of second coordinate
 %
 */
-WandExport void DrawRectangle(DrawingWand *drawing_wand,const double x1,
+WandExport void MagickDrawRectangle(DrawingWand *drawing_wand,const double x1,
   const double y1,const double x2,const double y2)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"rectangle %g,%g %g,%g\n",x1,y1,x2,y2);
+  DrawRectangle(drawing_wand,x1,y1,x2,y2);
 }
 
 /*
@@ -3955,7 +2793,7 @@ WandExport void DrawRectangle(DrawingWand *drawing_wand,const double x1,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  DrawRender() renders all preceding drawing commands onto the image.
-%  This function is deprecated.  Use MagickDrawImage() instead.
+%  This function is deprecated.  Use DrawImage() instead.
 %
 %  The format of the DrawRender method is:
 %
@@ -3966,22 +2804,9 @@ WandExport void DrawRectangle(DrawingWand *drawing_wand,const double x1,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport unsigned int DrawRender(const DrawingWand *drawing_wand)
+WandExport unsigned int MagickDrawRender(const DrawingWand *drawing_wand)
 {
-  MagickPassFail
-    status;
-
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  CurrentContext->primitive=drawing_wand->mvg;
-  (void) LogMagickEvent(DrawEvent,GetMagickModule(),"MVG:\n'%s'\n",
-    drawing_wand->mvg);
-  /* SetImageAttribute concatenates values! Delete with NULL */
-  (void) SetImageAttribute(drawing_wand->image,"[MVG]",NULL);
-  (void) SetImageAttribute(drawing_wand->image,"[MVG]",CurrentContext->primitive);
-  status=DrawImage(drawing_wand->image, CurrentContext);
-  CurrentContext->primitive=(char *) NULL;
-  return status;
+  return DrawRender(drawing_wand);
 }
 
 /*
@@ -4008,20 +2833,9 @@ WandExport unsigned int DrawRender(const DrawingWand *drawing_wand)
 %    o degrees: degrees of rotation
 %
 */
-WandExport void DrawRotate(DrawingWand *drawing_wand,const double degrees)
+WandExport void MagickDrawRotate(DrawingWand *drawing_wand,const double degrees)
 {
-  AffineMatrix
-    affine;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  IdentityAffine(&affine);
-  affine.sx=cos(DegreesToRadians(fmod(degrees,360.0)));
-  affine.rx=sin(DegreesToRadians(fmod(degrees,360.0)));
-  affine.ry=(-sin(DegreesToRadians(fmod(degrees,360.0))));
-  affine.sy=cos(DegreesToRadians(fmod(degrees,360.0)));
-  AdjustAffine(drawing_wand,&affine);
-  (void) MvgPrintf(drawing_wand,"rotate %g\n",degrees);
+  DrawRotate(drawing_wand,degrees);
 }
 
 /*
@@ -4061,13 +2875,10 @@ WandExport void DrawRotate(DrawingWand *drawing_wand,const double degrees)
 %    o ry: radius of corner in vertical direction
 %
 */
-WandExport void DrawRoundRectangle(DrawingWand *drawing_wand,double x1,
+WandExport void MagickDrawRoundRectangle(DrawingWand *drawing_wand,double x1,
   double y1,double x2,double y2,double rx,double ry)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"roundrectangle %g,%g %g,%g %g,%g\n",
-    x1,y1,x2,y2,rx,ry);
+  DrawRoundRectangle(drawing_wand,x1,y1,x2,y2,rx,ry);
 }
 
 /*
@@ -4097,19 +2908,10 @@ WandExport void DrawRoundRectangle(DrawingWand *drawing_wand,double x1,
 %    o y: vertical scale factor
 %
 */
-WandExport void DrawScale(DrawingWand *drawing_wand,const double x,
+WandExport void MagickDrawScale(DrawingWand *drawing_wand,const double x,
   const double y)
 {
-  AffineMatrix
-    affine;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  IdentityAffine(&affine);
-  affine.sx=x;
-  affine.sy=y;
-  AdjustAffine( drawing_wand, &affine );
-  (void) MvgPrintf(drawing_wand,"scale %g,%g\n",x,y);
+  DrawScale(drawing_wand,x,y);
 }
 
 /*
@@ -4137,17 +2939,9 @@ WandExport void DrawScale(DrawingWand *drawing_wand,const double x,
 %    o degrees: number of degrees to skew the coordinates
 %
 */
-WandExport void DrawSkewX(DrawingWand *drawing_wand,const double degrees)
+WandExport void MagickDrawSkewX(DrawingWand *drawing_wand,const double degrees)
 {
-  AffineMatrix
-    affine;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  IdentityAffine(&affine);
-  affine.ry=tan(DegreesToRadians(fmod(degrees,360.0)));
-  AdjustAffine(drawing_wand,&affine);
-  (void) MvgPrintf(drawing_wand,"skewX %g\n",degrees);
+  DrawSkewX(drawing_wand,degrees);
 }
 
 /*
@@ -4175,17 +2969,9 @@ WandExport void DrawSkewX(DrawingWand *drawing_wand,const double degrees)
 %    o degrees: number of degrees to skew the coordinates
 %
 */
-WandExport void DrawSkewY(DrawingWand *drawing_wand,const double degrees)
+WandExport void MagickDrawSkewY(DrawingWand *drawing_wand,const double degrees)
 {
-  AffineMatrix
-    affine;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  IdentityAffine(&affine);
-  affine.rx=tan(DegreesToRadians(fmod(degrees,360.0)));
-  DrawAffine(drawing_wand,&affine);
-  (void) MvgPrintf(drawing_wand,"skewY %g\n",degrees);
+  DrawSkewY(drawing_wand,degrees);
 }
 #if 0
 
@@ -4217,15 +3003,10 @@ WandExport void DrawSkewY(DrawingWand *drawing_wand,const double degrees)
 %
 */
 /* This is gradient stuff so it shouldn't be supported yet */
-WandExport void DrawSetStopColor(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStopColor(DrawingWand *drawing_wand,
   const PixelPacket * stop_color,const double offset)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(stop_color != (const PixelPacket *) NULL);
-  (void) MvgPrintf(drawing_wand,"stop-color ");
-  MvgAppendColor(drawing_wand,stop_color);
-  (void) MvgPrintf(drawing_wand,"\n");
+  DrawSetStopColor(drawing_wand,stop_color,offset);
 }
 #endif
 
@@ -4254,12 +3035,11 @@ $        PixelWand *stroke_color)
 %    o stroke_color: Return the stroke color.
 %
 */
-WandExport void DrawGetStrokeColor(const DrawingWand *drawing_wand,
+WandExport void MagickDrawGetStrokeColor(const DrawingWand *drawing_wand,
   PixelWand *stroke_color)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  PixelSetQuantumColor(stroke_color,&CurrentContext->stroke);
+  PixelPacket packet=DrawGetStrokeColor(drawing_wand);
+  PixelSetQuantumColor(stroke_color,&packet);
 }
 
 /*
@@ -4287,30 +3067,16 @@ WandExport void DrawGetStrokeColor(const DrawingWand *drawing_wand,
 %    o stroke_wand: stroke wand.
 %
 */
-WandExport void DrawSetStrokeColor(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeColor(DrawingWand *drawing_wand,
   const PixelWand *stroke_wand)
 {
   PixelPacket
-    *current_stroke,
-    new_stroke,
     stroke_color;
 
   assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
   assert(stroke_wand != (const PixelWand *) NULL);
   PixelGetQuantumColor(stroke_wand,&stroke_color);
-  new_stroke=stroke_color;
-  if (new_stroke.opacity != TransparentOpacity)
-    new_stroke.opacity=CurrentContext->opacity;
-  current_stroke=&CurrentContext->stroke;
-  if (drawing_wand->filter_off ||
-      !WandColorMatch(current_stroke,&new_stroke))
-    {
-      CurrentContext->stroke=new_stroke;
-      (void) MvgPrintf(drawing_wand,"stroke '");
-      MvgAppendColor(drawing_wand,&stroke_color);
-      (void) MvgPrintf(drawing_wand,"'\n");
-    }
+  DrawSetStrokeColor(drawing_wand,&stroke_color);
 }
 
 /*
@@ -4338,35 +3104,10 @@ WandExport void DrawSetStrokeColor(DrawingWand *drawing_wand,
 %    o stroke_url: URL specifying pattern ID (e.g. "#pattern_id")
 %
 */
-WandExport void DrawSetStrokePatternURL(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokePatternURL(DrawingWand *drawing_wand,
   const char *stroke_url)
 {
-  char
-    pattern[MaxTextExtent];
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(stroke_url != NULL);
-  if (stroke_url[0] != '#')
-    ThrowException(&drawing_wand->exception,DrawWarning,
-      NotARelativeURL,stroke_url);
-  (void) MagickFormatString(pattern,MaxTextExtent,"[%.1024s]",stroke_url+1);
-  if (GetImageAttribute(drawing_wand->image,pattern) == (ImageAttribute *) NULL)
-    {
-      ThrowException(&drawing_wand->exception,DrawWarning,
-        URLNotFound,stroke_url);
-    }
-  else
-    {
-      char
-        pattern_spec[MaxTextExtent];
-
-      (void) MagickFormatString(pattern_spec,MaxTextExtent,"url(%.1024s)",
-        stroke_url);
-      if (CurrentContext->stroke.opacity != TransparentOpacity)
-        CurrentContext->stroke.opacity=CurrentContext->opacity;
-      (void) MvgPrintf(drawing_wand,"stroke %s\n",pattern_spec);
-    }
+  DrawSetStrokePatternURL(drawing_wand,stroke_url);
 }
 
 /*
@@ -4393,11 +3134,9 @@ WandExport void DrawSetStrokePatternURL(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport unsigned int DrawGetStrokeAntialias(const DrawingWand *drawing_wand)
+WandExport unsigned int MagickDrawGetStrokeAntialias(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->stroke_antialias);
+  return DrawGetStrokeAntialias(drawing_wand);
 }
 
 /*
@@ -4428,17 +3167,10 @@ WandExport unsigned int DrawGetStrokeAntialias(const DrawingWand *drawing_wand)
 %    o stroke_antialias: set to false (zero) to disable antialiasing
 %
 */
-WandExport void DrawSetStrokeAntialias(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeAntialias(DrawingWand *drawing_wand,
   const unsigned int stroke_antialias)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off ||
-     (CurrentContext->stroke_antialias != stroke_antialias))
-    {
-      CurrentContext->stroke_antialias=stroke_antialias;
-      (void) MvgPrintf(drawing_wand,"stroke-antialias %i\n",stroke_antialias ? 1 : 0);
-    }
+  DrawSetStrokeAntialias(drawing_wand,stroke_antialias);
 }
 
 /*
@@ -4468,46 +3200,10 @@ WandExport void DrawSetStrokeAntialias(DrawingWand *drawing_wand,
 %    o number_elements: address to place number of elements in dash array
 %
 % */
-WandExport double *DrawGetStrokeDashArray(const DrawingWand *drawing_wand,
+WandExport double *MagickDrawGetStrokeDashArray(const DrawingWand *drawing_wand,
   unsigned long *number_elements)
 {
-  register const double
-    *p;
-
-  register double
-    *q;
-
-  double
-    *dash_array;
-
-  unsigned long
-    i,
-    n = 0;
-
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(number_elements != (unsigned long *)NULL);
-
-  p = CurrentContext->dash_pattern;
-  if ( p != (const double *) NULL )
-    while (*p++ != 0.0)
-      n++;
-
-  *number_elements = n;
-  dash_array = (double *) NULL;
-  if (n != 0)
-    {
-      dash_array = MagickAllocateArray(double *, (size_t) n+1, sizeof(double));
-      if (dash_array != (double *) NULL)
-        {
-          p = CurrentContext->dash_pattern;
-          q = dash_array;
-          for (i=0; i < n; i++)
-            *q++ = (*p++);
-          *q=0.0;
-        }
-    }
-  return(dash_array);
+  return DrawGetStrokeDashArray(drawing_wand,number_elements);
 }
 
 /*
@@ -4543,92 +3239,10 @@ WandExport double *DrawGetStrokeDashArray(const DrawingWand *drawing_wand,
 %    o dash_array: dash array values
 %
 % */
-WandExport void DrawSetStrokeDashArray(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeDashArray(DrawingWand *drawing_wand,
   const unsigned long number_elements,const double *dash_array)
 {
-  register const double
-    *p;
-
-  register double
-    *q;
-
-  unsigned long
-    i,
-    n_new = number_elements,
-    n_old = 0;
-
-  MagickBool
-    updated = MagickFalse;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (dash_array == (const double *) NULL)
-    n_new = 0;
-  q=CurrentContext->dash_pattern;
-  if (q != (const double *) NULL)
-    while (*q++ != 0.0)
-      n_old++;
-
-  if ((n_old == 0) && (n_new == 0))
-    {
-      updated=MagickFalse;
-    }
-  else if ( n_old != n_new )
-    {
-      updated=MagickTrue;
-    }
-  else if ((CurrentContext->dash_pattern != (double *) NULL) &&
-           (dash_array != (double *) NULL))
-    {
-      p=dash_array;
-      q=CurrentContext->dash_pattern;
-      i=n_new;
-      while ( i-- )
-      {
-        if (AbsoluteValue(*p - *q) > MagickEpsilon)
-          {
-            updated=MagickTrue;
-            break;
-          }
-        p++;
-        q++;
-      }
-    }
-  if (drawing_wand->filter_off || updated)
-    {
-      if (CurrentContext->dash_pattern != (double *) NULL)
-        MagickFreeMemory(CurrentContext->dash_pattern);
-      if (n_new != 0)
-        {
-          CurrentContext->dash_pattern=MagickAllocateArray(double *,
-                                                           ((size_t) n_new+1),
-                                                           sizeof(double));
-          if (!CurrentContext->dash_pattern)
-            {
-              ThrowException3(&drawing_wand->exception,
-                ResourceLimitError,MemoryAllocationFailed,UnableToDrawOnImage);
-            }
-          else
-            {
-              for (i=0; i < n_new; i++)
-                CurrentContext->dash_pattern[i]=dash_array[i];
-              CurrentContext->dash_pattern[n_new]=0.0;
-            }
-        }
-      (void) MvgPrintf(drawing_wand,"stroke-dasharray ");
-      if ( n_new == 0 )
-        (void) MvgPrintf(drawing_wand, "none");
-      else
-        {
-          for (i=0; i < n_new; i++)
-            {
-              if (i != 0)
-                (void) MvgPrintf(drawing_wand, ",");
-              (void) MvgPrintf(drawing_wand, "%g", dash_array[i]);
-            }
-        }
-      (void) MvgPrintf(drawing_wand,"\n");
-    }
+  DrawSetStrokeDashArray(drawing_wand,number_elements,dash_array);
 }
 
 /*
@@ -4654,11 +3268,9 @@ WandExport void DrawSetStrokeDashArray(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport double DrawGetStrokeDashOffset(const DrawingWand *drawing_wand)
+WandExport double MagickDrawGetStrokeDashOffset(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->dash_offset);
+  return DrawGetStrokeDashOffset(drawing_wand);
 }
 
 /*
@@ -4687,18 +3299,10 @@ WandExport double DrawGetStrokeDashOffset(const DrawingWand *drawing_wand)
 %    o dash_offset: dash offset
 %
 */
-WandExport void DrawSetStrokeDashOffset(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeDashOffset(DrawingWand *drawing_wand,
   const double dash_offset)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-
-  if (drawing_wand->filter_off ||
-     (AbsoluteValue(CurrentContext->dash_offset-dash_offset) > MagickEpsilon))
-    {
-      CurrentContext->dash_offset=dash_offset;
-      (void) MvgPrintf(drawing_wand,"stroke-dashoffset %g\n",dash_offset);
-    }
+  DrawSetStrokeDashOffset(drawing_wand,dash_offset);
 }
 
 /*
@@ -4725,11 +3329,9 @@ WandExport void DrawSetStrokeDashOffset(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 % */
-WandExport LineCap DrawGetStrokeLineCap(const DrawingWand *drawing_wand)
+WandExport LineCap MagickDrawGetStrokeLineCap(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->linecap);
+  return DrawGetStrokeLineCap(drawing_wand);
 }
 
 /*
@@ -4759,35 +3361,10 @@ WandExport LineCap DrawGetStrokeLineCap(const DrawingWand *drawing_wand)
 %    o linecap: linecap style
 %
 % */
-WandExport void DrawSetStrokeLineCap(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeLineCap(DrawingWand *drawing_wand,
   const LineCap linecap)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-
-  if (drawing_wand->filter_off || (CurrentContext->linecap != linecap))
-    {
-      const char
-        *p=NULL;
-
-      CurrentContext->linecap=linecap;
-      switch (linecap)
-      {
-        case ButtCap:
-          p="butt";
-          break;
-        case RoundCap:
-          p="round";
-          break;
-        case SquareCap:
-          p="square";
-          break;
-        default:
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand,"stroke-linecap %s\n",p);
-    }
+  DrawSetStrokeLineCap(drawing_wand,linecap);
 }
 
 /*
@@ -4815,11 +3392,9 @@ WandExport void DrawSetStrokeLineCap(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 % */
-WandExport LineJoin DrawGetStrokeLineJoin(const DrawingWand *drawing_wand)
+WandExport LineJoin MagickDrawGetStrokeLineJoin(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->linejoin);
+  return DrawGetStrokeLineJoin(drawing_wand);
 }
 
 /*
@@ -4851,35 +3426,10 @@ WandExport LineJoin DrawGetStrokeLineJoin(const DrawingWand *drawing_wand)
 %
 %
 */
-WandExport void DrawSetStrokeLineJoin(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeLineJoin(DrawingWand *drawing_wand,
   const LineJoin linejoin)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->linejoin != linejoin))
-    {
-      const char
-        *p=NULL;
-
-      CurrentContext->linejoin=linejoin;
-
-      switch (linejoin)
-      {
-        case MiterJoin:
-          p="miter";
-          break;
-        case RoundJoin:
-          p="round";
-          break;
-        case BevelJoin:
-          p="bevel";
-          break;
-        default:
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand,"stroke-linejoin %s\n",p);
-    }
+  DrawSetStrokeLineJoin(drawing_wand,linejoin);
 }
 
 /*
@@ -4908,11 +3458,9 @@ WandExport void DrawSetStrokeLineJoin(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 % */
-WandExport unsigned long DrawGetStrokeMiterLimit(const DrawingWand *drawing_wand)
+WandExport unsigned long MagickDrawGetStrokeMiterLimit(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return CurrentContext->miterlimit;
+  return DrawGetStrokeMiterLimit(drawing_wand);
 }
 
 /*
@@ -4944,16 +3492,10 @@ WandExport unsigned long DrawGetStrokeMiterLimit(const DrawingWand *drawing_wand
 %    o miterlimit: miter limit
 %
 % */
-WandExport void DrawSetStrokeMiterLimit(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeMiterLimit(DrawingWand *drawing_wand,
   const unsigned long miterlimit)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (CurrentContext->miterlimit != miterlimit)
-    {
-      CurrentContext->miterlimit=miterlimit;
-      (void) MvgPrintf(drawing_wand,"stroke-miterlimit %lu\n",miterlimit);
-    }
+  DrawSetStrokeMiterLimit(drawing_wand,miterlimit);
 }
 
 /*
@@ -4977,11 +3519,9 @@ WandExport void DrawSetStrokeMiterLimit(DrawingWand *drawing_wand,
 %
 %    o drawing_wand: The drawing wand.
 */
-WandExport double DrawGetStrokeOpacity(const DrawingWand *drawing_wand)
+WandExport double MagickDrawGetStrokeOpacity(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(1.0-(((double)CurrentContext->stroke.opacity)/MaxRGB));
+  return DrawGetStrokeOpacity(drawing_wand);
 }
 
 /*
@@ -5009,21 +3549,10 @@ WandExport double DrawGetStrokeOpacity(const DrawingWand *drawing_wand)
 %    o stroke_opacity: stroke opacity.  The value 1.0 is opaque.
 %
 */
-WandExport void DrawSetStrokeOpacity(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeOpacity(DrawingWand *drawing_wand,
   const double stroke_opacity)
 {
-  double
-    opacity;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  opacity=(Quantum) ((double) MaxRGB*
-    (1.0-(stroke_opacity <= 1.0 ? stroke_opacity : 1.0 ))+0.5);
-  if (drawing_wand->filter_off || (CurrentContext->stroke.opacity != opacity))
-    {
-      CurrentContext->stroke.opacity=(Quantum) (opacity+0.5);
-      (void) MvgPrintf(drawing_wand,"stroke-opacity %g\n",stroke_opacity);
-    }
+  DrawSetStrokeOpacity(drawing_wand,stroke_opacity);
 }
 
 /*
@@ -5049,11 +3578,9 @@ WandExport void DrawSetStrokeOpacity(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport double DrawGetStrokeWidth(const DrawingWand *drawing_wand)
+WandExport double MagickDrawGetStrokeWidth(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->stroke_width);
+  return DrawGetStrokeWidth(drawing_wand);
 }
 
 /*
@@ -5082,17 +3609,10 @@ WandExport double DrawGetStrokeWidth(const DrawingWand *drawing_wand)
 %    o stroke_width: stroke width
 %
 */
-WandExport void DrawSetStrokeWidth(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetStrokeWidth(DrawingWand *drawing_wand,
   const double stroke_width)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off ||
-     (AbsoluteValue(CurrentContext->stroke_width-stroke_width) > MagickEpsilon))
-    {
-      CurrentContext->stroke_width=stroke_width;
-      (void) MvgPrintf(drawing_wand,"stroke-width %g\n",stroke_width);
-    }
+  DrawSetStrokeWidth(drawing_wand,stroke_width);
 }
 
 /*
@@ -5118,11 +3638,9 @@ WandExport void DrawSetStrokeWidth(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport unsigned int DrawGetTextAntialias(const DrawingWand *drawing_wand)
+WandExport unsigned int MagickDrawGetTextAntialias(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->text_antialias);
+  return DrawGetTextAntialias(drawing_wand);
 }
 
 /*
@@ -5152,17 +3670,10 @@ WandExport unsigned int DrawGetTextAntialias(const DrawingWand *drawing_wand)
 %      antialiasing.
 %
 */
-WandExport void DrawSetTextAntialias(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetTextAntialias(DrawingWand *drawing_wand,
   const unsigned int text_antialias)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off ||
-      (CurrentContext->text_antialias != text_antialias))
-    {
-      CurrentContext->text_antialias=text_antialias;
-      (void) MvgPrintf(drawing_wand,"text-antialias %i\n",text_antialias ? 1 : 0);
-    }
+  DrawSetTextAntialias(drawing_wand,text_antialias);
 }
 
 /*
@@ -5188,11 +3699,9 @@ WandExport void DrawSetTextAntialias(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 */
-WandExport DecorationType DrawGetTextDecoration(const DrawingWand *drawing_wand)
+WandExport DecorationType MagickDrawGetTextDecoration(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  return(CurrentContext->decorate);
+  return DrawGetTextDecoration(drawing_wand);
 }
 
 /*
@@ -5222,35 +3731,10 @@ WandExport DecorationType DrawGetTextDecoration(const DrawingWand *drawing_wand)
 %      OverlineDecoration, or LineThroughDecoration
 %
 */
-WandExport void DrawSetTextDecoration(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetTextDecoration(DrawingWand *drawing_wand,
   const DecorationType decoration)
 {
-  const char
-    *p=NULL;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (drawing_wand->filter_off || (CurrentContext->decorate != decoration))
-    {
-      CurrentContext->decorate=decoration;
-      switch (decoration)
-      {
-        case NoDecoration:
-          p="none";
-          break;
-        case UnderlineDecoration:
-          p="underline";
-          break;
-        case OverlineDecoration:
-          p="overline";
-          break;
-        case LineThroughDecoration:
-          p="line-through";
-          break;
-      }
-      if (p != NULL)
-        (void) MvgPrintf(drawing_wand,"decorate %s\n",p);
-    }
+  DrawSetTextDecoration(drawing_wand,decoration);
 }
 
 /*
@@ -5277,13 +3761,9 @@ WandExport void DrawSetTextDecoration(DrawingWand *drawing_wand,
 %    o drawing_wand: The drawing wand.
 %
 % */
-WandExport char *DrawGetTextEncoding(const DrawingWand *drawing_wand)
+WandExport char *MagickDrawGetTextEncoding(const DrawingWand *drawing_wand)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  if (CurrentContext->encoding != (char *)NULL)
-    return((char *) AcquireString(CurrentContext->encoding));
-  return((char *) NULL);
+  return DrawGetTextEncoding(drawing_wand);
 }
 
 /*
@@ -5315,18 +3795,10 @@ WandExport char *DrawGetTextEncoding(const DrawingWand *drawing_wand)
 %    o encoding: character string specifying text encoding
 %
 % */
-WandExport void DrawSetTextEncoding(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetTextEncoding(DrawingWand *drawing_wand,
   const char *encoding)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  assert(encoding != (char *) NULL);
-  if (drawing_wand->filter_off || (CurrentContext->encoding == (char *) NULL) ||
-      (LocaleCompare(CurrentContext->encoding,encoding) != 0))
-    {
-      (void) CloneString(&CurrentContext->encoding,encoding);
-      (void) MvgPrintf(drawing_wand,"encoding '%s'\n",encoding);
-    }
+  DrawSetTextEncoding(drawing_wand,encoding);
 }
 
 /*
@@ -5355,12 +3827,14 @@ WandExport void DrawSetTextEncoding(DrawingWand *drawing_wand,
 %    o under_color: Return the under color.
 %
 */
-WandExport void DrawGetTextUnderColor(const DrawingWand *drawing_wand,
+WandExport void MagickDrawGetTextUnderColor(const DrawingWand *drawing_wand,
   PixelWand *under_color)
 {
-  assert(drawing_wand != (const DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  PixelSetQuantumColor(under_color,&CurrentContext->undercolor);
+  PixelPacket
+    packet;
+
+  packet=DrawGetTextUnderColor(drawing_wand);
+  PixelSetQuantumColor(under_color,&packet);
 }
 
 /*
@@ -5389,24 +3863,16 @@ WandExport void DrawGetTextUnderColor(const DrawingWand *drawing_wand,
 %    o under_wand.: text under wand.
 %
 */
-WandExport void DrawSetTextUnderColor(DrawingWand *drawing_wand,
+WandExport void MagickDrawSetTextUnderColor(DrawingWand *drawing_wand,
   const PixelWand *under_wand)
 {
   PixelPacket
     under_color;
 
   assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
   assert(under_wand != (const PixelWand *) NULL);
   PixelGetQuantumColor(under_wand,&under_color);
-  if (drawing_wand->filter_off ||
-      !WandColorMatch(&CurrentContext->undercolor,&under_color))
-    {
-      CurrentContext->undercolor=under_color;
-      (void) MvgPrintf(drawing_wand,"text-undercolor '");
-      MvgAppendColor(drawing_wand,&under_color);
-      (void) MvgPrintf(drawing_wand,"'\n");
-    }
+  DrawSetTextUnderColor(drawing_wand,&under_color);
 }
 
 /*
@@ -5438,19 +3904,10 @@ WandExport void DrawSetTextUnderColor(DrawingWand *drawing_wand,
 %    o y: new y ordinate for coordinate system origin
 %
 */
-WandExport void DrawTranslate(DrawingWand *drawing_wand,const double x,
+WandExport void MagickDrawTranslate(DrawingWand *drawing_wand,const double x,
   const double y)
 {
-  AffineMatrix
-    affine;
-
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  IdentityAffine(&affine);
-  affine.tx=x;
-  affine.ty=y;
-  AdjustAffine(drawing_wand,&affine );
-  (void) MvgPrintf(drawing_wand,"translate %g,%g\n",x,y);
+  DrawTranslate(drawing_wand,x,y);
 }
 
 /*
@@ -5488,12 +3945,10 @@ WandExport void DrawTranslate(DrawingWand *drawing_wand,const double x,
 %    o y2: bottom y ordinate
 %
 */
-WandExport void DrawSetViewbox(DrawingWand *drawing_wand,unsigned long x1,
+WandExport void MagickDrawSetViewbox(DrawingWand *drawing_wand,unsigned long x1,
   unsigned long y1,unsigned long x2,unsigned long y2)
 {
-  assert(drawing_wand != (DrawingWand *) NULL);
-  assert(drawing_wand->signature == MagickSignature);
-  (void) MvgPrintf(drawing_wand,"viewbox %lu %lu %lu %lu\n",x1,y1,x2,y2);
+  DrawSetViewbox(drawing_wand,x1,y1,x2,y2);
 }
 
 /*
@@ -5514,9 +3969,11 @@ WandExport void DrawSetViewbox(DrawingWand *drawing_wand,unsigned long x1,
 %
 %      DrawingWand *NewDrawingWand(void)
 %
-%
 */
-WandExport DrawingWand *NewDrawingWand(void)
+/*
+  Similar to magick/draw.c DrawNewContext()
+*/
+WandExport DrawingWand *MagickNewDrawingWand(void)
 {
   DrawingWand
     *drawing_wand;
@@ -5538,43 +3995,7 @@ WandExport DrawingWand *NewDrawingWand(void)
 
   InitializeMagick(NULL);
 
-  drawing_wand=MagickAllocateMemory(DrawingWand *,sizeof(struct _DrawingWand));
-  if (drawing_wand == (DrawingWand *) NULL)
-    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-      UnableToAllocateDrawingWand);
-  GetExceptionInfo(&drawing_wand->exception);
-  drawing_wand->image=AllocateImage((const ImageInfo *) NULL);
-  drawing_wand->own_image=MagickTrue;
-  drawing_wand->mvg=NULL;
-  drawing_wand->mvg_alloc=0;
-  drawing_wand->mvg_length=0;
-  drawing_wand->mvg_width=0;
-  drawing_wand->pattern_id=NULL;
-  drawing_wand->pattern_offset=0;
-  drawing_wand->pattern_bounds.x=0;
-  drawing_wand->pattern_bounds.y=0;
-  drawing_wand->pattern_bounds.width=0;
-  drawing_wand->pattern_bounds.height=0;
-  drawing_wand->index=0;
-  drawing_wand->graphic_context=MagickAllocateMemory(DrawInfo **,
-                                                     sizeof(DrawInfo *));
-  if (drawing_wand->graphic_context == (DrawInfo **) NULL)
-    {
-      ThrowException3(&drawing_wand->exception,ResourceLimitError,
-        MemoryAllocationFailed,UnableToDrawOnImage);
-      return (DrawingWand *) NULL;
-    }
-  CurrentContext=CloneDrawInfo((ImageInfo*)NULL,(DrawInfo *) NULL);
-  if (CurrentContext == (DrawInfo*) NULL)
-    {
-      ThrowException3(&drawing_wand->exception,ResourceLimitError,
-        MemoryAllocationFailed,UnableToDrawOnImage);
-      return (DrawingWand *) NULL;
-    }
-  drawing_wand->filter_off=MagickFalse;
-  drawing_wand->indent_depth=0;
-  drawing_wand->path_operation=PathDefaultOperation;
-  drawing_wand->path_mode=DefaultPathMode;
-  drawing_wand->signature=MagickSignature;
+  drawing_wand=DrawNewContext();
+
   return(drawing_wand);
 }

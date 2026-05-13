@@ -33,6 +33,10 @@ extern MagickExport int _Gm_convert_fp24_to_fp32 (const fp_24bits *fp24, float *
 
 extern MagickExport int _Gm_convert_fp32_to_fp24 (const float *fp32, fp_24bits *fp24, const int mode);
 
+#if defined(__cplusplus) || defined(c_plusplus)
+}
+#endif /* defined(__cplusplus) || defined(c_plusplus) */
+
 #endif /* ifndef _MAGICK_FLOATS_H */
 
 /*

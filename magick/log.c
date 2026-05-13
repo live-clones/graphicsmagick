@@ -980,7 +980,7 @@ MagickExport MagickPassFail LogMagickEvent(const ExceptionType type,
 %                                                                             %
 %                                                                             %
 %                                                                             %
-+   R e a d C o n f i g u r e F i l e                                         %
++   R e a d L o g C o n f i g u r e F i l e                                   %
 %                                                                             %
 %                                                                             %
 %                                                                             %
@@ -995,7 +995,7 @@ MagickExport MagickPassFail LogMagickEvent(const ExceptionType type,
 %
 %  A description of each parameter follows:
 %
-%    o status: ReadLogConfigureFile() returns True if at least one log entry
+%    o status: ReadLogConfigureFile() returns MagickPass if at least one log entry
 %      is defined otherwise False.
 %
 %    o basename:  The log configuration filename.
@@ -1012,13 +1012,13 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
   char
     keyword[MaxTextExtent],
     path[MaxTextExtent],
+    token[MaxTextExtent],
     *q,
-    *token,
     *xml;
 
   size_t
-    length=0,
-    token_max_length;
+    blob_length=0,
+    token_length;
 
   MagickPassFail
     status=MagickPass;
@@ -1032,7 +1032,7 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
       /*
         Load top configuration file based on configure search path.
       */
-      xml=(char *) GetConfigureBlob(basename,path,&length,exception);
+      xml=(char *) GetConfigureBlob(basename,path,&blob_length,exception);
     }
   else
     {
@@ -1040,19 +1040,17 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
         Load subordinate configuration file based on path specified
         by parent configuration file.
       */
-      xml=(char *) FileToBlob(basename,&length,exception);
+      xml=(char *) FileToBlob(basename,&blob_length,exception);
     }
   if (xml == (char *) NULL)
     return MagickFail;
-  token=AllocateString(xml);
-  token_max_length=strlen(token);
   for (q=xml; *q != '\0'; )
   {
     /*
       Interpret Coder.
     */
-    MagickGetToken(q,&q,token,token_max_length);
-    if (*token == '\0')
+    token_length=MagickGetToken(q,&q,token,MaxTextExtent);
+    if ((token_length == 0) || (*token == '\0'))
       break;
     (void) strlcpy(keyword,token,MaxTextExtent);
     if (LocaleNCompare(keyword,"<!--",4) == 0)
@@ -1060,8 +1058,8 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
         /*
           Comment element.
         */
-        while ((LocaleNCompare(q,"->",2) != 0) && (*q != '\0'))
-          MagickGetToken(q,&q,token,token_max_length);
+        while ((token_length) && (LocaleNCompare(q,"->",2) != 0) && (*q != '\0'))
+          token_length=MagickGetToken(q,&q,token,MaxTextExtent);
         continue;
       }
     if (LocaleCompare(keyword,"<include") == 0)
@@ -1069,13 +1067,13 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
         /*
           Include element.
         */
-        while ((*token != '>') && (*q != '\0'))
+        while ((token_length) && (*token != '>') && (*q != '\0'))
         {
           (void) strlcpy(keyword,token,MaxTextExtent);
-          MagickGetToken(q,&q,token,token_max_length);
-          if (*token != '=')
+          token_length=MagickGetToken(q,&q,token,MaxTextExtent);
+          if ((token_length) && (*token != '='))
             continue;
-          MagickGetToken(q,&q,token,token_max_length);
+          (void) MagickGetToken(q,&q,token,MaxTextExtent);
           if (LocaleCompare(keyword,"file") == 0)
             {
               if (depth > 200)
@@ -1093,7 +1091,6 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
                   status &= ReadLogConfigureFile(filename,depth+1,exception);
                   if (status != MagickPass)
                     {
-                      MagickFreeMemory(token);
                       MagickFreeMemory(xml);
                       return (status);
                     }
@@ -1107,11 +1104,11 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
         (void) strlcpy(log_info->path,path,sizeof(log_info->path));
         continue;
       }
-    MagickGetToken(q,(char **) NULL,token,token_max_length);
-    if (*token != '=')
+    token_length=MagickGetToken(q,(char **) NULL,token,MaxTextExtent);
+    if ((token_length) && (*token != '='))
       continue;
-    MagickGetToken(q,&q,token,token_max_length);
-    MagickGetToken(q,&q,token,token_max_length);
+    (void) MagickGetToken(q,&q,token,MaxTextExtent);
+    (void) MagickGetToken(q,&q,token,MaxTextExtent);
     switch (*keyword)
     {
       case 'E':
@@ -1193,7 +1190,7 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
         break;
     }
   }
-  MagickFreeMemory(token);
+
   MagickFreeMemory(xml);
 
   if ((depth == 0) && (status == MagickPass))

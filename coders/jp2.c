@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -46,6 +46,7 @@
 #include "magick/profile.h"
 #include "magick/resource.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasJP2)
 #  if !defined(uchar)
 #    define uchar  unsigned char
@@ -455,7 +456,7 @@ static jas_stream_t *JP2StreamManager(jas_stream_ops_t *stream_ops, Image *image
 #define ThrowJP2ReaderException(code_,reason_,image_)                   \
   {                                                                     \
     for (component=0; component < (long) number_components; component++) \
-      MagickFreeResourceLimitedMemory(channel_lut[component]);          \
+      MagickFreeResourceLimitedMemory(Quantum *,channel_lut[component]); \
     if (pixels)                                                         \
       jas_matrix_destroy(pixels);                                       \
     if (jp2_stream)                                                     \
@@ -482,7 +483,7 @@ static void *alloc_rlm(struct jas_allocator_s *allocator, size_t size)
   char *p;
   (void) allocator;
   /* JasPer expects its allocator to return non-null for zero size */
-  p=_MagickAllocateResourceLimitedMemory(size == 0 ? 1 : size);
+  p=(char *) _MagickAllocateResourceLimitedMemoryLoc((size == 0 ? 1 : size),GetMagickModule());
   /* fprintf(stderr,"alloc_rlm(%p, %zu) -> %p\n", allocator, size, p); */
   return p;
 }
@@ -490,14 +491,14 @@ static void free_rlm(struct jas_allocator_s *allocator, void *pointer)
 {
   (void) allocator;
   /* fprintf(stderr,"free_rlm(%p, %p\n", allocator, pointer); */
-  _MagickFreeResourceLimitedMemory(pointer);
+  _MagickFreeResourceLimitedMemoryLoc(pointer,GetMagickModule());
 }
 static void *realloc_rlm(struct jas_allocator_s *allocator, void *pointer,
                          size_t new_size)
 {
   char *p;
   (void) allocator;
-  p =_MagickReallocateResourceLimitedMemory(pointer,1,new_size,0);
+  p =(char *) _MagickReallocateResourceLimitedMemoryLoc(pointer, 1,new_size,0,GetMagickModule());
   /* fprintf(stderr,"realloc_rlm(%p, %p, %zu) -> %p\n", allocator, pointer, new_size, p); */
   return p;
 }
@@ -824,7 +825,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
 
         if ((value=AccessDefinition(image_info,"jp2",option)) != NULL)
           {
-            FormatString(option_keyval,"%s=%.1024s ",option,value);
+            MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%.1024s ",option,value);
             ConcatenateString(&options,option_keyval);
 
             if (LocaleCompare(option,"max_samples") == 0)
@@ -853,7 +854,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
                               "%" MAGICK_UINTMAX_F "u, max_samples_pixels = %" MAGICK_UINTMAX_F "u",
                               max_samples_rectangle, max_samples_pixels);
 
-        FormatString(option_keyval,"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples*3);
+        MagickFormatString(option_keyval,sizeof(option_keyval),"max_samples=%" MAGICK_UINTMAX_F "u ", max_samples*3);
         ConcatenateString(&options,option_keyval);
       }
 
@@ -1211,7 +1212,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
   }
 
   for (component=0; component < (long) number_components; component++)
-    MagickFreeResourceLimitedMemory(channel_lut[component]);
+    MagickFreeResourceLimitedMemory(Quantum *,channel_lut[component]);
   jas_matrix_destroy(pixels);
   (void) jas_stream_close(jp2_stream);
   MagickFreeMemory(options);
@@ -1475,19 +1476,23 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowJP2WriterException(FileOpenError,UnableToOpenFile,image);
 
   /*
     Ensure that image is in RGB space.
   */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
   /*
     PGX format requires a grayscale representation
   */
   if (strcmp("PGX",image_info->magick) == 0)
-    (void) SetImageType(image,GrayscaleType);
+    {
+      if (SetImageType(image,GrayscaleType) == MagickFail)
+        ThrowWriterException(CoderError,UnableToSetImageType,image);
+    }
 
   /*
     Analyze image to be written.
@@ -1527,16 +1532,16 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
                 */
                 const double rate=atof(value);
 
+                rate_specified=MagickTrue;
                 if (rate < 1.0-MagickEpsilon)
                   {
-                    FormatString(option_keyval,"%s=%.1024s ",option,value);
+                    MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%.1024s ",option,value);
                     ConcatenateString(&options,option_keyval);
-                    rate_specified=MagickTrue;
                   }
               }
             else
               {
-                FormatString(option_keyval,"%s=%.1024s ",option,value);
+                MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%.1024s ",option,value);
                 ConcatenateString(&options,option_keyval);
 
                 /* Setting debug mode seems to require extra assistance */
@@ -1654,7 +1659,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   jp2_pixels=jas_matrix_create(1,(unsigned int) image->columns);
   if (jp2_pixels == (jas_matrix_t *) NULL)
     {
-      MagickFreeResourceLimitedMemory(lut);
+      MagickFreeResourceLimitedMemory(unsigned short *,lut);
       jas_image_destroy(jp2_image);
       ThrowJP2WriterException(ResourceLimitError,MemoryAllocationFailed,image);
     }
@@ -1743,7 +1748,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
             number_components;
           target_size=(current_size*rate)+header_size;
           rate=target_size/current_size;
-          FormatString(option_keyval,"%s=%g ","rate",rate);
+          MagickFormatString(option_keyval,sizeof(option_keyval),"%s=%g ","rate",rate);
           ConcatenateString(&options,option_keyval);
         }
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1759,7 +1764,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   status=jas_image_encode(jp2_image,jp2_stream,format,options);
   (void) jas_stream_close(jp2_stream);
   MagickFreeMemory(options);
-  MagickFreeResourceLimitedMemory(lut);
+  MagickFreeResourceLimitedMemory(unsigned short *,lut);
   jas_matrix_destroy(jp2_pixels);
   jas_image_destroy(jp2_image);
   if (status)

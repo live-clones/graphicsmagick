@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -28,7 +28,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 */
- 
+
 /*
   Include declarations.
 */
@@ -43,7 +43,7 @@
 #  define _INCLUDE_MESSAGE_TABLE_
 #endif
 #include "locale_c.h"
- 
+
 /*
   Static declaractions.
 */
@@ -96,8 +96,8 @@ NTFormatMessage(DWORD id, ...)
   va_start( args, id );
 
   buffer = (LPVOID) NULL; /* stop compiler from complaining */
-  FormatString(temp,"%.1024s%.1024s%.1024s",SetClientPath((char *) NULL),
-               DirectorySeparator,SetClientFilename((char *) NULL));
+  MagickFormatString(temp,sizeof(temp),"%.1024s%.1024s%.1024s",SetClientPath((char *) NULL),
+                     DirectorySeparator,SetClientFilename((char *) NULL));
   if (IsAccessibleNoLogging(temp))
     handle=GetModuleHandle(temp);
   else
@@ -124,8 +124,8 @@ NTFormatMessage(DWORD id, ...)
                            );
       if (!status)
         {
-          FormatString(temp,"Undefined message %ld (0x%08lx)",(long) id,
-                       (long) id);
+          MagickFormatString(temp,sizeof(temp),"Undefined message %ld (0x%08lx)",(long) id,
+                             (long) id);
           result=AllocateManagedString(temp);
         }
       else
@@ -154,7 +154,7 @@ NTFormatMessage(DWORD id, ...)
     }
   else
     {
-      FormatString(temp,"Undefined message %ld (0x%08lx)",(long) id, (long) id);
+      MagickFormatString(temp,sizeof(temp),"Undefined message %ld (0x%08lx)",(long) id, (long) id);
       result=AllocateManagedString(temp);
     }
   return(result);
@@ -315,7 +315,7 @@ GetLocaleMessageFromSeverityAndTag(const ExceptionType severity,
   */
   if (strrchr(tag, ' '))
     return(tag);
-  FormatString(message,"%.1024s%.1024s",SeverityToTag(severity),tag);
+  MagickFormatString(message,sizeof(message),"%.1024s%.1024s",SeverityToTag(severity),tag);
   locale_message=GetLocaleMessage(message);
   if (locale_message == message)
     return(tag);

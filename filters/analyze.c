@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2021 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -33,6 +33,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -141,12 +142,12 @@ ModuleExport MagickPassFail AnalyzeImage(Image **image_ref,
         }
       if (y == 0)
         {
-          FormatString(text,"#%02x%02x%02x",p->red,p->green,p->blue);
+          MagickFormatString(text,sizeof(text),"#%02x%02x%02x",p->red,p->green,p->blue);
           (void) SetImageAttribute(image,"TopLeftColor",text);
         }
       if (y == ((long) image->rows-1))
         {
-          FormatString(text,"#%02x%02x%02x",p->red,p->green,p->blue);
+          MagickFormatString(text,sizeof(text),"#%02x%02x%02x",p->red,p->green,p->blue);
           (void) SetImageAttribute(image,"BottomLeftColor",text);
         }
       for (x=0; x < image->columns; x++)
@@ -163,12 +164,12 @@ ModuleExport MagickPassFail AnalyzeImage(Image **image_ref,
       p--; /* backup one pixel to allow us to sample */
       if (y == 0)
         {
-          FormatString(text,"#%02x%02x%02x",p->red,p->green,p->blue);
+          MagickFormatString(text,sizeof(text),"#%02x%02x%02x",p->red,p->green,p->blue);
           (void) SetImageAttribute(image,"TopRightColor",text);
         }
       if (y == ((long) image->rows-1))
         {
-          FormatString(text,"#%02x%02x%02x",p->red,p->green,p->blue);
+          MagickFormatString(text,sizeof(text),"#%02x%02x%02x",p->red,p->green,p->blue);
           (void) SetImageAttribute(image,"BottomRightColor",text);
         }
 
@@ -229,12 +230,12 @@ ModuleExport MagickPassFail AnalyzeImage(Image **image_ref,
 
       total_pixels = (double) image->columns * (double) image->rows;
       brightness_mean = bsumX/total_pixels;
-      FormatString(text,PRECISION,brightness_mean);
+      MagickFormatString(text,sizeof(text),PRECISION,brightness_mean);
       (void) SetImageAttribute(image,"BrightnessMean",text);
       /*  This formula gives a slightly biased result */
       brightness_stdev =
         sqrt(bsumX2/total_pixels - (bsumX/total_pixels*bsumX/total_pixels));
-      FormatString(text,PRECISION,brightness_stdev);
+      MagickFormatString(text,sizeof(text),PRECISION,brightness_stdev);
       (void) SetImageAttribute(image,"BrightnessStddev",text);
       /* Now the correction for bias. */
       /*  stdev = stdev*sqrt((double)total_pixels/(double)(total_pixels-1)); */
@@ -242,12 +243,12 @@ ModuleExport MagickPassFail AnalyzeImage(Image **image_ref,
       /*  brightness_stdevmean = bstdev/sqrt((double)total_pixels); */
 
       saturation_mean = ssumX/total_pixels;
-      FormatString(text,PRECISION,saturation_mean);
+      MagickFormatString(text,sizeof(text),PRECISION,saturation_mean);
       (void) SetImageAttribute(image,"SaturationMean",text);
       /* This formula gives a slightly biased result */
       saturation_stdev =
         sqrt(ssumX2/total_pixels - (ssumX/total_pixels*ssumX/total_pixels));
-      FormatString(text,PRECISION,saturation_stdev);
+      MagickFormatString(text,sizeof(text),PRECISION,saturation_stdev);
       (void) SetImageAttribute(image,"SaturationStddev",text);
       /* Now the correction for bias. */
       /*  stdev = stdev*sqrt((double)total_pixels/(double)(total_pixels-1)); */

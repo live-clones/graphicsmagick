@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -745,7 +745,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
       return((Image *) NULL);
     }
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) blob;
+  clone_info->blob=(_BlobInfoPtr_) blob;
   clone_info->length=length;
   /*
     Set file magick based on file name or file header if magick was
@@ -802,7 +802,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
 
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Using temporary file");
-    clone_info->blob=(void *) NULL;
+    clone_info->blob=(_BlobInfoPtr_) NULL;
     clone_info->length=0;
 
     if (!AcquireTemporaryFileName(temporary_file))
@@ -890,7 +890,7 @@ MagickExport BlobInfo *CloneBlobInfo(const BlobInfo *blob_info)
   if (clone_info == (BlobInfo *) NULL)
     MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
       UnableToCloneBlobInfo);
-  GetBlobInfo(clone_info);
+  GetBlobInfo(clone_info); /* Also clears memory */
   if (blob_info == (BlobInfo *) NULL)
     return(clone_info);
   semaphore=clone_info->semaphore;
@@ -1078,7 +1078,7 @@ MagickExport MagickPassFail CloseBlob(Image *image)
         case PipeStream:
           {
 #if defined(HAVE_PCLOSE)
-            if (pclose(blob->handle.std) != 0)
+            if (pclose(blob->handle.std) == -1)
               {
                 if (!status)
                   {
@@ -1336,6 +1336,7 @@ MagickExport void DetachBlob(BlobInfo *blob_info)
         (void) UnmapBlob(blob_info->data,blob_info->length);
       LiberateMagickResource(MapResource,blob_info->length);
     }
+  MagickFreeMemory(blob_info->vbuf);
   blob_info->mapped=MagickFalse;
   blob_info->length=0;
   blob_info->offset=0;
@@ -1916,7 +1917,8 @@ MagickExport MagickBool GetBlobTemporary(const Image *image)
 %
 %  The format of the GetConfigureBlob method is:
 %
-%      void *GetConfigureBlob(const char *filename,ExceptionInfo *exception)
+%      void *GetConfigureBlob(const char *filename,char *path,
+%                             size_t *length,ExceptionInfo *exception)
 %
 %  A description of each parameter follows:
 %
@@ -1961,13 +1963,13 @@ static void AddConfigurePath(MagickMap path_map, unsigned int *path_index,
   char
     key[MaxTextExtent];
 
-  FormatString(key,"%u",*path_index);
+  MagickFormatString(key,sizeof(key),"%u",*path_index);
   (void) MagickMapAddEntry(path_map,key,(void *)path,0,exception);
   (*path_index)++;
 }
 
 MagickExport void *GetConfigureBlob(const char *filename,char *path,
-  size_t *length,ExceptionInfo *exception)
+                                    size_t *length,ExceptionInfo *exception)
 {
   MagickMap
     path_map;
@@ -1998,7 +2000,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
     {
       /* MagickMap is a tiny allocation so failure to allocate it is fatal */
       ThrowException3(exception,ResourceLimitFatalError,MemoryAllocationFailed,
-      UnableToAllocateMagickMap);
+                      UnableToAllocateMagickMap);
       return (void *) NULL;
     }
 
@@ -2070,7 +2072,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
         return 0;
       }
 
-    FormatString(path,"%.1024s%s",key_value,DirectorySeparator);
+    MagickFormatString(path,MaxTextExtent,"%.1024s%s",key_value,DirectorySeparator);
     AddConfigurePath(path_map,&path_index,path,exception);
   }
 #  endif /* defined(MSWINDOWS) */
@@ -2088,28 +2090,28 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
     if (magick_home)
       {
 #if defined(POSIX)
-        FormatString(path,"%.1024s/share/%s/",magick_home,
-          MagickShareConfigSubDir);
+        MagickFormatString(path,MaxTextExtent,"%.1024s/share/%s/",magick_home,
+                           MagickShareConfigSubDir);
         AddConfigurePath(path_map,&path_index,path,exception);
 
-        FormatString(path,"%.1024s/lib/%s/",magick_home,
-          MagickLibConfigSubDir);
+        MagickFormatString(path,MaxTextExtent,"%.1024s/lib/%s/",magick_home,
+                           MagickLibConfigSubDir);
         AddConfigurePath(path_map,&path_index,path,exception);
 #else
-        FormatString(path,"%.1024s%s",magick_home,
-          DirectorySeparator);
+        MagickFormatString(path,MaxTextExtent,"%.1024s%s",magick_home,
+                           DirectorySeparator);
         AddConfigurePath(path_map,&path_index,path,exception);
 #endif /* defined(POSIX) */
       }
-    }
+  }
 
   if (getenv("HOME") != (char *) NULL)
     {
       /*
         Search $HOME/.magick.
       */
-      FormatString(path,"%.1024s%s%s",getenv("HOME"),
-        *getenv("HOME") == '/' ? "/.magick" : "",DirectorySeparator);
+      MagickFormatString(path,MaxTextExtent,"%.1024s%s%s",getenv("HOME"),
+                         *getenv("HOME") == '/' ? "/.magick" : "",DirectorySeparator);
       AddConfigurePath(path_map,&path_index,path,exception);
     }
 
@@ -2122,17 +2124,17 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       /*
         Search based on executable directory if directory is known.
       */
-      (void) strlcpy(prefix,SetClientPath((char *) NULL),MaxTextExtent);
+      (void) strlcpy(prefix,SetClientPath((char *) NULL),sizeof(prefix));
       ChopPathComponents(prefix,1);
 
-      FormatString(path,"%.1024s/lib/%s/",prefix,MagickLibConfigSubDir);
+      MagickFormatString(path,MaxTextExtent,"%.1024s/lib/%s/",prefix,MagickLibConfigSubDir);
       AddConfigurePath(path_map,&path_index,path,exception);
 
-      FormatString(path,"%.1024s/share/%s/",prefix,MagickShareConfigSubDir);
+      MagickFormatString(path,MaxTextExtent,"%.1024s/share/%s/",prefix,MagickShareConfigSubDir);
       AddConfigurePath(path_map,&path_index,path,exception);
 #else /* defined(POSIX) */
-      FormatString(path,"%.1024s%s",SetClientPath((char *) NULL),
-        DirectorySeparator);
+      MagickFormatString(path,MaxTextExtent,"%.1024s%s",SetClientPath((char *) NULL),
+                         DirectorySeparator);
       AddConfigurePath(path_map,&path_index,path,exception);
 #endif /* !defined(POSIX) */
     }
@@ -2158,11 +2160,11 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
           if (search_path)
             (void) ConcatenateString(&search_path,list_separator);
           (void) ConcatenateString(&search_path,
-            (const char *) MagickMapDereferenceIterator(path_map_iterator,0));
+                                   (const char *) MagickMapDereferenceIterator(path_map_iterator,0));
         }
 
       (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-         "Searching for file \"%s\" in path \"%s\"",filename,search_path);
+                            "Searching for file \"%s\" in path \"%s\"",filename,search_path);
 
       MagickFreeMemory(search_path);
       MagickMapIterateToFront(path_map_iterator);
@@ -2176,16 +2178,16 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       FILE
         *file;
 
-      FormatString(test_path,"%.1024s%.256s",
-        (const char *)MagickMapDereferenceIterator(path_map_iterator,0),
-        filename);
+      MagickFormatString(test_path,sizeof(test_path),"%.1024s%.256s",
+                         (const char *)MagickMapDereferenceIterator(path_map_iterator,0),
+                         filename);
 
       file=fopen(test_path,"rb");
       if (file )
         {
           if (logging)
             (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-              "Found: %.1024s",test_path);
+                                  "Found: %.1024s",test_path);
           (void) strlcpy(path,test_path,MaxTextExtent);
           (void) MagickFseek(file,0L,SEEK_END);
           *length=MagickFtell(file); /* FIXME: ftell returns long, but size_t may be unsigned */
@@ -2230,7 +2232,7 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
 #endif /* defined(MSWINDOWS) */
 
   ThrowException(exception,ConfigureError,UnableToAccessConfigureFile,
-    filename);
+                 filename);
 
   return 0;
 }
@@ -2341,8 +2343,8 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
         Native blob support for this image format.
         FIXME: This results in a memory leak if the blob is not opened.
       */
-      clone_info->blob=MagickAllocateMemory(void *,65535L);
-      if (clone_info->blob == (void *) NULL)
+      clone_info->blob=MagickAllocateMemory(_BlobInfoPtr_,65535L);
+      if (clone_info->blob == (_BlobInfoPtr_) NULL)
         {
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,
                          MagickMsg(BlobError,UnableToCreateBlob));
@@ -2401,7 +2403,7 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                           "Allocated temporary file \"%s\"",unique);
-  FormatString(image->filename,"%.1024s:%.1024s",image->magick,unique);
+  MagickFormatString(image->filename,sizeof(image->filename),"%.1024s:%.1024s",image->magick,unique);
   status=WriteImage(clone_info,image);
   DestroyImageInfo(clone_info);
   if (status == MagickFail)
@@ -2986,6 +2988,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                     vbuf_size;
 
                   vbuf_size=image->blob->block_size;
+                  MagickFreeMemory(image->blob->vbuf);
                   image->blob->vbuf=MagickAllocateClearedMemory(char *, vbuf_size);
                   if ((0 != vbuf_size) && (image->blob->vbuf != (char *) NULL))
                     {
@@ -3422,14 +3425,14 @@ MagickExport size_t ReadBlob(Image *image,const size_t req_length,void *data)
       }
     case BlobStream:
       {
-        void
-          *source_void = 0;
+        void *
+          source_void = 0;
 
         const unsigned char
           *source;
 
-        count=ReadBlobStream(image,length,&source_void);
-        source=source_void;
+        count=ReadBlobStream(image,length,(void **) &source_void);
+        source=(const unsigned char*) source_void;
         if (count <= 10)
           {
             register size_t

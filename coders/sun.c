@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -44,6 +44,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -499,7 +500,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   image->colormap[i].blue=ScaleCharToQuantum(sun_colormap[i]);
                 break;
               } while (1);
-            MagickFreeResourceLimitedMemory(sun_colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,sun_colormap);
             if (MagickFail == status)
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             if (logging)
@@ -525,7 +526,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
             if (ReadBlob(image,sun_info.maplength,(char *) sun_colormap) !=
                 sun_info.maplength)
               status = MagickFail;
-            MagickFreeResourceLimitedMemory(sun_colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,sun_colormap);
             if (MagickFail == status)
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             if (logging)
@@ -623,7 +624,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if ((count=ReadBlob(image,sun_info.length,(char *) sun_data))
           != sun_info.length)
         {
-          MagickFreeResourceLimitedMemory(sun_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
           ThrowReaderException(CorruptImageError,UnableToReadImageData,image);
         }
       sun_pixels=sun_data;
@@ -636,15 +637,15 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                                          bytes_per_image+image->rows);
           if (sun_pixels == (unsigned char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(sun_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
               ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
                                    image);
             }
           status &= DecodeImage(sun_data,sun_data_length,sun_pixels,bytes_per_image);
-          MagickFreeResourceLimitedMemory(sun_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
           if (status != MagickPass)
             {
-              MagickFreeResourceLimitedMemory(sun_pixels);
+              MagickFreeResourceLimitedMemory(unsigned char *,sun_pixels);
               ThrowReaderException(CorruptImageError,UnableToRunlengthDecodeImage,image);
             }
         }
@@ -671,7 +672,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   for (bit=7; bit >= 0; bit--)
                     {
                       index=((*p) & (0x01 << bit) ? 0x00 : 0x01);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
                       indexes[x+7-bit]=index;
                       q[x+7-bit]=image->colormap[index];
                     }
@@ -682,7 +683,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   for (bit=7; bit >= (long) (8-(image->columns % 8)); bit--)
                     {
                       index=((*p) & (0x01 << bit) ? 0x00 : 0x01);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
                       indexes[x+7-bit]=index;
                       q[x+7-bit]=image->colormap[index];
                     }
@@ -717,7 +718,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
               for (x=0; x < (long) image->columns; x++)
                 {
                   index=(*p++);
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
                   indexes[x]=index;
                   q[x]=image->colormap[index];
                 }
@@ -782,7 +783,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     break;
             }
         }
-      MagickFreeResourceLimitedMemory(sun_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,sun_pixels);
       if (EOFBlob(image))
         {
           ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
@@ -1010,7 +1011,8 @@ static unsigned int WriteSUNImage(const ImageInfo *image_info,Image *image)
       /*
         Ensure that image is in an RGB space.
       */
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
       /*
         Analyze image to be written.
       */
@@ -1116,7 +1118,11 @@ static unsigned int WriteSUNImage(const ImageInfo *image_info,Image *image)
           if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                   "Writing SUN monochrome frame %lu...",image->scene);
-          (void) SetImageType(image,BilevelType);
+          if (SetImageType(image,BilevelType) == MagickFail)
+            {
+              MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+              ThrowWriterException(CoderError,UnableToSetImageType,image);
+            }
           polarity=PixelIntensityToQuantum(&image->colormap[0]) > (MaxRGB/2);
           if (image->colors == 2)
             polarity=PixelIntensityToQuantum(&image->colormap[0]) >
@@ -1229,7 +1235,7 @@ static unsigned int WriteSUNImage(const ImageInfo *image_info,Image *image)
                     break;
             }
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

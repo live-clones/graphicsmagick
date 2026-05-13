@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2025 GraphicsMagick Group
+# Copyright (C) 2003-2026 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1998, 1999 E. I. du Pont de Nemours and Company
 #
@@ -548,10 +548,11 @@ if test "$with_symbol_prefix" != 'no' ; then
   DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --enable-symbol-prefix "
 fi
 
-# Enable ImageMagick utilities compatibility shortcuts (default no)
+# Enable ImageMagick (version 6 and earlier) utilities compatibility shortcuts (default no)
+# ImageMagick 7 provides only a single 'magick' program.
 AC_ARG_ENABLE([magick-compat],
               AS_HELP_STRING([--enable-magick-compat],
-                             [install ImageMagick utility shortcuts]),
+                             [install ImageMagick (v6 and earlier) utility shortcuts]),
               [with_magick_compat=$enableval],
               [with_magick_compat='no'])
 AM_CONDITIONAL([MAGICK_COMPAT],[test "$with_magick_compat" != 'no'])
@@ -689,7 +690,7 @@ fi
 # Disable HEIF.
 AC_ARG_WITH([heif],
         AS_HELP_STRING([--without-heif],
-                             [disable HEIF support]),
+                             [disable HEIF (e.g. AVCI, AVIF, HEIC, MP4) support]),
         [with_heif=$withval],
         [with_heif='yes'])
 if test "$with_heif" != 'yes' ; then
@@ -776,7 +777,7 @@ fi
 # Enable TRIO.
 AC_ARG_WITH([trio],
               AS_HELP_STRING([--with-trio],
-                             [enable TRIO support]),
+                             [enable TRIO (C'99 printf/scanf) support]),
               [with_trio=$withval],
               [with_trio='no'])
 if test "$with_trio" != 'no' ; then
@@ -862,10 +863,10 @@ if test "$with_fontpath=" != '' ; then
   DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --with-fontpath=$with_fontpath "
 fi
 
-# Set Ghostscript font directory
+# Set legacy Ghostscript font directory
 AC_ARG_WITH([gs-font-dir],
               AS_HELP_STRING([--with-gs-font-dir=DIR],
-                             [directory containing Ghostscript fonts]),
+                             [directory containing legacy Ghostscript fonts (type-ghostscript.mgk)]),
               [with_gs_font_dir=$withval],
               [with_gs_font_dir='default'])
 if test "$with_gs_font_dir" != 'default' ; then
@@ -885,7 +886,7 @@ fi
 # Set Windows font directory
 AC_ARG_WITH([windows-font-dir],
               AS_HELP_STRING([--with-windows-font-dir=DIR],
-                             [directory containing MS-Windows fonts]),
+                             [directory containing MS-Windows XP fonts (type-windows.mgk)]),
               [with_windows_font_dir=$withval],
               [with_windows_font_dir=''])
 if test "$with_windows_font_dir" != '' ; then
@@ -2913,7 +2914,8 @@ if test "$with_tiff" != 'no' ; then
                             TIFFSetErrorHandlerExt \
                             TIFFSetTagExtender \
                             TIFFSetWarningHandlerExt \
-                            TIFFSwabArrayOfTriples])
+                            TIFFSwabArrayOfTriples \
+                            TIFFOpenOptionsSetMaxCumulatedMemAlloc])
         fi
     else
         AC_MSG_RESULT([no])
@@ -3103,7 +3105,7 @@ AC_SUBST([LIB_WMF_DEPS])
 have_heif='no'
 LIB_HEIF=''
 if test "$with_heif" != 'no' ; then
-    AC_MSG_CHECKING([for HEIF support ])
+    AC_MSG_CHECKING([for HEIF support])
     AC_MSG_RESULT()
     OLD_CPPFLAGS=$CPPFLAGS
     OLD_LDFLAGS=$LDFLAGS
@@ -3131,6 +3133,7 @@ if test "$with_heif" != 'no' ; then
       failed=0
     fi
     AC_CHECK_HEADER([libheif/heif.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`])
+    AC_CHECK_HEADERS([libheif/heif_sequences.h])dnl Optional headers
     # Libheif 1.14.0 (November 17, 2022) added heif_init(), so it is a good way to enforce at least that version.
     AC_CHECK_LIB([heif],[heif_init],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[${HEIF_LIBS}])
     AC_MSG_CHECKING([if HEIF package is complete])
@@ -3437,11 +3440,21 @@ MVDelegateDefault='mv'
 dnl PGPDecodeDelegateDefault='pgpv'
 dnl POVDelegateDefault='povray'
 if test "$with_gs" = 'yes' ; then
-   if test "$native_win32_build" = 'yes' ; then
-      PSDelegateDefault='gswin32c'
-   else
-      PSDelegateDefault='gs'
-   fi
+  if test "$native_win32_build" = 'yes' ; then
+    # Modern Ghostcript provides gsdll64.dll/gswin64c.exe and the
+    # DLL is found via the Windows Registry.  Use of the DLL
+    # requires that GraphicsMagick build type (32/64) be the same.
+    #
+    # FIXME: MSYS2 provides its own gswin64c.exe via a package but
+    # also blocks the Windows default path which would include
+    # gswin64c.exe for a formally installed Ghostscript. If we want to
+    # build GraphicsMagick using the MSYS2 toolchain, but also use a
+    # formally installed Ghostscript DLL + fonts then something more
+    # needs to be done.
+    PSDelegateDefault='gswin64c.exe'
+  else
+    PSDelegateDefault='gs'
+  fi
 else
    PSDelegateDefault='false'
 fi

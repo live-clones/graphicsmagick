@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2025 GraphicsMagick Group
+# Copyright (C) 2003-2026 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1998,1999 E. I. du Pont de Nemours and Company
 #
@@ -40,7 +40,7 @@ require AutoLoader;
     );
 
 # This version identifier must match the package version.
-($VERSION) = '1.3.46' =~ /^([\d.]+)/g;
+($VERSION) = '1.3.47' =~ /^([\d.]+)/g;
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

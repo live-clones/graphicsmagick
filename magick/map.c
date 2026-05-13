@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2021 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -1087,7 +1087,7 @@ MagickMapCopyString(const void *string, const size_t size)
   ARG_NOT_USED(size);
   if (string)
     {
-      size_t length = strlen(string);
+      size_t length = strlen((const char *) string);
       char *dstring=MagickAllocateMemory(char *,length+1);
       if (dstring != (char *) NULL)
         {
@@ -1234,7 +1234,7 @@ MagickMapCopyResourceLimitedString(const void *string, const size_t size)
   ARG_NOT_USED(size);
   if (string)
     {
-      size_t length = strlen(string);
+      size_t length = strlen((const char *) string);
       char *dstring=MagickAllocateResourceLimitedMemory(char *,length+1);
       if (dstring != (char *) NULL)
         {
@@ -1275,7 +1275,7 @@ MagickMapCopyResourceLimitedString(const void *string, const size_t size)
 MagickExport void
 MagickMapDeallocateResourceLimitedString(void *string)
 {
-  MagickFreeResourceLimitedMemory(string);
+  MagickFreeResourceLimitedMemory(void *,string);
 }
 
 /*
@@ -1349,5 +1349,5 @@ MagickMapCopyResourceLimitedBlob(const void *blob, const size_t size)
 MagickExport void
 MagickMapDeallocateResourceLimitedBlob(void *blob)
 {
-  MagickFreeResourceLimitedMemory(blob);
+  MagickFreeResourceLimitedMemory(void *,blob);
 }

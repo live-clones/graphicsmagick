@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -141,7 +141,7 @@ MagickExport Image *AdaptiveThresholdImage(const Image * image,
     is_grayscale = image->is_grayscale;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   const MagickBool
     matte = ((image->matte)
@@ -174,8 +174,12 @@ MagickExport Image *AdaptiveThresholdImage(const Image * image,
     return ((Image *) NULL);
   if (is_monochrome)
     return threshold_image;
-  (void) SetImageType(threshold_image, TrueColorType);
-  status = MagickPass;
+  status &= SetImageType(threshold_image, TrueColorType);
+  if (status == MagickFail)
+    {
+      DestroyImage(threshold_image);
+      return ((Image *) NULL);
+    }
 
 #if 0
   fprintf(stderr,"overflow_mask=%lx\n",overflow_mask);
@@ -871,7 +875,7 @@ static MagickPassFail BlurImageScanlines(Image *image,const double *kernel,
           if (thread_status == MagickFail)
             continue;
 
-          scanline=AccessThreadViewData(data_set);
+          scanline=(PixelPacket *) AccessThreadViewData(data_set);
           q=GetImagePixelsEx(image,0,y,image->columns,1,exception);
           if (q == (PixelPacket *) NULL)
             thread_status=MagickFail;
@@ -971,21 +975,21 @@ BlurImage(const Image *original_image,const double radius,
       while ((long) (MaxRGB*kernel[0]) > 0)
         {
           if (last_kernel != (double *)NULL)
-            MagickFreeResourceLimitedMemory(last_kernel);
+            MagickFreeResourceLimitedMemory(double *,last_kernel);
           last_kernel=kernel;
           kernel=(double *) NULL;
           width=GetBlurKernel(width+2,sigma,&kernel);
         }
       if (last_kernel != (double *) NULL)
         {
-          MagickFreeResourceLimitedMemory(kernel);
+          MagickFreeResourceLimitedMemory(double *,kernel);
           width-=2;
           kernel=last_kernel;
         }
     }
   if (width < 3)
     {
-      MagickFreeResourceLimitedMemory(kernel);
+      MagickFreeResourceLimitedMemory(double *,kernel);
       ThrowImageException3(OptionError,UnableToBlurImage,
                            KernelRadiusIsTooSmall);
     }
@@ -1021,7 +1025,7 @@ BlurImage(const Image *original_image,const double radius,
     status&=BlurImageScanlines(blur_image,kernel,width,BlurImageRowsText,
                                exception);
 
-  MagickFreeResourceLimitedMemory(kernel);
+  MagickFreeResourceLimitedMemory(double *,kernel);
 
   if (blur_image != (Image *) NULL)
     blur_image->is_grayscale=original_image->is_grayscale;
@@ -1168,7 +1172,7 @@ ChannelThresholdPixels(void *mutable_data,         /* User provided mutable data
 
 #define ChannelThresholdImageText "[%s] Channel threshold..."
 MagickExport MagickPassFail ChannelThresholdImage(Image *image,
-  const char *threshold)
+                                                  const char *threshold)
 {
   DoublePixelPacket
     double_threshold;
@@ -1244,15 +1248,17 @@ MagickExport MagickPassFail ChannelThresholdImage(Image *image,
   if (options.opacity_enabled)
     options.thresholds.opacity = RoundDoubleToQuantum(double_threshold.opacity);
 
-  (void) SetImageType(image,TrueColorType);
+  status &= SetImageType(image,TrueColorType);
+  if (status == MagickFail)
+    return status;
 
-  status=PixelIterateMonoModify(ChannelThresholdPixels,
-                                NULL,
-                                ChannelThresholdImageText,
-                                NULL,&options,
-                                0,0,image->columns,image->rows,
-                                image,
-                                &image->exception);
+  status &= PixelIterateMonoModify(ChannelThresholdPixels,
+                                   NULL,
+                                   ChannelThresholdImageText,
+                                   NULL,&options,
+                                   0,0,image->columns,image->rows,
+                                   image,
+                                   &image->exception);
 
   if (is_grayscale && options.red_enabled && options.green_enabled && options.blue_enabled)
     {
@@ -1405,7 +1411,7 @@ MagickExport Image *ConvolveImage(const Image * restrict image,const unsigned in
           *row_text='\0';
           for (u=0; u < width; u++)
             {
-              FormatString(cell_text,"%#12.4g",*k++);
+              MagickFormatString(cell_text,sizeof(cell_text),"%#12.4g",*k++);
               (void) strlcat(row_text,cell_text,sizeof(row_text));
               if (u%5 == 4)
                 {
@@ -2775,7 +2781,7 @@ MagickExport Image *MedianFilterImage(const Image *image,const double radius,
         if (thread_status == MagickFail)
           continue;
 
-        skiplist=AccessThreadViewData(data_set);
+        skiplist=(MedianPixelList *) AccessThreadViewData(data_set);
         p=AcquireImagePixels(image,-width/2,y-width/2,
                              image->columns+width,width,exception);
         q=SetImagePixelsEx(median_image,0,y,median_image->columns,1,exception);
@@ -3813,7 +3819,7 @@ MagickExport Image *ReduceNoiseImage(const Image *image,const double radius,
       if (thread_status == MagickFail)
         continue;
 
-      skiplist=AccessThreadViewData(data_set);
+      skiplist=(MedianPixelList*) AccessThreadViewData(data_set);
       p=AcquireImagePixels(image,-width/2,y-width/2,
                            image->columns+width,width,exception);
       q=SetImagePixelsEx(noise_image,0,y,noise_image->columns,1,exception);
@@ -4760,8 +4766,8 @@ UnsharpMaskPixels(void *mutable_data,                /* User provided mutable da
 }
 
 MagickExport Image *UnsharpMaskImage(const Image *image,const double radius,
-  const double sigma,const double amount,const double threshold,
-  ExceptionInfo *exception)
+                                     const double sigma,const double amount,const double threshold,
+                                     ExceptionInfo *exception)
 {
   UnsharpMaskOptions_t
     options;
@@ -4780,8 +4786,9 @@ MagickExport Image *UnsharpMaskImage(const Image *image,const double radius,
     return((Image *) NULL);
   options.amount=amount;
   options.threshold=(MaxRGBFloat*threshold)/2.0;
-  FormatString(message,"[%%s] Unsharp mask: amount %g, threshold %g...",
-               amount,threshold);
+  MagickFormatString(message,sizeof(message),
+                     "[%%s] Unsharp mask: amount %g, threshold %g...",
+                     amount,threshold);
   (void) PixelIterateDualModify(UnsharpMaskPixels,NULL,
                                 message,NULL,&options,
                                 image->columns,image->rows,image,0,0,

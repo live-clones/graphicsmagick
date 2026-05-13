@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2024-2024 GraphicsMagick Group
+% Copyright (C) 2024-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -35,16 +35,15 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
-
 #define ThrowAAIReaderException(code_,reason_,image_)                  \
   {                                                                    \
-    MagickFreeResourceLimitedMemory(pixels);                           \
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);           \
     ThrowReaderException(code_,reason_,image_);                        \
   }
 #define AAI_WIDTH_LIMIT 65536UL  /* Artificially limit width to 64K pixels */
 #define AAI_HEIGHT_LIMIT 65536UL /* Artificially limit height to 64K pixels */
-
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,7 +162,7 @@ static Image *ReadAAIImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   break;
                 }
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
       if (MagickFail == status)
         break;
@@ -281,7 +280,9 @@ static unsigned int WriteAAIImage(const ImageInfo *image_info,Image *image)
       /*
         Write AAI header.
       */
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+
       (void) WriteBlobLSBLong(image,image->columns);
       (void) WriteBlobLSBLong(image,image->rows);
       /*
@@ -318,7 +319,7 @@ static unsigned int WriteAAIImage(const ImageInfo *image_info,Image *image)
                                           image->columns,image->rows))
                 break;
         }
-      MagickFreeResourceLimitedMemory(pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pixels);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

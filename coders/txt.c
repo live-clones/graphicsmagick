@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -52,6 +52,7 @@
 #include "magick/render.h"
 #include "magick/texture.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 typedef enum
 {
@@ -342,10 +343,10 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
   if (txt_subformat != NO_TXT)
     {
-#define ThrowNOTXTReaderException(code_,reason_,image_) \
-      do {                                              \
-        MagickFreeResourceLimitedMemory(BImgBuff);                     \
-        ThrowReaderException(code_,reason_,image_);     \
+#define ThrowNOTXTReaderException(code_,reason_,image_)                 \
+      do {                                                              \
+        MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);      \
+        ThrowReaderException(code_,reason_,image_);                     \
       } while (0);
 
       unsigned
@@ -681,11 +682,11 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     continue;
                   }
                 if (ch == 0 || ch > 128 ||	/* Duplicate image check for data with fixed geometry previous check is skipped. */
-                      (ch >= 'a' && ch <= 'z') ||
-                      (ch >= 'A' && ch <= 'Z'))
-                {                                 /* not a text data */
-                  ThrowNOTXTReaderException(CoderError,ImageTypeNotSupported,image);
-                }
+                    (ch >= 'a' && ch <= 'z') ||
+                    (ch >= 'A' && ch <= 'Z'))
+                  {                                 /* not a text data */
+                    ThrowNOTXTReaderException(CoderError,ImageTypeNotSupported,image);
+                  }
               }
 
             x = ReadInt(image,&ch);             /* x */
@@ -871,7 +872,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
               }
           }
         /* Note that DImgBuff and WImgBuff point to BImgBuff */
-        MagickFreeResourceLimitedMemory(BImgBuff);
+        MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
       } while(!EOFBlob(image) && NextImagePos>0);
 
       goto FINISH_TXT;
@@ -954,7 +955,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
           *clone_info;
 
         clone_info=CloneImageInfo(image_info);
-        clone_info->blob=(void *) NULL;
+        clone_info->blob=(_BlobInfoPtr_) NULL;
         clone_info->length=0;
         (void) strlcpy(clone_info->filename,image_info->texture,MaxTextExtent);
         texture=ReadImage(clone_info,exception);
@@ -967,7 +968,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
     draw_info=CloneDrawInfo(image_info,(DrawInfo *) NULL);
     draw_info->fill=image_info->pen;
     (void) CloneString(&draw_info->text,image_info->filename);
-    FormatString(geometry,"0x0%+ld%+ld",page.x,page.y);
+    MagickFormatString(geometry,sizeof(geometry),"0x0%+ld%+ld",page.x,page.y);
     (void) CloneString(&draw_info->geometry,geometry);
     status=GetTypeMetrics(image,draw_info,&metrics);
     if (status == False)
@@ -1257,7 +1258,8 @@ static unsigned int WriteTXTImage(const ImageInfo *image_info,Image *image)
       unsigned int
         depth;
 
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
       if (image->depth <= 8)
         depth=8;
       else if (image->depth <= 16)
@@ -1271,9 +1273,9 @@ static unsigned int WriteTXTImage(const ImageInfo *image_info,Image *image)
 
           unsigned char a = image->matte ? 'a' : ' ';
 
-          FormatString(buffer,
-                       "# ImageMagick pixel enumeration: %.20g,%.20g,%.20g,rgb%c\n",
-                       (double) image->columns, (double) image->rows, (double) depth, a);
+          MagickFormatString(buffer,sizeof(buffer),
+                             "# ImageMagick pixel enumeration: %.20g,%.20g,%.20g,rgb%c\n",
+                             (double) image->columns, (double) image->rows, (double) depth, a);
 
           (void) WriteBlobString(image,buffer);
         }
@@ -1288,7 +1290,7 @@ static unsigned int WriteTXTImage(const ImageInfo *image_info,Image *image)
             break;
           for (x=0; x < (long) image->columns; x++)
             {
-              FormatString(buffer,"%ld,%ld: ",x,y);
+              MagickFormatString(buffer,sizeof(buffer),"%ld,%ld: ",x,y);
               (void) WriteBlobString(image,buffer);
               GetColorTuple(p,depth,image->matte,MagickFalse,tuple);
               (void) strlcat(tuple," ",sizeof(tuple));

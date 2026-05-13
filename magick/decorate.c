@@ -208,8 +208,14 @@ MagickExport Image *FrameImage(const Image *image,const FrameInfo *frame_info,
   /*
     Set image type.
   */
-  (void) SetImageType(frame_image,frame_image->matte_color.opacity !=
-                      OpaqueOpacity ? TrueColorMatteType : TrueColorType);
+  status &= SetImageType(frame_image,frame_image->matte_color.opacity !=
+                         OpaqueOpacity ? TrueColorMatteType : TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&frame_image->exception);
+      DestroyImage(frame_image);
+      return (Image *) NULL;
+    }
 
   /*
     Initialize 3D effects color.
@@ -517,7 +523,9 @@ RaiseImage(Image *image,const RectangleInfo *raise_info,const int raise_flag)
       foreground=0.0;
       background=MaxRGBDouble;
     }
-  (void) SetImageType(image,TrueColorType);
+  status &= SetImageType(image,TrueColorType);
+  if (status == MagickFail)
+    return status;
 
   monitor_active=MagickMonitorActive();
 

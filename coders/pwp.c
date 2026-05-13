@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/monitor.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -165,89 +166,90 @@ static Image *ReadPWPImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if ((count != 5) || (LocaleNCompare((char *) magick,"SFW95",5) != 0))
     ThrowReaderException(CorruptImageError,ImproperImageHeader,pwp_image);
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   for ( ; ; )
-  {
-    (void) memset(magick,0,sizeof(magick));
-    for (c=ReadBlobByte(pwp_image); c != EOF; c=ReadBlobByte(pwp_image))
     {
-      for (i=0; i < 17; i++)
-        magick[i]=magick[i+1];
-      magick[17]=(unsigned char) c;
-      if (LocaleNCompare((char *) (magick+12),"SFW94A",6) == 0)
-        break;
-    }
-    if (c == EOF)
-      {
-        ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                       clone_info->filename);
-        break;
-      }
-    if (LocaleNCompare((char *) (magick+12),"SFW94A",6) != 0)
-      {
-        ThrowException(exception,CorruptImageError,ImproperImageHeader,
-                       clone_info->filename);
-        break;
-      }
-    /*
-      Dump SFW image to a temporary file.
-    */
-    {
-      char tmpfile[MaxTextExtent];
-      file=AcquireTemporaryFileStream(tmpfile,BinaryFileIOMode);
-      if (file == (FILE *) NULL)
+      (void) memset(magick,0,sizeof(magick));
+      for (c=ReadBlobByte(pwp_image); c != EOF; c=ReadBlobByte(pwp_image))
         {
-          ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,
+          for (i=0; i < 17; i++)
+            magick[i]=magick[i+1];
+          magick[17]=(unsigned char) c;
+          if (LocaleNCompare((char *) (magick+12),"SFW94A",6) == 0)
+            break;
+        }
+      if (c == EOF)
+        {
+          ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
                          clone_info->filename);
           break;
         }
-      (void) strlcpy(clone_info->filename,"SFW:",sizeof(clone_info->filename));
-      (void) strlcat(clone_info->filename,tmpfile,sizeof(clone_info->filename));
-    }
-    (void) fwrite("SFW94A",1,6,file);
-    filesize=(65535L*magick[2]+256L*magick[1]+magick[0]) & 0xFFFFFFFF;
-    for (i=0; i < filesize; i++)
-    {
-      if ((c=ReadBlobByte(pwp_image)) == EOF)
-        break;
-      (void) fputc(c,file);
-    }
-    (void) fclose(file);
-    if (c == EOF)
+      if (LocaleNCompare((char *) (magick+12),"SFW94A",6) != 0)
+        {
+          ThrowException(exception,CorruptImageError,ImproperImageHeader,
+                         clone_info->filename);
+          break;
+        }
+      /*
+        Dump SFW image to a temporary file.
+      */
       {
-        ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                       clone_info->filename);
-        break;
+        char tmpfile[MaxTextExtent];
+        file=AcquireTemporaryFileStream(tmpfile,BinaryFileIOMode);
+        if (file == (FILE *) NULL)
+          {
+            ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,
+                           clone_info->filename);
+            break;
+          }
+        (void) strlcpy(clone_info->filename,"SFW:",sizeof(clone_info->filename));
+        (void) strlcat(clone_info->filename,tmpfile,sizeof(clone_info->filename));
       }
-    handler=SetMonitorHandler((MonitorHandler) NULL);
-    next_image=ReadImage(clone_info,exception);
-    (void) LiberateTemporaryFile(clone_info->filename);
-    (void) SetMonitorHandler(handler);
-    if (next_image == (Image *) NULL)
-      break;
-    StopTimer(&next_image->timer);
-    FormatString(next_image->filename,"slide_%02ld.sfw",next_image->scene);
-    if (image == (Image *) NULL)
-      image=next_image;
-    else
-      {
-        /*
-          Link image into image list.
-        */
-        for (p=image; p->next != (Image *) NULL; p=p->next);
-        next_image->previous=p;
-        next_image->scene=p->scene+1;
-        p->next=next_image;
-      }
-    if (image_info->subrange != 0)
-      if (next_image->scene >= (image_info->subimage+image_info->subrange-1))
+      (void) fwrite("SFW94A",1,6,file);
+      filesize=(65535L*magick[2]+256L*magick[1]+magick[0]) & 0xFFFFFFFF;
+      for (i=0; i < filesize; i++)
+        {
+          if ((c=ReadBlobByte(pwp_image)) == EOF)
+            break;
+          (void) fputc(c,file);
+        }
+      (void) fclose(file);
+      if (c == EOF)
+        {
+          ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                         clone_info->filename);
+          break;
+        }
+      handler=SetMonitorHandler((MonitorHandler) NULL);
+      next_image=ReadImage(clone_info,exception);
+      (void) LiberateTemporaryFile(clone_info->filename);
+      (void) SetMonitorHandler(handler);
+      if (next_image == (Image *) NULL)
         break;
-    if (!MagickMonitorFormatted(TellBlob(pwp_image),GetBlobSize(image),
-                                &image->exception,LoadImagesText,
-                                image->filename))
-      break;
-  }
+      StopTimer(&next_image->timer);
+      MagickFormatString(next_image->filename,sizeof(next_image->filename),
+                         "slide_%02ld.sfw",next_image->scene);
+      if (image == (Image *) NULL)
+        image=next_image;
+      else
+        {
+          /*
+            Link image into image list.
+          */
+          for (p=image; p->next != (Image *) NULL; p=p->next);
+          next_image->previous=p;
+          next_image->scene=p->scene+1;
+          p->next=next_image;
+        }
+      if (image_info->subrange != 0)
+        if (next_image->scene >= (image_info->subimage+image_info->subrange-1))
+          break;
+      if (!MagickMonitorFormatted(TellBlob(pwp_image),GetBlobSize(image),
+                                  &image->exception,LoadImagesText,
+                                  image->filename))
+        break;
+    }
   DestroyImageInfo(clone_info);
   CloseBlob(pwp_image);
   DestroyImage(pwp_image);

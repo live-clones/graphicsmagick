@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -43,6 +43,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -50,11 +51,11 @@
 static unsigned int
   WriteRGBImage(const ImageInfo *,Image *);
 
-#define ThrowRGBReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(scanline);                 \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowRGBReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);  \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -510,7 +511,7 @@ static Image *ReadRGBImage(const ImageInfo *image_info,ExceptionInfo *exception)
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -696,7 +697,7 @@ static unsigned int WriteRGBImage(const ImageInfo *image_info,Image *image)
                                                     packet_size,image->columns);
     if (new_pixels == (unsigned char *) NULL)
       {
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
       }
     pixels=new_pixels;
@@ -727,7 +728,8 @@ static unsigned int WriteRGBImage(const ImageInfo *image_info,Image *image)
     /*
       Convert MIFF to RGB raster pixels.
     */
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     if (LocaleCompare(image_info->magick,"RGBA") == 0)
       if (!image->matte)
         SetImageOpacity(image,OpaqueOpacity);
@@ -908,7 +910,7 @@ static unsigned int WriteRGBImage(const ImageInfo *image_info,Image *image)
                                 image->filename))
       break;
   } while (image_info->adjoin);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   if (image_info->adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;

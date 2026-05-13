@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -42,7 +42,7 @@
 #include "magick/magick.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
-
+#include "magick/static.h"
 
 typedef struct
 {
@@ -100,6 +100,9 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
   register IndexPacket
     *indexes;
 
+  MagickPassFail
+    status = MagickPass;
+
   switch (depth)
     {
     case 1:                     /* Convert bitmap scanline. */
@@ -144,19 +147,19 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         for (x = 0; x < ((long)columns - 1); x += 2)
           {
             index = (IndexPacket) ((*p >> 6) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p >> 4) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p >> 2) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x + 1] = index;
             *q++ = image->colormap[index];
             p++;
@@ -164,19 +167,19 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         if ((columns % 4) != 0)
           {
             index = (IndexPacket) ((*p >> 6) & 0x3);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             if ((columns % 4) >= 1)
               {
                 index = (IndexPacket) ((*p >> 4) & 0x3);
-                VerifyColormapIndex(image, index);
+                VerifyColormapIndex(status,image,index);
                 indexes[x] = index;
                 *q++ = image->colormap[index];
                 if ((columns % 4) >= 2)
                   {
                     index = (IndexPacket) ((*p >> 2) & 0x3);
-                    VerifyColormapIndex(image, index);
+                    VerifyColormapIndex(status,image,index);
                     indexes[x] = index;
                     *q++ = image->colormap[index];
                   }
@@ -200,11 +203,11 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         for (x = 0; x < ((long)columns - 1); x += 2)
           {
             index = (IndexPacket) ((*p >> 4) & 0xF);    /* Lo nibble */
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             index = (IndexPacket) ((*p) & 0xF);         /* Hi nibble */
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x + 1] = index;
             *q++ = image->colormap[index];
             p++;
@@ -212,7 +215,7 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         if ((columns % 2) != 0)
           {
             index = (IndexPacket) ((*p >> 4) & 0xF);    /* padding nibble */
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             p++;
@@ -234,7 +237,7 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
         for (x = 0; x < (long)columns; x++)
           {
             index = (IndexPacket) (*p);
-            VerifyColormapIndex(image, index);
+            VerifyColormapIndex(status,image,index);
             indexes[x] = index;
             *q++ = image->colormap[index];
             p++;
@@ -275,6 +278,9 @@ static int InsertRow(int depth, unsigned char *p, long y, Image * image, unsigne
       break;
 
     }
+
+  if (status == MagickFail)
+   return -1;
 
   return 0;
 }
@@ -407,15 +413,15 @@ static ImageInfo *CheckFName(ImageInfo *clone_info, size_t *i)
 %
 */
 
-#define ThrowTOPOLReaderException(code_,reason_,image_) \
-  {                                                     \
-    if (clone_info)                                     \
-      DestroyImageInfo(clone_info);                     \
-    if (palette)                                        \
-      DestroyImage(palette);                            \
-    MagickFreeResourceLimitedMemory(BImgBuff);          \
-    ThrowReaderException(code_,reason_,image_);         \
-}
+#define ThrowTOPOLReaderException(code_,reason_,image_)         \
+  {                                                             \
+    if (clone_info)                                             \
+      DestroyImageInfo(clone_info);                             \
+    if (palette)                                                \
+      DestroyImage(palette);                                    \
+    MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);  \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * exception)
 {
@@ -758,17 +764,17 @@ static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * excep
         (void)SeekBlob(image, Header.TileOffsets, SEEK_SET);
         if (ReadBlobDwordLSB(image, (size_t) TilesAcross*TilesDown*4, (magick_uint32_t *)Offsets) < 0)
           {
-            MagickFreeResourceLimitedMemory(Offsets);
+            MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
             ThrowTOPOLReaderException(CorruptImageError,InsufficientImageDataInFile, image);
           }
 
         for (TilY=0; TilY<Header.Rows; TilY+=Header.TileHeight)	/* TilY counts per pixel.*/
-          for (TilX=0; TilX<TilesAcross; TilX++)			/* TilX counts per tile.*/
+          for (TilX=0; TilX<TilesAcross; TilX++)		/* TilX counts per tile.*/
             {
               ldblk = Offsets[(TilY/Header.TileHeight)*TilesAcross+TilX];
               if (SeekBlob(image, ldblk, SEEK_SET) != ldblk)
-                {                                                  /* When seek does not reach required place, bail out. */
-                  MagickFreeResourceLimitedMemory(Offsets);
+                {                 /* When seek does not reach required place, bail out. */
+                  MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
                   ThrowTOPOLReaderException(CorruptImageError,InsufficientImageDataInFile, image);
                   break;
                 }
@@ -788,7 +794,7 @@ static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * excep
 
                   if (ReadBlob(image, ldblk, (char *)BImgBuff) != (size_t) ldblk)
                     {
-                      MagickFreeResourceLimitedMemory(Offsets);
+                      MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
                       ThrowTOPOLReaderException(CorruptImageError,InsufficientImageDataInFile, image);
                       break;
                     }
@@ -798,21 +804,21 @@ static Image *ReadTopoLImage(const ImageInfo * image_info, ExceptionInfo * excep
                   if (InsertRow(depth, BImgBuff, (long)(i+TilY), image, TilX*Header.TileWidth,
                                 (image->columns<Header.TileWidth)?image->columns:Header.TileWidth, &import_options))
                     {
-                      MagickFreeResourceLimitedMemory(Offsets);
+                      MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
                       ThrowTOPOLReaderException(CorruptImageError,TooMuchImageDataInFile, image);
                       break;
                     }
                 }
             }
 
-        MagickFreeResourceLimitedMemory(Offsets);
+        MagickFreeResourceLimitedMemory(magick_uint32_t *,Offsets);
         break;
       }
     }
 
   /* Finish: */
  DONE_READING:
-  MagickFreeResourceLimitedMemory(BImgBuff);
+  MagickFreeResourceLimitedMemory(unsigned char *, BImgBuff);
   if (palette != NULL)
     DestroyImage(palette);
   if (clone_info != NULL)
@@ -973,7 +979,7 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
     }
 
   status &= CloseBlob(image); /* valgrind reports write of uninitialized data */
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
   if (y != (long)image->rows)
     ThrowWriterException(FileOpenError,UnableToWriteFile,image);

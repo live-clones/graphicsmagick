@@ -91,7 +91,7 @@ AllocateThreadViewDataSet(const MagickFreeFunc destructor,
                       UnableToAllocateCacheView);
   data_set->destructor=destructor;
   data_set->nviews=omp_get_max_threads();
-  data_set->view_data=MagickAllocateArray(void *,data_set->nviews,sizeof(void *));
+  data_set->view_data=MagickAllocateArray(void **,data_set->nviews,sizeof(void *));
   if (data_set->view_data == (void *) NULL)
     {
       ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,

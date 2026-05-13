@@ -18,6 +18,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +98,7 @@ static Image *ReadIdentityImage(const ImageInfo *image_info,
   image->columns=image->rows=order*order*order;
 
   if (image->columns*image->rows <= MaxColormapSize)
-    if (!AllocateImageColormap(image,(const unsigned long) image->columns*image->rows))
+    if (!AllocateImageColormap(image,(unsigned long) image->columns*image->rows))
       ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
 
 #if defined(HAVE_OPENMP)

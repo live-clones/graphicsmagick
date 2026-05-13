@@ -95,6 +95,9 @@ image formats.
    | ART          | RW   | PFS: 1st Publisher        | (MacPaint?) and later used for PFS: 1st          |
    |              |      |                           | Publisher clip art.                              |
    +--------------+------+---------------------------+--------------------------------------------------+
+   | AVCI         | R    | Advanced Video Coding     | AVC in a _HEIF container.  AVCI is supported     |
+   |              |      | Image Format              | via libheif if it supports H.264/MPEG-4 AVC.     |
+   +--------------+------+---------------------------+--------------------------------------------------+
    | AVIF_        | R    | AVIF Image File Format    | AV1 in a _HEIF container.  AVIF is supported     |
    |              |      |                           | via libheif if it supports AVIF decode.          |
    +--------------+------+---------------------------+--------------------------------------------------+
@@ -200,9 +203,15 @@ image formats.
    | GRAYA        | RW   | Raw gray samples + alpha  | Use -size, -depth, and -endian to specify the    |
    |              |      |                           | image width, height, depth, and byte order.      |
    +--------------+------+---------------------------+--------------------------------------------------+
+   | HEIC         | R    | High Efficiency Image     | HEIC is HEIF_ using H.265 (HEIC) encoding.       |
+   |              |      | File Format (with         |                                                  |
+   |              |      | h.265/HEVC encoding)      |                                                  |
+   +--------------+------+---------------------------+--------------------------------------------------+
    | HEIF_        | R    | High Efficiency Image     | HEIF is a container format supporting multiple   |
-   |              |      | File Format (with         | codecs.  HEIF with h.265/HEVC encoding           |
-   |              |      | h.265/HEVC encoding)      | is supported via libheif and libde265.           |
+   |              |      | File Format               | codecs and many subformats. Libheif is used      |
+   |              |      |                           | to support HEIF and the subformats supported     |
+   |              |      |                           | depend on the version of libheif and the codecs  |
+   |              |      |                           | it is configured to support.                     |
    +--------------+------+---------------------------+--------------------------------------------------+
    | HPGL         | R    | HP-GL plotter language    | Requires hp2xx_ 3.2.0 or later                   |
    +--------------+------+---------------------------+--------------------------------------------------+

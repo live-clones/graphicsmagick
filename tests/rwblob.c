@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2025 GraphicsMagick Group
+ * Copyright (C) 2003-2026 GraphicsMagick Group
  * Copyright (C) 2003 ImageMagick Studio
  * Copyright 1991-1999 E. I. du Pont de Nemours and Company
  *
@@ -287,7 +287,7 @@ int main ( int argc, char **argv )
   columns = original->columns;
   size[0]='\0';
   if (magick_info->raw)
-    FormatString( size, "%dx%d", columns, rows );
+    MagickFormatString( size, sizeof(size), "%dx%d", columns, rows );
 
   /*
    * Save image to BLOB

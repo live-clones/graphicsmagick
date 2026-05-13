@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (c) 2000 Markus Friedl.  All rights reserved.
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
@@ -251,12 +251,12 @@ MagickExport void AppendImageFormat(const char *format,char *filename)
       char
         message[MaxTextExtent];
 
-      FormatString(message,"%.1024s:%.1024s",format,filename);
+      MagickFormatString(message,sizeof(message),"%.1024s:%.1024s",format,filename);
       (void) strlcpy(filename,message,MaxTextExtent);
       return;
     }
   GetPathComponent(filename,RootPath,root);
-  FormatString(filename,"%.1024s.%.1024s",root,format);
+  MagickFormatString(filename,MaxTextExtent,"%.1024s.%.1024s",root,format);
 }
 
 /*
@@ -1016,9 +1016,9 @@ MagickExport MagickPassFail ExpandFilenames(int *argc,char ***argv)
                         {
                           char **new_vector;
                           new_vector=
-                            (char **) MagickReallocStd(vector,
-                                                       MagickArraySize((size_t) *argc+count+prealloc_entries,
-                                                                       sizeof(char *)));
+                            (char **) MagickRealloc(vector,
+                                                    MagickArraySize((size_t) *argc+count+prealloc_entries,
+                                                                    sizeof(char *)));
                           if (new_vector == (char **) NULL)
                             {
                               for (j=0 ; j < count; j++)
@@ -1120,9 +1120,9 @@ MagickExport MagickPassFail ExpandFilenames(int *argc,char ***argv)
       {
          char **new_vector;
          new_vector =
-           (char **) MagickReallocStd(vector,
-                                      MagickArraySize((size_t) *argc+count+number_files+prealloc_entries,
-                                                      sizeof(char *)));
+           (char **) MagickRealloc(vector,
+                                   MagickArraySize((size_t) *argc+count+number_files+prealloc_entries,
+                                                   sizeof(char *)));
          if (new_vector == (char **) NULL)
            {
              for (j=0 ; j < count; j++)
@@ -1239,9 +1239,9 @@ MagickExport void FormatSize(const magick_int64_t size,char *format)
   for (i=0; length > 1024; i++)
     length/=1024.0;
   if (i > 0)
-    FormatString(format,"%.1f",length);
+    MagickFormatString(format,MaxTextExtent,"%.1f",length);
   else
-    FormatString(format,"%.0f",length);
+    MagickFormatString(format,MaxTextExtent,"%.0f",length);
   switch (i)
     {
     default: break;
@@ -1314,7 +1314,7 @@ MagickExport size_t FormatString(char *string,const char *format,...)
     formatted_len;
 
   va_start(operands,format);
-  formatted_len=FormatStringList(string, format, operands);
+  formatted_len=MagickFormatStringList(string, MaxTextExtent, format, operands);
   va_end(operands);
   return formatted_len;
 }
@@ -1424,12 +1424,12 @@ MagickExport MagickPassFail GetExecutionPath(char *path)
 
     pid=(long) getpid();
     /* Linux format */
-    FormatString(link_path,"/proc/%ld/exe",pid);
+    MagickFormatString(link_path,sizeof(link_path),"/proc/%ld/exe",pid);
     length=readlink(link_path, real_path, PATH_MAX);
     if (length == -1)
       {
         /* Try FreeBSD format */
-        FormatString(link_path,"/proc/%ld/file",pid);
+        MagickFormatString(link_path,sizeof(link_path),"/proc/%ld/file",pid);
         length=readlink(link_path, real_path, PATH_MAX);
       }
     if ((length > 0) && (length <= PATH_MAX))
@@ -2337,15 +2337,15 @@ MagickExport char *GetPageGeometry(const char *page_geometry)
   static const struct
   {
     char
-      name[12];
+    name[12];
 
     unsigned char
-       name_length;
+    name_length;
 
     char
-       geometry[10];
+    geometry[10];
   }
-  PageSizes[] =
+    PageSizes[] =
     {
       PAGE_SIZE("4x6",  "288x432"),
       PAGE_SIZE("5x7",  "360x504"),
@@ -2438,10 +2438,10 @@ MagickExport char *GetPageGeometry(const char *page_geometry)
         /*
           Replace mneumonic with the equivalent size in dots-per-inch.
         */
-        FormatString(page,"%s%.80s", PageSizes[i].geometry,
-                     page_geometry+PageSizes[i].name_length);
+        MagickFormatString(page,sizeof(page),"%s%.80s", PageSizes[i].geometry,
+                           page_geometry+PageSizes[i].name_length);
         flags=GetGeometry(page,&geometry.x,&geometry.y,&geometry.width,
-          &geometry.height);
+                          &geometry.height);
         if (!(flags & GreaterValue))
           (void) strlcat(page,">",sizeof(page));
         break;
@@ -4149,6 +4149,9 @@ MagickExport size_t MagickFormatString(char *string,
   size_t
     formatted_len;
 
+#if 0
+  assert(length > sizeof(char *)); /* Catch code update errors */
+#endif
   va_start(operands,format);
   formatted_len=MagickFormatStringList(string, length, format, operands);
   va_end(operands);
@@ -4166,45 +4169,53 @@ MagickExport size_t MagickFormatString(char *string,
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  Method MagickGetToken gets a token from the token stream.  A token is defined
-%  as sequence of characters delimited by whitespace (e.g. clip-path), a
-%  sequence delimited with quotes (.e.g "Quote me"), or a sequence enclosed
-%  in parenthesis (e.g. rgb(0,0,0)).
+%  Method MagickGetToken gets a token from the token stream given a
+%  NUL-terminated buffer.  A token is defined as sequence of characters
+%  delimited by whitespace (e.g. clip-path), a sequence delimited with
+%  quotes (.e.g "Quote me"), or a sequence enclosed in parenthesis
+%  (e.g. rgb(0,0,0)).
 %
 %  The format of the MagickGetToken method is:
 %
-%      void MagickGetToken(const char *start,char **end,char *token,
-%                          const size_t buffer_length)
+%      size_t MagickGetToken(const char *start,char **end,char *token,
+%                            const size_t max_token_length)
 %
 %  A description of each parameter follows:
 %
-%    o start: the start of the token sequence.
+%    o start: the start of the token sequence in a NUL-terminated buffer.
 %
-%    o end: point to the end of the token sequence (may be NULL).
+%    o end: points to the end of the scanned token sequence (may be NULL).
 %
 %    o token: copy the token to this buffer.
 %
-%    o buffer_length: size of the token buffer.  If the token exceeds
-%             the buffer size, the token will be truncated, but the
-%             parser will still update the end pointer as if the
-%             truncation did not occur.
+%    o max_token_length: maximum token length which may be returned.
+%     If the token exceeds the maximum token size,
+%     then the token will be truncated, but the parser will still
+%     update the end pointer (constrained by the terminating NUL
+%     character) as if the truncation did not occur. This allows
+%     using the end pointer as start when scanning a next token.
 %
-%    o returns: Size of the consumed token, not including a terminating
-%             null character.  If this is larger or equal to the buffer
-%             size then truncation has occurred.
+%    o returns: The size of the token returned.
+%
+%      This function used to "Report the size of the consumed token,
+%      not including a terminating null character.  If this is
+%      larger or equal to the buffer size then truncation has
+%      occurred". The old behavior is not useful given that
+%      the difference between 'end' and 'start' may be used to
+%      determine how many characters were consumed.
 %
 */
 MagickExport size_t MagickGetToken(const char *start,char **end,char *token,
-                                   const size_t buffer_length)
+                                   const size_t max_token_length)
 {
-  register char
+  register const char
     *p;
 
   register size_t
     i;
 
   register size_t
-    length = buffer_length - 1;
+    length = max_token_length - 1;
 
   double
     double_val;
@@ -4213,7 +4224,8 @@ MagickExport size_t MagickGetToken(const char *start,char **end,char *token,
   assert(token != (char *) NULL);
 
   i=0;
-  p=(char *) start;
+  token[i]='\0';
+  p=start;
 
   if (*p != '\0')
     {
@@ -4317,8 +4329,8 @@ MagickExport size_t MagickGetToken(const char *start,char **end,char *token,
       }
   }
   if (end != (char **) NULL)
-    *end=p;
-  return (p-start+1);
+    *end=(char *)p;
+  return (i); /* Was (p-start+1) to report consumed text */
 }
 
 /*
@@ -4546,7 +4558,7 @@ MagickSpawnVP(const unsigned int verbose,const char *file, char *const argv[])
       {
         /* Failed to fork, errno contains reason */
         status = -1;
-        FormatString(message,"fork failed: %.1024s", strerror(errno));
+        MagickFormatString(message,sizeof(message),"fork failed: %.1024s", strerror(errno));
       }
     else if ( 0 == child_pid )
       {
@@ -4569,7 +4581,7 @@ MagickSpawnVP(const unsigned int verbose,const char *file, char *const argv[])
           {
             /* Waitpid error */
             status = -1;
-            FormatString(message, "waitpid failed: %.1024s", strerror(errno));
+            MagickFormatString(message, sizeof(message), "waitpid failed: %.1024s", strerror(errno));
           }
         else if ( waitpid_status == child_pid )
           {
@@ -4582,7 +4594,7 @@ MagickSpawnVP(const unsigned int verbose,const char *file, char *const argv[])
               {
                 int sig_num = WTERMSIG( child_status );
                 status = -1;
-                FormatString(message, "child process quit due to signal %d", sig_num);
+                MagickFormatString(message, sizeof(message), "child process quit due to signal %d", sig_num);
               }
           }
       }
@@ -4610,7 +4622,7 @@ MagickSpawnVP(const unsigned int verbose,const char *file, char *const argv[])
           char
             buffer[MaxTextExtent];
 
-          FormatString(buffer,"\"%.1024s\"", argv[i]);
+          MagickFormatString(buffer,sizeof(buffer),"\"%.1024s\"", argv[i]);
 
           if (0 != i)
             (void) ConcatenateString(&command," ");
@@ -4952,7 +4964,7 @@ MagickExport MagickBool MagickSceneFileName(char *filename,
           register const int c = *p;
           if ('d' == c)
             {
-              FormatString(filename,filename_template,scene);
+              MagickFormatString(filename,MaxTextExtent,filename_template,scene);
               break;
             }
           if (!isdigit(c))
@@ -4968,7 +4980,7 @@ MagickExport MagickBool MagickSceneFileName(char *filename,
       char format[MaxTextExtent];
       (void) strlcpy(format,"%.1024s",sizeof(format));
       (void) strlcat(format,scene_template,sizeof(format));
-      FormatString(filename,format,filename_template,scene);
+      MagickFormatString(filename,MaxTextExtent,format,filename_template,scene);
     }
   if (LocaleCompare(filename,filename_template) != 0)
     status = MagickTrue;
@@ -5641,23 +5653,23 @@ MagickExport char **StringToList(const char *text)
       textlist=MagickAllocateMemory(char **,(lines+1)*sizeof(char *));
       if (textlist == (char **) NULL)
         MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-          UnableToConvertText);
+                          UnableToConvertText);
       p=text;
       for (i=0; i < lines; i++)
-      {
-        for (q=(char *) p; *q != '\0'; q++)
-          if ((*q == '\r') || (*q == '\n'))
-            break;
-        textlist[i]=MagickAllocateMemory(char *,(size_t) (q-p+1));
-        if (textlist[i] == (char *) NULL)
-          MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-            UnableToConvertText);
-        (void) memcpy(textlist[i],p,q-p);
-        textlist[i][q-p]='\0';
-        if (*q == '\r')
-          q++;
-        p=q+1;
-      }
+        {
+          for (q=(char *) p; *q != '\0'; q++)
+            if ((*q == '\r') || (*q == '\n'))
+              break;
+          textlist[i]=MagickAllocateMemory(char *,(size_t) (q-p+1));
+          if (textlist[i] == (char *) NULL)
+            MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
+                              UnableToConvertText);
+          (void) memcpy(textlist[i],p,q-p);
+          textlist[i][q-p]='\0';
+          if (*q == '\r')
+            q++;
+          p=q+1;
+        }
     }
   else
     {
@@ -5677,44 +5689,45 @@ MagickExport char **StringToList(const char *text)
       textlist=MagickAllocateMemory(char **,(lines+1)*sizeof(char *));
       if (textlist == (char **) NULL)
         MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-          UnableToConvertText);
+                          UnableToConvertText);
       p=text;
       for (i=0; i < lines; i++)
-      {
-        /* FIXME: Allocation here is excessively large */
-        textlist[i]=MagickAllocateMemory(char *,2*MaxTextExtent);
-        if (textlist[i] == (char *) NULL)
-          MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-            UnableToConvertText);
-        FormatString(textlist[i],"0x%08" MAGICK_SIZE_T_F "x: ",
-                     (MAGICK_SIZE_T) chars_per_line*i);
-        q=textlist[i]+strlen(textlist[i]);
-        for (j=1; j <= Min(strlen(p),chars_per_line); j++)
         {
-          FormatString(hex_string,"%02x",*(p+j));
-          (void) strlcpy(q,hex_string,MaxTextExtent);
-          q+=2;
-          if ((j % 0x04) == 0)
-            *q++=' ';
-        }
-        for (; j <= chars_per_line; j++)
-        {
+          /* FIXME: Allocation here is excessively large */
+          const size_t textlist_size = 2*MaxTextExtent;
+          textlist[i]=MagickAllocateMemory(char *,textlist_size);
+          if (textlist[i] == (char *) NULL)
+            MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
+                              UnableToConvertText);
+          MagickFormatString(textlist[i],textlist_size/2,"0x%08" MAGICK_SIZE_T_F "x: ",
+                             (MAGICK_SIZE_T) chars_per_line*i);
+          q=textlist[i]+strlen(textlist[i]);
+          for (j=1; j <= Min(strlen(p),chars_per_line); j++)
+            {
+              MagickFormatString(hex_string,sizeof(hex_string),"%02x",*(p+j));
+              (void) strlcpy(q,hex_string,MaxTextExtent);
+              q+=2;
+              if ((j % 0x04) == 0)
+                *q++=' ';
+            }
+          for (; j <= chars_per_line; j++)
+            {
+              *q++=' ';
+              *q++=' ';
+              if ((j % 0x04) == 0)
+                *q++=' ';
+            }
           *q++=' ';
-          *q++=' ';
-          if ((j % 0x04) == 0)
-            *q++=' ';
+          for (j=1; j <= Min(strlen(p),chars_per_line); j++)
+            {
+              if (isprint((int)(unsigned char)(*p)))
+                *q++=(*p);
+              else
+                *q++='-';
+              p++;
+            }
+          *q='\0';
         }
-        *q++=' ';
-        for (j=1; j <= Min(strlen(p),chars_per_line); j++)
-        {
-          if (isprint((int)(unsigned char)(*p)))
-            *q++=(*p);
-          else
-            *q++='-';
-          p++;
-        }
-        *q='\0';
-      }
     }
   textlist[i]=(char *) NULL;
   return(textlist);
@@ -5881,8 +5894,8 @@ MagickExport int SystemCommand(const unsigned int verbose,const char *command)
     }
   else if (WIFSIGNALED(status))
     {
-      FormatString(message,"terminated due to signal %d",
-                   WTERMSIG(status));
+      MagickFormatString(message,sizeof(message),"terminated due to signal %d",
+                         WTERMSIG(status));
       message[sizeof(message)-1]='\0';
       message_p=message;
     }
@@ -6428,470 +6441,476 @@ MagickExport char *TranslateTextEx(const ImageInfo *image_info,
   length=length+MaxTextExtent;
   p=text;
   for (q=translated_text; *p != '\0'; p++)
-  {
-    *q='\0';
-    if ((size_t) (q-translated_text+MaxTextExtent) >= length)
-      {
-        length<<=1;
-        MagickReallocMemory(char *,translated_text,length);
-        if (translated_text == (char *) NULL)
-          break;
-        q=translated_text+strlen(translated_text);
-      }
-    /*
-      Process formatting characters in text.
-    */
-    if ((*p == '\\') && (*(p+1) == 'r'))
-      {
-        *q++='\r';
-        p++;
-        continue;
-      }
-    if ((*p == '\\') && (*(p+1) == 'n'))
-      {
-        *q++='\n';
-        p++;
-        continue;
-      }
-    if (*p != '%')
-      {
-        *q++=(*p);
-        continue;
-      }
-    p++;
-    switch (*p)
     {
-      case 'b':
-      {
-        /* File size */
-        FormatSize(GetBlobSize(image),buffer);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'c':
-      {
-        /* Comment */
-        attribute=GetImageAttribute(image,"comment");
-        if (attribute != (ImageAttribute *) NULL)
-          {
-            /* Comments may be larger than MaxTextExtent so make sure
-               there is sufficient memory allocated. Make sure that
-               there is at least MaxTextExtent left available after we
-               have concatenated our part. */
-            offset=q-translated_text;
-            if ((size_t) (offset+attribute->length+1+MaxTextExtent) >= length)
-              {
-                length += (attribute->length+1+2*MaxTextExtent);
-                MagickReallocMemory(char *,translated_text,length);
-                if (translated_text == (char *) NULL)
-                  break;
-                q=translated_text+offset;
-              }
-            q+=(translate)(q,attribute->value,attribute->length+1+MaxTextExtent);
-          }
-        break;
-      }
-      case 'd':
-      case 'e':
-      case 'f':
-      case 't':
-      {
-        /*
-          Label segment is the base of the filename.
-        */
-        if (strlen(image->magick_filename) != 0)
-          {
-            (void) strlcpy(buffer,"",MaxTextExtent);
-            switch (*p)
-              {
-              case 'd':
-                {
-                  /* Directory */
-                  GetPathComponent(image->magick_filename,HeadPath,buffer);
-                  break;
-                }
-              case 'e':
-                {
-                  /* Filename extension */
-                  GetPathComponent(image->magick_filename,ExtensionPath,buffer);
-                  break;
-                }
-              case 'f':
-                {
-                  /* Filename */
-                  GetPathComponent(image->magick_filename,TailPath,buffer);
-                  break;
-                }
-              case 't':
-                {
-                  /* Top of filename */
-                  GetPathComponent(image->magick_filename,BasePath,buffer);
-                  break;
-                }
-              }
-            q+=(translate)(q,buffer,MaxTextExtent);
-          }
-        break;
-      }
-      case 'g':
-      {
-        /* page dimensions and offsets */
-        FormatString(buffer,"%lux%lu%+ld%+ld",
-                     image->page.width,image->page.height,
-                     image->page.x,image->page.y);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'h':
-      {
-        /* Image height */
-        FormatString(buffer,"%lu",image->rows);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'i':
-      {
-        /* Input filename */
-        q+=(translate)(q,image->filename,MaxTextExtent);
-        break;
-      }
-      case 'k':
-      {
-        /* Number of unique colors */
-        if (GetPixelCachePresent(image))
-          {
-            FormatString(buffer,"%lu",GetNumberColors(image,(FILE *) NULL,
-                                                      &image->exception));
-            q+=(translate)(q,buffer,MaxTextExtent);
-          }
-        else
-          {
-            *q++='%';
-            *q++=(*p);
-          }
-        break;
-      }
-      case 'l':
-      {
-        /* Label */
-        attribute=GetImageAttribute(image,"label");
-        if (attribute != (ImageAttribute *) NULL)
-          q+=(translate)(q,attribute->value,MaxTextExtent);
-        break;
-      }
-      case 'm':
-      {
-        /* File format "magick" */
-        q+=(translate)(q,image->magick,MaxTextExtent);
-        break;
-      }
-      case 'n':
-      {
-        /* Number of scenes */
-        FormatString(buffer,"%lu",(unsigned long) GetImageListLength(image));
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'o':
-      {
-        /* Output filename */
-        if (image_info != (const ImageInfo *) NULL)
-          q+=(translate)(q,image_info->filename,MaxTextExtent);
-        break;
-      }
-      case 'p':
-      {
-        /* Page number */
-        register const Image
-          *frame;
-
-        unsigned long
-          page;
-
-        frame=image;
-        for (page=1; frame->previous != (Image *) NULL; page++)
-          frame=frame->previous;
-        FormatString(buffer,"%lu",page);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'q':
-      {
-        /* Quantum depth */
-        if (GetPixelCachePresent(image))
-          FormatString(buffer,"%lu",GetImageDepth(image,&image->exception));
-        else
-          FormatString(buffer,"%u",image->depth);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'r':
-      {
-        /* Image type */
-        q+=(translate)(q,ImageTypeToString(GetImageType(image,&image->exception)),
-                       MaxTextExtent);
-        break;
-      }
-      case 's':
-      {
-        /* Scene number */
-        FormatString(buffer,"%lu",image->scene);
-        if (image_info != (const ImageInfo *) NULL)
-          if (image_info->subrange != 0)
-            FormatString(buffer,"%lu",image_info->subimage);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'u':
-      {
-        /* Unique temporary filename */
-        if (image_info != (const ImageInfo *) NULL)
-          {
-            if (strlcpy(buffer,image_info->unique,MaxTextExtent) == 0)
-              if (!AcquireTemporaryFileName(buffer))
-                break;
-            q+=(translate)(q,buffer,MaxTextExtent);
-          }
-        break;
-      }
-      case 'w':
-      {
-        /* Image width */
-        FormatString(buffer,"%lu",image->columns);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'x':
-      {
-        /* Horizontal resolution (default to 72.0 DPI if impossibly small) */
-        FormatString(buffer,"%g",
-                     fabs(image->x_resolution) > MagickEpsilon ? image->x_resolution :
-                     (image->units == PixelsPerCentimeterResolution ? 72.0/2.54 : 72.0));
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'y':
-      {
-        /* Vertical resolution (default to 72.0 DPI if impossibly small) */
-        FormatString(buffer,"%g",
-                     fabs(image->y_resolution) > MagickEpsilon ? image->y_resolution :
-                     (image->units == PixelsPerCentimeterResolution ? 72.0/2.54 : 72.0));
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'z':
-      {
-        /* Second unique temporary filename */
-        if (image_info != (const ImageInfo *) NULL)
-          {
-            if (strlcpy(buffer,image_info->zero,MaxTextExtent) == 0)
-              if (!AcquireTemporaryFileName(buffer))
-                break;
-            q+=(translate)(q,buffer,MaxTextExtent);
-          }
-        break;
-      }
-      case 'A':
-      {
-        /* Transparency supported */
-        FormatString(buffer,"%s",image->matte? "true" : "false");
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'C':
-      {
-        /* Image compression type */
-        FormatString(buffer,"%s",CompressionTypeToString(image->compression));
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'D':
-      {
-        /* GIF disposal method */
-        FormatString(buffer,"%d",image->dispose);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'G':
-      {
-        /* Original image width and height */
-        FormatString(buffer,"%lux%lu",image->magick_columns,image->magick_rows);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'H':
-      {
-        /* page height */
-        FormatString(buffer,"%lu",image->page.height);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'M':
-      {
-        /* Original filename specification */
-        q+=(translate)(q,image->magick_filename,MaxTextExtent);
-        break;
-      }
-      case 'O':
-      {
-        /* page offset */
-        FormatString(buffer,"%+ld%+ld",image->page.x,image->page.y);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'P':
-      {
-        /* page dimensions */
-        FormatString(buffer,"%lux%lu",image->page.width,image->page.height);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'Q':
-      {
-        /* Compression quality */
-        attribute=GetImageAttribute(image,"JPEG-Quality");
-        if (attribute != (ImageAttribute *) NULL)
-          {
-            q+=(translate)(q,attribute->value,MaxTextExtent);
+      *q='\0';
+      if ((size_t) (q-translated_text+MaxTextExtent) >= length)
+        {
+          length<<=1;
+          MagickReallocMemory(char *,translated_text,length);
+          if (translated_text == (char *) NULL)
             break;
-          }
-        if (image_info != (const ImageInfo *) NULL)
+          q=translated_text+strlen(translated_text);
+        }
+      /*
+        Process formatting characters in text.
+      */
+      if ((*p == '\\') && (*(p+1) == 'r'))
+        {
+          *q++='\r';
+          p++;
+          continue;
+        }
+      if ((*p == '\\') && (*(p+1) == 'n'))
+        {
+          *q++='\n';
+          p++;
+          continue;
+        }
+      if (*p != '%')
+        {
+          *q++=(*p);
+          continue;
+        }
+      p++;
+      switch (*p)
+        {
+        case 'b':
           {
-            FormatString(buffer,"%lu",image_info->quality);
+            /* File size */
+            FormatSize(GetBlobSize(image),buffer);
             q+=(translate)(q,buffer,MaxTextExtent);
             break;
           }
-        FormatString(buffer,"%u",DefaultCompressionQuality);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'T':
-      {
-        /* time delay (in centi-seconds) */
-        FormatString(buffer,"%lu",image->delay);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'U':
-      {
-        /* resolution units */
-        FormatString(buffer,"%s",ResolutionTypeToString(image->units));
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'W':
-      {
-        /* page width */
-        FormatString(buffer,"%lu",image->page.width);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'X':
-      {
-        /* page x offset */
-        FormatString(buffer,"%+ld",image->page.x);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case 'Y':
-      {
-        /* page y offset */
-        FormatString(buffer,"%+ld",image->page.y);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case '@':
-      {
-        /* trim bounding box */
-        RectangleInfo bounds = GetImageBoundingBox(image,
-                                                   &image->exception);
-        FormatString(buffer,"%lux%lu%+ld%+ld",bounds.width,bounds.height,
-                     bounds.x,bounds.y);
-        q+=(translate)(q,buffer,MaxTextExtent);
-        break;
-      }
-      case '[':
-      {
-        /* Image attribute */
-        char
-          key[MaxTextExtent];
-
-        /*
-          Extract attribute key string.
-
-          FIXME: does not handle nested specification so that
-          '%[[MVG]]' results in '[MVG]'.
-        */
-        p++;
-        for (i=0; (i < MaxTextExtent-1) && (*p) && (*p != ']'); i++)
+        case 'c':
           {
-            key[i]=(*p++);
-          }
-        if (']' != *p)
-          break;
-        key[i]='\0';
-
-        /* Try to get the attribute from image */
-        attribute=GetImageAttribute(image,key);
-
-        /* Try to get the attribute from image_info */
-        if (attribute == (const ImageAttribute *) NULL)
-          if (image_info != (const ImageInfo *) NULL)
-            attribute=GetImageInfoAttribute(image_info,image,key);
-
-        if (attribute != (const ImageAttribute *) NULL)
-          {
-            /* Attributes may be larger than MaxTextExtent so make
-               sure there is sufficient memory allocated. Make sure
-               that there is at least MaxTextExtent left available
-               after we have concatenated our part. */
-            offset=q-translated_text;
-            if ((size_t) (offset+attribute->length+1+MaxTextExtent) >= length)
+            /* Comment */
+            attribute=GetImageAttribute(image,"comment");
+            if (attribute != (ImageAttribute *) NULL)
               {
-                length += (attribute->length+1+2*MaxTextExtent);
-                MagickReallocMemory(char *,translated_text,length);
-                if (translated_text == (char *) NULL)
-                  break;
-                q=translated_text+offset;
+                /* Comments may be larger than MaxTextExtent so make sure
+                   there is sufficient memory allocated. Make sure that
+                   there is at least MaxTextExtent left available after we
+                   have concatenated our part. */
+                offset=q-translated_text;
+                if ((size_t) (offset+attribute->length+1+MaxTextExtent) >= length)
+                  {
+                    length += (attribute->length+1+2*MaxTextExtent);
+                    MagickReallocMemory(char *,translated_text,length);
+                    if (translated_text == (char *) NULL)
+                      break;
+                    q=translated_text+offset;
+                  }
+                q+=(translate)(q,attribute->value,attribute->length+1+MaxTextExtent);
               }
-            q+=(translate)(q,attribute->value,attribute->length+1+MaxTextExtent);
+            break;
           }
-        break;
-      }
-      case '#':
-      {
-        /* If 'ping' mode was used, then there may be no pixel cache! */
-        if (GetPixelCachePresent(image))
+        case 'd':
+        case 'e':
+        case 'f':
+        case 't':
           {
-            (void) SignatureImage(image);
-            attribute=GetImageAttribute(image,"signature");
+            /*
+              Label segment is the base of the filename.
+            */
+            if (strlen(image->magick_filename) != 0)
+              {
+                (void) strlcpy(buffer,"",MaxTextExtent);
+                switch (*p)
+                  {
+                  case 'd':
+                    {
+                      /* Directory */
+                      GetPathComponent(image->magick_filename,HeadPath,buffer);
+                      break;
+                    }
+                  case 'e':
+                    {
+                      /* Filename extension */
+                      GetPathComponent(image->magick_filename,ExtensionPath,buffer);
+                      break;
+                    }
+                  case 'f':
+                    {
+                      /* Filename */
+                      GetPathComponent(image->magick_filename,TailPath,buffer);
+                      break;
+                    }
+                  case 't':
+                    {
+                      /* Top of filename */
+                      GetPathComponent(image->magick_filename,BasePath,buffer);
+                      break;
+                    }
+                  }
+                q+=(translate)(q,buffer,MaxTextExtent);
+              }
+            break;
+          }
+        case 'g':
+          {
+            /* page dimensions and offsets */
+            MagickFormatString(buffer,sizeof(buffer),"%lux%lu%+ld%+ld",
+                               image->page.width,image->page.height,
+                               image->page.x,image->page.y);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'h':
+          {
+            /* Image height */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",image->rows);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'i':
+          {
+            /* Input filename */
+            q+=(translate)(q,image->filename,MaxTextExtent);
+            break;
+          }
+        case 'k':
+          {
+            /* Number of unique colors */
+            if (GetPixelCachePresent(image))
+              {
+                MagickFormatString(buffer,sizeof(buffer),"%lu",
+                                   GetNumberColors(image,(FILE *) NULL,
+                                                   &image->exception));
+                q+=(translate)(q,buffer,MaxTextExtent);
+              }
+            else
+              {
+                *q++='%';
+                *q++=(*p);
+              }
+            break;
+          }
+        case 'l':
+          {
+            /* Label */
+            attribute=GetImageAttribute(image,"label");
             if (attribute != (ImageAttribute *) NULL)
               q+=(translate)(q,attribute->value,MaxTextExtent);
+            break;
           }
-        else
+        case 'm':
           {
+            /* File format "magick" */
+            q+=(translate)(q,image->magick,MaxTextExtent);
+            break;
+          }
+        case 'n':
+          {
+            /* Number of scenes */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",
+                               (unsigned long) GetImageListLength(image));
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'o':
+          {
+            /* Output filename */
+            if (image_info != (const ImageInfo *) NULL)
+              q+=(translate)(q,image_info->filename,MaxTextExtent);
+            break;
+          }
+        case 'p':
+          {
+            /* Page number */
+            register const Image
+              *frame;
+
+            unsigned long
+              page;
+
+            frame=image;
+            for (page=1; frame->previous != (Image *) NULL; page++)
+              frame=frame->previous;
+            MagickFormatString(buffer,sizeof(buffer),"%lu",page);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'q':
+          {
+            /* Quantum depth */
+            if (GetPixelCachePresent(image))
+              MagickFormatString(buffer,sizeof(buffer),"%lu",
+                                 GetImageDepth(image,&image->exception));
+            else
+              MagickFormatString(buffer,sizeof(buffer),"%u",image->depth);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'r':
+          {
+            /* Image type */
+            q+=(translate)(q,ImageTypeToString(GetImageType(image,&image->exception)),
+                           MaxTextExtent);
+            break;
+          }
+        case 's':
+          {
+            /* Scene number */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",image->scene);
+            if (image_info != (const ImageInfo *) NULL)
+              if (image_info->subrange != 0)
+                MagickFormatString(buffer,sizeof(buffer),"%lu",image_info->subimage);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'u':
+          {
+            /* Unique temporary filename */
+            if (image_info != (const ImageInfo *) NULL)
+              {
+                if (strlcpy(buffer,image_info->unique,MaxTextExtent) == 0)
+                  if (!AcquireTemporaryFileName(buffer))
+                    break;
+                q+=(translate)(q,buffer,MaxTextExtent);
+              }
+            break;
+          }
+        case 'w':
+          {
+            /* Image width */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",image->columns);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'x':
+          {
+            /* Horizontal resolution (default to 72.0 DPI if impossibly small) */
+            MagickFormatString(buffer,sizeof(buffer),"%g",
+                               fabs(image->x_resolution) > MagickEpsilon ? image->x_resolution :
+                               (image->units == PixelsPerCentimeterResolution ? 72.0/2.54 : 72.0));
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'y':
+          {
+            /* Vertical resolution (default to 72.0 DPI if impossibly small) */
+            MagickFormatString(buffer,sizeof(buffer),"%g",
+                               fabs(image->y_resolution) > MagickEpsilon ? image->y_resolution :
+                               (image->units == PixelsPerCentimeterResolution ? 72.0/2.54 : 72.0));
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'z':
+          {
+            /* Second unique temporary filename */
+            if (image_info != (const ImageInfo *) NULL)
+              {
+                if (strlcpy(buffer,image_info->zero,MaxTextExtent) == 0)
+                  if (!AcquireTemporaryFileName(buffer))
+                    break;
+                q+=(translate)(q,buffer,MaxTextExtent);
+              }
+            break;
+          }
+        case 'A':
+          {
+            /* Transparency supported */
+            MagickFormatString(buffer,sizeof(buffer),"%s",image->matte? "true" : "false");
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'C':
+          {
+            /* Image compression type */
+            MagickFormatString(buffer,sizeof(buffer),"%s",CompressionTypeToString(image->compression));
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'D':
+          {
+            /* GIF disposal method */
+            MagickFormatString(buffer,sizeof(buffer),"%d",image->dispose);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'G':
+          {
+            /* Original image width and height */
+            MagickFormatString(buffer,sizeof(buffer),"%lux%lu",
+                               image->magick_columns,image->magick_rows);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'H':
+          {
+            /* page height */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",image->page.height);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'M':
+          {
+            /* Original filename specification */
+            q+=(translate)(q,image->magick_filename,MaxTextExtent);
+            break;
+          }
+        case 'O':
+          {
+            /* page offset */
+            MagickFormatString(buffer,sizeof(buffer),"%+ld%+ld",
+                               image->page.x,image->page.y);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'P':
+          {
+            /* page dimensions */
+            MagickFormatString(buffer,sizeof(buffer),"%lux%lu",
+                               image->page.width,image->page.height);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'Q':
+          {
+            /* Compression quality */
+            attribute=GetImageAttribute(image,"JPEG-Quality");
+            if (attribute != (ImageAttribute *) NULL)
+              {
+                q+=(translate)(q,attribute->value,MaxTextExtent);
+                break;
+              }
+            if (image_info != (const ImageInfo *) NULL)
+              {
+                MagickFormatString(buffer,sizeof(buffer),"%lu",image_info->quality);
+                q+=(translate)(q,buffer,MaxTextExtent);
+                break;
+              }
+            MagickFormatString(buffer,sizeof(buffer),"%u",DefaultCompressionQuality);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'T':
+          {
+            /* time delay (in centi-seconds) */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",image->delay);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'U':
+          {
+            /* resolution units */
+            MagickFormatString(buffer,sizeof(buffer),"%s",ResolutionTypeToString(image->units));
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'W':
+          {
+            /* page width */
+            MagickFormatString(buffer,sizeof(buffer),"%lu",image->page.width);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'X':
+          {
+            /* page x offset */
+            MagickFormatString(buffer,sizeof(buffer),"%+ld",image->page.x);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case 'Y':
+          {
+            /* page y offset */
+            MagickFormatString(buffer,sizeof(buffer),"%+ld",image->page.y);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case '@':
+          {
+            /* trim bounding box */
+            RectangleInfo bounds = GetImageBoundingBox(image,
+                                                       &image->exception);
+            MagickFormatString(buffer,sizeof(buffer),"%lux%lu%+ld%+ld",
+                               bounds.width,bounds.height,bounds.x,bounds.y);
+            q+=(translate)(q,buffer,MaxTextExtent);
+            break;
+          }
+        case '[':
+          {
+            /* Image attribute */
+            char
+              key[MaxTextExtent];
+
+            /*
+              Extract attribute key string.
+
+              FIXME: does not handle nested specification so that
+              '%[[MVG]]' results in '[MVG]'.
+            */
+            p++;
+            for (i=0; (i < MaxTextExtent-1) && (*p) && (*p != ']'); i++)
+              {
+                key[i]=(*p++);
+              }
+            if (']' != *p)
+              break;
+            key[i]='\0';
+
+            /* Try to get the attribute from image */
+            attribute=GetImageAttribute(image,key);
+
+            /* Try to get the attribute from image_info */
+            if (attribute == (const ImageAttribute *) NULL)
+              if (image_info != (const ImageInfo *) NULL)
+                attribute=GetImageInfoAttribute(image_info,image,key);
+
+            if (attribute != (const ImageAttribute *) NULL)
+              {
+                /* Attributes may be larger than MaxTextExtent so make
+                   sure there is sufficient memory allocated. Make sure
+                   that there is at least MaxTextExtent left available
+                   after we have concatenated our part. */
+                offset=q-translated_text;
+                if ((size_t) (offset+attribute->length+1+MaxTextExtent) >= length)
+                  {
+                    length += (attribute->length+1+2*MaxTextExtent);
+                    MagickReallocMemory(char *,translated_text,length);
+                    if (translated_text == (char *) NULL)
+                      break;
+                    q=translated_text+offset;
+                  }
+                q+=(translate)(q,attribute->value,attribute->length+1+MaxTextExtent);
+              }
+            break;
+          }
+        case '#':
+          {
+            /* If 'ping' mode was used, then there may be no pixel cache! */
+            if (GetPixelCachePresent(image))
+              {
+                (void) SignatureImage(image);
+                attribute=GetImageAttribute(image,"signature");
+                if (attribute != (ImageAttribute *) NULL)
+                  q+=(translate)(q,attribute->value,MaxTextExtent);
+              }
+            else
+              {
+                *q++='%';
+                *q++=(*p);
+              }
+            break;
+          }
+        case '%':
+          {
+            /* Pass through literal % */
+            *q++=(*p);
+            break;
+          }
+        default:
+          {
+            /* Pass through unknown codes */
             *q++='%';
             *q++=(*p);
+            break;
           }
+        }
+      if (*p == '\0')
         break;
-      }
-      case '%':
-      {
-        /* Pass through literal % */
-        *q++=(*p);
-        break;
-      }
-      default:
-      {
-        /* Pass through unknown codes */
-        *q++='%';
-        *q++=(*p);
-        break;
-      }
     }
-    if (*p == '\0')
-      break;
-  }
   *q='\0';
   if (text != (char *) formatted_text)
     MagickFreeMemory(text);

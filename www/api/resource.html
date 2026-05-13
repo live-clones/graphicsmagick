@@ -58,8 +58,9 @@
 </section>
 <section id="description">
 <h2>Description</h2>
-<p>AcquireMagickResource() acquires resources of the specified type.  True is
-returned if the specified resource is available otherwise False.</p>
+<p>AcquireMagickResource() acquires resources of the specified type.
+MagickTrue is returned if the specified resource is available otherwise
+MagickFalse.</p>
 <p>The format of the AcquireMagickResource() method is:</p>
 <pre class="literal-block">MagickPassFail AcquireMagickResource( const <a class="reference external" href="../api/types.html#resourcetype">ResourceType</a> type, const magick_int64_t size );</pre>
 <dl class="simple">
@@ -175,7 +176,8 @@ ThreadsResource -- Threads
 WidthResource   -- Pixels
 HeightResource  -- Pixels
 ReadResource    -- Bytes
-WriteResource   -- Bytes</p>
+WriteResource   -- Bytes
+ImagesResource  -- Discrete Images</p>
 <p>The format of the SetMagickResourceLimit() method is:</p>
 <pre class="literal-block">void SetMagickResourceLimit( const <a class="reference external" href="../api/types.html#resourcetype">ResourceType</a> type, const unsigned long limit );</pre>
 <dl class="simple">
@@ -193,7 +195,7 @@ WriteResource   -- Bytes</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2026<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

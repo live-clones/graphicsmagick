@@ -386,7 +386,7 @@ int main ( int argc, char **argv )
   rows=842;
   image_info=CloneImageInfo((ImageInfo*)NULL);
   GetExceptionInfo( &exception );
-  FormatString(size, "%dx%d", columns, rows);
+  MagickFormatString(size, sizeof(size), "%dx%d", columns, rows);
   (void) CloneString(&image_info->size, size);
   (void) strcpy( image_info->filename, "xc:white");
   canvas = ReadImage ( image_info, &exception );

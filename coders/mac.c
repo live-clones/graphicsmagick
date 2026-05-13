@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2010-2020 GraphicsMagick Group
+% Copyright (C) 2010-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -40,6 +40,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 
 /*
@@ -186,7 +187,7 @@ static Image *ReadMACImage(const ImageInfo *image_info,ExceptionInfo *exception)
         }
     }
   if (BImgBuff!=NULL)
-    MagickFreeResourceLimitedMemory(BImgBuff);
+    MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
   if (EOFBlob(image))
     ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
 

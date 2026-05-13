@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2018 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -44,6 +44,7 @@
 #include "magick/color.h"
 #include "magick/color_lookup.h"
 #include "magick/composite.h"
+#include "magick/confirm_access.h"
 #include "magick/constitute.h"
 #include "magick/gem.h"
 #include "magick/log.h"
@@ -349,14 +350,14 @@ MagickExport MagickPassFail AnnotateImage(Image *image,const DrawInfo *draw_info
         clone_info->affine.tx=offset.x-draw_info->affine.ry*(metrics.ascent-
           metrics.max_advance/4);
         clone_info->affine.ty=offset.y-draw_info->affine.sy*metrics.ascent;
-        FormatString(primitive,"rectangle 0,0 %g,%ld",metrics.width+
+        MagickFormatString(primitive,sizeof(primitive),"rectangle 0,0 %g,%ld",metrics.width+
           metrics.max_advance/2.0,height);
         (void) CloneString(&clone_info->primitive,primitive);
         (void) DrawImage(image,clone_info);
       }
     clone_info->affine.tx=offset.x;
     clone_info->affine.ty=offset.y;
-    FormatString(primitive,"stroke-width %g line 0,0 %g,0",
+    MagickFormatString(primitive,sizeof(primitive),"stroke-width %g line 0,0 %g,0",
       metrics.underline_thickness,metrics.width);
     if (annotate->decorate == OverlineDecoration)
       {
@@ -1006,7 +1007,7 @@ static int TraceCubicBezier(FT_Vector *p,FT_Vector *q,FT_Vector *to,
     path[MaxTextExtent];
 
   affine=draw_info->affine;
-  FormatString(path,"C%g,%g %g,%g %g,%g",affine.tx+p->x/64.0,
+  MagickFormatString(path,sizeof(path),"C%g,%g %g,%g %g,%g",affine.tx+p->x/64.0,
     affine.ty-p->y/64.0,affine.tx+q->x/64.0,affine.ty-q->y/64.0,
     affine.tx+to->x/64.0,affine.ty-to->y/64.0);
   (void) ConcatenateString(&draw_info->primitive,path);
@@ -1022,7 +1023,7 @@ static int TraceLineTo(FT_Vector *to,DrawInfo *draw_info)
     path[MaxTextExtent];
 
   affine=draw_info->affine;
-  FormatString(path,"L%g,%g",affine.tx+to->x/64.0,affine.ty-to->y/64.0);
+  MagickFormatString(path,sizeof(path),"L%g,%g",affine.tx+to->x/64.0,affine.ty-to->y/64.0);
   (void) ConcatenateString(&draw_info->primitive,path);
   return(0);
 }
@@ -1036,7 +1037,7 @@ static int TraceMoveTo(FT_Vector *to,DrawInfo *draw_info)
     path[MaxTextExtent];
 
   affine=draw_info->affine;
-  FormatString(path,"M%g,%g",affine.tx+to->x/64.0,affine.ty-to->y/64.0);
+  MagickFormatString(path,sizeof(path),"M%g,%g",affine.tx+to->x/64.0,affine.ty-to->y/64.0);
   (void) ConcatenateString(&draw_info->primitive,path);
   return(0);
 }
@@ -1051,7 +1052,7 @@ static int TraceQuadraticBezier(FT_Vector *control,FT_Vector *to,
     path[MaxTextExtent];
 
   affine=draw_info->affine;
-  FormatString(path,"Q%g,%g %g,%g",affine.tx+control->x/64.0,
+  MagickFormatString(path,sizeof(path),"Q%g,%g %g,%g",affine.tx+control->x/64.0,
     affine.ty-control->y/64.0,affine.tx+to->x/64.0,affine.ty-to->y/64.0);
   (void) ConcatenateString(&draw_info->primitive,path);
   return(0);
@@ -1091,7 +1092,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     ft_status;
 
   FT_Face
-    face;
+    face = (FT_Face) 0;
 
   FT_Library
     library;
@@ -1148,11 +1149,28 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
   magick_code_point_t
     *text;
 
+  const char
+    *font;
+
   MagickPassFail
     status=MagickPass;
 
-  if (draw_info->font == (char *) NULL)
+  if ((draw_info->font == (char *) NULL) ||
+      (draw_info->font[0] == '\0') ||
+      ((draw_info->font[0] == '@') && (draw_info->font[1] == '\0')))
     ThrowBinaryException(TypeError,FontNotSpecified,image->filename);
+
+  if (draw_info->font[0] != '@')
+    font=draw_info->font;
+  else
+    font=draw_info->font+1;
+
+  /*
+    Verify if file is allowed to be accessed.
+  */
+  if (MagickConfirmAccess(FileReadConfirmAccessMode,font,
+                          &image->exception) == MagickFail)
+      return MagickFail;
 
   glyph.image=(FT_Glyph) 0;
   last_glyph.image=(FT_Glyph) 0;
@@ -1164,11 +1182,8 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
   if (ft_status)
     ThrowBinaryException(TypeError,UnableToInitializeFreetypeLibrary,
                          draw_info->font);
-  if (*draw_info->font != '@')
-    ft_status=FT_New_Face(library,draw_info->font,0,&face);
-  else
-    ft_status=FT_New_Face(library,draw_info->font+1,0,&face);
-  if (ft_status != 0)
+  ft_status=FT_New_Face(library,font,0,&face);
+  if ((ft_status != 0) || (face == (FT_Face) 0))
     {
       (void) FT_Done_FreeType(library);
       ThrowBinaryException(TypeError,UnableToReadFont,draw_info->font)
@@ -1682,6 +1697,9 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   unsigned int
     identity;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Render label with a Postscript font.
   */
@@ -1739,13 +1757,13 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   MagickFreeMemory(text);
   (void) fprintf(file,"showpage\n");
   (void) fclose(file);
-  FormatString(geometry,"%ldx%ld+0+0!",(long) ceil(extent.x-0.5),
+  MagickFormatString(geometry,sizeof(geometry),"%ldx%ld+0+0!",(long) ceil(extent.x-0.5),
     (long) ceil(extent.y-0.5));
   clone_info=CloneImageInfo((ImageInfo *) NULL);
-  (void) FormatString(clone_info->filename,"ps:%.1024s",filename);
+  MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"ps:%.1024s",filename);
   (void) CloneString(&clone_info->page,geometry);
   if (draw_info->density != (char *) NULL)
-    (void) CloneString(&clone_info->density,draw_info->density);
+    status &= CloneString(&clone_info->density,draw_info->density);
   clone_info->antialias=draw_info->text_antialias;
   annotate_image=ReadImage(clone_info,&image->exception);
   if (image->exception.severity != UndefinedException)
@@ -1754,7 +1772,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   DestroyImageInfo(clone_info);
   (void) LiberateTemporaryFile(filename);
   if (annotate_image == (Image *) NULL)
-    return(False);
+    return(MagickFail);
   resolution.x=72.0;
   resolution.y=72.0;
   if (draw_info->density != (char *) NULL)
@@ -1767,7 +1785,9 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
         resolution.y=resolution.x;
     }
   if (!identity)
-    TransformImage(&annotate_image,"0x0",(char *) NULL);
+    {
+      status &= TransformImage(&annotate_image,"0x0",(char *) NULL);
+    }
   else
     {
       RectangleInfo
@@ -1777,9 +1797,9 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
       crop_info.height=(unsigned long) ceil((resolution.y/72.0)*
         ExpandAffine(&draw_info->affine)*draw_info->pointsize-0.5);
       crop_info.y=(long) ceil((resolution.y/72.0)*extent.y/8.0-0.5);
-      (void) FormatString(geometry,"%lux%lu%+ld%+ld",crop_info.width,
+      MagickFormatString(geometry,sizeof(geometry),"%lux%lu%+ld%+ld",crop_info.width,
         crop_info.height,crop_info.x,crop_info.y);
-      TransformImage(&annotate_image,geometry,(char *) NULL);
+      status &= TransformImage(&annotate_image,geometry,(char *) NULL);
     }
   metrics->pixels_per_em.x=(resolution.y/72.0)*
     ExpandAffine(&draw_info->affine)*draw_info->pointsize;
@@ -1798,7 +1818,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
   if (!draw_info->render)
     {
       DestroyImage(annotate_image);
-      return(True);
+      return(MagickPass);
     }
   if (draw_info->fill.opacity != TransparentOpacity)
     {
@@ -1808,7 +1828,11 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
       /*
         Render fill color.
       */
-      (void) SetImageType(annotate_image,TrueColorMatteType);
+      if ((status &= SetImageType(annotate_image,TrueColorMatteType)) == MagickFail)
+        {
+          DestroyImage(annotate_image);
+          return(MagickFail);
+        }
       fill_color=draw_info->fill;
       pattern=draw_info->fill_pattern;
       for (y=0; y < (long) annotate_image->rows; y++)
@@ -1819,7 +1843,7 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
         for (x=0; x < (long) annotate_image->columns; x++)
         {
           if (pattern != (Image *) NULL)
-            (void) AcquireOnePixelByReference(pattern,&fill_color,
+            status &= AcquireOnePixelByReference(pattern,&fill_color,
               (long) (x-pattern->tile_info.x) % pattern->columns,
               (long) (y-pattern->tile_info.y) % pattern->rows,
               &image->exception);
@@ -1831,15 +1855,15 @@ static MagickPassFail RenderPostscript(Image *image,const DrawInfo *draw_info,
           q->blue=fill_color.blue;
           q++;
         }
-        if (!SyncImagePixels(annotate_image))
+        if ((status &= SyncImagePixels(annotate_image)) == MagickFail)
           break;
       }
-      (void) CompositeImage(image,OverCompositeOp,annotate_image,(long)
+      status &= CompositeImage(image,OverCompositeOp,annotate_image,(long)
         ceil(offset->x-0.5),(long) ceil(offset->y-(metrics->ascent+
         metrics->descent)-0.5));
     }
   DestroyImage(annotate_image);
-  return(MagickPass);
+  return(status);
 }
 
 /*
@@ -2021,7 +2045,7 @@ static MagickPassFail RenderX11(Image *image,const DrawInfo *draw_info,
         annotate_info.degrees=(180.0/MagickPI)*
           atan2(draw_info->affine.rx,draw_info->affine.sx);
     }
-  FormatString(annotate_info.geometry,"%lux%lu+%ld+%ld",width,height,
+  MagickFormatString(annotate_info.geometry,sizeof(annotate_info.geometry),"%lux%lu+%ld+%ld",width,height,
     (long) ceil(offset->x-0.5),
     (long) ceil(offset->y-metrics->ascent-metrics->descent-0.5));
   pixel.pen_color.red=ScaleQuantumToShort(draw_info->fill.red);

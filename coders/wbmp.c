@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -41,6 +41,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -240,12 +241,33 @@ ModuleExport void RegisterWBMPImage(void)
   MagickInfo
     *entry;
 
+  /* WBMP is the most common extension */
   entry=SetMagickInfo("WBMP");
   entry->decoder=(DecoderHandler) ReadWBMPImage;
   entry->encoder=(EncoderHandler) WriteWBMPImage;
   entry->adjoin=False;
   entry->description="Wireless Bitmap (level 0) image";
   entry->module="WBMP";
+  (void) RegisterMagickInfo(entry);
+
+  /* WBM is a less common extension */
+  entry=SetMagickInfo("WBM");
+  entry->decoder=(DecoderHandler) ReadWBMPImage;
+  entry->encoder=(EncoderHandler) WriteWBMPImage;
+  entry->adjoin=False;
+  entry->description="Wireless Bitmap (level 0) image";
+  entry->module="WBMP";
+  entry->stealth=MagickTrue; /* Don't list in '-list format' output */
+  (void) RegisterMagickInfo(entry);
+
+  /* WBP is the least common extension */
+  entry=SetMagickInfo("WBP");
+  entry->decoder=(DecoderHandler) ReadWBMPImage;
+  entry->encoder=(EncoderHandler) WriteWBMPImage;
+  entry->adjoin=False;
+  entry->description="Wireless Bitmap (level 0) image";
+  entry->module="WBMP";
+  entry->stealth=MagickTrue; /* Don't list in '-list format' output */
   (void) RegisterMagickInfo(entry);
 }
 
@@ -271,6 +293,8 @@ ModuleExport void RegisterWBMPImage(void)
 ModuleExport void UnregisterWBMPImage(void)
 {
   (void) UnregisterMagickInfo("WBMP");
+  (void) UnregisterMagickInfo("WBM");
+  (void) UnregisterMagickInfo("WBP");
 }
 
 /*
@@ -369,11 +393,13 @@ static unsigned int WriteWBMPImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Convert image to a bi-level image.
   */
-  (void) SetImageType(image,BilevelType);
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
   polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
   if (image->colors == 2)
     polarity=PixelIntensityToQuantum(&image->colormap[0]) <

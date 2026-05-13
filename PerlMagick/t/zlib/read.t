@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# Copyright (C) 2003, 2008 GraphicsMagick Group
+# Copyright (C) 2003-2026 GraphicsMagick Group
 # Copyright (C) 2002 ImageMagick Studio
 # Copyright (C) 1991-1999 E. I. du Pont de Nemours and Company
 #
@@ -26,7 +26,7 @@ chdir 't/zlib' || die 'Cd failed';
 # 1) Test reading Zip compressed MIFF
 #
 print("Reading Zip compressed MIFF ...\n");
-testRead( 'input.miff', q//,
+testRead( 'input_zlib.miff', q//,
   '8b19185a62241bd7b79ecf3f619711f4ebbedd73eaeca0366f05778762b6614f' );
 
 #
@@ -42,5 +42,5 @@ testRead( 'input_gray_lsb_08bit_zip.mat', q//,
 #
 print("Reading Zip stream-compressed MIFF (.gz extension) ...\n");
 ++$test;
-testRead( 'input.miff.gz', q//,
+testRead( 'input_zlib.miff.gz', q//,
   '8b19185a62241bd7b79ecf3f619711f4ebbedd73eaeca0366f05778762b6614f' );

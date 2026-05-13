@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -47,6 +47,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/profile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -126,23 +127,23 @@ static MagickBool IsMPC(const unsigned char *magick,const size_t length)
 %
 */
 
-#define ThrowMPCReaderException(code_,reason_,image_) \
-do { \
-  MagickFreeResourceLimitedMemory(comment); \
-  MagickFreeResourceLimitedMemory(values); \
-  if (number_of_profiles > 0) \
-    { \
-      unsigned long _index; \
-      for (_index=0; _index < number_of_profiles; _index++) \
-        { \
-          MagickFreeMemory(profiles[_index].name); \
-          MagickFreeResourceLimitedMemory(profiles[_index].info); \
-        } \
-      MagickFreeResourceLimitedMemory(profiles); \
-      number_of_profiles=0; \
-    } \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowMPCReaderException(code_,reason_,image_)                   \
+  do {                                                                  \
+    MagickFreeResourceLimitedMemory(char *,comment);                    \
+    MagickFreeResourceLimitedMemory(char *,values);                     \
+    if (number_of_profiles > 0)                                         \
+      {                                                                 \
+        unsigned long _index;                                           \
+        for (_index=0; _index < number_of_profiles; _index++)           \
+          {                                                             \
+            MagickFreeMemory(profiles[_index].name);                    \
+            MagickFreeResourceLimitedMemory(unsigned char *,profiles[_index].info); \
+          }                                                             \
+        MagickFreeResourceLimitedMemory(ProfileInfo *,profiles);        \
+        number_of_profiles=0;                                           \
+      }                                                                 \
+    ThrowReaderException(code_,reason_,image_);                         \
+  } while (0);
 
 #define ReadMPCMaxKeyWordCount 256 /* Arbitrary limit on number of keywords in MPC frame */
 
@@ -299,7 +300,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 new_comment=MagickReallocateResourceLimitedMemory(char *,comment,comment_length);
                 if (new_comment == (char *) NULL)
                   {
-                    MagickFreeResourceLimitedMemory(comment);
+                    MagickFreeResourceLimitedMemory(char *,comment);
                     break;
                   }
                 comment=new_comment;
@@ -313,7 +314,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
           *p='\0';
           (void) SetNewImageAttribute(image,"comment",comment);
           comment_count++;
-          MagickFreeResourceLimitedMemory(comment);
+          MagickFreeResourceLimitedMemory(char *,comment);
           c=ReadBlobByte(image);
         }
       else
@@ -382,7 +383,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                     new_values=MagickReallocateResourceLimitedMemory(char *,values,values_length);
                     if (new_values == (char *) NULL)
                       {
-                        MagickFreeResourceLimitedMemory(values);
+                        MagickFreeResourceLimitedMemory(char *,values);
                         break;
                       }
                     values=new_values;
@@ -795,7 +796,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 break;
               }
             }
-            MagickFreeResourceLimitedMemory(values);
+            MagickFreeResourceLimitedMemory(char *,values);
           }
         else
           {
@@ -899,9 +900,9 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 }
             }
           MagickFreeMemory(profiles[i].name);
-          MagickFreeResourceLimitedMemory(profiles[i].info);
+          MagickFreeResourceLimitedMemory(unsigned char *,profiles[i].info);
         }
-        MagickFreeResourceLimitedMemory(profiles);
+        MagickFreeResourceLimitedMemory(ProfileInfo *,profiles);
         number_of_profiles=0;
       }
 
@@ -956,7 +957,7 @@ static Image *ReadMPCImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 image->colormap[i].blue=(*p++ << 8);
                 image->colormap[i].blue|=(*p++);
               }
-            MagickFreeResourceLimitedMemory(colormap);
+            MagickFreeResourceLimitedMemory(unsigned char *,colormap);
           }
       }
     if (EOFBlob(image))
@@ -1164,327 +1165,327 @@ static MagickPassFail WriteMPCImage(const ImageInfo *image_info,Image *image)
   scene=0;
   offset=0;
   do
-  {
-    /*
-      Write persistent cache meta-information.
-    */
-    (void) WriteBlobString(image,"id=MagickCache\n");
-    FormatString(buffer,"quantum-depth=%d\n",QuantumDepth);
-    (void) WriteBlobString(image,buffer);
-    if (image->storage_class == PseudoClass)
-      FormatString(buffer,"class=PseudoClass  colors=%u  matte=%s\n",
-                   image->colors,MagickBoolToString(image->matte));
-    else
-      if (image->colorspace == CMYKColorspace)
-        FormatString(buffer,"class=DirectClass  colorspace=CMYK  matte=%s\n",
-                     MagickBoolToString(image->matte));
+    {
+      /*
+        Write persistent cache meta-information.
+      */
+      (void) WriteBlobString(image,"id=MagickCache\n");
+      MagickFormatString(buffer,sizeof(buffer),"quantum-depth=%d\n",QuantumDepth);
+      (void) WriteBlobString(image,buffer);
+      if (image->storage_class == PseudoClass)
+        MagickFormatString(buffer,sizeof(buffer),"class=PseudoClass  colors=%u  matte=%s\n",
+                           image->colors,MagickBoolToString(image->matte));
       else
-        FormatString(buffer,"class=DirectClass  matte=%s\n",
-                     MagickBoolToString(image->matte));
-    (void) WriteBlobString(image,buffer);
-    switch (image->compression)
-    {
-      default:
-      case NoCompression:
-      {
-        (void) WriteBlobString(image,"compression=None\n");
-        break;
-      }
-      case BZipCompression:
-      {
-        (void) WriteBlobString(image,"compression=BZip\n");
-        break;
-      }
-      case FaxCompression:
-      {
-        (void) WriteBlobString(image,"compression=Fax\n");
-        break;
-      }
-      case Group4Compression:
-      {
-        (void) WriteBlobString(image,"compression=Group4\n");
-        break;
-      }
-      case JPEGCompression:
-      {
-        (void) WriteBlobString(image,"compression=JPEG\n");
-        break;
-      }
-      case LosslessJPEGCompression:
-      {
-        (void) WriteBlobString(image,"compression=Lossless\n");
-        break;
-      }
-      case LZWCompression:
-      {
-        (void) WriteBlobString(image,"compression=LZW\n");
-        break;
-      }
-      case RLECompression:
-      {
-        (void) WriteBlobString(image,"compression=RLE\n");
-        break;
-      }
-      case ZipCompression:
-      {
-        (void) WriteBlobString(image,"compression=Zip\n");
-        break;
-      }
-    }
-    FormatString(buffer,"columns=%lu  rows=%lu  depth=%u\n",image->columns,
-      image->rows,image->depth);
-    (void) WriteBlobString(image,buffer);
-    if (image->is_monochrome != MagickFalse)
-      {
-        FormatString(buffer,"monochrome=True\n");
-        (void) WriteBlobString(image,buffer);
-      }
-    if (image->is_grayscale != MagickFalse)
-      {
-        FormatString(buffer,"grayscale=True\n");
-        (void) WriteBlobString(image,buffer);
-      }
-    if ((image->x_resolution != 0) && (image->y_resolution != 0))
-      {
-        char
-          units[MaxTextExtent];
-
-        /*
-          Set image resolution.
-        */
-        (void) strlcpy(units,"undefined",sizeof(units));
-        if (image->units == PixelsPerInchResolution)
-          (void) strlcpy(units,"pixels-per-inch",sizeof(units));
-        if (image->units == PixelsPerCentimeterResolution)
-          (void) strlcpy(units,"pixels-per-centimeter",sizeof(units));
-        FormatString(buffer,"Resolution=%gx%g  units=%.1024s\n",
-          image->x_resolution,image->y_resolution,units);
-        (void) WriteBlobString(image,buffer);
-      }
-    if ((image->page.width != 0) && (image->page.height != 0))
-      {
-        FormatString(buffer,"page=%lux%lu%+ld%+ld\n",image->page.width,
-          image->page.height,image->page.x,image->page.y);
-        (void) WriteBlobString(image,buffer);
-      }
-    if ((image->next != (Image *) NULL) || (image->previous != (Image *) NULL))
-      {
-        if (image->scene == 0)
-          FormatString(buffer,"iterations=%lu  delay=%lu\n",image->iterations,
-            image->delay);
+        if (image->colorspace == CMYKColorspace)
+          MagickFormatString(buffer,sizeof(buffer),"class=DirectClass  colorspace=CMYK  matte=%s\n",
+                             MagickBoolToString(image->matte));
         else
-          FormatString(buffer,"scene=%lu  iterations=%lu  delay=%lu\n",
-            image->scene,image->iterations,image->delay);
-        (void) WriteBlobString(image,buffer);
-      }
-    else
-      {
-        if (image->scene != 0)
-          {
-            FormatString(buffer,"scene=%lu\n",image->scene);
-            (void) WriteBlobString(image,buffer);
-          }
-        if (image->iterations != 0)
-          {
-            FormatString(buffer,"iterations=%lu\n",image->iterations);
-            (void) WriteBlobString(image,buffer);
-          }
-        if (image->delay != 0)
-          {
-            FormatString(buffer,"delay=%lu\n",image->delay);
-            (void) WriteBlobString(image,buffer);
-          }
-      }
-    if (image->dispose != UndefinedDispose)
-      {
-        if (image->dispose == BackgroundDispose)
-          (void) strlcpy(buffer,"dispose=background\n",sizeof(buffer));
-        else
-          if (image->dispose == NoneDispose)
-            (void) strlcpy(buffer,"dispose=none\n",sizeof(buffer));
-          else
-            (void) strlcpy(buffer,"dispose=previous\n",sizeof(buffer));
-        (void) WriteBlobString(image,buffer);
-      }
-    if (image->error.mean_error_per_pixel != 0.0)
-      {
-        FormatString(buffer,"error=%g  mean-error=%g  maximum-error=%g\n",
-          image->error.mean_error_per_pixel,image->error.normalized_mean_error,
-          image->error.normalized_maximum_error);
-        (void) WriteBlobString(image,buffer);
-      }
-    if (image->rendering_intent != UndefinedIntent)
-      {
-        if (image->rendering_intent == SaturationIntent)
-          (void) WriteBlobString(image,"rendering-intent=saturation\n");
-        else
-          if (image->rendering_intent == PerceptualIntent)
-            (void) WriteBlobString(image,"rendering-intent=perceptual\n");
-          else
-            if (image->rendering_intent == AbsoluteIntent)
-              (void) WriteBlobString(image,"rendering-intent=absolute\n");
-            else
-              (void) WriteBlobString(image,"rendering-intent=relative\n");
-      }
-    if (image->gamma != 0.0)
-      {
-        FormatString(buffer,"gamma=%g\n",image->gamma);
-        (void) WriteBlobString(image,buffer);
-      }
-    if (image->chromaticity.white_point.x != 0.0)
-      {
-        /*
-          Note chomaticity points.
-        */
-        FormatString(buffer,
-          "red-primary=%g,%g  green-primary=%g,%g  blue-primary=%g,%g\n",
-          image->chromaticity.red_primary.x,image->chromaticity.red_primary.y,
-          image->chromaticity.green_primary.x,
-          image->chromaticity.green_primary.y,
-          image->chromaticity.blue_primary.x,
-          image->chromaticity.blue_primary.y);
-        (void) WriteBlobString(image,buffer);
-        FormatString(buffer,"white-point=%g,%g\n",
-          image->chromaticity.white_point.x,image->chromaticity.white_point.y);
-        (void) WriteBlobString(image,buffer);
-      }
-    if (image->orientation != UndefinedOrientation)
-      {
-        FormatString(buffer,"orientation=%s\n",
-                     OrientationTypeToString(image->orientation));
-        (void) WriteBlobString(image,buffer);
-      }
-    /*
-      Attached profiles.
-    */
-    profile_iterator=AllocateImageProfileIterator(image);
-    if (profile_iterator)
-      {
-        while(NextImageProfile(profile_iterator,&profile_name,&profile_info,
-                               &profile_length)
-              != MagickFail)
-          {
-            FormatString(buffer,"profile-%.1024s=%lu\n",
-                         profile_name == (char *) NULL ? "generic" :
-                         profile_name,(unsigned long)
-                         profile_length);
-            (void) WriteBlobString(image,buffer);
-          }
-        DeallocateImageProfileIterator(profile_iterator);
-      }
-
-    if (image->montage != (char *) NULL)
-      {
-        FormatString(buffer,"montage=%.1024s\n",image->montage);
-        (void) WriteBlobString(image,buffer);
-      }
-    attribute=GetImageAttribute(image,(char *) NULL);
-    for ( ; attribute != (const ImageAttribute *) NULL; attribute=attribute->next)
-    {
-      if (attribute->value != NULL)
+          MagickFormatString(buffer,sizeof(buffer),"class=DirectClass  matte=%s\n",
+                             MagickBoolToString(image->matte));
+      (void) WriteBlobString(image,buffer);
+      switch (image->compression)
         {
-          long
-            j;
-
-          FormatString(buffer,"%.1024s=",attribute->key);
-          (void) WriteBlobString(image,buffer);
-          for (j=0; j < (long) strlen(attribute->value); j++)
-            if (isspace((int) attribute->value[j]))
-              break;
-          if (j < (long) strlen(attribute->value))
-            (void) WriteBlobByte(image,'{');
-          (void) WriteBlobString(image,attribute->value);
-          if (j < (long) strlen(attribute->value))
-            (void) WriteBlobByte(image,'}');
-          (void) WriteBlobByte(image,'\n');
+        default:
+        case NoCompression:
+          {
+            (void) WriteBlobString(image,"compression=None\n");
+            break;
+          }
+        case BZipCompression:
+          {
+            (void) WriteBlobString(image,"compression=BZip\n");
+            break;
+          }
+        case FaxCompression:
+          {
+            (void) WriteBlobString(image,"compression=Fax\n");
+            break;
+          }
+        case Group4Compression:
+          {
+            (void) WriteBlobString(image,"compression=Group4\n");
+            break;
+          }
+        case JPEGCompression:
+          {
+            (void) WriteBlobString(image,"compression=JPEG\n");
+            break;
+          }
+        case LosslessJPEGCompression:
+          {
+            (void) WriteBlobString(image,"compression=Lossless\n");
+            break;
+          }
+        case LZWCompression:
+          {
+            (void) WriteBlobString(image,"compression=LZW\n");
+            break;
+          }
+        case RLECompression:
+          {
+            (void) WriteBlobString(image,"compression=RLE\n");
+            break;
+          }
+        case ZipCompression:
+          {
+            (void) WriteBlobString(image,"compression=Zip\n");
+            break;
+          }
         }
-    }
-    (void) WriteBlobString(image,"\f\n:\032");
-    if (image->montage != (char *) NULL)
-      {
-        /*
-          Write montage tile directory.
-        */
-        if (image->directory != (char *) NULL)
-          (void) WriteBlobString(image,image->directory);
-        (void) WriteBlobByte(image,'\0');
-      }
+      MagickFormatString(buffer,sizeof(buffer),"columns=%lu  rows=%lu  depth=%u\n",image->columns,
+                         image->rows,image->depth);
+      (void) WriteBlobString(image,buffer);
+      if (image->is_monochrome != MagickFalse)
+        {
+          MagickFormatString(buffer,sizeof(buffer),"monochrome=True\n");
+          (void) WriteBlobString(image,buffer);
+        }
+      if (image->is_grayscale != MagickFalse)
+        {
+          MagickFormatString(buffer,sizeof(buffer),"grayscale=True\n");
+          (void) WriteBlobString(image,buffer);
+        }
+      if ((image->x_resolution != 0) && (image->y_resolution != 0))
+        {
+          char
+            units[MaxTextExtent];
 
-    /*
-      Attached profiles.
-    */
-    profile_iterator=AllocateImageProfileIterator(image);
-    if (profile_iterator)
-      {
-        while(NextImageProfile(profile_iterator,&profile_name,&profile_info,
-                               &profile_length) != MagickFail)
-          {
-            if (profile_length != 0)
-              (void) WriteBlob(image,profile_length,profile_info);
-          }
-        DeallocateImageProfileIterator(profile_iterator);
-      }
+          /*
+            Set image resolution.
+          */
+          (void) strlcpy(units,"undefined",sizeof(units));
+          if (image->units == PixelsPerInchResolution)
+            (void) strlcpy(units,"pixels-per-inch",sizeof(units));
+          if (image->units == PixelsPerCentimeterResolution)
+            (void) strlcpy(units,"pixels-per-centimeter",sizeof(units));
+          MagickFormatString(buffer,sizeof(buffer),"Resolution=%gx%g  units=%.1024s\n",
+                             image->x_resolution,image->y_resolution,units);
+          (void) WriteBlobString(image,buffer);
+        }
+      if ((image->page.width != 0) && (image->page.height != 0))
+        {
+          MagickFormatString(buffer,sizeof(buffer),"page=%lux%lu%+ld%+ld\n",image->page.width,
+                             image->page.height,image->page.x,image->page.y);
+          (void) WriteBlobString(image,buffer);
+        }
+      if ((image->next != (Image *) NULL) || (image->previous != (Image *) NULL))
+        {
+          if (image->scene == 0)
+            MagickFormatString(buffer,sizeof(buffer),"iterations=%lu  delay=%lu\n",image->iterations,
+                               image->delay);
+          else
+            MagickFormatString(buffer,sizeof(buffer),"scene=%lu  iterations=%lu  delay=%lu\n",
+                               image->scene,image->iterations,image->delay);
+          (void) WriteBlobString(image,buffer);
+        }
+      else
+        {
+          if (image->scene != 0)
+            {
+              MagickFormatString(buffer,sizeof(buffer),"scene=%lu\n",image->scene);
+              (void) WriteBlobString(image,buffer);
+            }
+          if (image->iterations != 0)
+            {
+              MagickFormatString(buffer,sizeof(buffer),"iterations=%lu\n",image->iterations);
+              (void) WriteBlobString(image,buffer);
+            }
+          if (image->delay != 0)
+            {
+              MagickFormatString(buffer,sizeof(buffer),"delay=%lu\n",image->delay);
+              (void) WriteBlobString(image,buffer);
+            }
+        }
+      if (image->dispose != UndefinedDispose)
+        {
+          if (image->dispose == BackgroundDispose)
+            (void) strlcpy(buffer,"dispose=background\n",sizeof(buffer));
+          else
+            if (image->dispose == NoneDispose)
+              (void) strlcpy(buffer,"dispose=none\n",sizeof(buffer));
+            else
+              (void) strlcpy(buffer,"dispose=previous\n",sizeof(buffer));
+          (void) WriteBlobString(image,buffer);
+        }
+      if (image->error.mean_error_per_pixel != 0.0)
+        {
+          MagickFormatString(buffer,sizeof(buffer),"error=%g  mean-error=%g  maximum-error=%g\n",
+                             image->error.mean_error_per_pixel,image->error.normalized_mean_error,
+                             image->error.normalized_maximum_error);
+          (void) WriteBlobString(image,buffer);
+        }
+      if (image->rendering_intent != UndefinedIntent)
+        {
+          if (image->rendering_intent == SaturationIntent)
+            (void) WriteBlobString(image,"rendering-intent=saturation\n");
+          else
+            if (image->rendering_intent == PerceptualIntent)
+              (void) WriteBlobString(image,"rendering-intent=perceptual\n");
+            else
+              if (image->rendering_intent == AbsoluteIntent)
+                (void) WriteBlobString(image,"rendering-intent=absolute\n");
+              else
+                (void) WriteBlobString(image,"rendering-intent=relative\n");
+        }
+      if (image->gamma != 0.0)
+        {
+          MagickFormatString(buffer,sizeof(buffer),"gamma=%g\n",image->gamma);
+          (void) WriteBlobString(image,buffer);
+        }
+      if (image->chromaticity.white_point.x != 0.0)
+        {
+          /*
+            Note chomaticity points.
+          */
+          MagickFormatString(buffer,sizeof(buffer),
+                             "red-primary=%g,%g  green-primary=%g,%g  blue-primary=%g,%g\n",
+                             image->chromaticity.red_primary.x,image->chromaticity.red_primary.y,
+                             image->chromaticity.green_primary.x,
+                             image->chromaticity.green_primary.y,
+                             image->chromaticity.blue_primary.x,
+                             image->chromaticity.blue_primary.y);
+          (void) WriteBlobString(image,buffer);
+          MagickFormatString(buffer,sizeof(buffer),"white-point=%g,%g\n",
+                             image->chromaticity.white_point.x,image->chromaticity.white_point.y);
+          (void) WriteBlobString(image,buffer);
+        }
+      if (image->orientation != UndefinedOrientation)
+        {
+          MagickFormatString(buffer,sizeof(buffer),"orientation=%s\n",
+                             OrientationTypeToString(image->orientation));
+          (void) WriteBlobString(image,buffer);
+        }
+      /*
+        Attached profiles.
+      */
+      profile_iterator=AllocateImageProfileIterator(image);
+      if (profile_iterator)
+        {
+          while(NextImageProfile(profile_iterator,&profile_name,&profile_info,
+                                 &profile_length)
+                != MagickFail)
+            {
+              MagickFormatString(buffer,sizeof(buffer),"profile-%.1024s=%lu\n",
+                                 profile_name == (char *) NULL ? "generic" :
+                                 profile_name,(unsigned long)
+                                 profile_length);
+              (void) WriteBlobString(image,buffer);
+            }
+          DeallocateImageProfileIterator(profile_iterator);
+        }
 
-    if (image->storage_class == PseudoClass)
-      {
-        register unsigned char
-          *q;
+      if (image->montage != (char *) NULL)
+        {
+          MagickFormatString(buffer,sizeof(buffer),"montage=%.1024s\n",image->montage);
+          (void) WriteBlobString(image,buffer);
+        }
+      attribute=GetImageAttribute(image,(char *) NULL);
+      for ( ; attribute != (const ImageAttribute *) NULL; attribute=attribute->next)
+        {
+          if (attribute->value != NULL)
+            {
+              long
+                j;
 
-        unsigned char
-          *colormap;
+              MagickFormatString(buffer,sizeof(buffer),"%.1024s=",attribute->key);
+              (void) WriteBlobString(image,buffer);
+              for (j=0; j < (long) strlen(attribute->value); j++)
+                if (isspace((int) attribute->value[j]))
+                  break;
+              if (j < (long) strlen(attribute->value))
+                (void) WriteBlobByte(image,'{');
+              (void) WriteBlobString(image,attribute->value);
+              if (j < (long) strlen(attribute->value))
+                (void) WriteBlobByte(image,'}');
+              (void) WriteBlobByte(image,'\n');
+            }
+        }
+      (void) WriteBlobString(image,"\f\n:\032");
+      if (image->montage != (char *) NULL)
+        {
+          /*
+            Write montage tile directory.
+          */
+          if (image->directory != (char *) NULL)
+            (void) WriteBlobString(image,image->directory);
+          (void) WriteBlobByte(image,'\0');
+        }
 
-        unsigned int
-          packet_size;
+      /*
+        Attached profiles.
+      */
+      profile_iterator=AllocateImageProfileIterator(image);
+      if (profile_iterator)
+        {
+          while(NextImageProfile(profile_iterator,&profile_name,&profile_info,
+                                 &profile_length) != MagickFail)
+            {
+              if (profile_length != 0)
+                (void) WriteBlob(image,profile_length,profile_info);
+            }
+          DeallocateImageProfileIterator(profile_iterator);
+        }
 
-        /*
-          Allocate colormap.
-        */
-        packet_size=image->depth > 8 ? 6 : 3;
-        colormap=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->colors);
-        if (colormap == (unsigned char *) NULL)
-          return(MagickFail);
-        /*
-          Write colormap to file.
-        */
-        q=colormap;
-        if (image->depth <= 8)
-          for (i=0; i < image->colors; i++)
-          {
-            *q++=image->colormap[i].red;
-            *q++=image->colormap[i].green;
-            *q++=image->colormap[i].blue;
-          }
+      if (image->storage_class == PseudoClass)
+        {
+          register unsigned char
+            *q;
+
+          unsigned char
+            *colormap;
+
+          unsigned int
+            packet_size;
+
+          /*
+            Allocate colormap.
+          */
+          packet_size=image->depth > 8 ? 6 : 3;
+          colormap=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->colors);
+          if (colormap == (unsigned char *) NULL)
+            return(MagickFail);
+          /*
+            Write colormap to file.
+          */
+          q=colormap;
+          if (image->depth <= 8)
+            for (i=0; i < image->colors; i++)
+              {
+                *q++=image->colormap[i].red;
+                *q++=image->colormap[i].green;
+                *q++=image->colormap[i].blue;
+              }
 #if QuantumDepth > 8
-        else
-          for (i=0; i < image->colors; i++)
-          {
-            *q++=image->colormap[i].red >> 8;
-            *q++=image->colormap[i].red & 0xff;
-            *q++=image->colormap[i].green >> 8;
-            *q++=image->colormap[i].green & 0xff;
-            *q++=image->colormap[i].blue >> 8;
-            *q++=image->colormap[i].blue & 0xff;
-          }
+          else
+            for (i=0; i < image->colors; i++)
+              {
+                *q++=image->colormap[i].red >> 8;
+                *q++=image->colormap[i].red & 0xff;
+                *q++=image->colormap[i].green >> 8;
+                *q++=image->colormap[i].green & 0xff;
+                *q++=image->colormap[i].blue >> 8;
+                *q++=image->colormap[i].blue & 0xff;
+              }
 #endif /* QuantumDepth > 8 */
 
-        (void) WriteBlob(image, (size_t) packet_size*image->colors,colormap);
-        MagickFreeResourceLimitedMemory(colormap);
-      }
-    /*
-      Initialize persistent pixel cache.
-    */
-    status=PersistCache(image,cache_filename,MagickFalse,&offset,&image->exception);
-    if (status == MagickFail)
-      ThrowWriterException(CacheError,UnableToPeristPixelCache,image);
-    if (image->next == (Image *) NULL)
-      break;
-    image=SyncNextImageInList(image);
-    status=MagickMonitorFormatted(scene++,image_list_length,
-                                  &image->exception,SaveImagesText,
-                                  image->filename);
-    if (status == False)
-      break;
-  } while (image_info->adjoin);
+          (void) WriteBlob(image, (size_t) packet_size*image->colors,colormap);
+          MagickFreeResourceLimitedMemory(unsigned char *,colormap);
+        }
+      /*
+        Initialize persistent pixel cache.
+      */
+      status=PersistCache(image,cache_filename,MagickFalse,&offset,&image->exception);
+      if (status == MagickFail)
+        ThrowWriterException(CacheError,UnableToPeristPixelCache,image);
+      if (image->next == (Image *) NULL)
+        break;
+      image=SyncNextImageInList(image);
+      status=MagickMonitorFormatted(scene++,image_list_length,
+                                    &image->exception,SaveImagesText,
+                                    image->filename);
+      if (status == False)
+        break;
+    } while (image_info->adjoin);
   if (image_info->adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;

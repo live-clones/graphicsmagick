@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v4.2.0 &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v4.2.0 &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changes in TIFF v4.1.0" href="v4.1.0.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v4.3.0.html" title="Changes in TIFF v4.3.0"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.2.0</a></li> 
       </ul>
@@ -78,9 +78,9 @@ included in the release package and by the Git commit history:</p>
 <section id="software-configuration-changes">
 <h2>Software configuration changes<a class="headerlink" href="#software-configuration-changes" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>The Microsoft Windows ‘nmake’ build is resuscitated and provides
-a default <code class="docutils literal notranslate"><span class="pre">HAVE_STRTOLL</span></code> setting in ‘nmake.opt’ which is suitable for
-MSVC++ 14.0 (“Visual Studio 2015”) and later but may be disabled in
+<li><p>The Microsoft Windows 'nmake' build is resuscitated and provides
+a default <code class="docutils literal notranslate"><span class="pre">HAVE_STRTOLL</span></code> setting in 'nmake.opt' which is suitable for
+MSVC++ 14.0 (&quot;Visual Studio 2015&quot;) and later but may be disabled in
 order to compile with earlier compiler versions.</p></li>
 <li><p>mingw-w64 cmake build fixes to not add libm</p></li>
 </ul>
@@ -134,7 +134,7 @@ will be the default value in that situation).</p>
 <li><p><strong class="program">tiff2ps</strong>, <strong class="program">tiff2rgba</strong>:  A default memory limit is now enforced (256MiB) and a <code class="docutils literal notranslate"><span class="pre">-M</span></code> option is added to allow the user to adjust the limit.</p></li>
 <li><p><strong class="program">tiff2pdf</strong>, <strong class="program">tiffcp</strong>: A default memory limit is now enforced (256MiB) and a <code class="docutils literal notranslate"><span class="pre">-m</span></code> option is added to allow the user to adjust the limit.</p></li>
 <li><p><strong class="program">tiffcrop</strong>: A default memory limit is now enforced (256MiB) and a <code class="docutils literal notranslate"><span class="pre">-k</span></code> option is added to allow the user to adjust the limit.</p></li>
-<li><p><strong class="program">tiff2pdf</strong>: fix “raw” copy of Deflate streams.</p></li>
+<li><p><strong class="program">tiff2pdf</strong>: fix &quot;raw&quot; copy of Deflate streams.</p></li>
 <li><p><strong class="program">tiff2pdf.c</strong>: properly calculate datasize when saving to JPEG YCbCr</p></li>
 <li><p><strong class="program">tiffcp</strong>: disable strip chopping when trying to convert to JBIG compression</p></li>
 </ul>
@@ -209,14 +209,14 @@ will be the default value in that situation).</p>
         <li class="right" >
           <a href="v4.3.0.html" title="Changes in TIFF v4.3.0"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v4.2.0</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

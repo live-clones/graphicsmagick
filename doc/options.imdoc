@@ -1187,12 +1187,33 @@ in the writer.
 
 <dt>heif:ignore-transformations={true|false}</dt>
 <dd>
-Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) applied.
+Return HEIF (e.g. HEIC/AVIF) image without any transformations
+(e.g. rotation) applied.  In 'ping' mode (the identify default) the
+default value is true, but is otherwise false. When
+ignore-transformations is false, identify may be much slower.
+</dd>
+
+<dt>heif:interleaved-rgb-decode={true|false}</dt>
+<dd>
+Requests that libheif return pixels in interleaved representation
+rather than in a planar representation. This should have no influence
+on the decoded result, but the performance may be different.
 </dd>
 
 <dt>heif:preserve-colorspace={true|false}</dt>
 <dd> Return HEIF image in its original colorspace.  This allows an
 image to be returned in the original YCbCr colorspace rather than RGB.
+</dd>
+
+<dt>heif:tile-threads=number</dt>
+
+<dd>
+If a HEIF image is comprised of multiple tiles, each tile may be
+decoded by one thread, and several tiles may be decoded at once by
+using more threads.  The maximum reasonable value is the minimum of
+the number of CPU cores available, or the number of tiles in the HEIF
+file, whichever is smaller.  If OpenMP is available, the default is
+the number of OpenMP threads, otherwise the default is 4.
 </dd>
 
 <dt>heif:max-image-size-pixels=number</dt>
@@ -1386,6 +1407,19 @@ input file, the quality setting is preserved but the sampling-factors
 are not.
 </dd>
 
+<dt>jxl:effort=<integer></dt>
+<dd>Encoder effort. Higher values allow more computation, generally achieving
+smaller output at same quality. For lossy encoding, higher effort should
+achieve more accurate quality. Please refer to libjxl source code (or
+documentation) for 'JXL_ENC_FRAME_SETTING_EFFORT'.
+</dd>
+
+<dt>jxl:decodingspeed=<integer></dt>
+<dd>Decoding speed. Higher values improve decode speed at the expense of
+quality or density. Please refer to libjxl source code (or documentation)
+for 'JXL_ENC_FRAME_SETTING_DECODING_SPEED'.
+</dd>
+
 <dt>pcl:fit-to-page</dt>
 <dd>If the pcl:fit-to-page flag is defined, then the printer is
 requested to scale the image to fit the page size (width and/or
@@ -1473,6 +1507,35 @@ TIFF file.  This is useful in order to be able to read files which
 which otherwise fail to read due to problems with TIFF tags.  Note
 that some TIFF tags are required in order to be able to read the image
 data at all.
+</dd>
+
+<dt>tiff:lerc-maxzerror=<value></dt>
+<dd>When LERC compression is selected (via `-compress lerc`),
+specifies the maximum allowable floating point error for lossy
+compression (e.g. 0.5). The default compression value is 0 (lossless).
+</dd>
+
+<dt>tiff:lerc-compression={1|deflate|zip|2|zstd}</dt>
+<dd>After LERC compression has taken place, an optional second
+compression pass using Deflate or Zstd compression may be performed.
+Specify a value of 1, deflate, or zip, to use Deflate compression, or
+2 or zstd, to use Zstd compression.  The argument is case-insensitive.
+</dd>
+
+<dt>tiff:lerc-zip-quality=<value></dt>
+<dd>When LERC compression is enabled, and a second-pass compression
+using Deflate has been selected, provide a value in the range of 1 to
+12 to indicate the Deflate compression level (larger is more
+compression). The default level for Deflate compression is 6.
+</dd>
+
+<dt>tiff:lerc-zstd-level=<value></dt>
+
+<dd>When LERC compression is enabled, and a second-pass compression
+using Zstd has been selected, provide a value in the range of 1 and 19
+(or 22 using a lot more memory) to indicate the Zstd compression level
+(larger is more compression). The default level for Zstd compression
+is 3.
 </dd>
 
 <dt>tiff:photometric={minisblack|miniswhite}</dt>
@@ -3360,22 +3423,23 @@ interface works similar to Photoshop's "Image->Adjustments->Levels..."
 <utils apps=animate,compare,composite,convert,display,identify,import,mogrify,montage>
 <dopt>-limit <type> <value></opt>
 
-<abs>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</abs>
+<abs>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</abs>
 
 <pp>
 
 By default, resource limits are estimated based on the available
 resources and capabilities of the system. The resource limits are
 <s>Disk</s>, maximum total disk space consumed; <s>File</s>, maximum
-number of file descriptors allowed to be open at once; <s>Map</s>,
-maximum total number of file bytes which may be memory mapped;
-<s>Memory</s>, maximum total number of bytes of heap memory used for
-image storage; <s>Pixels</s>, maximum absolute image size (per image);
-<s>Width</s>, maximum image pixels width; <s>Height</s>, maximum image
-pixels height; <s>Read</s>, maximum number of uncompressed bytes to
-read; <s>Write</s> maximum number of uncompressed bytes to write; and
-<s>Threads</s>, the maximum number of worker threads to use per OpenMP
-thread team.</pp>
+number of file descriptors allowed to be open at once; <s>Images</s>,
+maximum images allowed to be handled by the whole program at one time;
+<s>Map</s>, maximum total number of file bytes which may be memory
+mapped; <s>Memory</s>, maximum total number of bytes of heap memory
+used for image storage; <s>Pixels</s>, maximum absolute image size
+(per image); <s>Width</s>, maximum image pixels width; <s>Height</s>,
+maximum image pixels height; <s>Read</s>, maximum number of
+uncompressed bytes to read; <s>Write</s> maximum number of
+uncompressed bytes to write; and <s>Threads</s>, the maximum number of
+worker threads to use per OpenMP thread team.</pp>
 
 <pp>
 The <s>Disk</s> and <s>Map</s> resource limits are used to decide if
@@ -4982,6 +5046,35 @@ offset:</pp>
   0.0 0.0 0.0 0.8 0.1
   0.0 0.0 0.0 0.0 1.0
 </pre></pp>
+
+</utils>
+
+
+
+<!-- ------------ -remap [convert, mogrify ] -------------------------- -->
+
+<utils apps=convert,mogrify>
+<dopt>-map <filename></opt>
+
+<abs>choose a particular set of colors from this image</abs>
+
+<pp>
+[<i>convert</i> or <i>mogrify</i>]</pp>
+
+<pp>
+By default, color reduction chooses an optimal set of colors that best
+represent the original image. Alternatively, you can choose a particular
+set of colors from an image file with this option.</pp>
+
+<pp>
+Use
+<s>+map</s> to reduce
+all images in the image sequence that follows to a single optimal set of colors
+that best represent all the images.  The sequence of images
+is terminated by the appearance of any option.
+If the <s>+map</s>
+option appears after all of the input images, all images are mapped.</pp>
+
 
 </utils>
 

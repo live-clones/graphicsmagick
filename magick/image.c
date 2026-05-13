@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -135,7 +135,7 @@ MagickExport const char *AccessDefinition(const ImageInfo *image_info,
 
   if (image_info->definitions)
     {
-      FormatString(search_key, "%.60s:%.1024s", magick, key);
+      MagickFormatString(search_key, sizeof(search_key), "%.60s:%.1024s", magick, key);
       value=(const char*) MagickMapAccessEntry((MagickMap) image_info->definitions,search_key,0);
     }
   return value;
@@ -193,7 +193,7 @@ AddDefinition(ImageInfo *image_info,const char *magick, const char *key,
       /*
         Format string like "magick:key"
       */
-      FormatString(search_key, "%.60s:%.1024s", magick, key);
+      MagickFormatString(search_key, sizeof(search_key), "%.60s:%.1024s", magick, key);
 
       /*
         Add entry to map
@@ -625,7 +625,7 @@ MagickExport MagickPassFail AnimateImages(const ImageInfo *image_info,
 %
 */
 MagickExport Image *AppendImages(const Image *image,const unsigned int stack,
-  ExceptionInfo *exception)
+                                 ExceptionInfo *exception)
 {
 #define AppendImageText "[%s] Append sequence..."
 
@@ -640,7 +640,7 @@ MagickExport Image *AppendImages(const Image *image,const unsigned int stack,
     y;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   unsigned long
     height,
@@ -660,18 +660,18 @@ MagickExport Image *AppendImages(const Image *image,const unsigned int stack,
   width=image->columns;
   height=image->rows;
   for (next=image->next; next != (Image *) NULL; next=next->next)
-  {
-    if (stack)
-      {
-        if (next->columns > width)
-          width=next->columns;
-        height+=next->rows;
-        continue;
-      }
-    width+=next->columns;
-    if (next->rows > height)
-      height=next->rows;
-  }
+    {
+      if (stack)
+        {
+          if (next->columns > width)
+            width=next->columns;
+          height+=next->rows;
+          continue;
+        }
+      width+=next->columns;
+      if (next->rows > height)
+        height=next->rows;
+    }
   /*
     Initialize append next attributes.
   */
@@ -687,20 +687,20 @@ MagickExport Image *AppendImages(const Image *image,const unsigned int stack,
       */
       y=0;
       for (next=image; next != (Image *) NULL; next=next->next)
-      {
-        (void) CompositeImage(append_image,CopyCompositeOp,next,0,y);
-        if (append_image->columns > next->columns)
-          SetImageColorRegion(append_image,next->columns,y,
-                              append_image->columns-next->columns,next->rows,
-                              &append_image->background_color);
-        y+=next->rows;
-        status=MagickMonitorFormatted(scene,GetImageListLength(image),
-                                      exception,AppendImageText,
-                                      image->filename);
-        if (status == MagickFail)
-          break;
-        scene++;
-      }
+        {
+          (void) CompositeImage(append_image,CopyCompositeOp,next,0,y);
+          if (append_image->columns > next->columns)
+            status &= SetImageColorRegion(append_image,next->columns,y,
+                                          append_image->columns-next->columns,next->rows,
+                                          &append_image->background_color);
+          y+=next->rows;
+          status &= MagickMonitorFormatted(scene,GetImageListLength(image),
+                                           exception,AppendImageText,
+                                           image->filename);
+          if (status == MagickFail)
+            break;
+          scene++;
+        }
       return(append_image);
     }
   /*
@@ -708,20 +708,20 @@ MagickExport Image *AppendImages(const Image *image,const unsigned int stack,
   */
   x=0;
   for (next=image; next != (Image *) NULL; next=next->next)
-  {
-    (void) CompositeImage(append_image,CopyCompositeOp,next,x,0);
-    if (append_image->rows > next->rows)
-      SetImageColorRegion(append_image,x,next->rows,
-                          next->columns,
-                          append_image->rows-next->rows,
-                          &append_image->background_color);
-    x+=next->columns;
-    status=MagickMonitorFormatted(scene++,GetImageListLength(image),
-                                  exception,AppendImageText,
-                                  image->filename);
-    if (status == MagickFail)
-      break;
-  }
+    {
+      (void) CompositeImage(append_image,CopyCompositeOp,next,x,0);
+      if (append_image->rows > next->rows)
+        status &= SetImageColorRegion(append_image,x,next->rows,
+                                      next->columns,
+                                      append_image->rows-next->rows,
+                                      &append_image->background_color);
+      x+=next->columns;
+      status &= MagickMonitorFormatted(scene++,GetImageListLength(image),
+                                       exception,AppendImageText,
+                                       image->filename);
+      if (status == MagickFail)
+        break;
+    }
   return(append_image);
 }
 
@@ -847,7 +847,7 @@ ClipPathImageCallBack(void *mutable_data,         /* User provided mutable data 
   return MagickPass;
 }
 MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
-  const MagickBool inside)
+                                          const MagickBool inside)
 {
 
   char
@@ -868,15 +868,15 @@ MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
   assert(image != (const Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(pathname != NULL);
-  FormatString(key,"8BIM:1999,2998:%s",pathname);
+  MagickFormatString(key,sizeof(key),"8BIM:1999,2998:%s",pathname);
   attribute=GetImageAttribute(image,key);
   if (attribute == (const ImageAttribute *) NULL)
     return(MagickFail);
   image_info=CloneImageInfo((ImageInfo *) NULL);
   (void) QueryColorDatabase("#ffffffff",&image_info->background_color,
-    &image->exception);
+                            &image->exception);
   clip_mask=BlobToImage(image_info,attribute->value,strlen(attribute->value),
-    &image->exception);
+                        &image->exception);
   DestroyImageInfo(image_info);
   if (clip_mask == (Image *) NULL)
     return (MagickFail);
@@ -892,16 +892,17 @@ MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
     to remove any unintended antialiasing effects created by the SVG
     renderer.
   */
-  status=PixelIterateMonoModify(ClipPathImageCallBack,NULL,
-                                ClipPathImageText,
-                                NULL,&inside,0,0,clip_mask->columns,clip_mask->rows,
-                                clip_mask,&image->exception);
+  status &= PixelIterateMonoModify(ClipPathImageCallBack,NULL,
+                                   ClipPathImageText,
+                                   NULL,&inside,0,0,clip_mask->columns,clip_mask->rows,
+                                   clip_mask,&image->exception);
   /*
     Overload magick_filename to keep name of path that created image.
     This is needed so we can get the path as postscript for PS coders
     to create a postscript vector based clipping path.
   */
-  FormatString(clip_mask->magick_filename,"8BIM:1999,2998:%s\nPS",pathname);
+  MagickFormatString(clip_mask->magick_filename,sizeof(clip_mask->magick_filename),
+                     "8BIM:1999,2998:%s\nPS",pathname);
 
   clip_mask->is_grayscale=True;
   clip_mask->is_monochrome=True;
@@ -989,7 +990,7 @@ CompositePathImageCallBack(void *mutable_data,    /* User provided mutable data 
   return MagickPass;
 }
 MagickExport MagickPassFail CompositePathImage(Image *image,const char *pathname,
-  const MagickBool inside)
+                                               const MagickBool inside)
 {
 
   char
@@ -1010,15 +1011,15 @@ MagickExport MagickPassFail CompositePathImage(Image *image,const char *pathname
   assert(image != (const Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(pathname != NULL);
-  FormatString(key,"8BIM:1999,2998:%s",pathname);
+  MagickFormatString(key,sizeof(key),"8BIM:1999,2998:%s",pathname);
   attribute=GetImageAttribute(image,key);
   if (attribute == (const ImageAttribute *) NULL)
     return(MagickFail);
   image_info=CloneImageInfo((ImageInfo *) NULL);
-  (void) QueryColorDatabase("#ffffffff",&image_info->background_color,
-    &image->exception);
+  status &= QueryColorDatabase("#ffffffff",&image_info->background_color,
+                               &image->exception);
   composite_mask=BlobToImage(image_info,attribute->value,strlen(attribute->value),
-    &image->exception);
+                             &image->exception);
   DestroyImageInfo(image_info);
   if (composite_mask == (Image *) NULL)
     return (MagickFail);
@@ -1032,20 +1033,21 @@ MagickExport MagickPassFail CompositePathImage(Image *image,const char *pathname
   /*
     Force all pixel components to be the same (r == g == b).
   */
-  status=PixelIterateMonoModify(CompositePathImageCallBack,NULL,
-                                CompositePathImageText,
-                                NULL,&inside,0,0,composite_mask->columns,composite_mask->rows,
-                                composite_mask,&image->exception);
+  status &= PixelIterateMonoModify(CompositePathImageCallBack,NULL,
+                                   CompositePathImageText,
+                                   NULL,&inside,0,0,composite_mask->columns,composite_mask->rows,
+                                   composite_mask,&image->exception);
   /*
     Overload magick_filename to keep name of path that created image.
     This is needed so we can get the path as postscript for PS coders
     to create a postscript vector based compositing path.
   */
-  FormatString(composite_mask->magick_filename,"8BIM:1999,2998:%s\nPS",pathname);
+  MagickFormatString(composite_mask->magick_filename,sizeof(composite_mask->magick_filename),
+                     "8BIM:1999,2998:%s\nPS",pathname);
 
   composite_mask->is_grayscale=True;
   composite_mask->is_monochrome=True;
-  (void) SetImageCompositeMask(image,composite_mask);
+  status &= SetImageCompositeMask(image,composite_mask);
   DestroyImage(composite_mask);
   return status;
 }
@@ -1171,7 +1173,7 @@ MagickExport Image *CloneImage(const Image *image,const unsigned long columns,
   */
   if (image->profiles)
     {
-      clone_image->profiles=MagickMapCloneMap(image->profiles,exception);
+      clone_image->profiles=MagickMapCloneMap((MagickMap) image->profiles,exception);
       if (clone_image->profiles == (void *) NULL)
         {
           DestroyImage(clone_image);
@@ -1488,7 +1490,7 @@ MagickExport void DestroyImage(Image *image)
   MagickFreeMemory(image->colormap);
   if (image->profiles)
     {
-      MagickMapDeallocateMap(image->profiles);
+      MagickMapDeallocateMap((MagickMap) image->profiles);
       image->profiles=0;
     }
   DestroyImageAttributes(image);
@@ -2702,11 +2704,11 @@ MagickExport MagickPassFail SetImageDepth(Image *image,const unsigned long depth
 
   assert(image != (Image *) NULL);
 
-  status=QuantumOperatorImage(image,AllChannels,DepthQuantumOp,(double) depth,
-                              &image->exception);
+  status &= QuantumOperatorImage(image,AllChannels,DepthQuantumOp,(double) depth,
+                                 &image->exception);
   if ((image->matte) && (MagickFail != status))
-    status=QuantumOperatorImage(image,OpacityChannel,DepthQuantumOp,(double) depth,
-                                &image->exception);
+    status &= QuantumOperatorImage(image,OpacityChannel,DepthQuantumOp,(double) depth,
+                                   &image->exception);
   image->depth=Min(depth,QuantumDepth);
   image->is_monochrome = is_monochrome;
   image->is_grayscale = is_grayscale;
@@ -3518,7 +3520,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(Bilevel) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
 
        is_monochrome=image->is_monochrome;
@@ -3537,8 +3539,8 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
               if (xform_logging)
                 (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                       "SetImageType(Bilevel) Smashing to bilevel using Threshold method ...");
-              (void) ThresholdImage(image,(double)MaxRGB/2);
-              (void) AllocateImageColormap(image,2);
+              status &= ThresholdImage(image,(double)MaxRGB/2);
+              status &= AllocateImageColormap(image,2);
             }
         }
       else
@@ -3554,7 +3556,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(Bilevel) Dithering to bilevel using Quantize method ...");
-          (void) QuantizeImage(&quantize_info,image);
+          status &= QuantizeImage(&quantize_info,image);
         }
       image->colorspace=GRAYColorspace;
       image->is_grayscale=True;
@@ -3568,14 +3570,14 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(Grayscale) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
       if (!image->is_grayscale)
         {
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(Grayscale) Transforming to gray colorspace ...");
-          (void) TransformColorspace(image,GRAYColorspace);
+          status &= TransformColorspace(image,GRAYColorspace);
         }
       image->colorspace=GRAYColorspace;
       image->is_grayscale=True;
@@ -3588,21 +3590,21 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(GrayscaleMatte) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
       if (!image->is_grayscale)
         {
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(GrayscaleMatte) Transforming to gray colorspace ...");
-          (void) TransformColorspace(image,GRAYColorspace);
+          status &= TransformColorspace(image,GRAYColorspace);
         }
       if (!image->matte)
         {
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(GrayscaleMatte) Adding opaque matte channel ...");
-          SetImageOpacity(image,OpaqueOpacity);
+          status &= SetImageOpacity(image,OpaqueOpacity);
         }
       image->colorspace=GRAYColorspace;
       image->is_grayscale=True;
@@ -3615,7 +3617,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(Palette) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
       if (image->storage_class != PseudoClass)
         {
@@ -3624,7 +3626,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
                                   "SetImageType(Palette) Using Quantize method ...");
           GetQuantizeInfo(&quantize_info);
           quantize_info.dither=image->dither;
-          (void) QuantizeImage(&quantize_info,image);
+          status &= QuantizeImage(&quantize_info,image);
         }
       break;
     }
@@ -3635,14 +3637,14 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(PaletteMatte) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
       if (!image->matte)
         {
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(PaletteMatte) Adding opaque matte channel ...");
-          SetImageOpacity(image,OpaqueOpacity);
+          status &= SetImageOpacity(image,OpaqueOpacity);
         }
       if (image->storage_class != PseudoClass)
         {
@@ -3652,7 +3654,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           GetQuantizeInfo(&quantize_info);
           quantize_info.colorspace=TransparentColorspace;
           quantize_info.dither=image->dither;
-          (void) QuantizeImage(&quantize_info,image);
+          status &= QuantizeImage(&quantize_info,image);
         }
       break;
     }
@@ -3663,7 +3665,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(TrueColor) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
       image->storage_class=DirectClass;
       break;
@@ -3676,7 +3678,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(TrueColorMatte) Transforming to RGB colorspace ...");
-          (void) TransformColorspace(image,RGBColorspace);
+          status &= TransformColorspace(image,RGBColorspace);
         }
       image->storage_class=DirectClass;
       if (!image->matte)
@@ -3684,7 +3686,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(TrueColorMatte) Adding opaque matte channel ...");
-          SetImageOpacity(image,OpaqueOpacity);
+          status &= SetImageOpacity(image,OpaqueOpacity);
         }
       break;
     }
@@ -3695,7 +3697,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(ColorSeparation) Transforming to CMYK colorspace ...");
-          (void) TransformColorspace(image,CMYKColorspace);
+          status &= TransformColorspace(image,CMYKColorspace);
         }
       break;
     }
@@ -3706,14 +3708,14 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(ColorSeparationMatte) Transforming to CMYK colorspace ...");
-          (void) TransformColorspace(image,CMYKColorspace);
+          status &= TransformColorspace(image,CMYKColorspace);
         }
       if (!image->matte)
         {
           if (xform_logging)
             (void) LogMagickEvent(TransformEvent,GetMagickModule(),
                                   "SetImageType(ColorSeparationMatte) Adding opaque matte channel ...");
-          SetImageOpacity(image,OpaqueOpacity);
+          status &= SetImageOpacity(image,OpaqueOpacity);
         }
       break;
     }
@@ -3820,6 +3822,9 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
   register long
     i;
 
+  MagickPassFail
+    status = MagickPass;
+
   ARG_NOT_USED(mutable_data);
   ARG_NOT_USED(immutable_data);
   ARG_NOT_USED(exception);
@@ -3831,7 +3836,7 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
 
       for (i=0; i < npixels; i++)
         {
-          VerifyColormapIndex(image,indexes[i]);
+          VerifyColormapIndex(status,image,indexes[i]);
           /*
             Explicit member assignment is used in order to support a colormap
             simultaneous with with pixel opacity.
@@ -3846,7 +3851,7 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
     {
       for (i=0; i < npixels; i++)
         {
-          VerifyColormapIndex(image,indexes[i]);
+          VerifyColormapIndex(status,image,indexes[i]);
           /*
             Use structure assignment for improved performance.
             Trash whatever is in the opacity channel.
@@ -3855,7 +3860,7 @@ SyncImageCallBack(void *mutable_data,         /* User provided mutable data */
         }
     }
 
-  return MagickPass;
+  return status;
 }
 MagickExport MagickPassFail SyncImage(Image *image)
 {

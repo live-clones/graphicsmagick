@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -98,7 +98,7 @@ static ResourceInfo resource_info[] =
   {
    { "",       "",  "",                    0, 0,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
    { "disk",   "B", "MAGICK_LIMIT_DISK",   0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
-   { "files",  "",  "MAGICK_LIMIT_FILES",  0, 32,   256,                    0, SummationLimit, 0 },
+   { "files",  "",  "MAGICK_LIMIT_FILES",  0, 0,    256,                    0, SummationLimit, 0 },
    { "map",    "B", "MAGICK_LIMIT_MAP",    0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
    { "memory", "B", "MAGICK_LIMIT_MEMORY", 0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
    { "pixels", "P", "MAGICK_LIMIT_PIXELS", 0, 1,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
@@ -106,7 +106,8 @@ static ResourceInfo resource_info[] =
    { "width",  "P", "MAGICK_LIMIT_WIDTH",  0, 1,    PIXEL_LIMIT,            0, AbsoluteLimit, 0  },
    { "height", "P", "MAGICK_LIMIT_HEIGHT", 0, 1,    PIXEL_LIMIT,            0, AbsoluteLimit, 0  },
    { "read",   "B", "MAGICK_LIMIT_READ",   0, 4096, MagickResourceInfinity, 0, AbsoluteLimit, 0  },
-   { "write",  "B", "MAGICK_LIMIT_WRITE",  0, 4096, MagickResourceInfinity, 0, AbsoluteLimit, 0  }
+   { "write",  "B", "MAGICK_LIMIT_WRITE",  0, 4096, MagickResourceInfinity, 0, AbsoluteLimit, 0  },
+   { "images", "",  "MAGICK_LIMIT_IMAGES",  0, 0,   MagickResourceInfinity, 0, SummationLimit, 0 }
   };
 
 /*
@@ -120,8 +121,9 @@ static ResourceInfo resource_info[] =
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  AcquireMagickResource() acquires resources of the specified type.  True is
-%  returned if the specified resource is available otherwise False.
+%  AcquireMagickResource() acquires resources of the specified type.
+%  MagickTrue is returned if the specified resource is available otherwise
+%  MagickFalse.
 %
 %  The format of the AcquireMagickResource() method is:
 %
@@ -289,17 +291,20 @@ MagickExport void DestroyMagickResources(void)
       const ResourceInfo *file_info = GetResourceInfo(FileResource);
       const ResourceInfo *map_info = GetResourceInfo(MapResource);
       const ResourceInfo *memory_info = GetResourceInfo(MemoryResource);
+      const ResourceInfo *images_info = GetResourceInfo(ImagesResource);
 
       (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
                             "Resource Consumption Summary\n"
                             "    %c%s Limit: %" MAGICK_INTMAX_F "d, Maximum Used: %" MAGICK_INTMAX_F "d\n"
                             "    %c%s Limit: %" MAGICK_INTMAX_F "d, Maximum Used: %" MAGICK_INTMAX_F "d\n"
                             "    %c%s Limit: %" MAGICK_INTMAX_F "d, Maximum Used: %" MAGICK_INTMAX_F "d\n"
-                            "    %c%s Limit: %" MAGICK_INTMAX_F "d, Maximum Used: %" MAGICK_INTMAX_F "d",
+                            "    %c%s Limit: %" MAGICK_INTMAX_F "d, Maximum Used: %" MAGICK_INTMAX_F "d\n"
+                            "    %c%s Limit: %" MAGICK_INTMAX_F "d, Maximum Used: %" MAGICK_INTMAX_F "d\n",
                             toupper((int) disc_info->name[0]),disc_info->name+1, disc_info->maximum, (magick_int64_t) disc_info->highwater,
                             toupper((int) file_info->name[0]),file_info->name+1, file_info->maximum, (magick_int64_t) file_info->highwater,
-                            toupper((int) map_info->name[0]),file_info->name+1, map_info->maximum, (magick_int64_t) map_info->highwater,
-                            toupper((int) memory_info->name[0]),memory_info->name+1, map_info->maximum, (magick_int64_t) memory_info->highwater
+                            toupper((int) map_info->name[0]),map_info->name+1, map_info->maximum, (magick_int64_t) map_info->highwater,
+                            toupper((int) memory_info->name[0]),memory_info->name+1, memory_info->maximum, (magick_int64_t) memory_info->highwater,
+                            toupper((int) images_info->name[0]),images_info->name+1, images_info->maximum, (magick_int64_t) images_info->highwater
                             );
 #endif
 #if 1
@@ -468,7 +473,8 @@ MagickExport void InitializeMagickResources(void)
     max_width=-1,
     max_height=-1,
     max_read=-1,
-    max_write=-1;
+    max_write=-1,
+    max_images=-1;
 
   size_t
     index;
@@ -673,6 +679,9 @@ MagickExport void InitializeMagickResources(void)
     if ((envp=getenv("MAGICK_LIMIT_WRITE")))
       max_write=MagickSizeStrToInt64(envp,1024);
 
+    if ((envp=getenv("MAGICK_LIMIT_IMAGES")))
+      max_images=MagickSizeStrToInt64(envp,1024);
+
 #if defined(HAVE_OPENMP)
     max_threads=omp_get_num_procs();
     (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
@@ -783,6 +792,8 @@ MagickExport void InitializeMagickResources(void)
     (void) SetMagickResourceLimit(ReadResource,max_read);
   if (max_write >= 0)
     (void) SetMagickResourceLimit(WriteResource,max_write);
+  if (max_images >= 0)
+    (void) SetMagickResourceLimit(ImagesResource,max_images);
 }
 
 /*
@@ -840,6 +851,12 @@ MagickExport void LiberateMagickResource(const ResourceType type,
             LockSemaphoreInfo(info->semaphore);
             info->value-=size;
 #if defined(DEBUG_MAGICK_RESOURCES) && DEBUG_MAGICK_RESOURCES
+            if (!(info->value >= info->minimum))
+              (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
+                                    "ANOMALY: %s resource"
+                                    " value=%" MAGICK_INTMAX_F "d,"
+                                    " minimum=%" MAGICK_INTMAX_F "d",
+                                    info->name, info->value, info->minimum);
             assert(info->value >= info->minimum);
 #endif /* if defined(DEBUG_MAGICK_RESOURCES) && DEBUG_MAGICK_RESOURCES */
             value=info->value;
@@ -915,7 +932,7 @@ MagickExport void LiberateMagickResource(const ResourceType type,
 %
 */
 MagickExport MagickPassFail ListMagickResourceInfo(FILE *file,
-  ExceptionInfo *exception)
+                                                   ExceptionInfo *exception)
 {
   unsigned int
     index;
@@ -946,8 +963,9 @@ MagickExport MagickPassFail ListMagickResourceInfo(FILE *file,
           FormatSize(resource_info[index].maximum,limit);
           strlcat(limit,resource_info[index].units,sizeof(limit));
         }
-      FormatString(heading,"%c%s",toupper((int) resource_info[index].name[0]),
-                   resource_info[index].name+1);
+      MagickFormatString(heading,sizeof(heading),"%c%s",
+                         toupper((int) resource_info[index].name[0]),
+                         resource_info[index].name+1);
 
       (void) strlcpy(environment,resource_info[index].env,sizeof(environment));
 
@@ -993,6 +1011,7 @@ MagickExport MagickPassFail ListMagickResourceInfo(FILE *file,
 %    HeightResource  -- Pixels
 %    ReadResource    -- Bytes
 %    WriteResource   -- Bytes
+%    ImagesResource  -- Discrete Images
 %
 %  The format of the SetMagickResourceLimit() method is:
 %

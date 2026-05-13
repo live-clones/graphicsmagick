@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2023-2025 GraphicsMagick Group
+% Copyright (C) 2023-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -56,6 +56,7 @@
 #include "magick/profile.h"
 #include "magick/utility.h"
 #include "magick/resource.h"
+#include "magick/static.h"
 
 #if defined(HasJXL)
 #include <jxl/decode.h>
@@ -88,7 +89,7 @@ static void *MyJXLMalloc(void *opaque, size_t size)
 static void MyJXLFree(void *dummy, void *address)
 {
   (void)(dummy);
-  MagickFreeResourceLimitedMemory(address);
+  MagickFreeResourceLimitedMemory(void *,address);
 }
 
 static void MyJxlMemoryManagerInit(struct MyJXLMemoryManager *mm,
@@ -355,14 +356,14 @@ static const char *JxlColorSpaceAsString(const JxlColorSpace color_space)
 }
 
 
-#define JXLReadCleanup()                                \
-  MagickFreeResourceLimitedMemory(out_buf);             \
-  MagickFreeResourceLimitedMemory(in_buf);              \
-  MagickFreeResourceLimitedMemory(exif_profile);        \
-  MagickFreeResourceLimitedMemory(xmp_profile);         \
-  if (jxl_thread_runner)                                \
-    JxlThreadParallelRunnerDestroy(jxl_thread_runner);  \
-  if (jxl_decoder)                                      \
+#define JXLReadCleanup()                                                \
+  MagickFreeResourceLimitedMemory(unsigned char *,out_buf);             \
+  MagickFreeResourceLimitedMemory(unsigned char *,in_buf);              \
+  MagickFreeResourceLimitedMemory(unsigned char *,exif_profile);        \
+  MagickFreeResourceLimitedMemory(unsigned char *,xmp_profile);         \
+  if (jxl_thread_runner)                                                \
+    JxlThreadParallelRunnerDestroy(jxl_thread_runner);                  \
+  if (jxl_decoder)                                                      \
     JxlDecoderDestroy(jxl_decoder);
 
 
@@ -475,7 +476,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "JxlThreadParallelRunnerCreate() failed (%"MAGICK_SIZE_T_F"u threads)",
+                                  "JxlThreadParallelRunnerCreate() failed (%" MAGICK_SIZE_T_F "u threads)",
                                   num_worker_threads);
           ThrowJXLReaderException(CoderError,JXLDecoderAPIFailure,image);
         }
@@ -484,7 +485,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
         {
           if (image->logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "JxlDecoderSetParallelRunner() failed (%"MAGICK_SIZE_T_F"u) threads",
+                                  "JxlDecoderSetParallelRunner() failed (%" MAGICK_SIZE_T_F "u) threads",
                                   num_worker_threads);
           ThrowJXLReaderException(CoderError,JXLDecoderAPIFailure,image);
         }
@@ -812,7 +813,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 
                   if (image->logging)
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                          "ICC profile size %"MAGICK_SIZE_T_F"u",
+                                          "ICC profile size %" MAGICK_SIZE_T_F"u",
                                           profile_size);
 
                   if ((profile=MagickAllocateResourceLimitedMemory(unsigned char *,profile_size))
@@ -832,7 +833,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                                                   "JxlDecoderGetColorAsICCProfile() success");
                           (void) SetImageProfile(image,"ICM",profile,profile_size);
                         }
-                      MagickFreeResourceLimitedMemory(profile);
+                      MagickFreeResourceLimitedMemory(unsigned char *,profile);
                     }
                 }
             }
@@ -1032,7 +1033,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                     /*
                       Assure that there is no leak if there are duplicate requests
                     */
-                    MagickFreeResourceLimitedMemory(exif_profile);
+                    MagickFreeResourceLimitedMemory(unsigned char *,exif_profile);
                     exif_size=0;
                     /*
                       Allocate EXIF profile box buffer (plus a bit more)
@@ -1049,7 +1050,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                           }
                         else
                           {
-                            MagickFreeResourceLimitedMemory(profile);
+                            MagickFreeResourceLimitedMemory(unsigned char *,profile);
                             exif_profile=NULL;
                             exif_size=0;
                           }
@@ -1060,7 +1061,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                     /*
                       Assure that there is no leak if there are duplicate requests
                     */
-                    MagickFreeResourceLimitedMemory(xmp_profile);
+                    MagickFreeResourceLimitedMemory(unsigned char *,xmp_profile);
                     xmp_size=0;
                     /*
                       Allocate XMP profile box buffer
@@ -1075,7 +1076,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                           }
                         else
                           {
-                            MagickFreeResourceLimitedMemory(profile);
+                            MagickFreeResourceLimitedMemory(unsigned char *,profile);
                             xmp_profile=NULL;
                             xmp_size=0;
                           }
@@ -1115,10 +1116,11 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
       magick_uint32_t exif_profile_offset;
 
       /* Big-endian offset decoding */
-      exif_profile_offset = p[exif_pad+0] << 24 |
-        p[exif_pad+1] << 16 |
-        p[exif_pad+2] << 8 |
-        p[exif_pad+3];
+      exif_profile_offset =
+        ((magick_uint32_t) p[exif_pad+0]) << 24 |
+        ((magick_uint32_t) p[exif_pad+1]) << 16 |
+        ((magick_uint32_t) p[exif_pad+2]) << 8 |
+        ((magick_uint32_t) p[exif_pad+3]);
 
 #if 0
       fprintf(stderr,
@@ -1164,7 +1166,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 #endif
       (void) SetImageProfile(image,"EXIF",exif_profile,exif_size+exif_pad+4);
 
-      MagickFreeResourceLimitedMemory(exif_profile);
+      MagickFreeResourceLimitedMemory(unsigned char *,exif_profile);
       exif_size=0;
     }
   if (xmp_profile != NULL)
@@ -1172,7 +1174,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "XMP Box: Size %lu", (unsigned long) xmp_size);
       (void) SetImageProfile(image,"XMP",xmp_profile,xmp_size);
-      MagickFreeResourceLimitedMemory(xmp_profile);
+      MagickFreeResourceLimitedMemory(unsigned char *,xmp_profile);
       xmp_size=0;
     }
   /* every break outside of success is some kind of error */
@@ -1211,22 +1213,22 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 %
 */
 
-#define JXLWriteCleanup() \
+#define JXLWriteCleanup()                                               \
   if (jxl_thread_runner) JxlThreadParallelRunnerDestroy(jxl_thread_runner); \
-  if (jxl_encoder) JxlEncoderDestroy(jxl_encoder); \
-  MagickFreeResourceLimitedMemory(in_buf); \
-  MagickFreeResourceLimitedMemory(out_buf); \
+  if (jxl_encoder) JxlEncoderDestroy(jxl_encoder);                      \
+  MagickFreeResourceLimitedMemory(unsigned char *,in_buf);              \
+  MagickFreeResourceLimitedMemory(unsigned char *,out_buf);             \
 
-#define ThrowJXLWriterException(code_,reason_,image_) \
-do { \
-  JXLWriteCleanup();                          \
-  ThrowWriterException(code_,reason_,image_); \
- } while(1)
+#define ThrowJXLWriterException(code_,reason_,image_)   \
+  do {                                                  \
+    JXLWriteCleanup();                                  \
+    ThrowWriterException(code_,reason_,image_);         \
+  } while(1)
 
 static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
 {
   MagickPassFail
-    status;
+    status = MagickPass;
 
   JxlEncoder
     *jxl_encoder = NULL;
@@ -1274,10 +1276,16 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
   */
   if ((image_info->type != UndefinedType) &&
       (image_info->type != OptimizeType))
-    (void) SetImageType(image,image_info->type);
+    {
+      if (SetImageType(image,image_info->type) == MagickFail)
+        ThrowWriterException(CoderError,UnableToSetImageType,image);
+    }
   else if (!IsCMYKColorspace(image->colorspace) &&
            (!IsRGBColorspace(image->colorspace)))
-    (void) TransformColorspace(image,RGBColorspace);
+    {
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
 
   /*
     Analyze image to be written.
@@ -1325,7 +1333,7 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
       {
         if (image->logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "JxlThreadParallelRunnerCreate() failed (%"MAGICK_SIZE_T_F"u) threads",
+                                "JxlThreadParallelRunnerCreate() failed (%" MAGICK_SIZE_T_F "u) threads",
                                 num_worker_threads);
         ThrowJXLWriterException(CoderError,JXLEncoderAPIFailure,image);
       }
@@ -1334,7 +1342,7 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
       {
         if (image->logging)
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "JxlDecoderSetParallelRunner() failed (%"MAGICK_SIZE_T_F"u) threads",
+                                "JxlDecoderSetParallelRunner() failed (%" MAGICK_SIZE_T_F "u) threads",
                                 num_worker_threads);
         ThrowJXLWriterException(CoderError,JXLEncoderAPIFailure,image);
       }
@@ -1582,7 +1590,7 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
               (void) memcpy(exif_b+4U,exif+6U,exif_length-6U);
 
               (void) JxlEncoderAddBox(jxl_encoder,"Exif",exif_b,exif_length-2U,0);
-              MagickFreeResourceLimitedMemory(exif_b);
+              MagickFreeResourceLimitedMemory(unsigned char *,exif_b);
             }
         }
 

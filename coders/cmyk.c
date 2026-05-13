@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -43,6 +43,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -84,7 +85,7 @@ static unsigned int
 */
 #define ThrowCMYKReaderException(code_,reason_,image_) \
 { \
-  MagickFreeResourceLimitedMemory(scanline);                 \
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);                 \
   ThrowReaderException(code_,reason_,image_); \
 }
 static Image *ReadCMYKImage(const ImageInfo *image_info,
@@ -555,7 +556,7 @@ static Image *ReadCMYKImage(const ImageInfo *image_info,
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -739,7 +740,7 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
                                                     packet_size,image->columns);
     if (new_pixels == (unsigned char *) NULL)
       {
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
       }
     pixels=new_pixels;
@@ -769,7 +770,8 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
     /*
       Convert MIFF to CMYK raster pixels.
     */
-    (void) TransformColorspace(image,CMYKColorspace);
+    if (TransformColorspace(image,CMYKColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     if (LocaleCompare(image_info->magick,"CMYKA") == 0)
       if (!image->matte)
         SetImageOpacity(image,OpaqueOpacity);
@@ -970,7 +972,7 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
     if (status == False)
       break;
   } while (image_info->adjoin);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   if (image_info->adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;

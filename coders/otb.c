@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -40,6 +40,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -305,24 +306,28 @@ static unsigned int WriteOTBImage(const ImageInfo *image_info,Image *image)
     info,
     polarity;
 
-  unsigned int
+  MagickPassFail
     status;
 
-  /*
-    Open output image file.
-  */
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
-    ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+
   /*
     Convert image to a bi-level image.
   */
-  (void) SetImageType(image,BilevelType);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    return MagickFail;
+  if (SetImageType(image,BilevelType) == MagickFail)
+    return MagickFail;
+
+  /*
+    Open output image file.
+  */
+  status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
+  if (status == MagickFail)
+    ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
   if (image->colors == 2)
     polarity=PixelIntensityToQuantum(&image->colormap[0]) <

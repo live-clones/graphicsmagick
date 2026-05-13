@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -48,6 +48,7 @@
 #include "magick/monitor.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -127,6 +128,32 @@ static unsigned int IsPS(const unsigned char *magick,const size_t length)
 %
 */
 #if defined(HasGS)
+#define ThrowPsReaderExceptionOnFOpFailure(Op,DoClose)                    \
+  {                                                                     \
+  if (Op)                                                               \
+    {                                                                   \
+      if ((DoClose) != 0)                                               \
+        {                                                               \
+          (void) fclose(file);                                          \
+          file = (FILE *) NULL;                                         \
+        }                                                               \
+      (void) LiberateTemporaryFile(postscript_filename);                \
+      ThrowReaderException(CorruptImageError,                           \
+                           AnErrorHasOccurredWritingToFile,             \
+                           image);                                      \
+    }                                                                   \
+  }
+#define ThrowPsReaderException(code,reason,image)                   \
+  {                                                                 \
+    if (file != (FILE *) NULL)                                      \
+      {                                                             \
+        (void) fclose(file);                                        \
+        file = (FILE *) NULL;                                       \
+      }                                                             \
+    (void) LiberateTemporaryFile(postscript_filename);              \
+    ThrowReaderException(code,reason,image);                        \
+  }
+
 static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
 #define BoundingBox  "%%BoundingBox:"
@@ -154,14 +181,16 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
     filesize;
 
   FILE
-    *file;
+    *file = (FILE *) NULL;
 
   Image
     *image,
     *next_image;
 
   int
-    c,
+    c;
+
+  MagickPassFail
     status;
 
   unsigned int
@@ -202,7 +231,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   image=AllocateImage(image_info);
   status=OpenBlob(image_info,image,ReadBinaryBlobMode,exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   /*
     Open temporary output file.
@@ -210,7 +239,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   file=AcquireTemporaryFileStream(postscript_filename,BinaryFileIOMode);
   if (file == (FILE *) NULL)
     ThrowReaderTemporaryFileException(postscript_filename);
-  FormatString(translate_geometry,"%g %g translate\n              ",0.0,0.0);
+  MagickFormatString(translate_geometry,sizeof(translate_geometry),"%g %g translate\n              ",0.0,0.0);
   (void) fputs(translate_geometry,file);
   /*
     Set the page density.
@@ -224,7 +253,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (count != 2)
         image->y_resolution=image->x_resolution;
     }
-  FormatString(density,"%gx%g",image->x_resolution,image->y_resolution);
+  MagickFormatString(density,sizeof(density),"%gx%g",image->x_resolution,image->y_resolution);
   /*
     Determine page geometry from the Postscript bounding box.
   */
@@ -247,68 +276,84 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   bounds.y2=0.0;
   p=command;
   for (i=0; (LocaleCompare(image_info->magick,"EPT") != 0) ||
-    (i < (long) filesize); i++)
-  {
-    c=ReadBlobByte(image);
-    if (c == EOF)
-      break;
-    (void) fputc(c,file);
-    *p++=c;
-    if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
-      continue;
-    *p='\0';
-    p=command;
-    /*
-      Parse a bounding box statement.
-    */
-    count=0;
-    if (LocaleNCompare(BoundingBox,command,strlen(BoundingBox)) == 0)
-      count=sscanf(command,"%%%%BoundingBox: %lf %lf %lf %lf",&bounds.x1,
-        &bounds.y1,&bounds.x2,&bounds.y2);
-    if (LocaleNCompare(DocumentMedia,command,strlen(DocumentMedia)) == 0)
-      count=(size_t) sscanf(command,"%%%%DocumentMedia: %*s %lf %lf",&bounds.x2,
-        &bounds.y2)+2;
-    if (LocaleNCompare(PageBoundingBox,command,strlen(PageBoundingBox)) == 0)
-      count=(size_t) sscanf(command,"%%%%PageBoundingBox: %lf %lf %lf %lf",
-        &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
-    if (count != 4)
-      continue;
-    if ((bounds.x1 > bounds.x2) || (bounds.y1 > bounds.y2))
-      continue;
-    /*
-      Set Postscript render geometry.
-    */
-    FormatString(translate_geometry,"%g %g translate\n",-bounds.x1,-bounds.y1);
-    width=(unsigned long) (bounds.x2-bounds.x1+0.5);
-    height=(unsigned long) (bounds.y2-bounds.y1+0.5);
-    if (width > page.width)
-      page.width=width;
-    if (height > page.height)
-      page.height=height;
-  }
+         (i < (long) filesize); i++)
+    {
+      c=ReadBlobByte(image);
+      if (c == EOF)
+        break;
+      ThrowPsReaderExceptionOnFOpFailure(fputc(c,file) == EOF,1);
+      *p++=c;
+      if ((c != '\n') && (c != '\r') && ((p-command) < (MaxTextExtent-1)))
+        continue;
+      *p='\0';
+      p=command;
+      /*
+        Parse a bounding box statement.
+      */
+      count=0;
+      if (LocaleNCompare(BoundingBox,command,strlen(BoundingBox)) == 0)
+        count=sscanf(command,"%%%%BoundingBox: %lf %lf %lf %lf",&bounds.x1,
+                     &bounds.y1,&bounds.x2,&bounds.y2);
+      if (LocaleNCompare(DocumentMedia,command,strlen(DocumentMedia)) == 0)
+        count=(size_t) sscanf(command,"%%%%DocumentMedia: %*s %lf %lf",&bounds.x2,
+                              &bounds.y2)+2;
+      if (LocaleNCompare(PageBoundingBox,command,strlen(PageBoundingBox)) == 0)
+        count=(size_t) sscanf(command,"%%%%PageBoundingBox: %lf %lf %lf %lf",
+                              &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
+      if (count != 4)
+        continue;
+      if ((bounds.x1 > bounds.x2) || (bounds.y1 > bounds.y2))
+        continue;
+      /*
+        Set Postscript render geometry.
+      */
+      MagickFormatString(translate_geometry,sizeof(translate_geometry),"%g %g translate\n",-bounds.x1,-bounds.y1);
+      width=(unsigned long) (bounds.x2-bounds.x1+0.5);
+      height=(unsigned long) (bounds.y2-bounds.y1+0.5);
+      if (width > page.width)
+        page.width=width;
+      if (height > page.height)
+        page.height=height;
+    }
   if ((page.width == 0) || (page.height == 0))
     {
       SetGeometry(image,&page);
       (void) GetGeometry(PSPageGeometry,&page.x,&page.y,&page.width,
-        &page.height);
+                         &page.height);
     }
   if (image_info->page != (char *) NULL)
     (void) GetGeometry(image_info->page,&page.x,&page.y,&page.width,
-      &page.height);
-  FormatString(geometry,"%lux%lu",
-    (unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5),
-    (unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5));
-  if (ferror(file))
-    {
-      (void) fclose(file);
-      (void) LiberateTemporaryFile(postscript_filename);
-      ThrowReaderException(CorruptImageError,AnErrorHasOccurredWritingToFile,
-        image)
-    }
-  (void) rewind(file);
-  (void) fputs(translate_geometry,file);
-  (void) fclose(file);
-  CloseBlob(image);
+                       &page.height);
+  width=(unsigned long) ceil(page.width*image->x_resolution/dx_resolution-0.5);
+  height=(unsigned long) ceil(page.height*image->y_resolution/dy_resolution-0.5);
+  MagickFormatString(geometry,sizeof(geometry),"%lux%lu",width,height);
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Page geometry: %s",geometry);
+
+  /*
+    Enforce dimension limits to avoid denial of service
+  */
+  {
+    magick_uint64_t
+      pixels;
+
+    if (AcquireMagickResource(WidthResource,width) != MagickPass)
+      ThrowPsReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+    if (AcquireMagickResource(HeightResource,height) != MagickPass)
+      ThrowPsReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+    pixels=(magick_uint64_t)width*height;
+    if ((0 == pixels) || (pixels/width != height) ||
+        (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+      ThrowPsReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+  }
+
+  ThrowPsReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowPsReaderExceptionOnFOpFailure(fseek(file, 0L, SEEK_SET),1);
+  ThrowPsReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
+  ThrowPsReaderExceptionOnFOpFailure(ferror(file),1);
+  ThrowPsReaderExceptionOnFOpFailure(fclose(file),0);
+  ThrowPsReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
   filesize=GetBlobSize(image);
   DestroyImage(image);
   image=(Image *) NULL;
@@ -325,12 +370,12 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
       Append subrange.
     */
     if (image_info->subrange != 0)
-      FormatString(options,"-dFirstPage=%lu -dLastPage=%lu",
-                   image_info->subimage+1,image_info->subimage+image_info->subrange);
+      MagickFormatString(options,sizeof(options),"-dFirstPage=%lu -dLastPage=%lu",
+                         image_info->subimage+1,image_info->subimage+image_info->subrange);
     /*
       Append bounding box.
     */
-    FormatString(arg,"-g%s",geometry);
+    MagickFormatString(arg,sizeof(arg),"-g%s",geometry);
     if (options[0] != '\0')
       (void) strlcat(options," ",sizeof(options));
     (void) strlcat(options,arg,sizeof(options));
@@ -343,9 +388,9 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
         (void) LiberateTemporaryFile(postscript_filename);
         ThrowReaderTemporaryFileException(image_info->filename);
       }
-    FormatString(command,delegate_info->commands,antialias,
-                 antialias,density,options,image_info->filename,
-                 postscript_filename);
+    MagickFormatString(command,sizeof(command),delegate_info->commands,antialias,
+                       antialias,density,options,image_info->filename,
+                       postscript_filename);
   }
   (void) MagickMonitorFormatted(0,8,exception,RenderPostscriptText,
                                 image_info->filename);
@@ -377,7 +422,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
         *clone_info;
 
       clone_info=CloneImageInfo(image_info);
-      clone_info->blob=(void *) NULL;
+      clone_info->blob=(_BlobInfoPtr_) NULL;
       clone_info->length=0;
       clone_info->magick[0]='\0';
       clone_info->subimage=0;
@@ -681,7 +726,7 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
     bit,
     byte;
 
-  unsigned int
+  MagickPassFail
     status;
 
   unsigned long
@@ -708,960 +753,991 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
   page=1;
   scene=0;
   do
-  {
-    ImageCharacteristics
-      characteristics;
+    {
+      ImageCharacteristics
+        characteristics;
 
-    /*
-      Scale image to size of Postscript page.
-    */
-    (void) TransformColorspace(image,RGBColorspace);
-    text_size=0;
-    attribute=GetImageAttribute(image,"label");
-    if (attribute != (const ImageAttribute *) NULL)
-      text_size=(unsigned int)
-        (MultilineCensus(attribute->value)*image_info->pointsize+12);
-    SetGeometry(image,&geometry);
-    geometry.y=(long) text_size;
-    FormatString(page_geometry,"%lux%lu",image->columns,image->rows);
-    if (image_info->page != (char *) NULL)
-      (void) strlcpy(page_geometry,image_info->page,MaxTextExtent);
-    else
-      if ((image->page.width != 0) && (image->page.height != 0))
-        (void) FormatString(page_geometry,"%lux%lu%+ld%+ld",image->page.width,
-          image->page.height,image->page.x,image->page.y);
+      /*
+        Scale image to size of Postscript page.
+      */
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      /*
+        Analyze image to be written.
+      */
+      if (GetImageCharacteristics(image,&characteristics,
+                                  (OptimizeType == image_info->type),
+                                  &image->exception) == MagickFail)
+        ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
+      text_size=0;
+      attribute=GetImageAttribute(image,"label");
+      if (attribute != (const ImageAttribute *) NULL)
+        text_size=(unsigned int)
+          (MultilineCensus(attribute->value)*image_info->pointsize+12);
+      SetGeometry(image,&geometry);
+      geometry.y=(long) text_size;
+      MagickFormatString(page_geometry,sizeof(page_geometry),"%lux%lu",image->columns,image->rows);
+      if (image_info->page != (char *) NULL)
+        (void) strlcpy(page_geometry,image_info->page,MaxTextExtent);
       else
-        if (LocaleCompare(image_info->magick,"PS") == 0)
-          (void) strlcpy(page_geometry,PSPageGeometry,sizeof(page_geometry));
-    (void) GetMagickGeometry(page_geometry,&geometry.x,&geometry.y,
-      &geometry.width,&geometry.height);
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Image Resolution: %gx%g %s",
-                          image->x_resolution,
-                          image->y_resolution,
-                          ResolutionTypeToString(image->units));
-    /*
-      Scale relative to dots-per-inch.
-    */
-    dx_resolution=72.0;
-    dy_resolution=72.0;
-    x_resolution=72.0;
-    (void) strlcpy(density,PSDensityGeometry,sizeof(density));
-    count=GetMagickDimension(density,&x_resolution,&y_resolution,NULL,NULL);
-    if (count != 2)
-      y_resolution=x_resolution;
-    /*
-      Use override resolution information if it appears to be valid.
-    */
-    if ((image_info->density != (char *) NULL) &&
-        ((image_info->units == PixelsPerInchResolution) ||
-         (image_info->units == PixelsPerCentimeterResolution)))
-      {
-        count=GetMagickDimension(image_info->density,&x_resolution,&y_resolution,NULL,NULL);
-        if (count != 2)
-          y_resolution=x_resolution;
-        if (image_info->units == PixelsPerCentimeterResolution)
-          {
-            x_resolution *= 2.54;
-            y_resolution *= 2.54;
-          }
-      }
-    /*
-      Use image resolution information if it appears to be valid.
-    */
-    else if ((image->x_resolution > 0.0) && (image->y_resolution > 0.0) &&
-             ((image->units == PixelsPerInchResolution) ||
-              (image->units == PixelsPerCentimeterResolution)))
-      {
-        x_resolution = image->x_resolution;
-        y_resolution = image->y_resolution;
-        if (image->units == PixelsPerCentimeterResolution)
-          {
-            x_resolution *= 2.54;
-            y_resolution *= 2.54;
-          }
-      }
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Postscript Resolution: %gx%g DPI",
-                          x_resolution,y_resolution);
-    x_scale=(geometry.width*dx_resolution)/x_resolution;
-    geometry.width=(unsigned long) (x_scale+0.5);
-    y_scale=(geometry.height*dy_resolution)/y_resolution;
-    geometry.height=(unsigned long) (y_scale+0.5);
-    if (page == 1)
-      {
-        /*
-          Output Postscript header.
-        */
-#if defined(HAVE_CTIME_R)
-        char time_buf[26];
-#endif /* defined(HAVE_CTIME_R) */
-        if (LocaleCompare(image_info->magick,"PS") == 0)
-          (void) strlcpy(buffer,"%!PS-Adobe-3.0\n",sizeof(buffer));
+        if ((image->page.width != 0) && (image->page.height != 0))
+          (void) MagickFormatString(page_geometry,sizeof(page_geometry),"%lux%lu%+ld%+ld",image->page.width,
+                                    image->page.height,image->page.x,image->page.y);
         else
-          (void) strlcpy(buffer,"%!PS-Adobe-3.0 EPSF-3.0\n",sizeof(buffer));
-        (void) WriteBlobString(image,buffer);
-        (void) WriteBlobString(image,"%%Creator: (GraphicsMagick)\n");
-        FormatString(buffer,"%%%%Title: (%.1024s)\n",image->filename);
-        (void) WriteBlobString(image,buffer);
-        timer=time((time_t *) NULL);
-#if defined(HAVE_CTIME_R)
-        (void) strlcpy(date,ctime_r(&timer,time_buf),MaxTextExtent);
-#else
-        (void) strlcpy(date,ctime(&timer),MaxTextExtent); /* Thread-unsafe version */
-#endif /* defined(HAVE_CTIME_R) */
-        date[strlen(date)-1]='\0';
-        FormatString(buffer,"%%%%CreationDate: (%.1024s)\n",date);
-        (void) WriteBlobString(image,buffer);
-        bounds.x1=geometry.x;
-        bounds.y1=geometry.y;
-        bounds.x2=geometry.x+x_scale;
-        bounds.y2=geometry.y+((size_t) geometry.height+text_size);
-        if (image_info->adjoin && (image->next != (Image *) NULL))
-          (void) strlcpy(buffer,"%%%%BoundingBox: (atend)\n",sizeof(buffer));
-        else
-          FormatString(buffer,"%%%%BoundingBox: %g %g %g %g\n",
-            floor(bounds.x1+0.5),floor(bounds.y1+0.5),ceil(bounds.x2-0.5),
-            ceil(bounds.y2-0.5));
-        (void) WriteBlobString(image,buffer);
-        attribute=GetImageAttribute(image,"label");
-        if (attribute != (const ImageAttribute *) NULL)
-          (void) WriteBlobString(image,
-            "%%DocumentNeededResources: font Times-Roman\n");
-        (void) WriteBlobString(image,"%%DocumentData: Clean7Bit\n");
-        (void) WriteBlobString(image,"%%LanguageLevel: 1\n");
-        if (LocaleCompare(image_info->magick,"PS") != 0)
-          (void) WriteBlobString(image,"%%Pages: 1\n");
-        else
-          {
-            /*
-              Compute the number of pages.
-            */
-            (void) WriteBlobString(image,"%%Orientation: Portrait\n");
-            (void) WriteBlobString(image,"%%PageOrder: Ascend\n");
-            FormatString(buffer,"%%%%Pages: %lu\n", image_info->adjoin ?
-              (unsigned long) image_list_length : 1L);
-            (void) WriteBlobString(image,buffer);
-          }
-        (void) WriteBlobString(image,"%%EndComments\n");
-        (void) WriteBlobString(image,"\n%%BeginDefaults\n");
-        (void) WriteBlobString(image,"%%EndDefaults\n\n");
-        if ((LocaleCompare(image_info->magick,"EPI") == 0) ||
-            (LocaleCompare(image_info->magick,"EPT") == 0) ||
-            (LocaleCompare(image_info->magick,"EPSI") == 0))
-          {
-            Image
-              *preview_image;
-
-            /*
-              Create preview image.
-            */
-            preview_image=CloneImage(image,0,0,True,&image->exception);
-            if (preview_image == (Image *) NULL)
-              ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                image);
-            /*
-              Dump image as bitmap.
-            */
-            (void) SetImageType(preview_image,BilevelType);
-            polarity=
-              PixelIntensityToQuantum(&preview_image->colormap[0]) < (MaxRGB/2);
-            if (preview_image->colors == 2)
-              polarity=PixelIntensityToQuantum(&preview_image->colormap[0]) >
-                PixelIntensityToQuantum(&preview_image->colormap[1]);
-            FormatString(buffer,"%%%%BeginPreview: %lu %lu %lu %lu\n%%  ",
-              preview_image->columns,preview_image->rows,1L,
-              (((preview_image->columns+7) >> 3)*preview_image->rows+35)/36);
-            (void) WriteBlobString(image,buffer);
-            count=0;
-            bp=buffer;
-            for (y=0; y < (long) image->rows; y++)
-            {
-              p=AcquireImagePixels(preview_image,0,y,preview_image->columns,1,
-                &preview_image->exception);
-              if (p == (const PixelPacket *) NULL)
-                break;
-              indexes=AccessImmutableIndexes(preview_image);
-              bit=0;
-              byte=0;
-              for (x=0; x < (long) preview_image->columns; x++)
-              {
-                byte<<=1;
-                if (indexes[x] == polarity)
-                  byte|=0x01;
-                bit++;
-                if (bit == 8)
-                  {
-                    bp=AppendHexVal(bp,byte & 0xff);
-                    count++;
-                    if (count == 36)
-                      {
-                        count=0;
-                        *bp++='\n';
-                        *bp++='%';
-                        *bp++=' ';
-                        *bp++=' ';
-                        (void) WriteBlob(image,bp-buffer,buffer);
-                        bp=buffer;
-                      };
-                    bit=0;
-                    byte=0;
-                  }
-              }
-              if (bit != 0)
-                {
-                  byte<<=(8-bit);
-                  bp=AppendHexVal(bp,byte & 0xff);
-                  count++;
-                  if (count == 36)
-                    {
-                      count=0;
-                      *bp++='\n';
-                      *bp++='%';
-                      *bp++=' ';
-                      *bp++=' ';
-                      (void) WriteBlob(image,bp-buffer,buffer);
-                      bp=buffer;
-                    };
-                };
-            }
-            if (bp != buffer)
-              {
-                (void) WriteBlob(image,bp-buffer,buffer);
-                bp=buffer;
-              }
-            (void) WriteBlobString(image,"\n%%EndPreview\n");
-            DestroyImage(preview_image);
-          }
-        /*
-          Output Postscript commands.
-        */
-        (void) WriteBlobString(image,
-                               "%%BeginProlog\n"
-                               "%\n"
-                               "% Display a color image.  The image is displayed in color on\n"
-                               "% Postscript viewers or printers that support color, otherwise\n"
-                               "% it is displayed as grayscale.\n"
-                               "%\n"
-                               "/DirectClassPacket\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Get a DirectClass packet.\n"
-                               "  %\n"
-                               "  % Parameters:\n"
-                               "  %   red.\n"
-                               "  %   green.\n"
-                               "  %   blue.\n"
-                               "  %   length: number of pixels minus one of this color (optional).\n"
-                               "  %\n"
-                               "  currentfile color_packet readhexstring pop pop\n"
-                               "  compression 0 eq\n"
-                               "  {\n"
-                               "    /number_pixels 3 def\n"
-                               "  }\n"
-                               "  {\n"
-                               "    currentfile byte readhexstring pop 0 get\n"
-                               "    /number_pixels exch 1 add 3 mul def\n"
-                               "  } ifelse\n"
-                               "  0 3 number_pixels 1 sub\n"
-                               "  {\n"
-                               "    pixels exch color_packet putinterval\n"
-                               "  } for\n"
-                               "  pixels 0 number_pixels getinterval\n"
-                               "} bind def\n"
-                               "\n"
-                               "/DirectClassImage\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Display a DirectClass image.\n"
-                               "  %\n"
-                               "  systemdict /colorimage known\n"
-                               "  {\n"
-                               "    columns rows 8\n"
-                               "    [\n"
-                               "      columns 0 0\n"
-                               "      rows neg 0 rows\n"
-                               "    ]\n"
-                               "    { DirectClassPacket } false 3 colorimage\n"
-                               "  }\n"
-                               "  {\n"
-                               "    %\n"
-                               "    % No colorimage operator;  convert to grayscale.\n"
-                               "    %\n"
-                               "    columns rows 8\n"
-                               "    [\n"
-                               "      columns 0 0\n"
-                               "      rows neg 0 rows\n"
-                               "    ]\n"
-                               "    { GrayDirectClassPacket } image\n"
-                               "  } ifelse\n"
-                               "} bind def\n"
-                               "\n"
-                               "/GrayDirectClassPacket\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Get a DirectClass packet;  convert to grayscale.\n"
-                               "  %\n"
-                               "  % Parameters:\n"
-                               "  %   red\n"
-                               "  %   green\n"
-                               "  %   blue\n"
-                               "  %   length: number of pixels minus one of this color (optional).\n"
-                               "  %\n"
-                               "  currentfile color_packet readhexstring pop pop\n"
-                               "  color_packet 0 get 0.299 mul\n"
-                               "  color_packet 1 get 0.587 mul add\n"
-                               "  color_packet 2 get 0.114 mul add\n"
-                               "  cvi\n"
-                               "  /gray_packet exch def\n"
-                               "  compression 0 eq\n"
-                               "  {\n"
-                               "    /number_pixels 1 def\n"
-                               "  }\n"
-                               "  {\n"
-                               "    currentfile byte readhexstring pop 0 get\n"
-                               "    /number_pixels exch 1 add def\n"
-                               "  } ifelse\n"
-                               "  0 1 number_pixels 1 sub\n"
-                               "  {\n"
-                               "    pixels exch gray_packet put\n"
-                               "  } for\n"
-                               "  pixels 0 number_pixels getinterval\n"
-                               "} bind def\n"
-                               "\n"
-                               "/GrayPseudoClassPacket\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Get a PseudoClass packet;  convert to grayscale.\n"
-                               "  %\n"
-                               "  % Parameters:\n"
-                               "  %   index: index into the colormap.\n"
-                               "  %   length: number of pixels minus one of this color (optional).\n"
-                               "  %\n"
-                               "  currentfile byte readhexstring pop 0 get\n"
-                               "  /offset exch 3 mul def\n"
-                               "  /color_packet colormap offset 3 getinterval def\n"
-                               "  color_packet 0 get 0.299 mul\n"
-                               "  color_packet 1 get 0.587 mul add\n"
-                               "  color_packet 2 get 0.114 mul add\n"
-                               "  cvi\n"
-                               "  /gray_packet exch def\n"
-                               "  compression 0 eq\n"
-                               "  {\n"
-                               "    /number_pixels 1 def\n"
-                               "  }\n"
-                               "  {\n"
-                               "    currentfile byte readhexstring pop 0 get\n"
-                               "    /number_pixels exch 1 add def\n"
-                               "  } ifelse\n"
-                               "  0 1 number_pixels 1 sub\n"
-                               "  {\n"
-                               "    pixels exch gray_packet put\n"
-                               "  } for\n"
-                               "  pixels 0 number_pixels getinterval\n"
-                               "} bind def\n"
-                               "\n"
-                               "/PseudoClassPacket\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Get a PseudoClass packet.\n"
-                               "  %\n"
-                               "  % Parameters:\n"
-                               "  %   index: index into the colormap.\n"
-                               "  %   length: number of pixels minus one of this color (optional).\n"
-                               "  %\n"
-                               "  currentfile byte readhexstring pop 0 get\n"
-                               "  /offset exch 3 mul def\n"
-                               "  /color_packet colormap offset 3 getinterval def\n"
-                               "  compression 0 eq\n"
-                               "  {\n"
-                               "    /number_pixels 3 def\n"
-                               "  }\n"
-                               "  {\n"
-                               "    currentfile byte readhexstring pop 0 get\n"
-                               "    /number_pixels exch 1 add 3 mul def\n"
-                               "  } ifelse\n"
-                               "  0 3 number_pixels 1 sub\n"
-                               "  {\n"
-                               "    pixels exch color_packet putinterval\n"
-                               "  } for\n"
-                               "  pixels 0 number_pixels getinterval\n"
-                               "} bind def\n"
-                               "\n"
-                               "/PseudoClassImage\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Display a PseudoClass image.\n"
-                               "  %\n"
-                               "  % Parameters:\n"
-                               "  %   class: 0-PseudoClass or 1-Grayscale.\n"
-                               "  %\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /class exch def pop\n"
-                               "  class 0 gt\n"
-                               "  {\n"
-                               "    currentfile buffer readline pop\n"
-                               "    token pop /depth exch def pop\n"
-                               "    /grays columns 8 add depth sub depth mul 8 idiv string def\n"
-                               "    columns rows depth\n"
-                               "    [\n"
-                               "      columns 0 0\n"
-                               "      rows neg 0 rows\n"
-                               "    ]\n"
-                               "    { currentfile grays readhexstring pop } image\n"
-                               "  }\n"
-                               "  {\n"
-                               "    %\n"
-                               "    % Parameters:\n"
-                               "    %   colors: number of colors in the colormap.\n"
-                               "    %   colormap: red, green, blue color packets.\n"
-                               "    %\n"
-                               "    currentfile buffer readline pop\n"
-                               "    token pop /colors exch def pop\n"
-                               "    /colors colors 3 mul def\n"
-                               "    /colormap colors string def\n"
-                               "    currentfile colormap readhexstring pop pop\n"
-                               "    systemdict /colorimage known\n"
-                               "    {\n"
-                               "      columns rows 8\n"
-                               "      [\n"
-                               "        columns 0 0\n"
-                               "        rows neg 0 rows\n"
-                               "      ]\n"
-                               "      { PseudoClassPacket } false 3 colorimage\n"
-                               "    }\n"
-                               "    {\n"
-                               "      %\n"
-                               "      % No colorimage operator;  convert to grayscale.\n"
-                               "      %\n"
-                               "      columns rows 8\n"
-                               "      [\n"
-                               "        columns 0 0\n"
-                               "        rows neg 0 rows\n"
-                               "      ]\n"
-                               "      { GrayPseudoClassPacket } image\n"
-                               "    } ifelse\n"
-                               "  } ifelse\n"
-                               "} bind def\n"
-                               "\n"
-                               "/DisplayImage\n"
-                               "{\n"
-                               "  %\n"
-                               "  % Display a DirectClass or PseudoClass image.\n"
-                               "  %\n"
-                               "  % Parameters:\n"
-                               "  %   x & y translation.\n"
-                               "  %   x & y scale.\n"
-                               "  %   label pointsize.\n"
-                               "  %   image label.\n"
-                               "  %   image columns & rows.\n"
-                               "  %   class: 0-DirectClass or 1-PseudoClass.\n"
-                               "  %   compression: 0-none or 1-RunlengthEncoded.\n"
-                               "  %   hex color packets.\n"
-                               "  %\n"
-                               "  gsave\n"
-                               "  /buffer 512 string def\n"
-                               "  /byte 1 string def\n"
-                               "  /color_packet 3 string def\n"
-                               "  /pixels 768 string def\n"
-                               "\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /x exch def\n"
-                               "  token pop /y exch def pop\n"
-                               "  x y translate\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /x exch def\n"
-                               "  token pop /y exch def pop\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /pointsize exch def pop\n"
-                               "  /Times-Roman findfont pointsize scalefont setfont\n");
-
-        attribute=GetImageAttribute(image,"label");
-        if (attribute != (const ImageAttribute *) NULL)
-          for (j=(long) MultilineCensus(attribute->value)-1; j >= 0; j--)
-          {
-            (void) WriteBlobString(image,"  /label 512 string def\n");
-            (void) WriteBlobString(image,"  currentfile label readline pop\n");
-            FormatString(buffer,"  0 y %g add moveto label show pop\n",
-              j*image_info->pointsize+12);
-            (void) WriteBlobString(image,buffer);
-          }
-        (void) WriteBlobString(image,
-                               "  x y scale\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /columns exch def\n"
-                               "  token pop /rows exch def pop\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /class exch def pop\n"
-                               "  currentfile buffer readline pop\n"
-                               "  token pop /compression exch def pop\n"
-                               "  class 0 gt { PseudoClassImage } { DirectClassImage } ifelse\n"
-                               "  grestore\n");
-        if (LocaleCompare(image_info->magick,"PS") == 0)
-          (void) WriteBlobString(image,"  showpage\n");
-        (void) WriteBlobString(image,"} bind def\n");
-        (void) WriteBlobString(image,"%%EndProlog\n");
-      }
-    FormatString(buffer,"%%%%Page:  1 %lu\n",page++);
-    (void) WriteBlobString(image,buffer);
-    FormatString(buffer,"%%%%PageBoundingBox: %ld %ld %ld %ld\n",geometry.x,
-      geometry.y,geometry.x+(long) geometry.width,geometry.y+(long)
-      (geometry.height+text_size));
-    (void) WriteBlobString(image,buffer);
-    if (geometry.x < bounds.x1)
-      bounds.x1=geometry.x;
-    if (geometry.y < bounds.y1)
-      bounds.y1=geometry.y;
-    if ((geometry.x+((size_t) geometry.width-1)) > bounds.x2)
-      bounds.x2=geometry.x+(size_t) geometry.width-1;
-    if ((geometry.y+((size_t) geometry.height+text_size)-1) > bounds.y2)
-      bounds.y2=geometry.y+((size_t) geometry.height+text_size)-1;
-    attribute=GetImageAttribute(image,"label");
-    if (attribute != (const ImageAttribute *) NULL)
-      (void) WriteBlobString(image,"%%%%PageResources: font Times-Roman\n");
-    if (LocaleCompare(image_info->magick,"PS") != 0)
-      (void) WriteBlobString(image,"userdict begin\n");
-    (void) WriteBlobString(image,"DisplayImage\n");
-    /*
-      Output image data.
-    */
-    FormatString(buffer,"%ld %ld\n%g %g\n%f\n",geometry.x,geometry.y,
-      x_scale,y_scale,image_info->pointsize);
-    (void) WriteBlobString(image,buffer);
-    labels=(char **) NULL;
-    attribute=GetImageAttribute(image,"label");
-    if (attribute != (const ImageAttribute *) NULL)
-      labels=StringToList(attribute->value);
-    if (labels != (char **) NULL)
-      {
-        for (i=0; labels[i] != (char *) NULL; i++)
+          if (LocaleCompare(image_info->magick,"PS") == 0)
+            (void) strlcpy(page_geometry,PSPageGeometry,sizeof(page_geometry));
+      (void) GetMagickGeometry(page_geometry,&geometry.x,&geometry.y,
+                               &geometry.width,&geometry.height);
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Image Resolution: %gx%g %s",
+                            image->x_resolution,
+                            image->y_resolution,
+                            ResolutionTypeToString(image->units));
+      /*
+        Scale relative to dots-per-inch.
+      */
+      dx_resolution=72.0;
+      dy_resolution=72.0;
+      x_resolution=72.0;
+      (void) strlcpy(density,PSDensityGeometry,sizeof(density));
+      count=GetMagickDimension(density,&x_resolution,&y_resolution,NULL,NULL);
+      if (count != 2)
+        y_resolution=x_resolution;
+      /*
+        Use override resolution information if it appears to be valid.
+      */
+      if ((image_info->density != (char *) NULL) &&
+          ((image_info->units == PixelsPerInchResolution) ||
+           (image_info->units == PixelsPerCentimeterResolution)))
         {
-          FormatString(buffer,"%.1024s \n",labels[i]);
-          (void) WriteBlobString(image,buffer);
-          MagickFreeMemory(labels[i]);
+          count=GetMagickDimension(image_info->density,&x_resolution,&y_resolution,NULL,NULL);
+          if (count != 2)
+            y_resolution=x_resolution;
+          if (image_info->units == PixelsPerCentimeterResolution)
+            {
+              x_resolution *= 2.54;
+              y_resolution *= 2.54;
+            }
         }
-        MagickFreeMemory(labels);
-      }
-    (void) memset(&pixel,0,sizeof(PixelPacket));
-    pixel.opacity=TransparentOpacity;
-    i=0;
-    index=0;
-    x=0;
-    /*
-      Analyze image to be written.
-    */
-    (void) GetImageCharacteristics(image,&characteristics,
-                                   (OptimizeType == image_info->type),
-                                   &image->exception);
-    if ((image_info->type != TrueColorType) &&
-        (characteristics.grayscale))
+      /*
+        Use image resolution information if it appears to be valid.
+      */
+      else if ((image->x_resolution > 0.0) && (image->y_resolution > 0.0) &&
+               ((image->units == PixelsPerInchResolution) ||
+                (image->units == PixelsPerCentimeterResolution)))
+        {
+          x_resolution = image->x_resolution;
+          y_resolution = image->y_resolution;
+          if (image->units == PixelsPerCentimeterResolution)
+            {
+              x_resolution *= 2.54;
+              y_resolution *= 2.54;
+            }
+        }
+      x_scale=(geometry.width*dx_resolution)/x_resolution;
+      geometry.width=(unsigned long) (x_scale+0.5);
+      y_scale=(geometry.height*dy_resolution)/y_resolution;
+      geometry.height=(unsigned long) (y_scale+0.5);
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Postscript Resolution: %gx%g DPI (geometry %lux%lu)",
+                            x_resolution,y_resolution,geometry.width,geometry.height);
+
+      /*
+        Enforce maximum Postscript dimensions to avoid denial of service
+      */
       {
-        FormatString(buffer,"%lu %lu\n1\n1\n1\n%d\n",image->columns,
-          image->rows,((characteristics.monochrome) ? 1 : 8));
-        (void) WriteBlobString(image,buffer);
-        if (!characteristics.monochrome)
-          {
-            /*
-              Dump image as grayscale.
-            */
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Writing image as grayscale...");
-            i++;
-            bp=buffer;
-            for (y=0; y < (long) image->rows; y++)
-            {
-              p=AcquireImagePixels(image,0,y,image->columns,1,
-                &image->exception);
-              if (p == (const PixelPacket *) NULL)
-                break;
-              for (x=0; x < (long) image->columns; x++)
-              {
-                Quantum
-                  quantum;
+        magick_uint64_t
+          pixels;
 
-                if (image->is_grayscale)
-                  quantum=GetGraySample(p);
-                else
-                  quantum=PixelIntensityToQuantum(p);
-
-                bp=AppendHexVal(bp,ScaleQuantumToChar(quantum));
-                i++;
-                if (i == 36)
-                  {
-                    i=0;
-                    *bp++='\n';
-                    (void) WriteBlob(image,bp-buffer,buffer);
-                    bp=buffer;
-                  }
-                p++;
-              }
-              if (image->previous == (Image *) NULL)
-                if (QuantumTick(y,image->rows))
-                  if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                              SaveImageText,image->filename,
-                                              image->columns,image->rows))
-                    break;
-            }
-            if (bp != buffer)
-              {
-                *bp++='\n';
-                (void) WriteBlob(image,bp-buffer,buffer);
-                bp=buffer;
-              }
-          }
-        else
-          {
-            /*
-              Dump image as bitmap.
-            */
-            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Writing image as monochrome bitmap...");
-            (void) SetImageType(image,BilevelType);
-            count=0;
-            bp=buffer;
-            for (y=0; y < (long) image->rows; y++)
-            {
-              p=AcquireImagePixels(image,0,y,image->columns,1,
-                &image->exception);
-              if (p == (const PixelPacket *) NULL)
-                break;
-              indexes=AccessImmutableIndexes(image);
-              bit=0;
-              byte=0;
-              for (x=0; x < (long) image->columns; x++)
-              {
-                byte<<=1;
-                if (image->storage_class == PseudoClass)
-                  {
-                    if (GetGraySample(&image->colormap[indexes[x]]) >= MaxRGB/2)
-                      byte|=0x01;
-                  }
-                else
-                  {
-                    if (GetGraySample(p) >= MaxRGB/2)
-                      byte|=0x01;
-                  }
-                bit++;
-                if (bit == 8)
-                  {
-                    bp=AppendHexVal(bp,byte & 0xff);
-                    count++;
-                    if (count == 36)
-                      {
-                        count=0;
-                        *bp++='\n';
-                        (void) WriteBlob(image,bp-buffer,buffer);
-                        bp=buffer;
-                      }
-                    bit=0;
-                    byte=0;
-                  }
-                p++;
-              }
-              if (bit != 0)
-                {
-                  byte<<=(8-bit);
-                  bp=AppendHexVal(bp,byte & 0xff);
-                  count++;
-                  if (count == 36)
-                    {
-                      count=0;
-                      *bp++='\n';
-                      (void) WriteBlob(image,bp-buffer,buffer);
-                      bp=buffer;
-                    };
-                };
-              if (image->previous == (Image *) NULL)
-                if (QuantumTick(y,image->rows))
-                  if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                              SaveImageText,image->filename,
-                                              image->columns,image->rows))
-                    break;
-            }
-            if (bp != buffer)
-              {
-                (void) WriteBlob(image,bp-buffer,buffer);
-                bp=buffer;
-              }
-          }
-        if (count != 0)
-          (void) WriteBlobByte(image,'\n');
+        if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
+          ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
+        if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
+          ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
+        pixels=(magick_uint64_t)geometry.width*geometry.height;
+        if ((0 == pixels) || (pixels/geometry.width != geometry.height) ||
+            (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+          ThrowWriterException(ResourceLimitError,ImagePixelLimitExceeded,image);
       }
-    else
-      if (image->storage_class == DirectClass)
+
+      if (page == 1)
         {
           /*
-            Dump DirectClass image.
+            Output Postscript header.
           */
-          FormatString(buffer,"%lu %lu\n0\n%d\n",image->columns,image->rows,
-            (int) (image_info->compression == RLECompression));
+#if defined(HAVE_CTIME_R)
+          char time_buf[26];
+#endif /* defined(HAVE_CTIME_R) */
+          if (LocaleCompare(image_info->magick,"PS") == 0)
+            (void) strlcpy(buffer,"%!PS-Adobe-3.0\n",sizeof(buffer));
+          else
+            (void) strlcpy(buffer,"%!PS-Adobe-3.0 EPSF-3.0\n",sizeof(buffer));
           (void) WriteBlobString(image,buffer);
-          switch (image_info->compression)
-          {
-            case RLECompression:
+          (void) WriteBlobString(image,"%%Creator: (GraphicsMagick)\n");
+          MagickFormatString(buffer,sizeof(buffer),"%%%%Title: (%.1024s)\n",image->filename);
+          (void) WriteBlobString(image,buffer);
+          timer=time((time_t *) NULL);
+#if defined(HAVE_CTIME_R)
+          (void) strlcpy(date,ctime_r(&timer,time_buf),MaxTextExtent);
+#else
+          (void) strlcpy(date,ctime(&timer),MaxTextExtent); /* Thread-unsafe version */
+#endif /* defined(HAVE_CTIME_R) */
+          date[strlen(date)-1]='\0';
+          MagickFormatString(buffer,sizeof(buffer),"%%%%CreationDate: (%.1024s)\n",date);
+          (void) WriteBlobString(image,buffer);
+          bounds.x1=geometry.x;
+          bounds.y1=geometry.y;
+          bounds.x2=geometry.x+x_scale;
+          bounds.y2=geometry.y+((size_t) geometry.height+text_size);
+          if (image_info->adjoin && (image->next != (Image *) NULL))
+            (void) strlcpy(buffer,"%%%%BoundingBox: (atend)\n",sizeof(buffer));
+          else
+            MagickFormatString(buffer,sizeof(buffer),"%%%%BoundingBox: %g %g %g %g\n",
+                               floor(bounds.x1+0.5),floor(bounds.y1+0.5),ceil(bounds.x2-0.5),
+                               ceil(bounds.y2-0.5));
+          (void) WriteBlobString(image,buffer);
+          attribute=GetImageAttribute(image,"label");
+          if (attribute != (const ImageAttribute *) NULL)
+            (void) WriteBlobString(image,
+                                   "%%DocumentNeededResources: font Times-Roman\n");
+          (void) WriteBlobString(image,"%%DocumentData: Clean7Bit\n");
+          (void) WriteBlobString(image,"%%LanguageLevel: 1\n");
+          if (LocaleCompare(image_info->magick,"PS") != 0)
+            (void) WriteBlobString(image,"%%Pages: 1\n");
+          else
             {
               /*
-                Dump runlength-encoded DirectColor packets.
+                Compute the number of pages.
               */
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Writing image as DirectColor "
-                                    "(RLE compressed)...");
+              (void) WriteBlobString(image,"%%Orientation: Portrait\n");
+              (void) WriteBlobString(image,"%%PageOrder: Ascend\n");
+              MagickFormatString(buffer,sizeof(buffer),"%%%%Pages: %lu\n", image_info->adjoin ?
+                                 (unsigned long) image_list_length : 1L);
+              (void) WriteBlobString(image,buffer);
+            }
+          (void) WriteBlobString(image,"%%EndComments\n");
+          (void) WriteBlobString(image,"\n%%BeginDefaults\n");
+          (void) WriteBlobString(image,"%%EndDefaults\n\n");
+          if ((LocaleCompare(image_info->magick,"EPI") == 0) ||
+              (LocaleCompare(image_info->magick,"EPT") == 0) ||
+              (LocaleCompare(image_info->magick,"EPSI") == 0))
+            {
+              Image
+                *preview_image;
+
+              /*
+                Create preview image.
+              */
+              preview_image=CloneImage(image,0,0,True,&image->exception);
+              if (preview_image == (Image *) NULL)
+                {
+                  CloseBlob(image);
+                  return MagickFail;
+                }
+              /*
+                Dump image as bitmap.
+              */
+              if ((status &= SetImageType(preview_image,BilevelType)) == MagickFail)
+                {
+                  DestroyImage(preview_image);
+                  CloseBlob(image);
+                  return MagickFail;
+                }
+              polarity=
+                PixelIntensityToQuantum(&preview_image->colormap[0]) < (MaxRGB/2);
+              if (preview_image->colors == 2)
+                polarity=PixelIntensityToQuantum(&preview_image->colormap[0]) >
+                  PixelIntensityToQuantum(&preview_image->colormap[1]);
+              MagickFormatString(buffer,sizeof(buffer),"%%%%BeginPreview: %lu %lu %lu %lu\n%%  ",
+                                 preview_image->columns,preview_image->rows,1L,
+                                 (((preview_image->columns+7) >> 3)*preview_image->rows+35)/36);
+              (void) WriteBlobString(image,buffer);
+              count=0;
               bp=buffer;
               for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                pixel=(*p);
-                length=255;
-                for (x=0; x < (long) image->columns; x++)
                 {
-                  if ((p->red == pixel.red) && (p->green == pixel.green) &&
-                      (p->blue == pixel.blue) && (p->opacity == pixel.opacity) &&
-                      (length < 255) && (x < (long) (image->columns-1)))
-                    length++;
-                  else
+                  p=AcquireImagePixels(preview_image,0,y,preview_image->columns,1,
+                                       &preview_image->exception);
+                  if (p == (const PixelPacket *) NULL)
+                    break;
+                  indexes=AccessImmutableIndexes(preview_image);
+                  bit=0;
+                  byte=0;
+                  for (x=0; x < (long) preview_image->columns; x++)
                     {
-                      if (x > 0)
+                      byte<<=1;
+                      if (indexes[x] == polarity)
+                        byte|=0x01;
+                      bit++;
+                      if (bit == 8)
                         {
-                          WriteRunlengthPacket(image,bp,pixel,length,p);
-                          i++;
-                          if (i == 9)
+                          bp=AppendHexVal(bp,byte & 0xff);
+                          count++;
+                          if (count == 36)
                             {
+                              count=0;
                               *bp++='\n';
+                              *bp++='%';
+                              *bp++=' ';
+                              *bp++=' ';
                               (void) WriteBlob(image,bp-buffer,buffer);
                               bp=buffer;
-                              i=0;
-                            }
+                            };
+                          bit=0;
+                          byte=0;
                         }
-                      length=0;
                     }
-                  pixel=(*p);
-                  p++;
+                  if (bit != 0)
+                    {
+                      byte<<=(8-bit);
+                      bp=AppendHexVal(bp,byte & 0xff);
+                      count++;
+                      if (count == 36)
+                        {
+                          count=0;
+                          *bp++='\n';
+                          *bp++='%';
+                          *bp++=' ';
+                          *bp++=' ';
+                          (void) WriteBlob(image,bp-buffer,buffer);
+                          bp=buffer;
+                        };
+                    };
                 }
-                WriteRunlengthPacket(image,bp,pixel,length,p);
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                                SaveImageText,image->filename,
-                                                image->columns,image->rows))
-                      break;
-              }
               if (bp != buffer)
                 {
                   (void) WriteBlob(image,bp-buffer,buffer);
                   bp=buffer;
                 }
-              break;
+              (void) WriteBlobString(image,"\n%%EndPreview\n");
+              DestroyImage(preview_image);
             }
-            case NoCompression:
-            default:
+          /*
+            Output Postscript commands.
+          */
+          (void) WriteBlobString(image,
+                                 "%%BeginProlog\n"
+                                 "%\n"
+                                 "% Display a color image.  The image is displayed in color on\n"
+                                 "% Postscript viewers or printers that support color, otherwise\n"
+                                 "% it is displayed as grayscale.\n"
+                                 "%\n"
+                                 "/DirectClassPacket\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Get a DirectClass packet.\n"
+                                 "  %\n"
+                                 "  % Parameters:\n"
+                                 "  %   red.\n"
+                                 "  %   green.\n"
+                                 "  %   blue.\n"
+                                 "  %   length: number of pixels minus one of this color (optional).\n"
+                                 "  %\n"
+                                 "  currentfile color_packet readhexstring pop pop\n"
+                                 "  compression 0 eq\n"
+                                 "  {\n"
+                                 "    /number_pixels 3 def\n"
+                                 "  }\n"
+                                 "  {\n"
+                                 "    currentfile byte readhexstring pop 0 get\n"
+                                 "    /number_pixels exch 1 add 3 mul def\n"
+                                 "  } ifelse\n"
+                                 "  0 3 number_pixels 1 sub\n"
+                                 "  {\n"
+                                 "    pixels exch color_packet putinterval\n"
+                                 "  } for\n"
+                                 "  pixels 0 number_pixels getinterval\n"
+                                 "} bind def\n"
+                                 "\n"
+                                 "/DirectClassImage\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Display a DirectClass image.\n"
+                                 "  %\n"
+                                 "  systemdict /colorimage known\n"
+                                 "  {\n"
+                                 "    columns rows 8\n"
+                                 "    [\n"
+                                 "      columns 0 0\n"
+                                 "      rows neg 0 rows\n"
+                                 "    ]\n"
+                                 "    { DirectClassPacket } false 3 colorimage\n"
+                                 "  }\n"
+                                 "  {\n"
+                                 "    %\n"
+                                 "    % No colorimage operator;  convert to grayscale.\n"
+                                 "    %\n"
+                                 "    columns rows 8\n"
+                                 "    [\n"
+                                 "      columns 0 0\n"
+                                 "      rows neg 0 rows\n"
+                                 "    ]\n"
+                                 "    { GrayDirectClassPacket } image\n"
+                                 "  } ifelse\n"
+                                 "} bind def\n"
+                                 "\n"
+                                 "/GrayDirectClassPacket\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Get a DirectClass packet;  convert to grayscale.\n"
+                                 "  %\n"
+                                 "  % Parameters:\n"
+                                 "  %   red\n"
+                                 "  %   green\n"
+                                 "  %   blue\n"
+                                 "  %   length: number of pixels minus one of this color (optional).\n"
+                                 "  %\n"
+                                 "  currentfile color_packet readhexstring pop pop\n"
+                                 "  color_packet 0 get 0.299 mul\n"
+                                 "  color_packet 1 get 0.587 mul add\n"
+                                 "  color_packet 2 get 0.114 mul add\n"
+                                 "  cvi\n"
+                                 "  /gray_packet exch def\n"
+                                 "  compression 0 eq\n"
+                                 "  {\n"
+                                 "    /number_pixels 1 def\n"
+                                 "  }\n"
+                                 "  {\n"
+                                 "    currentfile byte readhexstring pop 0 get\n"
+                                 "    /number_pixels exch 1 add def\n"
+                                 "  } ifelse\n"
+                                 "  0 1 number_pixels 1 sub\n"
+                                 "  {\n"
+                                 "    pixels exch gray_packet put\n"
+                                 "  } for\n"
+                                 "  pixels 0 number_pixels getinterval\n"
+                                 "} bind def\n"
+                                 "\n"
+                                 "/GrayPseudoClassPacket\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Get a PseudoClass packet;  convert to grayscale.\n"
+                                 "  %\n"
+                                 "  % Parameters:\n"
+                                 "  %   index: index into the colormap.\n"
+                                 "  %   length: number of pixels minus one of this color (optional).\n"
+                                 "  %\n"
+                                 "  currentfile byte readhexstring pop 0 get\n"
+                                 "  /offset exch 3 mul def\n"
+                                 "  /color_packet colormap offset 3 getinterval def\n"
+                                 "  color_packet 0 get 0.299 mul\n"
+                                 "  color_packet 1 get 0.587 mul add\n"
+                                 "  color_packet 2 get 0.114 mul add\n"
+                                 "  cvi\n"
+                                 "  /gray_packet exch def\n"
+                                 "  compression 0 eq\n"
+                                 "  {\n"
+                                 "    /number_pixels 1 def\n"
+                                 "  }\n"
+                                 "  {\n"
+                                 "    currentfile byte readhexstring pop 0 get\n"
+                                 "    /number_pixels exch 1 add def\n"
+                                 "  } ifelse\n"
+                                 "  0 1 number_pixels 1 sub\n"
+                                 "  {\n"
+                                 "    pixels exch gray_packet put\n"
+                                 "  } for\n"
+                                 "  pixels 0 number_pixels getinterval\n"
+                                 "} bind def\n"
+                                 "\n"
+                                 "/PseudoClassPacket\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Get a PseudoClass packet.\n"
+                                 "  %\n"
+                                 "  % Parameters:\n"
+                                 "  %   index: index into the colormap.\n"
+                                 "  %   length: number of pixels minus one of this color (optional).\n"
+                                 "  %\n"
+                                 "  currentfile byte readhexstring pop 0 get\n"
+                                 "  /offset exch 3 mul def\n"
+                                 "  /color_packet colormap offset 3 getinterval def\n"
+                                 "  compression 0 eq\n"
+                                 "  {\n"
+                                 "    /number_pixels 3 def\n"
+                                 "  }\n"
+                                 "  {\n"
+                                 "    currentfile byte readhexstring pop 0 get\n"
+                                 "    /number_pixels exch 1 add 3 mul def\n"
+                                 "  } ifelse\n"
+                                 "  0 3 number_pixels 1 sub\n"
+                                 "  {\n"
+                                 "    pixels exch color_packet putinterval\n"
+                                 "  } for\n"
+                                 "  pixels 0 number_pixels getinterval\n"
+                                 "} bind def\n"
+                                 "\n"
+                                 "/PseudoClassImage\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Display a PseudoClass image.\n"
+                                 "  %\n"
+                                 "  % Parameters:\n"
+                                 "  %   class: 0-PseudoClass or 1-Grayscale.\n"
+                                 "  %\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /class exch def pop\n"
+                                 "  class 0 gt\n"
+                                 "  {\n"
+                                 "    currentfile buffer readline pop\n"
+                                 "    token pop /depth exch def pop\n"
+                                 "    /grays columns 8 add depth sub depth mul 8 idiv string def\n"
+                                 "    columns rows depth\n"
+                                 "    [\n"
+                                 "      columns 0 0\n"
+                                 "      rows neg 0 rows\n"
+                                 "    ]\n"
+                                 "    { currentfile grays readhexstring pop } image\n"
+                                 "  }\n"
+                                 "  {\n"
+                                 "    %\n"
+                                 "    % Parameters:\n"
+                                 "    %   colors: number of colors in the colormap.\n"
+                                 "    %   colormap: red, green, blue color packets.\n"
+                                 "    %\n"
+                                 "    currentfile buffer readline pop\n"
+                                 "    token pop /colors exch def pop\n"
+                                 "    /colors colors 3 mul def\n"
+                                 "    /colormap colors string def\n"
+                                 "    currentfile colormap readhexstring pop pop\n"
+                                 "    systemdict /colorimage known\n"
+                                 "    {\n"
+                                 "      columns rows 8\n"
+                                 "      [\n"
+                                 "        columns 0 0\n"
+                                 "        rows neg 0 rows\n"
+                                 "      ]\n"
+                                 "      { PseudoClassPacket } false 3 colorimage\n"
+                                 "    }\n"
+                                 "    {\n"
+                                 "      %\n"
+                                 "      % No colorimage operator;  convert to grayscale.\n"
+                                 "      %\n"
+                                 "      columns rows 8\n"
+                                 "      [\n"
+                                 "        columns 0 0\n"
+                                 "        rows neg 0 rows\n"
+                                 "      ]\n"
+                                 "      { GrayPseudoClassPacket } image\n"
+                                 "    } ifelse\n"
+                                 "  } ifelse\n"
+                                 "} bind def\n"
+                                 "\n"
+                                 "/DisplayImage\n"
+                                 "{\n"
+                                 "  %\n"
+                                 "  % Display a DirectClass or PseudoClass image.\n"
+                                 "  %\n"
+                                 "  % Parameters:\n"
+                                 "  %   x & y translation.\n"
+                                 "  %   x & y scale.\n"
+                                 "  %   label pointsize.\n"
+                                 "  %   image label.\n"
+                                 "  %   image columns & rows.\n"
+                                 "  %   class: 0-DirectClass or 1-PseudoClass.\n"
+                                 "  %   compression: 0-none or 1-RunlengthEncoded.\n"
+                                 "  %   hex color packets.\n"
+                                 "  %\n"
+                                 "  gsave\n"
+                                 "  /buffer 512 string def\n"
+                                 "  /byte 1 string def\n"
+                                 "  /color_packet 3 string def\n"
+                                 "  /pixels 768 string def\n"
+                                 "\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /x exch def\n"
+                                 "  token pop /y exch def pop\n"
+                                 "  x y translate\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /x exch def\n"
+                                 "  token pop /y exch def pop\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /pointsize exch def pop\n"
+                                 "  /Times-Roman findfont pointsize scalefont setfont\n");
+
+          attribute=GetImageAttribute(image,"label");
+          if (attribute != (const ImageAttribute *) NULL)
+            for (j=(long) MultilineCensus(attribute->value)-1; j >= 0; j--)
+              {
+                (void) WriteBlobString(image,"  /label 512 string def\n");
+                (void) WriteBlobString(image,"  currentfile label readline pop\n");
+                MagickFormatString(buffer,sizeof(buffer),"  0 y %g add moveto label show pop\n",
+                                   j*image_info->pointsize+12);
+                (void) WriteBlobString(image,buffer);
+              }
+          (void) WriteBlobString(image,
+                                 "  x y scale\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /columns exch def\n"
+                                 "  token pop /rows exch def pop\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /class exch def pop\n"
+                                 "  currentfile buffer readline pop\n"
+                                 "  token pop /compression exch def pop\n"
+                                 "  class 0 gt { PseudoClassImage } { DirectClassImage } ifelse\n"
+                                 "  grestore\n");
+          if (LocaleCompare(image_info->magick,"PS") == 0)
+            (void) WriteBlobString(image,"  showpage\n");
+          (void) WriteBlobString(image,"} bind def\n");
+          (void) WriteBlobString(image,"%%EndProlog\n");
+        }
+      MagickFormatString(buffer,sizeof(buffer),"%%%%Page:  1 %lu\n",page++);
+      (void) WriteBlobString(image,buffer);
+      MagickFormatString(buffer,sizeof(buffer),"%%%%PageBoundingBox: %ld %ld %ld %ld\n",geometry.x,
+                         geometry.y,geometry.x+(long) geometry.width,geometry.y+(long)
+                         (geometry.height+text_size));
+      (void) WriteBlobString(image,buffer);
+      if (geometry.x < bounds.x1)
+        bounds.x1=geometry.x;
+      if (geometry.y < bounds.y1)
+        bounds.y1=geometry.y;
+      if ((geometry.x+((size_t) geometry.width-1)) > bounds.x2)
+        bounds.x2=geometry.x+(size_t) geometry.width-1;
+      if ((geometry.y+((size_t) geometry.height+text_size)-1) > bounds.y2)
+        bounds.y2=geometry.y+((size_t) geometry.height+text_size)-1;
+      attribute=GetImageAttribute(image,"label");
+      if (attribute != (const ImageAttribute *) NULL)
+        (void) WriteBlobString(image,"%%%%PageResources: font Times-Roman\n");
+      if (LocaleCompare(image_info->magick,"PS") != 0)
+        (void) WriteBlobString(image,"userdict begin\n");
+      (void) WriteBlobString(image,"DisplayImage\n");
+      /*
+        Output image data.
+      */
+      MagickFormatString(buffer,sizeof(buffer),"%ld %ld\n%g %g\n%f\n",geometry.x,geometry.y,
+                         x_scale,y_scale,image_info->pointsize);
+      (void) WriteBlobString(image,buffer);
+      labels=(char **) NULL;
+      attribute=GetImageAttribute(image,"label");
+      if (attribute != (const ImageAttribute *) NULL)
+        labels=StringToList(attribute->value);
+      if (labels != (char **) NULL)
+        {
+          for (i=0; labels[i] != (char *) NULL; i++)
+            {
+              MagickFormatString(buffer,sizeof(buffer),"%.1024s \n",labels[i]);
+              (void) WriteBlobString(image,buffer);
+              MagickFreeMemory(labels[i]);
+            }
+          MagickFreeMemory(labels);
+        }
+      (void) memset(&pixel,0,sizeof(PixelPacket));
+      pixel.opacity=TransparentOpacity;
+      i=0;
+      index=0;
+      x=0;
+      if ((image_info->type != TrueColorType) &&
+          (characteristics.grayscale))
+        {
+          MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n1\n1\n1\n%d\n",image->columns,
+                             image->rows,((characteristics.monochrome) ? 1 : 8));
+          (void) WriteBlobString(image,buffer);
+          if (!characteristics.monochrome)
             {
               /*
-                Dump uncompressed DirectColor packets.
+                Dump image as grayscale.
               */
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Writing image as DirectColor "
-                                    "(uncompressed)...");
-              i=0;
+                                    "Writing image as grayscale...");
+              i++;
               bp=buffer;
               for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                for (x=0; x < (long) image->columns; x++)
                 {
-                  if (image->matte && (p->opacity == TransparentOpacity))
-                    bp=AppendHexTriplet(bp,0xff,0xff,0xff);
-                  else
-                    bp=AppendHexTriplet(bp,
-                                        ScaleQuantumToChar(p->red),
-                                        ScaleQuantumToChar(p->green),
-                                        ScaleQuantumToChar(p->blue));
-                  i++;
-                  if (i == 12)
+                  p=AcquireImagePixels(image,0,y,image->columns,1,
+                                       &image->exception);
+                  if (p == (const PixelPacket *) NULL)
+                    break;
+                  for (x=0; x < (long) image->columns; x++)
                     {
-                      i=0;
-                      *bp++='\n';
-                      (void) WriteBlob(image,bp-buffer,buffer);
-                      bp=buffer;
+                      Quantum
+                        quantum;
+
+                      if (image->is_grayscale)
+                        quantum=GetGraySample(p);
+                      else
+                        quantum=PixelIntensityToQuantum(p);
+
+                      bp=AppendHexVal(bp,ScaleQuantumToChar(quantum));
+                      i++;
+                      if (i == 36)
+                        {
+                          i=0;
+                          *bp++='\n';
+                          (void) WriteBlob(image,bp-buffer,buffer);
+                          bp=buffer;
+                        }
+                      p++;
                     }
-                  p++;
+                  if (image->previous == (Image *) NULL)
+                    if (QuantumTick(y,image->rows))
+                      if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                  SaveImageText,image->filename,
+                                                  image->columns,image->rows))
+                        break;
                 }
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                                SaveImageText,image->filename,
-                                                image->columns,image->rows))
-                      break;
-              }
               if (bp != buffer)
                 {
                   *bp++='\n';
                   (void) WriteBlob(image,bp-buffer,buffer);
                   bp=buffer;
                 }
-              break;
             }
-          }
-          (void) WriteBlobByte(image,'\n');
-        }
-      else
-        {
-          /*
-            Dump PseudoClass image.
-          */
-          FormatString(buffer,"%lu %lu\n%d\n%d\n0\n",image->columns,image->rows,
-            (int) (image->storage_class == PseudoClass),
-            (int) (image_info->compression == RLECompression));
-          (void) WriteBlobString(image,buffer);
-          /*
-            Dump number of colors and colormap.
-          */
-          FormatString(buffer,"%u\n",image->colors);
-          (void) WriteBlobString(image,buffer);
-          for (i=0; i < (long) image->colors; i++)
-          {
-            FormatString(buffer,"%02X%02X%02X\n",
-              ScaleQuantumToChar(image->colormap[i].red),
-              ScaleQuantumToChar(image->colormap[i].green),
-              ScaleQuantumToChar(image->colormap[i].blue));
-            (void) WriteBlobString(image,buffer);
-          }
-          switch (image_info->compression)
-          {
-            case RLECompression:
+          else
             {
               /*
-                Dump runlength-encoded PseudoColor packets.
+                Dump image as bitmap.
               */
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Writing image as PseudoColor "
-                                    "(%u colors, RLE compressed)...",
-                                    image->colors);
-              i=0;
+                                    "Writing image as monochrome bitmap...");
+              if ((status &= SetImageType(image,BilevelType)) == MagickFail)
+                {
+                  CloseBlob(image);
+                  return MagickFail;
+                }
+              count=0;
               bp=buffer;
               for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                indexes=AccessImmutableIndexes(image);
-                index=(*indexes);
-                length=255;
-                for (x=0; x < (long) image->columns; x++)
                 {
-                  if ((index == indexes[x]) && (length < 255) &&
-                      (x < ((long) image->columns-1)))
-                    length++;
-                  else
+                  p=AcquireImagePixels(image,0,y,image->columns,1,
+                                       &image->exception);
+                  if (p == (const PixelPacket *) NULL)
+                    break;
+                  indexes=AccessImmutableIndexes(image);
+                  bit=0;
+                  byte=0;
+                  for (x=0; x < (long) image->columns; x++)
                     {
-                      if (x > 0)
+                      byte<<=1;
+                      if (image->storage_class == PseudoClass)
                         {
-                          bp=AppendHexVal(bp,index);
-                          bp=AppendHexVal(bp,Min(length,0xff));
+                          if (GetGraySample(&image->colormap[indexes[x]]) >= MaxRGB/2)
+                            byte|=0x01;
+                        }
+                      else
+                        {
+                          if (GetGraySample(p) >= MaxRGB/2)
+                            byte|=0x01;
+                        }
+                      bit++;
+                      if (bit == 8)
+                        {
+                          bp=AppendHexVal(bp,byte & 0xff);
+                          count++;
+                          if (count == 36)
+                            {
+                              count=0;
+                              *bp++='\n';
+                              (void) WriteBlob(image,bp-buffer,buffer);
+                              bp=buffer;
+                            }
+                          bit=0;
+                          byte=0;
+                        }
+                      p++;
+                    }
+                  if (bit != 0)
+                    {
+                      byte<<=(8-bit);
+                      bp=AppendHexVal(bp,byte & 0xff);
+                      count++;
+                      if (count == 36)
+                        {
+                          count=0;
+                          *bp++='\n';
+                          (void) WriteBlob(image,bp-buffer,buffer);
+                          bp=buffer;
+                        };
+                    };
+                  if (image->previous == (Image *) NULL)
+                    if (QuantumTick(y,image->rows))
+                      if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                  SaveImageText,image->filename,
+                                                  image->columns,image->rows))
+                        break;
+                }
+              if (bp != buffer)
+                {
+                  (void) WriteBlob(image,bp-buffer,buffer);
+                  bp=buffer;
+                }
+            }
+          if (count != 0)
+            (void) WriteBlobByte(image,'\n');
+        }
+      else
+        if (image->storage_class == DirectClass)
+          {
+            /*
+              Dump DirectClass image.
+            */
+            MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n0\n%d\n",image->columns,image->rows,
+                               (int) (image_info->compression == RLECompression));
+            (void) WriteBlobString(image,buffer);
+            switch (image_info->compression)
+              {
+              case RLECompression:
+                {
+                  /*
+                    Dump runlength-encoded DirectColor packets.
+                  */
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Writing image as DirectColor "
+                                        "(RLE compressed)...");
+                  bp=buffer;
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      pixel=(*p);
+                      length=255;
+                      for (x=0; x < (long) image->columns; x++)
+                        {
+                          if ((p->red == pixel.red) && (p->green == pixel.green) &&
+                              (p->blue == pixel.blue) && (p->opacity == pixel.opacity) &&
+                              (length < 255) && (x < (long) (image->columns-1)))
+                            length++;
+                          else
+                            {
+                              if (x > 0)
+                                {
+                                  WriteRunlengthPacket(image,bp,pixel,length,p);
+                                  i++;
+                                  if (i == 9)
+                                    {
+                                      *bp++='\n';
+                                      (void) WriteBlob(image,bp-buffer,buffer);
+                                      bp=buffer;
+                                      i=0;
+                                    }
+                                }
+                              length=0;
+                            }
+                          pixel=(*p);
+                          p++;
+                        }
+                      WriteRunlengthPacket(image,bp,pixel,length,p);
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                      SaveImageText,image->filename,
+                                                      image->columns,image->rows))
+                            break;
+                    }
+                  if (bp != buffer)
+                    {
+                      (void) WriteBlob(image,bp-buffer,buffer);
+                      bp=buffer;
+                    }
+                  break;
+                }
+              case NoCompression:
+              default:
+                {
+                  /*
+                    Dump uncompressed DirectColor packets.
+                  */
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Writing image as DirectColor "
+                                        "(uncompressed)...");
+                  i=0;
+                  bp=buffer;
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      for (x=0; x < (long) image->columns; x++)
+                        {
+                          if (image->matte && (p->opacity == TransparentOpacity))
+                            bp=AppendHexTriplet(bp,0xff,0xff,0xff);
+                          else
+                            bp=AppendHexTriplet(bp,
+                                                ScaleQuantumToChar(p->red),
+                                                ScaleQuantumToChar(p->green),
+                                                ScaleQuantumToChar(p->blue));
                           i++;
-                          if (i == 18)
+                          if (i == 12)
+                            {
+                              i=0;
+                              *bp++='\n';
+                              (void) WriteBlob(image,bp-buffer,buffer);
+                              bp=buffer;
+                            }
+                          p++;
+                        }
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                      SaveImageText,image->filename,
+                                                      image->columns,image->rows))
+                            break;
+                    }
+                  if (bp != buffer)
+                    {
+                      *bp++='\n';
+                      (void) WriteBlob(image,bp-buffer,buffer);
+                      bp=buffer;
+                    }
+                  break;
+                }
+              }
+            (void) WriteBlobByte(image,'\n');
+          }
+        else
+          {
+            /*
+              Dump PseudoClass image.
+            */
+            MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n%d\n%d\n0\n",image->columns,image->rows,
+                               (int) (image->storage_class == PseudoClass),
+                               (int) (image_info->compression == RLECompression));
+            (void) WriteBlobString(image,buffer);
+            /*
+              Dump number of colors and colormap.
+            */
+            MagickFormatString(buffer,sizeof(buffer),"%u\n",image->colors);
+            (void) WriteBlobString(image,buffer);
+            for (i=0; i < (long) image->colors; i++)
+              {
+                MagickFormatString(buffer,sizeof(buffer),"%02X%02X%02X\n",
+                                   ScaleQuantumToChar(image->colormap[i].red),
+                                   ScaleQuantumToChar(image->colormap[i].green),
+                                   ScaleQuantumToChar(image->colormap[i].blue));
+                (void) WriteBlobString(image,buffer);
+              }
+            switch (image_info->compression)
+              {
+              case RLECompression:
+                {
+                  /*
+                    Dump runlength-encoded PseudoColor packets.
+                  */
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Writing image as PseudoColor "
+                                        "(%u colors, RLE compressed)...",
+                                        image->colors);
+                  i=0;
+                  bp=buffer;
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      indexes=AccessImmutableIndexes(image);
+                      index=(*indexes);
+                      length=255;
+                      for (x=0; x < (long) image->columns; x++)
+                        {
+                          if ((index == indexes[x]) && (length < 255) &&
+                              (x < ((long) image->columns-1)))
+                            length++;
+                          else
+                            {
+                              if (x > 0)
+                                {
+                                  bp=AppendHexVal(bp,index);
+                                  bp=AppendHexVal(bp,Min(length,0xff));
+                                  i++;
+                                  if (i == 18)
+                                    {
+                                      *bp++='\n';
+                                      (void) WriteBlob(image,bp-buffer,buffer);
+                                      bp=buffer;
+                                      i=0;
+                                    }
+                                }
+                              length=0;
+                            }
+                          index=indexes[x];
+                          pixel=(*p);
+                          p++;
+                        }
+                      bp=AppendHexVal(bp,index);
+                      bp=AppendHexVal(bp,Min(length,0xff));
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                      SaveImageText,image->filename,
+                                                      image->columns,image->rows))
+                            break;
+                    }
+                  if (bp != buffer)
+                    {
+                      (void) WriteBlob(image,bp-buffer,buffer);
+                      bp=buffer;
+                    }
+                  break;
+                }
+              case NoCompression:
+              default:
+                {
+                  /*
+                    Dump uncompressed PseudoColor packets.
+                  */
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Writing image as PseudoColor "
+                                        "(%u colors, unompressed)...",
+                                        image->colors);
+                  i=0;
+                  bp=buffer;
+                  for (y=0; y < (long) image->rows; y++)
+                    {
+                      p=AcquireImagePixels(image,0,y,image->columns,1,
+                                           &image->exception);
+                      if (p == (const PixelPacket *) NULL)
+                        break;
+                      indexes=AccessImmutableIndexes(image);
+                      for (x=0; x < (long) image->columns; x++)
+                        {
+                          bp=AppendHexVal(bp,indexes[x]);
+                          i++;
+                          if (i == 36)
                             {
                               *bp++='\n';
                               (void) WriteBlob(image,bp-buffer,buffer);
                               bp=buffer;
                               i=0;
                             }
+                          p++;
                         }
-                      length=0;
+                      if (image->previous == (Image *) NULL)
+                        if (QuantumTick(y,image->rows))
+                          if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                      SaveImageText,image->filename,
+                                                      image->columns,image->rows))
+                            break;
                     }
-                  index=indexes[x];
-                  pixel=(*p);
-                  p++;
-                }
-                bp=AppendHexVal(bp,index);
-                bp=AppendHexVal(bp,Min(length,0xff));
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                                SaveImageText,image->filename,
-                                                image->columns,image->rows))
-                      break;
-              }
-              if (bp != buffer)
-              {
-                (void) WriteBlob(image,bp-buffer,buffer);
-                bp=buffer;
-              }
-              break;
-            }
-            case NoCompression:
-            default:
-            {
-              /*
-                Dump uncompressed PseudoColor packets.
-              */
-              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Writing image as PseudoColor "
-                                    "(%u colors, unompressed)...",
-                                    image->colors);
-              i=0;
-              bp=buffer;
-              for (y=0; y < (long) image->rows; y++)
-              {
-                p=AcquireImagePixels(image,0,y,image->columns,1,
-                  &image->exception);
-                if (p == (const PixelPacket *) NULL)
-                  break;
-                indexes=AccessImmutableIndexes(image);
-                for (x=0; x < (long) image->columns; x++)
-                {
-                  bp=AppendHexVal(bp,indexes[x]);
-                  i++;
-                  if (i == 36)
+                  if (bp != buffer)
                     {
-                      *bp++='\n';
                       (void) WriteBlob(image,bp-buffer,buffer);
                       bp=buffer;
-                      i=0;
                     }
-                  p++;
+                  break;
                 }
-                if (image->previous == (Image *) NULL)
-                  if (QuantumTick(y,image->rows))
-                    if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                                SaveImageText,image->filename,
-                                                image->columns,image->rows))
-                      break;
               }
-              if (bp != buffer)
-                {
-                  (void) WriteBlob(image,bp-buffer,buffer);
-                  bp=buffer;
-                }
-              break;
-            }
+            (void) WriteBlobByte(image,'\n');
           }
-          (void) WriteBlobByte(image,'\n');
-        }
-    if (LocaleCompare(image_info->magick,"PS") != 0)
-      (void) WriteBlobString(image,"end\n");
-    (void) WriteBlobString(image,"%%PageTrailer\n");
-    if (image->next == (Image *) NULL)
-      break;
-    image=SyncNextImageInList(image);
-    if (!MagickMonitorFormatted(scene++,image_list_length,&image->exception,
-                                SaveImagesText,image->filename))
-      break;
-  } while (image_info->adjoin);
+      if (LocaleCompare(image_info->magick,"PS") != 0)
+        (void) WriteBlobString(image,"end\n");
+      (void) WriteBlobString(image,"%%PageTrailer\n");
+      if (image->next == (Image *) NULL)
+        break;
+      image=SyncNextImageInList(image);
+      if (!MagickMonitorFormatted(scene++,image_list_length,&image->exception,
+                                  SaveImagesText,image->filename))
+        break;
+    } while (image_info->adjoin);
   if (image_info->adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;
   (void) WriteBlobString(image,"%%Trailer\n");
   if (page > 2)
     {
-      FormatString(buffer,"%%%%BoundingBox: %g %g %g %g\n",floor(bounds.x1+0.5),
-        floor(bounds.y1+0.5),ceil(bounds.x2-0.5),ceil(bounds.y2-0.5));
+      MagickFormatString(buffer,sizeof(buffer),"%%%%BoundingBox: %g %g %g %g\n",floor(bounds.x1+0.5),
+                         floor(bounds.y1+0.5),ceil(bounds.x2-0.5),ceil(bounds.y2-0.5));
       (void) WriteBlobString(image,buffer);
     }
   (void) WriteBlobString(image,"%%EOF\n");

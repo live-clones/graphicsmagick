@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2023 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -45,6 +45,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/resource.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -55,7 +56,13 @@ static unsigned int
 #endif
 
 #if defined(HasJBIG)
+#if defined(__cplusplus) || defined(c_plusplus)
+extern "C" {
+#endif
 #include "jbig.h"
+#if defined(__cplusplus) || defined(c_plusplus)
+}
+#endif
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -489,7 +496,8 @@ static unsigned int WriteJBIGImage(const ImageInfo *image_info,Image *image)
     /*
       Ensure that image is in an RGB space.
     */
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     /*
       Allocate pixel data.
     */
@@ -533,7 +541,9 @@ static unsigned int WriteJBIGImage(const ImageInfo *image_info,Image *image)
     jbg_enc_init(&jbig_info,image->columns,image->rows,1,&pixels,
       (void (*)(unsigned char *,size_t,void *)) JBIGEncode,image);
     if (image_info->subimage != 0)
-      jbg_enc_layers(&jbig_info,(int) image_info->subimage);
+      {
+        jbg_enc_layers(&jbig_info,(int) image_info->subimage);
+      }
     else
       {
         long
@@ -564,7 +574,7 @@ static unsigned int WriteJBIGImage(const ImageInfo *image_info,Image *image)
     */
     jbg_enc_out(&jbig_info);
     jbg_enc_free(&jbig_info);
-    MagickFreeResourceLimitedMemory(pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

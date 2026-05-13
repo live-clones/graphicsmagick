@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -52,6 +52,7 @@
 #include "magick/profile.h"
 #include "magick/resource.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -239,10 +240,10 @@ static MagickClientData *FreeMagickClientData(MagickClientData *client_data)
       for (i=0 ; i < ArraySize(client_data->profiles); i++)
         {
           MagickFreeMemory(client_data->profiles[i].name);
-          MagickFreeResourceLimitedMemory(client_data->profiles[i].info);
+          MagickFreeResourceLimitedMemory(unsigned char *,client_data->profiles[i].info);
         }
       if (client_data->jpeg_pixels != (magick_jpeg_pixels_t *) NULL)
-        MagickFreeResourceLimitedMemory(client_data->jpeg_pixels->t.v);
+        MagickFreeResourceLimitedMemory(void *,client_data->jpeg_pixels->t.v);
 
       MagickFreeMemory(client_data);
     }
@@ -298,7 +299,7 @@ AppendProfile(MagickClientData *client_data,
       if (!profile->name || !profile->info)
         {
           MagickFreeMemory(profile->name);
-          MagickFreeResourceLimitedMemory(profile->info);
+          MagickFreeResourceLimitedMemory(unsigned char *,profile->info);
           break;
         }
       (void) memcpy(profile->info,profile_chunk,chunk_length);
@@ -468,7 +469,7 @@ static void JPEGDecodeProgressMonitor(j_common_ptr cinfo)
       if (scan_no > max_scan_number)
         {
           char message[MaxTextExtent];
-          FormatString(message,"Scan number %d exceeds maximum scans (%d)",
+          MagickFormatString(message,sizeof(message),"Scan number %d exceeds maximum scans (%d)",
                        scan_no, max_scan_number);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s", message);
           ThrowException2(&image->exception,CorruptImageError,(char *) message,
@@ -688,7 +689,7 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
   /*
     Compute generic profile name.
   */
-  FormatString(profile_name,"APP%d",marker);
+  MagickFormatString(profile_name,sizeof(profile_name),"APP%d",marker);
 
   /*
     Obtain Image.
@@ -716,7 +717,7 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
   if ((marker == 1) && (length > 4) &&
       (strncmp((char *) profile,"Exif",4) == 0))
     {
-      FormatString(profile_name,"EXIF");
+      MagickFormatString(profile_name,sizeof(profile_name),"EXIF");
     }
   else if (((marker == 1) && (length > strlen(xmp_std_header)+1)) &&
            (memcmp(profile, xmp_std_header, strlen(xmp_std_header)+1) == 0))
@@ -726,7 +727,7 @@ static boolean ReadGenericProfile(j_decompress_ptr jpeg_info)
          namespace header.
       */
       header_length=strlen(xmp_std_header)+1;
-      FormatString((char *) profile_name,"XMP");
+      MagickFormatString((char *) profile_name,sizeof(profile_name),"XMP");
     }
 
   /*
@@ -1175,7 +1176,8 @@ FormatJPEGColorSpace(const J_COLOR_SPACE colorspace,
 */
 static MagickPassFail
 FormatJPEGSamplingFactors(const struct jpeg_decompress_struct *jpeg_info,
-                          char *sampling_factors)
+                          char *sampling_factors,
+                          const size_t sizeof_sampling_factors)
 {
   unsigned int
     quantums = 0;
@@ -1268,31 +1270,31 @@ FormatJPEGSamplingFactors(const struct jpeg_decompress_struct *jpeg_info,
     case 0:
       break;
     case 1:
-      (void) FormatString(sampling_factors,"%dx%d",
-                          jpeg_info->comp_info[0].h_samp_factor,
-                          jpeg_info->comp_info[0].v_samp_factor);
+      (void) MagickFormatString(sampling_factors,sizeof_sampling_factors,"%dx%d",
+                                jpeg_info->comp_info[0].h_samp_factor,
+                                jpeg_info->comp_info[0].v_samp_factor);
       status = MagickPass;
       break;
     case 3:
-      (void) FormatString(sampling_factors,"%dx%d,%dx%d,%dx%d",
-                          jpeg_info->comp_info[0].h_samp_factor,
-                          jpeg_info->comp_info[0].v_samp_factor,
-                          jpeg_info->comp_info[1].h_samp_factor,
-                          jpeg_info->comp_info[1].v_samp_factor,
-                          jpeg_info->comp_info[2].h_samp_factor,
-                          jpeg_info->comp_info[2].v_samp_factor);
+      (void) MagickFormatString(sampling_factors,sizeof_sampling_factors,"%dx%d,%dx%d,%dx%d",
+                                jpeg_info->comp_info[0].h_samp_factor,
+                                jpeg_info->comp_info[0].v_samp_factor,
+                                jpeg_info->comp_info[1].h_samp_factor,
+                                jpeg_info->comp_info[1].v_samp_factor,
+                                jpeg_info->comp_info[2].h_samp_factor,
+                                jpeg_info->comp_info[2].v_samp_factor);
       status = MagickPass;
       break;
     case 4:
-      (void) FormatString(sampling_factors,"%dx%d,%dx%d,%dx%d,%dx%d",
-                          jpeg_info->comp_info[0].h_samp_factor,
-                          jpeg_info->comp_info[0].v_samp_factor,
-                          jpeg_info->comp_info[1].h_samp_factor,
-                          jpeg_info->comp_info[1].v_samp_factor,
-                          jpeg_info->comp_info[2].h_samp_factor,
-                          jpeg_info->comp_info[2].v_samp_factor,
-                          jpeg_info->comp_info[3].h_samp_factor,
-                          jpeg_info->comp_info[3].v_samp_factor);
+      (void) MagickFormatString(sampling_factors,sizeof_sampling_factors,"%dx%d,%dx%d,%dx%d,%dx%d",
+                                jpeg_info->comp_info[0].h_samp_factor,
+                                jpeg_info->comp_info[0].v_samp_factor,
+                                jpeg_info->comp_info[1].h_samp_factor,
+                                jpeg_info->comp_info[1].v_samp_factor,
+                                jpeg_info->comp_info[2].h_samp_factor,
+                                jpeg_info->comp_info[2].v_samp_factor,
+                                jpeg_info->comp_info[3].h_samp_factor,
+                                jpeg_info->comp_info[3].v_samp_factor);
       status = MagickPass;
       break;
     }
@@ -1676,10 +1678,10 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
     /*
       Estimate and retain JPEG properties as attributes.
     */
-    FormatString(attribute,"%d",EstimateJPEGQuality(&jpeg_info,image));
+    MagickFormatString(attribute,sizeof(attribute),"%d",EstimateJPEGQuality(&jpeg_info,image));
     (void) SetImageAttribute(image,"JPEG-Quality",attribute);
 
-    FormatString(attribute,"%ld",(long)jpeg_info.out_color_space);
+    MagickFormatString(attribute,sizeof(attribute),"%ld",(long)jpeg_info.out_color_space);
     (void) SetImageAttribute(image,"JPEG-Colorspace",attribute);
 
     FormatJPEGColorSpace(jpeg_info.out_color_space,attribute);
@@ -1689,7 +1691,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                             "Colorspace: %s (%d)", attribute,
                             jpeg_info.out_color_space);
 
-    if (FormatJPEGSamplingFactors(&jpeg_info,attribute) != MagickFail)
+    if (FormatJPEGSamplingFactors(&jpeg_info,attribute,sizeof(attribute)) != MagickFail)
       {
         (void) SetImageAttribute(image,"JPEG-Sampling-factors",attribute);
         if (image->logging)
@@ -1711,6 +1713,18 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
             jpeg_destroy_decompress(&jpeg_info);
             ThrowJPEGReaderException(ResourceLimitError,MemoryAllocationFailed,image);
           }
+      if (image_info->ping)
+        {
+          image->is_grayscale=MagickTrue;
+        }
+    }
+  else
+    {
+      if (image_info->ping)
+        {
+          image->is_grayscale=MagickFalse;
+          image->is_monochrome=MagickFalse;
+        }
     }
 
   /*
@@ -1839,7 +1853,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Setjmp return from longjmp!");
       /* Error handling code executed if longjmp was invoked */
-      MagickFreeResourceLimitedMemory(jpeg_pixels.t.v);
+      MagickFreeResourceLimitedMemory(void *,jpeg_pixels.t.v);
       jpeg_destroy_decompress(&jpeg_info);
       if (image->exception.severity > exception->severity)
         CopyException(exception,&image->exception);
@@ -1932,10 +1946,13 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
 #if defined(HAVE_JPEG16_READ_SCANLINES) && HAVE_JPEG16_READ_SCANLINES
                 case 16:
                   {
+                    image->is_grayscale=MagickTrue;
                     for (x=0; x < (long) image->columns; x++)
                     {
-                      index=(IndexPacket) ScaleQuantumToIndex((ScaleShortToQuantum(jpeg_pixels.t.j16[x])));
-                      VerifyColormapIndex(image,index);
+                      index=(IndexPacket) jpeg_pixels.t.j16[x];
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       indexes[x]=index;
                       *q++=image->colormap[index];
                     }
@@ -1945,13 +1962,13 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
 #if defined(HAVE_JPEG12_READ_SCANLINES) && HAVE_JPEG12_READ_SCANLINES
                 case 12:
                   {
-                    const unsigned int
-                      scale_short = 65535U/MAXJ12SAMPLE;
-
+                    image->is_grayscale=MagickTrue;
                     for (x=0; x < (long) image->columns; x++)
                     {
-                      index=(IndexPacket) ScaleQuantumToIndex((ScaleShortToQuantum(scale_short*((unsigned short)jpeg_pixels.t.j12[x]))));
-                      VerifyColormapIndex(image,index);
+                      index=(IndexPacket) jpeg_pixels.t.j12[x];
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       indexes[x]=index;
                       *q++=image->colormap[index];
                     }
@@ -1960,10 +1977,13 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
 #endif /* if defined(HAVE_JPEG12_READ_SCANLINES) && HAVE_JPEG12_READ_SCANLINES */
                 default:
                   {
+                    image->is_grayscale=MagickTrue;
                     for (x=0; x < (long) image->columns; x++)
                       {
                         index=(IndexPacket) (GETJSAMPLE(jpeg_pixels.t.j[x]));
-                        VerifyColormapIndex(image,index);
+                        VerifyColormapIndex(status,image,index);
+                        if (status == MagickFail)
+                          break;
                         indexes[x]=index;
                         *q++=image->colormap[index];
                       }
@@ -2093,6 +2113,11 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                 }
             }
         }
+      if (status == MagickFail)
+        {
+          jpeg_abort_decompress(&jpeg_info);
+          break;
+        }
       if (!SyncImagePixels(image))
         {
           status=MagickFail;
@@ -2136,7 +2161,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
         }
     }
   jpeg_destroy_decompress(&jpeg_info);
-  MagickFreeResourceLimitedMemory(jpeg_pixels.t.v);
+  MagickFreeResourceLimitedMemory(void *,jpeg_pixels.t.v);
   client_data=FreeMagickClientData(client_data);
   CloseBlob(image);
 
@@ -2169,6 +2194,12 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
   GetImageException(image,exception);
   StopTimer(&image->timer);
+  if (image->exception.severity > exception->severity)
+    {
+      DestroyImageList(image);
+      return((Image *) NULL);
+    }
+
   return(image);
 }
 #endif
@@ -2422,7 +2453,7 @@ static void WriteICCProfile(j_compress_ptr jpeg_info,
     for (j=0; j < (long) length; j++)
       profile[j+14]=color_profile[i+j];
     jpeg_write_marker(jpeg_info,ICC_MARKER,profile,(unsigned int) alloc_length);
-    MagickFreeResourceLimitedMemory(profile);
+    MagickFreeResourceLimitedMemory(unsigned char *,profile);
   }
 }
 
@@ -2472,7 +2503,7 @@ static void WriteIPTCProfile(j_compress_ptr jpeg_info,
       profile[length+tag_length]=0;
     jpeg_write_marker(jpeg_info,IPTC_MARKER,profile,(unsigned int)
       (length+roundup+tag_length));
-    MagickFreeResourceLimitedMemory(profile);
+    MagickFreeResourceLimitedMemory(unsigned char *,profile);
   }
 }
 
@@ -2845,19 +2876,26 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
                               "  Transforming colorspace from %s to %s",
                               ColorspaceTypeToString(image->colorspace),
                               ColorspaceTypeToString(image_info->colorspace));
-      (void) TransformColorspace(image,image_info->colorspace);
+      if (TransformColorspace(image,image_info->colorspace) == MagickFail)
+        {
+          client_data=FreeMagickClientData(client_data);
+          ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+        }
     }
 
   /*
-    This writer expects an RGB-compatible colorspace. If the current
-    colorspace is not RGB-compatible, then convert it to RGB.
+    This writer expects an RGB-compatible or CMYK colorspace. If the
+    current colorspace is not compatible with those, then convert it
+    to RGB.
 
     Convert RGB-compatible colorspaces (e.g. CineonLog) to RGB by
     default.  User can still override it by explicitly specifying the
     desired colorspace.
   */
   if (((UndefinedColorspace == image_info->colorspace) &&
-       (!IsRGBCompatibleColorspace(image->colorspace))) ||
+       (!IsRGBCompatibleColorspace(image->colorspace) &&
+        !IsCMYKColorspace(image->colorspace)))
+       ||
       ((IsRGBCompatibleColorspace(image->colorspace) &&
         !IsRGBColorspace(image->colorspace))))
     {
@@ -2865,7 +2903,11 @@ static MagickPassFail WriteJPEGImage(const ImageInfo *image_info,Image *imagep)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "  Transforming colorspace from %s to RGB",
                               ColorspaceTypeToString(image->colorspace));
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        {
+          client_data=FreeMagickClientData(client_data);
+          ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+        }
     }
 
   /*

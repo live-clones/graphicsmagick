@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -36,6 +36,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/magick.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasWINGDI32)
 #  if defined(__CYGWIN__)
 #    include <windows.h>

@@ -23,17 +23,21 @@
 # OF THIS SOFTWARE.
 
 # Generate headers
+# and update configuration settings and package / version information.
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tif_config.h.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/tif_config.h
                @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tiffconf.h.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/tiffconf.h
                @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tiffvers.h.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/tiffvers.h
+               @ONLY)
 
 set(tiff_public_HEADERS
         tiff.h
         tiffio.h
-        tiffvers.h
+        ${CMAKE_CURRENT_BINARY_DIR}/tiffvers.h
         ${CMAKE_CURRENT_BINARY_DIR}/tiffconf.h)
 
 set(tiff_private_HEADERS
@@ -45,7 +49,7 @@ set(tiff_private_HEADERS
         ${CMAKE_CURRENT_BINARY_DIR}/tif_config.h)
 
 
-add_library(tiff libtiff.def)
+add_library(tiff ${TIFF_BUILD_LIB_VALUE} libtiff.def)
 add_library(TIFF::tiff ALIAS tiff)
 
 target_sources(tiff PRIVATE
@@ -94,10 +98,21 @@ target_sources(tiff PRIVATE
         tif_zip.c
         tif_zstd.c)
 
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
+  set_property(SOURCE tif_jpeg.c tif_jpeg12.c PROPERTY SKIP_UNITY_BUILD_INCLUSION ON)
+endif ()
+
+# For all files (but tif_open.c, tif_unix.c and tif_win32.c), forbid the use
+# of _TIFFmalloc/_TIFFfree and require the use of their "Ext" versions
+target_compile_definitions(tiff PRIVATE TIFF_DO_NOT_USE_NON_EXT_ALLOC_FUNCTIONS)
+set_property(SOURCE tif_open.c APPEND PROPERTY COMPILE_DEFINITIONS ALLOW_TIFF_NON_EXT_ALLOC_FUNCTIONS)
+
 if(USE_WIN32_FILEIO)
   target_sources(tiff PRIVATE tif_win32.c)
+  set_property(SOURCE tif_win32.c APPEND PROPERTY COMPILE_DEFINITIONS ALLOW_TIFF_NON_EXT_ALLOC_FUNCTIONS)
 else()
   target_sources(tiff PRIVATE tif_unix.c)
+  set_property(SOURCE tif_unix.c APPEND PROPERTY COMPILE_DEFINITIONS ALLOW_TIFF_NON_EXT_ALLOC_FUNCTIONS)
 endif()
 
 target_include_directories(tiff
@@ -109,8 +124,8 @@ target_include_directories(tiff
         ${TIFF_INCLUDES}
 )
 
-# MSVC specific resource preparation
-if (WIN32 AND MSVC)
+# Windows specific resource preparation
+if (WIN32)
   message(STATUS "Include resource version information for LibTIFF")
   target_sources(tiff PRIVATE tif_win32_versioninfo.rc)
   source_group("Resource Files" FILES tif_win32_versioninfo.rc)
@@ -126,14 +141,16 @@ if(ZIP_SUPPORT)
 endif()
 if(ZIP_SUPPORT AND LIBDEFLATE_SUPPORT)
   target_link_libraries(tiff PRIVATE Deflate::Deflate)
-  list(APPEND tiff_libs_private_list "${Deflate_LIBRARY}")
+  if(Deflate_VERSION_STRING VERSION_GREATER_EQUAL "1.9")
+    string(APPEND tiff_requires_private " libdeflate")
+  else()
+    list(APPEND tiff_libs_private_list "${Deflate_LIBRARY}")
+  endif()
 endif()
 if(JPEG_SUPPORT)
   target_link_libraries(tiff PRIVATE JPEG::JPEG)
   string(APPEND tiff_requires_private " libjpeg")
-  if(HAVE_JPEGTURBO_DUAL_MODE_8_12)
-    target_compile_definitions(tiff PRIVATE HAVE_JPEGTURBO_DUAL_MODE_8_12)
-  elseif(JPEG_DUAL_MODE_8_12)
+  if(JPEG_DUAL_MODE_8_12 AND NOT HAVE_JPEGTURBO_DUAL_MODE_8_12)
     target_include_directories(tiff PRIVATE ${JPEG12_INCLUDE_DIR})
     target_link_libraries(tiff PRIVATE ${JPEG12_LIBRARIES})
   endif()
@@ -144,9 +161,10 @@ if(JBIG_SUPPORT)
 endif()
 if(LERC_SUPPORT)
   target_link_libraries(tiff PRIVATE LERC::LERC)
-  list(APPEND tiff_libs_private_list "${LERC_LIBRARY}")
-  if(NOT BUILD_SHARED_LIBS)
-    set_target_properties(tiff PROPERTIES COMPILE_DEFINITIONS LERC_STATIC)
+  if(LERC_VERSION_STRING VERSION_GREATER_EQUAL "4.0")
+    string(APPEND tiff_requires_private " Lerc")
+  else()
+    list(APPEND tiff_libs_private_list "${LERC_LIBRARY}")
   endif()
 endif()
 if(LZMA_SUPPORT)
@@ -178,8 +196,13 @@ if(NOT CYGWIN)
     set_target_properties(tiff PROPERTIES VERSION ${SO_VERSION})
 endif()
 if(HAVE_LD_VERSION_SCRIPT)
-  set_target_properties(tiff PROPERTIES LINK_FLAGS
-                        "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiff.map")
+  if (CMAKE_VERSION GREATER_EQUAL 3.29 AND CMAKE_C_COMPILER_LINKER_ID STREQUAL "LLD" AND CMAKE_C_COMPILER_LINKER_VERSION GREATER_EQUAL 17)
+    set_target_properties(tiff PROPERTIES LINK_FLAGS
+                              "-Wl,--undefined-version -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiff.map")
+  else()
+    set_target_properties(tiff PROPERTIES LINK_FLAGS
+                              "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiff.map")
+  endif()
 endif()
 
 if(tiff-install)
@@ -216,10 +239,10 @@ if(CXX_SUPPORT)
           tiffio.hxx)
 
   # No .def file for this library.
-  if (WIN32)
+  if (WIN32 AND NOT MINGW)
       add_library(tiffxx STATIC ../placeholder.h)
   else()
-      add_library(tiffxx ../placeholder.h)
+      add_library(tiffxx ${TIFF_BUILD_LIB_VALUE} ../placeholder.h)
   endif()
 
   add_library(TIFF::CXX ALIAS tiffxx)
@@ -242,7 +265,7 @@ if(CXX_SUPPORT)
   endif()
 
   if(tiff-install)
-    install(TARGETS tiffxx
+    install(TARGETS tiffxx EXPORT TiffTargets
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -250,17 +273,6 @@ if(CXX_SUPPORT)
     install(FILES ${tiffxx_HEADERS}
             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
   endif()
-      
+
 endif()
 
-if(NOT CMAKE_CROSSCOMPILING)
-  add_executable(tiff_mkg3states ../placeholder.h)
-  target_sources(tiff_mkg3states PRIVATE mkg3states.c tif_fax3.h)
-  target_link_libraries(tiff_mkg3states tiff tiff_port)
-
-  add_custom_target(tiff_faxtable
-          DEPENDS tiff_mkg3states
-          COMMAND ${CMAKE_COMMAND} -E rm "tif_fax3sm.c"
-          COMMAND tiff_mkg3states -b -c const "tif_fax3sm.c"
-          WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-endif()

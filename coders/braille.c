@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2019 GraphicsMagick Group
+% Copyright (C) 2019-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -34,12 +34,14 @@
 #include "magick/magick.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
 */
 static unsigned int
   WriteBRAILLEImage(const ImageInfo *,Image *);
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -167,8 +169,8 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
     unicode = 0,
     iso_11548_1 = 0;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   register const IndexPacket
     *indexes;
@@ -185,11 +187,15 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
   unsigned long
     y;
 
+  assert(image_info != (const ImageInfo *) NULL);
+  assert(image != (Image *) NULL);
+
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
+
   /*
     Open output image file.
   */
-  assert(image_info != (const ImageInfo *) NULL);
-  assert(image != (Image *) NULL);
   if (LocaleCompare(image_info->magick,"UBRL") == 0)
     unicode=1;
   else if (LocaleCompare(image_info->magick,"UBRL6") == 0)
@@ -213,25 +219,24 @@ static unsigned int WriteBRAILLEImage(const ImageInfo *image_info,
     {
       if (image->page.x != 0)
         {
-          (void) FormatString(buffer,"X: %.20g\n",(double)
+          (void) MagickFormatString(buffer,sizeof(buffer),"X: %.20g\n",(double)
             image->page.x);
           (void) WriteBlobString(image,buffer);
         }
       if (image->page.y != 0)
         {
-          (void) FormatString(buffer,"Y: %.20g\n",(double)
+          (void) MagickFormatString(buffer,sizeof(buffer),"Y: %.20g\n",(double)
             image->page.y);
           (void) WriteBlobString(image,buffer);
         }
-      (void) FormatString(buffer,"Width: %.20g\n",(double)
+      (void) MagickFormatString(buffer,sizeof(buffer),"Width: %.20g\n",(double)
         image->columns+(image->columns % 2));
       (void) WriteBlobString(image,buffer);
-      (void) FormatString(buffer,"Height: %.20g\n",(double)
+      (void) MagickFormatString(buffer,sizeof(buffer),"Height: %.20g\n",(double)
         image->rows);
       (void) WriteBlobString(image,buffer);
       (void) WriteBlobString(image,"\n");
     }
-  (void) SetImageType(image,BilevelType);
   polarity=PixelIntensityToQuantum(&image->colormap[0]) >= (MaxRGB/2);
   if (image->colors == 2)
     polarity=PixelIntensityToQuantum(&image->colormap[0]) >=

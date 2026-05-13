@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2025
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Implementation of Image
 //
@@ -10,6 +10,8 @@
 
 #include "Magick++/Include.h"
 #include <cstdlib>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <string.h>
 #include <errno.h>
@@ -402,23 +404,26 @@ void Magick::Image::annotate ( const std::string &text_,
   DrawInfo *drawInfo
     = options()->drawInfo();
 
-  drawInfo->text = const_cast<char *>(text_.c_str());
+  CloneString(&drawInfo->text,text_.c_str());
+  MagickFreeMemory(drawInfo->geometry);
 
-  char boundingArea[MaxTextExtent];
-
-  drawInfo->geometry = 0;
-  if ( boundingArea_.isValid() ){
-    if ( boundingArea_.width() == 0 || boundingArea_.height() == 0 )
+  {
+    std::string boundingArea;
+    if ( boundingArea_.isValid() )
       {
-        FormatString( boundingArea, "+%u+%u",
-                      boundingArea_.xOff(), boundingArea_.yOff() );
+        if ( boundingArea_.width() == 0 || boundingArea_.height() == 0 )
+          {
+            std::ostringstream geometry_stream;
+            geometry_stream << '+' << boundingArea_.xOff()
+                            << '+' << boundingArea_.yOff();
+            boundingArea = geometry_stream.str();
+          }
+        else
+          {
+            boundingArea = std::string(boundingArea_);
+          }
+        CloneString(&drawInfo->geometry,boundingArea.c_str());
       }
-    else
-      {
-        strlcpy( boundingArea, string(boundingArea_).c_str(),
-                 sizeof(boundingArea));
-      }
-    drawInfo->geometry = boundingArea;
   }
 
   drawInfo->gravity = gravity_;
@@ -426,35 +431,35 @@ void Magick::Image::annotate ( const std::string &text_,
   AffineMatrix oaffine = drawInfo->affine;
   if ( degrees_ != 0.0)
     {
-        AffineMatrix affine;
-        affine.sx=1.0;
-        affine.rx=0.0;
-        affine.ry=0.0;
-        affine.sy=1.0;
-        affine.tx=0.0;
-        affine.ty=0.0;
+      AffineMatrix affine;
+      affine.sx=1.0;
+      affine.rx=0.0;
+      affine.ry=0.0;
+      affine.sy=1.0;
+      affine.tx=0.0;
+      affine.ty=0.0;
 
-        AffineMatrix current = drawInfo->affine;
+      AffineMatrix current = drawInfo->affine;
 #define DegreesToRadians(x) ((x)*3.14159265358979323846/180.0)
-        affine.sx=cos(DegreesToRadians(fmod(degrees_,360.0)));
-        affine.rx=sin(DegreesToRadians(fmod(degrees_,360.0)));
-        affine.ry=(-sin(DegreesToRadians(fmod(degrees_,360.0))));
-        affine.sy=cos(DegreesToRadians(fmod(degrees_,360.0)));
+      affine.sx=cos(DegreesToRadians(fmod(degrees_,360.0)));
+      affine.rx=sin(DegreesToRadians(fmod(degrees_,360.0)));
+      affine.ry=(-sin(DegreesToRadians(fmod(degrees_,360.0))));
+      affine.sy=cos(DegreesToRadians(fmod(degrees_,360.0)));
 
-        drawInfo->affine.sx=current.sx*affine.sx+current.ry*affine.rx;
-        drawInfo->affine.rx=current.rx*affine.sx+current.sy*affine.rx;
-        drawInfo->affine.ry=current.sx*affine.ry+current.ry*affine.sy;
-        drawInfo->affine.sy=current.rx*affine.ry+current.sy*affine.sy;
-        drawInfo->affine.tx=current.sx*affine.tx+current.ry*affine.ty
-          +current.tx;
+      drawInfo->affine.sx=current.sx*affine.sx+current.ry*affine.rx;
+      drawInfo->affine.rx=current.rx*affine.sx+current.sy*affine.rx;
+      drawInfo->affine.ry=current.sx*affine.ry+current.ry*affine.sy;
+      drawInfo->affine.sy=current.rx*affine.ry+current.sy*affine.sy;
+      drawInfo->affine.tx=current.sx*affine.tx+current.ry*affine.ty
+        +current.tx;
     }
 
   AnnotateImage( image(), drawInfo );
 
-  // Restore original values
+  // Restore original state
   drawInfo->affine = oaffine;
-  drawInfo->text = 0;
-  drawInfo->geometry = 0;
+  MagickFreeMemory(drawInfo->text);
+  MagickFreeMemory(drawInfo->geometry);
 
   throwImageException();
 }
@@ -604,13 +609,13 @@ void Magick::Image::colorize ( const unsigned int opacityRed_,
                             "Pen color argument is invalid");
   }
 
-  char opacity[MaxTextExtent];
-  FormatString(opacity,"%u/%u/%u",opacityRed_,opacityGreen_,opacityBlue_);
+  std::ostringstream opacity;
+  opacity << opacityRed_ << '/' << opacityGreen_ << '/' << opacityBlue_;
 
   ExceptionInfo exceptionInfo;
   GetExceptionInfo( &exceptionInfo );
   MagickLib::Image* newImage =
-  ColorizeImage ( image(), opacity,
+    ColorizeImage ( image(), opacity.str().c_str(),
                   penColor_, &exceptionInfo );
   replaceImage( newImage );
   throwImageException( exceptionInfo );
@@ -1142,22 +1147,22 @@ void Magick::Image::frame ( const unsigned int width_,
 // Gamma correct image
 void Magick::Image::gamma ( const double gamma_ )
 {
-  char gamma[MaxTextExtent + 1];
-  FormatString( gamma, "%3.6f", gamma_);
-
+  std::ostringstream gamma;
+  gamma << std::fixed << std::setprecision(6) << gamma_;
   modifyImage();
-  GammaImage ( image(), gamma );
+  GammaImage ( image(), gamma.str().c_str() );
 }
 void Magick::Image::gamma ( const double gammaRed_,
                             const double gammaGreen_,
                             const double gammaBlue_ )
 {
-  char gamma[MaxTextExtent + 1];
-  FormatString( gamma, "%3.6f/%3.6f/%3.6f/",
-                gammaRed_, gammaGreen_, gammaBlue_);
-
+  std::ostringstream gamma;
+  gamma << std::fixed << std::setprecision(6)
+        << gammaRed_ << '/'
+        << gammaGreen_ << '/'
+        << gammaBlue_;
   modifyImage();
-  GammaImage ( image(), gamma );
+  GammaImage ( image(), gamma.str().c_str() );
   throwImageException();
 }
 
@@ -1211,9 +1216,12 @@ void Magick::Image::level ( const double black_point,
                             const double mid_point )
 {
   modifyImage();
-  char levels[MaxTextExtent];
-  FormatString( levels, "%g,%g,%g",black_point,mid_point,white_point);
-  (void) LevelImage( image(), levels );
+  std::ostringstream levels;
+  levels << std::fixed
+         << black_point << ','
+         << mid_point << ','
+         << white_point;
+  (void) LevelImage( image(), levels.str().c_str() );
   throwImageException();
 }
 
@@ -1307,12 +1315,13 @@ void Magick::Image::modulate ( const double brightness_,
                                const double saturation_,
                                const double hue_ )
 {
-  char modulate[MaxTextExtent + 1];
-  FormatString( modulate, "%3.6f/%3.6f/%3.6f",
-                brightness_, saturation_, hue_);
-
+  std::ostringstream modulate;
+  modulate << std::fixed << std::setprecision(6)
+        << brightness_ << '/'
+        << saturation_ << '/'
+        << hue_;
   modifyImage();
-  ModulateImage( image(), modulate );
+  ModulateImage( image(), modulate.str().c_str() );
   throwImageException();
 }
 
@@ -3251,6 +3260,8 @@ void Magick::Image::monochrome ( const bool monochromeFlag_ )
 {
   modifyImage();
   options()->monochrome( monochromeFlag_ );
+  if (! monochromeFlag_ && constImage()->is_monochrome)
+    image()->is_monochrome=MagickFalse;
 }
 bool Magick::Image::monochrome ( void ) const
 {
@@ -3283,9 +3294,9 @@ void Magick::Image::orientation ( const Magick::OrientationType orientation_ )
 {
   modifyImage();
   image()->orientation = orientation_;
-  char orientation[MaxTextExtent];
-  FormatString(orientation,"%d",constImage()->orientation);
-  (void) SetImageAttribute(image(),"EXIF:Orientation",orientation);
+  std::ostringstream orientation_str;
+  orientation_str << (int) orientation_;
+  (void) SetImageAttribute(image(),"EXIF:Orientation",orientation_str.str().c_str());
 }
 Magick::OrientationType Magick::Image::orientation ( void ) const
 {
@@ -3820,7 +3831,8 @@ void Magick::Image::type ( const Magick::ImageType type_)
 {
   modifyImage();
   options()->type( type_ );
-  SetImageType( image(), type_ );
+  if (SetImageType( image(), type_ ) == MagickFail)
+    throwImageException();
 }
 
 void Magick::Image::verbose ( const bool verboseFlag_ )

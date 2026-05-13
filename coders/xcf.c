@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -43,6 +43,7 @@
 #include "magick/monitor.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Typedef declarations.
@@ -364,7 +365,7 @@ static MagickPassFail load_tile (Image* image, Image* tile_image, XCFDocInfo* in
   nmemb_read_successfully = ReadBlob(image, data_length, xcfdata);
   if (nmemb_read_successfully != data_length)
     {
-      MagickFreeResourceLimitedMemory(xcfodata);
+      MagickFreeResourceLimitedMemory(XCFPixelPacket *,xcfodata);
       ThrowBinaryException(CorruptImageError,UnexpectedEndOfFile,image->filename);
     }
 
@@ -372,7 +373,7 @@ static MagickPassFail load_tile (Image* image, Image* tile_image, XCFDocInfo* in
   if (q == (PixelPacket *) NULL)
     {
       CopyException(&image->exception,&tile_image->exception);
-      MagickFreeResourceLimitedMemory(xcfodata);
+      MagickFreeResourceLimitedMemory(XCFPixelPacket *,xcfodata);
       return MagickFail;
     }
 
@@ -403,7 +404,7 @@ static MagickPassFail load_tile (Image* image, Image* tile_image, XCFDocInfo* in
         }
     }
 
-  MagickFreeResourceLimitedMemory(xcfodata);
+  MagickFreeResourceLimitedMemory(XCFPixelPacket *,xcfodata);
   return MagickPass;
 }
 
@@ -455,7 +456,7 @@ static MagickPassFail load_tile_rle (Image* image,
                               "Read %lu bytes, expected %lu bytes",
                               (unsigned long) nmemb_read_successfully,
                               (unsigned long) data_length);
-      MagickFreeResourceLimitedMemory(xcfodata);
+      MagickFreeResourceLimitedMemory(unsigned char *,xcfodata);
       ThrowBinaryException(CorruptImageError,UnexpectedEndOfFile,image->filename);
     }
 
@@ -628,12 +629,12 @@ static MagickPassFail load_tile_rle (Image* image,
       if (SyncImagePixelsEx(tile_image,&tile_image->exception) == MagickFail)
         break;
     }
-  MagickFreeResourceLimitedMemory(xcfodata);
+  MagickFreeResourceLimitedMemory(unsigned char *,xcfodata);
   return MagickPass;
 
  bogus_rle:
   if (xcfodata)
-    MagickFreeResourceLimitedMemory(xcfodata);
+    MagickFreeResourceLimitedMemory(unsigned char *,xcfodata);
 
   (void) LogMagickEvent(CoderEvent,GetMagickModule(), "Failed to RLE-decode tile");
   ThrowBinaryException(CorruptImageError,CorruptImage,image->filename);
@@ -1130,6 +1131,8 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
           break;
         case PROP_OPACITY:
           outLayer->opacity = ReadBlobMSBLong(image);
+          if (outLayer->opacity > 255)
+            outLayer->opacity = 255;
           break;
         case PROP_VISIBLE:
           outLayer->visible = ReadBlobMSBLong(image);
@@ -1343,23 +1346,23 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
 %
 %
 */
-#define DestroyLayerInfo(number_layers,layer_info) \
+#define DestroyLayerInfo(number_layers,layer_info)             \
   do {                                                         \
     size_t                                                     \
       j;                                                       \
                                                                \
-    if (layer_info != (XCFLayerInfo *) NULL)                   \
-      {                                                        \
-        for (j=0; j < number_layers; j++)       \
-          {                                                    \
-            if (layer_info[j].image != (Image *) NULL)         \
-              {                                                \
-                DestroyImage(layer_info[j].image);             \
-                layer_info[j].image = (Image *) NULL;          \
-              }                                                \
-          }                                                    \
-      }                                                        \
-    MagickFreeResourceLimitedMemory(layer_info);                              \
+    if (layer_info != (XCFLayerInfo *) NULL)                    \
+      {                                                         \
+        for (j=0; j < number_layers; j++)                       \
+          {                                                     \
+            if (layer_info[j].image != (Image *) NULL)          \
+              {                                                 \
+                DestroyImage(layer_info[j].image);              \
+                layer_info[j].image = (Image *) NULL;           \
+              }                                                 \
+          }                                                     \
+      }                                                         \
+    MagickFreeResourceLimitedMemory(XCFLayerInfo *,layer_info); \
   } while (0);
 static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -1745,6 +1748,10 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
       first_layer = image_info->subimage;
       num_layers = number_layers;
+
+      if (number_layers == 0)
+        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+
       /* subrange==0 means read all the images */
       if( image_info->subrange > 0UL && image_info->subrange < number_layers )
         num_layers = image_info->subrange;
@@ -1798,7 +1805,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
           saved_pos = TellBlob(image);
           if (saved_pos < 0)
             {
-              MagickFreeResourceLimitedMemory(layer_info);
+              MagickFreeResourceLimitedMemory(XCFLayerInfo *,layer_info);
               ThrowReaderException(BlobError,UnableToObtainOffset,image);
             }
 
@@ -1839,7 +1846,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                           layer_info[j].image = (Image *) NULL;
                         }
                     }
-                  MagickFreeResourceLimitedMemory(layer_info);
+                  MagickFreeResourceLimitedMemory(XCFLayerInfo *,layer_info);
 #endif
                   DestroyLayerInfo(number_layers,layer_info);
                   CopyException(exception,&image->exception);
@@ -1945,7 +1952,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
 #endif
         }
 
-      MagickFreeResourceLimitedMemory(layer_info);
+      MagickFreeResourceLimitedMemory(XCFLayerInfo *,layer_info);
 
 #if 0  /* BOGUS: do we need the channels?? */
       while (True)

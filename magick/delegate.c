@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -619,7 +619,7 @@ WindowsShellTextEscape(char *dst, const char *src, const size_t size)
 #endif /* MSWINDOWS */
 
 MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
-  const char *decode,const char *encode,ExceptionInfo *exception)
+                                         const char *decode,const char *encode,ExceptionInfo *exception)
 {
   char
     *command,
@@ -660,7 +660,7 @@ MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
       if (temporary_image_filename)
         (void) LiberateTemporaryFile(image->filename);
       (void) ThrowException(exception,DelegateError,NoTagFound,
-        decode ? decode : encode);
+                            decode ? decode : encode);
       return(False);
     }
 
@@ -699,24 +699,24 @@ MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
         */
 
         if (!AcquireTemporaryFileName(image_info->unique))
-        {
-          if (temporary_image_filename)
-            (void) LiberateTemporaryFile(image->filename);
-          (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->unique);
-          return(False);
-        }
+          {
+            if (temporary_image_filename)
+              (void) LiberateTemporaryFile(image->filename);
+            (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->unique);
+            return(False);
+          }
 
         if (!AcquireTemporaryFileName(image_info->zero))
-        {
-          if (temporary_image_filename)
-            (void) LiberateTemporaryFile(image->filename);
-          (void) LiberateTemporaryFile(image_info->unique);
-          (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->zero);
-          return(False);
-        }
+          {
+            if (temporary_image_filename)
+              (void) LiberateTemporaryFile(image->filename);
+            (void) LiberateTemporaryFile(image_info->unique);
+            (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->zero);
+            return(False);
+          }
         /* Expand sprintf-style codes in delegate command to command string */
         magick=TranslateText(image_info,image,decode != (char *) NULL ?
-          delegate_info->encode : delegate_info->decode);
+                             delegate_info->encode : delegate_info->decode);
         if (magick == (char *) NULL)
           {
             (void) LiberateTemporaryFile(image_info->unique);
@@ -724,7 +724,7 @@ MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
             if (temporary_image_filename)
               (void) LiberateTemporaryFile(image->filename);
             (void) ThrowException(exception,DelegateError,DelegateFailed,
-              decode ? decode : encode);
+                                  decode ? decode : encode);
             return(False);
           }
         LocaleUpper(magick);
@@ -733,29 +733,29 @@ MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
         (void) strlcpy(image->magick,magick,MaxTextExtent);
         MagickFreeMemory(magick);
         (void) strlcpy(decode_filename,image->filename,MaxTextExtent);
-        FormatString(clone_info->filename,"%.1024s:",delegate_info->decode);
+        MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"%.1024s:",delegate_info->decode);
         (void) SetImageInfo(clone_info,SETMAGICK_WRITE,exception);
         (void) strlcpy(clone_info->filename,image_info->filename,
-          MaxTextExtent);
+                       MaxTextExtent);
         for (p=image; p != (Image *) NULL; p=p->next)
-        {
-          FormatString(p->filename,"%.1024s:%.1024s",delegate_info->decode,
-            decode_filename);
-          status=WriteImage(clone_info,p);
-          if (status == False)
-            {
-              (void) LiberateTemporaryFile(image_info->unique);
-              (void) LiberateTemporaryFile(image_info->zero);
-              if (temporary_image_filename)
-                (void) LiberateTemporaryFile(image->filename);
-              DestroyImageInfo(clone_info);
-              (void) ThrowException(exception,DelegateError,DelegateFailed,
-                decode ? decode : encode);
-              return(False);
-            }
-          if (clone_info->adjoin)
-            break;
-        }
+          {
+            MagickFormatString(p->filename,sizeof(p->filename),"%.1024s:%.1024s",delegate_info->decode,
+                               decode_filename);
+            status=WriteImage(clone_info,p);
+            if (status == False)
+              {
+                (void) LiberateTemporaryFile(image_info->unique);
+                (void) LiberateTemporaryFile(image_info->zero);
+                if (temporary_image_filename)
+                  (void) LiberateTemporaryFile(image->filename);
+                DestroyImageInfo(clone_info);
+                (void) ThrowException(exception,DelegateError,DelegateFailed,
+                                      decode ? decode : encode);
+                return(False);
+              }
+            if (clone_info->adjoin)
+              break;
+          }
         (void) LiberateTemporaryFile(image_info->unique);
         (void) LiberateTemporaryFile(image_info->zero);
         DestroyImageInfo(clone_info);
@@ -776,140 +776,140 @@ MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
   status=True;
   /* For each delegate command ... */
   for (i=0; commands[i] != (char *) NULL; i++)
-  {
-    status=True;
-    /* Allocate convenience temporary files */
-    if (!AcquireTemporaryFileName(image_info->unique))
     {
-      (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->unique);
-      status=False;
-      goto error_exit;
-    }
-    if (!AcquireTemporaryFileName(image_info->zero))
-    {
-      (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->zero);
-      (void) LiberateTemporaryFile(image_info->unique);
-      status=False;
-      goto error_exit;
-    }
-    {
-      MagickBool
-        needs_shell;
-
-      /*
-        Check to see if command template must be executed via shell
-        due to using constructs requiring multiple processes or I/O
-        redirection.
-      */
-      needs_shell = MagickFalse;
-      {
-        char *
-          p;
-
-        p = commands[i];
-        for (p = commands[i]; *p; p++)
-          {
-            if (('&' == *p) ||
-                (';' == *p) ||
-                ('<' == *p) ||
-                ('>' == *p) ||
-                ('|' == *p))
-              {
-                needs_shell = MagickTrue;
-                break;
-              }
-          }
-      }
-
-      if (MagickFalse == needs_shell)
+      status=True;
+      /* Allocate convenience temporary files */
+      if (!AcquireTemporaryFileName(image_info->unique))
         {
-          int
-            arg_count,
-            j;
-
-          char
-            **arg_array;
-
-          /*
-            Convert command template into an argument array.  Translate
-            each argument array element individually in order to
-            absolutely avoid any possibility that the number of arguments
-            may be altered due to substituted data.
-          */
-          arg_array = StringToArgv(commands[i],&arg_count);
-          for (j = 0; arg_array[j] != (const char*) NULL; j++)
-            {
-              if (strchr(arg_array[j], '%') != (const char*) NULL)
-                {
-                  char *expanded = TranslateText(image_info,image,arg_array[j]);
-                  if (expanded != (char *) NULL)
-                    {
-                      MagickFreeMemory(arg_array[j]);
-                      arg_array[j] = expanded;
-                    }
-                }
-#if defined(HAVE_SPAWNVP)
-              /*
-                Windows _spawnvp() pretends to offer an argv style
-                interface but actually splits arguments into
-                additional arguments based on white-space.  It might
-                have more wonderful properties we are not aware of
-                yet.  Escape white-space in arguments with double
-                quotes to avoid the splitting.
-
-                This code should likely be in MagickSpawnVP() but then
-                we would need to clone the input array so it can be
-                modified.
-
-                This undocumented feature is an example of why
-                Microsoft Windows can not be a secure operating
-                system.
-              */
-              WindowsArgumentTextEscape(&arg_array[j]);
-#endif
-            }
-          /*
-            Execute delegate using our secure "spawn" facility.
-          */
-          status = MagickSpawnVP(image_info->verbose,arg_array[1],arg_array+1);
-          for (j = 0; arg_array[j] != (const char*) NULL; j++)
-            MagickFreeMemory(arg_array[j]);
-          MagickFreeMemory(arg_array);
+          (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->unique);
+          status=False;
+          goto error_exit;
         }
-      else
+      if (!AcquireTemporaryFileName(image_info->zero))
         {
-          /*
-            Expand sprintf-style codes in delegate command to command
-            string, escaping replacement text appropriately
-          */
-          command=TranslateTextEx(image_info,image,commands[i],
+          (void) ThrowException(exception,FileOpenError,UnableToCreateTemporaryFile,image_info->zero);
+          (void) LiberateTemporaryFile(image_info->unique);
+          status=False;
+          goto error_exit;
+        }
+      {
+        MagickBool
+          needs_shell;
+
+        /*
+          Check to see if command template must be executed via shell
+          due to using constructs requiring multiple processes or I/O
+          redirection.
+        */
+        needs_shell = MagickFalse;
+        {
+          char *
+            p;
+
+          p = commands[i];
+          for (p = commands[i]; *p; p++)
+            {
+              if (('&' == *p) ||
+                  (';' == *p) ||
+                  ('<' == *p) ||
+                  ('>' == *p) ||
+                  ('|' == *p))
+                {
+                  needs_shell = MagickTrue;
+                  break;
+                }
+            }
+        }
+
+        if (MagickFalse == needs_shell)
+          {
+            int
+              arg_count,
+              j;
+
+            char
+              **arg_array;
+
+            /*
+              Convert command template into an argument array.  Translate
+              each argument array element individually in order to
+              absolutely avoid any possibility that the number of arguments
+              may be altered due to substituted data.
+            */
+            arg_array = StringToArgv(commands[i],&arg_count);
+            for (j = 0; arg_array[j] != (const char*) NULL; j++)
+              {
+                if (strchr(arg_array[j], '%') != (const char*) NULL)
+                  {
+                    char *expanded = TranslateText(image_info,image,arg_array[j]);
+                    if (expanded != (char *) NULL)
+                      {
+                        MagickFreeMemory(arg_array[j]);
+                        arg_array[j] = expanded;
+                      }
+                  }
+#if defined(HAVE_SPAWNVP)
+                /*
+                  Windows _spawnvp() pretends to offer an argv style
+                  interface but actually splits arguments into
+                  additional arguments based on white-space.  It might
+                  have more wonderful properties we are not aware of
+                  yet.  Escape white-space in arguments with double
+                  quotes to avoid the splitting.
+
+                  This code should likely be in MagickSpawnVP() but then
+                  we would need to clone the input array so it can be
+                  modified.
+
+                  This undocumented feature is an example of why
+                  Microsoft Windows can not be a secure operating
+                  system.
+                */
+                WindowsArgumentTextEscape(&arg_array[j]);
+#endif
+              }
+            /*
+              Execute delegate using our secure "spawn" facility.
+            */
+            status = MagickSpawnVP(image_info->verbose,arg_array[1],arg_array+1);
+            for (j = 0; arg_array[j] != (const char*) NULL; j++)
+              MagickFreeMemory(arg_array[j]);
+            MagickFreeMemory(arg_array);
+          }
+        else
+          {
+            /*
+              Expand sprintf-style codes in delegate command to command
+              string, escaping replacement text appropriately
+            */
+            command=TranslateTextEx(image_info,image,commands[i],
 #if defined(POSIX)
-                                  UnixShellTextEscape
+                                    UnixShellTextEscape
 #endif /* POSIX */
 #if defined(MSWINDOWS)
-                                  WindowsShellTextEscape
+                                    WindowsShellTextEscape
 #endif /* MSWINDOWS */
-                                  );
-          if (command == (char *) NULL)
-            break;
-          /*
-            Execute delegate using command shell.
-          */
-          status=SystemCommand(image_info->verbose,command);
-        }
-    }
-    MagickFreeMemory(command);
-    /* Liberate convenience temporary files */
-    (void) LiberateTemporaryFile(image_info->unique);
-    (void) LiberateTemporaryFile(image_info->zero);
-    if (status != False)
-      {
-        (void) ThrowException(exception,DelegateError,DelegateFailed,
-          commands[i]);
-        goto error_exit;
+                                    );
+            if (command == (char *) NULL)
+              break;
+            /*
+              Execute delegate using command shell.
+            */
+            status=SystemCommand(image_info->verbose,command);
+          }
       }
-    MagickFreeMemory(commands[i]);
-  }
+      MagickFreeMemory(command);
+      /* Liberate convenience temporary files */
+      (void) LiberateTemporaryFile(image_info->unique);
+      (void) LiberateTemporaryFile(image_info->zero);
+      if (status != False)
+        {
+          (void) ThrowException(exception,DelegateError,DelegateFailed,
+                                commands[i]);
+          goto error_exit;
+        }
+      MagickFreeMemory(commands[i]);
+    }
   /*
     Free resources.
   */
@@ -950,7 +950,7 @@ MagickExport unsigned int InvokeDelegate(ImageInfo *image_info,Image *image,
 %      executing it.
 %
 %    o command: The address of a character string containing the command to
-%      execute.  The command is formulated through direct FormatString()
+%      execute.  The command is formulated through direct MagickFormatString()
 %      substitutions rather than using TranslateText.
 %
 %
@@ -1050,8 +1050,8 @@ InvokePostscriptDelegate(const unsigned int verbose,
               char
                 reason[MaxTextExtent];
 
-              FormatString(reason,"Ghostscript returns status %d, exit code %d",
-                           status,pexit_code);
+              MagickFormatString(reason,sizeof(reason),"Ghostscript returns status %d, exit code %d",
+                                 status,pexit_code);
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s",reason);
               ThrowException(exception,DelegateError,PostscriptDelegateFailed,command);
             }

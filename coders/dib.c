@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -45,6 +45,7 @@
 #include "magick/render.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Macro definitions (from Windows wingdi.h).
@@ -709,7 +710,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   " (expected %" MAGICK_SIZE_T_F  "u bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) packet_size*image->colors);
-          MagickFreeResourceLimitedMemory(dib_colormap);
+          MagickFreeResourceLimitedMemory(unsigned char *,dib_colormap);
           ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
         }
       p=dib_colormap;
@@ -721,7 +722,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if (packet_size == 4)
           p++;
       }
-      MagickFreeResourceLimitedMemory(dib_colormap);
+      MagickFreeResourceLimitedMemory(unsigned char *,dib_colormap);
     }
   /*
     Read image data.
@@ -783,7 +784,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   " (expected %" MAGICK_SIZE_T_F  "u bytes)",
                                   (MAGICK_SIZE_T) count,
                                   (MAGICK_SIZE_T) length);
-          MagickFreeResourceLimitedMemory(pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,pixels);
           ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
         }
     }
@@ -799,7 +800,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
                          (size_t) image->rows*image->columns);
       if (status == False)
         {
-          MagickFreeResourceLimitedMemory(pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,pixels);
           ThrowReaderException(CorruptImageError,UnableToRunlengthDecodeImage,
                                image);
         }
@@ -832,7 +833,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
           for (bit=0; bit < 8; bit++)
           {
             index=((*p) & (0x80 >> bit) ? 0x01 : 0x00);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x+bit]=index;
             *q++=image->colormap[index];
           }
@@ -843,7 +844,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
             for (bit=0; bit < (long) (image->columns % 8); bit++)
             {
               index=((*p) & (0x80 >> bit) ? 0x01 : 0x00);
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               indexes[x+bit]=index;
               *q++=image->colormap[index];
             }
@@ -879,11 +880,11 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         for (x=0; x < ((long) image->columns-1); x+=2)
         {
           index=(IndexPacket) ((*p >> 4) & 0xf);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q++=image->colormap[index];
           index=(IndexPacket) (*p & 0xf);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x+1]=index;
           *q++=image->colormap[index];
           p++;
@@ -891,7 +892,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if ((image->columns % 2) != 0)
           {
             index=(IndexPacket) ((*p >> 4) & 0xf);
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x]=index;
             *q++=image->colormap[index];
             p++;
@@ -928,7 +929,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         for (x=0; x < (long) image->columns; x++)
         {
           index=(IndexPacket) (*p);
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q=image->colormap[index];
           p++;
@@ -1037,11 +1038,11 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
     default:
       {
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
       }
   }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   if (EOFBlob(image))
     ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
                    image->filename);
@@ -1306,7 +1307,8 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
   /*
     Ensure that image is in an RGB space.
   */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Analyze image to be written.
   */
@@ -1327,6 +1329,9 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
       */
       dib_info.number_colors=0;
       dib_info.bits_per_pixel=image->matte ? 32 : 24;
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Writing full color DIB raster with %u bits per pixel...",
+                            dib_info.bits_per_pixel);
     }
   else
     {
@@ -1337,6 +1342,11 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
       if (characteristics.monochrome)
         dib_info.bits_per_pixel=1;
       dib_info.number_colors=1 << dib_info.bits_per_pixel;
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Writing colormapped DIB with %u colors and %u "
+                            "bit%s per colormap index...",
+                            dib_info.number_colors, dib_info.bits_per_pixel,
+                            dib_info.bits_per_pixel ? "s" : "");
     }
   /*
      Below emulates:
@@ -1502,13 +1512,13 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
         dib_data=MagickAllocateResourceLimitedMemory(unsigned char *,length);
         if (dib_data == (unsigned char *) NULL)
           {
-            MagickFreeResourceLimitedMemory(pixels);
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
             ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
                                  image);
           }
         dib_info.image_size=(unsigned long)
           EncodeImage(image,bytes_per_line,pixels,dib_data);
-        MagickFreeResourceLimitedMemory(pixels);
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
         pixels=dib_data;
         dib_info.compression=1;
       }
@@ -1538,7 +1548,7 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
                                                       (((size_t) 1U) << dib_info.bits_per_pixel),4);
       if (dib_colormap == (unsigned char *) NULL)
         {
-          MagickFreeResourceLimitedMemory(pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,pixels);
           ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
         }
       q=dib_colormap;
@@ -1558,10 +1568,10 @@ static unsigned int WriteDIBImage(const ImageInfo *image_info,Image *image)
       }
       (void) WriteBlob(image, 4*(((size_t) 1U) << dib_info.bits_per_pixel),
         (char *) dib_colormap);
-      MagickFreeResourceLimitedMemory(dib_colormap);
+      MagickFreeResourceLimitedMemory(unsigned char *,dib_colormap);
     }
   (void) WriteBlob(image,dib_info.image_size,(char *) pixels);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   status &= CloseBlob(image);
   return(status);
 }

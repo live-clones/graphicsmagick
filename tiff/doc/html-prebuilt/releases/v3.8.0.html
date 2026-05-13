@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changes in TIFF v3.8.0 &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>Changes in TIFF v3.8.0 &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changes in TIFF v3.7.4" href="v3.7.4.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="v3.8.1.html" title="Changes in TIFF v3.8.1"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="historical.html" accesskey="U">Old release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v3.8.0</a></li> 
@@ -61,7 +61,7 @@
 </table>
 <p>This document describes the changes made to the software between the
 <em>previous</em> and <em>current</em> versions (see above).
-If you don’t find something listed here, then it was not done in this
+If you don't find something listed here, then it was not done in this
 timeframe, or it was not considered important enough to be mentioned.
 The following information is located here:</p>
 <section id="major-changes">
@@ -93,7 +93,7 @@ The following information is located here:</p>
 redefininition of <code class="xref c c-macro docutils literal notranslate"><span class="pre">USE_WIN32_FILEIO</span></code></p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">tif_dir.c</span></code>, <code class="file docutils literal notranslate"><span class="pre">tif_dir.h</span></code>, <code class="file docutils literal notranslate"><span class="pre">tif_print.c</span></code>: Make <code class="docutils literal notranslate"><span class="pre">RichTIFFIPTC</span></code>,
 <code class="docutils literal notranslate"><span class="pre">Photoshop</span></code> and <code class="docutils literal notranslate"><span class="pre">ICCProfile</span></code> tags custom.</p></li>
-<li><p><code class="file docutils literal notranslate"><span class="pre">libtiff/*</span></code>, <code class="file docutils literal notranslate"><span class="pre">contrib/*</span></code>: Added ‘dual-mode’ error handling, enabling
+<li><p><code class="file docutils literal notranslate"><span class="pre">libtiff/*</span></code>, <code class="file docutils literal notranslate"><span class="pre">contrib/*</span></code>: Added 'dual-mode' error handling, enabling
 newer code to get context indicator in error handler and still
 remain compatible with older code: Done <a class="reference internal" href="../functions/TIFFError.html#c.TIFFError" title="TIFFError"><code class="xref c c-func docutils literal notranslate"><span class="pre">TIFFError()</span></code></a> calls everywhere
 except in tools.</p></li>
@@ -120,12 +120,12 @@ public.</p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">/tif_dirinfo.c</span></code>: Make <code class="docutils literal notranslate"><span class="pre">XResolution</span></code>, <code class="docutils literal notranslate"><span class="pre">YResolution</span></code> and
 <code class="docutils literal notranslate"><span class="pre">ResolutionUnit</span></code> tags modifiable during write process. As per bug
 <a class="reference external" href="http://bugzilla.remotesensing.org/show_bug.cgi?id=977">Remote Sensing bugzilla #977 [no longer available]</a></p></li>
-<li><p><code class="file docutils literal notranslate"><span class="pre">if_dirread.c</span></code>: Don’t try and split single strips into “0” strips
+<li><p><code class="file docutils literal notranslate"><span class="pre">if_dirread.c</span></code>: Don't try and split single strips into &quot;0&quot; strips
 in <code class="xref c c-func docutils literal notranslate"><span class="pre">ChopUpSingleUncompressedStrip()</span></code>.  This happens in some degenerate
 cases (like 1×1 files with <code class="docutils literal notranslate"><span class="pre">stripbytecounts==0</span></code> (<code class="file docutils literal notranslate"><span class="pre">gtsmall.jp2</span></code> embed tiff)</p></li>
-<li><p><code class="file docutils literal notranslate"><span class="pre">tif_fax3.c</span></code>: changed ‘<cite>at scanline …</cite>’ style warning/errors
-with incorrect use of tif_row, to ‘<cite>at line … of
-strip/tile …</cite>’ style.</p></li>
+<li><p><code class="file docutils literal notranslate"><span class="pre">tif_fax3.c</span></code>: changed '<cite>at scanline ...</cite>' style warning/errors
+with incorrect use of tif_row, to '<cite>at line ... of
+strip/tile ...</cite>' style.</p></li>
 </ul>
 </section>
 <section id="tools-changes">
@@ -227,15 +227,15 @@ YCbCr images in jpeg compressed TIFF files.</p></li>
         <li class="right" >
           <a href="v3.8.1.html" title="Changes in TIFF v3.8.1"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Release history</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="historical.html" >Old release history</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changes in TIFF v3.8.0</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>

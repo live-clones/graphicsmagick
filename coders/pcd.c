@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -49,6 +49,7 @@
 #include "magick/shear.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -392,7 +393,7 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
       Decode luminance or chrominance deltas.
     */
     r=pcd_table[plane];
-    for (i=0; ((i < (long) length) && ((sum & r->mask) != r->sequence)); i++)
+    for (i=1; ((i < (long) length) && ((sum & r->mask) != r->sequence)); i++)
       r++;
     if ((row > image->rows) || (r == (PCDTable *) NULL))
       {
@@ -420,8 +421,8 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
     Free memory.
   */
   for (i=0; i < (image->columns > 1536 ? 3 : 1); i++)
-    MagickFreeResourceLimitedMemory(pcd_table[i]);
-  MagickFreeResourceLimitedMemory(buffer);
+    MagickFreeResourceLimitedMemory(PCDTable *,pcd_table[i]);
+  MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   return(status);
 }
 
@@ -528,12 +529,12 @@ static Image *OverviewImage(const ImageInfo *image_info,Image *images,
   return(montage_image);
 }
 
-#define ThrowPCDReaderException(code_,reason_,image_) \
-  {                                                   \
-    MagickFreeResourceLimitedMemory(chroma1);                        \
-    MagickFreeResourceLimitedMemory(chroma2);                        \
-    MagickFreeResourceLimitedMemory(luma);                           \
-    ThrowReaderException(code_,reason_,image_);       \
+#define ThrowPCDReaderException(code_,reason_,image_)                \
+  {                                                                  \
+    MagickFreeResourceLimitedMemory(unsigned char *,chroma1);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,chroma2);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,luma);           \
+    ThrowReaderException(code_,reason_,image_);                      \
   }
 
 static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
@@ -696,8 +697,8 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
       for (j=1; j <= (long) number_images; j++)
       {
         handler=SetMonitorHandler((MonitorHandler) NULL);
-        FormatString(image->filename,"images/img%04ld.pcd",j);
-        FormatString(image->magick_filename,"images/img%04ld.pcd",j);
+        MagickFormatString(image->filename,sizeof(image->filename),"images/img%04ld.pcd",j);
+        MagickFormatString(image->magick_filename,sizeof(image->magick_filename),"images/img%04ld.pcd",j);
         image->scene=j;
         image->columns=width;
         image->rows=height;
@@ -768,9 +769,9 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                     image->columns,image->rows))
           break;
       }
-      MagickFreeResourceLimitedMemory(chroma2);
-      MagickFreeResourceLimitedMemory(chroma1);
-      MagickFreeResourceLimitedMemory(luma);
+      MagickFreeResourceLimitedMemory(unsigned char *,chroma2);
+      MagickFreeResourceLimitedMemory(unsigned char *,chroma1);
+      MagickFreeResourceLimitedMemory(unsigned char *,luma);
       while (image->previous != (Image *) NULL)
         image=image->previous;
       CloseBlob(image);
@@ -869,15 +870,17 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   image->columns,image->rows))
         break;
   }
-  MagickFreeResourceLimitedMemory(chroma2);
-  MagickFreeResourceLimitedMemory(chroma1);
-  MagickFreeResourceLimitedMemory(luma);
+  MagickFreeResourceLimitedMemory(unsigned char *,chroma2);
+  MagickFreeResourceLimitedMemory(unsigned char *,chroma1);
+  MagickFreeResourceLimitedMemory(unsigned char *,luma);
   if (LocaleCompare(image_info->magick,"PCDS") == 0)
     image->colorspace=sRGBColorspace;
   else
     image->colorspace=YCCColorspace;
   /* FIXME: YCCColorspace transform is broken! 1.1 is ok! */
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowException(exception,CoderError,UnableToTransformColorspace,
+                   image->filename);
   if ((rotate == 1) || (rotate == 3))
     {
       double
@@ -1090,7 +1093,13 @@ static unsigned int WritePCDTile(const ImageInfo *image_info,
                           tile_geometry,
                           image->columns, image->rows);
   (void) TransformImage(&tile_image,(char *) NULL,tile_geometry);
-  (void) TransformColorspace(tile_image,YCCColorspace);
+  if (TransformColorspace(tile_image,YCCColorspace) == MagickFail)
+    {
+      ThrowException(&image->exception,CoderError,UnableToTransformColorspace,
+                     image->filename);
+      DestroyImage(tile_image);
+      return(MagickFail);
+    }
   downsample_image=ResizeImage(tile_image,tile_image->columns/2,
     tile_image->rows/2,TriangleFilter,1.0,&image->exception);
   if (downsample_image == (Image *) NULL)
@@ -1180,7 +1189,8 @@ static MagickPassFail WritePCDImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,pcd_image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,pcd_image);
-  (void) TransformColorspace(pcd_image,RGBColorspace);
+  if (TransformColorspace(pcd_image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,pcd_image);
   /*
     Write PCD image header.
   */

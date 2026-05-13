@@ -72,6 +72,13 @@ Internet radio stations or channels.</p></td>
 (MacPaint?) and later used for PFS: 1st
 Publisher clip art.</p></td>
 </tr>
+<tr><td><p>AVCI</p></td>
+<td><p>R</p></td>
+<td><p>Advanced Video Coding
+Image Format</p></td>
+<td><p>AVC in a _HEIF container.  AVCI is supported
+via libheif if it supports H.264/MPEG-4 AVC.</p></td>
+</tr>
 <tr><td><p><a class="reference external" href="https://aomediacodec.github.io/av1-avif/">AVIF</a></p></td>
 <td><p>R</p></td>
 <td><p>AVIF Image File Format</p></td>
@@ -272,14 +279,22 @@ image width, height, depth, and byte order.</p></td>
 <td><p>Use -size, -depth, and -endian to specify the
 image width, height, depth, and byte order.</p></td>
 </tr>
-<tr><td><p><a class="reference external" href="https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format">HEIF</a></p></td>
+<tr><td><p>HEIC</p></td>
 <td><p>R</p></td>
 <td><p>High Efficiency Image
 File Format (with
 h.265/HEVC encoding)</p></td>
+<td><p>HEIC is <a class="reference external" href="https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format">HEIF</a> using H.265 (HEIC) encoding.</p></td>
+</tr>
+<tr><td><p><a class="reference external" href="https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format">HEIF</a></p></td>
+<td><p>R</p></td>
+<td><p>High Efficiency Image
+File Format</p></td>
 <td><p>HEIF is a container format supporting multiple
-codecs.  HEIF with h.265/HEVC encoding
-is supported via libheif and libde265.</p></td>
+codecs and many subformats. Libheif is used
+to support HEIF and the subformats supported
+depend on the version of libheif and the codecs
+it is configured to support.</p></td>
 </tr>
 <tr><td><p>HPGL</p></td>
 <td><p>R</p></td>
@@ -1316,7 +1331,7 @@ automatically uncompressed while the image is read.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
+    <p><a href="Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2026<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

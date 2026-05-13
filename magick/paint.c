@@ -38,6 +38,7 @@
 #include "magick/alpha_composite.h"
 #include "magick/color.h"
 #include "magick/monitor.h"
+#include "magick/paint.h"
 #include "magick/pixel_cache.h"
 #include "magick/pixel_iterator.h"
 #include "magick/render.h"
@@ -54,8 +55,8 @@
   {                                                                     \
     if (s >= (segment_stack+MaxStacksize))                              \
       {                                                                 \
-        MagickFreeResourceLimitedMemory(floodplane);                    \
-        MagickFreeResourceLimitedMemory(segment_stack);                 \
+        MagickFreeResourceLimitedMemory(unsigned char *,floodplane);    \
+        MagickFreeResourceLimitedMemory(SegmentInfo *,segment_stack);   \
         ThrowBinaryException2(DrawError,"SegmentStackOverflow",         \
                               image->filename);                         \
       }                                                                 \
@@ -117,7 +118,8 @@
 %
 %
 */
-
+/* FIXME: There is a data-sharing issue (causing corruption) if OpenMP is enabled. */
+#define ENABLE_COLORFLOODFILL_OPENMP 0
 MagickExport MagickPassFail ColorFloodfillImage(Image *image,
                                                 const DrawInfo *draw_info,
                                                 const PixelPacket target,
@@ -191,8 +193,8 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
   if ((floodplane== (unsigned char *) NULL) ||
       (segment_stack == (SegmentInfo *) NULL))
     {
-      MagickFreeResourceLimitedMemory(floodplane);
-      MagickFreeResourceLimitedMemory(segment_stack);
+      MagickFreeResourceLimitedMemory(unsigned char *, floodplane);
+      MagickFreeResourceLimitedMemory(SegmentInfo *, segment_stack);
       ThrowBinaryException3(ResourceLimitError,MemoryAllocationFailed,
                             UnableToFloodfillImage);
     }
@@ -401,8 +403,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       */
       if (status == MagickPass)
         {
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp parallel for schedule(static,64) shared(status)
+#endif
 #endif
           for (y=0; y < (long) image->rows; y++)
             {
@@ -433,8 +437,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
               /* There was a problem */
             tile_color_fail:;
               status=MagickFail;
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp flush (status)
+#endif
 #endif
             }
         }
@@ -446,8 +452,10 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       */
       if (status == MagickPass)
         {
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp parallel for schedule(static,64) shared(status)
+#endif
 #endif
           for (y=0; y < (long) image->rows; y++)
             {
@@ -491,14 +499,16 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
               /* There was a problem */
             tile_pattern_fail:;
               status=MagickFail;
+#if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
 #  pragma omp flush (status)
+#endif
 #endif
             } /* for y ... */
         } /* if status ... */
     }
-  MagickFreeResourceLimitedMemory(segment_stack);
-  MagickFreeResourceLimitedMemory(floodplane);
+  MagickFreeResourceLimitedMemory(SegmentInfo *, segment_stack);
+  MagickFreeResourceLimitedMemory(unsigned char *, floodplane);
   return(status);
 }
 
@@ -605,6 +615,9 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
       ThrowException(&image->exception,DrawError,UnableToFloodFillImageDueToClipMask,image->filename);
       return(MagickFail);
     }
+  status &= SetImageType(image,TrueColorMatteType);
+  if (status == MagickFail)
+    return status;
   /*
     Allocate segment stack.
   */
@@ -615,7 +628,6 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
   /*
     Push initial segment on stack.
   */
-  (void) SetImageType(image,TrueColorMatteType);
   x=x_offset;
   y=y_offset;
   start=0;
@@ -726,7 +738,7 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
       start=x;
     } while (x <= x2);
   }
-  MagickFreeResourceLimitedMemory(segment_stack);
+  MagickFreeResourceLimitedMemory(SegmentInfo*, segment_stack);
   return(status);
 }
 

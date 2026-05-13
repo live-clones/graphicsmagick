@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -47,6 +47,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 #define USE_GRAYMAP
@@ -259,6 +260,8 @@ static DicomElemParseFunc funcDCM_TransferSyntax;
 static DicomElemParseFunc funcDCM_TriggerTime;
 static DicomElemParseFunc funcDCM_WindowCenter;
 static DicomElemParseFunc funcDCM_WindowWidth;
+
+static void DCM_SetRescaling(DicomStream *dcm,int avoid_scaling);
 
 /*
   Function vectors for supported DICOM element parsing functions.
@@ -5533,12 +5536,12 @@ static MagickPassFail DCM_InitDCM(DicomStream *dcm,int verbose)
 
 static void DCM_DestroyDCM(DicomStream *dcm)
 {
-  MagickFreeResourceLimitedMemory(dcm->offset_arr);
-  MagickFreeResourceLimitedMemory(dcm->data);
+  MagickFreeResourceLimitedMemory(magick_uint32_t *,dcm->offset_arr);
+  MagickFreeResourceLimitedMemory(unsigned char *,dcm->data);
 #if defined(USE_GRAYMAP)
-  MagickFreeResourceLimitedMemory(dcm->graymap);
+  MagickFreeResourceLimitedMemory(unsigned short *,dcm->graymap);
 #endif
-  MagickFreeResourceLimitedMemory(dcm->rescale_map);
+  MagickFreeResourceLimitedMemory(Quantum *,dcm->rescale_map);
 }
 
 /*
@@ -5993,7 +5996,7 @@ static MagickPassFail funcDCM_Palette(Image *image,DicomStream *dcm,ExceptionInf
       /*
         Allocate color map first time in
       */
-      if (!AllocateImageColormap(image,(const unsigned long) dcm->length))
+      if (!AllocateImageColormap(image,(unsigned long) dcm->length))
         {
           ThrowException(exception,ResourceLimitError,UnableToCreateColormap,image->filename);
           return MagickFail;
@@ -6076,7 +6079,7 @@ static magick_uint8_t DCM_RLE_ReadByte(Image *image, DicomStream *dcm)
 
 static magick_uint16_t DCM_RLE_ReadShort(Image *image, DicomStream *dcm)
 {
-  return (((magick_uint16_t) DCM_RLE_ReadByte(image,dcm) << 4) |
+  return (((magick_uint16_t) DCM_RLE_ReadByte(image,dcm) << 8) |
           (magick_uint16_t) DCM_RLE_ReadByte(image,dcm));
 }
 
@@ -6540,7 +6543,7 @@ static MagickPassFail DCM_SetupRescaleMap(Image *image,DicomStream *dcm,Exceptio
   return MagickPass;
 }
 
-void DCM_SetRescaling(DicomStream *dcm,int avoid_scaling)
+static void DCM_SetRescaling(DicomStream *dcm,int avoid_scaling)
 {
   /*
     If avoid_scaling is True then scaling will only be applied where necessary ie
@@ -6741,6 +6744,9 @@ static MagickPassFail DCM_ReadPaletteImage(Image *image,DicomStream *dcm,Excepti
   unsigned char
     byte;
 
+  MagickPassFail
+    status = MagickPass;
+
   byte=0;
 
   if (image->logging)
@@ -6807,7 +6813,7 @@ static MagickPassFail DCM_ReadPaletteImage(Image *image,DicomStream *dcm,Excepti
                 index=dcm->graymap[index];
 #endif
               index=(IndexPacket) (index);
-              VerifyColormapIndex(image,index);
+              VerifyColormapIndex(status,image,index);
               indexes[x]=index;
               *q=image->colormap[index];
               q++;
@@ -6828,7 +6834,7 @@ static MagickPassFail DCM_ReadPaletteImage(Image *image,DicomStream *dcm,Excepti
                                       image->columns,image->rows))
             return MagickFail;
     }
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail DCM_ReadGrayscaleImage(Image *image,DicomStream *dcm,ExceptionInfo *exception)
@@ -7316,12 +7322,12 @@ static MagickPassFail DCM_ReadNonNativeImages(Image **image,const ImageInfo *ima
       if (status == MagickPass)
         {
           clone_info=CloneImageInfo(image_info);
-          clone_info->blob=(void *) NULL;
+          clone_info->blob=(_BlobInfoPtr_) NULL;
           clone_info->length=0;
           if (dcm->transfer_syntax == DCM_TS_JPEG_2000)
-            FormatString(clone_info->filename,"jp2:%.1024s",filename);
+            MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"jp2:%.1024s",filename);
           else
-            FormatString(clone_info->filename,"jpeg:%.1024s",filename);
+            MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"jpeg:%.1024s",filename);
           next_image=ReadImage(clone_info,exception);
           DestroyImageInfo(clone_info);
           if (next_image == (Image*)NULL)
@@ -7493,7 +7499,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       pfunc=parse_funcs[dicom_info[dcm.index].funce];
       if (pfunc != (DicomElemParseFunc *)NULL)
         status=pfunc(image,&dcm,exception);
-      MagickFreeResourceLimitedMemory(dcm.data);
+      MagickFreeResourceLimitedMemory(unsigned char *,dcm.data);
       dcm.data = NULL;
       dcm.length = 0;
       if (status == MagickPass)

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,7 +101,7 @@ static Image *ReadTILEImage(const ImageInfo *image_info,
 
   GetTimerInfo(&timer);
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   *clone_info->magick='\0';
   MagickFreeMemory(clone_info->size);
@@ -113,7 +114,14 @@ static Image *ReadTILEImage(const ImageInfo *image_info,
     Adapt tile image to desired image type.
   */
   if (image_info->type != UndefinedType)
-    (void) SetImageType(tile_image,image_info->type);
+    if (SetImageType(tile_image,image_info->type) == MagickFail)
+      {
+        CopyException(exception,&tile_image->exception);
+        ThrowException(exception,CoderError,UnableToSetImageType,
+                       tile_image->filename);
+        DestroyImage(tile_image);
+        return (Image *) NULL;
+      }
 
   /*
     Create tiled canvas image.

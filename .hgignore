@@ -57,6 +57,7 @@ out_.*\.+
 ^magick/magick_config_api\.h
 ^magick/magick_types\.h
 ^magick/stamp-.*
+^m4/autom4te.cache
 ^perl-sources
 ^rungm\.sh
 ^tests/bitstream

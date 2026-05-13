@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -43,6 +43,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -345,7 +346,7 @@ static Image *ReadGRAYImage(const ImageInfo *image_info,
         AllocateNextImage(image_info,image);
         if (image->next == (Image *) NULL)
           {
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
           }
         image=SyncNextImageInList(image);
@@ -354,7 +355,7 @@ static Image *ReadGRAYImage(const ImageInfo *image_info,
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -619,12 +620,6 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
   do
   {
     /*
-      Allocate scanline
-    */
-    scanline=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->columns);
-    if (scanline == (unsigned char *) NULL)
-      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-    /*
       Transform to target color space
     */
     switch (quantum_type)
@@ -634,17 +629,27 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
       case YellowQuantum:
       case BlackQuantum:
         {
-          (void) TransformColorspace(image,CMYKColorspace);
+          if (TransformColorspace(image,CMYKColorspace) == MagickFail)
+            ThrowWriterException(CoderError,UnableToTransformColorspace,image);
           break;
         }
       default:
         {
-          (void) TransformColorspace(image,RGBColorspace);
+          if (TransformColorspace(image,RGBColorspace) == MagickFail)
+            ThrowWriterException(CoderError,UnableToTransformColorspace,image);
         }
       }
     if (!(image->matte) &&
         ((quantum_type == GrayAlphaQuantum) || (quantum_type == AlphaQuantum)))
       (void) SetImageOpacity(image,OpaqueOpacity);
+
+    /*
+      Allocate scanline
+    */
+    scanline=MagickAllocateResourceLimitedArray(unsigned char *,packet_size,image->columns);
+    if (scanline == (unsigned char *) NULL)
+      ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+
     /*
       Initialize export options.
     */
@@ -685,7 +690,7 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(scanline);
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

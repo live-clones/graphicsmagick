@@ -64,6 +64,7 @@ version of this page.
 .. _`ASan` : https://github.com/google/sanitizers/wiki/AddressSanitizer
 .. _`UBSan` : https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
 .. _`oss-fuzz` : https://github.com/google/oss-fuzz
+.. _`oss-fuzz open issues` : https://issues.oss-fuzz.com/issues?q=status:open%20graphicsmagick
 .. _`Coverity Analysis Metrics` : https://scan.coverity.com/projects/graphicsmagick
 
 GraphicsMagick is the swiss army knife of image processing. Comprised
@@ -71,8 +72,8 @@ of 286K physical lines (according to David A. Wheeler's `SLOCCount`_)
 of source code in the base package, it provides a robust and efficient
 collection of tools and libraries which support reading, writing, and
 manipulating an image in over 92 major formats including important
-formats like AVIF, DPX, GIF, HEIC, JPEG, JPEG-2000, JXL, PNG, PDF,
-PNM, TIFF, and WebP.
+formats like AVIF, DPX, GIF, HEIC, HEIF, JPEG, JPEG-2000, JXL, PNG,
+PDF, PNM, TIFF, and WebP.
 
 Image processing is multi-threaded using OpenMP_ (`read about OpenMP
 in GraphicsMagick`_) so that CPU-bound tasks scale linearly as
@@ -107,6 +108,10 @@ development model but without breaking the API or utilities operation.
 Here are some reasons to prefer GraphicsMagick over ImageMagick or
 other popular software:
 
+  * GM provides detailed yet comprehensible `ChangeLog`_ and `NEWS`_
+    files, as part of the source code, and as part of the formatted
+    documentation (ImageMagick does not).
+
   * GM is more efficient than ImageMagick so it gets the job done
     faster using fewer resources.
 
@@ -123,7 +128,7 @@ other popular software:
 
   * GM suffers from fewer security issues and exploits than ImageMagick.
 
-  * GM participates in Google's `oss-fuzz`_ project (since February, 2018).
+  * GM participates in Google's `oss-fuzz`_ project since 2018 (see `oss-fuzz open issues`_).
 
   * GM `valgrind`_'s 100% clean (memcheck and helgrind).
 
@@ -131,9 +136,9 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (377,270 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (379,091 total
     lines included) according to `Coverity Analysis Metrics`_ on
-    October 11th, 2025.
+    March 20, 2026.
 
   * GM has zero issues detected by Clang 15 scan-build.
 
@@ -141,9 +146,6 @@ other popular software:
 
   * GM provides API and ABI stability and managed releases that you can
     count on (ImageMagick does not).
-
-  * GM provides detailed yet comprehensible `ChangeLog`_ and `NEWS`_
-    files (ImageMagick does not).
 
   * GM is available for free, and may be used to support both open and
     proprietary applications.

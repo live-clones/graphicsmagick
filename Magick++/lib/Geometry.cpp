@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999 - 2014
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Geometry implementation
 //
@@ -11,6 +11,8 @@
 #include "Magick++/Include.h"
 #include <string>
 #include <ctype.h> // for isdigit
+#include <iostream>
+#include <sstream> // for ostringstream
 #include <string.h> // for strcpy
 #include <cassert>
 
@@ -335,22 +337,19 @@ Magick::Geometry& Magick::Geometry::operator = ( const Geometry& geometry_ )
 /* virtual */ const Magick::Geometry&
 Magick::Geometry::operator = ( const std::string &geometry_ )
 {
-  char
-    geom[MaxTextExtent];
-
   // If argument does not start with digit, presume that it is a
   // page-size specification that needs to be converted to an
   // equivalent geometry specification using PostscriptGeometry()
-  strlcpy(geom,geometry_.c_str(),sizeof(geom));
-  if ( geom[0] != '-' &&
-       geom[0] != '+' &&
-       geom[0] != 'x' &&
-       !isdigit(static_cast<int>(geom[0])))
+  std::string geom = geometry_;
+  if (geom[0] != '-' &&
+      geom[0] != '+' &&
+      geom[0] != 'x' &&
+      !std::isdigit(static_cast<int>(geom[0])))
     {
-      char *pageptr = GetPageGeometry( geom );
+      char *pageptr = GetPageGeometry( geom.c_str() );
       if ( pageptr != 0 )
         {
-          strlcpy(geom,pageptr,sizeof(geom));
+          geom = pageptr;
           MagickFreeMemory(pageptr);
         }
     }
@@ -359,7 +358,7 @@ Magick::Geometry::operator = ( const std::string &geometry_ )
   long y = 0;
   unsigned long width_val = 0;
   unsigned long height_val = 0;
-  int flags = GetGeometry (geom, &x, &y, &width_val, &height_val );
+  int flags = GetGeometry (geom.c_str(), &x, &y, &width_val, &height_val );
 
   if (flags == NoValue)
     {
@@ -434,57 +433,55 @@ Magick::Geometry::operator std::string() const
     }
 
   string geometry;
-  char buffer[MaxTextExtent];
+  std::ostringstream oss;
 
-  if ( _width )
+   if ( _width )
     {
-      FormatString( buffer, "%u", _width );
-      geometry += buffer;
+      oss << _width;
     }
 
-  if ( _width && _height )
-    {
-      FormatString( buffer, "%u",  _height);
-      geometry += 'x';
-      geometry +=  buffer;
-    }
+   if ( _width && _height )
+     {
+       oss << 'x'
+           << _height;
+     }
 
-  if ( _xOff || _yOff )
+   if ( _xOff || _yOff )
     {
       if ( xNegative() )
-        geometry += '-';
+        oss << '-';
       else
-        geometry += '+';
+        oss << '+';
 
-      FormatString( buffer, "%u", _xOff);
-      geometry += buffer;
+      oss << _xOff;
 
       if ( yNegative() )
-        geometry += '-';
+        oss << '-';
       else
-        geometry += '+';
+        oss << '+';
 
-      FormatString( buffer, "%u", _yOff);
-      geometry += buffer;
+      oss << _yOff;
     }
 
-  if ( percent() )
-    geometry += '%';
+   if ( percent() )
+     oss << '%';
 
   if ( aspect() )
-    geometry += '!';
+    oss << '!';
 
   if ( greater() )
-    geometry += '>';
+    oss << '>';
 
   if ( less() )
-    geometry += '<';
+    oss << '<';
 
   if ( limitPixels() )
-    geometry += '@';
+    oss << '@';
 
   if ( fillArea() )
-    geometry += '^';
+    oss << '^';
+
+  geometry = oss.str();
 
   return geometry;
 }

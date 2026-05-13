@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/monitor.h"
 #include "magick/resize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -81,13 +82,13 @@ static unsigned int
 %
 %
 */
-#define ThrowYUVReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(scanline);  \
-  DestroyImage(chroma_image);                 \
-  DestroyImage(resize_image);                 \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowYUVReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);  \
+    DestroyImage(chroma_image);                                 \
+    DestroyImage(resize_image);                                 \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -153,8 +154,8 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
         &vertical_factor);
       if (factors != 2)
         vertical_factor=horizontal_factor;
-      if ((horizontal_factor != 1) && (horizontal_factor != 2) &&
-          (vertical_factor != 1) && (vertical_factor != 2))
+      if (((horizontal_factor != 1) && (horizontal_factor != 2)) ||
+          ((vertical_factor != 1) && (vertical_factor != 2)))
         ThrowYUVReaderException(OptionError,UnsupportedSamplingFactor,
           image);
     }
@@ -388,7 +389,12 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
     if (status == MagickFail)
       break;
     image->colorspace=YCbCrColorspace;
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      {
+        ThrowException(exception,CoderError,UnableToTransformColorspace,
+                       image->filename);
+        break;
+      }
     if (interlace == PartitionInterlace)
       (void) strlcpy(image->filename,image_info->filename,MaxTextExtent);
     if (EOFBlob(image))
@@ -417,7 +423,7 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if (image->next == (Image *) NULL)
           {
             DestroyImageList(image);
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             return((Image *) NULL);
           }
         image=SyncNextImageInList(image);
@@ -427,7 +433,7 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
           break;
       }
   } while (count != 0);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -576,8 +582,8 @@ static unsigned int WriteYUVImage(const ImageInfo *image_info,Image *image)
         &vertical_factor);
       if (factors != 2)
         vertical_factor=horizontal_factor;
-      if ((horizontal_factor != 1) && (horizontal_factor != 2) &&
-          (vertical_factor != 1) && (vertical_factor != 2))
+      if (((horizontal_factor != 1) && (horizontal_factor != 2)) ||
+          ((vertical_factor != 1) && (vertical_factor != 2)))
         ThrowWriterException(OptionError,UnsupportedSamplingFactor,
           image);
     }
@@ -611,14 +617,20 @@ static unsigned int WriteYUVImage(const ImageInfo *image_info,Image *image)
       Sample image to an even width and height, if necessary.
     */
     image->depth=8;
-    (void) TransformColorspace(image,RGBColorspace);
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
     width=image->columns+(image->columns & (horizontal_factor-1));
     height=image->rows+(image->rows & (vertical_factor-1));
     yuv_image=ResizeImage(image,width,height,TriangleFilter,1.0,
       &image->exception);
     if (yuv_image == (Image *) NULL)
       ThrowWriterException2(ResourceLimitError,image->exception.reason,image);
-    (void) TransformColorspace(yuv_image,YCbCrColorspace);
+    if (TransformColorspace(yuv_image,YCbCrColorspace) == MagickFail)
+      {
+        CopyException(&yuv_image->exception,&image->exception);
+        DestroyImage(yuv_image);
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      }
     /*
       Downsample image.
     */

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/magick.h"
 #include "magick/render.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasTTF)
 
 #  if defined(__MINGW32__)
@@ -233,7 +234,7 @@ static Image *ReadTTFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   {
     y+=i+12;
     (void) DrawSetFontSize(context,18);
-    (void) FormatString(buffer,"%ld",i);
+    (void) MagickFormatString(buffer,sizeof(buffer),"%ld",i);
     (void) DrawAnnotation(context,10,y,(const unsigned char *) buffer);
     (void) DrawSetFontSize(context,i);
     (void) DrawAnnotation(context,50,y,(const unsigned char *)
@@ -292,7 +293,7 @@ ModuleExport void RegisterTTFImage(void)
 
   /*   *version='\0'; */
   /* #if defined(FREETYPE_MAJOR) && defined(FREETYPE_MINOR) && defined(FREETYPE_PATCH) */
-  /*   FormatString(version,"FreeType %d.%d.%d",FREETYPE_MAJOR,FREETYPE_MINOR,FREETYPE_PATCH); */
+  /*   MagickFormatString(version,sizeof(version),"FreeType %d.%d.%d",FREETYPE_MAJOR,FREETYPE_MINOR,FREETYPE_PATCH); */
   /* #endif */
 
   entry=SetMagickInfo("TTF");

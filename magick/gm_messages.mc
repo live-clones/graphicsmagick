@@ -449,9 +449,21 @@ Unable to create bitmap
 .
 
 MessageId       = +1
+SymbolicName    = CoderErrorUnableToDecodeImage
+Language        = English
+Unable to decode image
+.
+
+MessageId       = +1
 SymbolicName    = CoderErrorUnableToDecompressImage
 Language        = English
 Unable to decompress image
+.
+
+MessageId       = +1
+SymbolicName    = CoderErrorUnableToGetImageCharacteristics
+Language        = English
+Unable to get image characteristics
 .
 
 MessageId       = +1
@@ -464,6 +476,12 @@ MessageId       = +1
 SymbolicName    = CoderErrorUnableToOpenBlob
 Language        = English
 Unable to open blob
+.
+
+MessageId       = +1
+SymbolicName    = CoderErrorUnableToOpenFile
+Language        = English
+Unable to open file
 .
 
 MessageId       = +1
@@ -482,6 +500,12 @@ MessageId       = +1
 SymbolicName    = CoderErrorUnableToReadSummaryInfo
 Language        = English
 Unable to read summary info
+.
+
+MessageId       = +1
+SymbolicName    = CoderErrorUnableToResizeImage
+Language        = English
+Unable to resize image
 .
 
 MessageId       = +1
@@ -521,9 +545,21 @@ Unable to set image comment
 .
 
 MessageId       = +1
+SymbolicName    = CoderErrorUnableToSetImageOpacity
+Language        = English
+Unable to set image opacity
+.
+
+MessageId       = +1
 SymbolicName    = CoderErrorUnableToSetImageTitle
 Language        = English
 Unable to set image title
+.
+
+MessageId       = +1
+SymbolicName    = CoderErrorUnableToSetImageType
+Language        = English
+Unable to set image type
 .
 
 MessageId       = +1
@@ -542,6 +578,12 @@ MessageId       = +1
 SymbolicName    = CoderErrorUnableToSetSummaryInfo
 Language        = English
 Unable to set summary info
+.
+
+MessageId       = +1
+SymbolicName    = CoderErrorUnableToTransformColorspace
+Language        = English
+Unable to transform image colorspace
 .
 
 MessageId       = +1
@@ -1253,6 +1295,24 @@ text value does not convert to integer
 .
 
 MessageId       = +1
+SymbolicName    = DrawErrorInvalidAttributeArgument
+Language        = English
+invalid attribute argument
+.
+
+MessageId       = +1
+SymbolicName    = DrawErrorInvalidClassName
+Language        = English
+invalid class name
+.
+
+MessageId       = +1
+SymbolicName    = DrawErrorInvalidElementIdentifier
+Language        = English
+invalid element identifier
+.
+
+MessageId       = +1
 SymbolicName    = DrawErrorInvalidPrimitiveArgument
 Language        = English
 invalid primitive argument
@@ -1268,6 +1328,12 @@ MessageId       = +1
 SymbolicName    = DrawErrorPrimitiveArithmeticOverflow
 Language        = English
 primitive arithmetic overflow
+.
+
+MessageId       = +1
+SymbolicName    = DrawErrorTextStringTruncation
+Language        = English
+string truncation (length exceeds limit)
 .
 
 MessageId       = +1
@@ -2531,6 +2597,12 @@ Image pixel width limit exceeded (see -limit Width)
 .
 
 MessageId       = +1
+SymbolicName    = LimitErrorImagesLimitExceeded
+Language        = English
+Images limit exceeded (see -limit Images)
+.
+
+MessageId       = +1
 SymbolicName    = LimitErrorMemoryAllocationFailed
 Language        = English
 Memory allocation failed
@@ -2639,9 +2711,9 @@ unable to average image sequence
 .
 
 MessageId       = +1
-SymbolicName    = LimitErrorUnableToCloneDrawingWand
+SymbolicName    = LimitErrorUnableToCloneDrawingContext
 Language        = English
-unable to clone drawing wand
+unable to clone drawing context
 .
 
 MessageId       = +1

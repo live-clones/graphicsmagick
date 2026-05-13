@@ -256,19 +256,19 @@ transform is adjusted rather than replaced.</p>
 <h1><a class="toc-backref" href="#toc-entry-5" role="doc-backlink">DrawAllocateWand</a></h1>
 <section id="synopsis-4">
 <h2>Synopsis</h2>
-<pre class="literal-block">DrawingWand DrawAllocateWand( const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info, <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
+<pre class="literal-block">DrawingWand *DrawAllocateWand( const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info, <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
 </section>
 <section id="description-4">
 <h2>Description</h2>
 <p>DrawAllocateWand() allocates an initial drawing wand which is an
 opaque handle required by the remaining drawing methods.</p>
 <p>The format of the DrawAllocateWand method is:</p>
-<pre class="literal-block">DrawingWand DrawAllocateWand( const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info, <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
+<pre class="literal-block">DrawingWand *DrawAllocateWand( const <a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *draw_info, <a class="reference external" href="../api/types.html#image">Image</a> *image );</pre>
 <p>A description of each parameter follows:</p>
 <dl class="simple">
 <dt>draw_info:</dt>
 <dd><p>Initial drawing defaults. Set to NULL to use
-ImageMagick defaults.</p>
+GraphicsMagick defaults.</p>
 </dd>
 <dt>image:</dt>
 <dd><p>The image to draw on.</p>
@@ -377,13 +377,13 @@ image.</p>
 <h1><a class="toc-backref" href="#toc-entry-9" role="doc-backlink">DrawClearException</a></h1>
 <section id="synopsis-8">
 <h2>Synopsis</h2>
-<pre class="literal-block">MagickPassFail DrawClearException( DrawingWand *drawing_wand );</pre>
+<pre class="literal-block">PassFail DrawClearException( DrawingWand *drawing_wand );</pre>
 </section>
 <section id="description-8">
 <h2>Description</h2>
 <p>DrawClearException() clears any existing exception from the drawing wand.</p>
-<p>The format of the DrawGetException method is:</p>
-<pre class="literal-block">MagickPassFail DrawClearException( DrawingWand *drawing_wand );</pre>
+<p>The format of the DrawClearException method is:</p>
+<pre class="literal-block">PassFail DrawClearException( DrawingWand *drawing_wand );</pre>
 <p>A description of each parameter follows:</p>
 <dl class="simple">
 <dt>drawing_wand:</dt>
@@ -1890,7 +1890,9 @@ function by themselves.</p>
 </section>
 <section id="description-64">
 <h2>Description</h2>
-<p>DrawPeekGraphicContext() returns the current graphic drawing_wand.</p>
+<p>DrawPeekGraphicContext() returns a copy of the the DrawInfo structure at
+the head of the drawing context stack. The user is responsible for
+deallocating the returned object using DestroyDrawInfo.</p>
 <p>The format of the DrawPeekGraphicContext method is:</p>
 <pre class="literal-block"><a class="reference external" href="../api/types.html#drawinfo">DrawInfo</a> *DrawPeekGraphicContext( const DrawingWand *drawing_wand );</pre>
 <p>A description of each parameter follows:</p>
@@ -2208,7 +2210,7 @@ the current stroke, stroke width, and fill settings.</p>
 <section id="description-77">
 <h2>Description</h2>
 <p>DrawRender() renders all preceding drawing commands onto the image.
-This function is deprecated.  Use MagickDrawImage() instead.</p>
+This function is deprecated.  Use DrawImage() instead.</p>
 <p>The format of the DrawRender method is:</p>
 <pre class="literal-block">unsigned int DrawRender( const DrawingWand *drawing_wand );</pre>
 <p>A description of each parameter follows:</p>
@@ -3064,7 +3066,7 @@ the API.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2026<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

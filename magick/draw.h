@@ -1,12 +1,12 @@
 /*
-  Copyright (C) 2003-2018 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
   package; otherwise see http://www.graphicsmagick.org/www/Copyright.html.
 
-  ImageMagick Drawing API.
+  GraphicsMagick Drawing API.
 
   Usage synopsis:
 
@@ -33,219 +33,233 @@ extern "C" {
 
 typedef struct _DrawContext *DrawContext;
 
+typedef enum
+{
+  DefaultPathMode,
+  AbsolutePathMode,
+  RelativePathMode
+} DrawPathMode;
+
 extern MagickExport ClipPathUnits
-  DrawGetClipUnits(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetClipUnits(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport DrawInfo
-  *DrawPeekGraphicContext(const DrawContext context);
+  *DrawPeekGraphicContext(const struct _DrawContext * context);
 
 extern MagickExport DecorationType
-  DrawGetTextDecoration(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetTextDecoration(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
-extern MagickExport DrawContext
-  DrawAllocateContext(const DrawInfo *draw_info, Image *image);
+extern MagickExport struct _DrawContext
+  *DrawNewContext(void),
+  *DrawAllocateContext(const DrawInfo *draw_info, Image *image),
+  *DrawCloneContext(const struct _DrawContext *context);
+
+extern MagickExport MagickBool
+  DrawClearException(struct _DrawContext * context);
 
 extern MagickExport FillRule
-  DrawGetClipRule(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetFillRule(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetClipRule(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetFillRule(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport GravityType
-  DrawGetGravity(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetGravity(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport LineCap
-  DrawGetStrokeLineCap(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetStrokeLineCap(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport LineJoin
-  DrawGetStrokeLineJoin(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetStrokeLineJoin(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport PixelPacket
-  DrawGetFillColor(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetStrokeColor(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetTextUnderColor(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetFillColor(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetStrokeColor(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetTextUnderColor(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport StretchType
-  DrawGetFontStretch(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetFontStretch(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport StyleType
-  DrawGetFontStyle(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetFontStyle(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport char
-  *DrawGetClipPath(DrawContext context),
-  *DrawGetFont(DrawContext context),
-  *DrawGetFontFamily(DrawContext context),
-  *DrawGetTextEncoding(DrawContext context);
+  *DrawGetClipPath(const struct _DrawContext * context),
+  *DrawGetFont(const struct _DrawContext * context),
+  *DrawGetFontFamily(const struct _DrawContext * context),
+  *DrawGetTextEncoding(const struct _DrawContext * context),
+  *DrawGetException(const struct _DrawContext * context,ExceptionType *severity);
 
 extern MagickExport int
-  DrawRender(const DrawContext context);
+  DrawRender(const struct _DrawContext * context);
 
 extern MagickExport unsigned int
-  DrawGetStrokeAntialias(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetTextAntialias(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetStrokeAntialias(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetTextAntialias(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport unsigned long
-  DrawGetFontWeight(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetStrokeMiterLimit(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetFontWeight(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetStrokeMiterLimit(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport double
-  DrawGetFillOpacity(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetFontSize(DrawContext context) MAGICK_FUNC_PURE,
-  *DrawGetStrokeDashArray(DrawContext context, unsigned long *num_elems),
-  DrawGetStrokeDashOffset(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetStrokeOpacity(DrawContext context) MAGICK_FUNC_PURE,
-  DrawGetStrokeWidth(DrawContext context) MAGICK_FUNC_PURE;
+  DrawGetFillOpacity(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetFontSize(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  *DrawGetStrokeDashArray(const struct _DrawContext * context, unsigned long *num_elems),
+  DrawGetStrokeDashOffset(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetStrokeOpacity(const struct _DrawContext * context) MAGICK_FUNC_PURE,
+  DrawGetStrokeWidth(const struct _DrawContext * context) MAGICK_FUNC_PURE;
 
 extern MagickExport void
-  DrawAffine(DrawContext context, const AffineMatrix *affine),
-  DrawAnnotation(DrawContext context,
+  DrawAffine(struct _DrawContext * context, const AffineMatrix *affine),
+  DrawAnnotation(struct _DrawContext * context,
     const double x, const double y,
     const unsigned char *text),
-  DrawArc(DrawContext context,
+  DrawArc(struct _DrawContext * context,
           const double sx, const double sy,
           const double ex, const double ey,
           const double sd, const double ed),
-  DrawBezier(DrawContext context,
+  DrawBezier(struct _DrawContext * context,
              const unsigned long num_coords, const PointInfo * coordinates),
-  DrawCircle(DrawContext context,
+  DrawCircle(struct _DrawContext * context,
              const double ox, const double oy,
              const double px, const double py),
-  DrawColor(DrawContext context,
+  DrawColor(struct _DrawContext * context,
             const double x, const double y,
             const PaintMethod paintMethod),
-  DrawComment(DrawContext context,const char* comment),
-  DrawDestroyContext(DrawContext context),
-  DrawEllipse(DrawContext context,
+  DrawComment(struct _DrawContext * context,const char* comment),
+  DrawDestroyContext(struct _DrawContext * context),
+  DrawEllipse(struct _DrawContext * context,
               const double ox, const double oy,
               const double rx, const double ry,
               const double start, const double end),
-  DrawComposite(DrawContext context,
+  DrawComposite(struct _DrawContext * context,
                 const CompositeOperator composite_operator,
                 const double x, const double y,
                 const double width, const double height,
                 const Image * image ),
-  DrawLine(DrawContext context,
+  DrawLine(struct _DrawContext * context,
            const double sx, const double sy,
            const double ex, const double ey),
-  DrawMatte(DrawContext context,
+  DrawMatte(struct _DrawContext * context,
             const double x, const double y,
             const PaintMethod paint_method),
-  DrawPathClose(DrawContext context),
-  DrawPathCurveToAbsolute(DrawContext context,
+  DrawPathClose(struct _DrawContext * context),
+  DrawPathCurveToAbsolute(struct _DrawContext * context,
                           const double x1, const double y1,
                           const double x2, const double y2,
                           const double x, const double y),
-  DrawPathCurveToRelative(DrawContext context,
+  DrawPathCurveToRelative(struct _DrawContext * context,
                           const double x1, const double y1,
                           const double x2, const double y2,
                           const double x, const double y),
-  DrawPathCurveToQuadraticBezierAbsolute(DrawContext context,
+  DrawPathCurveToQuadraticBezierAbsolute(struct _DrawContext * context,
                                          const double x1, const double y1,
                                          const double x, const double y),
-  DrawPathCurveToQuadraticBezierRelative(DrawContext context,
+  DrawPathCurveToQuadraticBezierRelative(struct _DrawContext * context,
                                          const double x1, const double y1,
                                          const double x, const double y),
-  DrawPathCurveToQuadraticBezierSmoothAbsolute(DrawContext context,
+  DrawPathCurveToQuadraticBezierSmoothAbsolute(struct _DrawContext * context,
                                                const double x, const double y),
-  DrawPathCurveToQuadraticBezierSmoothRelative(DrawContext context,
+  DrawPathCurveToQuadraticBezierSmoothRelative(struct _DrawContext * context,
                                                const double x, const double y),
-  DrawPathCurveToSmoothAbsolute(DrawContext context,
+  DrawPathCurveToSmoothAbsolute(struct _DrawContext * context,
                                 const double x2, const double y2,
                                 const double x, const double y),
-  DrawPathCurveToSmoothRelative(DrawContext context,
+  DrawPathCurveToSmoothRelative(struct _DrawContext * context,
                                 const double x2, const double y2,
                                 const double x, const double y),
-  DrawPathEllipticArcAbsolute(DrawContext context,
+  DrawPathEllipticArcAbsolute(struct _DrawContext * context,
                               const double rx, const double ry,
                               const double x_axis_rotation,
                               unsigned int large_arc_flag,
                               unsigned int sweep_flag,
                               const double x, const double y),
-  DrawPathEllipticArcRelative(DrawContext context,
+  DrawPathEllipticArcRelative(struct _DrawContext * context,
                               const double rx, const double ry,
                               const double x_axis_rotation,
                               unsigned int large_arc_flag,
                               unsigned int sweep_flag,
                               const double x, const double y),
-  DrawPathFinish(DrawContext context),
-  DrawPathLineToAbsolute(DrawContext context,
+  DrawPathFinish(struct _DrawContext * context),
+  DrawPathLineToAbsolute(struct _DrawContext * context,
                          const double x, const double y),
-  DrawPathLineToRelative(DrawContext context,
+  DrawPathLineToRelative(struct _DrawContext * context,
                          const double x, const double y),
-  DrawPathLineToHorizontalAbsolute(DrawContext context, const double x),
-  DrawPathLineToHorizontalRelative(DrawContext context, const double x),
-  DrawPathLineToVerticalAbsolute(DrawContext context, const double y),
-  DrawPathLineToVerticalRelative(DrawContext context, const double y),
-  DrawPathMoveToAbsolute(DrawContext context,
+  DrawPathLineToHorizontalAbsolute(struct _DrawContext * context, const double x),
+  DrawPathLineToHorizontalRelative(struct _DrawContext * context, const double x),
+  DrawPathLineToVerticalAbsolute(struct _DrawContext * context, const double y),
+  DrawPathLineToVerticalRelative(struct _DrawContext * context, const double y),
+  DrawPathMoveToAbsolute(struct _DrawContext * context,
                          const double x, const double y),
-  DrawPathMoveToRelative(DrawContext context,
+  DrawPathMoveToRelative(struct _DrawContext * context,
                          const double x, const double y),
-  DrawPathStart(DrawContext context),
-  DrawPoint(DrawContext context, const double x, const double y),
-  DrawPolygon(DrawContext context,
+  DrawPathStart(struct _DrawContext * context),
+  DrawPoint(struct _DrawContext * context, const double x, const double y),
+  DrawPolygon(struct _DrawContext * context,
               const unsigned long num_coords, const PointInfo * coordinates),
-  DrawPolyline(DrawContext context,
+  DrawPolyline(struct _DrawContext * context,
                const unsigned long num_coords, const PointInfo * coordinates),
-  DrawPopClipPath(DrawContext context),
-  DrawPopDefs(DrawContext context),
-  DrawPopGraphicContext(DrawContext context),
-  DrawPopPattern(DrawContext context),
-  DrawPushClipPath(DrawContext context, const char *clip_path_id),
-  DrawPushDefs(DrawContext context),
-  DrawPushGraphicContext(DrawContext context),
-  DrawPushPattern(DrawContext context,
+  DrawPopClipPath(struct _DrawContext * context),
+  DrawPopDefs(struct _DrawContext * context),
+  DrawPopGraphicContext(struct _DrawContext * context),
+  DrawPopPattern(struct _DrawContext * context),
+  DrawPushClipPath(struct _DrawContext * context, const char *clip_path_id),
+  DrawPushDefs(struct _DrawContext * context),
+  DrawPushGraphicContext(struct _DrawContext * context),
+  DrawPushPattern(struct _DrawContext * context,
                   const char *pattern_id,
                   const double x, const double y,
                   const double width, const double height),
-  DrawRectangle(DrawContext context,
+  DrawRectangle(struct _DrawContext * context,
                 const double x1, const double y1,
                 const double x2, const double y2),
-  DrawRoundRectangle(DrawContext context,
+  DrawRoundRectangle(struct _DrawContext * context,
                      double x1, double y1,
                      double x2, double y2,
                      double rx, double ry),
-  DrawScale(DrawContext context, const double x, const double y),
-  DrawSetClipPath(DrawContext context, const char *clip_path),
-  DrawSetClipRule(DrawContext context, const FillRule fill_rule),
-  DrawSetClipUnits(DrawContext context, const ClipPathUnits clip_units),
-  DrawSetFillColor(DrawContext context, const PixelPacket *fill_color),
-  DrawSetFillColorString(DrawContext context, const char *fill_color),
-  DrawSetFillOpacity(DrawContext context, const double fill_opacity),
-  DrawSetFillRule(DrawContext context, const FillRule fill_rule),
-  DrawSetFillPatternURL(DrawContext context, const char *fill_url),
-  DrawSetFont(DrawContext context, const char *font_name),
-  DrawSetFontFamily(DrawContext context, const char *font_family),
-  DrawSetFontSize(DrawContext context, const double font_pointsize),
-  DrawSetFontStretch(DrawContext context, const StretchType font_stretch),
-  DrawSetFontStyle(DrawContext context, const StyleType font_style),
-  DrawSetFontWeight(DrawContext context, const unsigned long font_weight),
-  DrawSetGravity(DrawContext context, const GravityType gravity),
-  DrawRotate(DrawContext context, const double degrees),
-  DrawSkewX(DrawContext context, const double degrees),
-  DrawSkewY(DrawContext context, const double degrees),
+  DrawScale(struct _DrawContext * context, const double x, const double y),
+  DrawSetClipPath(struct _DrawContext * context, const char *clip_path),
+  DrawSetClipRule(struct _DrawContext * context, const FillRule fill_rule),
+  DrawSetClipUnits(struct _DrawContext * context, const ClipPathUnits clip_units),
+  DrawSetFillColor(struct _DrawContext * context, const PixelPacket *fill_color),
+  DrawSetFillColorString(struct _DrawContext * context, const char *fill_color),
+  DrawSetFillOpacity(struct _DrawContext * context, const double fill_opacity),
+  DrawSetFillRule(struct _DrawContext * context, const FillRule fill_rule),
+  DrawSetFillPatternURL(struct _DrawContext * context, const char *fill_url),
+  DrawSetFont(struct _DrawContext * context, const char *font_name),
+  DrawSetFontFamily(struct _DrawContext * context, const char *font_family),
+  DrawSetFontSize(struct _DrawContext * context, const double font_pointsize),
+  DrawSetFontStretch(struct _DrawContext * context, const StretchType font_stretch),
+  DrawSetFontStyle(struct _DrawContext * context, const StyleType font_style),
+  DrawSetFontWeight(struct _DrawContext * context, const unsigned long font_weight),
+  DrawSetGravity(struct _DrawContext * context, const GravityType gravity),
+  DrawRotate(struct _DrawContext * context, const double degrees),
+  DrawSkewX(struct _DrawContext * context, const double degrees),
+  DrawSkewY(struct _DrawContext * context, const double degrees),
   /*
-   DrawSetStopColor(DrawContext context, const PixelPacket * color,
+   DrawSetStopColor(struct _DrawContext * context, const PixelPacket * color,
                     const double offset),
   */
-  DrawSetStrokeAntialias(DrawContext context, const unsigned int true_false),
-  DrawSetStrokeColor(DrawContext context, const PixelPacket *stroke_color),
-  DrawSetStrokeColorString(DrawContext context, const char *stroke_color),
-  DrawSetStrokeDashArray(DrawContext context, const unsigned long num_elems,
+  DrawSetStrokeAntialias(struct _DrawContext * context, const unsigned int true_false),
+  DrawSetStrokeColor(struct _DrawContext * context, const PixelPacket *stroke_color),
+  DrawSetStrokeColorString(struct _DrawContext * context, const char *stroke_color),
+  DrawSetStrokeDashArray(struct _DrawContext * context, const unsigned long num_elems,
                          const double *dasharray),
-  DrawSetStrokeDashOffset(DrawContext context,const double dashoffset),
-  DrawSetStrokeLineCap(DrawContext context, const LineCap linecap),
-  DrawSetStrokeLineJoin(DrawContext context, const LineJoin linejoin),
-  DrawSetStrokeMiterLimit(DrawContext context,const unsigned long miterlimit),
-  DrawSetStrokeOpacity(DrawContext context, const double opacity),
-  DrawSetStrokePatternURL(DrawContext context, const char* stroke_url),
-  DrawSetStrokeWidth(DrawContext context, const double width),
-  DrawSetTextAntialias(DrawContext context, const unsigned int true_false),
-  DrawSetTextDecoration(DrawContext context, const DecorationType decoration),
-  DrawSetTextEncoding(DrawContext context, const char *encoding),
-  DrawSetTextUnderColor(DrawContext context, const PixelPacket *color),
-  DrawSetTextUnderColorString(DrawContext context, const char *under_color),
-  DrawSetViewbox(DrawContext context,
+  DrawSetStrokeDashOffset(struct _DrawContext * context,const double dashoffset),
+  DrawSetStrokeLineCap(struct _DrawContext * context, const LineCap linecap),
+  DrawSetStrokeLineJoin(struct _DrawContext * context, const LineJoin linejoin),
+  DrawSetStrokeMiterLimit(struct _DrawContext * context,const unsigned long miterlimit),
+  DrawSetStrokeOpacity(struct _DrawContext * context, const double opacity),
+  DrawSetStrokePatternURL(struct _DrawContext * context, const char* stroke_url),
+  DrawSetStrokeWidth(struct _DrawContext * context, const double width),
+  DrawSetTextAntialias(struct _DrawContext * context, const unsigned int true_false),
+  DrawSetTextDecoration(struct _DrawContext * context, const DecorationType decoration),
+  DrawSetTextEncoding(struct _DrawContext * context, const char *encoding),
+  DrawSetTextUnderColor(struct _DrawContext * context, const PixelPacket *color),
+  DrawSetTextUnderColorString(struct _DrawContext * context, const char *under_color),
+  DrawSetViewbox(struct _DrawContext * context,
                  unsigned long x1, unsigned long y1,
                  unsigned long x2, unsigned long y2),
-  DrawTranslate(DrawContext context, const double x, const double y);
+  DrawTranslate(struct _DrawContext * context, const double x, const double y);
+
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

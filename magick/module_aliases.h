@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2024 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -41,6 +41,7 @@ static const struct
     MODULEALIAS("APP1JPEG","META"),
     MODULEALIAS("ARW","DCRAW"),
 #if defined(HasHEIF)
+    MODULEALIAS("AVCI","HEIF"),
     MODULEALIAS("AVIF","HEIF"),
 #endif /* if defined(HasHEIF) */
     MODULEALIAS("B","GRAY"),
@@ -132,7 +133,9 @@ static const struct
 #if defined(HasPNG)
     MODULEALIAS("MNG","PNG"),
 #endif /* if defined(HasPNG) */
+    MODULEALIAS("MP4", "HEIF"),
     MODULEALIAS("MPG","MPEG"),
+    MODULEALIAS("MPRI","MPR"),
     MODULEALIAS("MRW","DCRAW"),
     MODULEALIAS("NEF","DCRAW"),
     MODULEALIAS("NETSCAPE","LOGO"),
@@ -183,6 +186,8 @@ static const struct
     MODULEALIAS("UBRL6","BRAILLE"),
     MODULEALIAS("VDA","TGA"),
     MODULEALIAS("VST","TGA"),
+    MODULEALIAS("WBM", "WBMP"),
+    MODULEALIAS("WBP", "WBMP"),
     MODULEALIAS("X3F","DCRAW"),
     MODULEALIAS("XMP","META"),
     MODULEALIAS("XTRNARRAY","XTRN"),

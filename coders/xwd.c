@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -44,6 +44,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -264,14 +265,14 @@ static MagickPassFail BytesPerLine(size_t *bytes_per_line,
 %
 %
 */
-#define ThrowXWDReaderException(code_,reason_,image_) \
-do { \
-  if (ximage) \
-    MagickFreeResourceLimitedMemory(ximage->data); \
-  MagickFreeResourceLimitedMemory(ximage); \
-  MagickFreeResourceLimitedMemory(colors); \
-  ThrowReaderException(code_,reason_,image_); \
-} while (0);
+#define ThrowXWDReaderException(code_,reason_,image_)           \
+  do {                                                          \
+    if (ximage)                                                 \
+      MagickFreeResourceLimitedMemory(char *,ximage->data);     \
+    MagickFreeResourceLimitedMemory(XImage *,ximage);           \
+    MagickFreeResourceLimitedMemory(XColor *,colors);           \
+    ThrowReaderException(code_,reason_,image_);                 \
+  } while (0);
 
 static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -725,18 +726,26 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                         pixel=XGetPixel(ximage,(int) x,(int) y);
                         index_val=(unsigned short)
                           ((pixel >> red_shift) & red_mask);
-                        VerifyColormapIndexWithColors(image,index_val,header.ncolors);
+                        VerifyColormapIndexWithColors(status,image,index_val,header.ncolors);
+                        if (status == MagickFail)
+                          break;
                         q->red=ScaleShortToQuantum(colors[index_val].red);
                         index_val=(unsigned short)
                           ((pixel >> green_shift) & green_mask);
-                        VerifyColormapIndexWithColors(image,index_val,header.ncolors);
+                        VerifyColormapIndexWithColors(status,image,index_val,header.ncolors);
+                        if (status == MagickFail)
+                          break;
                         q->green=ScaleShortToQuantum(colors[index_val].green);
                         index_val=(unsigned short)
                           ((pixel >> blue_shift) & blue_mask);
-                        VerifyColormapIndexWithColors(image,index_val,header.ncolors);
+                        VerifyColormapIndexWithColors(status,image,index_val,header.ncolors);
+                        if (status == MagickFail)
+                          break;
                         q->blue=ScaleShortToQuantum(colors[index_val].blue);
                         q++;
                       }
+                    if (status == MagickFail)
+                      break;
                     if (!SyncImagePixels(image))
                       break;
                     if (QuantumTick(y,image->rows))
@@ -809,10 +818,14 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 for (x=0; x < (long) image->columns; x++)
                   {
                     index_val=(IndexPacket) (XGetPixel(ximage,(int) x,(int) y));
-                    VerifyColormapIndex(image,index_val);
+                    VerifyColormapIndex(status,image,index_val);
+                    if (status == MagickFail)
+                      break;
                     indexes[x]=index_val;
                     *q++=image->colormap[index_val];
                   }
+                if (status == MagickFail)
+                  break;
                 if (!SyncImagePixels(image))
                   break;
                 if (QuantumTick(y,image->rows))
@@ -829,11 +842,19 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   /*
     Free image and colormap.
   */
-  MagickFreeResourceLimitedMemory(colors);
-  MagickFreeResourceLimitedMemory(ximage->data);
-  MagickFreeResourceLimitedMemory(ximage);
+  MagickFreeResourceLimitedMemory(XColor *,colors);
+  MagickFreeResourceLimitedMemory(char *,ximage->data);
+  MagickFreeResourceLimitedMemory(XImage *,ximage);
   CloseBlob(image);
   StopTimer(&image->timer);
+
+  if (image->exception.severity >= ErrorException)
+    {
+      GetImageException(image,exception);
+      DestroyImageList(image);
+      return((Image *) NULL);
+    }
+
   return(image);
 }
 #endif
@@ -984,12 +1005,15 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+
   /*
     XWD does not support more than 256 colors.
   */
   if ((image->storage_class == PseudoClass) && (image->colors > 256))
-    SetImageType(image,TrueColorType);
+    if (SetImageType(image,TrueColorType) == MagickFail)
+      ThrowWriterException(CoderError,UnableToSetImageType,image);
 
   /*
     Compute required allocation sizes
@@ -1118,7 +1142,7 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
         if (WriteBlob(image,sz_XWDColor,(char *) &color) != sz_XWDColor)
           break;
       }
-      MagickFreeResourceLimitedMemory(colors);
+      MagickFreeResourceLimitedMemory(XColor *,colors);
     }
   /*
     Convert MIFF to XWD raster pixels.
@@ -1161,7 +1185,7 @@ static unsigned int WriteXWDImage(const ImageInfo *image_info,Image *image)
                                     image->columns,image->rows))
           break;
   }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   CloseBlob(image);
   return (y < image->rows ? MagickFail :  MagickPass);
 }

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -231,7 +231,7 @@ ColorizeImagePixelsCB(void *mutable_data,                /* User provided mutabl
   return MagickPass;
 }
 MagickExport Image *ColorizeImage(const Image *image,const char *opacity,
-  const PixelPacket target,ExceptionInfo *exception)
+                                  const PixelPacket target,ExceptionInfo *exception)
 {
 #define ColorizeImageText "[%s] Colorize..."
 
@@ -248,7 +248,7 @@ MagickExport Image *ColorizeImage(const Image *image,const char *opacity,
     is_grayscale;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   /*
     Allocate colorized image.
@@ -261,7 +261,13 @@ MagickExport Image *ColorizeImage(const Image *image,const char *opacity,
   colorize_image=CloneImage(image,image->columns,image->rows,True,exception);
   if (colorize_image == (Image *) NULL)
     return((Image *) NULL);
-  (void) SetImageType(colorize_image,TrueColorType);
+  status &= SetImageType(colorize_image,TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&colorize_image->exception);
+      DestroyImage(colorize_image);
+      return (Image *) NULL;
+    }
   if (opacity == (const char *) NULL)
     return(colorize_image);
   /*
@@ -272,7 +278,7 @@ MagickExport Image *ColorizeImage(const Image *image,const char *opacity,
   options.amount.blue=100.0;
   options.amount.opacity=0.0;
   count=sscanf(opacity,"%lf%*[/,]%lf%*[/,]%lf%*[/,]%lf",
-    &options.amount.red,&options.amount.green,&options.amount.blue,&options.amount.opacity);
+               &options.amount.red,&options.amount.green,&options.amount.blue,&options.amount.opacity);
   if (count == 1)
     {
       if (options.amount.red == 0.0)
@@ -288,10 +294,10 @@ MagickExport Image *ColorizeImage(const Image *image,const char *opacity,
   /*
     Colorize DirectClass image.
   */
-  status=PixelIterateDualNew(ColorizeImagePixelsCB,NULL,
-                             ColorizeImageText,NULL,&options,
-                             image->columns,image->rows,image,0,0,
-                             colorize_image,0,0,exception);
+  status &= PixelIterateDualNew(ColorizeImagePixelsCB,NULL,
+                                ColorizeImageText,NULL,&options,
+                                image->columns,image->rows,image,0,0,
+                                colorize_image,0,0,exception);
   colorize_image->is_grayscale=(is_grayscale && IsGray(target));
   if (status == MagickFail)
     {
@@ -537,7 +543,7 @@ ColorMatrixImage(Image *image,const unsigned int order,const double *color_matri
           *row_text='\0';
           for (u=0; u < width; u++)
             {
-              FormatString(cell_text,"%#12.4g",*k++);
+              MagickFormatString(cell_text,sizeof(cell_text),"%#12.4g",*k++);
               (void) strlcat(row_text,cell_text,sizeof(row_text));
               if (u%5 == 4)
                 {
@@ -643,8 +649,14 @@ MagickExport Image *ImplodeImage(const Image * restrict image,const double amoun
   implode_image=CloneImage(image,image->columns,image->rows,True,exception);
   if (implode_image == (Image *) NULL)
     return((Image *) NULL);
-  (void) SetImageType(implode_image,implode_image->background_color.opacity !=
+  status &= SetImageType(implode_image,implode_image->background_color.opacity !=
                       OpaqueOpacity ? TrueColorMatteType : TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&implode_image->exception);
+      DestroyImage(implode_image);
+      return (Image *) NULL;
+    }
   /*
     Compute scaling factor.
   */
@@ -884,6 +896,9 @@ MagickExport Image *MorphImages(const Image *image,
   unsigned long
     scene;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Clone first frame in sequence.
   */
@@ -947,14 +962,14 @@ MagickExport Image *MorphImages(const Image *image,
       DestroyImage(clone_image);
       if (morph_image == (Image *) NULL)
         break;
-      (void) SetImageType(morph_images,TrueColorType);
-      (void) PixelIterateDualNew(MorphImagePixelsCB,NULL,
+      status &= SetImageType(morph_images,TrueColorType);
+      status &= PixelIterateDualNew(MorphImagePixelsCB,NULL,
                                  MorphImageText,NULL,&options,
                                  morph_images->columns,morph_images->rows,morph_image,0,0,
                                  morph_images,0,0,exception);
       DestroyImage(morph_image);
     }
-    if (i < (long) number_frames)
+    if ((i < (long) number_frames) || (MagickFail == status))
       break;
     /*
       Clone last frame in sequence.
@@ -972,7 +987,7 @@ MagickExport Image *MorphImages(const Image *image,
   }
   while (morph_images->previous != (Image *) NULL)
     morph_images=morph_images->previous;
-  if (next->next != (Image *) NULL)
+  if ((MagickFail == status) || (next->next != (Image *) NULL))
     {
       DestroyImageList(morph_images);
       return((Image *) NULL);
@@ -1047,7 +1062,13 @@ MagickExport Image *OilPaintImage(const Image *image,const double radius,
   if (paint_image == (Image *) NULL)
     return((Image *) NULL);
 
-  (void) SetImageType(paint_image,TrueColorType);
+  status &= SetImageType(paint_image,TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&paint_image->exception);
+      DestroyImage(paint_image);
+      return (Image *) NULL;
+    }
 
   monitor_active=MagickMonitorActive();
 
@@ -1358,6 +1379,9 @@ MagickExport Image *SteganoImage(const Image * restrict image,const Image * rest
   register PixelPacket
     * restrict q;
 
+  MagickPassFail
+    status = MagickPass;
+
   /*
     Initialize steganographic image attributes.
   */
@@ -1371,7 +1395,14 @@ MagickExport Image *SteganoImage(const Image * restrict image,const Image * rest
   stegano_image=CloneImage(image,0,0,True,exception);
   if (stegano_image == (Image *) NULL)
     return((Image *) NULL);
-  (void) SetImageType(stegano_image,TrueColorType);
+  status &= SetImageType(stegano_image,TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&stegano_image->exception);
+      DestroyImage(stegano_image);
+      return (Image *) NULL;
+    }
+
   stegano_image->depth=QuantumDepth;
   /*
     Hide watermark in low-order bits of image.
@@ -1485,6 +1516,9 @@ MagickExport Image *StereoImage(const Image * restrict image,const Image * restr
   register PixelPacket
     * restrict r;
 
+  MagickPassFail
+    status = MagickPass;
+
   assert(image != (const Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(exception != (ExceptionInfo *) NULL);
@@ -1500,7 +1534,13 @@ MagickExport Image *StereoImage(const Image * restrict image,const Image * restr
   stereo_image=CloneImage(image,image->columns,image->rows,True,exception);
   if (stereo_image == (Image *) NULL)
     return((Image *) NULL);
-  (void) SetImageType(stereo_image,TrueColorType);
+  status &= SetImageType(stereo_image,TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&stereo_image->exception);
+      DestroyImage(stereo_image);
+      return (Image *) NULL;
+    }
   /*
     Copy left image to red channel and right image to blue channel.
   */
@@ -1599,8 +1639,14 @@ MagickExport Image *SwirlImage(const Image * restrict image,double degrees,
   swirl_image=CloneImage(image,image->columns,image->rows,True,exception);
   if (swirl_image == (Image *) NULL)
     return((Image *) NULL);
-  (void) SetImageType(swirl_image,swirl_image->background_color.opacity !=
+  status &= SetImageType(swirl_image,swirl_image->background_color.opacity !=
                       OpaqueOpacity ? TrueColorMatteType : TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(exception,&swirl_image->exception);
+      DestroyImage(swirl_image);
+      return (Image *) NULL;
+    }
   /*
     Compute scaling factor.
   */

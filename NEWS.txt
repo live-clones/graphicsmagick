@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to October 29, 2025.
+This file was last updated to reflect changes up to May 13, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -18,6 +18,269 @@ release and not attempt to patch older releases.
 
 .. contents::
   :local:
+
+1.3.47 (May 13, 2026)
+===========================
+
+Special Issues:
+
+* GraphicsMagick needs some additional productive volunteers.  For
+  several years now, the burden has entirely been on me (Bob
+  Friesenhahn).  I have been sheparding the project for 24 years
+  already (and contributed to ImageMagick and GraphicsMagick combined
+  for 30 years already).  Volunteers are needed to add/improve
+  new/existing file format support, and to assure correct operation on
+  all targets.
+
+Security Fixes:
+
+* DPX: Fix subsampling validation logic which was failing due to
+  incorrect logic. This avoids a divide by zero possibility.
+
+* JNG writer: Properly handle and report the case where
+  ImageToBlob()returns NULL.
+
+* MNG writer: Enforce that MNG only supports a color palette up to 256
+  colors (ImageMagick CVE-2026-28690).
+
+* MagickXImageWindowCommand(): Assure that static buffer does not
+  overflow if the user keeps a numeric key depressed (ImageMagick
+  CVE-2026-33535).
+
+* PCD: Prevent an out of bounds read (ImageMagick security advisory
+  GHSA-wrhr-rf8j-r842).
+
+* PNG writer: Detect and report an excessively large profile, an other
+  unexpected conditions (ImageMagick CVE-2026-30883).
+
+* RenderFreetype(): Use MagickConfirmAccess() to verify that font file
+  name is allowed to be read.
+
+* TIFF EXIF IFD writer: Detect and prevent infinite looping (EXIF IFD
+  writer code may be excluded by the -DEXPERIMENTAL_EXIF_TAGS=0
+  define).
+
+* TIFF EXIF IFD writer: Only transfer tags from EXIF and GPS IFDs. Do
+  not transfer tags from the main IFDs.
+
+* YUV: Fix validation of 'sampling-factor' argument. (ImageMagick
+  CVE-2026-25799). Given that the argument normally comes from a user
+  (rather than an input file) this seems to be a minor security issue
+  at most.
+
+* PS, PS2, PS3: Enforce that width and height dimensions, and total
+  pixels, to/from Ghostscript are within the same limits as specified
+  for GraphicsMagick.  This helps avoid Ghostscript-based denial of
+  service opportunities.
+
+* SVG: Add validations for element id syntax.  Reject invalid
+  attribute values which contain single quotes.
+
+* XCF: Report an error if there are no layers. Fix two unsigned
+  integer overflow cases.
+
+* DescribeImage(): Avoid heap write overflow while parsing the image
+  directory.
+
+Bug fixes:
+
+* ColorFloodfillImage(): Disable OpenMP since it was observed to
+  create corrupt images.
+
+* DCM/DICOM: Fix bit shift for 16-bit short, which corrupted results
+  for some images.
+
+* DrawImage(): Fix memory leak which might occur under severe
+  conditions.
+
+* Magick++: Use HAVE_PTHREAD to enable thread-safe code. This bug has
+  been present since 2003!
+
+* Magick++: If monochrome is disabled, then clear the image
+  is_monochrome flag if it is set.
+
+* Magick++: No longer throw a C++ exception from the MutexLock
+  destructor.
+
+* JP2: Fix a bug which caused lossless compression to not be engaged
+  by '-define jp2:rate=1.0'.
+
+* JPEG: Allow writing CMYK JPEG without specifically requesting it
+  (SourceForge issue #768).  This fixes a regression introduced in the
+  last release.
+
+* JPEG: For components == 1 (gray), fix reading PseudoClass images.
+
+* ModuleAliases: Added a mapping from magick "MPRI" to module
+  "MPR". This missing mapping caused the "MPRI" coder to not work for
+  non-module builds. As a result, the 'mogrify' "hald-clut", "map",
+  "mask", and "tile" subcommands were not working.  Any use of
+  "MPRI:N" syntax to save an image for later (from the command-line or
+  via the APIs) would have failed.
+
+* HEIF: Check the return status of
+  heif_image_handle_get_preferred_decoding_colorspace() in order to
+  avoid consuming uninitialized memory.  While this might appear to be
+  a security issue, it appears to be reasonably benign.
+
+* Apple PICT: Since the implementation originating from ImageMagick,
+  the rowBytes transition from from byte to short while reading
+  byteCount was 200. However, it should have been 250! See
+  "https://github.com/ImageMagick/ImageMagick/issues/7837" for
+  details.  The reader and writer have been changed to use 250.  This
+  means that PICT files written by the fixed GraphicsMagick will not
+  be readable by older GraphicsMagick versions (but the fixed
+  GraphicsMagick can read older existing files).
+
+* PNM: Improve ASCII formats error checking.
+
+* HEIF (HEIC, AVIF, etc.): The identify command was very slow with
+  HEIF, although it always reported accurate information. Now identify
+  is fast but may return wrong results if the image is rotated.  Use
+  '-define heif:ignore-transformations=false' to assure that the
+  values returned are accurate.
+
+* TIFF: Be more pessimistic about claims from libtiff and require that
+  it produce a scanline, strip, or tile, before allocating pixels from
+  the pixel cache. This helps prevent small files from using excessive
+  resources.
+
+* Rendering (-draw/MVG): use the resource-limited memory allocator to
+  provide more resource limit control (for primitive info and graphic
+  contexts).
+
+* GIF: Store image comment in first image frame rather than the last
+  frame.
+
+* Add missing prototypes for some functions and declare some functions
+  as 'static' which were accidentally left visible.
+
+* PerlMagick: PerlMagick is now "const correct" and data which could
+  be const is now declared as such.
+
+* MAT: Fix memory leaks.
+
+* XPM/PICON: Verify that the expected number of pixels were
+  transferred to the image.
+
+* SetImageType(): Assure that callers of SetImageType() do check for
+  its failure, and return appropriate status.
+
+API Updates:
+
+* Wand API: Added the MagickSetBackgroundColor() function to support
+  setting the default background color.
+
+* Drawing API: DrawNewContext(), is a new function to allocate an
+  empty drawing context.
+
+* Wand API: The wand/drawing_wand.c functions which duplicate code in
+  magick/draw.c are gutted and replaced with calls into magick/draw.c.
+
+* Magick++: Add access confirmation functions and enumerations to
+  Magick namespace so that file/URL access confirmation functions may
+  be used.  A sample implementation is included in the 'zoom' demo
+  program.
+
+New Features:
+
+* PNM: Support reading PBM raw (P1), PGM raw (P2), and PPM raw (P3)
+  files which lack a newline character at the end of the last
+  line.
+
+* HEIF (HEIC, AVCI, AVIF, MP4, etc.): Memory limits and many more
+  libheif resource limits are now applied/available. Support reading
+  multiple image frames. Support arbitrary image depths up to 16
+  bits. Deduce file type by consulting libheif. Support reading HEIF
+  image from an in-memory BLOB, or memory mapped file.
+
+* HEIF (HEIC, AVCI, AVIF, MP4, etc.): Support both RGB interleaved and
+  planar decode modes at once. Use the
+  heif:interleaved-rgb-decode=yes/no define to select which mode is
+  used.
+
+* HEIF (HEIC, AVCI, AVIF, MP4, etc.): Add support for -define
+  heif:tile-threads=number to specify how many tiles may be decoded at
+  once.
+
+* The 'convert' and 'mogrify' subcommands now support -remap, which is
+  equivalent to -map.  This is to improve compatibility with
+  ImageMagick, which changed from -map to -remap some time after the
+  GraphicsMagick fork in 2022.
+
+* Command arguments which currently accept "Opacity" now accept
+  "Alpha" as a synonym.  This is to improve compatibility with
+  ImageMagick
+
+* Command arguments which currently accept "CopyOpacity" now accept
+  "CopyAlpha" as a synonym.  This is to improve compatibility with
+  ImageMagick.
+
+* Resource Limited Memory: Added module, function, and line parameters
+  for the purpose of tracing, and to capture the source location where
+  the allocation was made.
+
+* Resource limit for number of simultaneous images: Add an
+  'ImagesResource' limit and '-limit images' to place a limit on
+  discrete raster images which may be loaded into the program
+  simultaneously.  The resource which is limited is the number of
+  Image pixel cache stores with allocated pixels rather than
+  reference-counted "Image" handles.
+
+* WBMP: Support alternate file extensions "WBM" and "WBP".
+
+* OSS-Fuzz: The oss-fuzz build script is completely re-written and
+  supports building almost all of the available library dependencies.
+
+* TIFF: Added support for LERC compression in TIFF reader and writer,
+  as welll as update Magick++, PerlMagick, and TclMagick to be able to
+  access it.
+
+Behavior Changes:
+
+* Apple PICT: Older GraphicsMagick will be unable to read the PICT
+  files that newer versions write, but newer GraphicsMagick can still
+  read files which were written by ImageMagick or GraphicsMagick in
+  the broken format.
+
+* C API: MagickRealloc() now behaves like standard realloc() and the
+  MagickReallocMemory() macro takes responsibility for freeing the
+  original memory upon a reallocation failure.
+
+* Rendering (-draw/MVG): The default image canvas color is now the
+  background color (default white), which may be
+  transparent. Previously, the image was always set to opaque.
+
+General Implementation Improvements:
+
+* FormatString(): Deprecate FormatString(), and replace all usages
+  with MagickFormatString(), or a suitable equivalent. Code previously
+  depended on many string buffers being allocated with size
+  'MaxTextExtent' to avoid buffer overflow. The updates result in
+  MagickFormatString() being passed the actual underlying buffer size
+  in most cases (except for when the API design prevents it).  This
+  allows underlying buffer sizes to be optimially-sized, but that has
+  not been done yet.
+
+Build Changes:
+
+* It is now supported to build the C code using C++.
+
+* PerlMagick can be built with C++.
+
+* The native Windows build using the configure script, (e.g. MinGW,
+  MSYS2) now searches for 'gswin64c.exe' rather than 'gswin32c.exe'.
+
+Windows Delegate Updates/Additions:
+
+* Installer: Do not attempt to execute vcredist_x64.exe.
+
+* Libtiff: Libtiff is updated to version 4.7.1.
+
+Other News:
+
+* A used laptop running Windows 11 has been contributed to the
+  project. Thank you very much for the contribution!
 
 1.3.46 (October 29, 2025)
 ===========================

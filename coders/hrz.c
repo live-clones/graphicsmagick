@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2009-2024 GraphicsMagick Group
+% Copyright (C) 2009-2025 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -40,6 +40,7 @@
 #include "magick/resize.h"
 #include "magick/utility.h"
 #include "magick/constitute.h"
+#include "magick/static.h"
 
 
 /*
@@ -143,7 +144,7 @@ static Image *ReadHRZImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
 
   if (BImgBuff!=NULL)
-    MagickFreeResourceLimitedMemory(BImgBuff);
+    MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
   if ((y != height) || EOFBlob(image))
     ThrowReaderException(CorruptImageError, UnexpectedEndOfFile, image);
 
@@ -253,7 +254,7 @@ static unsigned int WriteHRZImage(const ImageInfo *image_info,Image *image)
          if (status == MagickFalse)
          break; */
     }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   DestroyImage(hrz_image);
   status &= CloseBlob(image);
 

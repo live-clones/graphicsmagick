@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/magick.h"
 #include "magick/monitor.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -185,7 +186,7 @@ static Image *ReadMTVImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
     if (EOFBlob(image))
       {
         ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
@@ -363,9 +364,13 @@ static unsigned int WriteMTVImage(const ImageInfo *image_info,Image *image)
   do
   {
     /*
+      Set image to RGB colorspace
+    */
+    if (TransformColorspace(image,RGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    /*
       Allocate memory for pixels.
     */
-    (void) TransformColorspace(image,RGBColorspace);
     pixels=MagickAllocateResourceLimitedMemory(unsigned char *,
       image->columns*sizeof(PixelPacket));
     if (pixels == (unsigned char *) NULL)
@@ -373,7 +378,7 @@ static unsigned int WriteMTVImage(const ImageInfo *image_info,Image *image)
     /*
       Initialize raster file header.
     */
-    FormatString(buffer,"%lu %lu\n",image->columns,image->rows);
+    MagickFormatString(buffer,sizeof(buffer),"%lu %lu\n",image->columns,image->rows);
     (void) WriteBlobString(image,buffer);
     for (y=0; y < (long) image->rows; y++)
     {
@@ -396,7 +401,7 @@ static unsigned int WriteMTVImage(const ImageInfo *image_info,Image *image)
                                       image->columns,image->rows))
             break;
     }
-    MagickFreeResourceLimitedMemory(pixels);
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);
     if (image->next == (Image *) NULL)
       break;
     image=SyncNextImageInList(image);

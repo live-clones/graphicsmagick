@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -41,6 +41,7 @@
 #include "magick/render.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -194,7 +195,11 @@ static Image *ReadMVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   /*
     Render drawing.
   */
-  (void) SetImage(image,OpaqueOpacity);
+  /*
+    Initialize image canvas with the background color (default white),
+    which may be transparent.
+  */
+  SetImageColor(image,&image->background_color);
   draw_info=CloneDrawInfo(image_info,(DrawInfo *) NULL);
   draw_info->fill=image_info->pen;
   draw_info->primitive=NULL;

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -40,6 +40,7 @@
 #include "magick/magick.h"
 #include "magick/profile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -279,7 +280,7 @@ static char *super_fgets(char **b, size_t *blen, Image *file)
         new_p=MagickReallocateResourceLimitedMemory(unsigned char *,p,(len+2));
         if (new_p == (unsigned char *) NULL)
           {
-            MagickFreeResourceLimitedMemory(p);
+            MagickFreeResourceLimitedMemory(unsigned char *,p);
             break;
           }
         p=new_p;
@@ -486,7 +487,7 @@ static long parse8BIM(Image *ifile, Image *ofile)
                   }
                 if (recnum != IPTC_ID)
                   {
-                    if (WriteBlobMSBLong(ofile, (const magick_uint32_t) len) < 4)
+                    if (WriteBlobMSBLong(ofile, (magick_uint32_t) len) < 4)
                       goto parse8BIM_failure;
                     outputlen += 4;
 
@@ -525,7 +526,7 @@ static long parse8BIM(Image *ifile, Image *ofile)
                       goto parse8BIM_failure;
                     if (WriteBlobByte(ofile,recnum & 255) < 1)
                       goto parse8BIM_failure;
-                    if (WriteBlobMSBShort(ofile,(const magick_uint16_t) len) < 2)
+                    if (WriteBlobMSBShort(ofile,(magick_uint16_t) len) < 2)
                       goto parse8BIM_failure;
                     outputlen += 5;
                     next=0;
@@ -538,11 +539,11 @@ static long parse8BIM(Image *ifile, Image *ofile)
           }
       state++;
     }
-    MagickFreeResourceLimitedMemory(token);
-    MagickFreeResourceLimitedMemory(newstr);
-    MagickFreeResourceLimitedMemory(name);
+    MagickFreeResourceLimitedMemory(char *,token);
+    MagickFreeResourceLimitedMemory(char *,newstr);
+    MagickFreeResourceLimitedMemory(char *,name);
   }
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,line);
   if (savedolen > 0)
     {
       long diff = outputlen - savedolen;
@@ -562,10 +563,10 @@ static long parse8BIM(Image *ifile, Image *ofile)
   return outputlen;
 
  parse8BIM_failure:
-  MagickFreeResourceLimitedMemory(token);
-  MagickFreeResourceLimitedMemory(newstr);
-  MagickFreeResourceLimitedMemory(name);
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,token);
+  MagickFreeResourceLimitedMemory(char *,newstr);
+  MagickFreeResourceLimitedMemory(char *,name);
+  MagickFreeResourceLimitedMemory(char *,line);
   return 0L;
 }
 
@@ -603,7 +604,7 @@ static char *super_fgets_w(char **b, size_t *blen, Image *file)
         new_p=MagickReallocateResourceLimitedMemory(unsigned char *,p,(len+2));
         if (new_p == (unsigned char *) NULL)
           {
-            MagickFreeResourceLimitedMemory(p);
+            MagickFreeResourceLimitedMemory(unsigned char *,p);
             break;
           }
         p=new_p;
@@ -811,7 +812,7 @@ static long parse8BIMW(Image *ifile, Image *ofile)
                   }
                 if (recnum != IPTC_ID)
                   {
-                    if (WriteBlobMSBLong(ofile, (const magick_uint32_t) len) != 4)
+                    if (WriteBlobMSBLong(ofile, (magick_uint32_t) len) != 4)
                       goto parse8BIMW_failure;
                     outputlen += 4;
 
@@ -850,7 +851,7 @@ static long parse8BIMW(Image *ifile, Image *ofile)
                       goto parse8BIMW_failure;
                     if (WriteBlobByte(ofile,recnum & 255) != 1)
                       goto parse8BIMW_failure;
-                    if (WriteBlobMSBShort(ofile,(const magick_uint16_t) len) != 2)
+                    if (WriteBlobMSBShort(ofile,(magick_uint16_t) len) != 2)
                       goto parse8BIMW_failure;
                     outputlen += 5;
                     next=0;
@@ -863,11 +864,11 @@ static long parse8BIMW(Image *ifile, Image *ofile)
           }
       state++;
     }
-    MagickFreeResourceLimitedMemory(token);
-    MagickFreeResourceLimitedMemory(newstr);
-    MagickFreeResourceLimitedMemory(name);
+    MagickFreeResourceLimitedMemory(char *,token);
+    MagickFreeResourceLimitedMemory(char *,newstr);
+    MagickFreeResourceLimitedMemory(char *,name);
   }
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,line);
   if (savedolen > 0)
     {
       long diff = outputlen - savedolen;
@@ -886,10 +887,10 @@ static long parse8BIMW(Image *ifile, Image *ofile)
   return outputlen;
 
  parse8BIMW_failure:
-  MagickFreeResourceLimitedMemory(token);
-  MagickFreeResourceLimitedMemory(newstr);
-  MagickFreeResourceLimitedMemory(name);
-  MagickFreeResourceLimitedMemory(line);
+  MagickFreeResourceLimitedMemory(char *,token);
+  MagickFreeResourceLimitedMemory(char *,newstr);
+  MagickFreeResourceLimitedMemory(char *,name);
+  MagickFreeResourceLimitedMemory(char *,line);
   return 0L;
 }
 
@@ -1373,7 +1374,7 @@ static Image *ReadMETAImage(const ImageInfo *image_info,
               if (i < length)
                 break;
             }
-          MagickFreeResourceLimitedMemory(buffer);
+          MagickFreeResourceLimitedMemory(char *,buffer);
 #endif
         }
       blob=GetBlobStreamData(buff); /* blob may be realloced */
@@ -1899,7 +1900,7 @@ static void formatString(Image *ofile, const char *s, int len)
         (void) WriteBlobByte(ofile,*s);
       else
         {
-          FormatString(temp, "&#%d;", c & 255);
+          MagickFormatString(temp, sizeof(temp), "&#%d;", c & 255);
           (void) WriteBlobString(ofile,temp);
         }
       break;
@@ -2069,7 +2070,7 @@ static int formatIPTC(Image *ifile, Image *ofile)
       c=ReadBlobByte(ifile);
       if (c == EOF)
         {
-          MagickFreeResourceLimitedMemory(str);
+          MagickFreeResourceLimitedMemory(unsigned char *,str);
           return -1;
         }
       str[tagindx] = (unsigned char) c;
@@ -2078,16 +2079,16 @@ static int formatIPTC(Image *ifile, Image *ofile)
 
     /* now finish up by formatting this binary data into ASCII equivalent */
     if (strlen((char *)readable) != 0)
-      FormatString(temp, "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
+      MagickFormatString(temp, sizeof(temp), "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
     else
-      FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
+      MagickFormatString(temp, sizeof(temp), "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
     if (WriteBlobString(ofile,temp) == 0)
       {
-        MagickFreeResourceLimitedMemory(str);
+        MagickFreeResourceLimitedMemory(unsigned char *,str);
         return -1;
       }
     formatString( ofile, (char *)str, taglen );
-    MagickFreeResourceLimitedMemory(str);
+    MagickFreeResourceLimitedMemory(unsigned char *,str);
 
     tagsfound++;
 
@@ -2200,7 +2201,7 @@ static int formatIPTCfromBuffer(Image *ofile, char *s, long len)
       c = *s++; len--;
       if (len < 0)
         {
-          MagickFreeResourceLimitedMemory(str);
+          MagickFreeResourceLimitedMemory(unsigned char *,str);
           return -1;
         }
       str[tagindx] = (unsigned char) c;
@@ -2209,23 +2210,23 @@ static int formatIPTCfromBuffer(Image *ofile, char *s, long len)
 
     /* now finish up by formatting this binary data into ASCII equivalent */
     if (strlen((char *)readable) != 0)
-      FormatString(temp, "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
+      MagickFormatString(temp, sizeof(temp), "%d#%d#%s=",(unsigned int)dataset, (unsigned int) recnum, readable);
     else
-      FormatString(temp, "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
+      MagickFormatString(temp, sizeof(temp), "%d#%d=",(unsigned int)dataset, (unsigned int) recnum);
     (void) WriteBlobString(ofile,temp);
     formatString( ofile, (char *)str, taglen );
-    MagickFreeResourceLimitedMemory(str);
+    MagickFreeResourceLimitedMemory(unsigned char *,str);
 
     tagsfound++;
   }
   return tagsfound;
 }
 
-#define Format8BIMLiberate()                    \
-  do                                            \
-    {                                           \
-      MagickFreeResourceLimitedMemory(PString);                \
-      MagickFreeResourceLimitedMemory(str);                    \
+#define Format8BIMLiberate()                                   \
+  do                                                           \
+    {                                                          \
+      MagickFreeResourceLimitedMemory(unsigned char *,PString);  \
+      MagickFreeResourceLimitedMemory(unsigned char *,str);      \
     } while(0);
 
 static int format8BIM(Image *ifile, Image *ofile)
@@ -2370,9 +2371,9 @@ static int format8BIM(Image *ifile, Image *ofile)
            * ASCII equivalent
            */
           if (strlen((const char *) PString) != 0)
-            FormatString(temp, "8BIM#%d#%s=", ID, PString);
+            MagickFormatString(temp, sizeof(temp), "8BIM#%d#%s=", ID, PString);
           else
-            FormatString(temp, "8BIM#%d=", ID);
+            MagickFormatString(temp, sizeof(temp), "8BIM#%d=", ID);
           (void) WriteBlobString(ofile,temp);
           if (ID == IPTC_ID)
             {

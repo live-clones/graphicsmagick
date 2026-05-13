@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2021 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -52,6 +52,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Typedef declarations.
@@ -342,11 +343,11 @@ static unsigned int IsPDB(const unsigned char *magick,const size_t length)
 %
 %
 */
-#define ThrowPDBReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(pixels);                   \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowPDBReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(unsigned char *,pixels);    \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -517,7 +518,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
       image->compression=NoCompression;
       if (ReadBlob(image,packets,(char *) pixels) != packets)
         {
-          MagickFreeResourceLimitedMemory(pixels);
+          MagickFreeResourceLimitedMemory(unsigned char *,pixels);
           ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
         }
       break;
@@ -593,7 +594,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
           {
             shift -= 2;
             index=(IndexPacket) (3-((*p >> shift) & 0x03));
-            VerifyColormapIndex(image,index);
+            VerifyColormapIndex(status,image,index);
             indexes[x]=index;
             *q++=image->colormap[index];
             if (shift == 0)
@@ -631,7 +632,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         {
           shift -= 4;
           index=(IndexPacket) (15-((*p >> shift) & 0x0f));
-          VerifyColormapIndex(image,index);
+          VerifyColormapIndex(status,image,index);
           indexes[x]=index;
           *q++=image->colormap[index];
           if (shift == 0)
@@ -655,7 +656,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         ThrowPDBReaderException(CorruptImageError,ImproperImageHeader,image);
       }
   }
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   if (EOFBlob(image))
     ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
       image->filename);
@@ -693,7 +694,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   new_comment=MagickReallocateResourceLimitedMemory(char *,comment,length+1);
                   if (new_comment == (char *) NULL)
                     {
-                      MagickFreeResourceLimitedMemory(comment);
+                      MagickFreeResourceLimitedMemory(char *,comment);
                       break;
                     }
                   comment=new_comment;
@@ -707,7 +708,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (comment == (char *) NULL)
         ThrowPDBReaderException(ResourceLimitError,MemoryAllocationFailed,image);
       (void) SetImageAttribute(image,"comment",comment);
-      MagickFreeResourceLimitedMemory(comment);
+      MagickFreeResourceLimitedMemory(char *,comment);
     }
   CloseBlob(image);
   StopTimer(&image->timer);
@@ -821,13 +822,13 @@ static unsigned char *EncodeRLE(unsigned char *destination,
   return(destination);
 }
 
-#define ThrowPDBWriterException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(buffer);                     \
-  MagickFreeResourceLimitedMemory(p);                          \
-  MagickFreeResourceLimitedMemory(scanline);                   \
-  ThrowWriterException(code_,reason_,image_); \
-}
+#define ThrowPDBWriterException(code_,reason_,image_)            \
+  {                                                              \
+    MagickFreeResourceLimitedMemory(unsigned char *,buffer);     \
+    MagickFreeResourceLimitedMemory(unsigned char *,p);          \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);   \
+    ThrowWriterException(code_,reason_,image_);                  \
+  }
 
 static unsigned int WritePDBImage(const ImageInfo *image_info,Image *image)
 {
@@ -879,11 +880,15 @@ static unsigned int WritePDBImage(const ImageInfo *image_info,Image *image)
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    return MagickFail;
+  if (SetImageType(image,GrayscaleType) == MagickFail)
+    return MagickFail;
+
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowPDBWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
-  (void) SetImageType(image,GrayscaleType);
   bits_per_pixel=image->depth;
   if (GetImageType(image,&image->exception) == BilevelType)
     bits_per_pixel=1;
@@ -962,7 +967,8 @@ static unsigned int WritePDBImage(const ImageInfo *image_info,Image *image)
   scanline=MagickAllocateResourceLimitedArray(unsigned char *,image->columns,packet_size);
   if (scanline == (unsigned char *) NULL)
     ThrowPDBWriterException(ResourceLimitWarning,MemoryAllocationFailed,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowPDBWriterException(CoderError,UnableToTransformColorspace,image);
   /*
     Convert to GRAY raster scanline.
   */
@@ -1031,8 +1037,8 @@ static unsigned int WritePDBImage(const ImageInfo *image_info,Image *image)
         break;
   }
   q=EncodeRLE(q,buffer,literal,repeat);
-  MagickFreeResourceLimitedMemory(scanline);
-  MagickFreeResourceLimitedMemory(buffer);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,buffer);
   /*
     Write the Image record header.
   */
@@ -1069,7 +1075,7 @@ static unsigned int WritePDBImage(const ImageInfo *image_info,Image *image)
   (void) WriteBlobMSBShort(image,pdb_image.width);
   (void) WriteBlobMSBShort(image,pdb_image.height);
   (void) WriteBlob(image,q-p,p);
-  MagickFreeResourceLimitedMemory(p);
+  MagickFreeResourceLimitedMemory(unsigned char *,p);
   if ((comment != (ImageAttribute *) NULL) && (comment->value != (char *) NULL))
     (void) WriteBlobString(image,comment->value);
   status &= CloseBlob(image);

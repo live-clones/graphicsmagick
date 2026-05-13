@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -42,8 +42,8 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
-
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -141,7 +141,7 @@ static Image *ReadARTImage(const ImageInfo *image_info,ExceptionInfo *exception)
       (void)ImportImagePixelArea(image,GrayQuantum,1,BImgBuff,NULL,0);
       if (!SyncImagePixelsEx(image,exception)) break;
     }
-  MagickFreeResourceLimitedMemory(BImgBuff);
+  MagickFreeResourceLimitedMemory(unsigned char *,BImgBuff);
 
   if (i != height)
     ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
@@ -247,7 +247,7 @@ static MagickPassFail WriteARTImage(const ImageInfo *image_info,Image *image)
   }
 
   status &= CloseBlob(image);
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
   if (logging)
     (void)LogMagickEvent(CoderEvent,GetMagickModule(),"return ART");

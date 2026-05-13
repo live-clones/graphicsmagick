@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2024 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2003 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -49,6 +49,7 @@ extern WandExport Quantum
   PixelGetYellowQuantum(const PixelWand *) MAGICK_FUNC_PURE;
 
 extern WandExport unsigned int
+  PixelGetException(PixelWand *wand,char **description),
   PixelSetColor(PixelWand *,const char *);
 
 extern WandExport unsigned long

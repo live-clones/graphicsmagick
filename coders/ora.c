@@ -1,4 +1,10 @@
 /*
+% Copyright (C) 2024-2025 GraphicsMagick Group
+%
+% This program is covered by multiple licenses, which are described in
+% Copyright.txt. You should have received a copy of Copyright.txt with this
+% package; otherwise see http://www.graphicsmagick.org/www/Copyright.html.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
 %                                                                             %
@@ -40,7 +46,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
-
+#include "magick/static.h"
 
 #if defined(HasPNG) && defined(HasZLIB) && (defined(HasUNZIP) || defined(HasLIBZIP))
 
@@ -88,17 +94,30 @@ static const char MERGED_IMAGE_PATH[] = "mergedimage.png";
 static Image *ReadORAImage(const ImageInfo *image_info, ExceptionInfo *exception)
 {
 #if defined(HasUNZIP)
-  unzFile zip_archive;
+  unzFile
+    zip_archive;
 #else
-  zip_t *zip_archive;
-  zip_file_t *merged_image_file;
+  zip_t
+    *zip_archive;
+
+  zip_file_t
+    *merged_image_file;
 #endif
 
-  Image *image;
-  int res;
-  void *buf;
-  FILE *PngFile;
-  ImageInfo *clone_info;
+  Image
+    *image;
+
+  int
+    res;
+
+  void
+    *buf;
+
+  FILE
+    *PngFile;
+
+  ImageInfo
+    *clone_info;
 
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
@@ -107,8 +126,8 @@ static Image *ReadORAImage(const ImageInfo *image_info, ExceptionInfo *exception
 
   image = AllocateImage(image_info);
 
-  buf = MagickAllocateResourceLimitedArray(void*,BUFFER_SIZE,1);
-  if(buf == NULL)
+  buf = MagickAllocateResourceLimitedArray(void *,BUFFER_SIZE,1);
+  if (buf == NULL)
         ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
 
 #if defined(HasUNZIP)
@@ -116,14 +135,14 @@ static Image *ReadORAImage(const ImageInfo *image_info, ExceptionInfo *exception
 #else
   zip_archive = zip_open(image_info->filename,ZIP_RDONLY,&res);
 #endif
-  if(zip_archive == NULL)
+  if (zip_archive == NULL)
   {
-    MagickFreeResourceLimitedMemory(buf);
+    MagickFreeResourceLimitedMemory(void *,buf);
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   }
 
 #if defined(HasUNZIP)
-  if(UNZ_OK != unzLocateFile(zip_archive,MERGED_IMAGE_PATH,0))
+  if (UNZ_OK != unzLocateFile(zip_archive,MERGED_IMAGE_PATH,0))
   {
     unzClose(zip_archive);
 #else
@@ -132,14 +151,14 @@ static Image *ReadORAImage(const ImageInfo *image_info, ExceptionInfo *exception
   {
     zip_discard(zip_archive);
 #endif
-    MagickFreeResourceLimitedMemory(buf);
+    MagickFreeResourceLimitedMemory(void *,buf);
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   }
 
   clone_info = CloneImageInfo(image_info);
   memcpy(clone_info->filename,"PNG:",4);
   PngFile = AcquireTemporaryFileStream(clone_info->filename+4,BinaryFileIOMode);
-  if(!PngFile)
+  if (!PngFile)
   {
     DestroyImageInfo(clone_info);
     clone_info = (ImageInfo *) NULL;
@@ -148,19 +167,19 @@ static Image *ReadORAImage(const ImageInfo *image_info, ExceptionInfo *exception
 #else
     zip_discard(zip_archive);
 #endif
-    MagickFreeResourceLimitedMemory(buf);
+    MagickFreeResourceLimitedMemory(void *,buf);
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   }
 
 #if defined(HasUNZIP)
   unzOpenCurrentFile(zip_archive);
-  while((res=unzReadCurrentFile(zip_archive,buf,BUFFER_SIZE)) > 0)
+  while ((res=unzReadCurrentFile(zip_archive,buf,BUFFER_SIZE)) > 0)
   {
     fwrite(buf,res,1,PngFile);
   }
   unzCloseCurrentFile(zip_archive);
 #else
-  while((res=zip_fread(merged_image_file,buf,BUFFER_SIZE)) > 0)
+  while ((res=zip_fread(merged_image_file,buf,BUFFER_SIZE)) > 0)
   {
     fwrite(buf,res,1,PngFile);
   }
@@ -170,7 +189,7 @@ static Image *ReadORAImage(const ImageInfo *image_info, ExceptionInfo *exception
 
   fclose(PngFile);
 
-  MagickFreeResourceLimitedMemory(buf);
+  MagickFreeResourceLimitedMemory(void *,buf);
 #if defined(HasUNZIP)
   unzClose(zip_archive);
 #endif

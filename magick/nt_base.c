@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2019 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -195,8 +195,9 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,DWORD fdwReason,LPVOID lpvReserved)
                   char
                     new_path[ENV_VAR_MAX];
 
-                  FormatString(new_path,"%.*s;%.*s",DLL_PATH_MAX,dll_path,
-                               ENV_VAR_MAX-DLL_PATH_MAX-1,current_path);
+                  MagickFormatString(new_path,sizeof(new_path),"%.*s;%.*s",
+                                     DLL_PATH_MAX,dll_path,
+                                     ENV_VAR_MAX-DLL_PATH_MAX-1,current_path);
                   SetEnvironmentVariable("PATH",new_path);
                 }
             }
@@ -470,7 +471,7 @@ MagickUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *info)
     DWORD  code;
     const char *text;
   }
-  except_descr[] =
+    except_descr[] =
     {
       /*
         The thread tried to read from or write to a virtual address
@@ -619,9 +620,9 @@ MagickUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *info)
 
         gm.exe identify: caught exception 0xC0000005 "Access violation"...
       */
-      FormatString(message,
-                   "%s: caught exception 0x%08X \"%s\"...",
-                   GetClientName(), (unsigned int) code, text);
+      MagickFormatString(message,sizeof(message),
+                         "%s: caught exception 0x%08X \"%s\"...",
+                         GetClientName(), (unsigned int) code, text);
       if (write(STDERR_FILENO,message,
                 (MAGICK_POSIX_IO_SIZE_T) strlen(message)) == -1)
         {
@@ -1058,7 +1059,7 @@ MagickExport double NTElapsedTime(void)
 %
 */
 MagickExport void NTErrorHandler(const ExceptionType error,const char *reason,
-  const char *description)
+                                 const char *description)
 {
   char
     buffer[3*MaxTextExtent];
@@ -1071,21 +1072,21 @@ MagickExport void NTErrorHandler(const ExceptionType error,const char *reason,
       Exit(0);
     }
   if ((description != (char *) NULL) && errno)
-    FormatString(buffer,"%.1024s: %.1024s (%.1024s) [%.1024s].\n",
-      GetClientName(),reason,description,strerror(errno));
+    MagickFormatString(buffer,sizeof(buffer),"%.1024s: %.1024s (%.1024s) [%.1024s].\n",
+                       GetClientName(),reason,description,strerror(errno));
   else
     if (description != (char *) NULL)
-      FormatString(buffer,"%.1024s: %.1024s (%.1024s).\n",
-        GetClientName(),reason,description);
+      MagickFormatString(buffer,sizeof(buffer),"%.1024s: %.1024s (%.1024s).\n",
+                         GetClientName(),reason,description);
     else
       if (errno)
-        FormatString(buffer,"%.1024s: %.1024s [%.1024s].\n",
-          GetClientName(),reason,strerror(errno));
+        MagickFormatString(buffer,sizeof(buffer),"%.1024s: %.1024s [%.1024s].\n",
+                           GetClientName(),reason,strerror(errno));
       else
-        FormatString(buffer,"%.1024s: %.1024s.\n",GetClientName(),
-          reason);
+        MagickFormatString(buffer,sizeof(buffer),"%.1024s: %.1024s.\n",GetClientName(),
+                           reason);
   (void) MessageBox(NULL,buffer,"GraphicsMagick Exception",MB_OK | MB_TASKMODAL |
-    MB_SETFOREGROUND | MB_ICONEXCLAMATION);
+                    MB_SETFOREGROUND | MB_ICONEXCLAMATION);
   DestroyMagick();
   Exit(0);
 }
@@ -1284,140 +1285,140 @@ NTGhostscriptFind(const char **gs_productfamily,
   gs_version[0]='\0';
 
   for(whence=0; whence<=1; whence++)
-  {
-    const HKEY hkeyroot = hkeys[whence].hkey;
-    const char *KeyRootStr = hkeys[whence].name;
-
-    for(product_index=0; product_index < sizeof(products)/sizeof(products[0]); ++product_index)
     {
-      HKEY hkey;
-      LONG winstatus;
+      const HKEY hkeyroot = hkeys[whence].hkey;
+      const char *KeyRootStr = hkeys[whence].name;
 
-      REGSAM
-        open_key_mode;
-
-      char
-        key[MaxTextExtent],
-        last_error_msg[MaxTextExtent];
-
-      (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                            "  Searching for %s...",
-                            products[product_index]);
-      FormatString(key,"SOFTWARE\\%s",products[product_index]);
-
-      /*
-        long WINAPI RegOpenKeyEx(const HKEY hKey, const LPCTSTR
-        lpSubKey, const DWORD ulOptions, const REGSAM samDesired,
-        PHKEY phkResult)
-      */
-      open_key_mode=KEY_READ;
-      if ((winstatus=RegOpenKeyExA(hkeyroot, key, 0, open_key_mode, &hkey))
-          == ERROR_SUCCESS)
+      for(product_index=0; product_index < sizeof(products)/sizeof(products[0]); ++product_index)
         {
-          DWORD
-            cbData;
+          HKEY hkey;
+          LONG winstatus;
 
-          int
-            n;
+          REGSAM
+            open_key_mode;
+
+          char
+            key[MaxTextExtent],
+            last_error_msg[MaxTextExtent];
 
           (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                                "    RegOpenKeyExA() opened "
-                                "\"%s\\%s\"",
-                                KeyRootStr, key);
-          /* Now enumerate the keys */
-          cbData = sizeof(key) / sizeof(char);
-          n=0;
+                                "  Searching for %s...",
+                                products[product_index]);
+          MagickFormatString(key,sizeof(key),"SOFTWARE\\%s",products[product_index]);
+
           /*
-            LONG WINAPI RegEnumKeyEx(HKEY hKey, DWORD dwIndex, LPTSTR
-            lpName, LPDWORD lpcName, LPDWORD lpReserved, LPTSTR
-            lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
-
-            Enumerates the subkeys of the specified open registry key.
-
-            RegEnumKeyA is is provided only for compatibility with
-            16-bit versions of Windows.
+            long WINAPI RegOpenKeyEx(const HKEY hKey, const LPCTSTR
+            lpSubKey, const DWORD ulOptions, const REGSAM samDesired,
+            PHKEY phkResult)
           */
-          while ((winstatus=RegEnumKeyA(hkey, n, key, cbData)) == ERROR_SUCCESS)
+          open_key_mode=KEY_READ;
+          if ((winstatus=RegOpenKeyExA(hkeyroot, key, 0, open_key_mode, &hkey))
+              == ERROR_SUCCESS)
             {
-              char
-                gs_found_version[MaxTextExtent];
+              DWORD
+                cbData;
 
               int
-                count,
-                major_version,
-                minor_version,
-                point_version;
+                n;
 
               (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                                    "      RegEnumKeyA enumerated \"%s\"",key);
-              n++;
-              major_version=0;
-              minor_version=0;
-              point_version=-1;
+                                    "    RegOpenKeyExA() opened "
+                                    "\"%s\\%s\"",
+                                    KeyRootStr, key);
+              /* Now enumerate the keys */
+              cbData = sizeof(key) / sizeof(char);
+              n=0;
+              /*
+                LONG WINAPI RegEnumKeyEx(HKEY hKey, DWORD dwIndex, LPTSTR
+                lpName, LPDWORD lpcName, LPDWORD lpReserved, LPTSTR
+                lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime)
 
-              /* Version string may be like 9.27, or 9.53.0, or 9.53.3 */
-              count=sscanf(key,"%d.%d.%d",&major_version,&minor_version,&point_version);
-              if ((count != 2) && (count != 3))
-                continue;
+                Enumerates the subkeys of the specified open registry key.
 
-              if (count == 3)
-                FormatString(gs_found_version,"%d.%02d.%d",major_version, minor_version, point_version);
-              else
-                FormatString(gs_found_version,"%d.%02d",major_version, minor_version);
-
-              (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                                    "      Found Ghostscript (%s) version %s",
-                                    products[product_index],
-                                    gs_found_version);
-
-              if ((major_version > *gs_major_version)
-                  ||
-                  ((major_version == *gs_major_version) &&
-                   (minor_version > *gs_minor_version))
-                  ||
-                  ((major_version == *gs_major_version) &&
-                   (minor_version == *gs_minor_version) &&
-                   (point_version > *gs_point_version))
-                  )
+                RegEnumKeyA is is provided only for compatibility with
+                16-bit versions of Windows.
+              */
+              while ((winstatus=RegEnumKeyA(hkey, n, key, cbData)) == ERROR_SUCCESS)
                 {
-                  *gs_productfamily=products[product_index];
-                  *gs_major_version=major_version;
-                  *gs_minor_version=minor_version;
-                  *gs_point_version=point_version;
-                  (void) strlcpy(gs_version,gs_found_version,sizeof(gs_version));
-                  status=MagickPass;
+                  char
+                    gs_found_version[MaxTextExtent];
+
+                  int
+                    count,
+                    major_version,
+                    minor_version,
+                    point_version;
+
+                  (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
+                                        "      RegEnumKeyA enumerated \"%s\"",key);
+                  n++;
+                  major_version=0;
+                  minor_version=0;
+                  point_version=-1;
+
+                  /* Version string may be like 9.27, or 9.53.0, or 9.53.3 */
+                  count=sscanf(key,"%d.%d.%d",&major_version,&minor_version,&point_version);
+                  if ((count != 2) && (count != 3))
+                    continue;
+
+                  if (count == 3)
+                    MagickFormatString(gs_found_version,sizeof(gs_found_version),"%d.%02d.%d",major_version, minor_version, point_version);
+                  else
+                    MagickFormatString(gs_found_version,sizeof(gs_found_version),"%d.%02d",major_version, minor_version);
+
+                  (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
+                                        "      Found Ghostscript (%s) version %s",
+                                        products[product_index],
+                                        gs_found_version);
+
+                  if ((major_version > *gs_major_version)
+                      ||
+                      ((major_version == *gs_major_version) &&
+                       (minor_version > *gs_minor_version))
+                      ||
+                      ((major_version == *gs_major_version) &&
+                       (minor_version == *gs_minor_version) &&
+                       (point_version > *gs_point_version))
+                      )
+                    {
+                      *gs_productfamily=products[product_index];
+                      *gs_major_version=major_version;
+                      *gs_minor_version=minor_version;
+                      *gs_point_version=point_version;
+                      (void) strlcpy(gs_version,gs_found_version,sizeof(gs_version));
+                      status=MagickPass;
+                    }
                 }
+              if (winstatus != ERROR_NO_MORE_ITEMS)
+                {
+                  (void) NTstrerror_r(winstatus,last_error_msg,sizeof(last_error_msg));
+                  (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
+                                        "      RegEnumKeyA (%s)",
+                                        last_error_msg);
+                }
+              /*
+                LONG WINAPI RegCloseKey(HKEY hKey)
+
+                Close the registry key.
+              */
+              winstatus=RegCloseKey(hkey);
             }
-          if (winstatus != ERROR_NO_MORE_ITEMS)
+          else
             {
+              /*
+                If the function fails, the return value is a nonzero error
+                code defined in Winerror.h. You can use the FormatMessage
+                function with the FORMAT_MESSAGE_FROM_SYSTEM flag to get a
+                generic description of the error.
+              */
               (void) NTstrerror_r(winstatus,last_error_msg,sizeof(last_error_msg));
               (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                                    "      RegEnumKeyA (%s)",
-                                    last_error_msg);
+                                    "    RegOpenKeyExA() failed to open "
+                                    "\"%s\\%s\" (%s)", KeyRootStr,
+                                    key,last_error_msg);
             }
-          /*
-            LONG WINAPI RegCloseKey(HKEY hKey)
-
-            Close the registry key.
-          */
-          winstatus=RegCloseKey(hkey);
-        }
-      else
-        {
-          /*
-            If the function fails, the return value is a nonzero error
-            code defined in Winerror.h. You can use the FormatMessage
-            function with the FORMAT_MESSAGE_FROM_SYSTEM flag to get a
-            generic description of the error.
-           */
-          (void) NTstrerror_r(winstatus,last_error_msg,sizeof(last_error_msg));
-          (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                                "    RegOpenKeyExA() failed to open "
-                                "\"%s\\%s\" (%s)", KeyRootStr,
-                                key,last_error_msg);
         }
     }
-  }
 
   if (status != MagickFail)
     {
@@ -1471,11 +1472,11 @@ NTGhostscriptGetString(const char *name, char *ptr, const size_t len)
     return MagickFail;
 
   if (gs_point_version >= 0)
-    FormatString(key,"SOFTWARE\\%s\\%d.%02d.%d",gs_productfamily,
-                 gs_major_version, gs_minor_version, gs_point_version);
+    MagickFormatString(key,sizeof(key),"SOFTWARE\\%s\\%d.%02d.%d",gs_productfamily,
+                       gs_major_version, gs_minor_version, gs_point_version);
   else
-    FormatString(key,"SOFTWARE\\%s\\%d.%02d",gs_productfamily,
-                 gs_major_version, gs_minor_version);
+    MagickFormatString(key,sizeof(key),"SOFTWARE\\%s\\%d.%02d",gs_productfamily,
+                       gs_major_version, gs_minor_version);
 
   for (i=0; i < sizeof(hkeys)/sizeof(hkeys[0]); ++i)
     {
@@ -1540,13 +1541,13 @@ MagickExport int NTGhostscriptDLL(char *path, int path_length)
       directory=getenv("MAGICK_GHOSTSCRIPT_PATH");
       if (directory != (const char *) NULL)
         {
-          FormatString(cache, "%.1024s%sgsdll%u.dll", directory,
-            DirectorySeparator, (unsigned int) sizeof(directory)*8);
+          MagickFormatString(cache, sizeof(cache), "%.1024s%sgsdll%u.dll", directory,
+                             DirectorySeparator, (unsigned int) sizeof(directory)*8);
           if (IsAccessibleAndNotEmpty(cache))
             result=cache;
           else
             (void) LogMagickEvent(ConfigureEvent, GetMagickModule(),
-              "Unable to find ghostscript library: \"%s\"", cache);
+                                  "Unable to find ghostscript library: \"%s\"", cache);
         }
       else if (NTGhostscriptGetString("GS_DLL", cache, sizeof(cache)))
         {
@@ -1635,7 +1636,7 @@ MagickExport int NTGhostscriptEXE(char *path, int path_length)
         *p;
 
       /* Ensure a suitable default. */
-      (void) FormatString(gsexe,"gswin%uc.exe",(unsigned int) sizeof(p)*8);
+      (void) MagickFormatString(gsexe,sizeof(gsexe),"gswin%uc.exe",(unsigned int) sizeof(p)*8);
       (void) strlcpy(cache,gsexe,sizeof(cache));
 
       if (NTGhostscriptDLL(cache,sizeof(cache)))
@@ -2013,8 +2014,8 @@ MagickExport unsigned char *NTRegistryKeyLookup(const char *subkey)
       LONG
         res;
 
-      FormatString(package_key,"SOFTWARE\\%s\\%s\\Q:%d", MagickPackageName,
-                   MagickLibVersionText,QuantumDepth);
+      MagickFormatString(package_key,sizeof(package_key),"SOFTWARE\\%s\\%s\\Q:%d", MagickPackageName,
+                         MagickLibVersionText,QuantumDepth);
 
       res = RegOpenKeyExA (HKEY_LOCAL_MACHINE, package_key, 0, KEY_READ,
                            &reg_key);
@@ -2113,8 +2114,8 @@ MagickExport unsigned char *NTResourceToBlob(const char *id)
 #ifdef MagickLibName
   handle=GetModuleHandle(MagickLibName);
 #else
-  FormatString(directory,"%.1024s%.1024s%.1024s",GetClientPath(),
-    DirectorySeparator,GetClientFilename());
+  MagickFormatString(directory,sizeof(directory),"%.1024s%.1024s%.1024s",GetClientPath(),
+                     DirectorySeparator,GetClientFilename());
   if (IsAccessible(directory))
     handle=GetModuleHandle(directory);
   else
@@ -2128,13 +2129,13 @@ MagickExport unsigned char *NTResourceToBlob(const char *id)
   */
   resource=FindResource(handle,id,"IMAGEMAGICK");
   if (!resource)
-  {
-    (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-      "Tried: windows resource \"%.1024s\"",id);
-    return((unsigned char *) NULL);
-  }
+    {
+      (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
+                            "Tried: windows resource \"%.1024s\"",id);
+      return((unsigned char *) NULL);
+    }
   (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-    "Found: windows resource \"%.1024s\"",id);
+                        "Found: windows resource \"%.1024s\"",id);
   /*
     Load resource into global memory (in WIN32, resources are already
     in memory).
@@ -2412,7 +2413,8 @@ MagickExport double NTUserTime(void)
 %
 */
 MagickExport void NTWarningHandler(const ExceptionType warning,
-  const char *reason,const char *description)
+                                   const char *reason,
+                                   const char *description)
 {
   char
     buffer[2*MaxTextExtent];
@@ -2422,13 +2424,13 @@ MagickExport void NTWarningHandler(const ExceptionType warning,
   if (reason == (char *) NULL)
     return;
   if (description == (char *) NULL)
-    FormatString(buffer,"%.1024s: %.1024s.\n",
-      GetClientName(),reason);
+    MagickFormatString(buffer,sizeof(buffer),"%.1024s: %.1024s.\n",
+                       GetClientName(),reason);
   else
-    FormatString(buffer,"%.1024s: %.1024s (%.1024s).\n",
-      GetClientName(),reason,description);
+    MagickFormatString(buffer,sizeof(buffer),"%.1024s: %.1024s (%.1024s).\n",
+                       GetClientName(),reason,description);
   (void) MessageBox(NULL,buffer,"GraphicsMagick Warning",MB_OK | MB_TASKMODAL |
-    MB_SETFOREGROUND | MB_ICONINFORMATION);
+                    MB_SETFOREGROUND | MB_ICONINFORMATION);
 }
 
 /*

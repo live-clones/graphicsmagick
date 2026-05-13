@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2023 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -356,6 +356,9 @@ ImportIndexQuantumType(const unsigned char *source,
   register magick_uint32_t
     index;
 
+  MagickPassFail
+    status = MagickPass;
+
   assert(image->colors <= MaxColormapSize);
 
   if ((image->storage_class != PseudoClass) ||
@@ -381,7 +384,9 @@ ImportIndexQuantumType(const unsigned char *source,
               {
                 --bit;
                 index=(*p >> bit) & 0x01;
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q++=image->colormap[index];
                 if (bit == 0)
@@ -404,7 +409,9 @@ ImportIndexQuantumType(const unsigned char *source,
               {
                 state ^= 1; /* Produces 1 0 1 0 ... */
                 index=(IndexPacket) ((state ? (*p >> 4) : (*p++)) & 0xf);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q++=image->colormap[index];
               }
@@ -430,7 +437,9 @@ ImportIndexQuantumType(const unsigned char *source,
                 for (x = number_pixels; x != 0; --x)
                   {
                     ImportUInt8Quantum(index,p);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
+                    if (status == MagickFail)
+                      break;
                     *indexes++=index;
                     *q++=image->colormap[index];
                   }
@@ -442,7 +451,9 @@ ImportIndexQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt16Quantum(endian,index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q++=image->colormap[index];
               }
@@ -453,7 +464,9 @@ ImportIndexQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt32Quantum(endian,index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q++=image->colormap[index];
               }
@@ -464,7 +477,9 @@ ImportIndexQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt64Quantum(endian,index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q++=image->colormap[index];
               }
@@ -482,7 +497,9 @@ ImportIndexQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 index=MagickBitStreamMSBRead(&stream,quantum_size);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q++=image->colormap[index];
               }
@@ -496,7 +513,7 @@ ImportIndexQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -524,6 +541,9 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
    unsigned int
      sample_bits;
 
+  MagickPassFail
+    status = MagickPass;
+
   assert(image->colors <= MaxColormapSize);
 
   if ((image->storage_class != PseudoClass) ||
@@ -544,7 +564,9 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt8Quantum(index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q=image->colormap[index];
 
@@ -559,7 +581,9 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt16Quantum(endian,index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q=image->colormap[index];
 
@@ -574,7 +598,9 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt32Quantum(endian,index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q=image->colormap[index];
 
@@ -589,7 +615,9 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 ImportUInt64Quantum(endian,index,p);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q=image->colormap[index];
 
@@ -611,7 +639,9 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
             for (x = number_pixels; x != 0; --x)
               {
                 index=MagickBitStreamMSBRead(&stream,quantum_size);
-                VerifyColormapIndex(image,index);
+                VerifyColormapIndex(status,image,index);
+                if (status == MagickFail)
+                  break;
                 *indexes++=index;
                 *q=image->colormap[index];
 
@@ -633,7 +663,7 @@ ImportIndexAlphaQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -667,6 +697,9 @@ ImportGrayQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -886,7 +919,9 @@ ImportGrayQuantumType(const unsigned char *source,
                 for (x = number_pixels; x != 0; --x)
                   {
                     ImportUInt8Quantum(index,p);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
+                    if (status == MagickFail)
+                      break;
                     if (grayscale_miniswhite)
                       index=(image->colors-1)-index;
                     *indexes++=index;
@@ -899,7 +934,9 @@ ImportGrayQuantumType(const unsigned char *source,
                 for (x = number_pixels; x != 0; --x)
                   {
                     ImportUInt16Quantum(endian,index,p);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
+                    if (status == MagickFail)
+                      break;
                     if (grayscale_miniswhite)
                       index=(image->colors-1)-index;
                     *indexes++=index;
@@ -912,7 +949,9 @@ ImportGrayQuantumType(const unsigned char *source,
                 for (x = number_pixels; x != 0; --x)
                   {
                     ImportUInt32Quantum(endian,index,p);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
+                    if (status == MagickFail)
+                      break;
                     if (grayscale_miniswhite)
                       index=(image->colors-1)-index;
                     *indexes++=index;
@@ -925,7 +964,9 @@ ImportGrayQuantumType(const unsigned char *source,
                 for (x = number_pixels; x != 0; --x)
                   {
                     ImportUInt64Quantum(endian,index,p);
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
+                    if (status == MagickFail)
+                      break;
                     if (grayscale_miniswhite)
                       index=(image->colors-1)-index;
                     *indexes++=index;
@@ -952,7 +993,9 @@ ImportGrayQuantumType(const unsigned char *source,
                   {
                     index=MagickBitStreamMSBRead(&stream,quantum_size);
                     index /= indexes_scale;
-                    VerifyColormapIndex(image,index);
+                    VerifyColormapIndex(status,image,index);
+                    if (status == MagickFail)
+                      break;
                     if (grayscale_miniswhite)
                       index=(image->colors-1)-index;
                     *indexes++=index;
@@ -1025,7 +1068,7 @@ ImportGrayQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -1059,6 +1102,9 @@ ImportGrayAlphaQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -1242,7 +1288,9 @@ ImportGrayAlphaQuantumType(const unsigned char *source,
                   for (x = number_pixels; x != 0; --x)
                     {
                       ImportModulo8Quantum(index,quantum_size,p);
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       if (grayscale_miniswhite)
                         index=(image->colors-1)-index;
                       *indexes++=index;
@@ -1263,7 +1311,9 @@ ImportGrayAlphaQuantumType(const unsigned char *source,
                     {
                       ImportModulo8Quantum(index,quantum_size,p);
                       index /= indexes_scale;
-                      VerifyColormapIndex(image,index);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
                       if (grayscale_miniswhite)
                         index=(image->colors-1)-index;
                       *indexes++=index;
@@ -1292,7 +1342,9 @@ ImportGrayAlphaQuantumType(const unsigned char *source,
                 {
                   index=MagickBitStreamMSBRead(&stream,quantum_size);
                   index /= indexes_scale;
-                  VerifyColormapIndex(image,index);
+                  VerifyColormapIndex(status,image,index);
+                  if (status == MagickFail)
+                    break;
                   if (grayscale_miniswhite)
                     index=(image->colors-1)-index;
                   *indexes++=index;
@@ -1387,7 +1439,7 @@ ImportGrayAlphaQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -1416,6 +1468,9 @@ ImportRedQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -1556,7 +1611,7 @@ ImportRedQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -1585,6 +1640,9 @@ ImportGreenQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -1725,7 +1783,7 @@ ImportGreenQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -1754,6 +1812,9 @@ ImportBlueQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -1895,7 +1956,7 @@ ImportBlueQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -1926,6 +1987,9 @@ ImportAlphaQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -2184,7 +2248,7 @@ ImportAlphaQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -2213,6 +2277,9 @@ ImportBlackQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -2353,7 +2420,7 @@ ImportBlackQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -2382,6 +2449,9 @@ ImportRGBQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -2585,7 +2655,7 @@ ImportRGBQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -2614,6 +2684,9 @@ ImportRGBAQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -2829,7 +2902,7 @@ ImportRGBAQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -2858,6 +2931,9 @@ ImportCMYKQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -3073,7 +3149,7 @@ ImportCMYKQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -3104,6 +3180,9 @@ ImportCMYKAQuantumType(const unsigned char *source,
 
   unsigned int
     sample_bits;
+
+  MagickPassFail
+    status = MagickPass;
 
   sample_bits=quantum_size;
   p=source;
@@ -3348,7 +3427,7 @@ ImportCMYKAQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -3365,6 +3444,9 @@ ImportCIEXYZQuantumType(const unsigned char *source,
 
   register unsigned long
     x;
+
+  MagickPassFail
+    status = MagickPass;
 
   p=source;
 
@@ -3421,7 +3503,7 @@ ImportCIEXYZQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 static MagickPassFail
@@ -3441,6 +3523,9 @@ ImportCIEYQuantumType(const unsigned char *source,
 
   double
     double_value;
+
+  MagickPassFail
+    status = MagickPass;
 
   p=source;
 
@@ -3475,7 +3560,7 @@ ImportCIEYQuantumType(const unsigned char *source,
       import_info->bytes_imported=p-source;
     }
 
-  return MagickPass;
+  return status;
 }
 
 MagickExport MagickPassFail
@@ -3576,7 +3661,7 @@ ImportViewPixelArea(ViewInfo *view,
           (quantum_size == 64)))))
     {
       char quantum_size_str[MaxTextExtent];
-      FormatString(quantum_size_str,"%u",quantum_size);
+      MagickFormatString(quantum_size_str,sizeof(quantum_size_str),"%u",quantum_size);
       status=0;
       ThrowException(&GetCacheViewImage(view)->exception,CoderError,
                      UnsupportedBitsPerSample,quantum_size_str);

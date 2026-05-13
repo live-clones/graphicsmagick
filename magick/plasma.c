@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2009 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -17,6 +17,7 @@
 #include "magick/studio.h"
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
+#include "magick/plasma.h"
 #include "magick/random.h"
 #include "magick/utility.h"
 
@@ -84,6 +85,9 @@ MagickExport MagickPassFail PlasmaImage(Image *image,const SegmentInfo *segment,
   register PixelPacket
     *q;
 
+  MagickPassFail
+    status = MagickPass;
+
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(segment != (SegmentInfo *) NULL);
@@ -102,30 +106,31 @@ MagickExport MagickPassFail PlasmaImage(Image *image,const SegmentInfo *segment,
       local_info=(*segment);
       local_info.x2=x_mid;
       local_info.y2=y_mid;
-      (void) PlasmaImage(image,&local_info,attenuate,depth);
+      status &= PlasmaImage(image,&local_info,attenuate,depth);
       local_info=(*segment);
       local_info.y1=y_mid;
       local_info.x2=x_mid;
-      (void) PlasmaImage(image,&local_info,attenuate,depth);
+      status &= PlasmaImage(image,&local_info,attenuate,depth);
       local_info=(*segment);
       local_info.x1=x_mid;
       local_info.y2=y_mid;
-      (void) PlasmaImage(image,&local_info,attenuate,depth);
+      status &= PlasmaImage(image,&local_info,attenuate,depth);
       local_info=(*segment);
       local_info.x1=x_mid;
       local_info.y1=y_mid;
-      return(PlasmaImage(image,&local_info,attenuate,depth));
+      status &= PlasmaImage(image,&local_info,attenuate,depth);
+      return status;
     }
   if ((image->colorspace != RGBColorspace) ||
       (image->storage_class != DirectClass))
     {
-      (void) SetImageType(image,TrueColorType);
+      status &= SetImageType(image,TrueColorType);
     }
   x_mid=(long) (segment->x1+segment->x2+0.5)/2;
   y_mid=(long) (segment->y1+segment->y2+0.5)/2;
   if ((segment->x1 == x_mid) && (segment->x2 == x_mid) &&
       (segment->y1 == y_mid) && (segment->y2 == y_mid))
-    return(False);
+    return(MagickFail);
   /*
     Average pixels and apply plasma.
   */
@@ -136,30 +141,30 @@ MagickExport MagickPassFail PlasmaImage(Image *image,const SegmentInfo *segment,
         Left pixel.
       */
       x=(long) (segment->x1+0.5);
-      (void) AcquireOnePixelByReference(image,&u,x,(long) (segment->y1+0.5),&image->exception);
-      (void) AcquireOnePixelByReference(image,&v,x,(long) (segment->y2+0.5),&image->exception);
+      status &= AcquireOnePixelByReference(image,&u,x,(long) (segment->y1+0.5),&image->exception);
+      status &= AcquireOnePixelByReference(image,&v,x,(long) (segment->y2+0.5),&image->exception);
       q=SetImagePixels(image,x,y_mid,1,1);
       if (q == (PixelPacket *) NULL)
         return(True);
       q->red=PlasmaPixel(((double) u.red+v.red)/2,plasma);
       q->green=PlasmaPixel(((double) u.green+v.green)/2,plasma);
       q->blue=PlasmaPixel(((double) u.blue+v.blue)/2,plasma);
-      (void) SyncImagePixels(image);
+      status &= SyncImagePixels(image);
       if (segment->x1 != segment->x2)
         {
           /*
             Right pixel.
           */
           x=(long) (segment->x2+0.5);
-          (void) AcquireOnePixelByReference(image,&u,x,(long) (segment->y1+0.5),&image->exception);
-          (void) AcquireOnePixelByReference(image,&v,x,(long) (segment->y2+0.5),&image->exception);
+          status &= AcquireOnePixelByReference(image,&u,x,(long) (segment->y1+0.5),&image->exception);
+          status &= AcquireOnePixelByReference(image,&v,x,(long) (segment->y2+0.5),&image->exception);
           q=SetImagePixels(image,x,y_mid,1,1);
           if (q == (PixelPacket *) NULL)
             return(True);
           q->red=PlasmaPixel(((double) u.red+v.red)/2,plasma);
           q->green=PlasmaPixel(((double) u.green+v.green)/2,plasma);
           q->blue=PlasmaPixel(((double) u.blue+v.blue)/2,plasma);
-          (void) SyncImagePixels(image);
+          status &= SyncImagePixels(image);
         }
     }
   if ((segment->y1 != y_mid) || (segment->y2 != y_mid))
@@ -170,15 +175,15 @@ MagickExport MagickPassFail PlasmaImage(Image *image,const SegmentInfo *segment,
             Bottom pixel.
           */
           y=(long) (segment->y2+0.5);
-          (void) AcquireOnePixelByReference(image,&u,(long) (segment->x1+0.5),y,&image->exception);
-          (void) AcquireOnePixelByReference(image,&v,(long) (segment->x2+0.5),y,&image->exception);
+          status &= AcquireOnePixelByReference(image,&u,(long) (segment->x1+0.5),y,&image->exception);
+          status &= AcquireOnePixelByReference(image,&v,(long) (segment->x2+0.5),y,&image->exception);
           q=SetImagePixels(image,x_mid,y,1,1);
           if (q == (PixelPacket *) NULL)
             return(True);
           q->red=PlasmaPixel(((double) u.red+v.red)/2,plasma);
           q->green=PlasmaPixel(((double) u.green+v.green)/2,plasma);
           q->blue=PlasmaPixel(((double) u.blue+v.blue)/2,plasma);
-          (void) SyncImagePixels(image);
+          status &= SyncImagePixels(image);
         }
       if (segment->y1 != segment->y2)
         {
@@ -186,15 +191,15 @@ MagickExport MagickPassFail PlasmaImage(Image *image,const SegmentInfo *segment,
             Top pixel.
           */
           y=(long) (segment->y1+0.5);
-          (void) AcquireOnePixelByReference(image,&u,(long) (segment->x1+0.5),y,&image->exception);
-          (void) AcquireOnePixelByReference(image,&v,(long) (segment->x2+0.5),y,&image->exception);
+          status &= AcquireOnePixelByReference(image,&u,(long) (segment->x1+0.5),y,&image->exception);
+          status &= AcquireOnePixelByReference(image,&v,(long) (segment->x2+0.5),y,&image->exception);
           q=SetImagePixels(image,x_mid,y,1,1);
           if (q == (PixelPacket *) NULL)
             return(True);
           q->red=PlasmaPixel(((double) u.red+v.red)/2,plasma);
           q->green=PlasmaPixel(((double) u.green+v.green)/2,plasma);
           q->blue=PlasmaPixel(((double) u.blue+v.blue)/2,plasma);
-          (void) SyncImagePixels(image);
+          status &= SyncImagePixels(image);
         }
     }
   if ((segment->x1 != segment->x2) || (segment->y1 != segment->y2))
@@ -204,19 +209,21 @@ MagickExport MagickPassFail PlasmaImage(Image *image,const SegmentInfo *segment,
       */
       x=(long) (segment->x1+0.5);
       y=(long) (segment->y1+0.5);
-      (void) AcquireOnePixelByReference(image,&u,x,y,&image->exception);
+      status &= AcquireOnePixelByReference(image,&u,x,y,&image->exception);
       x=(long) (segment->x2+0.5);
       y=(long) (segment->y2+0.5);
-      (void) AcquireOnePixelByReference(image,&v,x,y,&image->exception);
+      status &= AcquireOnePixelByReference(image,&v,x,y,&image->exception);
       q=SetImagePixels(image,x_mid,y_mid,1,1);
       if (q == (PixelPacket *) NULL)
         return(True);
       q->red=PlasmaPixel(((double) u.red+v.red)/2,plasma);
       q->green=PlasmaPixel(((double) u.green+v.green)/2,plasma);
       q->blue=PlasmaPixel(((double) u.blue+v.blue)/2,plasma);
-      (void) SyncImagePixels(image);
+      status &= SyncImagePixels(image);
     }
+  if (status == MagickFail)
+    return status;
   if (((segment->x2-segment->x1) < 3.0) && ((segment->y2-segment->y1) < 3.0))
-    return(True);
-  return(False);
+    return(MagickPass);
+  return(MagickFail);
 }

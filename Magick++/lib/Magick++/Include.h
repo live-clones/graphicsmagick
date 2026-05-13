@@ -1,6 +1,6 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2025
+// Copyright Bob Friesenhahn, 1999-2026
 //
 // Inclusion of GraphicsMagick headers (with namespace magic)
 
@@ -40,8 +40,9 @@ namespace MagickLib
 {
 #include <magick/api.h>
 #undef inline // Remove possible definition from config.h
-
 #undef class
+#undef strlcpy
+#undef strlcat
 }
 
 //
@@ -325,6 +326,7 @@ namespace Magick
   using MagickLib::Group3Compression;
   using MagickLib::Group4Compression;
   using MagickLib::JPEGCompression;
+  using MagickLib::LosslessJPEGCompression;
   using MagickLib::LZWCompression;
   using MagickLib::RLECompression;
   using MagickLib::ZipCompression;
@@ -334,6 +336,7 @@ namespace Magick
   using MagickLib::JBIG2Compression;
   using MagickLib::ZSTDCompression;
   using MagickLib::WebPCompression;
+  using MagickLib::LERCCompression;
 
   using MagickLib::DisposeType;
   using MagickLib::UndefinedDispose;
@@ -349,6 +352,7 @@ namespace Magick
   using MagickLib::NativeEndian;
 
   // Exception types
+  using MagickLib::ExceptionInfo; // FIXME: Need a better solution!
   using MagickLib::ExceptionType;
   using MagickLib::UndefinedException;
   using MagickLib::EventException;
@@ -729,6 +733,7 @@ namespace Magick
 
   // Resource types
   using MagickLib::ResourceType;
+  using MagickLib::UndefinedResource;
   using MagickLib::DiskResource;
   using MagickLib::FileResource;
   using MagickLib::MapResource;
@@ -739,6 +744,7 @@ namespace Magick
   using MagickLib::HeightResource;
   using MagickLib::ReadResource;
   using MagickLib::WriteResource;
+  using MagickLib::ImagesResource;
 
   // Virtual pixel methods
   using MagickLib::VirtualPixelMethod;
@@ -751,6 +757,19 @@ namespace Magick
   // Logging related types
   using MagickLib::LogMethod;
   using MagickLib::LogOutputType;
+
+  // Access confirmation functions and enumerations
+  using MagickLib::ConfirmAccessMode;
+  using MagickLib::ConfirmAccessHandler;
+  using MagickLib::MagickConfirmAccess;
+  using MagickLib::MagickSetConfirmAccessHandler;
+  using MagickLib::UndefinedConfirmAccessMode;
+  using MagickLib::FileExecuteConfirmAccessMode; /* Path is to be opened for execution */
+  using MagickLib::FileReadConfirmAccessMode;    /* Path is to be opened for read */
+  using MagickLib::FileWriteConfirmAccessMode;   /* Path is to be opened for write */
+  using MagickLib::URLGetFTPConfirmAccessMode;   /* ftp:// URL get */
+  using MagickLib::URLGetFileConfirmAccessMode;  /* file:// URL get */
+  using MagickLib::URLGetHTTPConfirmAccessMode;   /* http:// URL get */
 
 #if defined(MAGICK_IMPLEMENTATION)
   //
@@ -920,7 +939,6 @@ namespace Magick
   using MagickLib::EmbossImage;
   using MagickLib::EnhanceImage;
   using MagickLib::EqualizeImage;
-  using MagickLib::ExceptionInfo;
   using MagickLib::ExceptionType;
   using MagickLib::ExecuteModuleProcess;
   using MagickLib::ExportImagePixelArea;
@@ -931,7 +949,6 @@ namespace Magick
   using MagickLib::FlattenImages;
   using MagickLib::FlipImage;
   using MagickLib::FlopImage;
-  using MagickLib::FormatString;
   using MagickLib::FrameImage;
   using MagickLib::FrameInfo;
   using MagickLib::GammaImage;
@@ -1125,7 +1142,6 @@ namespace Magick
 
 
 #endif // MAGICK_IMPLEMENTATION
-
 }
 
 #endif // Magick_Include_header

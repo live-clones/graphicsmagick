@@ -1,6 +1,6 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
-% Copyright (C) 2002 - 2022 ImageMagick Studio
+% Copyright (C) 2003-2026 GraphicsMagick Group
+% Copyright (C) 2002-2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
 % This program is covered by multiple licenses, which are described in
@@ -48,6 +48,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -756,7 +757,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info, ExceptionInfo *exception
                       index = ReadBlobByte(image);
                       if (image->storage_class == PseudoClass)
                         {
-                          VerifyColormapIndex(image,index);
+                          VerifyColormapIndex(status,image,index);
                           pixel=image->colormap[index];
                           indexes[x] = index;
                         }
@@ -791,7 +792,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info, ExceptionInfo *exception
                       if (image->storage_class == PseudoClass)
                         {
                           index=(IndexPacket) (packet & 0x7fff);
-                          VerifyColormapIndex(image,index);
+                          VerifyColormapIndex(status,image,index);
                         }
                       break;
                     }
@@ -1098,14 +1099,16 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
       /*
         Convert colorspace to an RGB-compatible type.
       */
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
       /*
         Analyze image to be written.
       */
-      (void) GetImageCharacteristics(image,&characteristics,
-                                     (OptimizeType == image_info->type),
-                                     &image->exception);
+      if (GetImageCharacteristics(image,&characteristics,
+                                  (OptimizeType == image_info->type),
+                                  &image->exception) == MagickFail)
+        ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
 
       /*
         If some other type has not been requested and the image is
@@ -1256,7 +1259,7 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
             }
           (void) WriteBlob(image, (size_t)(tga_info.colormap_size/8)*tga_info.colormap_length,
                            (char *) targa_colormap);
-          MagickFreeResourceLimitedMemory(targa_colormap);
+          MagickFreeResourceLimitedMemory(unsigned char *,targa_colormap);
         }
       /*
         Convert MIFF to TGA raster pixels.
@@ -1303,7 +1306,7 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
                                           image->columns,image->rows))
                 break;
         }
-      MagickFreeResourceLimitedMemory(tga_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,tga_pixels);
       if (image->next == (Image *) NULL)
         break;
       image=SyncNextImageInList(image);

@@ -1,12 +1,12 @@
 /*
-  Copyright (C) 2003 GraphicsMagick Group
+  Copyright (C) 2003-2025 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
   package; otherwise see http://www.graphicsmagick.org/www/Copyright.html.
 
-  X11 Utility Methods for ImageMagick.
+  X11 Utility Methods for GraphicsMagick.
 */
 #ifndef _MAGICK_XWINDOW_H
 #define _MAGICK_XWINDOW_H
@@ -638,6 +638,15 @@ extern MagickExport MagickXWindows
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }
+#endif
+
+/*
+  X11 struct members use 'c_class' in C++, and 'class' in C.
+*/
+#if defined(__cplusplus) || defined(c_plusplus)
+#  define klass  c_class
+#else
+#  define klass  class
 #endif
 
 #endif

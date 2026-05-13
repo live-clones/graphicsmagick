@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -198,7 +198,7 @@ static const struct
   CommandVectorHandler  command_vector;
   UsageVectorHandler    usage_vector;
   int                   pass_metadata;
-  RunMode               support_mode;
+  unsigned int          support_mode; /* RunMode flags */
 } commands[] =
   {
 #if defined(HasX11)
@@ -512,7 +512,7 @@ static void NormalizeSamplingFactor(ImageInfo *image_info)
   if (factors[2] == 0)
     vertical=2;
 
-  FormatString(buffer,"%ux%u",horizontal,vertical);
+  MagickFormatString(buffer,sizeof(buffer),"%ux%u",horizontal,vertical);
   (void) CloneString(&image_info->sampling_factor,buffer);
 }
 
@@ -1579,7 +1579,7 @@ static MagickPassFail BatchCommand(int argc, char **argv)
 #endif
   {
     char client_name[MaxTextExtent];
-    FormatString(client_name,"%.1024s %s", argv[0], argv[1]);
+    MagickFormatString(client_name,sizeof(client_name),"%.1024s %s", argv[0], argv[1]);
     (void) SetClientName(client_name);
   }
 #if 1
@@ -2337,7 +2337,7 @@ static OptionStatus CheckOptionValue(const char *option, const char *value)
 }
 MagickExport MagickPassFail
 CompareImageCommand(ImageInfo *image_info,
-  int argc,char **argv,char **metadata,ExceptionInfo *exception)
+                    int argc,char **argv,char **metadata,ExceptionInfo *exception)
 {
   const char
     *difference_filename;
@@ -2359,9 +2359,9 @@ CompareImageCommand(ImageInfo *image_info,
     metric=UndefinedMetric;
 
   enum {
-        UndefinedMatte,
-        IgnoreMatte,
-        StoreMatte
+    UndefinedMatte,
+    IgnoreMatte,
+    StoreMatte
   } matte=UndefinedMatte;
 
   DifferenceImageOptions
@@ -2376,8 +2376,8 @@ CompareImageCommand(ImageInfo *image_info,
   MagickBool
     auto_orient = MagickFalse;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   /*
     Set default.
@@ -2385,10 +2385,9 @@ CompareImageCommand(ImageInfo *image_info,
   assert(image_info != (const ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
   assert(exception != (ExceptionInfo *) NULL);
-  status=MagickPass;
 
   if (argc < 2 || ((argc < 3) && (LocaleCompare("-help",argv[1]) == 0 ||
-      LocaleCompare("-?",argv[1]) == 0)))
+                                  LocaleCompare("-?",argv[1]) == 0)))
     {
       CompareUsage();
       if (argc < 2)
@@ -2407,7 +2406,7 @@ CompareImageCommand(ImageInfo *image_info,
   status=ExpandFilenames(&argc,&argv);
   if (status == MagickFail)
     MagickFatalError(ResourceLimitFatalError,MemoryAllocationFailed,
-    (char *) NULL);
+                     (char *) NULL);
 
   InitializeDifferenceImageOptions(&difference_options,exception);
   difference_image=NewImageList();
@@ -2423,414 +2422,414 @@ CompareImageCommand(ImageInfo *image_info,
     Check command syntax.
   */
   for (i=1; i < argc; i++)
-  {
-    option=argv[i];
-    if ((strlen(option) < 2) ||
-        /* stdin + subexpression */
-        ((option[0] == '-') && (option[1] == '[')) ||
-        ((option[0] != '-') && option[0] != '+'))
-      {
-        /*
-          Read input images.
-        */
-        filename=argv[i];
-        (void) strlcpy(image_info->filename,filename,MaxTextExtent);
-        DestroyExceptionInfo(exception);
-        GetExceptionInfo(exception);
-        if (reference_image == (Image *) NULL)
-          {
-            reference_image=ReadImage(image_info,exception);
-            continue;
-          }
-        if (compare_image == (Image *) NULL)
-          {
-            compare_image=ReadImage(image_info,exception);
-            continue;
-          }
-        continue;
-      }
-    switch(*(option+1))
     {
-      case 'a':
-      {
-        if (LocaleCompare("authenticate",option+1) == 0)
+      option=argv[i];
+      if ((strlen(option) < 2) ||
+          /* stdin + subexpression */
+          ((option[0] == '-') && (option[1] == '[')) ||
+          ((option[0] != '-') && option[0] != '+'))
+        {
+          /*
+            Read input images.
+          */
+          filename=argv[i];
+          (void) strlcpy(image_info->filename,filename,MaxTextExtent);
+          DestroyExceptionInfo(exception);
+          GetExceptionInfo(exception);
+          if (reference_image == (Image *) NULL)
+            {
+              reference_image=ReadImage(image_info,exception);
+              continue;
+            }
+          if (compare_image == (Image *) NULL)
+            {
+              compare_image=ReadImage(image_info,exception);
+              continue;
+            }
+          continue;
+        }
+      switch(*(option+1))
+        {
+        case 'a':
           {
-            (void) CloneString(&image_info->authenticate,(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("authenticate",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                (void) CloneString(&image_info->authenticate,argv[i]);
+                (void) CloneString(&image_info->authenticate,(char *) NULL);
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    (void) CloneString(&image_info->authenticate,argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("auto-orient",option+1) == 0)
-          {
-            auto_orient = MagickTrue;
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option);
-      }
-      case 'c':
-      {
-        if (LocaleCompare("colorspace",option+1) == 0)
-          {
-            image_info->colorspace=RGBColorspace;
-            if (*option == '-')
+            if (LocaleCompare("auto-orient",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                option=argv[i];
-                image_info->colorspace=StringToColorspaceType(option);
-                if (image_info->colorspace == UndefinedColorspace)
-                  ThrowCompareException(OptionError,UnrecognizedColorspace,
-                    option);
+                auto_orient = MagickTrue;
+                break;
               }
-            break;
+            ThrowCompareException(OptionError,UnrecognizedOption,option);
           }
-        if (LocaleCompare("compress",option+1) == 0)
+        case 'c':
           {
-            image_info->compression=NoCompression;
-            if (*option == '-')
+            if (LocaleCompare("colorspace",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                option=argv[i];
-                image_info->compression=StringToCompressionType(option);
-                if (image_info->compression == UndefinedCompression)
-                  ThrowCompareException(OptionError,UnrecognizedImageCompression,
-                    option);
+                image_info->colorspace=RGBColorspace;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    option=argv[i];
+                    image_info->colorspace=StringToColorspaceType(option);
+                    if (image_info->colorspace == UndefinedColorspace)
+                      ThrowCompareException(OptionError,UnrecognizedColorspace,
+                                            option);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option);
-      }
-      case 'd':
-      {
-        if (LocaleCompare("debug",option+1) == 0)
-          {
-            (void) SetLogEventMask("None");
-            if (*option == '-')
+            if (LocaleCompare("compress",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,
-                    option);
-                (void) SetLogEventMask(argv[i]);
+                image_info->compression=NoCompression;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    option=argv[i];
+                    image_info->compression=StringToCompressionType(option);
+                    if (image_info->compression == UndefinedCompression)
+                      ThrowCompareException(OptionError,UnrecognizedImageCompression,
+                                            option);
+                  }
+                break;
               }
-            break;
+            ThrowCompareException(OptionError,UnrecognizedOption,option);
           }
-        if (LocaleCompare("define",option+1) == 0)
+        case 'd':
           {
-            i++;
-            if (i == argc)
-              ThrowCompareException(OptionError,MissingArgument,
-                option);
-            if (*option == '+')
-              (void) RemoveDefinitions(image_info,argv[i]);
-            else
-              (void) AddDefinitions(image_info,argv[i],exception);
-            break;
-          }
-        if (LocaleCompare("density",option+1) == 0)
-          {
-            (void) CloneString(&image_info->density,(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("debug",option+1) == 0)
               {
-                i++;
-                if ((i == argc) || !IsGeometry(argv[i]))
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                (void) CloneString(&image_info->density,argv[i]);
+                (void) SetLogEventMask("None");
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    (void) SetLogEventMask(argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("depth",option+1) == 0)
-          {
-            image_info->depth=QuantumDepth;
-            if (*option == '-')
-              {
-                i++;
-                if ((i == argc) || !sscanf(argv[i],"%ld",&x))
-                  ThrowCompareException(OptionError,MissingArgument,
-                    option);
-                image_info->depth=MagickAtoL(argv[i]);
-              }
-            break;
-          }
-        if (LocaleCompare("display",option+1) == 0)
-          {
-            (void) CloneString(&image_info->server_name,(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("define",option+1) == 0)
               {
                 i++;
                 if (i == argc)
                   ThrowCompareException(OptionError,MissingArgument,
-                    option);
-                (void) CloneString(&image_info->server_name,argv[i]);
+                                        option);
+                if (*option == '+')
+                  (void) RemoveDefinitions(image_info,argv[i]);
+                else
+                  (void) AddDefinitions(image_info,argv[i],exception);
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 'e':
-      {
-        if (LocaleCompare("endian",option+1) == 0)
-          {
-            image_info->endian=UndefinedEndian;
-            if (*option == '-')
+            if (LocaleCompare("density",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                option=argv[i];
-                image_info->endian=StringToEndianType(option);
-                if (image_info->endian == UndefinedEndian)
-                  ThrowCompareException(OptionError,UnrecognizedEndianType,
-                    option);
+                (void) CloneString(&image_info->density,(char *) NULL);
+                if (*option == '-')
+                  {
+                    i++;
+                    if ((i == argc) || !IsGeometry(argv[i]))
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    (void) CloneString(&image_info->density,argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-    case 'f':
-      {
-        if (LocaleCompare("file",option+1) == 0)
-          {
-            if (*option == '-')
+            if (LocaleCompare("depth",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,
-                    option);
-                difference_filename=argv[i];
+                image_info->depth=QuantumDepth;
+                if (*option == '-')
+                  {
+                    i++;
+                    if ((i == argc) || !sscanf(argv[i],"%ld",&x))
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    image_info->depth=MagickAtoL(argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 'h':
-      {
-        if (LocaleCompare("help",option+1) == 0)
-          {
-            CompareUsage();
-            break;
-            /* ThrowCompareException(OptionError,UsageError,NULL); */
-          }
-        if ((LocaleCompare("highlight-color",option+1) == 0) ||
-            (LocaleCompare("hilight-color",option+1) == 0))
-          {
-            if (*option == '-')
+            if (LocaleCompare("display",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,
-                    option);
-                (void) QueryColorDatabase(argv[i],&difference_options.highlight_color,
-                  exception);
+                (void) CloneString(&image_info->server_name,(char *) NULL);
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    (void) CloneString(&image_info->server_name,argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        if ((LocaleCompare("highlight-style",option+1) == 0) ||
-            (LocaleCompare("hilight-style",option+1) == 0))
-          {
-            difference_options.highlight_style=UndefinedHighlightStyle;
-            if (*option == '-')
-              {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                option=argv[i];
-                difference_options.highlight_style=StringToHighlightStyle(option);
-                if (difference_options.highlight_style == UndefinedHighlightStyle)
-                  ThrowCompareException(OptionError,UnrecognizedHighlightStyle,
-                    option);
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 'i':
-      {
-        if (LocaleCompare("interlace",option+1) == 0)
+        case 'e':
           {
-            image_info->interlace=UndefinedInterlace;
-            if (*option == '-')
+            if (LocaleCompare("endian",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                option=argv[i];
-                image_info->interlace=StringToInterlaceType(option);
-                if (image_info->interlace == UndefinedInterlace)
-                  ThrowCompareException(OptionError,UnrecognizedInterlaceType,
-                    option);
+                image_info->endian=UndefinedEndian;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    option=argv[i];
+                    image_info->endian=StringToEndianType(option);
+                    if (image_info->endian == UndefinedEndian)
+                      ThrowCompareException(OptionError,UnrecognizedEndianType,
+                                            option);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 'l':
-      {
-        if (LocaleCompare("limit",option+1) == 0)
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 'f':
           {
-            if (*option == '-')
+            if (LocaleCompare("file",option+1) == 0)
               {
-                ResourceType
-                  resource_type;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    difference_filename=argv[i];
+                  }
+                break;
+              }
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 'h':
+          {
+            if (LocaleCompare("help",option+1) == 0)
+              {
+                CompareUsage();
+                break;
+                /* ThrowCompareException(OptionError,UsageError,NULL); */
+              }
+            if ((LocaleCompare("highlight-color",option+1) == 0) ||
+                (LocaleCompare("hilight-color",option+1) == 0))
+              {
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    (void) QueryColorDatabase(argv[i],&difference_options.highlight_color,
+                                              exception);
+                  }
+                break;
+              }
+            if ((LocaleCompare("highlight-style",option+1) == 0) ||
+                (LocaleCompare("hilight-style",option+1) == 0))
+              {
+                difference_options.highlight_style=UndefinedHighlightStyle;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    option=argv[i];
+                    difference_options.highlight_style=StringToHighlightStyle(option);
+                    if (difference_options.highlight_style == UndefinedHighlightStyle)
+                      ThrowCompareException(OptionError,UnrecognizedHighlightStyle,
+                                            option);
+                  }
+                break;
+              }
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 'i':
+          {
+            if (LocaleCompare("interlace",option+1) == 0)
+              {
+                image_info->interlace=UndefinedInterlace;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    option=argv[i];
+                    image_info->interlace=StringToInterlaceType(option);
+                    if (image_info->interlace == UndefinedInterlace)
+                      ThrowCompareException(OptionError,UnrecognizedInterlaceType,
+                                            option);
+                  }
+                break;
+              }
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 'l':
+          {
+            if (LocaleCompare("limit",option+1) == 0)
+              {
+                if (*option == '-')
+                  {
+                    ResourceType
+                      resource_type;
 
-                char
-                  *type;
+                    char
+                      *type;
 
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                type=argv[i];
-                i++;
-                if ((i == argc) || !sscanf(argv[i],"%ld",&x))
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                resource_type=StringToResourceType(type);
-                if (resource_type == UndefinedResource)
-                  ThrowCompareException(OptionError,UnrecognizedResourceType,type);
-                (void) SetMagickResourceLimit(resource_type,MagickSizeStrToInt64(argv[i],1024));
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    type=argv[i];
+                    i++;
+                    if ((i == argc) || !sscanf(argv[i],"%ld",&x))
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    resource_type=StringToResourceType(type);
+                    if (resource_type == UndefinedResource)
+                      ThrowCompareException(OptionError,UnrecognizedResourceType,type);
+                    (void) SetMagickResourceLimit(resource_type,MagickSizeStrToInt64(argv[i],1024));
+                  }
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("log",option+1) == 0)
-          {
-            if (*option == '-')
+            if (LocaleCompare("log",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,
-                    option);
-                (void) SetLogFormat(argv[i]);
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    (void) SetLogFormat(argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 'm':
-      {
-        if (LocaleCompare("matte",option+1) == 0)
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 'm':
           {
-            if (*option == '+')
-              matte=IgnoreMatte;
-            else
-              matte=StoreMatte;
-            break;
-          }
-        if (LocaleCompare("maximum-error",option+1) == 0)
-          {
-            if (*option == '-')
+            if (LocaleCompare("matte",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,
-                                        option);
-                maximum_error=MagickAtoF(argv[i]);
+                if (*option == '+')
+                  matte=IgnoreMatte;
+                else
+                  matte=StoreMatte;
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("metric",option+1) == 0)
-          {
-            if (*option == '-')
+            if (LocaleCompare("maximum-error",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,
-                                        option);
-                metric=StringToMetricType(argv[i]);
-                if (metric == UndefinedMetric)
-                  ThrowCompareException(OptionError,UnrecognizedMetric,
-                                        option);
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    maximum_error=MagickAtoF(argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("monitor",option+1) == 0)
-          {
-            if (*option == '+')
+            if (LocaleCompare("metric",option+1) == 0)
               {
-                (void) SetMonitorHandler((MonitorHandler) NULL);
-                (void) MagickSetConfirmAccessHandler((ConfirmAccessHandler) NULL);
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,
+                                            option);
+                    metric=StringToMetricType(argv[i]);
+                    if (metric == UndefinedMetric)
+                      ThrowCompareException(OptionError,UnrecognizedMetric,
+                                            option);
+                  }
+                break;
               }
-            else
+            if (LocaleCompare("monitor",option+1) == 0)
               {
-                (void) SetMonitorHandler(CommandProgressMonitor);
-                (void) MagickSetConfirmAccessHandler(CommandAccessMonitor);
+                if (*option == '+')
+                  {
+                    (void) SetMonitorHandler((MonitorHandler) NULL);
+                    (void) MagickSetConfirmAccessHandler((ConfirmAccessHandler) NULL);
+                  }
+                else
+                  {
+                    (void) SetMonitorHandler(CommandProgressMonitor);
+                    (void) MagickSetConfirmAccessHandler(CommandAccessMonitor);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 's':
-      {
-        if (LocaleCompare("sampling-factor",option+1) == 0)
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 's':
           {
-            (void) CloneString(&image_info->sampling_factor,(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("sampling-factor",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                (void) CloneString(&image_info->sampling_factor,argv[i]);
-                NormalizeSamplingFactor(image_info);
+                (void) CloneString(&image_info->sampling_factor,(char *) NULL);
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    (void) CloneString(&image_info->sampling_factor,argv[i]);
+                    NormalizeSamplingFactor(image_info);
+                  }
+                break;
               }
-            break;
-          }
-        if (LocaleCompare("size",option+1) == 0)
-          {
-            (void) CloneString(&image_info->size,(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("size",option+1) == 0)
               {
-                i++;
-                if ((i == argc) || !IsGeometry(argv[i]))
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                (void) CloneString(&image_info->size,argv[i]);
+                (void) CloneString(&image_info->size,(char *) NULL);
+                if (*option == '-')
+                  {
+                    i++;
+                    if ((i == argc) || !IsGeometry(argv[i]))
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    (void) CloneString(&image_info->size,argv[i]);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case 't':
-      {
-        if (LocaleCompare("type",option+1) == 0)
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 't':
           {
-            image_info->type=UndefinedType;
-            if (*option == '-')
+            if (LocaleCompare("type",option+1) == 0)
               {
-                i++;
-                if (i == argc)
-                  ThrowCompareException(OptionError,MissingArgument,option);
-                option=argv[i];
-                image_info->type=StringToImageType(option);
-                if (image_info->type == UndefinedType)
-                  ThrowCompareException(OptionError,UnrecognizedImageType,
-                    option);
+                image_info->type=UndefinedType;
+                if (*option == '-')
+                  {
+                    i++;
+                    if (i == argc)
+                      ThrowCompareException(OptionError,MissingArgument,option);
+                    option=argv[i];
+                    image_info->type=StringToImageType(option);
+                    if (image_info->type == UndefinedType)
+                      ThrowCompareException(OptionError,UnrecognizedImageType,
+                                            option);
+                  }
+                break;
               }
-            break;
-          }
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-    case 'v':
-      {
-        if (LocaleCompare("verbose",option+1) == 0)
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case 'v':
           {
-            image_info->verbose+=(*option == '-');
-            break;
-          }
-        if ((LocaleCompare("version",option+1) == 0) || (LocaleCompare("-version",option+1) == 0))
+            if (LocaleCompare("verbose",option+1) == 0)
+              {
+                image_info->verbose+=(*option == '-');
+                break;
+              }
+            if ((LocaleCompare("version",option+1) == 0) || (LocaleCompare("-version",option+1) == 0))
+              break;
+            ThrowCompareException(OptionError,UnrecognizedOption,option)
+              }
+        case '?':
           break;
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
-      }
-      case '?':
-        break;
-      default:
-        ThrowCompareException(OptionError,UnrecognizedOption,option)
+        default:
+          ThrowCompareException(OptionError,UnrecognizedOption,option)
+            }
     }
-  }
   if (compare_image == (Image *) NULL)
     {
       if (exception->severity == UndefinedException)
@@ -2854,15 +2853,21 @@ CompareImageCommand(ImageInfo *image_info,
 
   if (image_info->type != UndefinedType)
     {
-      (void) SetImageType(reference_image,image_info->type);
-      (void) SetImageType(compare_image,image_info->type);
+      status &= SetImageType(reference_image,image_info->type);
+      status &= SetImageType(compare_image,image_info->type);
     }
+
+  if (status == MagickFail)
+    goto compare_cleanup_and_return;
 
   if (image_info->colorspace != UndefinedColorspace)
     {
-      (void) TransformColorspace(reference_image,image_info->colorspace);
-      (void) TransformColorspace(compare_image,image_info->colorspace);
+      status &= TransformColorspace(reference_image,image_info->colorspace);
+      status &= TransformColorspace(compare_image,image_info->colorspace);
     }
+
+  if (status == MagickFail)
+    goto compare_cleanup_and_return;
 
   if (auto_orient)
     {
@@ -2905,72 +2910,76 @@ CompareImageCommand(ImageInfo *image_info,
     }
 
   if (matte != UndefinedMatte)
-  {
-    if (matte == IgnoreMatte)
-      {
-        reference_image->matte=MagickFalse;
-        compare_image->matte=MagickFalse;
-      }
-    else if (matte == StoreMatte)
-      {
-        if (reference_image->matte == MagickFalse)
-          SetImageOpacity(reference_image,OpaqueOpacity);
-        reference_image->matte=MagickTrue;
-        if (compare_image->matte == MagickFalse)
-          SetImageOpacity(compare_image,OpaqueOpacity);
-        compare_image->matte=MagickTrue;
-      }
-  }
+    {
+      if (matte == IgnoreMatte)
+        {
+          reference_image->matte=MagickFalse;
+          compare_image->matte=MagickFalse;
+        }
+      else if (matte == StoreMatte)
+        {
+          if (reference_image->matte == MagickFalse)
+            status &= SetImageOpacity(reference_image,OpaqueOpacity);
+          if (status == MagickFail)
+            goto compare_cleanup_and_return;
+          reference_image->matte=MagickTrue;
+          if (compare_image->matte == MagickFalse)
+            status &= SetImageOpacity(compare_image,OpaqueOpacity);
+          if (status == MagickFail)
+            goto compare_cleanup_and_return;
+          compare_image->matte=MagickTrue;
+        }
+    }
 
   if (metric != UndefinedMetric)
-  {
-    /*
-      Compute and print statistical differences based on metric.
-    */
-    DifferenceStatistics
-      statistics;
+    {
+      /*
+        Compute and print statistical differences based on metric.
+      */
+      DifferenceStatistics
+        statistics;
 
-    InitializeDifferenceStatistics(&statistics,exception);
-    status&=GetImageChannelDifference(reference_image,compare_image,metric,
-                                      &statistics,exception);
-    fprintf(stdout,"Image Difference (%s):\n",MetricTypeToString(metric));
-    if (metric == PeakSignalToNoiseRatioMetric)
-      {
-        fprintf(stdout, "           PSNR\n");
-        fprintf(stdout, "          ======\n");
-        fprintf(stdout,"     Red: %#-6.2f\n",statistics.red);
-        fprintf(stdout,"   Green: %#-6.2f\n",statistics.green);
-        fprintf(stdout,"    Blue: %#-6.2f\n",statistics.blue);
-        if (reference_image->matte)
-          fprintf(stdout," Opacity: %#-6.2f\n",statistics.opacity);
-        fprintf(stdout,"   Total: %#-6.2f\n",statistics.combined);
+      InitializeDifferenceStatistics(&statistics,exception);
+      status&=GetImageChannelDifference(reference_image,compare_image,metric,
+                                        &statistics,exception);
+      fprintf(stdout,"Image Difference (%s):\n",MetricTypeToString(metric));
+      if (metric == PeakSignalToNoiseRatioMetric)
+        {
+          fprintf(stdout, "           PSNR\n");
+          fprintf(stdout, "          ======\n");
+          fprintf(stdout,"     Red: %#-6.2f\n",statistics.red);
+          fprintf(stdout,"   Green: %#-6.2f\n",statistics.green);
+          fprintf(stdout,"    Blue: %#-6.2f\n",statistics.blue);
+          if (reference_image->matte)
+            fprintf(stdout," Opacity: %#-6.2f\n",statistics.opacity);
+          fprintf(stdout,"   Total: %#-6.2f\n",statistics.combined);
 
-        if ((maximum_error >= 0.0) && (statistics.combined < maximum_error))
-          {
-            status &= MagickFail;
-            FormatString(message,"%g",statistics.combined);
-            ThrowException(exception,ImageError,ImageDifferenceExceedsLimit,message);
-          }
-      }
-    else
-      {
-        fprintf(stdout, "           Normalized    Absolute\n");
-        fprintf(stdout, "          ============  ==========\n");
-        fprintf(stdout,"     Red: %#-12.10f % 10.1f\n",statistics.red,statistics.red*MaxRGBDouble);
-        fprintf(stdout,"   Green: %#-12.10f % 10.1f\n",statistics.green,statistics.green*MaxRGBDouble);
-        fprintf(stdout,"    Blue: %#-12.10f % 10.1f\n",statistics.blue,statistics.blue*MaxRGBDouble);
-        if (reference_image->matte)
-          fprintf(stdout," Opacity: %#-12.10f % 10.1f\n",statistics.opacity,statistics.opacity*MaxRGBDouble);
-        fprintf(stdout,"   Total: %#-12.10f % 10.1f\n",statistics.combined,statistics.combined*MaxRGBDouble);
+          if ((maximum_error >= 0.0) && (statistics.combined < maximum_error))
+            {
+              status &= MagickFail;
+              MagickFormatString(message,sizeof(message),"%g",statistics.combined);
+              ThrowException(exception,ImageError,ImageDifferenceExceedsLimit,message);
+            }
+        }
+      else
+        {
+          fprintf(stdout, "           Normalized    Absolute\n");
+          fprintf(stdout, "          ============  ==========\n");
+          fprintf(stdout,"     Red: %#-12.10f % 10.1f\n",statistics.red,statistics.red*MaxRGBDouble);
+          fprintf(stdout,"   Green: %#-12.10f % 10.1f\n",statistics.green,statistics.green*MaxRGBDouble);
+          fprintf(stdout,"    Blue: %#-12.10f % 10.1f\n",statistics.blue,statistics.blue*MaxRGBDouble);
+          if (reference_image->matte)
+            fprintf(stdout," Opacity: %#-12.10f % 10.1f\n",statistics.opacity,statistics.opacity*MaxRGBDouble);
+          fprintf(stdout,"   Total: %#-12.10f % 10.1f\n",statistics.combined,statistics.combined*MaxRGBDouble);
 
-        if ((maximum_error >= 0.0) && (statistics.combined > maximum_error))
-          {
-            status &= MagickFail;
-            FormatString(message,"%g > %g",statistics.combined, maximum_error);
-            ThrowException(exception,ImageError,ImageDifferenceExceedsLimit,message);
-          }
-      }
-  }
+          if ((maximum_error >= 0.0) && (statistics.combined > maximum_error))
+            {
+              status &= MagickFail;
+              MagickFormatString(message,sizeof(message),"%g > %g",statistics.combined, maximum_error);
+              ThrowException(exception,ImageError,ImageDifferenceExceedsLimit,message);
+            }
+        }
+    }
 
   if ((difference_filename != (const char *) NULL) &&
       (difference_options.highlight_style != UndefinedHighlightStyle))
@@ -3096,8 +3105,8 @@ static void CompareUsage(void)
 %
 */
 static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
-  Image *composite_image,Image *mask_image,CompositeOptions *option_info,
-  ExceptionInfo *exception)
+                                         Image *composite_image,Image *mask_image,CompositeOptions *option_info,
+                                         ExceptionInfo *exception)
 {
   long
     x,
@@ -3119,11 +3128,11 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
       if (mask_image != (Image *) NULL)
         {
           assert(mask_image->signature == MagickSignature);
-          (void) SetImageType(composite_image,TrueColorMatteType);
+          status&=SetImageType(composite_image,TrueColorMatteType);
           if (!composite_image->matte)
             SetImageOpacity(composite_image,OpaqueOpacity);
           status&=CompositeImage(composite_image,CopyOpacityCompositeOp,
-            mask_image,0,0);
+                                 mask_image,0,0);
           if (status == MagickFail)
             GetImageException(composite_image,exception);
         }
@@ -3138,29 +3147,29 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
           if (!composite_image->matte)
             SetImageOpacity(composite_image,OpaqueOpacity);
           for (y=0; y < (long) composite_image->rows; y++)
-          {
-            q=GetImagePixels(composite_image,0,y,composite_image->columns,1);
-            if (q == (PixelPacket *) NULL)
-              break;
-            for (x=0; x < (long) composite_image->columns; x++)
             {
-              q->opacity=(Quantum)
-                ((((unsigned long) MaxRGB-q->opacity)*option_info->dissolve)/100.0);
-              q++;
+              q=GetImagePixels(composite_image,0,y,composite_image->columns,1);
+              if (q == (PixelPacket *) NULL)
+                break;
+              for (x=0; x < (long) composite_image->columns; x++)
+                {
+                  q->opacity=(Quantum)
+                    ((((unsigned long) MaxRGB-q->opacity)*option_info->dissolve)/100.0);
+                  q++;
+                }
+              if (!SyncImagePixels(composite_image))
+                break;
             }
-            if (!SyncImagePixels(composite_image))
-              break;
-          }
         }
       if (option_info->compose == DisplaceCompositeOp)
         (void) CloneString(&composite_image->geometry,
-          option_info->displace_geometry);
+                           option_info->displace_geometry);
       if (option_info->compose == ModulateCompositeOp)
         (void) CloneString(&composite_image->geometry,
-          option_info->watermark_geometry);
+                           option_info->watermark_geometry);
       if (option_info->compose == ThresholdCompositeOp)
         (void) CloneString(&composite_image->geometry,
-          option_info->unsharp_geometry);
+                           option_info->unsharp_geometry);
       /*
         Composite image.
       */
@@ -3199,11 +3208,11 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
               */
               for (y=0; y < (long) (*image)->rows; y+=composite_image->rows)
                 for (x=0; x < (long) (*image)->columns; x+=composite_image->columns)
-                {
-                  status&=CompositeImage(*image,option_info->compose,
-                    composite_image,x,y);
-                  GetImageException(*image,exception);
-                }
+                  {
+                    status&=CompositeImage(*image,option_info->compose,
+                                           composite_image,x,y);
+                    GetImageException(*image,exception);
+                  }
             }
           else
             {
@@ -3219,15 +3228,16 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
               geometry.x=0;
               geometry.y=0;
               (void) GetGeometry(option_info->geometry,&geometry.x,&geometry.y,
-                &geometry.width,&geometry.height);
-              FormatString(composite_geometry,"%lux%lu%+ld%+ld",
-                composite_image->columns,composite_image->rows,geometry.x,
-                geometry.y);
+                                 &geometry.width,&geometry.height);
+              MagickFormatString(composite_geometry,sizeof(composite_geometry),
+                                 "%lux%lu%+ld%+ld",
+                                 composite_image->columns,composite_image->rows,geometry.x,
+                                 geometry.y);
               (*image)->gravity=option_info->gravity;
               (void) GetImageGeometry(*image,composite_geometry,MagickFalse,
-                &geometry);
+                                      &geometry);
               status&=CompositeImage(*image,option_info->compose,
-                composite_image,geometry.x,geometry.y);
+                                     composite_image,geometry.x,geometry.y);
               GetImageException(*image,exception);
             }
       if (option_info->compose != CopyOpacityCompositeOp)
@@ -4451,9 +4461,11 @@ static MagickPassFail ConcatenateImages(const int argc,char **argv,
 MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
   int argc,char **argv,char **metadata,ExceptionInfo *exception)
 {
+  const char
+    *format;
+
   char
     *filename,
-    *format,
     *option;
 
   double
@@ -5101,7 +5113,7 @@ MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
                   {
                     char *text;
                     size_t length;
-                    text = FileToBlob(format+1,&length,exception);
+                    text = (char *) FileToBlob(format+1,&length,exception);
                     if (text != (char *) NULL)
                       {
                         TrimStringNewLine(text,length);
@@ -5814,6 +5826,16 @@ MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
               }
             break;
           }
+        if (LocaleCompare("remap",option+1) == 0)
+          {
+            if (*option == '-')
+              {
+                i++;
+                if (i == argc)
+                  ThrowConvertException(OptionError,MissingArgument,option);
+              }
+            break;
+          }
         if (LocaleCompare("red-primary",option+1) == 0)
           {
             if (*option == '-')
@@ -6468,6 +6490,7 @@ static void ConvertUsage(void)
   (void) puts("  -recolor matrix      apply a color translation matrix to image channels");
   (void) puts("  -red-primary point   chomaticity red primary point");
   (void) puts("  -region geometry     apply options to a portion of the image");
+  (void) puts("  -remap filename      transform image colors to match this set of colors");
   (void) puts("  -render              render vector graphics");
   (void) puts("  +render              disable rendering vector graphics");
   (void) puts("  -resample geometry   resample to horizontal and vertical resolution");
@@ -6673,7 +6696,7 @@ MagickExport MagickPassFail ConjureImageCommand(ImageInfo *image_info,
     status&=SetImageAttribute(image_info->attributes,"filename",argv[i]);
     if (status == MagickFail)
       MagickFatalError(ImageFatalError,UnableToPersistKey,argv[i]);
-    (void) FormatString(image_info->filename,"msl:%.1024s",argv[i]);
+    MagickFormatString(image_info->filename,sizeof(image_info->filename),"msl:%.1024s",argv[i]);
     image=ReadImage(image_info,exception);
     if (exception->severity > UndefinedException)
       {
@@ -8529,7 +8552,7 @@ MagickExport MagickPassFail IdentifyImageCommand(ImageInfo *image_info,
         if ((*argv[i] == '@') && IsAccessible(argv[i]+1))
           {
             MagickFreeMemory(format);
-            format=FileToBlob(argv[i]+1,&length,exception);
+            format=(char *) FileToBlob(argv[i]+1,&length,exception);
             TrimStringNewLine(format,length);
           }
         else
@@ -9000,7 +9023,7 @@ static void LiberateArgumentList(const int argc,char **argv)
 %
 */
 MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
-  int argc,char **argv,char **metadata,ExceptionInfo *exception)
+                                          int argc,char **argv,char **metadata,ExceptionInfo *exception)
 {
   char
     *option;
@@ -9044,8 +9067,9 @@ MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
                   char
                     client_name[MaxTextExtent];
 
-                  FormatString(client_name,"%.1024s %s",GetClientName(),
-                               commands[i].command);
+                  MagickFormatString(client_name,sizeof(client_name),
+                                     "%.1024s %s",GetClientName(),
+                                     commands[i].command);
 
                   (void) SetClientName(client_name);
                 }
@@ -9054,7 +9078,8 @@ MagickExport MagickPassFail MagickCommand(ImageInfo *image_info,
 
           if (commands[i].command_vector != (CommandVectorHandler) NULL)
             return(commands[i].command_vector)(image_info,argc,argv,
-              commands[i].pass_metadata ? metadata : (char **) NULL,exception);
+                                               commands[i].pass_metadata ?
+                                               metadata : (char **) NULL,exception);
         }
     }
   ThrowException(exception,OptionError,UnrecognizedCommand,option);
@@ -9148,7 +9173,7 @@ MagickInitializeCommandInfo(void)
 %
 */
 MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
-  int argc,char **argv,Image **image)
+                                         int argc,char **argv,Image **image)
 {
   char
     *option;
@@ -9177,6 +9202,9 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
 
   unsigned int
     matte;
+
+  MagickPassFail
+    status = MagickPass;
 
   /*
     Verify option length.
@@ -9213,2338 +9241,2360 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
     Transmogrify the image.
   */
   for (i=0; i < argc; i++)
-  {
-    option=argv[i];
-    if ((strlen(option) <= 1) || ((option[0] != '-') && (option[0] != '+')))
-      continue;
-    switch (*(option+1))
     {
-      case 'a':
-      {
-        if (LocaleCompare("affine",option+1) == 0)
+      option=argv[i];
+      if ((strlen(option) <= 1) || ((option[0] != '-') && (option[0] != '+')))
+        continue;
+      switch (*(option+1))
+        {
+        case 'a':
           {
-            char
-              *p;
-
-            /*
-              Draw affine matrix.
-            */
-            if (*option == '+')
-              {
-                IdentityAffine(&draw_info->affine);
-                continue;
-              }
-            p=argv[++i];
-            draw_info->affine.sx=strtod(p,&p);
-            if (*p ==',')
-              p++;
-            draw_info->affine.rx=strtod(p,&p);
-            if (*p ==',')
-              p++;
-            draw_info->affine.ry=strtod(p,&p);
-            if (*p ==',')
-              p++;
-            draw_info->affine.sy=strtod(p,&p);
-            if (*p ==',')
-              p++;
-            draw_info->affine.tx=strtod(p,&p);
-            if (*p ==',')
-              p++;
-            draw_info->affine.ty=strtod(p,&p);
-            break;
-          }
-        if (LocaleCompare("antialias",option+1) == 0)
-          {
-            clone_info->antialias=(*option == '-');
-            draw_info->stroke_antialias=(*option == '-');
-            draw_info->text_antialias=(*option == '-');
-            break;
-          }
-        if (LocaleCompare("asc-cdl",option+1) == 0)
-          {
-            ++i;
-            (void) CdlImage(*image,argv[i]);
-            continue;
-          }
-        if (LocaleCompare("auto-orient",option+1) == 0)
-          {
-            Image
-              *orient_image;
-
-            /*
-              Auto orient (upright) image scanlines.
-            */
-            orient_image=AutoOrientImage(*image,(*image)->orientation,
-                                         &(*image)->exception);
-            if (orient_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=orient_image;
-            continue;
-          }
-        break;
-      }
-      case 'b':
-      {
-        if (LocaleCompare("background",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&clone_info->background_color,
-              &(*image)->exception);
-            (*image)->background_color=clone_info->background_color;
-            continue;
-          }
-        if (LocaleCompare("blue-primary",option+1) == 0)
-          {
-            /*
-              Blue chromaticity primary point.
-            */
-            if (*option == '+')
-              {
-                (*image)->chromaticity.blue_primary.x=0.0;
-                (*image)->chromaticity.blue_primary.y=0.0;
-                continue;
-              }
-            (void) sscanf(argv[++i],"%lf%*[,/]%lf",
-              &(*image)->chromaticity.blue_primary.x,
-              &(*image)->chromaticity.blue_primary.y);
-            continue;
-          }
-        if (LocaleCompare("black-threshold",option+1) == 0)
-          {
-            /*
-              Black threshold image.
-            */
-            ++i;
-            (void) BlackThresholdImage(*image,argv[i]);
-            continue;
-          }
-        if (LocaleCompare("blur",option+1) == 0)
-          {
-            double
-              radius,
-              sigma;
-
-            Image
-              *blur_image;
-
-            /*
-              Gaussian blur image.
-            */
-            radius=0.0;
-            sigma=1.0;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
-            blur_image=BlurImage(*image,radius,sigma,&(*image)->exception);
-            if (blur_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=blur_image;
-            continue;
-          }
-        if (LocaleCompare("border",option+1) == 0)
-          {
-            Image
-              *border_image;
-
-            /*
-              Surround image with a border of solid color.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            border_image=BorderImage(*image,&geometry,&(*image)->exception);
-            if (border_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=border_image;
-            continue;
-          }
-        if (LocaleCompare("bordercolor",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&clone_info->border_color,
-              &(*image)->exception);
-            draw_info->border_color=clone_info->border_color;
-            (*image)->border_color=clone_info->border_color;
-            continue;
-          }
-        if (LocaleCompare("box",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&draw_info->undercolor,
-              &(*image)->exception);
-            continue;
-          }
-        break;
-      }
-      case 'c':
-      {
-        if (LocaleCompare("channel",option+1) == 0)
-          {
-            ChannelType
-              channel;
-
-            channel=StringToChannelType(argv[++i]);
-            if (clone_info->colorspace != UndefinedColorspace)
-              (void) TransformColorspace(*image,clone_info->colorspace);
-            (void) ChannelImage(*image,channel);
-            continue;
-          }
-        if (LocaleCompare("charcoal",option+1) == 0)
-          {
-            double
-              radius,
-              sigma;
-
-            Image
-              *charcoal_image;
-
-            /*
-              Charcoal image.
-            */
-            radius=0.0;
-            sigma=1.0;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
-            charcoal_image=
-              CharcoalImage(*image,radius,sigma,&(*image)->exception);
-            if (charcoal_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=charcoal_image;
-            continue;
-          }
-        if (LocaleCompare("chop",option+1) == 0)
-          {
-            Image
-              *chop_image;
-
-            /*
-              Chop the image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            chop_image=ChopImage(*image,&geometry,&(*image)->exception);
-            if (chop_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=chop_image;
-            continue;
-          }
-        if (LocaleCompare("clip",option+1) == 0)
-          {
-            if (*option == '+')
-              {
-                (void) SetImageClipMask(*image,(Image *) NULL);
-                continue;
-              }
-            (void) ClipImage(*image);
-            continue;
-          }
-        if (LocaleCompare("clippath",option+1) == 0)
-          {
-            (void) ClipPathImage(*image,argv[++i],*option == '-');
-            continue;
-          }
-        if (LocaleCompare("colorize",option+1) == 0)
-          {
-            Image
-              *colorize_image;
-
-            /*
-              Colorize the image.
-            */
-            colorize_image=ColorizeImage(*image,argv[++i],draw_info->fill,
-              &(*image)->exception);
-            if (colorize_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=colorize_image;
-            continue;
-          }
-        if (LocaleCompare("colors",option+1) == 0)
-          {
-            quantize_info.number_colors=MagickAtoL(argv[++i]);
-
-            if ( IsGrayColorspace(quantize_info.colorspace) )
-              {
-                /*
-                  If color reduction is requested, then quantize to the requested
-                  number of colors in the gray colorspace, otherwise simply
-                  transform the image to the gray colorspace.
-                */
-                if ( quantize_info.number_colors != 0 )
-                  (void) QuantizeImage(&quantize_info,*image);
-                else
-                  (void) TransformColorspace(*image,quantize_info.colorspace);
-              }
-            else
-              {
-                /*
-                  If color reduction is requested, and the image is DirectClass,
-                  or the image is PseudoClass and the number of colors exceeds
-                  the number requested, then quantize the image colors. Otherwise
-                  compress an existing colormap.
-                */
-                if ( quantize_info.number_colors != 0 )
-                  {
-                    if (((*image)->storage_class == DirectClass) ||
-                        ((*image)->colors > quantize_info.number_colors))
-                      (void) QuantizeImage(&quantize_info,*image);
-                    else
-                      CompressImageColormap(*image);
-                  }
-              }
-
-            quantize_info.number_colors=0;
-
-            continue;
-          }
-        if (LocaleCompare("colorspace",option+1) == 0)
-          {
-            char
-              type;
-
-            ColorspaceType
-              colorspace;
-
-            type=(*option);
-            option=argv[++i];
-            colorspace=StringToColorspaceType(option);
-            if (colorspace == UndefinedColorspace)
-              {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,"colorspace");
-                break;
-              }
-            quantize_info.colorspace=colorspace;
-            /* Never quantize in CMYK colorspace */
-            if (IsCMYKColorspace(colorspace))
-              quantize_info.colorspace=RGBColorspace;
-            (void) TransformColorspace(*image,colorspace);
-            clone_info->colorspace=colorspace;
-            if (type == '+')
-              (*image)->colorspace=colorspace;
-            continue;
-          }
-        if (LocaleCompare("comment",option+1) == 0)
-          {
-            (void) SetImageAttribute(*image,"comment",(char *) NULL);
-            if (*option == '-')
-              {
-                /*
-                  Like TranslateText() except with added support for
-                  '@' to take input from local file.
-                */
-                char *translated_text =
-                  AmpersandTranslateText(clone_info,*image,argv[++i]);
-                if (translated_text != (char *) NULL)
-                  {
-                    (void) SetImageAttribute(*image,"comment",translated_text);
-                    MagickFreeMemory(translated_text);
-                  }
-              }
-            continue;
-          }
-        if (LocaleCompare("compose",option+1) == 0)
-          {
-            (*image)->compose=CopyCompositeOp;
-            if (*option == '-')
-              (*image)->compose=StringToCompositeOperator(argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("compress",option+1) == 0)
-          {
-            if (*option == '+')
-              {
-                (*image)->compression=UndefinedCompression;
-                continue;
-              }
-            option=argv[++i];
-            (*image)->compression=StringToCompressionType(option);
-            continue;
-          }
-        if (LocaleCompare("contrast",option+1) == 0)
-          {
-            (void) ContrastImage(*image,*option == '-');
-            continue;
-          }
-        if (LocaleCompare("convolve",option+1) == 0)
-          {
-            Image
-              *convolve_image;
-
-            char
-              *p,
-              token[MaxTextExtent];
-
-            double
-              *kernel;
-
-            register long
-              x;
-
-            unsigned int
-              elements,
-              order;
-
-            /*
-              Convolve image.
-            */
-            p=argv[++i];
-            for (elements=0; *p != '\0'; elements++)
-            {
-              MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-              if (*token == ',')
-                MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-            }
-            order=(unsigned int) sqrt(elements);
-            if ((0 == elements) || (order*order != elements))
+            if (LocaleCompare("affine",option+1) == 0)
               {
                 char
-                  message[MaxTextExtent];
+                  *p;
 
-                FormatString(message,"%u",elements);
-                ThrowException(&(*image)->exception,OptionError,MatrixIsNotSquare,message);
+                /*
+                  Draw affine matrix.
+                */
+                if (*option == '+')
+                  {
+                    IdentityAffine(&draw_info->affine);
+                    continue;
+                  }
+                p=argv[++i];
+                draw_info->affine.sx=strtod(p,&p);
+                if (*p ==',')
+                  p++;
+                draw_info->affine.rx=strtod(p,&p);
+                if (*p ==',')
+                  p++;
+                draw_info->affine.ry=strtod(p,&p);
+                if (*p ==',')
+                  p++;
+                draw_info->affine.sy=strtod(p,&p);
+                if (*p ==',')
+                  p++;
+                draw_info->affine.tx=strtod(p,&p);
+                if (*p ==',')
+                  p++;
+                draw_info->affine.ty=strtod(p,&p);
+                break;
+              }
+            if (LocaleCompare("antialias",option+1) == 0)
+              {
+                clone_info->antialias=(*option == '-');
+                draw_info->stroke_antialias=(*option == '-');
+                draw_info->text_antialias=(*option == '-');
+                break;
+              }
+            if (LocaleCompare("asc-cdl",option+1) == 0)
+              {
+                ++i;
+                status &= CdlImage(*image,argv[i]);
                 continue;
               }
-            kernel=MagickAllocateArray(double *,(size_t) order*order,sizeof(double));
-            if (kernel == (double *) NULL)
-              MagickFatalError(ResourceLimitFatalError,MemoryAllocationFailed,
-                MagickMsg(ResourceLimitError,UnableToAllocateCoefficients));
-            p=argv[i];
-            for (x=0; *p != '\0'; x++)
-            {
-              MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-              if (token[0] == ',')
-                MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-              kernel[x]=MagickAtoF(token);
-            }
-            for ( ; x < (long) (order*order); x++)
-              kernel[x]=0.0;
-            convolve_image=ConvolveImage(*image,order,kernel,
-              &(*image)->exception);
-            MagickFreeMemory(kernel);
-            if (convolve_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=convolve_image;
-            continue;
-          }
-        if (LocaleCompare("crop",option+1) == 0)
-          {
-            /*
-              FIXME: This command can produce multiple images from one
-              image, causing only the first to be fully processed.
-            */
-            TransformImage(image,argv[++i],(char *) NULL);
-            continue;
-          }
-        if (LocaleCompare("cycle",option+1) == 0)
-          {
-            /*
-              Cycle an image colormap.
-            */
-            (void) CycleColormapImage(*image,MagickAtoI(argv[++i]));
-            continue;
-          }
-        break;
-      }
-      case 'd':
-      {
-        if (LocaleCompare("define",option+1) == 0)
-          {
-            i++;
-            if (*option == '+')
-              (void) RemoveDefinitions(clone_info,argv[i]);
-            else
-              (void) AddDefinitions(clone_info,argv[i],&(*image)->exception);
+            if (LocaleCompare("auto-orient",option+1) == 0)
+              {
+                Image
+                  *orient_image;
+
+                /*
+                  Auto orient (upright) image scanlines.
+                */
+                orient_image=AutoOrientImage(*image,(*image)->orientation,
+                                             &(*image)->exception);
+                if (orient_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=orient_image;
+                continue;
+              }
             break;
           }
-        if (LocaleCompare("delay",option+1) == 0)
+        case 'b':
           {
-            double
-              maximum_delay,
-              minimum_delay;
-
-            /*
-              Set image delay.
-            */
-            if (*option == '+')
+            if (LocaleCompare("background",option+1) == 0)
               {
-                (*image)->delay=0;
+                status &= QueryColorDatabase(argv[++i],&clone_info->background_color,
+                                             &(*image)->exception);
+                (*image)->background_color=clone_info->background_color;
                 continue;
               }
-            count=sscanf(argv[++i],"%lf-%lf",&minimum_delay,&maximum_delay);
-            if (count == 1)
-              (*image)->delay=(unsigned long) minimum_delay;
-            else
-              {
-                if ((*image)->delay < minimum_delay)
-                  (*image)->delay=(unsigned long) minimum_delay;
-                if ((*image)->delay > maximum_delay)
-                  (*image)->delay=(unsigned long) maximum_delay;
-              }
-            continue;
-          }
-        if (LocaleCompare("density",option+1) == 0)
-          {
-            /*
-              Set image density.
-            */
-            (void) CloneString(&clone_info->density,argv[++i]);
-            (void) CloneString(&draw_info->density,clone_info->density);
-            count=GetMagickDimension(clone_info->density,
-                                     &(*image)->x_resolution,
-                                     &(*image)->y_resolution,NULL,NULL);
-            if (count != 2)
-              (*image)->y_resolution=(*image)->x_resolution;
-            continue;
-          }
-        if (LocaleCompare("depth",option+1) == 0)
-          {
-            (*image)->depth = MagickAtoL(argv[++i]);
-            /* Below is equivalent to '-operator All Depth [value]' */
-            /* (void) SetImageDepth(*image,MagickAtoL(argv[++i])); */
-            continue;
-          }
-        if (LocaleCompare("despeckle",option+1) == 0)
-          {
-            Image
-              *despeckle_image;
-
-            /*
-              Reduce the speckles within an image.
-            */
-            despeckle_image=DespeckleImage(*image,&(*image)->exception);
-            if (despeckle_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=despeckle_image;
-            continue;
-          }
-        if (LocaleCompare("display",option+1) == 0)
-          {
-            (void) CloneString(&clone_info->server_name,argv[++i]);
-            (void) CloneString(&draw_info->server_name,clone_info->server_name);
-            continue;
-          }
-        if (LocaleCompare("dispose",option+1) == 0)
-          {
-            DisposeType
-              dispose;;
-
-            if (*option == '+')
-              {
-                (*image)->dispose=UndefinedDispose;
-                continue;
-              }
-            option=argv[++i];
-            dispose=UndefinedDispose;
-            if (LocaleCompare("0",option) == 0)
-              dispose=UndefinedDispose;
-            if (LocaleCompare("1",option) == 0)
-              dispose=NoneDispose;
-            if (LocaleCompare("2",option) == 0)
-              dispose=BackgroundDispose;
-            if (LocaleCompare("3",option) == 0)
-              dispose=PreviousDispose;
-            if (LocaleCompare("Background",option) == 0)
-              dispose=BackgroundDispose;
-            if (LocaleCompare("None",option) == 0)
-              dispose=NoneDispose;
-            if (LocaleCompare("Previous",option) == 0)
-              dispose=PreviousDispose;
-            if (LocaleCompare("Undefined",option) == 0)
-              dispose=UndefinedDispose;
-            (*image)->dispose=dispose;
-            continue;
-          }
-        if (LocaleCompare("dither",option+1) == 0)
-          {
-            clone_info->dither=(*option == '-');
-            quantize_info.dither=clone_info->dither;
-            (*image)->dither=quantize_info.dither;
-            continue;
-          }
-        if (LocaleCompare("draw",option+1) == 0)
-          {
-            /*
-              Draw image.
-            */
-            MagickFreeMemory(draw_info->primitive);
-            draw_info->primitive=AmpersandTranslateText(clone_info,*image,argv[++i]);
-            if (draw_info->primitive == (char *) NULL)
-              {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,option);
-                break;
-              }
-              (void) DrawImage(*image,draw_info);
-            continue;
-          }
-        break;
-      }
-      case 'e':
-      {
-        if (LocaleCompare("edge",option+1) == 0)
-          {
-            double
-              radius;
-
-            Image
-              *edge_image;
-
-            /*
-              Enhance edges in the image.
-            */
-            radius=MagickAtoF(argv[++i]);
-            edge_image=EdgeImage(*image,radius,&(*image)->exception);
-            if (edge_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=edge_image;
-            continue;
-          }
-        if (LocaleCompare("emboss",option+1) == 0)
-          {
-            double
-              radius,
-              sigma;
-
-            Image
-              *emboss_image;
-
-            /*
-              Emboss the image.
-            */
-            radius=0.0;
-            sigma=1.0;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
-            emboss_image=EmbossImage(*image,radius,sigma,&(*image)->exception);
-            if (emboss_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=emboss_image;
-            continue;
-          }
-        if (LocaleCompare("encoding",option+1) == 0)
-          {
-            (void) CloneString(&draw_info->encoding,argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("endian",option+1) == 0)
-          {
-            if (*option == '+')
-              {
-                clone_info->endian=NativeEndian;
-                continue;
-              }
-            option=argv[++i];
-            clone_info->endian=StringToEndianType(option);
-            continue;
-          }
-        if (LocaleCompare("enhance",option+1) == 0)
-          {
-            Image
-              *enhance_image;
-
-            /*
-              Enhance image.
-            */
-            enhance_image=EnhanceImage(*image,&(*image)->exception);
-            if (enhance_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=enhance_image;
-            continue;
-          }
-        if (LocaleCompare("equalize",option+1) == 0)
-          {
-            /*
-              Equalize image.
-            */
-            (void) EqualizeImage(*image);
-            continue;
-          }
-        if (LocaleCompare("extent",option+1) == 0)
-          {
-            Image
-              *extent_image;
-
-            /*
-              Extent image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            if (geometry.width == 0)
-              geometry.width=(*image)->columns;
-            if (geometry.height == 0)
-              geometry.height=(*image)->rows;
-            geometry.x=(-geometry.x);
-            geometry.y=(-geometry.y);
-            extent_image=ExtentImage(*image,&geometry,&(*image)->exception);
-            if (extent_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=extent_image;
-            continue;
-          }
-        break;
-      }
-      case 'f':
-      {
-        if (LocaleCompare("fill",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&draw_info->fill,
-              &(*image)->exception);
-            continue;
-          }
-        if (LocaleCompare("filter",option+1) == 0)
-          {
-            FilterTypes
-              filter;
-
-            if (*option == '+')
-              {
-                (*image)->filter=DefaultResizeFilter;
-                continue;
-              }
-            option=argv[++i];
-            filter=StringToFilterTypes(option);
-            (*image)->filter=filter;
-            continue;
-          }
-        if (LocaleCompare("flip",option+1) == 0)
-          {
-            Image
-              *flip_image;
-
-            /*
-              Flip image scanlines.
-            */
-            flip_image=FlipImage(*image,&(*image)->exception);
-            if (flip_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=flip_image;
-            continue;
-          }
-        if (LocaleCompare("flop",option+1) == 0)
-          {
-            Image
-              *flop_image;
-
-            /*
-              Flop image scanlines.
-            */
-            flop_image=FlopImage(*image,&(*image)->exception);
-            if (flop_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=flop_image;
-            continue;
-          }
-        if (LocaleCompare("frame",option+1) == 0)
-          {
-            Image
-              *frame_image;
-
-            FrameInfo
-              frame_info;
-
-            /*
-              Surround image with an ornamental border.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            frame_info.width=geometry.width;
-            frame_info.height=geometry.height;
-            frame_info.outer_bevel=geometry.x;
-            frame_info.inner_bevel=geometry.y;
-            frame_info.x=(long) frame_info.width;
-            frame_info.y=(long) frame_info.height;
-            frame_info.width=(*image)->columns+2*frame_info.width;
-            frame_info.height=(*image)->rows+2*frame_info.height;
-            frame_image=FrameImage(*image,&frame_info,&(*image)->exception);
-            if (frame_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=frame_image;
-            continue;
-          }
-        if (LocaleCompare("fuzz",option+1) == 0)
-          {
-            (*image)->fuzz=StringToDouble(argv[++i],MaxRGB);
-            continue;
-          }
-        if (LocaleCompare("font",option+1) == 0)
-          {
-            (void) CloneString(&clone_info->font,argv[++i]);
-            (void) CloneString(&draw_info->font,clone_info->font);
-            continue;
-          }
-        break;
-      }
-      case 'g':
-      {
-        if (LocaleCompare("gamma",option+1) == 0)
-          {
-            if (*option == '+')
-              (*image)->gamma=MagickAtoF(argv[++i]);
-            else
-              (void) GammaImage(*image,argv[++i]);
-            continue;
-          }
-        if ((LocaleCompare("gaussian",option+1) == 0) ||
-            (LocaleCompare("gaussian-blur",option+1) == 0))
-          {
-            double
-              radius,
-              sigma;
-
-            Image
-              *blur_image;
-
-            /*
-              Gaussian blur image.
-            */
-            radius=0.0;
-            sigma=1.0;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
-            blur_image=
-              GaussianBlurImage(*image,radius,sigma,&(*image)->exception);
-            if (blur_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=blur_image;
-            continue;
-          }
-        if (LocaleCompare("geometry",option+1) == 0)
-          {
-            Image
-              *zoom_image;
-
-            /*
-              Resize image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
-            if ((geometry.width == (*image)->columns) &&
-                (geometry.height == (*image)->rows))
-              break;
-            zoom_image=ZoomImage(*image,geometry.width,geometry.height,
-              &(*image)->exception);
-            if (zoom_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=zoom_image;
-            continue;
-          }
-        if (LocaleCompare("gravity",option+1) == 0)
-          {
-            GravityType
-              gravity;
-
-            if (*option == '+')
-              {
-                draw_info->gravity=(GravityType) ForgetGravity;
-                (*image)->gravity=(GravityType) ForgetGravity;
-                continue;
-              }
-            option=argv[++i];
-            gravity=StringToGravityType(option);
-            draw_info->gravity=gravity;
-            (*image)->gravity=gravity;
-            continue;
-          }
-        if (LocaleCompare("green-primary",option+1) == 0)
-          {
-            /*
-              Green chromaticity primary point.
-            */
-            if (*option == '+')
-              {
-                (*image)->chromaticity.green_primary.x=0.0;
-                (*image)->chromaticity.green_primary.y=0.0;
-                continue;
-              }
-            (void) sscanf(argv[++i],"%lf%*[,/]%lf",
-              &(*image)->chromaticity.green_primary.x,
-              &(*image)->chromaticity.green_primary.y);
-            continue;
-          }
-        break;
-      }
-      case 'h':
-      {
-        if (LocaleCompare("hald-clut",option+1) == 0)
-          {
-            Image
-              *clut_image;
-
-            (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
-            clut_image=ReadImage(clone_info,&(*image)->exception);
-            if (clut_image == (Image *) NULL)
-              continue;
-
-            (void) HaldClutImage(*image,clut_image);
-
-            (void) DestroyImage(clut_image);
-            clut_image=(Image *) NULL;
-            continue;
-          }
-        break;
-      }
-      case 'i':
-      {
-        if (LocaleCompare("implode",option+1) == 0)
-          {
-            double
-              amount;
-
-            Image
-              *implode_image;
-
-            /*
-              Implode image.
-            */
-            amount=MagickAtoF(argv[++i]);
-            implode_image=ImplodeImage(*image,amount,&(*image)->exception);
-            if (implode_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=implode_image;
-            continue;
-          }
-        if (LocaleCompare("interlace",option+1) == 0)
-          {
-            if (*option == '+')
-              {
-                clone_info->interlace=UndefinedInterlace;
-                continue;
-              }
-            option=argv[++i];
-            clone_info->interlace=StringToInterlaceType(option);
-            continue;
-          }
-        if (LocaleCompare("intent",option+1) == 0)
-          {
-            RenderingIntent
-              rendering_intent;
-
-            if (*option == '+')
-              {
-                (*image)->rendering_intent=UndefinedIntent;
-                continue;
-              }
-            option=argv[++i];
-            rendering_intent=UndefinedIntent;
-            if (LocaleCompare("Absolute",option) == 0)
-              rendering_intent=AbsoluteIntent;
-            if (LocaleCompare("Perceptual",option) == 0)
-              rendering_intent=PerceptualIntent;
-            if (LocaleCompare("Relative",option) == 0)
-              rendering_intent=RelativeIntent;
-            if (LocaleCompare("Saturation",option) == 0)
-              rendering_intent=SaturationIntent;
-            (*image)->rendering_intent=rendering_intent;
-            continue;
-          }
-        break;
-      }
-      case 'l':
-      {
-        if (LocaleCompare("label",option+1) == 0)
-          {
-            (void) SetImageAttribute(*image,"label",(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("blue-primary",option+1) == 0)
               {
                 /*
-                  Like TranslateText() except with added support for
-                  '@' to take input from local file.
+                  Blue chromaticity primary point.
                 */
-                char *translated_text =
-                  AmpersandTranslateText(clone_info,*image,argv[++i]);
-                if (translated_text != (char *) NULL)
+                if (*option == '+')
                   {
-                    (void) SetImageAttribute(*image,"label",translated_text);
-                    MagickFreeMemory(translated_text);
+                    (*image)->chromaticity.blue_primary.x=0.0;
+                    (*image)->chromaticity.blue_primary.y=0.0;
+                    continue;
                   }
-              }
-            continue;
-          }
-        if (LocaleCompare("lat",option+1) == 0)
-          {
-            Image
-              *threshold_image;
-
-            double
-              offset;
-
-            unsigned long
-              height,
-              width;
-
-            /*
-              Local adaptive threshold image.
-            */
-            if (sscanf(argv[++i],"%lux%lu%lf",&width,&height,&offset) != 3)
-              {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,option);
-                break;
-              }
-            if ((width == 0) || (height == 0))
-              {
-                ThrowException3(&(*image)->exception,OptionError,UnableToThresholdImage,NonzeroWidthAndHeightRequired);
-                break;
-              }
-            if (strchr(argv[i],'%') != (char *) NULL)
-              offset*=((double) MaxRGB/100.0);
-            threshold_image=AdaptiveThresholdImage(*image,width,height,offset,
-              &(*image)->exception);
-            if (threshold_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=threshold_image;
-            continue;
-          }
-        if (LocaleCompare("level",option+1) == 0)
-          {
-            (void) LevelImage(*image,argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("linewidth",option+1) == 0)
-          {
-            draw_info->stroke_width=MagickAtoF(argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("loop",option+1) == 0)
-          {
-            /*
-              Set image iterations.
-            */
-            (*image)->iterations=MagickAtoL(argv[++i]);
-            continue;
-          }
-        break;
-      }
-      case 'm':
-      {
-        if (LocaleCompare("magnify",option+1) == 0)
-          {
-            Image
-              *magnify_image;
-
-            /*
-              Magnify image.
-            */
-            magnify_image=MagnifyImage(*image,&(*image)->exception);
-            if (magnify_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=magnify_image;
-            continue;
-          }
-        if (LocaleCompare("map",option+1) == 0)
-          {
-            /*
-              Transform image colors to match this set of colors.
-            */
-            if (*option == '+')
-              continue;
-            (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
-            {
-              Image
-                *map_image;
-
-              if ((map_image=ReadImage(clone_info,&(*image)->exception)) !=
-                  (Image *) NULL)
-                {
-                  (void) MapImage(*image,map_image,quantize_info.dither);
-                  DestroyImage(map_image);
-                }
-            }
-            continue;
-          }
-        if (LocaleCompare("mask",option+1) == 0)
-          {
-            Image
-              *mask;
-
-            long
-              y;
-
-            register long
-              x;
-
-            register PixelPacket
-              *q;
-
-            if (*option == '+')
-              {
-                /*
-                  Remove a clip mask.
-                */
-                (void) SetImageClipMask(*image,(Image *) NULL);
+                (void) sscanf(argv[++i],"%lf%*[,/]%lf",
+                              &(*image)->chromaticity.blue_primary.x,
+                              &(*image)->chromaticity.blue_primary.y);
                 continue;
               }
-            /*
-              Set the image clip mask.
-            */
-            (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
-            mask=ReadImage(clone_info,&(*image)->exception);
-            if (mask == (Image *) NULL)
-              continue;
-            for (y=0; y < (long) mask->rows; y++)
-            {
-              q=GetImagePixels(mask,0,y,mask->columns,1);
-              if (q == (PixelPacket *) NULL)
-                break;
-              for (x=0; x < (long) mask->columns; x++)
+            if (LocaleCompare("black-threshold",option+1) == 0)
               {
-                if (!mask->matte)
-                  q->opacity=PixelIntensityToQuantum(q);
-                q->red=q->opacity;
-                q->green=q->opacity;
-                q->blue=q->opacity;
-                q++;
+                /*
+                  Black threshold image.
+                */
+                ++i;
+                status &= BlackThresholdImage(*image,argv[i]);
+                continue;
               }
-              if (!SyncImagePixels(mask))
-                break;
-            }
-            (void) SetImageType(mask,TrueColorMatteType);
-            (void) SetImageClipMask(*image,mask);
-            /*
-              SetImageClipMask clones the image.
-             */
-            DestroyImage(mask);
-          }
-        if (LocaleCompare("matte",option+1) == 0)
-          {
-            if (*option == '-')
-              if (!(*image)->matte)
-                SetImageOpacity(*image,OpaqueOpacity);
-            (*image)->matte=(*option == '-');
-            continue;
-          }
-        if (LocaleCompare("mattecolor",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&clone_info->matte_color,
-              &(*image)->exception);
-            (*image)->matte_color=clone_info->matte_color;
-            continue;
-          }
-        if (LocaleCompare("median",option+1) == 0)
-          {
-            double
-              radius;
-
-            Image
-              *median_image;
-
-            /*
-              Median filter image.
-            */
-            radius=MagickAtoF(argv[++i]);
-            median_image=MedianFilterImage(*image,radius,&(*image)->exception);
-            if (median_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=median_image;
-            continue;
-          }
-        if (LocaleCompare("minify",option+1) == 0)
-          {
-            Image
-              *minify_image;
-
-            /*
-              Minify image.
-            */
-            minify_image=MinifyImage(*image,&(*image)->exception);
-            if (minify_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=minify_image;
-            continue;
-          }
-        if (LocaleCompare("modulate",option+1) == 0)
-          {
-            (void) ModulateImage(*image,argv[++i]);
-            continue;
-          }
-        if ((LocaleCompare("mono",option+1) == 0) ||
-            (LocaleCompare("monochrome",option+1) == 0))
-          {
-            clone_info->monochrome=MagickTrue;
-            (void) SetImageType(*image,BilevelType);
-            continue;
-          }
-        if (LocaleCompare("motion-blur",option+1) == 0)
-          {
-            double
-              angle,
-              radius,
-              sigma;
-
-            Image
-              *blur_image;
-
-            /*
-              Motion blur image.
-            */
-            radius=0.0;
-            sigma=1.0;
-            angle=0.0;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,&angle,NULL);
-            blur_image=MotionBlurImage(*image,radius,sigma,angle,&(*image)->exception);
-            if (blur_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=blur_image;
-            continue;
-          }
-        break;
-      }
-      case 'n':
-      {
-        if (LocaleCompare("negate",option+1) == 0)
-          {
-            (void) NegateImage(*image,*option == '+');
-            continue;
-          }
-        if (LocaleCompare("noise",option+1) == 0)
-          {
-            Image
-              *noisy_image;
-
-            if (*option == '-')
-              noisy_image=
-                ReduceNoiseImage(*image,MagickAtoL(argv[++i]),&(*image)->exception);
-            else
+            if (LocaleCompare("blur",option+1) == 0)
               {
-                NoiseType
-                  noise_type;
+                double
+                  radius,
+                  sigma;
+
+                Image
+                  *blur_image;
 
                 /*
-                  Add noise to image.
+                  Gaussian blur image.
                 */
-                option=argv[++i];
-                noise_type=StringToNoiseType(option);
-                noisy_image=
-                  AddNoiseImage(*image,noise_type,&(*image)->exception);
+                radius=0.0;
+                sigma=1.0;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
+                blur_image=BlurImage(*image,radius,sigma,&(*image)->exception);
+                if (blur_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=blur_image;
+                continue;
               }
-            if (noisy_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=noisy_image;
-            continue;
-          }
-        if (LocaleCompare("normalize",option+1) == 0)
-          {
-            (void) NormalizeImage(*image);
-            continue;
-          }
-        break;
-      }
-      case 'o':
-      {
-        if (LocaleCompare("opaque",option+1) == 0)
-          {
-            PixelPacket
-              target;
+            if (LocaleCompare("border",option+1) == 0)
+              {
+                Image
+                  *border_image;
 
-            (void) AcquireOnePixelByReference(*image,&target,0,0,&(*image)->exception);
-            (void) QueryColorDatabase(argv[++i],&target,&(*image)->exception);
-            (void) OpaqueImage(*image,target,draw_info->fill);
-            continue;
+                /*
+                  Surround image with a border of solid color.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                border_image=BorderImage(*image,&geometry,&(*image)->exception);
+                if (border_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=border_image;
+                continue;
+              }
+            if (LocaleCompare("bordercolor",option+1) == 0)
+              {
+                status &= QueryColorDatabase(argv[++i],&clone_info->border_color,
+                                             &(*image)->exception);
+                draw_info->border_color=clone_info->border_color;
+                (*image)->border_color=clone_info->border_color;
+                continue;
+              }
+            if (LocaleCompare("box",option+1) == 0)
+              {
+                status &= QueryColorDatabase(argv[++i],&draw_info->undercolor,
+                                             &(*image)->exception);
+                continue;
+              }
+            break;
           }
-        if (LocaleCompare("operator",option+1) == 0)
+        case 'c':
           {
-            if (*option == '-')
+            if (LocaleCompare("channel",option+1) == 0)
               {
                 ChannelType
                   channel;
 
-                QuantumOperator
-                  quantum_operator;
+                channel=StringToChannelType(argv[++i]);
+                if (clone_info->colorspace != UndefinedColorspace)
+                  status &= TransformColorspace(*image,clone_info->colorspace);
+                status &= ChannelImage(*image,channel);
+                continue;
+              }
+            if (LocaleCompare("charcoal",option+1) == 0)
+              {
+                double
+                  radius,
+                  sigma;
+
+                Image
+                  *charcoal_image;
+
+                /*
+                  Charcoal image.
+                */
+                radius=0.0;
+                sigma=1.0;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
+                charcoal_image=
+                  CharcoalImage(*image,radius,sigma,&(*image)->exception);
+                if (charcoal_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=charcoal_image;
+                continue;
+              }
+            if (LocaleCompare("chop",option+1) == 0)
+              {
+                Image
+                  *chop_image;
+
+                /*
+                  Chop the image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                chop_image=ChopImage(*image,&geometry,&(*image)->exception);
+                if (chop_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=chop_image;
+                continue;
+              }
+            if (LocaleCompare("clip",option+1) == 0)
+              {
+                if (*option == '+')
+                  {
+                    status &= SetImageClipMask(*image,(Image *) NULL);
+                    continue;
+                  }
+                status &= ClipImage(*image);
+                continue;
+              }
+            if (LocaleCompare("clippath",option+1) == 0)
+              {
+                status &= ClipPathImage(*image,argv[++i],*option == '-');
+                continue;
+              }
+            if (LocaleCompare("colorize",option+1) == 0)
+              {
+                Image
+                  *colorize_image;
+
+                /*
+                  Colorize the image.
+                */
+                colorize_image=ColorizeImage(*image,argv[++i],draw_info->fill,
+                                             &(*image)->exception);
+                if (colorize_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=colorize_image;
+                continue;
+              }
+            if (LocaleCompare("colors",option+1) == 0)
+              {
+                quantize_info.number_colors=MagickAtoL(argv[++i]);
+
+                if ( IsGrayColorspace(quantize_info.colorspace) )
+                  {
+                    /*
+                      If color reduction is requested, then quantize to the requested
+                      number of colors in the gray colorspace, otherwise simply
+                      transform the image to the gray colorspace.
+                    */
+                    if ( quantize_info.number_colors != 0 )
+                      status &= QuantizeImage(&quantize_info,*image);
+                    else
+                      status &= TransformColorspace(*image,quantize_info.colorspace);
+                  }
+                else
+                  {
+                    /*
+                      If color reduction is requested, and the image is DirectClass,
+                      or the image is PseudoClass and the number of colors exceeds
+                      the number requested, then quantize the image colors. Otherwise
+                      compress an existing colormap.
+                    */
+                    if ( quantize_info.number_colors != 0 )
+                      {
+                        if (((*image)->storage_class == DirectClass) ||
+                            ((*image)->colors > quantize_info.number_colors))
+                          status &= QuantizeImage(&quantize_info,*image);
+                        else
+                          CompressImageColormap(*image);
+                      }
+                  }
+
+                quantize_info.number_colors=0;
+
+                continue;
+              }
+            if (LocaleCompare("colorspace",option+1) == 0)
+              {
+                char
+                  type;
+
+                ColorspaceType
+                  colorspace;
+
+                type=(*option);
+                option=argv[++i];
+                colorspace=StringToColorspaceType(option);
+                if (colorspace == UndefinedColorspace)
+                  {
+                    ThrowException(&(*image)->exception,OptionError,MissingArgument,"colorspace");
+                    break;
+                  }
+                quantize_info.colorspace=colorspace;
+                /* Never quantize in CMYK colorspace */
+                if (IsCMYKColorspace(colorspace))
+                  quantize_info.colorspace=RGBColorspace;
+                status &= TransformColorspace(*image,colorspace);
+                clone_info->colorspace=colorspace;
+                if (type == '+')
+                  (*image)->colorspace=colorspace;
+                continue;
+              }
+            if (LocaleCompare("comment",option+1) == 0)
+              {
+                (void) SetImageAttribute(*image,"comment",(char *) NULL);
+                if (*option == '-')
+                  {
+                    /*
+                      Like TranslateText() except with added support for
+                      '@' to take input from local file.
+                    */
+                    char *translated_text =
+                      AmpersandTranslateText(clone_info,*image,argv[++i]);
+                    if (translated_text != (char *) NULL)
+                      {
+                        status &= SetImageAttribute(*image,"comment",translated_text);
+                        MagickFreeMemory(translated_text);
+                      }
+                  }
+                continue;
+              }
+            if (LocaleCompare("compose",option+1) == 0)
+              {
+                (*image)->compose=CopyCompositeOp;
+                if (*option == '-')
+                  (*image)->compose=StringToCompositeOperator(argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("compress",option+1) == 0)
+              {
+                if (*option == '+')
+                  {
+                    (*image)->compression=UndefinedCompression;
+                    continue;
+                  }
+                option=argv[++i];
+                (*image)->compression=StringToCompressionType(option);
+                continue;
+              }
+            if (LocaleCompare("contrast",option+1) == 0)
+              {
+                status &= ContrastImage(*image,*option == '-');
+                continue;
+              }
+            if (LocaleCompare("convolve",option+1) == 0)
+              {
+                Image
+                  *convolve_image;
+
+                char
+                  *p,
+                  token[MaxTextExtent];
 
                 double
-                  rvalue;
+                  *kernel;
 
-                if (i+3 > argc)
+                register long
+                  x;
+
+                unsigned int
+                  elements,
+                  order;
+
+                /*
+                  Convolve image.
+                */
+                p=argv[++i];
+                for (elements=0; *p != '\0'; elements++)
+                  {
+                    MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                    if (*token == ',')
+                      MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                  }
+                order=(unsigned int) sqrt(elements);
+                if ((0 == elements) || (order*order != elements))
+                  {
+                    char
+                      message[MaxTextExtent];
+
+                    MagickFormatString(message,sizeof(message),"%u",elements);
+                    ThrowException(&(*image)->exception,OptionError,MatrixIsNotSquare,message);
+                    continue;
+                  }
+                kernel=MagickAllocateArray(double *,(size_t) order*order,sizeof(double));
+                if (kernel == (double *) NULL)
+                  MagickFatalError(ResourceLimitFatalError,MemoryAllocationFailed,
+                                   MagickMsg(ResourceLimitError,UnableToAllocateCoefficients));
+                p=argv[i];
+                for (x=0; *p != '\0'; x++)
+                  {
+                    MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                    if (token[0] == ',')
+                      MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                    kernel[x]=MagickAtoF(token);
+                  }
+                for ( ; x < (long) (order*order); x++)
+                  kernel[x]=0.0;
+                convolve_image=ConvolveImage(*image,order,kernel,
+                                             &(*image)->exception);
+                MagickFreeMemory(kernel);
+                if (convolve_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=convolve_image;
+                continue;
+              }
+            if (LocaleCompare("crop",option+1) == 0)
+              {
+                /*
+                  FIXME: This command can produce multiple images from one
+                  image, causing only the first to be fully processed.
+                */
+                status &= TransformImage(image,argv[++i],(char *) NULL);
+                continue;
+              }
+            if (LocaleCompare("cycle",option+1) == 0)
+              {
+                /*
+                  Cycle an image colormap.
+                */
+                status &= CycleColormapImage(*image,MagickAtoI(argv[++i]));
+                continue;
+              }
+            break;
+          }
+        case 'd':
+          {
+            if (LocaleCompare("define",option+1) == 0)
+              {
+                i++;
+                if (*option == '+')
+                  (void) RemoveDefinitions(clone_info,argv[i]);
+                else
+                  (void) AddDefinitions(clone_info,argv[i],&(*image)->exception);
+                break;
+              }
+            if (LocaleCompare("delay",option+1) == 0)
+              {
+                double
+                  maximum_delay,
+                  minimum_delay;
+
+                /*
+                  Set image delay.
+                */
+                if (*option == '+')
+                  {
+                    (*image)->delay=0;
+                    continue;
+                  }
+                count=sscanf(argv[++i],"%lf-%lf",&minimum_delay,&maximum_delay);
+                if (count == 1)
+                  (*image)->delay=(unsigned long) minimum_delay;
+                else
+                  {
+                    if ((*image)->delay < minimum_delay)
+                      (*image)->delay=(unsigned long) minimum_delay;
+                    if ((*image)->delay > maximum_delay)
+                      (*image)->delay=(unsigned long) maximum_delay;
+                  }
+                continue;
+              }
+            if (LocaleCompare("density",option+1) == 0)
+              {
+                /*
+                  Set image density.
+                */
+                status &= CloneString(&clone_info->density,argv[++i]);
+                status &= CloneString(&draw_info->density,clone_info->density);
+                count=GetMagickDimension(clone_info->density,
+                                         &(*image)->x_resolution,
+                                         &(*image)->y_resolution,NULL,NULL);
+                if (count != 2)
+                  (*image)->y_resolution=(*image)->x_resolution;
+                continue;
+              }
+            if (LocaleCompare("depth",option+1) == 0)
+              {
+                (*image)->depth = MagickAtoL(argv[++i]);
+                /* Below is equivalent to '-operator All Depth [value]' */
+                /* (void) SetImageDepth(*image,MagickAtoL(argv[++i])); */
+                continue;
+              }
+            if (LocaleCompare("despeckle",option+1) == 0)
+              {
+                Image
+                  *despeckle_image;
+
+                /*
+                  Reduce the speckles within an image.
+                */
+                despeckle_image=DespeckleImage(*image,&(*image)->exception);
+                if (despeckle_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=despeckle_image;
+                continue;
+              }
+            if (LocaleCompare("display",option+1) == 0)
+              {
+                (void) CloneString(&clone_info->server_name,argv[++i]);
+                (void) CloneString(&draw_info->server_name,clone_info->server_name);
+                continue;
+              }
+            if (LocaleCompare("dispose",option+1) == 0)
+              {
+                DisposeType
+                  dispose;;
+
+                if (*option == '+')
+                  {
+                    (*image)->dispose=UndefinedDispose;
+                    continue;
+                  }
+                option=argv[++i];
+                dispose=UndefinedDispose;
+                if (LocaleCompare("0",option) == 0)
+                  dispose=UndefinedDispose;
+                if (LocaleCompare("1",option) == 0)
+                  dispose=NoneDispose;
+                if (LocaleCompare("2",option) == 0)
+                  dispose=BackgroundDispose;
+                if (LocaleCompare("3",option) == 0)
+                  dispose=PreviousDispose;
+                if (LocaleCompare("Background",option) == 0)
+                  dispose=BackgroundDispose;
+                if (LocaleCompare("None",option) == 0)
+                  dispose=NoneDispose;
+                if (LocaleCompare("Previous",option) == 0)
+                  dispose=PreviousDispose;
+                if (LocaleCompare("Undefined",option) == 0)
+                  dispose=UndefinedDispose;
+                (*image)->dispose=dispose;
+                continue;
+              }
+            if (LocaleCompare("dither",option+1) == 0)
+              {
+                clone_info->dither=(*option == '-');
+                quantize_info.dither=clone_info->dither;
+                (*image)->dither=quantize_info.dither;
+                continue;
+              }
+            if (LocaleCompare("draw",option+1) == 0)
+              {
+                /*
+                  Draw image.
+                */
+                MagickFreeMemory(draw_info->primitive);
+                draw_info->primitive=AmpersandTranslateText(clone_info,*image,argv[++i]);
+                if (draw_info->primitive == (char *) NULL)
+                  {
+                    ThrowException(&(*image)->exception,OptionError,MissingArgument,option);
+                    break;
+                  }
+                status &= DrawImage(*image,draw_info);
+                continue;
+              }
+            break;
+          }
+        case 'e':
+          {
+            if (LocaleCompare("edge",option+1) == 0)
+              {
+                double
+                  radius;
+
+                Image
+                  *edge_image;
+
+                /*
+                  Enhance edges in the image.
+                */
+                radius=MagickAtoF(argv[++i]);
+                edge_image=EdgeImage(*image,radius,&(*image)->exception);
+                if (edge_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=edge_image;
+                continue;
+              }
+            if (LocaleCompare("emboss",option+1) == 0)
+              {
+                double
+                  radius,
+                  sigma;
+
+                Image
+                  *emboss_image;
+
+                /*
+                  Emboss the image.
+                */
+                radius=0.0;
+                sigma=1.0;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
+                emboss_image=EmbossImage(*image,radius,sigma,&(*image)->exception);
+                if (emboss_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=emboss_image;
+                continue;
+              }
+            if (LocaleCompare("encoding",option+1) == 0)
+              {
+                status &= CloneString(&draw_info->encoding,argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("endian",option+1) == 0)
+              {
+                if (*option == '+')
+                  {
+                    clone_info->endian=NativeEndian;
+                    continue;
+                  }
+                option=argv[++i];
+                clone_info->endian=StringToEndianType(option);
+                continue;
+              }
+            if (LocaleCompare("enhance",option+1) == 0)
+              {
+                Image
+                  *enhance_image;
+
+                /*
+                  Enhance image.
+                */
+                enhance_image=EnhanceImage(*image,&(*image)->exception);
+                if (enhance_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=enhance_image;
+                continue;
+              }
+            if (LocaleCompare("equalize",option+1) == 0)
+              {
+                /*
+                  Equalize image.
+                */
+                status &= EqualizeImage(*image);
+                continue;
+              }
+            if (LocaleCompare("extent",option+1) == 0)
+              {
+                Image
+                  *extent_image;
+
+                /*
+                  Extent image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                if (geometry.width == 0)
+                  geometry.width=(*image)->columns;
+                if (geometry.height == 0)
+                  geometry.height=(*image)->rows;
+                geometry.x=(-geometry.x);
+                geometry.y=(-geometry.y);
+                extent_image=ExtentImage(*image,&geometry,&(*image)->exception);
+                if (extent_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=extent_image;
+                continue;
+              }
+            break;
+          }
+        case 'f':
+          {
+            if (LocaleCompare("fill",option+1) == 0)
+              {
+                status &= QueryColorDatabase(argv[++i],&draw_info->fill,
+                                             &(*image)->exception);
+                continue;
+              }
+            if (LocaleCompare("filter",option+1) == 0)
+              {
+                FilterTypes
+                  filter;
+
+                if (*option == '+')
+                  {
+                    (*image)->filter=DefaultResizeFilter;
+                    continue;
+                  }
+                option=argv[++i];
+                filter=StringToFilterTypes(option);
+                (*image)->filter=filter;
+                continue;
+              }
+            if (LocaleCompare("flip",option+1) == 0)
+              {
+                Image
+                  *flip_image;
+
+                /*
+                  Flip image scanlines.
+                */
+                flip_image=FlipImage(*image,&(*image)->exception);
+                if (flip_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=flip_image;
+                continue;
+              }
+            if (LocaleCompare("flop",option+1) == 0)
+              {
+                Image
+                  *flop_image;
+
+                /*
+                  Flop image scanlines.
+                */
+                flop_image=FlopImage(*image,&(*image)->exception);
+                if (flop_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=flop_image;
+                continue;
+              }
+            if (LocaleCompare("frame",option+1) == 0)
+              {
+                Image
+                  *frame_image;
+
+                FrameInfo
+                  frame_info;
+
+                /*
+                  Surround image with an ornamental border.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                frame_info.width=geometry.width;
+                frame_info.height=geometry.height;
+                frame_info.outer_bevel=geometry.x;
+                frame_info.inner_bevel=geometry.y;
+                frame_info.x=(long) frame_info.width;
+                frame_info.y=(long) frame_info.height;
+                frame_info.width=(*image)->columns+2*frame_info.width;
+                frame_info.height=(*image)->rows+2*frame_info.height;
+                frame_image=FrameImage(*image,&frame_info,&(*image)->exception);
+                if (frame_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=frame_image;
+                continue;
+              }
+            if (LocaleCompare("fuzz",option+1) == 0)
+              {
+                (*image)->fuzz=StringToDouble(argv[++i],MaxRGB);
+                continue;
+              }
+            if (LocaleCompare("font",option+1) == 0)
+              {
+                status &= CloneString(&clone_info->font,argv[++i]);
+                status &= CloneString(&draw_info->font,clone_info->font);
+                continue;
+              }
+            break;
+          }
+        case 'g':
+          {
+            if (LocaleCompare("gamma",option+1) == 0)
+              {
+                if (*option == '+')
+                  (*image)->gamma=MagickAtoF(argv[++i]);
+                else
+                  (void) GammaImage(*image,argv[++i]);
+                continue;
+              }
+            if ((LocaleCompare("gaussian",option+1) == 0) ||
+                (LocaleCompare("gaussian-blur",option+1) == 0))
+              {
+                double
+                  radius,
+                  sigma;
+
+                Image
+                  *blur_image;
+
+                /*
+                  Gaussian blur image.
+                */
+                radius=0.0;
+                sigma=1.0;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
+                blur_image=
+                  GaussianBlurImage(*image,radius,sigma,&(*image)->exception);
+                if (blur_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=blur_image;
+                continue;
+              }
+            if (LocaleCompare("geometry",option+1) == 0)
+              {
+                Image
+                  *zoom_image;
+
+                /*
+                  Resize image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
+                if ((geometry.width == (*image)->columns) &&
+                    (geometry.height == (*image)->rows))
+                  break;
+                zoom_image=ZoomImage(*image,geometry.width,geometry.height,
+                                     &(*image)->exception);
+                if (zoom_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=zoom_image;
+                continue;
+              }
+            if (LocaleCompare("gravity",option+1) == 0)
+              {
+                GravityType
+                  gravity;
+
+                if (*option == '+')
+                  {
+                    draw_info->gravity=(GravityType) ForgetGravity;
+                    (*image)->gravity=(GravityType) ForgetGravity;
+                    continue;
+                  }
+                option=argv[++i];
+                gravity=StringToGravityType(option);
+                draw_info->gravity=gravity;
+                (*image)->gravity=gravity;
+                continue;
+              }
+            if (LocaleCompare("green-primary",option+1) == 0)
+              {
+                /*
+                  Green chromaticity primary point.
+                */
+                if (*option == '+')
+                  {
+                    (*image)->chromaticity.green_primary.x=0.0;
+                    (*image)->chromaticity.green_primary.y=0.0;
+                    continue;
+                  }
+                (void) sscanf(argv[++i],"%lf%*[,/]%lf",
+                              &(*image)->chromaticity.green_primary.x,
+                              &(*image)->chromaticity.green_primary.y);
+                continue;
+              }
+            break;
+          }
+        case 'h':
+          {
+            if (LocaleCompare("hald-clut",option+1) == 0)
+              {
+                Image
+                  *clut_image;
+
+                (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+                clut_image=ReadImage(clone_info,&(*image)->exception);
+                if (clut_image == (Image *) NULL)
+                  continue;
+
+                status &= HaldClutImage(*image,clut_image);
+
+                (void) DestroyImage(clut_image);
+                clut_image=(Image *) NULL;
+                continue;
+              }
+            break;
+          }
+        case 'i':
+          {
+            if (LocaleCompare("implode",option+1) == 0)
+              {
+                double
+                  amount;
+
+                Image
+                  *implode_image;
+
+                /*
+                  Implode image.
+                */
+                amount=MagickAtoF(argv[++i]);
+                implode_image=ImplodeImage(*image,amount,&(*image)->exception);
+                if (implode_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=implode_image;
+                continue;
+              }
+            if (LocaleCompare("interlace",option+1) == 0)
+              {
+                if (*option == '+')
+                  {
+                    clone_info->interlace=UndefinedInterlace;
+                    continue;
+                  }
+                option=argv[++i];
+                clone_info->interlace=StringToInterlaceType(option);
+                continue;
+              }
+            if (LocaleCompare("intent",option+1) == 0)
+              {
+                RenderingIntent
+                  rendering_intent;
+
+                if (*option == '+')
+                  {
+                    (*image)->rendering_intent=UndefinedIntent;
+                    continue;
+                  }
+                option=argv[++i];
+                rendering_intent=UndefinedIntent;
+                if (LocaleCompare("Absolute",option) == 0)
+                  rendering_intent=AbsoluteIntent;
+                if (LocaleCompare("Perceptual",option) == 0)
+                  rendering_intent=PerceptualIntent;
+                if (LocaleCompare("Relative",option) == 0)
+                  rendering_intent=RelativeIntent;
+                if (LocaleCompare("Saturation",option) == 0)
+                  rendering_intent=SaturationIntent;
+                (*image)->rendering_intent=rendering_intent;
+                continue;
+              }
+            break;
+          }
+        case 'l':
+          {
+            if (LocaleCompare("label",option+1) == 0)
+              {
+                (void) SetImageAttribute(*image,"label",(char *) NULL);
+                if (*option == '-')
+                  {
+                    /*
+                      Like TranslateText() except with added support for
+                      '@' to take input from local file.
+                    */
+                    char *translated_text =
+                      AmpersandTranslateText(clone_info,*image,argv[++i]);
+                    if (translated_text != (char *) NULL)
+                      {
+                        (void) SetImageAttribute(*image,"label",translated_text);
+                        MagickFreeMemory(translated_text);
+                      }
+                  }
+                continue;
+              }
+            if (LocaleCompare("lat",option+1) == 0)
+              {
+                Image
+                  *threshold_image;
+
+                double
+                  offset;
+
+                unsigned long
+                  height,
+                  width;
+
+                /*
+                  Local adaptive threshold image.
+                */
+                if (sscanf(argv[++i],"%lux%lu%lf",&width,&height,&offset) != 3)
+                  {
+                    ThrowException(&(*image)->exception,OptionError,MissingArgument,option);
+                    break;
+                  }
+                if ((width == 0) || (height == 0))
+                  {
+                    ThrowException3(&(*image)->exception,OptionError,UnableToThresholdImage,NonzeroWidthAndHeightRequired);
+                    break;
+                  }
+                if (strchr(argv[i],'%') != (char *) NULL)
+                  offset*=((double) MaxRGB/100.0);
+                threshold_image=AdaptiveThresholdImage(*image,width,height,offset,
+                                                       &(*image)->exception);
+                if (threshold_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=threshold_image;
+                continue;
+              }
+            if (LocaleCompare("level",option+1) == 0)
+              {
+                status &= LevelImage(*image,argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("linewidth",option+1) == 0)
+              {
+                draw_info->stroke_width=MagickAtoF(argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("loop",option+1) == 0)
+              {
+                /*
+                  Set image iterations.
+                */
+                (*image)->iterations=MagickAtoL(argv[++i]);
+                continue;
+              }
+            break;
+          }
+        case 'm':
+          {
+            if (LocaleCompare("magnify",option+1) == 0)
+              {
+                Image
+                  *magnify_image;
+
+                /*
+                  Magnify image.
+                */
+                magnify_image=MagnifyImage(*image,&(*image)->exception);
+                if (magnify_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=magnify_image;
+                continue;
+              }
+            if (LocaleCompare("map",option+1) == 0)
+              {
+                /*
+                  Transform image colors to match this set of colors.
+                */
+                if (*option == '+')
+                  continue;
+                (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+                {
+                  Image
+                    *map_image;
+
+                  if ((map_image=ReadImage(clone_info,&(*image)->exception)) !=
+                      (Image *) NULL)
+                    {
+                      status &= MapImage(*image,map_image,quantize_info.dither);
+                      DestroyImage(map_image);
+                    }
+                }
+                continue;
+              }
+            if (LocaleCompare("mask",option+1) == 0)
+              {
+                Image
+                  *mask;
+
+                long
+                  y;
+
+                register long
+                  x;
+
+                register PixelPacket
+                  *q;
+
+                if (*option == '+')
+                  {
+                    /*
+                      Remove a clip mask.
+                    */
+                    status &= SetImageClipMask(*image,(Image *) NULL);
+                    continue;
+                  }
+                /*
+                  Set the image clip mask.
+                */
+                (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+                mask=ReadImage(clone_info,&(*image)->exception);
+                if (mask == (Image *) NULL)
+                  continue;
+                for (y=0; y < (long) mask->rows; y++)
+                  {
+                    q=GetImagePixels(mask,0,y,mask->columns,1);
+                    if (q == (PixelPacket *) NULL)
+                      break;
+                    for (x=0; x < (long) mask->columns; x++)
+                      {
+                        if (!mask->matte)
+                          q->opacity=PixelIntensityToQuantum(q);
+                        q->red=q->opacity;
+                        q->green=q->opacity;
+                        q->blue=q->opacity;
+                        q++;
+                      }
+                    if (!SyncImagePixels(mask))
+                      break;
+                  }
+                status &= SetImageType(mask,TrueColorMatteType);
+                status &= SetImageClipMask(*image,mask);
+                /*
+                  SetImageClipMask clones the image.
+                */
+                DestroyImage(mask);
+              }
+            if (LocaleCompare("matte",option+1) == 0)
+              {
+                if (*option == '-')
+                  if (!(*image)->matte)
+                    status &= SetImageOpacity(*image,OpaqueOpacity);
+                (*image)->matte=(*option == '-');
+                continue;
+              }
+            if (LocaleCompare("mattecolor",option+1) == 0)
+              {
+                status &= QueryColorDatabase(argv[++i],&clone_info->matte_color,
+                                             &(*image)->exception);
+                (*image)->matte_color=clone_info->matte_color;
+                continue;
+              }
+            if (LocaleCompare("median",option+1) == 0)
+              {
+                double
+                  radius;
+
+                Image
+                  *median_image;
+
+                /*
+                  Median filter image.
+                */
+                radius=MagickAtoF(argv[++i]);
+                median_image=MedianFilterImage(*image,radius,&(*image)->exception);
+                if (median_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=median_image;
+                continue;
+              }
+            if (LocaleCompare("minify",option+1) == 0)
+              {
+                Image
+                  *minify_image;
+
+                /*
+                  Minify image.
+                */
+                minify_image=MinifyImage(*image,&(*image)->exception);
+                if (minify_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=minify_image;
+                continue;
+              }
+            if (LocaleCompare("modulate",option+1) == 0)
+              {
+                status &= ModulateImage(*image,argv[++i]);
+                continue;
+              }
+            if ((LocaleCompare("mono",option+1) == 0) ||
+                (LocaleCompare("monochrome",option+1) == 0))
+              {
+                clone_info->monochrome=MagickTrue;
+                status &= SetImageType(*image,BilevelType);
+                continue;
+              }
+            if (LocaleCompare("motion-blur",option+1) == 0)
+              {
+                double
+                  angle,
+                  radius,
+                  sigma;
+
+                Image
+                  *blur_image;
+
+                /*
+                  Motion blur image.
+                */
+                radius=0.0;
+                sigma=1.0;
+                angle=0.0;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,&angle,NULL);
+                blur_image=MotionBlurImage(*image,radius,sigma,angle,&(*image)->exception);
+                if (blur_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=blur_image;
+                continue;
+              }
+            break;
+          }
+        case 'n':
+          {
+            if (LocaleCompare("negate",option+1) == 0)
+              {
+                status &= NegateImage(*image,*option == '+');
+                continue;
+              }
+            if (LocaleCompare("noise",option+1) == 0)
+              {
+                Image
+                  *noisy_image;
+
+                if (*option == '-')
+                  noisy_image=
+                    ReduceNoiseImage(*image,MagickAtoL(argv[++i]),&(*image)->exception);
+                else
+                  {
+                    NoiseType
+                      noise_type;
+
+                    /*
+                      Add noise to image.
+                    */
+                    option=argv[++i];
+                    noise_type=StringToNoiseType(option);
+                    noisy_image=
+                      AddNoiseImage(*image,noise_type,&(*image)->exception);
+                  }
+                if (noisy_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=noisy_image;
+                continue;
+              }
+            if (LocaleCompare("normalize",option+1) == 0)
+              {
+                status &= NormalizeImage(*image);
+                continue;
+              }
+            break;
+          }
+        case 'o':
+          {
+            if (LocaleCompare("opaque",option+1) == 0)
+              {
+                PixelPacket
+                  target;
+
+                status &= AcquireOnePixelByReference(*image,&target,0,0,&(*image)->exception);
+                status &= QueryColorDatabase(argv[++i],&target,&(*image)->exception);
+                status &= OpaqueImage(*image,target,draw_info->fill);
+                continue;
+              }
+            if (LocaleCompare("operator",option+1) == 0)
+              {
+                if (*option == '-')
+                  {
+                    ChannelType
+                      channel;
+
+                    QuantumOperator
+                      quantum_operator;
+
+                    double
+                      rvalue;
+
+                    if (i+3 > argc)
+                      {
+                        ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
+                        break;
+                      }
+
+                    /* channel */
+                    channel=StringToChannelType(argv[++i]);
+
+                    /* operator id */
+                    quantum_operator=StringToQuantumOperator(argv[++i]);
+
+                    /* rvalue */
+                    option=argv[++i];
+                    rvalue=StringToDouble(option,MaxRGBDouble);
+                    status &= QuantumOperatorImage(*image,channel,quantum_operator,
+                                                   rvalue,&(*image)->exception);
+
+                    continue;
+                  }
+                else
                   {
                     ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
                     break;
                   }
-
-                /* channel */
-                channel=StringToChannelType(argv[++i]);
-
-                /* operator id */
-                quantum_operator=StringToQuantumOperator(argv[++i]);
-
-                /* rvalue */
-                option=argv[++i];
-                rvalue=StringToDouble(option,MaxRGBDouble);
-                (void) QuantumOperatorImage(*image,channel,quantum_operator,
-                                            rvalue,&(*image)->exception);
-
-                continue;
               }
-            else
-              {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
-                break;
-              }
-          }
-        if (LocaleCompare("ordered-dither",option+1) == 0)
-          {
-            /*
-              Ordered-dither image.
-            */
-            if (i+2 > argc)
-              {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
-                break;
-              }
-            (void) RandomChannelThresholdImage(*image,argv[i+1],argv[i+2],
-                &(*image)->exception);
-            i+=2;
-            continue;
-          }
-        if (LocaleCompare("orient",option+1) == 0)
-          {
-            (*image)->orientation=UndefinedOrientation;
-            if (*option == '-')
-              {
-                char orientation[MaxTextExtent];
-                (*image)->orientation=StringToOrientationType(argv[++i]);
-                FormatString(orientation,"%d",(*image)->orientation);
-                (void) SetImageAttribute((*image),"EXIF:Orientation",orientation);
-              }
-            continue;
-          }
-        break;
-      }
-      case 'p':
-      {
-        if (LocaleCompare("page",option+1) == 0)
-          {
-            if (option[0] == '+')
-              {
-                (*image)->page.width=0U;
-                (*image)->page.height=0U;
-                (*image)->page.x=0;
-                (*image)->page.y=0;
-              }
-            else
-              {
-                char
-                  *geometry_str;
-
-                geometry_str=GetPageGeometry(argv[++i]);
-                (void) GetGeometry(geometry_str,&(*image)->page.x,&(*image)->page.y,
-                                   &(*image)->page.width,&(*image)->page.height);
-                MagickFreeMemory(geometry_str);
-              }
-          }
-        if (LocaleCompare("paint",option+1) == 0)
-          {
-            double
-              radius;
-
-            Image
-              *paint_image;
-
-            /*
-              Oil paint image.
-            */
-            radius=MagickAtoF(argv[++i]);
-            paint_image=OilPaintImage(*image,radius,&(*image)->exception);
-            if (paint_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=paint_image;
-            continue;
-          }
-        if (LocaleCompare("pen",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&draw_info->fill,
-              &(*image)->exception);
-            continue;
-          }
-        if (LocaleCompare("pointsize",option+1) == 0)
-          {
-            clone_info->pointsize=MagickAtoF(argv[++i]);
-            draw_info->pointsize=clone_info->pointsize;
-            continue;
-          }
-        if (LocaleCompare("profile",option+1) == 0)
-          {
-            void
-              *client_data;
-
-            if (*option == '+')
+            if (LocaleCompare("ordered-dither",option+1) == 0)
               {
                 /*
-                  Remove a ICM, IPTC, or generic profile from the image.
+                  Ordered-dither image.
                 */
-                (void) ProfileImage(*image,argv[++i],
-                  (unsigned char *) NULL,0,MagickTrue);
+                if (i+2 > argc)
+                  {
+                    ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
+                    break;
+                  }
+                status &= RandomChannelThresholdImage(*image,argv[i+1],argv[i+2],
+                                                      &(*image)->exception);
+                i+=2;
                 continue;
               }
-            else if (*option == '-')
-            {
-              /*
-                Add a ICM, IPTC, or generic profile to the image.
-              */
-
-              Image
-                *profile_image;
-
-              ProfileInfo
-                profile_info;
-
-              const char
-                *profile_name;
-
-              size_t
-                profile_length;
-
-              const unsigned char *
-                profile_data;
-
-              ImageProfileIterator
-                profile_iterator;
-
-              client_data=clone_info->client_data;
-
-              /*
-                 FIXME: Next three lines replace:
-                  clone_info->client_data=(void *) &(*image)->iptc_profile;
-              */
-              profile_info.name="IPTC";
-              profile_info.info=
-                (unsigned char *) GetImageProfile(*image,profile_info.name,
-                                                  &profile_info.length);
-              clone_info->client_data=&profile_info; /* used to pass profile to meta.c */
-
-              (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
-              profile_image=ReadImage(clone_info,&(*image)->exception);
-              if (profile_image == (Image *) NULL)
-                {
-                  (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                       "Failed to load profile from file \"%s\"",
-                                       clone_info->filename);
-                  continue;
-                }
-              /*
-                Transfer profile(s) to image.
-              */
-              profile_iterator=AllocateImageProfileIterator(profile_image);
-              while(NextImageProfile(profile_iterator,&profile_name,&profile_data,
-                                     &profile_length) != MagickFail)
-                {
-                  size_t
-                    existing_length;
-
-                  if (((LocaleCompare(profile_name,"ICC") == 0) ||
-                       (LocaleCompare(profile_name,"ICM") == 0)) &&
-                      (GetImageProfile(*image,"ICM",&existing_length)))
-                    {
-                      (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                            "Transform using %s profile \"%s\","
-                                            " %lu bytes",
-                                            profile_name,clone_info->filename,
-                                            (unsigned long) profile_length);
-                      (void) ProfileImage(*image,profile_name,
-                                          (unsigned char *) profile_data,
-                                          profile_length,MagickTrue);
-                    }
-                  else
-                    {
-                      (void) LogMagickEvent(TransformEvent,GetMagickModule(),
-                                            "Adding %s profile \"%s\","
-                                            " %lu bytes",
-                                            profile_name,clone_info->filename,
-                                            (unsigned long) profile_length);
-                      (void) SetImageProfile(*image,profile_name,profile_data,profile_length);
-                    }
-                }
-              DeallocateImageProfileIterator(profile_iterator);
-              DestroyImage(profile_image);
-              profile_image=(Image *) NULL;
-              clone_info->client_data=client_data;
-            }
-            continue;
-          }
-        break;
-      }
-      case 'q':
-      {
-        if (LocaleCompare("quality",option+1) == 0)
-          {
-            /*
-              Set image compression quality.
-            */
-            clone_info->quality=MagickAtoL(argv[++i]);
-            continue;
-          }
-        break;
-      }
-      case 'r':
-      {
-        if (LocaleCompare("raise",option+1) == 0)
-          {
-            /*
-              Surround image with a raise of solid color.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            (void) RaiseImage(*image,&geometry,*option == '-');
-            continue;
-          }
-        if (LocaleCompare("random-threshold",option+1) == 0)
-          {
-            /*
-              Threshold image.
-            */
-            if (i+2 > argc)
+            if (LocaleCompare("orient",option+1) == 0)
               {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
-                break;
-              }
-            (void) RandomChannelThresholdImage(*image,argv[i+1],argv[i+2],
-                &(*image)->exception);
-            i+=2;
-            continue;
-          }
-        if (LocaleCompare("recolor",option+1) == 0)
-          {
-            char
-              *p,
-              token[MaxTextExtent];
-
-            double
-              *matrix;
-
-            register long
-              x;
-
-            unsigned int
-              elements,
-              order;
-
-            /*
-              Color matrix image.
-            */
-            p=argv[++i];
-            for (elements=0; *p != '\0'; elements++)
-            {
-              MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-              if (token[0] == ',')
-                MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-            }
-            order=(unsigned int) sqrt(elements);
-            if ((0 == elements) || (order*order != elements))
-              {
-                char
-                  message[MaxTextExtent];
-
-                FormatString(message,"%u",elements);
-                ThrowException(&(*image)->exception,OptionError,MatrixIsNotSquare,message);
+                (*image)->orientation=UndefinedOrientation;
+                if (*option == '-')
+                  {
+                    char orientation[MaxTextExtent];
+                    (*image)->orientation=StringToOrientationType(argv[++i]);
+                    MagickFormatString(orientation,sizeof(orientation),"%d",(*image)->orientation);
+                    status &= SetImageAttribute((*image),"EXIF:Orientation",orientation);
+                  }
                 continue;
               }
-            matrix=MagickAllocateArray(double *,MagickArraySize(order,order),sizeof(double));
-            if (matrix == (double *) NULL)
-              MagickFatalError(ResourceLimitFatalError,MemoryAllocationFailed,
-                MagickMsg(ResourceLimitError,UnableToAllocateCoefficients));
-            p=argv[i];
-            for (x=0; *p != '\0'; x++)
-            {
-              MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == ',')
-                MagickGetToken(p,&p,token,MaxTextExtent);
-              if (token[0] == '\0')
-                break;
-              matrix[x]=MagickAtoF(token);
-            }
-            for ( ; x < (long) (order*order); x++)
-              matrix[x]=0.0;
-            (void) ColorMatrixImage(*image,order,matrix);
-            MagickFreeMemory(matrix);
-            continue;
+            break;
           }
-        if (LocaleCompare("red-primary",option+1) == 0)
+        case 'p':
           {
-            /*
-              Red chromaticity primary point.
-            */
-            if (*option == '+')
+            if (LocaleCompare("page",option+1) == 0)
               {
-                (*image)->chromaticity.red_primary.x=0.0;
-                (*image)->chromaticity.red_primary.y=0.0;
-                continue;
-              }
-            (void) sscanf(argv[++i],"%lf%*[,/]%lf",
-              &(*image)->chromaticity.red_primary.x,
-              &(*image)->chromaticity.red_primary.y);
-            continue;
-          }
-        if (LocaleCompare("region",option+1) == 0)
-          {
-            Image
-              *crop_image;
+                if (option[0] == '+')
+                  {
+                    (*image)->page.width=0U;
+                    (*image)->page.height=0U;
+                    (*image)->page.x=0;
+                    (*image)->page.y=0;
+                  }
+                else
+                  {
+                    char
+                      *geometry_str;
 
-            if (region_image != (Image *) NULL)
+                    geometry_str=GetPageGeometry(argv[++i]);
+                    (void) GetGeometry(geometry_str,&(*image)->page.x,&(*image)->page.y,
+                                       &(*image)->page.width,&(*image)->page.height);
+                    MagickFreeMemory(geometry_str);
+                  }
+              }
+            if (LocaleCompare("paint",option+1) == 0)
               {
+                double
+                  radius;
+
+                Image
+                  *paint_image;
+
                 /*
-                  Composite region.
+                  Oil paint image.
                 */
-                (void) CompositeImage(region_image,(*image)->matte ?
-                  OverCompositeOp : CopyCompositeOp,*image,region_geometry.x,
-                  region_geometry.y);
+                radius=MagickAtoF(argv[++i]);
+                paint_image=OilPaintImage(*image,radius,&(*image)->exception);
+                if (paint_image == (Image *) NULL)
+                  break;
                 DestroyImage(*image);
-                *image=region_image;
-                region_image=(Image *) NULL;
-              }
-            if (*option == '+')
-              continue;
-            /*
-              Apply transformations to a selected region of the image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&region_geometry);
-            crop_image=CropImage(*image,&region_geometry,&(*image)->exception);
-            if (crop_image == (Image *) NULL)
-              break;
-            region_image=(*image);
-            *image=crop_image;
-            continue;
-          }
-        if (LocaleCompare("render",option+1) == 0)
-          {
-            draw_info->render=(*option == '+');
-            continue;
-          }
-        if (LocaleCompare("repage",option+1) == 0)
-          {
-            if (*option == '+')
-              {
-                /* Reset page to defaults */
-                (*image)->page.width=0U;
-                (*image)->page.height=0U;
-                (*image)->page.x=0;
-                (*image)->page.y=0;
-              }
-            else
-              {
-                /* Adjust page offsets */
-                (void) ResetImagePage(*image,argv[++i]);
-              }
-            continue;
-          }
-        if (LocaleCompare("resample",option+1) == 0)
-          {
-            Image
-              *resample_image;
-
-            char
-              resample_density[MaxTextExtent];
-
-            double
-              x_resolution,
-              y_resolution;
-
-            unsigned long
-              resample_height,
-              resample_width;
-
-            /*
-              Verify that image contains useful resolution information.
-            */
-            if ( ((*image)->x_resolution == 0) || ((*image)->y_resolution == 0) )
-              {
-                ThrowException(&(*image)->exception,ImageError,
-                               ImageDoesNotContainResolution,image_info->filename);
+                *image=paint_image;
                 continue;
               }
-
-            /*
-              Obtain target resolution.
-            */
-            {
-              unsigned long
-                x_integral_resolution=0,
-                y_integral_resolution=0;
-
-              long
-                x,
-                y;
-
-              int
-                flags;
-
-              flags=GetGeometry(argv[++i],&x,&y,&x_integral_resolution,&y_integral_resolution);
-              if (!(flags & HeightValue))
-                y_integral_resolution=x_integral_resolution;
-              FormatString(resample_density,"%lux%lu",x_integral_resolution,y_integral_resolution);
-              x_resolution=x_integral_resolution;
-              y_resolution=y_integral_resolution;
-            }
-
-            resample_width=(unsigned long)
-              ((*image)->columns*(x_resolution/(*image)->x_resolution)+0.5);
-            if (resample_width < 1)
-              resample_width = 1;
-            resample_height=(unsigned long)
-              ((*image)->rows*(y_resolution/(*image)->y_resolution)+0.5);
-            if (resample_height < 1)
-              resample_height = 1;
-
-            (void) CloneString(&clone_info->density,resample_density);
-            (void) CloneString(&draw_info->density,resample_density);
-            (*image)->x_resolution=x_resolution;
-            (*image)->y_resolution=y_resolution;
-            if ((((*image)->columns == resample_width)) && ((*image)->rows == resample_height))
-              break;
-
-            /*
-              Resample image.
-            */
-            resample_image=ResizeImage(*image,resample_width,resample_height,(*image)->filter,
-                                       (*image)->blur,&(*image)->exception);
-            if (resample_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=resample_image;
-            continue;
-          }
-        if (LocaleCompare("resize",option+1) == 0)
-          {
-            Image
-              *resize_image;
-
-            /*
-              Resize image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
-            if ((geometry.width == (*image)->columns) &&
-                (geometry.height == (*image)->rows))
-              break;
-            resize_image=ResizeImage(*image,geometry.width,geometry.height,
-              (*image)->filter,(*image)->blur,&(*image)->exception);
-            if (resize_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=resize_image;
-            continue;
-          }
-        if (LocaleCompare("roll",option+1) == 0)
-          {
-            Image
-              *roll_image;
-
-            /*
-              Roll image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            roll_image=RollImage(*image,geometry.x,geometry.y,
-              &(*image)->exception);
-            if (roll_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=roll_image;
-            continue;
-          }
-        if (LocaleCompare("rotate",option+1) == 0)
-          {
-            double
-              degrees;
-
-            Image
-              *rotate_image;
-
-            /*
-              Check for conditional image rotation.
-            */
-            i++;
-            if (strchr(argv[i],'>') != (char *) NULL)
-              if ((*image)->columns <= (*image)->rows)
-                break;
-            if (strchr(argv[i],'<') != (char *) NULL)
-              if ((*image)->columns >= (*image)->rows)
-                break;
-            /*
-              Rotate image.
-            */
-            degrees=MagickAtoF(argv[i]);
-            rotate_image=RotateImage(*image,degrees,&(*image)->exception);
-            if (rotate_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=rotate_image;
-            continue;
-          }
-        break;
-      }
-      case 's':
-      {
-        if (LocaleCompare("sample",option+1) == 0)
-          {
-            Image
-              *sample_image;
-
-            /*
-              Sample image with pixel replication.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
-            if ((geometry.width == (*image)->columns) &&
-                (geometry.height == (*image)->rows))
-              break;
-            sample_image=SampleImage(*image,geometry.width,geometry.height,
-              &(*image)->exception);
-            if (sample_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=sample_image;
-            continue;
-          }
-        if (LocaleCompare("sampling_factor",option+1) == 0)
-          {
-            /*
-              Set image sampling factor.
-            */
-            (void) CloneString(&clone_info->sampling_factor,argv[++i]);
-            NormalizeSamplingFactor(clone_info);
-            continue;
-          }
-        if (LocaleCompare("scale",option+1) == 0)
-          {
-            Image
-              *scale_image;
-
-            /*
-              Resize image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
-            if ((geometry.width == (*image)->columns) &&
-                (geometry.height == (*image)->rows))
-              break;
-            scale_image=ScaleImage(*image,geometry.width,geometry.height,
-              &(*image)->exception);
-            if (scale_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=scale_image;
-            continue;
-          }
-        if (LocaleCompare("scene",option+1) == 0)
-          {
-            (*image)->scene=MagickAtoL(argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("set",option+1) == 0)
-          {
-            const char
-              *key,
-              *value;
-
-            if (i+1 > argc)
+            if (LocaleCompare("pen",option+1) == 0)
               {
-                ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
-                break;
+                status &= QueryColorDatabase(argv[++i],&draw_info->fill,
+                                             &(*image)->exception);
+                continue;
               }
-            key=argv[++i];
-            (void) SetImageAttribute(*image,key,(char *) NULL);
-            if (*option == '-')
+            if (LocaleCompare("pointsize",option+1) == 0)
               {
+                clone_info->pointsize=MagickAtoF(argv[++i]);
+                draw_info->pointsize=clone_info->pointsize;
+                continue;
+              }
+            if (LocaleCompare("profile",option+1) == 0)
+              {
+                void
+                  *client_data;
+
+                if (*option == '+')
+                  {
+                    /*
+                      Remove a ICM, IPTC, or generic profile from the image.
+                    */
+                    status &= ProfileImage(*image,argv[++i],
+                                           (unsigned char *) NULL,0,MagickTrue);
+                    continue;
+                  }
+                else if (*option == '-')
+                  {
+                    /*
+                      Add a ICM, IPTC, or generic profile to the image.
+                    */
+
+                    Image
+                      *profile_image;
+
+                    ProfileInfo
+                      profile_info;
+
+                    const char
+                      *profile_name;
+
+                    size_t
+                      profile_length;
+
+                    const unsigned char *
+                      profile_data;
+
+                    ImageProfileIterator
+                      profile_iterator;
+
+                    client_data=clone_info->client_data;
+
+                    /*
+                      FIXME: Next three lines replace:
+                      clone_info->client_data=(void *) &(*image)->iptc_profile;
+                    */
+                    profile_info.name=AcquireString("IPTC"); /* FIXME: Is this okay? */
+                    profile_info.info=
+                      (unsigned char *) GetImageProfile(*image,profile_info.name,
+                                                        &profile_info.length);
+                    clone_info->client_data=&profile_info; /* used to pass profile to meta.c */
+
+                    (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+                    profile_image=ReadImage(clone_info,&(*image)->exception);
+                    MagickFreeMemory(profile_info.name);
+                    if (profile_image == (Image *) NULL)
+                      {
+                        (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                              "Failed to load profile from file \"%s\"",
+                                              clone_info->filename);
+                        continue;
+                      }
+                    /*
+                      Transfer profile(s) to image.
+                    */
+                    profile_iterator=AllocateImageProfileIterator(profile_image);
+                    while(NextImageProfile(profile_iterator,&profile_name,&profile_data,
+                                           &profile_length) != MagickFail)
+                      {
+                        size_t
+                          existing_length;
+
+                        if (((LocaleCompare(profile_name,"ICC") == 0) ||
+                             (LocaleCompare(profile_name,"ICM") == 0)) &&
+                            (GetImageProfile(*image,"ICM",&existing_length)))
+                          {
+                            (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                                  "Transform using %s profile \"%s\","
+                                                  " %lu bytes",
+                                                  profile_name,clone_info->filename,
+                                                  (unsigned long) profile_length);
+                            status &= ProfileImage(*image,profile_name,
+                                                   (unsigned char *) profile_data,
+                                                   profile_length,MagickTrue);
+                          }
+                        else
+                          {
+                            (void) LogMagickEvent(TransformEvent,GetMagickModule(),
+                                                  "Adding %s profile \"%s\","
+                                                  " %lu bytes",
+                                                  profile_name,clone_info->filename,
+                                                  (unsigned long) profile_length);
+                            status &= SetImageProfile(*image,profile_name,profile_data,profile_length);
+                          }
+                      }
+                    DeallocateImageProfileIterator(profile_iterator);
+                    DestroyImage(profile_image);
+                    profile_image=(Image *) NULL;
+                    clone_info->client_data=client_data;
+                  }
+                continue;
+              }
+            break;
+          }
+        case 'q':
+          {
+            if (LocaleCompare("quality",option+1) == 0)
+              {
+                /*
+                  Set image compression quality.
+                */
+                clone_info->quality=MagickAtoL(argv[++i]);
+                continue;
+              }
+            break;
+          }
+        case 'r':
+          {
+            if (LocaleCompare("raise",option+1) == 0)
+              {
+                /*
+                  Surround image with a raise of solid color.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                status &= RaiseImage(*image,&geometry,*option == '-');
+                continue;
+              }
+            if (LocaleCompare("random-threshold",option+1) == 0)
+              {
+                /*
+                  Threshold image.
+                */
+                if (i+2 > argc)
+                  {
+                    ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
+                    break;
+                  }
+                status &= RandomChannelThresholdImage(*image,argv[i+1],argv[i+2],
+                                                      &(*image)->exception);
+                i+=2;
+                continue;
+              }
+            if (LocaleCompare("recolor",option+1) == 0)
+              {
+                char
+                  *p,
+                  token[MaxTextExtent];
+
+                double
+                  *matrix;
+
+                register long
+                  x;
+
+                unsigned int
+                  elements,
+                  order;
+
+                /*
+                  Color matrix image.
+                */
+                p=argv[++i];
+                for (elements=0; *p != '\0'; elements++)
+                  {
+                    MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                    if (token[0] == ',')
+                      MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                  }
+                order=(unsigned int) sqrt(elements);
+                if ((0 == elements) || (order*order != elements))
+                  {
+                    char
+                      message[MaxTextExtent];
+
+                    MagickFormatString(message,sizeof(message),"%u",elements);
+                    ThrowException(&(*image)->exception,OptionError,MatrixIsNotSquare,message);
+                    continue;
+                  }
+                matrix=MagickAllocateArray(double *,MagickArraySize(order,order),sizeof(double));
+                if (matrix == (double *) NULL)
+                  MagickFatalError(ResourceLimitFatalError,MemoryAllocationFailed,
+                                   MagickMsg(ResourceLimitError,UnableToAllocateCoefficients));
+                p=argv[i];
+                for (x=0; *p != '\0'; x++)
+                  {
+                    MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == ',')
+                      MagickGetToken(p,&p,token,MaxTextExtent);
+                    if (token[0] == '\0')
+                      break;
+                    matrix[x]=MagickAtoF(token);
+                  }
+                for ( ; x < (long) (order*order); x++)
+                  matrix[x]=0.0;
+                status &= ColorMatrixImage(*image,order,matrix);
+                MagickFreeMemory(matrix);
+                continue;
+              }
+            if (LocaleCompare("red-primary",option+1) == 0)
+              {
+                /*
+                  Red chromaticity primary point.
+                */
+                if (*option == '+')
+                  {
+                    (*image)->chromaticity.red_primary.x=0.0;
+                    (*image)->chromaticity.red_primary.y=0.0;
+                    continue;
+                  }
+                (void) sscanf(argv[++i],"%lf%*[,/]%lf",
+                              &(*image)->chromaticity.red_primary.x,
+                              &(*image)->chromaticity.red_primary.y);
+                continue;
+              }
+            if (LocaleCompare("region",option+1) == 0)
+              {
+                Image
+                  *crop_image;
+
+                if (region_image != (Image *) NULL)
+                  {
+                    /*
+                      Composite region.
+                    */
+                    status &= CompositeImage(region_image,(*image)->matte ?
+                                             OverCompositeOp : CopyCompositeOp,*image,region_geometry.x,
+                                             region_geometry.y);
+                    DestroyImage(*image);
+                    *image=region_image;
+                    region_image=(Image *) NULL;
+                  }
+                if (*option == '+')
+                  continue;
+                /*
+                  Apply transformations to a selected region of the image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&region_geometry);
+                crop_image=CropImage(*image,&region_geometry,&(*image)->exception);
+                if (crop_image == (Image *) NULL)
+                  break;
+                region_image=(*image);
+                *image=crop_image;
+                continue;
+              }
+            if (LocaleCompare("remap",option+1) == 0)
+              {
+                /*
+                  Transform image colors to match this set of colors.
+                */
+                if (*option == '+')
+                  continue;
+                (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+                {
+                  Image
+                    *map_image;
+
+                  if ((map_image=ReadImage(clone_info,&(*image)->exception)) !=
+                      (Image *) NULL)
+                    {
+                      status &= MapImage(*image,map_image,quantize_info.dither);
+                      DestroyImage(map_image);
+                    }
+                }
+                continue;
+              }
+            if (LocaleCompare("render",option+1) == 0)
+              {
+                draw_info->render=(*option == '+');
+                continue;
+              }
+            if (LocaleCompare("repage",option+1) == 0)
+              {
+                if (*option == '+')
+                  {
+                    /* Reset page to defaults */
+                    (*image)->page.width=0U;
+                    (*image)->page.height=0U;
+                    (*image)->page.x=0;
+                    (*image)->page.y=0;
+                  }
+                else
+                  {
+                    /* Adjust page offsets */
+                    status &= ResetImagePage(*image,argv[++i]);
+                  }
+                continue;
+              }
+            if (LocaleCompare("resample",option+1) == 0)
+              {
+                Image
+                  *resample_image;
+
+                char
+                  resample_density[MaxTextExtent];
+
+                double
+                  x_resolution,
+                  y_resolution;
+
+                unsigned long
+                  resample_height,
+                  resample_width;
+
+                /*
+                  Verify that image contains useful resolution information.
+                */
+                if ( ((*image)->x_resolution == 0) || ((*image)->y_resolution == 0) )
+                  {
+                    ThrowException(&(*image)->exception,ImageError,
+                                   ImageDoesNotContainResolution,image_info->filename);
+                    continue;
+                  }
+
+                /*
+                  Obtain target resolution.
+                */
+                {
+                  unsigned long
+                    x_integral_resolution=0,
+                    y_integral_resolution=0;
+
+                  long
+                    x,
+                    y;
+
+                  int
+                    flags;
+
+                  flags=GetGeometry(argv[++i],&x,&y,&x_integral_resolution,&y_integral_resolution);
+                  if (!(flags & HeightValue))
+                    y_integral_resolution=x_integral_resolution;
+                  MagickFormatString(resample_density,sizeof(resample_density),"%lux%lu",x_integral_resolution,y_integral_resolution);
+                  x_resolution=x_integral_resolution;
+                  y_resolution=y_integral_resolution;
+                }
+
+                resample_width=(unsigned long)
+                  ((*image)->columns*(x_resolution/(*image)->x_resolution)+0.5);
+                if (resample_width < 1)
+                  resample_width = 1;
+                resample_height=(unsigned long)
+                  ((*image)->rows*(y_resolution/(*image)->y_resolution)+0.5);
+                if (resample_height < 1)
+                  resample_height = 1;
+
+                status &= CloneString(&clone_info->density,resample_density);
+                status &= CloneString(&draw_info->density,resample_density);
+                (*image)->x_resolution=x_resolution;
+                (*image)->y_resolution=y_resolution;
+                if ((((*image)->columns == resample_width)) && ((*image)->rows == resample_height))
+                  break;
+
+                /*
+                  Resample image.
+                */
+                resample_image=ResizeImage(*image,resample_width,resample_height,(*image)->filter,
+                                           (*image)->blur,&(*image)->exception);
+                if (resample_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=resample_image;
+                continue;
+              }
+            if (LocaleCompare("resize",option+1) == 0)
+              {
+                Image
+                  *resize_image;
+
+                /*
+                  Resize image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
+                if ((geometry.width == (*image)->columns) &&
+                    (geometry.height == (*image)->rows))
+                  break;
+                resize_image=ResizeImage(*image,geometry.width,geometry.height,
+                                         (*image)->filter,(*image)->blur,&(*image)->exception);
+                if (resize_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=resize_image;
+                continue;
+              }
+            if (LocaleCompare("roll",option+1) == 0)
+              {
+                Image
+                  *roll_image;
+
+                /*
+                  Roll image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                roll_image=RollImage(*image,geometry.x,geometry.y,
+                                     &(*image)->exception);
+                if (roll_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=roll_image;
+                continue;
+              }
+            if (LocaleCompare("rotate",option+1) == 0)
+              {
+                double
+                  degrees;
+
+                Image
+                  *rotate_image;
+
+                /*
+                  Check for conditional image rotation.
+                */
+                i++;
+                if (strchr(argv[i],'>') != (char *) NULL)
+                  if ((*image)->columns <= (*image)->rows)
+                    break;
+                if (strchr(argv[i],'<') != (char *) NULL)
+                  if ((*image)->columns >= (*image)->rows)
+                    break;
+                /*
+                  Rotate image.
+                */
+                degrees=MagickAtoF(argv[i]);
+                rotate_image=RotateImage(*image,degrees,&(*image)->exception);
+                if (rotate_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=rotate_image;
+                continue;
+              }
+            break;
+          }
+        case 's':
+          {
+            if (LocaleCompare("sample",option+1) == 0)
+              {
+                Image
+                  *sample_image;
+
+                /*
+                  Sample image with pixel replication.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
+                if ((geometry.width == (*image)->columns) &&
+                    (geometry.height == (*image)->rows))
+                  break;
+                sample_image=SampleImage(*image,geometry.width,geometry.height,
+                                         &(*image)->exception);
+                if (sample_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=sample_image;
+                continue;
+              }
+            if (LocaleCompare("sampling_factor",option+1) == 0)
+              {
+                /*
+                  Set image sampling factor.
+                */
+                status &= CloneString(&clone_info->sampling_factor,argv[++i]);
+                NormalizeSamplingFactor(clone_info);
+                continue;
+              }
+            if (LocaleCompare("scale",option+1) == 0)
+              {
+                Image
+                  *scale_image;
+
+                /*
+                  Resize image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
+                if ((geometry.width == (*image)->columns) &&
+                    (geometry.height == (*image)->rows))
+                  break;
+                scale_image=ScaleImage(*image,geometry.width,geometry.height,
+                                       &(*image)->exception);
+                if (scale_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=scale_image;
+                continue;
+              }
+            if (LocaleCompare("scene",option+1) == 0)
+              {
+                (*image)->scene=MagickAtoL(argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("set",option+1) == 0)
+              {
+                const char
+                  *key,
+                  *value;
+
                 if (i+1 > argc)
                   {
                     ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
                     break;
                   }
-                value=argv[++i];
-                (void) SetImageAttribute(*image,key,value);
-              }
-            continue;
-          }
-        if (LocaleCompare("segment",option+1) == 0)
-          {
-            double
-              cluster_threshold,
-              smoothing_threshold;
-
-            /*
-              Segment image.
-            */
-            cluster_threshold=1.0;
-            smoothing_threshold=1.5;
-            (void) GetMagickDimension(argv[++i],&cluster_threshold,
-                                      &smoothing_threshold,NULL,NULL);
-            (void) SegmentImage(*image,quantize_info.colorspace,
-              clone_info->verbose,cluster_threshold,smoothing_threshold);
-            continue;
-          }
-        if (LocaleCompare("shade",option+1) == 0)
-          {
-            double
-              azimuth,
-              elevation;
-
-            Image
-              *shade_image;
-
-            /*
-              Shade image.
-            */
-            azimuth=30.0;
-            elevation=30.0;
-            (void) GetMagickDimension(argv[++i],&azimuth,&elevation,NULL,NULL);
-            shade_image=ShadeImage(*image,*option == '-',azimuth,elevation,
-              &(*image)->exception);
-            if (shade_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=shade_image;
-            continue;
-          }
-        if (LocaleCompare("sharpen",option+1) == 0)
-          {
-            double
-              radius,
-              sigma;
-
-            Image
-              *sharp_image;
-
-            /*
-              Gaussian sharpen image.
-            */
-            radius=0.0;
-            sigma=1.0;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
-            sharp_image=SharpenImage(*image,radius,sigma,&(*image)->exception);
-            if (sharp_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=sharp_image;
-            continue;
-          }
-        if (LocaleCompare("shave",option+1) == 0)
-          {
-            Image
-              *shave_image;
-
-            /*
-              Shave the image edges.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
-            shave_image=ShaveImage(*image,&geometry,&(*image)->exception);
-            if (shave_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=shave_image;
-            continue;
-          }
-        if (LocaleCompare("shear",option+1) == 0)
-          {
-            double
-              x_shear,
-              y_shear;
-
-            Image
-              *shear_image;
-
-            /*
-              Shear image.
-            */
-            x_shear=0.0;
-            y_shear=0.0;
-            (void) GetMagickDimension(argv[++i],&x_shear,&y_shear,NULL,NULL);
-            shear_image=ShearImage(*image,x_shear,y_shear,&(*image)->exception);
-            if (shear_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=shear_image;
-            continue;
-          }
-        if (LocaleCompare("solarize",option+1) == 0)
-          {
-            double
-              threshold;
-
-            threshold=StringToDouble(argv[++i],MaxRGB);
-            (void) SolarizeImage(*image,threshold);
-            continue;
-          }
-        if (LocaleCompare("spread",option+1) == 0)
-          {
-            unsigned int
-              amount;
-
-            Image
-              *spread_image;
-
-            /*
-              Spread an image.
-            */
-            amount=MagickAtoI(argv[++i]);
-            spread_image=SpreadImage(*image,amount,&(*image)->exception);
-            if (spread_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=spread_image;
-            continue;
-          }
-        if (LocaleCompare("strip",option+1) == 0)
-          {
-            (void) StripImage(*image);
-            continue;
-          }
-        if (LocaleCompare("stroke",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&draw_info->stroke,
-              &(*image)->exception);
-            continue;
-          }
-        if (LocaleCompare("strokewidth",option+1) == 0)
-          {
-            draw_info->stroke_width=MagickAtoF(argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("swirl",option+1) == 0)
-          {
-            double
-              degrees;
-
-            Image
-              *swirl_image;
-
-            /*
-              Swirl image.
-            */
-            degrees=MagickAtoF(argv[++i]);
-            swirl_image=SwirlImage(*image,degrees,&(*image)->exception);
-            if (swirl_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=swirl_image;
-            continue;
-          }
-        break;
-      }
-      case 't':
-      {
-        if (LocaleCompare("threshold",option+1) == 0)
-          {
-            /*
-              Threshold image.
-            */
-            double
-              threshold;
-
-            ++i;
-            count=sscanf(argv[i],"%lf",&threshold);
-            if (count > 0)
-              {
-                if (strchr(argv[i],'%') != (char *) NULL)
-                  threshold *=  MaxRGB/100.0;
-                (void) ThresholdImage(*image,threshold);
-              }
-            continue;
-          }
-        if (LocaleCompare("thumbnail",option+1) == 0)
-          {
-            Image
-              *resize_image;
-
-            /*
-              Resize image.
-            */
-            (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
-            if ((geometry.width == (*image)->columns) &&
-                (geometry.height == (*image)->rows))
-              break;
-            resize_image=ThumbnailImage(*image,geometry.width,geometry.height,
-              &(*image)->exception);
-            if (resize_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=resize_image;
-            continue;
-          }
-        if (LocaleCompare("tile",option+1) == 0)
-          {
-            Image
-              *fill_pattern;
-
-            (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
-            fill_pattern=ReadImage(clone_info,&(*image)->exception);
-            if (fill_pattern == (Image *) NULL)
-              continue;
-            draw_info->fill_pattern=
-              CloneImage(fill_pattern,0,0,MagickTrue,&(*image)->exception);
-            DestroyImage(fill_pattern);
-            fill_pattern=(Image *) NULL;
-            continue;
-          }
-        if (LocaleCompare("transform",option+1) == 0)
-          {
-            Image
-              *transform_image;
-
-            /*
-              Affine transform image.
-            */
-            transform_image=AffineTransformImage(*image,&draw_info->affine,
-              &(*image)->exception);
-            if (transform_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=transform_image;
-            continue;
-          }
-        if (LocaleCompare("transparent",option+1) == 0)
-          {
-            PixelPacket
-              target;
-
-            (void) AcquireOnePixelByReference(*image,&target,0,0,&(*image)->exception);
-            (void) QueryColorDatabase(argv[++i],&target,&(*image)->exception);
-            (void) TransparentImage(*image,target,TransparentOpacity);
-            continue;
-          }
-        if (LocaleCompare("treedepth",option+1) == 0)
-          {
-            quantize_info.tree_depth=MagickAtoI(argv[++i]);
-            continue;
-          }
-        if (LocaleCompare("trim",option+1) == 0)
-          {
-            /* SourceForge issue #653 Trim requires NorthWestGravity */
-            (*image)->gravity=NorthWestGravity;
-            TransformImage(image,"0x0",(char *) NULL);
-            continue;
-          }
-        if (LocaleCompare("type",option+1) == 0)
-          {
-            ImageType
-              image_type;
-
-            option=argv[++i];
-            image_type=StringToImageType(option);
-            (*image)->dither=image_info->dither;
-            if (UndefinedType != image_type)
-              (void) SetImageType(*image,image_type);
-            continue;
-          }
-        break;
-      }
-      case 'u':
-      {
-        if (LocaleCompare("undercolor",option+1) == 0)
-          {
-            (void) QueryColorDatabase(argv[++i],&draw_info->undercolor,
-              &(*image)->exception);
-            continue;
-          }
-        if (LocaleCompare("units",option+1) == 0)
-          {
-            ResolutionType
-              resolution_type = UndefinedResolution;
-
-            if (*option == '+')
-              {
-              }
-            else if (*option == '-')
-              {
-                option=argv[++i];
-                if (LocaleCompare("PixelsPerInch",option) == 0)
-                  resolution_type=PixelsPerInchResolution;
-                else if (LocaleCompare("PixelsPerCentimeter",option) == 0)
-                  resolution_type=PixelsPerCentimeterResolution;
-                else
+                key=argv[++i];
+                (void) SetImageAttribute(*image,key,(char *) NULL);
+                if (*option == '-')
                   {
-                    ThrowException(&(*image)->exception,OptionError,
-                                   UnrecognizedUnitsType,option);
-                    continue;
+                    if (i+1 > argc)
+                      {
+                        ThrowException(&(*image)->exception,OptionError,MissingArgument,option+1);
+                        break;
+                      }
+                    value=argv[++i];
+                    (void) SetImageAttribute(*image,key,value);
                   }
+                continue;
+              }
+            if (LocaleCompare("segment",option+1) == 0)
+              {
+                double
+                  cluster_threshold,
+                  smoothing_threshold;
 
                 /*
-                  Adjust resolution values if necessary.
+                  Segment image.
                 */
-                if ( (resolution_type == PixelsPerInchResolution) &&
-                     ((*image)->units == PixelsPerCentimeterResolution) )
-                  {
-                    (*image)->x_resolution *= 2.54;
-                    (*image)->y_resolution *= 2.54;
-                  }
-                else if ( (resolution_type == PixelsPerCentimeterResolution) &&
-                          ((*image)->units == PixelsPerInchResolution) )
-                  {
-                    (*image)->x_resolution /= 2.54;
-                    (*image)->y_resolution /= 2.54;
-                  }
-              }
-
-            (*image)->units=resolution_type;
-            continue;
-          }
-        if (LocaleCompare("unsharp",option+1) == 0)
-          {
-            double
-              amount,
-              radius,
-              sigma,
-              threshold;
-
-            Image
-              *unsharp_image;
-
-            /*
-              Gaussian unsharpen image.
-            */
-            amount=1.0;
-            radius=0.0;
-            sigma=1.0;
-            threshold=0.05;
-            (void) GetMagickDimension(argv[++i],&radius,&sigma,&amount,&threshold);
-            unsharp_image=UnsharpMaskImage(*image,radius,sigma,amount,threshold,
-              &(*image)->exception);
-            if (unsharp_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=unsharp_image;
-            continue;
-          }
-        break;
-      }
-      case 'v':
-      {
-        if (LocaleCompare("verbose",option+1) == 0)
-          {
-            clone_info->verbose+=(*option == '-');
-            quantize_info.measure_error=(*option == '-');
-            continue;
-          }
-        if (LocaleCompare("virtual-pixel",option+1) == 0)
-          {
-            VirtualPixelMethod
-              virtual_pixel_method;
-
-            if (*option == '+')
-              {
-                (void) SetImageVirtualPixelMethod(*image,UndefinedVirtualPixelMethod);
+                cluster_threshold=1.0;
+                smoothing_threshold=1.5;
+                (void) GetMagickDimension(argv[++i],&cluster_threshold,
+                                          &smoothing_threshold,NULL,NULL);
+                status &= SegmentImage(*image,quantize_info.colorspace,
+                                       clone_info->verbose,cluster_threshold,smoothing_threshold);
                 continue;
               }
-            option=argv[++i];
-            virtual_pixel_method=StringToVirtualPixelMethod(option);
-            (void) SetImageVirtualPixelMethod(*image,virtual_pixel_method);
-            continue;
-          }
-        break;
-      }
-      case 'w':
-      {
-        if (LocaleCompare("wave",option+1) == 0)
-          {
-            double
-              amplitude,
-              wavelength;
-
-            Image
-              *wave_image;
-
-            /*
-              Wave image.
-            */
-            amplitude=25.0;
-            wavelength=150.0;
-            (void) GetMagickDimension(argv[++i],&amplitude,&wavelength,NULL,NULL);
-            wave_image=WaveImage(*image,amplitude,wavelength,
-              &(*image)->exception);
-            if (wave_image == (Image *) NULL)
-              break;
-            DestroyImage(*image);
-            *image=wave_image;
-            continue;
-          }
-        if (LocaleCompare("white-point",option+1) == 0)
-          {
-            /*
-              White chromaticity point.
-            */
-            if (*option == '+')
+            if (LocaleCompare("shade",option+1) == 0)
               {
-                (*image)->chromaticity.white_point.x=0.0;
-                (*image)->chromaticity.white_point.y=0.0;
+                double
+                  azimuth,
+                  elevation;
+
+                Image
+                  *shade_image;
+
+                /*
+                  Shade image.
+                */
+                azimuth=30.0;
+                elevation=30.0;
+                (void) GetMagickDimension(argv[++i],&azimuth,&elevation,NULL,NULL);
+                shade_image=ShadeImage(*image,*option == '-',azimuth,elevation,
+                                       &(*image)->exception);
+                if (shade_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=shade_image;
                 continue;
               }
-            (void) sscanf(argv[++i],"%lf%*[,/]%lf",
-              &(*image)->chromaticity.white_point.x,
-              &(*image)->chromaticity.white_point.y);
-            continue;
-          }
-        if (LocaleCompare("white-threshold",option+1) == 0)
-          {
-            /*
-              White threshold image.
-            */
-            ++i;
-            (void) WhiteThresholdImage(*image,argv[i]);
-            continue;
-          }
-        if (LocaleCompare("write",option+1) == 0)
-          {
-            /*
-              Write current image to specified file.
-            */
-            Image
-              *clone_image;
-
-            ++i;
-            clone_image=CloneImage(*image,0,0,MagickTrue,&(*image)->exception);
-            if (clone_image != (Image *) NULL)
+            if (LocaleCompare("sharpen",option+1) == 0)
               {
-                (void) strlcpy(clone_image->filename,argv[i],sizeof(clone_image->filename));
-                (void) WriteImage(clone_info,clone_image);
-                if (clone_info->verbose)
-                  (void) DescribeImage(clone_image,stderr,MagickFalse);
-                DestroyImage(clone_image);
-                clone_image=(Image *) NULL;
+                double
+                  radius,
+                  sigma;
+
+                Image
+                  *sharp_image;
+
+                /*
+                  Gaussian sharpen image.
+                */
+                radius=0.0;
+                sigma=1.0;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,NULL,NULL);
+                sharp_image=SharpenImage(*image,radius,sigma,&(*image)->exception);
+                if (sharp_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=sharp_image;
+                continue;
               }
-            continue;
+            if (LocaleCompare("shave",option+1) == 0)
+              {
+                Image
+                  *shave_image;
+
+                /*
+                  Shave the image edges.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickFalse,&geometry);
+                shave_image=ShaveImage(*image,&geometry,&(*image)->exception);
+                if (shave_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=shave_image;
+                continue;
+              }
+            if (LocaleCompare("shear",option+1) == 0)
+              {
+                double
+                  x_shear,
+                  y_shear;
+
+                Image
+                  *shear_image;
+
+                /*
+                  Shear image.
+                */
+                x_shear=0.0;
+                y_shear=0.0;
+                (void) GetMagickDimension(argv[++i],&x_shear,&y_shear,NULL,NULL);
+                shear_image=ShearImage(*image,x_shear,y_shear,&(*image)->exception);
+                if (shear_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=shear_image;
+                continue;
+              }
+            if (LocaleCompare("solarize",option+1) == 0)
+              {
+                double
+                  threshold;
+
+                threshold=StringToDouble(argv[++i],MaxRGB);
+                (void) SolarizeImage(*image,threshold);
+                continue;
+              }
+            if (LocaleCompare("spread",option+1) == 0)
+              {
+                unsigned int
+                  amount;
+
+                Image
+                  *spread_image;
+
+                /*
+                  Spread an image.
+                */
+                amount=MagickAtoI(argv[++i]);
+                spread_image=SpreadImage(*image,amount,&(*image)->exception);
+                if (spread_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=spread_image;
+                continue;
+              }
+            if (LocaleCompare("strip",option+1) == 0)
+              {
+                status &= StripImage(*image);
+                continue;
+              }
+            if (LocaleCompare("stroke",option+1) == 0)
+              {
+                (void) QueryColorDatabase(argv[++i],&draw_info->stroke,
+                                          &(*image)->exception);
+                continue;
+              }
+            if (LocaleCompare("strokewidth",option+1) == 0)
+              {
+                draw_info->stroke_width=MagickAtoF(argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("swirl",option+1) == 0)
+              {
+                double
+                  degrees;
+
+                Image
+                  *swirl_image;
+
+                /*
+                  Swirl image.
+                */
+                degrees=MagickAtoF(argv[++i]);
+                swirl_image=SwirlImage(*image,degrees,&(*image)->exception);
+                if (swirl_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=swirl_image;
+                continue;
+              }
+            break;
           }
-        break;
-      }
-      case 'Z':
-      {
-        /*
-          Option -Z (used to be "sans") indicates an already handled
-          option (so ignore it).
-        */
-        if (LocaleCompare("Z",option+1) == 0)
-          if (*option == '-')
-            {
-              i++;
-              continue;
-            }
-        break;
-      }
-      default:
-        break;
+        case 't':
+          {
+            if (LocaleCompare("threshold",option+1) == 0)
+              {
+                /*
+                  Threshold image.
+                */
+                double
+                  threshold;
+
+                ++i;
+                count=sscanf(argv[i],"%lf",&threshold);
+                if (count > 0)
+                  {
+                    if (strchr(argv[i],'%') != (char *) NULL)
+                      threshold *=  MaxRGB/100.0;
+                    status &= ThresholdImage(*image,threshold);
+                  }
+                continue;
+              }
+            if (LocaleCompare("thumbnail",option+1) == 0)
+              {
+                Image
+                  *resize_image;
+
+                /*
+                  Resize image.
+                */
+                (void) GetImageGeometry(*image,argv[++i],MagickTrue,&geometry);
+                if ((geometry.width == (*image)->columns) &&
+                    (geometry.height == (*image)->rows))
+                  break;
+                resize_image=ThumbnailImage(*image,geometry.width,geometry.height,
+                                            &(*image)->exception);
+                if (resize_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=resize_image;
+                continue;
+              }
+            if (LocaleCompare("tile",option+1) == 0)
+              {
+                Image
+                  *fill_pattern;
+
+                (void) strlcpy(clone_info->filename,argv[++i],MaxTextExtent);
+                fill_pattern=ReadImage(clone_info,&(*image)->exception);
+                if (fill_pattern == (Image *) NULL)
+                  continue;
+                draw_info->fill_pattern=
+                  CloneImage(fill_pattern,0,0,MagickTrue,&(*image)->exception);
+                DestroyImage(fill_pattern);
+                fill_pattern=(Image *) NULL;
+                continue;
+              }
+            if (LocaleCompare("transform",option+1) == 0)
+              {
+                Image
+                  *transform_image;
+
+                /*
+                  Affine transform image.
+                */
+                transform_image=AffineTransformImage(*image,&draw_info->affine,
+                                                     &(*image)->exception);
+                if (transform_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=transform_image;
+                continue;
+              }
+            if (LocaleCompare("transparent",option+1) == 0)
+              {
+                PixelPacket
+                  target;
+
+                status &= AcquireOnePixelByReference(*image,&target,0,0,&(*image)->exception);
+                status &= QueryColorDatabase(argv[++i],&target,&(*image)->exception);
+                status &= TransparentImage(*image,target,TransparentOpacity);
+                continue;
+              }
+            if (LocaleCompare("treedepth",option+1) == 0)
+              {
+                quantize_info.tree_depth=MagickAtoI(argv[++i]);
+                continue;
+              }
+            if (LocaleCompare("trim",option+1) == 0)
+              {
+                /* SourceForge issue #653 Trim requires NorthWestGravity */
+                (*image)->gravity=NorthWestGravity;
+                status &= TransformImage(image,"0x0",(char *) NULL);
+                continue;
+              }
+            if (LocaleCompare("type",option+1) == 0)
+              {
+                ImageType
+                  image_type;
+
+                option=argv[++i];
+                image_type=StringToImageType(option);
+                (*image)->dither=image_info->dither;
+                if (UndefinedType != image_type)
+                  status &= SetImageType(*image,image_type);
+                continue;
+              }
+            break;
+          }
+        case 'u':
+          {
+            if (LocaleCompare("undercolor",option+1) == 0)
+              {
+                status &= QueryColorDatabase(argv[++i],&draw_info->undercolor,
+                                             &(*image)->exception);
+                continue;
+              }
+            if (LocaleCompare("units",option+1) == 0)
+              {
+                ResolutionType
+                  resolution_type = UndefinedResolution;
+
+                if (*option == '+')
+                  {
+                  }
+                else if (*option == '-')
+                  {
+                    option=argv[++i];
+                    if (LocaleCompare("PixelsPerInch",option) == 0)
+                      resolution_type=PixelsPerInchResolution;
+                    else if (LocaleCompare("PixelsPerCentimeter",option) == 0)
+                      resolution_type=PixelsPerCentimeterResolution;
+                    else
+                      {
+                        ThrowException(&(*image)->exception,OptionError,
+                                       UnrecognizedUnitsType,option);
+                        continue;
+                      }
+
+                    /*
+                      Adjust resolution values if necessary.
+                    */
+                    if ( (resolution_type == PixelsPerInchResolution) &&
+                         ((*image)->units == PixelsPerCentimeterResolution) )
+                      {
+                        (*image)->x_resolution *= 2.54;
+                        (*image)->y_resolution *= 2.54;
+                      }
+                    else if ( (resolution_type == PixelsPerCentimeterResolution) &&
+                              ((*image)->units == PixelsPerInchResolution) )
+                      {
+                        (*image)->x_resolution /= 2.54;
+                        (*image)->y_resolution /= 2.54;
+                      }
+                  }
+
+                (*image)->units=resolution_type;
+                continue;
+              }
+            if (LocaleCompare("unsharp",option+1) == 0)
+              {
+                double
+                  amount,
+                  radius,
+                  sigma,
+                  threshold;
+
+                Image
+                  *unsharp_image;
+
+                /*
+                  Gaussian unsharpen image.
+                */
+                amount=1.0;
+                radius=0.0;
+                sigma=1.0;
+                threshold=0.05;
+                (void) GetMagickDimension(argv[++i],&radius,&sigma,&amount,&threshold);
+                unsharp_image=UnsharpMaskImage(*image,radius,sigma,amount,threshold,
+                                               &(*image)->exception);
+                if (unsharp_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=unsharp_image;
+                continue;
+              }
+            break;
+          }
+        case 'v':
+          {
+            if (LocaleCompare("verbose",option+1) == 0)
+              {
+                clone_info->verbose+=(*option == '-');
+                quantize_info.measure_error=(*option == '-');
+                continue;
+              }
+            if (LocaleCompare("virtual-pixel",option+1) == 0)
+              {
+                VirtualPixelMethod
+                  virtual_pixel_method;
+
+                if (*option == '+')
+                  {
+                    (void) SetImageVirtualPixelMethod(*image,UndefinedVirtualPixelMethod);
+                    continue;
+                  }
+                option=argv[++i];
+                virtual_pixel_method=StringToVirtualPixelMethod(option);
+                status &= SetImageVirtualPixelMethod(*image,virtual_pixel_method);
+                continue;
+              }
+            break;
+          }
+        case 'w':
+          {
+            if (LocaleCompare("wave",option+1) == 0)
+              {
+                double
+                  amplitude,
+                  wavelength;
+
+                Image
+                  *wave_image;
+
+                /*
+                  Wave image.
+                */
+                amplitude=25.0;
+                wavelength=150.0;
+                (void) GetMagickDimension(argv[++i],&amplitude,&wavelength,NULL,NULL);
+                wave_image=WaveImage(*image,amplitude,wavelength,
+                                     &(*image)->exception);
+                if (wave_image == (Image *) NULL)
+                  break;
+                DestroyImage(*image);
+                *image=wave_image;
+                continue;
+              }
+            if (LocaleCompare("white-point",option+1) == 0)
+              {
+                /*
+                  White chromaticity point.
+                */
+                if (*option == '+')
+                  {
+                    (*image)->chromaticity.white_point.x=0.0;
+                    (*image)->chromaticity.white_point.y=0.0;
+                    continue;
+                  }
+                (void) sscanf(argv[++i],"%lf%*[,/]%lf",
+                              &(*image)->chromaticity.white_point.x,
+                              &(*image)->chromaticity.white_point.y);
+                continue;
+              }
+            if (LocaleCompare("white-threshold",option+1) == 0)
+              {
+                /*
+                  White threshold image.
+                */
+                ++i;
+                status &= WhiteThresholdImage(*image,argv[i]);
+                continue;
+              }
+            if (LocaleCompare("write",option+1) == 0)
+              {
+                /*
+                  Write current image to specified file.
+                */
+                Image
+                  *clone_image;
+
+                ++i;
+                clone_image=CloneImage(*image,0,0,MagickTrue,&(*image)->exception);
+                if (clone_image != (Image *) NULL)
+                  {
+                    (void) strlcpy(clone_image->filename,argv[i],sizeof(clone_image->filename));
+                    (void) WriteImage(clone_info,clone_image);
+                    if (clone_info->verbose)
+                      status &= DescribeImage(clone_image,stderr,MagickFalse);
+                    DestroyImage(clone_image);
+                    clone_image=(Image *) NULL;
+                  }
+                continue;
+              }
+            break;
+          }
+        case 'Z':
+          {
+            /*
+              Option -Z (used to be "sans") indicates an already handled
+              option (so ignore it).
+            */
+            if (LocaleCompare("Z",option+1) == 0)
+              if (*option == '-')
+                {
+                  i++;
+                  continue;
+                }
+            break;
+          }
+        default:
+          break;
+        }
     }
-  }
   if ((region_image != (Image *) NULL) && (region_image != *image))
     {
       /*
         Composite transformed region onto image.
       */
       matte=region_image->matte;
-      (void) CompositeImage(region_image,
-        (*image)->matte ? OverCompositeOp : CopyCompositeOp,*image,
-        region_geometry.x,region_geometry.y);
+      status &= CompositeImage(region_image,
+                               (*image)->matte ? OverCompositeOp : CopyCompositeOp,*image,
+                               region_geometry.x,region_geometry.y);
       DestroyImage(*image);
       *image=region_image;
       (*image)->matte=matte;
@@ -11559,9 +11609,9 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
       */
 
       if ( quantize_info.number_colors != 0 )
-        (void) QuantizeImage(&quantize_info,*image);
+        status &= QuantizeImage(&quantize_info,*image);
       else
-        (void) TransformColorspace(*image,quantize_info.colorspace);
+        status &= TransformColorspace(*image,quantize_info.colorspace);
     }
   else
     {
@@ -11576,9 +11626,9 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
         {
           if (((*image)->storage_class == DirectClass) ||
               ((*image)->colors > quantize_info.number_colors))
-            (void) QuantizeImage(&quantize_info,*image);
+            status &= QuantizeImage(&quantize_info,*image);
           else
-            CompressImageColormap(*image);
+            status &= CompressImageColormap(*image);
         }
     }
 #endif
@@ -11588,6 +11638,10 @@ MagickExport MagickPassFail MogrifyImage(const ImageInfo *image_info,
   */
   DestroyDrawInfo(draw_info);
   DestroyImageInfo(clone_info);
+  if ((MagickFail == status) &&
+      (*image)->exception.severity == UndefinedException)
+    (void) LogMagickEvent(ExceptionEvent,GetMagickModule(),
+                          "Error status reported but no thrown exception!");
   return((*image)->exception.severity == UndefinedException);
 }
 
@@ -12140,6 +12194,14 @@ static MagickPassFail* TransmogrifyImage(TransmogrifyOptions *options)
   return (&options->status);
 }
 
+
+/*
+  Given input filename ("foo.bar"), read from filename, cache Image
+  which was read to MPRI store, and replace filename with MPRI:N to
+  retrieve cached image later. Code which used to read file directly
+  will then retreive already decoded image from the persistent image
+  cache via MPRI:N.
+*/
 static MagickPassFail
 LoadAndCacheImageFile(char **filename,long *id,ExceptionInfo *exception)
 {
@@ -12148,7 +12210,7 @@ LoadAndCacheImageFile(char **filename,long *id,ExceptionInfo *exception)
 
   status=MagickFail;
   *id=-1;
-  if (LocaleNCompare(*filename,"MPRI:",5) != 0)
+  if (LocaleNCompare(*filename,"MPRI:",5) != 0) /* Ignore MPRI */
     {
       ImageInfo
         *image_info;
@@ -12169,7 +12231,7 @@ LoadAndCacheImageFile(char **filename,long *id,ExceptionInfo *exception)
                   char
                     mpri[MaxTextExtent];
 
-                  FormatString(mpri,"MPRI:%ld",*id);
+                  MagickFormatString(mpri,sizeof(mpri),"MPRI:%ld",*id);
                   MagickFreeMemory(*filename);
                   *filename=AcquireString(mpri);
                   if (*filename != (char *) NULL)
@@ -13511,6 +13573,24 @@ MagickExport MagickPassFail MogrifyImageCommand(ImageInfo *image_info,
               }
             break;
           }
+        if (LocaleCompare("remap",option+1) == 0)
+          {
+            global_colormap=(*option == '+');
+            if (*option == '-')
+              {
+                i++;
+                if (i == argc)
+                  ThrowMogrifyException(OptionError,MissingArgument,
+                    option);
+
+                /*
+                  Cache argument image.
+                */
+                CacheArgumentImage(&argv[i],image_cache,image_cache_entries,
+                                   exception);
+              }
+            break;
+          }
         if (LocaleCompare("render",option+1) == 0)
           break;
         if (LocaleCompare("repage",option+1) == 0)
@@ -14098,6 +14178,7 @@ static void MogrifyUsage(void)
   (void) puts("  -recolor matrix      apply a color translation matrix to image channels");
   (void) puts("  -red-primary point   chomaticity red primary point");
   (void) puts("  -region geometry     apply options to a portion of the image");
+  (void) puts("  -remap filename      transform image colors to match this set of colors");
   (void) puts("  -render              render vector graphics");
   (void) puts("  +render              disable rendering vector graphics");
   (void) puts("  -resample geometry   resample to horizontal and vertical resolution");
@@ -16756,7 +16837,7 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
   int i;
   for (i = 1; i < argc; i++ )
     {
-      char *option;
+      const char *option;
       char *p = argv[i];
       OptionStatus status = OptionUnknown;
 
@@ -16775,24 +16856,32 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
 
         case 'e':
         case 'E':
-          if (LocaleCompare(option = "-escape", p) == 0)
+          if (LocaleCompare("-escape", p) == 0)
             {
               int index;
+              option = "-escape";
               status = GetOptionValueRestricted(option, escape_option_values, argv[++i], &index);
               if (status == OptionSuccess)
                 options->command_line_parser = index ? ParseWindowsCommandLine : ParseUnixCommandLine;
             }
-          else if (LocaleCompare(option = "-echo", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->is_echo_enabled);
+          else if (LocaleCompare("-echo", p) == 0)
+            {
+              option = "-echo";
+              status = GetOnOffOptionValue(option, argv[++i], &options->is_echo_enabled);
+            }
           break;
 
         case 'f':
         case 'F':
-          if (LocaleCompare(option = "-feedback", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->is_feedback_enabled);
-          else if (LocaleCompare(option = "-fail", p) == 0)
+          if (LocaleCompare("-feedback", p) == 0)
+            {
+              option = "-feedback";
+              status = GetOnOffOptionValue(option, argv[++i], &options->is_feedback_enabled);
+            }
+          else if (LocaleCompare("-fail", p) == 0)
             {
               char *value = NULL;
+              option = "-fail";
               status = GetOptionValue(option, argv[++i], &value);
               if (OptionSuccess == status)
                 strlcpy(options->fail, value, sizeof(options->fail));
@@ -16812,15 +16901,17 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
 
         case 'p':
         case 'P':
-          if (LocaleCompare(option = "-pass", p) == 0)
+          if (LocaleCompare("-pass", p) == 0)
             {
               char *value = NULL;
+              option = "-pass";
               status = GetOptionValue(option, argv[++i], &value);
               if (OptionSuccess == status)
                 strlcpy(options->pass, value, sizeof(options->pass));
             }
-          else if (LocaleCompare(option = "-prompt", p) == 0) {
+          else if (LocaleCompare("-prompt", p) == 0) {
               char *value = NULL;
+              option = "-prompt";
               status = GetOptionValue(option, argv[++i], &value);
               if (OptionSuccess == status)
                 strlcpy(options->prompt,
@@ -16831,12 +16922,18 @@ static int ProcessBatchOptions(int argc, char **argv, BatchOptions *options)
 
         case 's':
         case 'S':
-          if (LocaleCompare(option = "-stop-on-error", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->stop_on_error);
+          if (LocaleCompare("-stop-on-error", p) == 0)
+            {
+              option = "-stop-on-error";
+              status = GetOnOffOptionValue(option, argv[++i], &options->stop_on_error);
+            }
           break;
         case 't':
-          if (LocaleCompare(option = "-tap-mode", p) == 0)
-            status = GetOnOffOptionValue(option, argv[++i], &options->is_tap_mode);
+          if (LocaleCompare("-tap-mode", p) == 0)
+            {
+              option = "-tap-mode";
+              status = GetOnOffOptionValue(option, argv[++i], &options->is_tap_mode);
+            }
           break;
         }
       if (status == OptionSuccess)
@@ -17319,7 +17416,7 @@ static MagickPassFail VersionCommand(ImageInfo *image_info_ignored,
       default: omp_ver = "?"; break;
       }
     supported=MagickTrue;
-    FormatString(text,"%u \"%s\"",(unsigned int) _OPENMP, omp_ver);
+    MagickFormatString(text,sizeof(text),"%u \"%s\"",(unsigned int) _OPENMP, omp_ver);
   }
 #endif /* defined(HAVE_OPENMP) */
   PrintFeatureTextual("OpenMP", supported, text);
@@ -17561,8 +17658,8 @@ static MagickPassFail RegisterCommand(ImageInfo *image_info,
 
       /* set a pointer to this application as the source for our messages */
       memset(szPathName, 0, MaxTextExtent*sizeof(char));
-      FormatString(szPathName,"%.1024s%s%.1024s",
-                   GetClientPath(),DirectorySeparator,GetClientName());
+      MagickFormatString(szPathName,sizeof(szPathName),"%.1024s%s%.1024s",
+                         GetClientPath(),DirectorySeparator,GetClientName());
       RegSetValueEx(hKey, "EventMessageFile", 0, REG_SZ,
                     (const BYTE *) szPathName,
                     ((DWORD) strlen(szPathName) + 1)*sizeof(char));

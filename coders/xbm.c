@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -42,6 +42,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -136,23 +137,23 @@ static int XBMInteger(Image *image,const unsigned int max_digits, short int *hex
   value=0;
   digits=0U;
   for ( digits=0U; digits <= max_digits+1; )
-  {
-    c=ReadBlobByte(image);
-    if (c == EOF)
-      {
-        value=(-1);
+    {
+      c=ReadBlobByte(image);
+      if (c == EOF)
+        {
+          value=(-1);
+          break;
+        }
+      c&=0xff;
+      if (isxdigit(c))
+        {
+          value=(value << 4)+hex_digits[c];
+          digits++;
+          continue;
+        }
+      if ((hex_digits[c]) < 0 && digits)
         break;
-      }
-    c&=0xff;
-    if (isxdigit(c))
-      {
-        value=(value << 4)+hex_digits[c];
-        digits++;
-        continue;
-      }
-    if ((hex_digits[c]) < 0 && digits)
-      break;
-  }
+    }
   /* The '0' in '0x' is currently counted as a digit */
   if (digits > max_digits+1)
     value=(-1);
@@ -229,14 +230,14 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
     if (sscanf(buffer,"#define %s %ld",name,&columns_signed) == 2)
       if ((strlen(name) >= 6) &&
           (LocaleCompare(name+strlen(name)-6,"_width") == 0))
-          break;
+        break;
   while (ReadBlobString(image,buffer) != (char *) NULL)
     if (sscanf(buffer,"#define %s %ld",name,&rows_signed) == 2)
       if ((strlen(name) >= 7) &&
           (LocaleCompare(name+strlen(name)-7,"_height") == 0))
-          break;
+        break;
   if (EOFBlob(image))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+    ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
   if ((columns_signed <= 0) || (rows_signed <= 0))
     ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
   image->columns=(unsigned long) columns_signed;
@@ -249,25 +250,25 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   version=11;
   while (ReadBlobString(image,buffer) != (char *) NULL)
-  {
-    if (sscanf(buffer,"static short %s = {",name) == 1)
-      version=10;
-    else
-      if (sscanf(buffer,"static unsigned char %s = {",name) == 1)
-        version=11;
+    {
+      if (sscanf(buffer,"static short %s = {",name) == 1)
+        version=10;
       else
-        if (sscanf(buffer,"static char %s = {",name) == 1)
+        if (sscanf(buffer,"static unsigned char %s = {",name) == 1)
           version=11;
         else
-          continue;
-    p=(unsigned char *) strrchr(name,'_');
-    if (p == (unsigned char *) NULL)
-      p=(unsigned char *) name;
-    else
-      p++;
-    if (LocaleCompare("bits[]",(char *) p) == 0)
-      break;
-  }
+          if (sscanf(buffer,"static char %s = {",name) == 1)
+            version=11;
+          else
+            continue;
+      p=(unsigned char *) strrchr(name,'_');
+      if (p == (unsigned char *) NULL)
+        p=(unsigned char *) name;
+      else
+        p++;
+      if (LocaleCompare("bits[]",(char *) p) == 0)
+        break;
+    }
   if (EOFBlob(image))
     ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
 
@@ -292,7 +293,7 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       return(image);
     }
   if (CheckImagePixelLimits(image, exception) != MagickPass)
-      ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+    ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   /*
     Allocate temporary storage for X bitmap image
   */
@@ -342,59 +343,59 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
   p=data;
   if (version == 10)
     for (i=0; i < (bytes_per_line*image->rows); (i+=2))
-    {
-      value=XBMInteger(image,4,hex_digits);
-      if (value < 0)
-        {
-          MagickFreeResourceLimitedMemory(data);
-          ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-        }
-      *p++=(unsigned char) value;
-      if (!padding || ((i+2) % bytes_per_line))
-        *p++=(unsigned char) (value >> 8);
-    }
+      {
+        value=XBMInteger(image,4,hex_digits);
+        if (value < 0)
+          {
+            MagickFreeResourceLimitedMemory(unsigned char *,data);
+            ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+          }
+        *p++=(unsigned char) value;
+        if (!padding || ((i+2) % bytes_per_line))
+          *p++=(unsigned char) (value >> 8);
+      }
   else
     for (i=0; i < (bytes_per_line*image->rows); i++)
-    {
-      value=XBMInteger(image,2,hex_digits);
-      if (value < 0)
-        {
-          MagickFreeResourceLimitedMemory(data);
-          ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-        }
-      *p++=(unsigned char) value;
-    }
+      {
+        value=XBMInteger(image,2,hex_digits);
+        if (value < 0)
+          {
+            MagickFreeResourceLimitedMemory(unsigned char *,data);
+            ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+          }
+        *p++=(unsigned char) value;
+      }
   /*
     Convert X bitmap image to pixel packets.
   */
   p=data;
   for (y=0; y < image->rows; y++)
-  {
-    q=SetImagePixels(image,0,y,image->columns,1);
-    if (q == (PixelPacket *) NULL)
-      break;
-    indexes=AccessMutableIndexes(image);
-    bit=0U;
-    byte=0U;
-    for (x=0; x < image->columns; x++)
     {
-      if (bit == 0U)
-        byte=(*p++);
-      indexes[x]=byte & 0x01 ? 0x01 : 0x00;
-      bit++;
-      byte>>=1U;
-      if (bit == 8U)
-        bit=0U;
+      q=SetImagePixels(image,0,y,image->columns,1);
+      if (q == (PixelPacket *) NULL)
+        break;
+      indexes=AccessMutableIndexes(image);
+      bit=0U;
+      byte=0U;
+      for (x=0; x < image->columns; x++)
+        {
+          if (bit == 0U)
+            byte=(*p++);
+          indexes[x]=byte & 0x01 ? 0x01 : 0x00;
+          bit++;
+          byte>>=1U;
+          if (bit == 8U)
+            bit=0U;
+        }
+      if (!SyncImagePixels(image))
+        break;
+      if (QuantumTick(y,image->rows))
+        if (!MagickMonitorFormatted(y,image->rows,exception,
+                                    LoadImageText,image->filename,
+                                    image->columns,image->rows))
+          break;
     }
-    if (!SyncImagePixels(image))
-      break;
-    if (QuantumTick(y,image->rows))
-      if (!MagickMonitorFormatted(y,image->rows,exception,
-                                  LoadImageText,image->filename,
-                                  image->columns,image->rows))
-         break;
-  }
-  MagickFreeResourceLimitedMemory(data);
+  MagickFreeResourceLimitedMemory(unsigned char *,data);
   (void) SyncImage(image);
   CloseBlob(image);
   StopTimer(&image->timer);
@@ -531,23 +532,25 @@ static unsigned int WriteXBMImage(const ImageInfo *image_info,Image *image)
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+  if (SetImageType(image,BilevelType) == MagickFail)
+    ThrowWriterException(CoderError,UnableToSetImageType,image);
   /*
     Write X bitmap header.
   */
   GetPathComponent(image->filename,BasePath,basename);
-  FormatString(buffer,"#define %.1024s_width %lu\n",basename,image->columns);
+  MagickFormatString(buffer,sizeof(buffer),"#define %.1024s_width %lu\n",basename,image->columns);
   (void) WriteBlob(image,strlen(buffer),buffer);
-  FormatString(buffer,"#define %.1024s_height %lu\n",basename,image->rows);
+  MagickFormatString(buffer,sizeof(buffer),"#define %.1024s_height %lu\n",basename,image->rows);
   (void) WriteBlob(image,strlen(buffer),buffer);
-  FormatString(buffer,"static char %.1024s_bits[] = {\n",basename);
+  MagickFormatString(buffer,sizeof(buffer),"static char %.1024s_bits[] = {\n",basename);
   (void) WriteBlob(image,strlen(buffer),buffer);
   (void) strlcpy(buffer," ",sizeof(buffer));
   (void) WriteBlob(image,strlen(buffer),buffer);
   /*
     Convert MIFF to X bitmap pixels.
   */
-  (void) SetImageType(image,BilevelType);
   polarity=(PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2));
   if (image->colors == 2)
     polarity=(PixelIntensityToQuantum(&image->colormap[0]) <
@@ -560,23 +563,43 @@ static unsigned int WriteXBMImage(const ImageInfo *image_info,Image *image)
   (void) strlcpy(buffer," ",sizeof(buffer));
   (void) WriteBlob(image,strlen(buffer),buffer);
   for (y=0; y < (long) image->rows; y++)
-  {
-    p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-    if (p == (const PixelPacket *) NULL)
-      break;
-    indexes=AccessImmutableIndexes(image);
-    for (x=0; x < (long) image->columns; x++)
     {
-      byte>>=1;
-      if (indexes[x] != polarity)
-        byte|=0x80;
-      bit++;
-      if (bit == 8)
+      p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+      if (p == (const PixelPacket *) NULL)
+        break;
+      indexes=AccessImmutableIndexes(image);
+      for (x=0; x < (long) image->columns; x++)
+        {
+          byte>>=1;
+          if (indexes[x] != polarity)
+            byte|=0x80;
+          bit++;
+          if (bit == 8)
+            {
+              /*
+                Write a bitmap byte to the image file.
+              */
+              MagickFormatString(buffer,sizeof(buffer),"0x%02X, ",(unsigned int) (byte & 0xff));
+              (void) WriteBlob(image,strlen(buffer),buffer);
+              count++;
+              if (count == 12)
+                {
+                  (void) strlcpy(buffer,"\n  ",sizeof(buffer));
+                  (void) WriteBlob(image,strlen(buffer),buffer);
+                  count=0;
+                };
+              bit=0;
+              byte=0;
+            }
+          p++;
+        }
+      if (bit != 0)
         {
           /*
             Write a bitmap byte to the image file.
           */
-          FormatString(buffer,"0x%02X, ",(unsigned int) (byte & 0xff));
+          byte>>=(8-bit);
+          MagickFormatString(buffer,sizeof(buffer),"0x%02X, ",(unsigned int) (byte & 0xff));
           (void) WriteBlob(image,strlen(buffer),buffer);
           count++;
           if (count == 12)
@@ -587,33 +610,13 @@ static unsigned int WriteXBMImage(const ImageInfo *image_info,Image *image)
             };
           bit=0;
           byte=0;
-        }
-        p++;
-      }
-    if (bit != 0)
-      {
-        /*
-          Write a bitmap byte to the image file.
-        */
-        byte>>=(8-bit);
-        FormatString(buffer,"0x%02X, ",(unsigned int) (byte & 0xff));
-        (void) WriteBlob(image,strlen(buffer),buffer);
-        count++;
-        if (count == 12)
-          {
-            (void) strlcpy(buffer,"\n  ",sizeof(buffer));
-            (void) WriteBlob(image,strlen(buffer),buffer);
-            count=0;
-          };
-        bit=0;
-        byte=0;
-      };
-    if (QuantumTick(y,image->rows))
-      if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                  SaveImageText,image->filename,
-                                  image->columns,image->rows))
-        break;
-  }
+        };
+      if (QuantumTick(y,image->rows))
+        if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                    SaveImageText,image->filename,
+                                    image->columns,image->rows))
+          break;
+    }
   (void) strlcpy(buffer,"};\n",sizeof(buffer));
   (void) WriteBlob(image,strlen(buffer),buffer);
   status &= CloseBlob(image);

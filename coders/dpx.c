@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2005-2022 GraphicsMagick Group
+% Copyright (C) 2005-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -136,6 +136,7 @@
 #include "magick/resize.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 
 /*
   Define STATIC to nothing so that normally static functions are
@@ -495,7 +496,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U8(member)) \
     { \
-      FormatString(buffer_,"%u",(unsigned int) member); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%u",(unsigned int) member); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -507,7 +508,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U16(member)) \
     { \
-      FormatString(buffer_,"%u",(unsigned int) member); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%u",(unsigned int) member); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -519,7 +520,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U32(member)) \
     { \
-      FormatString(buffer_,"%u",member); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%u",member); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -543,7 +544,7 @@ STATIC unsigned int IsDPX(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_R32(member)) \
     { \
-      FormatString(buffer_,"%g",member.f); \
+      MagickFormatString(buffer_,sizeof(buffer_),"%g",member.f); \
       (void) SetImageAttribute(image,name,buffer_); \
       LogSetImageAttribute(name,buffer_); \
     } \
@@ -751,7 +752,7 @@ STATIC size_t DPXIOOctets(const long current_row, /* 0 based */
 
 }
 #endif
-STATIC const char *DescribeImageElementDescriptor(char *buffer, const DPXImageElementDescriptor descriptor)
+STATIC const char *DescribeImageElementDescriptor(char *buffer, const size_t buffer_size, const DPXImageElementDescriptor descriptor)
 {
   const char *
     description="Unknown";
@@ -829,7 +830,7 @@ STATIC const char *DescribeImageElementDescriptor(char *buffer, const DPXImageEl
       break;
     default:
       {
-        FormatString(buffer,"Unknown (%u)",(unsigned int) descriptor);
+        MagickFormatString(buffer,buffer_size,"Unknown (%u)",(unsigned int) descriptor);
         description=buffer;
       }
     }
@@ -839,7 +840,7 @@ STATIC const char *DescribeImageElementDescriptor(char *buffer, const DPXImageEl
 /*
   Describe the element transfer characteristic.
 */
-STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const DPXTransferCharacteristic characteristic)
+STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const size_t buffer_size, const DPXTransferCharacteristic characteristic)
 {
   const char
     *description=buffer;
@@ -888,7 +889,7 @@ STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const DPXTr
       break;
     default:
       {
-        FormatString(buffer,"Reserved(%u)",(unsigned int) characteristic);
+        MagickFormatString(buffer,buffer_size,"Reserved(%u)",(unsigned int) characteristic);
       }
     }
 
@@ -897,7 +898,7 @@ STATIC const char *DescribeImageTransferCharacteristic(char *buffer, const DPXTr
 /*
   Describe the element colorimetric.
 */
-STATIC const char *DescribeImageColorimetric(char *buffer, const DPXColorimetric colorimetric)
+STATIC const char *DescribeImageColorimetric(char *buffer, const size_t buffer_size, const DPXColorimetric colorimetric)
 {
   const char
     *description=buffer;
@@ -946,7 +947,7 @@ STATIC const char *DescribeImageColorimetric(char *buffer, const DPXColorimetric
       break;
     default:
       {
-        FormatString(buffer,"Reserved(%u)",(unsigned int) colorimetric);
+        MagickFormatString(buffer,buffer_size,"Reserved(%u)",(unsigned int) colorimetric);
       }
     }
 
@@ -977,11 +978,11 @@ STATIC void DescribeDPXImageElement(const DPXImageElement *element_info,
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Element %u: descriptor=%s(%u) transfer_characteristic=%s(%u) colorimetric=%s(%u)",
                         element,
-                        DescribeImageElementDescriptor(txt_buffer,(DPXImageElementDescriptor) element_info->descriptor),
+                        DescribeImageElementDescriptor(txt_buffer,sizeof(txt_buffer),(DPXImageElementDescriptor) element_info->descriptor),
                         (unsigned int) element_info->descriptor,
-                        DescribeImageTransferCharacteristic(txt_buffer,(DPXTransferCharacteristic) element_info->transfer_characteristic),
+                        DescribeImageTransferCharacteristic(txt_buffer,sizeof(txt_buffer),(DPXTransferCharacteristic) element_info->transfer_characteristic),
                         (unsigned int) element_info->transfer_characteristic,
-                        DescribeImageColorimetric(txt_buffer,(DPXColorimetric) element_info->colorimetric),
+                        DescribeImageColorimetric(txt_buffer,sizeof(txt_buffer),(DPXColorimetric) element_info->colorimetric),
                         (unsigned int) element_info->colorimetric);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Element %u: bits-per-sample=%u",
@@ -1546,16 +1547,16 @@ STATIC void TentUpsampleChroma(PixelPacket *pixels, unsigned long columns)
     }
 }
 
-#define ThrowDPXReaderException(code_,reason_,image_) \
-{ \
-  MagickFreeResourceLimitedMemory(map_Y); \
-  MagickFreeResourceLimitedMemory(map_CbCr); \
-  if (samples_set) \
-    DestroyThreadViewDataSet(samples_set);    \
-  if (scanline_set) \
-    DestroyThreadViewDataSet(scanline_set);    \
-  ThrowReaderException(code_,reason_,image_); \
-}
+#define ThrowDPXReaderException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(Quantum *,map_Y);           \
+    MagickFreeResourceLimitedMemory(Quantum *,map_CbCr);        \
+    if (samples_set)                                            \
+      DestroyThreadViewDataSet(samples_set);                    \
+    if (scanline_set)                                           \
+      DestroyThreadViewDataSet(scanline_set);                   \
+    ThrowReaderException(code_,reason_,image_);                 \
+  }
 
 STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
 {
@@ -1719,17 +1720,17 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (IS_UNDEFINED_U32(dpx_file_info.generic_section_length))
         (void) strlcpy(generic_length_str,"UNDEFINED",sizeof(generic_length_str));
       else
-        FormatString(generic_length_str,"%u",dpx_file_info.generic_section_length);
+        MagickFormatString(generic_length_str,sizeof(generic_length_str),"%u",dpx_file_info.generic_section_length);
 
       if (IS_UNDEFINED_U32(dpx_file_info.industry_section_length))
         (void) strlcpy(industry_length_str,"UNDEFINED",sizeof(industry_length_str));
       else
-        FormatString(industry_length_str,"%u",dpx_file_info.industry_section_length);
+        MagickFormatString(industry_length_str,sizeof(industry_length_str),"%u",dpx_file_info.industry_section_length);
 
       if (IS_UNDEFINED_U32(dpx_file_info.user_defined_length))
         (void) strlcpy(user_length_str,"UNDEFINED",sizeof(user_length_str));
       else
-        FormatString(user_length_str,"%u",dpx_file_info.user_defined_length);
+        MagickFormatString(user_length_str,sizeof(user_length_str),"%u",dpx_file_info.user_defined_length);
 
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1885,13 +1886,13 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               new_user_data=MagickReallocateResourceLimitedMemory(unsigned char *,user_data,user_data_length+read_size);
               if (new_user_data == (unsigned char *) NULL)
                 {
-                  MagickFreeResourceLimitedMemory(user_data);
+                  MagickFreeResourceLimitedMemory(unsigned char *,user_data);
                   ThrowDPXReaderException(ResourceLimitError,MemoryAllocationFailed,image);
                 }
               user_data=new_user_data;
               if (ReadBlob(image,read_size,user_data+user_data_length) != read_size)
                 {
-                  MagickFreeResourceLimitedMemory(user_data);
+                  MagickFreeResourceLimitedMemory(unsigned char *,user_data);
                   ThrowDPXReaderException(CorruptImageError,UnexpectedEndOfFile,image);
                 }
               user_data_length += read_size;
@@ -1902,10 +1903,10 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
           StringToAttribute(image,"DPX:user.data.id",dpx_user_data->user_id);
           if (!SetImageProfile(image,"DPXUSERDATA",user_data,user_data_length))
             {
-              MagickFreeResourceLimitedMemory(user_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,user_data);
               ThrowDPXReaderException(ResourceLimitError,MemoryAllocationFailed,image);
             }
-          MagickFreeResourceLimitedMemory(user_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,user_data);
         }
     }
   /*
@@ -2025,6 +2026,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                           "Image width must be evenly divisible"
                                           " by 2 for \"%s\" element",
                                           DescribeImageElementDescriptor(txt_buffer,
+                                                                         sizeof(txt_buffer),
                                                                          element_descriptor));
                   }
                 dpx_image_info.elements=element;
@@ -2084,7 +2086,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                     "Unhandled element descriptor (%u): %s"
                                     " (truncating elements)",
                                     element_descriptor,
-                                    DescribeImageElementDescriptor(txt_buffer,element_descriptor));
+                                    DescribeImageElementDescriptor(txt_buffer,sizeof(txt_buffer),element_descriptor));
               dpx_image_info.elements=element;
               break;
             }
@@ -2670,8 +2672,8 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
               if (thread_status == MagickFail)
                 continue;
 
-              samples=AccessThreadViewData(samples_set);
-              scanline=AccessThreadViewData(scanline_set);
+              samples=(sample_t *) AccessThreadViewData(samples_set);
+              scanline=(unsigned char *) AccessThreadViewData(scanline_set);
 
               /*
                 Obtain a row's worth of samples.
@@ -3033,15 +3035,17 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (IsYCbCrColorspace(image->colorspace) &&
       (transfer_characteristic == TransferCharacteristicPrintingDensity))
     {
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowException(exception,CoderError,UnableToTransformColorspace,
+                       image->filename);
       image->colorspace=CineonLogRGBColorspace;
     }
 
   image->is_monochrome=is_monochrome;
   image->is_grayscale=is_grayscale;
   image->depth=Min(QuantumDepth,image->depth);
-  MagickFreeResourceLimitedMemory(map_CbCr);
-  MagickFreeResourceLimitedMemory(map_Y);
+  MagickFreeResourceLimitedMemory(Quantum *,map_CbCr);
+  MagickFreeResourceLimitedMemory(Quantum *,map_Y);
   DestroyThreadViewDataSet(scanline_set);
   DestroyThreadViewDataSet(samples_set);
   StopTimer(&image->timer);
@@ -3655,16 +3659,16 @@ STATIC void WriteRowSamples(const sample_t *samples,
 #define RoundUpToBoundary(offset,boundary) \
   (((offset+boundary-1)/boundary)*boundary);
 
-#define ThrowDPXWriterException(code_,reason_,image_)    \
-{ \
-  MagickFreeResourceLimitedMemory(map_CbCr);   \
-  MagickFreeResourceLimitedMemory(map_Y); \
-  MagickFreeResourceLimitedMemory(samples); \
-  MagickFreeResourceLimitedMemory(scanline); \
-  if (chroma_image) \
-    DestroyImage(chroma_image); \
-  ThrowWriterException(code_,reason_,image_); \
-}
+#define ThrowDPXWriterException(code_,reason_,image_)           \
+  {                                                             \
+    MagickFreeResourceLimitedMemory(sample_t *,map_CbCr);       \
+    MagickFreeResourceLimitedMemory(sample_t *,map_Y);          \
+    MagickFreeResourceLimitedMemory(sample_t *,samples);        \
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);  \
+    if (chroma_image)                                           \
+      DestroyImage(chroma_image);                               \
+    ThrowWriterException(code_,reason_,image_);                 \
+  }
 
 STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
 {
@@ -3794,30 +3798,54 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
   */
   if ((image_info->colorspace == CineonLogRGBColorspace) &&
       (image->colorspace != CineonLogRGBColorspace))
-    (void) TransformColorspace(image,CineonLogRGBColorspace);
+    {
+      if (TransformColorspace(image,CineonLogRGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec601LumaColorspace) &&
            (image->colorspace != Rec601LumaColorspace))
-    (void) TransformColorspace(image,Rec601LumaColorspace);
+    {
+      if (TransformColorspace(image,Rec601LumaColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec601YCbCrColorspace) &&
            (image->colorspace != Rec601YCbCrColorspace))
-    (void) TransformColorspace(image,Rec601YCbCrColorspace);
+    {
+      if (TransformColorspace(image,Rec601YCbCrColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == YCbCrColorspace) &&
            (image->colorspace != Rec601YCbCrColorspace))
-    (void) TransformColorspace(image,Rec601YCbCrColorspace);
+    {
+      if (TransformColorspace(image,Rec601YCbCrColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec709LumaColorspace) &&
            (image->colorspace != Rec709LumaColorspace))
-    (void) TransformColorspace(image,Rec709LumaColorspace);
+    {
+      if (TransformColorspace(image,Rec709LumaColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if ((image_info->colorspace == Rec709YCbCrColorspace) &&
            (image->colorspace != Rec709YCbCrColorspace))
-    (void) TransformColorspace(image,Rec709YCbCrColorspace);
+    {
+      if (TransformColorspace(image,Rec709YCbCrColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if (IsRGBColorspace(image_info->colorspace) &&
            !IsRGBColorspace(image->colorspace))
-    (void) TransformColorspace(image,RGBColorspace);
+    {
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
   else if (!IsRGBColorspace(image->colorspace) &&
            (image->colorspace != CineonLogRGBColorspace) &&
            (image->colorspace != Rec601YCbCrColorspace) &&
            (image->colorspace != Rec709YCbCrColorspace))
-    (void) TransformColorspace(image,RGBColorspace);
+    {
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    }
 
   /*
     Compute desired/necessary number of bits per sample.
@@ -3857,8 +3885,8 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
                      &sampling_factor_vertical);
       if (factors != 2)
         sampling_factor_vertical=sampling_factor_horizontal;
-      if ((sampling_factor_horizontal != 1) && (sampling_factor_horizontal != 2) &&
-          (sampling_factor_vertical != 1) && (sampling_factor_vertical != 2))
+      if (((sampling_factor_horizontal != 1) && (sampling_factor_horizontal != 2)) ||
+          ((sampling_factor_vertical != 1) && (sampling_factor_vertical != 2)))
         ThrowDPXWriterException(OptionError,UnsupportedSamplingFactor,
                                 image);
 
@@ -4206,12 +4234,14 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
     {
       (void) strlcpy(dpx_image_info.element_info[i].description,
                      DescribeImageElementDescriptor(txt_buffer,
+                                                    sizeof(txt_buffer),
                      (DPXImageElementDescriptor) dpx_image_info.element_info[i].descriptor),
                      sizeof(dpx_image_info.element_info[0].description));
       (void) strlcat(dpx_image_info.element_info[i].description," / ",
                      sizeof(dpx_image_info.element_info[0].description));
       (void) strlcat(dpx_image_info.element_info[i].description,
                      DescribeImageTransferCharacteristic(txt_buffer,
+                                                         sizeof(txt_buffer),
                      (DPXTransferCharacteristic) dpx_image_info.element_info[i].transfer_characteristic),
                      sizeof(dpx_image_info.element_info[0].description));
     }
@@ -4335,7 +4365,7 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
     Allocate row samples.
   */
   samples=MagickAllocateResourceLimitedArray(sample_t *,image->columns,
-                              max_samples_per_pixel*sizeof(sample_t));
+                                             max_samples_per_pixel*sizeof(sample_t));
   if (samples == (sample_t *) NULL)
     ThrowDPXWriterException(ResourceLimitError,MemoryAllocationFailed,image);
   (void) memset((void *) samples,0,(size_t) max_samples_per_pixel*image->columns*
@@ -4777,10 +4807,10 @@ STATIC unsigned int WriteDPXImage(const ImageInfo *image_info,Image *image)
       }
   }
 
-  MagickFreeResourceLimitedMemory(map_CbCr);
-  MagickFreeResourceLimitedMemory(map_Y);
-  MagickFreeResourceLimitedMemory(samples);
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(sample_t *,map_CbCr);
+  MagickFreeResourceLimitedMemory(sample_t *,map_Y);
+  MagickFreeResourceLimitedMemory(sample_t *,samples);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   status &= CloseBlob(image);
   if (chroma_image != (Image *) NULL)
     {

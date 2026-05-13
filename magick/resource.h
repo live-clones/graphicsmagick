@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2023 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -24,13 +24,14 @@ typedef enum
   DiskResource,        /* Pixel cache total disk space (Gigabytes) */
   FileResource,        /* Pixel cache number of open files (Files) */
   MapResource,         /* Pixel cache total file memory-mapping (Megabytes) */
-  MemoryResource,      /* Maximum heap memory (e.g. malloc) allocations (Megabytes) */
-  PixelsResource,      /* Maximum number of pixels in single image (Pixels) */
+  MemoryResource,      /* Maximum heap memory allocations (Megabytes) */
+  PixelsResource,      /* Maximum number of pixels in image (Pixels) */
   ThreadsResource,     /* Maximum number of worker threads */
   WidthResource,       /* Maximum pixel width of an image (Pixels) */
   HeightResource,      /* Maximum pixel height of an image (Pixels) */
-  ReadResource,        /* Maximum amount of uncompressed file data which may be read from one file */
-  WriteResource        /* Maximum amount of uncompressed file data which may be written to one file */
+  ReadResource,        /* Maximum uncompressed data read from file */
+  WriteResource,       /* Maximum uncompressed data written to file */
+  ImagesResource       /* Maximum number of discrete images */
 } ResourceType;
 
 

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2015 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -40,6 +40,7 @@
 #include "magick/magick.h"
 #include "magick/render.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,7 +82,7 @@ do { \
 } while (0);
 
 static Image *ReadLABELImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                             ExceptionInfo *exception)
 {
   char
     geometry[MaxTextExtent];
@@ -123,39 +124,39 @@ static Image *ReadLABELImage(const ImageInfo *image_info,
         Fit label to canvas size.
       */
       for ( ; GetTypeMetrics(image,draw_info,&metrics); draw_info->pointsize*=2)
-      {
-        width=(unsigned long) floor(metrics.width+metrics.max_advance/2+0.5);
-        height=(unsigned long) floor(metrics.ascent-metrics.descent+0.5);
-        if (((image->columns != 0) && (width >= image->columns)) ||
-            ((image->rows != 0) && (height >= image->rows)))
-          break;
-      }
+        {
+          width=(unsigned long) floor(metrics.width+metrics.max_advance/2+0.5);
+          height=(unsigned long) floor(metrics.ascent-metrics.descent+0.5);
+          if (((image->columns != 0) && (width >= image->columns)) ||
+              ((image->rows != 0) && (height >= image->rows)))
+            break;
+        }
       for ( ; GetTypeMetrics(image,draw_info,&metrics); draw_info->pointsize--)
-      {
-        width=(unsigned long) floor(metrics.width+metrics.max_advance/2+0.5);
-        height=(unsigned long) floor(metrics.ascent-metrics.descent+0.5);
-        if ((image->columns != 0) && (width <= image->columns) &&
-           ((image->rows == 0) || (height <= image->rows)))
-          break;
-        if ((image->rows != 0) && (height <= image->rows) &&
-           ((image->columns == 0) || (width <= image->columns)))
-          break;
-        if (draw_info->pointsize < 2.0)
-          break;
-      }
+        {
+          width=(unsigned long) floor(metrics.width+metrics.max_advance/2+0.5);
+          height=(unsigned long) floor(metrics.ascent-metrics.descent+0.5);
+          if ((image->columns != 0) && (width <= image->columns) &&
+              ((image->rows == 0) || (height <= image->rows)))
+            break;
+          if ((image->rows != 0) && (height <= image->rows) &&
+              ((image->columns == 0) || (width <= image->columns)))
+            break;
+          if (draw_info->pointsize < 2.0)
+            break;
+        }
     }
   status=GetTypeMetrics(image,draw_info,&metrics);
   if (status == False)
     ThrowLABELReaderException(TypeError,UnableToGetTypeMetrics,image);
-  FormatString(geometry,"+%g+%g",metrics.max_advance/4,metrics.ascent);
+  MagickFormatString(geometry,sizeof(geometry),"+%g+%g",metrics.max_advance/4,metrics.ascent);
   if (image->columns == 0)
     image->columns=(unsigned long)
       floor(metrics.width+metrics.max_advance/2+0.5);
   if (image->rows == 0)
     {
       image->rows=(unsigned long) floor(metrics.ascent-metrics.descent+0.5);
-      FormatString(geometry,"+%g+%g",image->columns/2.0-metrics.width/2.0,
-        metrics.ascent);
+      MagickFormatString(geometry,sizeof(geometry),"+%g+%g",image->columns/2.0-metrics.width/2.0,
+                         metrics.ascent);
     }
   draw_info->geometry=AllocateString(geometry);
   (void) SetImage(image,OpaqueOpacity);

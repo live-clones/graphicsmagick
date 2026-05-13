@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2019 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -682,7 +682,7 @@ MagickExport MagickPassFail HuffmanDecodeImage(Image *image)
   mask=1 << (entry->length-1);  \
   while (mask != 0)  \
   {  \
-    OutputBit((entry->code & mask ? 1 : 0));  \
+    OutputBit(((entry->code & mask) ? 1 : 0));  \
     mask>>=1;  \
   }  \
 }
@@ -700,7 +700,9 @@ MagickExport MagickPassFail HuffmanDecodeImage(Image *image)
     }  \
 }
 MagickExport MagickPassFail HuffmanEncode2Image(const ImageInfo *image_info,
-                                                Image *image, WriteByteHook write_byte, void *info)
+                                                Image *image,
+                                                WriteByteHook write_byte,
+                                                void *info)
 {
   const HuffmanTable
     *entry;
@@ -762,7 +764,7 @@ MagickExport MagickPassFail HuffmanEncode2Image(const ImageInfo *image_info,
   width=image->columns;
   if (is_fax == True)
     width=Max(image->columns,1728);
-  scanline=MagickAllocateMemory(unsigned char *,(size_t) width+1);
+  scanline=MagickAllocateClearedMemory(unsigned char *,(size_t) width+1);
   if (scanline == (unsigned char *) NULL)
     ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
                          (char *) NULL);
@@ -776,6 +778,8 @@ MagickExport MagickPassFail HuffmanEncode2Image(const ImageInfo *image_info,
     {
       CopyException(&image->exception,&huffman_image->exception);
       MagickFreeMemory(scanline);
+      DestroyImage(huffman_image);
+      huffman_image=(Image *) NULL;
       return(MagickFail);
     }
   byte=0;
@@ -797,7 +801,7 @@ MagickExport MagickPassFail HuffmanEncode2Image(const ImageInfo *image_info,
     polarity=(PixelIntensityToQuantum(&huffman_image->colormap[0]) <
               PixelIntensityToQuantum(&huffman_image->colormap[1]) ? 0x00 : 0x01);
   q=scanline;
-  for (i=0; i < width; i++) /* was: for (i=(long) width; i > 0; i--) */
+  for (i=0; i < width; i++)
     *q++=(unsigned char) polarity;
   q=scanline;
   for (y=0; y < huffman_image->rows; y++)
@@ -977,7 +981,7 @@ ImageToHuffman2DBlob(const Image *image,const ImageInfo *image_info,
         {
           (void) strlcpy(huffman_image->magick,"GROUP4RAW",sizeof(huffman_image->magick));
           (void) strlcpy(huffman_image->filename,"",sizeof(huffman_image->filename));
-          blob=ImageToBlob(huffman_info, huffman_image, blob_length, exception);
+          blob=(unsigned char *) ImageToBlob(huffman_info, huffman_image, blob_length, exception);
           DestroyImage(huffman_image);
         }
       DestroyImageInfo(huffman_info);

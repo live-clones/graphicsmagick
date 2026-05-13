@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -47,6 +47,7 @@
 #include "magick/tempfile.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -154,8 +155,8 @@ ModuleExport void UnregisterHISTOGRAMImage(void)
 %
 %
 */
-static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
-                                        Image *image)
+static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
+                                          Image *image)
 {
 #define HistogramDensity  "256x200"
 
@@ -174,10 +175,10 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   long
     *blue,
     *green,
-    maximum,
     *red;
 
   long
+    maximum,
     y;
 
   RectangleInfo
@@ -193,8 +194,8 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
     *q,
     *r;
 
-  unsigned int
-    status;
+  MagickPassFail
+    status = MagickPass;
 
   size_t
     length;
@@ -206,7 +207,7 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  (void) SetImageDepth(image,image->depth);
+  status &= SetImageDepth(image,image->depth);
   SetGeometry(image,&geometry);
   if (image_info->density == (char *) NULL)
     (void) GetMagickGeometry(HistogramDensity,&geometry.x,&geometry.y,
@@ -218,7 +219,13 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
                              &image->exception);
   if (histogram_image == (Image *) NULL)
     ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-  (void) SetImageType(histogram_image,TrueColorType);
+  status &= SetImageType(histogram_image,TrueColorType);
+  if (status == MagickFail)
+    {
+      CopyException(&image->exception,&histogram_image->exception);
+      DestroyImage(histogram_image);
+      return status;
+    }
   /*
     Allocate histogram count arrays.
   */
@@ -229,9 +236,9 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   if ((red == (long *) NULL) || (green == (long *) NULL) ||
       (blue == (long *) NULL))
     {
-      MagickFreeResourceLimitedMemory(red);
-      MagickFreeResourceLimitedMemory(green);
-      MagickFreeResourceLimitedMemory(blue);
+      MagickFreeResourceLimitedMemory(long *,red);
+      MagickFreeResourceLimitedMemory(long *,green);
+      MagickFreeResourceLimitedMemory(long *,blue);
       DestroyImage(histogram_image);
       ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
     }
@@ -311,9 +318,9 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
   /*
     Free memory resources.
   */
-  MagickFreeResourceLimitedMemory(blue);
-  MagickFreeResourceLimitedMemory(green);
-  MagickFreeResourceLimitedMemory(red);
+  MagickFreeResourceLimitedMemory(long *,blue);
+  MagickFreeResourceLimitedMemory(long *,green);
+  MagickFreeResourceLimitedMemory(long *,red);
   file=AcquireTemporaryFileStream(filename,BinaryFileIOMode);
   if (file == (FILE *) NULL)
     {
@@ -332,7 +339,7 @@ static unsigned int WriteHISTOGRAMImage(const ImageInfo *image_info,
     */
     (void) GetNumberColors(image,file,&image->exception);
     (void) fclose(file);
-    histogram=FileToBlob(filename,&histogram_length,&histogram_image->exception);
+    histogram=(char *) FileToBlob(filename,&histogram_length,&histogram_image->exception);
     (void) StripImage(histogram_image);
     (void) SetImageAttribute(histogram_image,"comment",NULL);
     if (histogram && histogram_length > 0)

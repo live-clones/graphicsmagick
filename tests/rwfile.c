@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2025 GraphicsMagick Group
+ * Copyright (C) 2003-2026 GraphicsMagick Group
  * Copyright (C) 2003 ImageMagick Studio
  * Copyright 1991-1999 E. I. du Pont de Nemours and Company
  *
@@ -268,6 +268,14 @@ int main ( int argc, char **argv )
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Reading stdio image %s", infile);
       imageInfo->file=fopen(infile,"rb");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -324,7 +332,7 @@ int main ( int argc, char **argv )
       /*
        * Specify original image size (WIDTHxHEIGHT) if format requires it
        */
-      FormatString( size, "%lux%lu", original->columns, original->rows );
+      MagickFormatString( size, sizeof(size), "%lux%lu", original->columns, original->rows );
     }
   if (IgnoreExtensionTreatment == magick_info->extension_treatment)
     {
@@ -357,6 +365,14 @@ int main ( int argc, char **argv )
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Writing stdio image %s", filename);
       imageInfo->file=fopen(filename,"wb+");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for writing %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -399,6 +415,14 @@ int main ( int argc, char **argv )
     if (use_stdio)
       {
         imageInfo->file=fopen(filename,"rb");
+        if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
       }
     else
       {
@@ -451,6 +475,14 @@ int main ( int argc, char **argv )
   if (use_stdio)
     {
       imageInfo->file=fopen(filename,"rb");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -498,6 +530,14 @@ int main ( int argc, char **argv )
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Writing stdio image %s", filename);
       imageInfo->file=fopen(filename,"wb+");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for writing %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {
@@ -531,6 +571,14 @@ int main ( int argc, char **argv )
   if (use_stdio)
     {
       imageInfo->file=fopen(filename,"rb");
+      if (imageInfo->file == (FILE *) NULL)
+        {
+          (void) printf ( "Failed to open stdio for reading %s\n",
+                          imageInfo->filename );
+          (void) fflush(stdout);
+          exit_status = 1;
+          goto program_exit;
+        }
     }
   else
     {

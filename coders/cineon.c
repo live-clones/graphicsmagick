@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -52,6 +52,7 @@
 #include "magick/monitor.h"
 #include "magick/profile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declaractions.
@@ -269,7 +270,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U8(member)) \
     { \
-      FormatString(buffer,"%u",(unsigned int) member); \
+      MagickFormatString(buffer,sizeof(buffer),"%u",(unsigned int) member); \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -281,7 +282,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_U32(member)) \
     { \
-      FormatString(buffer,"%u",member); \
+      MagickFormatString(buffer,sizeof(buffer),"%u",member);    \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -293,7 +294,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_R32(member)) \
     { \
-      FormatString(buffer,"%g",member.f); \
+      MagickFormatString(buffer,sizeof(buffer),"%g",member.f);  \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -305,7 +306,7 @@ static unsigned int IsCINEON(const unsigned char *magick,const size_t length)
 \
   if (!IS_UNDEFINED_S32(member)) \
     { \
-      FormatString(buffer,"%d",member); \
+      MagickFormatString(buffer,sizeof(buffer),"%d",member);    \
       (void) SetImageAttribute(image,name,buffer); \
       LogSetImageAttribute(name,buffer); \
     } \
@@ -722,13 +723,13 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
           new_user_data=MagickReallocateResourceLimitedMemory(unsigned char *,user_data,user_data_length+read_size);
           if (new_user_data == (unsigned char *) NULL)
             {
-              MagickFreeResourceLimitedMemory(user_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,user_data);
               ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
             }
           user_data=new_user_data;
           if (ReadBlob(image,read_size,user_data+user_data_length) != read_size)
             {
-              MagickFreeResourceLimitedMemory(user_data);
+              MagickFreeResourceLimitedMemory(unsigned char *,user_data);
               ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             }
           user_data_length += read_size;
@@ -736,10 +737,10 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
         }
       if (!SetImageProfile(image,"CINEONUSERDATA",user_data,user_data_length))
         {
-          MagickFreeResourceLimitedMemory(user_data);
+          MagickFreeResourceLimitedMemory(unsigned char *,user_data);
           ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
         }
-      MagickFreeResourceLimitedMemory(user_data);
+      MagickFreeResourceLimitedMemory(unsigned char *,user_data);
     }
 
   if (image_info->ping)
@@ -805,7 +806,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
           if (scandata == (unsigned char *) NULL)
             ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
           scanline=scandata;
-          MagickBitStreamInitializeRead(&bit_stream,scanline);
+          MagickBitStreamInitializeRead(&bit_stream,(const unsigned char*) scanline);
           for (y=0; y < image->rows; y++)
             {
               q=SetImagePixels(image,0,y,image->columns,1);
@@ -824,7 +825,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
                       if (ReadBlobZC(image,scandata_bytes,&scanline) !=
                           scandata_bytes)
                         break;
-                      MagickBitStreamInitializeRead(&bit_stream,scanline);
+                      MagickBitStreamInitializeRead(&bit_stream,(const unsigned char *) scanline);
                       i=0;
                     }
                   q->red=q->green=q->blue=
@@ -843,7 +844,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
                                               image->columns,image->rows))
                     break;
             }
-          MagickFreeResourceLimitedMemory(scandata);
+          MagickFreeResourceLimitedMemory(unsigned char *,scandata);
           break;
         }
       case 3:
@@ -865,7 +866,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
               scanline=scandata;
               if (ReadBlobZC(image,scandata_bytes,&scanline) != scandata_bytes)
                 break;
-              MagickBitStreamInitializeRead(&bit_stream,scanline);
+              MagickBitStreamInitializeRead(&bit_stream,(const unsigned char*) scanline);
               for (x=0 ; x < image->columns; x++)
                 {
                   /*
@@ -896,7 +897,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
                                               image->columns,image->rows))
                     break;
             }
-          MagickFreeResourceLimitedMemory(scandata);
+          MagickFreeResourceLimitedMemory(unsigned char *,scandata);
           break;
         }
       default:
@@ -1190,7 +1191,8 @@ static unsigned int WriteCINEONImage(const ImageInfo *image_info,Image *image)
     Cineon files are written in Cineon Log color space.
   */
   if (image->colorspace != CineonLogRGBColorspace)
-    (void) TransformColorspace(image,CineonLogRGBColorspace);
+    if (TransformColorspace(image,CineonLogRGBColorspace) == MagickFail)
+      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
 
 #if !defined(WORDS_BIGENDIAN)
   swab=MagickTrue;
@@ -1524,7 +1526,7 @@ static unsigned int WriteCINEONImage(const ImageInfo *image_info,Image *image)
                                         image->columns,image->rows))
               break;
       }
-    MagickFreeResourceLimitedMemory(scanline);
+    MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   }
 
   if ((magick_off_t) cin_file_info.file_size != TellBlob(image))

@@ -337,9 +337,10 @@ format used by modules.mgk. True is returned on success.</p>
 <section id="description-11">
 <h2>Description</h2>
 <p>Method MagickToMime returns the officially registered (or de facto) MIME
-media-type corresponding to a magick string.  If there is no registered
-media-type, then the string &quot;image/x-magick&quot; (all lower case) is returned.
-The returned string must be deallocated by the user.</p>
+media-type (see <a class="reference external" href="https://www.iana.org/assignments/media-types/media-types.xhtml">https://www.iana.org/assignments/media-types/media-types.xhtml</a>)
+corresponding to a magick string.  If there is no registered media-type,
+then the string &quot;image/x-magick&quot; (all lower case) is returned.  The returned
+string must be deallocated by the user.</p>
 <p>The format of the MagickToMime method is:</p>
 <pre class="literal-block">char *MagickToMime( const char *magick );</pre>
 <p>A description of each parameter follows.</p>
@@ -448,7 +449,7 @@ looking for.</p>
 
 <hr class="docutils">
 <div class="document">
-    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2025<!--SPONSOR_LOGO--></p>
+    <p><a href="../Copyright.html">Copyright</a> © GraphicsMagick Group 2002-2026<!--SPONSOR_LOGO--></p>
 </div>
 
 </main>

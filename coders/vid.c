@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2020 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -45,6 +45,7 @@
 #include "magick/montage.h"
 #include "magick/resize.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
@@ -155,7 +156,7 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (list == (char **) NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image)
+      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image);
     }
   list[0]=(char *) AllocateString((char *) NULL);
   (void) strlcpy(list[0],image_info->filename,MaxTextExtent);
@@ -165,7 +166,7 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if ((status == False) || (number_files == 0))
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image)
+      ThrowVIDReaderException(ResourceLimitError,MemoryAllocationFailed,image);
     }
   DestroyImage(image);
   image=(Image *) NULL;
@@ -174,59 +175,59 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   image=(Image *) NULL;
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(void *) NULL;
+  clone_info->blob=(_BlobInfoPtr_) NULL;
   clone_info->length=0;
   if (clone_info->size == (char *) NULL)
     (void) CloneString(&clone_info->size,DefaultTileGeometry);
   for (i=0; i < number_files; i++)
-  {
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),"name: %.1024s",
-      filelist[i]);
-    handler=SetMonitorHandler((MonitorHandler) NULL);
-    (void) strlcpy(clone_info->filename,filelist[i],MaxTextExtent);
-    *clone_info->magick='\0';
-    next_image=ReadImage(clone_info,exception);
-    MagickFreeMemory(filelist[i]);
-    if (next_image != (Image *) NULL)
-      {
-        (void) SetImageAttribute(next_image,"label",DefaultTileLabel);
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),"geometry: %ldx%ld",
-          next_image->columns,next_image->rows);
-        SetGeometry(next_image,&geometry);
-        (void) GetMagickGeometry(clone_info->size,&geometry.x,&geometry.y,
-          &geometry.width,&geometry.height);
-        thumbnail_image=ZoomImage(next_image,geometry.width,geometry.height,
-          exception);
-        if (thumbnail_image != (Image *) NULL)
-          {
-            DestroyImage(next_image);
-            next_image=thumbnail_image;
-          }
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-          "thumbnail geometry: %ldx%ld",next_image->columns,next_image->rows);
-        if (image == (Image *) NULL)
-          image=next_image;
-        else
-          {
-            image->next=next_image;
-            image->next->previous=image;
-            image=SyncNextImageInList(image);
-          }
-      }
-    (void) SetMonitorHandler(handler);
-    if (image != (Image *) NULL)
-      if (!MagickMonitorFormatted(i,number_files,&image->exception,
-                                  LoadImageText,image->filename,
-                                  image->columns,image->rows))
-      break;
-  }
+    {
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),"name: %.1024s",
+                            filelist[i]);
+      handler=SetMonitorHandler((MonitorHandler) NULL);
+      (void) strlcpy(clone_info->filename,filelist[i],MaxTextExtent);
+      *clone_info->magick='\0';
+      next_image=ReadImage(clone_info,exception);
+      MagickFreeMemory(filelist[i]);
+      if (next_image != (Image *) NULL)
+        {
+          (void) SetImageAttribute(next_image,"label",DefaultTileLabel);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"geometry: %ldx%ld",
+                                next_image->columns,next_image->rows);
+          SetGeometry(next_image,&geometry);
+          (void) GetMagickGeometry(clone_info->size,&geometry.x,&geometry.y,
+                                   &geometry.width,&geometry.height);
+          thumbnail_image=ZoomImage(next_image,geometry.width,geometry.height,
+                                    exception);
+          if (thumbnail_image != (Image *) NULL)
+            {
+              DestroyImage(next_image);
+              next_image=thumbnail_image;
+            }
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "thumbnail geometry: %ldx%ld",next_image->columns,next_image->rows);
+          if (image == (Image *) NULL)
+            image=next_image;
+          else
+            {
+              image->next=next_image;
+              image->next->previous=image;
+              image=SyncNextImageInList(image);
+            }
+        }
+      (void) SetMonitorHandler(handler);
+      if (image != (Image *) NULL)
+        if (!MagickMonitorFormatted(i,number_files,&image->exception,
+                                    LoadImageText,image->filename,
+                                    image->columns,image->rows))
+          break;
+    }
   DestroyImageInfo(clone_info);
   clone_info=(ImageInfo *) NULL;
   MagickFreeMemory(filelist);
   if (image == (Image *) NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image)
+      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image);
     }
   while (image->previous != (Image *) NULL)
     image=image->previous;
@@ -241,7 +242,7 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if (montage_image == (Image *) NULL)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),"return");
-      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image)
+      ThrowVIDReaderException(CorruptImageError,UnableToReadVIDImage,image);
     }
   DestroyImageList(image);
   LiberateVIDLists();
@@ -366,7 +367,7 @@ static unsigned int WriteVIDImage(const ImageInfo *image_info,Image *image)
   montage_info=(MontageInfo *) NULL;
   if (montage_image == (Image *) NULL)
     ThrowWriterException2(CorruptImageError,image->exception.reason,image);
-  FormatString(montage_image->filename,"miff:%.1024s",image->filename);
+  MagickFormatString(montage_image->filename,sizeof(montage_image->filename),"miff:%.1024s",image->filename);
   status=WriteImage(image_info,montage_image);
   DestroyImageList(montage_image);
   return(status);

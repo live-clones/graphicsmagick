@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -46,6 +46,7 @@
 #include "magick/pixel_cache.h"
 #include "magick/profile.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(EnableBrokenCoders) && EnableBrokenCoders
 
 /*
@@ -1846,13 +1847,15 @@ static unsigned int WritePSDImage(const ImageInfo *image_info,Image *image)
        (image->colorspace != CMYKColorspace)) &&
       (image_info->colorspace != CMYKColorspace))
     {
-      (void) TransformColorspace(image,RGBColorspace);
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
       (void) WriteBlobMSBShort(image,
                                image->storage_class == PseudoClass ? 2 : 3);
     }
   else
     {
-      (void) TransformColorspace(image,CMYKColorspace);
+      if (TransformColorspace(image,CMYKColorspace) == MagickFail)
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
       (void) WriteBlobMSBShort(image,4);
     }
   if ((image->storage_class == DirectClass) || (image->colors > 256))
@@ -2022,7 +2025,7 @@ static unsigned int WritePSDImage(const ImageInfo *image_info,Image *image)
           char
             layer_name[MaxTextExtent];
 
-          FormatString( layer_name, "L%04d", layer_count++ );
+          MagickFormatString( layer_name, sizeof(layer_name), "L%04d", layer_count++ );
           WritePascalString( image, layer_name, 4 );
         }
         tmp_image = tmp_image->next;

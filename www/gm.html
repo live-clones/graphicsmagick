@@ -1515,11 +1515,29 @@ in the writer.
 </dd>
 <dt>heif:ignore-transformations={true|false}</dt>
 <dd>
-Return HEIF (e.g. HEIC/AVIF) image without any transformations (e.g. rotation) applied.
+Return HEIF (e.g. HEIC/AVIF) image without any transformations
+(e.g. rotation) applied.  In 'ping' mode (the identify default) the
+default value is true, but is otherwise false. When
+ignore-transformations is false, identify may be much slower.
+</dd>
+<dt>heif:interleaved-rgb-decode={true|false}</dt>
+<dd>
+Requests that libheif return pixels in interleaved representation
+rather than in a planar representation. This should have no influence
+on the decoded result, but the performance may be different.
 </dd>
 <dt>heif:preserve-colorspace={true|false}</dt>
 <dd> Return HEIF image in its original colorspace.  This allows an
 image to be returned in the original YCbCr colorspace rather than RGB.
+</dd>
+<dt>heif:tile-threads=number</dt>
+<dd>
+If a HEIF image is comprised of multiple tiles, each tile may be
+decoded by one thread, and several tiles may be decoded at once by
+using more threads.  The maximum reasonable value is the minimum of
+the number of CPU cores available, or the number of tiles in the HEIF
+file, whichever is smaller.  If OpenMP is available, the default is
+the number of OpenMP threads, otherwise the default is 4.
 </dd>
 <dt>heif:max-image-size-pixels=number</dt>
 <dd>
@@ -1675,6 +1693,17 @@ file.  If the colorspace of the output file differs from that of the
 input file, the quality setting is preserved but the sampling-factors
 are not.
 </dd>
+<dt>jxl:effort=&lt;integer&gt;</dt>
+<dd>Encoder effort. Higher values allow more computation, generally achieving
+smaller output at same quality. For lossy encoding, higher effort should
+achieve more accurate quality. Please refer to libjxl source code (or
+documentation) for 'JXL_ENC_FRAME_SETTING_EFFORT'.
+</dd>
+<dt>jxl:decodingspeed=&lt;integer&gt;</dt>
+<dd>Decoding speed. Higher values improve decode speed at the expense of
+quality or density. Please refer to libjxl source code (or documentation)
+for 'JXL_ENC_FRAME_SETTING_DECODING_SPEED'.
+</dd>
 <dt>pcl:fit-to-page</dt>
 <dd>If the pcl:fit-to-page flag is defined, then the printer is
 requested to scale the image to fit the page size (width and/or
@@ -1752,6 +1781,30 @@ TIFF file.  This is useful in order to be able to read files which
 which otherwise fail to read due to problems with TIFF tags.  Note
 that some TIFF tags are required in order to be able to read the image
 data at all.
+</dd>
+<dt>tiff:lerc-maxzerror=&lt;value&gt;</dt>
+<dd>When LERC compression is selected (via `-compress lerc`),
+specifies the maximum allowable floating point error for lossy
+compression (e.g. 0.5). The default compression value is 0 (lossless).
+</dd>
+<dt>tiff:lerc-compression={1|deflate|zip|2|zstd}</dt>
+<dd>After LERC compression has taken place, an optional second
+compression pass using Deflate or Zstd compression may be performed.
+Specify a value of 1, deflate, or zip, to use Deflate compression, or
+2 or zstd, to use Zstd compression.  The argument is case-insensitive.
+</dd>
+<dt>tiff:lerc-zip-quality=&lt;value&gt;</dt>
+<dd>When LERC compression is enabled, and a second-pass compression
+using Deflate has been selected, provide a value in the range of 1 to
+12 to indicate the Deflate compression level (larger is more
+compression). The default level for Deflate compression is 6.
+</dd>
+<dt>tiff:lerc-zstd-level=&lt;value&gt;</dt>
+<dd>When LERC compression is enabled, and a second-pass compression
+using Zstd has been selected, provide a value in the range of 1 and 19
+(or 22 using a lot more memory) to indicate the Zstd compression level
+(larger is more compression). The default level for Zstd compression
+is 3.
 </dd>
 <dt>tiff:photometric={minisblack|miniswhite}</dt>
 <dd>For grayscale and bilevel images, GraphicsMagick normally chooses
@@ -3407,20 +3460,21 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a name="details-limit"></a>-limit <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 By default, resource limits are estimated based on the available
 resources and capabilities of the system. The resource limits are
 <strong>Disk</strong>, maximum total disk space consumed; <strong>File</strong>, maximum
-number of file descriptors allowed to be open at once; <strong>Map</strong>,
-maximum total number of file bytes which may be memory mapped;
-<strong>Memory</strong>, maximum total number of bytes of heap memory used for
-image storage; <strong>Pixels</strong>, maximum absolute image size (per image);
-<strong>Width</strong>, maximum image pixels width; <strong>Height</strong>, maximum image
-pixels height; <strong>Read</strong>, maximum number of uncompressed bytes to
-read; <strong>Write</strong> maximum number of uncompressed bytes to write; and
-<strong>Threads</strong>, the maximum number of worker threads to use per OpenMP
-thread team.</font></td></tr></table>
+number of file descriptors allowed to be open at once; <strong>Images</strong>,
+maximum images allowed to be handled by the whole program at one time;
+<strong>Map</strong>, maximum total number of file bytes which may be memory
+mapped; <strong>Memory</strong>, maximum total number of bytes of heap memory
+used for image storage; <strong>Pixels</strong>, maximum absolute image size
+(per image); <strong>Width</strong>, maximum image pixels width; <strong>Height</strong>,
+maximum image pixels height; <strong>Read</strong>, maximum number of
+uncompressed bytes to read; <strong>Write</strong> maximum number of
+uncompressed bytes to write; and <strong>Threads</strong>, the maximum number of
+worker threads to use per OpenMP thread team.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 The <strong>Disk</strong> and <strong>Map</strong> resource limits are used to decide if
 (for a given image) the decoded image ("pixel cache") should be stored
@@ -4833,6 +4887,31 @@ offset:</font></td></tr></table>
   0.0 0.0 0.0 0.8 0.1
   0.0 0.0 0.0 0.0 1.0
 </pre></font></td></tr></table>
+<table BORDER=0 WIDTH="94%">
+<tr>
+<td width="3%"><br></td> 
+<td ALIGN=LEFT BGCOLOR="#FFFFFF">
+<img SRC="images/right_triangle_option.png"
+ALT=">" BORDER=0 height=14
+width=15><b><font face="Helvetica, Arial"
+><font color="#00B04F"><font size="+1">
+    <a name="details-map"></a>-map <i>&lt;filename&gt;</i>
+</font></font></font></b></td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>choose a particular set of colors from this image</td></tr></table>
+<table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
+[<em>convert</em> or <em>mogrify</em>]</font></td></tr></table>
+<table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
+By default, color reduction chooses an optimal set of colors that best
+represent the original image. Alternatively, you can choose a particular
+set of colors from an image file with this option.</font></td></tr></table>
+<table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
+Use
+<strong>+map</strong> to reduce
+all images in the image sequence that follows to a single optimal set of colors
+that best represent all the images.  The sequence of images
+is terminated by the appearance of any option.
+If the <strong>+map</strong>
+option appears after all of the input images, all images are mapped.</font></td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -6975,7 +7054,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -8083,7 +8162,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -8608,7 +8687,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -10313,7 +10392,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -10710,6 +10789,17 @@ width=15><b><font face="Helvetica, Arial"
     <a href="GraphicsMagick.html#details-recolor">-recolor</a> <i>&lt;matrix&gt;</i>
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>apply a color translation matrix to image channels</td></tr></table>
+<table BORDER=0 WIDTH="94%">
+<tr>
+<td width="3%"><br></td> 
+<td ALIGN=LEFT BGCOLOR="#FFFFFF">
+<img SRC="images/right_triangle_option.png"
+ALT=">" BORDER=0 height=14
+width=15><b><font face="Helvetica, Arial"
+><font color="#00B04F"><font size="+1">
+    <a href="GraphicsMagick.html#details-map">-map</a> <i>&lt;filename&gt;</i>
+</font></font></font></b></td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>choose a particular set of colors from this image</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -11842,7 +11932,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -14915,7 +15005,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -15333,7 +15423,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -16366,7 +16456,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -16741,6 +16831,17 @@ width=15><b><font face="Helvetica, Arial"
     <a href="GraphicsMagick.html#details-recolor">-recolor</a> <i>&lt;matrix&gt;</i>
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>apply a color translation matrix to image channels</td></tr></table>
+<table BORDER=0 WIDTH="94%">
+<tr>
+<td width="3%"><br></td> 
+<td ALIGN=LEFT BGCOLOR="#FFFFFF">
+<img SRC="images/right_triangle_option.png"
+ALT=">" BORDER=0 height=14
+width=15><b><font face="Helvetica, Arial"
+><font color="#00B04F"><font size="+1">
+    <a href="GraphicsMagick.html#details-map">-map</a> <i>&lt;filename&gt;</i>
+</font></font></font></b></td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>choose a particular set of colors from this image</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -17798,7 +17899,7 @@ width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
     <a href="GraphicsMagick.html#details-limit">-limit</a> <i>&lt;type&gt; &lt;value&gt;</i>
 </font></font></font></b></td></tr></table>
-<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
+<table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Disk, File, Images, Map, Memory, Pixels, Width, Height, Read, Threads, or Write resource limit</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 

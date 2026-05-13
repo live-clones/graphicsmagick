@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1208,7 +1208,7 @@ InitializeMagickEx(const char *path, unsigned int options,
 
 #if defined(USE_GLIBC_MTRACE) && USE_GLIBC_MTRACE
   mtrace();
-#endif /* f defined(USE_GLIBC_MTRACE) && USE_GLIBC_MTRACE */
+#endif /* if defined(USE_GLIBC_MTRACE) && USE_GLIBC_MTRACE */
 
   /* Save initialization options in case we need them later */
   initialize_magick_options = options;
@@ -1241,7 +1241,8 @@ InitializeMagickEx(const char *path, unsigned int options,
   InitializeMagickRandomGenerator();
 
   (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
-                        "Initialize Magick");
+                        "Initialize Magick (path=\"%s\", options = 0x%04x)",
+                        path ? path : "(null)", options);
 
   /*
     Set the filesystem block size.
@@ -1304,17 +1305,17 @@ InitializeMagickEx(const char *path, unsigned int options,
 #endif /* defined(MSWINDOWS) */
   if (!(options & MAGICK_OPT_NO_SIGNAL_HANDER))
     InitializeMagickSignalHandlers(); /* Signal handlers */
-  InitializeTemporaryFiles();       /* Temporary files */
-  InitializeMagickResources();      /* Resources */
-  InitializeMagickRegistry();       /* Image/blob registry */
-  InitializeConstitute();           /* Constitute semaphore */
+  InitializeTemporaryFiles();       /* Temporary files (semaphore only) */
+  InitializeMagickResources();      /* Resources (semaphore+calculations) */
+  InitializeMagickRegistry();       /* Image/blob registry (semaphore+vars only) */
+  InitializeConstitute();           /* Constitute (semaphore only) */
   InitializeMagickInfoList();       /* Coder registrations + modules */
   /*InitializeMagicInfo();*/        /* File format detection */
-  InitializeTypeInfo();             /* Font information */
-  InitializeDelegateInfo();         /* External delegate information */
-  InitializeColorInfo();            /* Color database */
-  InitializeMagickMonitor();        /* Progress monitor */
-  MagickInitializeCommandInfo();    /* Command parser */
+  InitializeTypeInfo();             /* Font information (semaphore only) */
+  InitializeDelegateInfo();         /* External delegate information (semaphore only) */
+  InitializeColorInfo();            /* Color database (semaphore only) */
+  InitializeMagickMonitor();        /* Progress monitor (semaphore only) */
+  MagickInitializeCommandInfo();    /* Command parser (semaphore only) */
 
   /* Let's log the three important setting as we exit this routine */
   (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
@@ -1565,9 +1566,10 @@ ListModuleMap(FILE *file,ExceptionInfo *exception)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  Method MagickToMime returns the officially registered (or de facto) MIME
-%  media-type corresponding to a magick string.  If there is no registered
-%  media-type, then the string "image/x-magick" (all lower case) is returned.
-%  The returned string must be deallocated by the user.
+%  media-type (see https://www.iana.org/assignments/media-types/media-types.xhtml)
+%  corresponding to a magick string.  If there is no registered media-type,
+%  then the string "image/x-magick" (all lower case) is returned.  The returned
+%  string must be deallocated by the user.
 %
 %  The format of the MagickToMime method is:
 %
@@ -1582,8 +1584,8 @@ ListModuleMap(FILE *file,ExceptionInfo *exception)
 MagickExport char *
 MagickToMime(const char *magick)
 {
-   char
-     media[MaxTextExtent];
+  char
+    media[MaxTextExtent];
 
   unsigned int
     i;
@@ -1591,17 +1593,20 @@ MagickToMime(const char *magick)
   static const struct
   {
     const char
-      magick[6],
+    magick[14],
       *media;
   }
-  MediaTypes[] =
+    MediaTypes[] =
     {
-      { "avi",   "video/avi" },
       { "apng",  "image/apng" },
+      { "avc",   "image/avci" },
+      { "avi",   "video/avi" },
       { "avif",  "image/avif" },
       { "bmp",   "image/bmp" },
       { "cgm",   "image/cgm;Version=4;ProfileId=WebCGM" }, /* W3 WebCGM */
       { "dcm",   "application/dicom" }, /* Incomplete.  See RFC 3240 */
+      { "dpx",   "image/dpx" },
+      { "emf",   "image/emf" },
       { "epdf",  "application/pdf" },
       { "epi",   "application/postscript" },
       { "eps",   "application/postscript" },
@@ -1610,17 +1615,24 @@ MagickToMime(const char *magick)
       { "epsf",  "application/postscript" },
       { "ept",   "application/postscript" },
       { "fax",   "image/g3fax" },
+      { "fits",  "image/fits" },
       { "fpx",   "image/vnd.fpx" },
       { "g3",    "image/g3fax" },
       { "gif",   "image/gif" },
       { "gif87", "image/gif" },
+      { "heic",  "image/heic" },
+      { "heic-sequence", "image/heic-sequence" },
+      { "heif",  "image/heif" },
+      { "heif-sequence", "image/heif-sequence" },
       { "ico",   "image/x-icon" },
+      { "j2c",   "image/j2c" },
       { "jpeg",  "image/jpeg" },
       { "jpg",   "image/jpeg" },
+      { "jxl",   "image/jxl" },
       { "mng",   "video/x-mng" },
       { "mpeg",  "video/mpeg" },
-      { "png",   "image/png" },
       { "pdf",   "application/pdf" },
+      { "png",   "image/png" },
       { "ps",    "application/postscript" },
       { "ps2",   "application/postscript" },
       { "ps3",   "application/postscript" },
@@ -1628,13 +1640,14 @@ MagickToMime(const char *magick)
       { "tif",   "image/tiff" },
       { "tiff",  "image/tiff" },
       { "wbmp",  "image/vnd.wap.wbmp" },
-      { "webp",  "image/image/webp" }
+      { "webp",  "image/webp" },
+      { "wmf",   "image/wmf" }
     };
 
   for (i=0; i < ArraySize(MediaTypes); i++)
     if (LocaleCompare(MediaTypes[i].magick,magick) == 0)
       return(AllocateString(MediaTypes[i].media));
-  FormatString(media,"image/x-%.1024s",magick);
+  MagickFormatString(media,sizeof(media),"image/x-%.1024s",magick);
   LocaleLower(media+8);
   return(AllocateString(media));
 }

@@ -94,7 +94,7 @@
 
 	* www/wand/wand.rst: Add a simple example of using the Wand API.
 
-2012-11-21  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-11-21  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* coders/bmp.c (ReadBMPImage): Fixed an old bug with decoding
 	chromaticity primaries.
@@ -145,7 +145,7 @@
 	* magick/floats.c: Use compile-time selection of endian-specific
 	code rather than run-time.  Fix cast warning with 64-bit builds.
 
-2012-11-07  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-11-07  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* coders/png.c (WriteOnePNGImage): The wrong QuantumType was
 	sometimes passed to ExportImagePixelArea() by the PNG encoder.
@@ -290,7 +290,7 @@
 	Returning a computed string width was causing text placement
 	problems when testing with libwmf's fulltest.wmf.
 
-2012-08-31  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-08-31  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* coders/png.c: ReadOnePNGImage: sub-8-bit palette images were
 	getting unpacked twice; once by libpng via png_set_packing()
@@ -500,7 +500,7 @@
 	'magick_filename' do not contain unexpected content due to using a
 	temporary file.
 
-2012-06-07  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-06-07  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* coders/png.c: Disable new libpng-1.5.10 test for invalid palette
 	index when reading a PNG or MNG (for speed), or when writing a MNG
@@ -524,7 +524,7 @@
 	Resolves SourceForge issue 3531512 "PerlMagick does not build with
 	perl 5.16".
 
-2012-05-29  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-05-29  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* coders/png.c: Ignore APNG chunks even if we are using a libpng
 	that was built with the "APNG patch".
@@ -565,7 +565,7 @@
 	* magick/pixel_iterator.c (GetRegionThreads): Don't thread region
 	if it is not memory-based.
 
-2012-05-09  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-05-09  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* coders/png.c (ReadOnePNGImage): make transparent_color elements
 	unsigned long instead of unsigned short, so 65537 is actually out of
@@ -620,7 +620,7 @@
 	support logic.
 	(AddDefinition): Fix use of uninitialized variable.
 
-2012-04-23  Glenn Randers-Pehrson  <glennrp@simplesystems.org> 
+2012-04-23  Glenn Randers-Pehrson  <glennrp@simplesystems.org>
 
 	* doc/*.imdoc: some example commandlines in the documentation
 	were missing the leading "gm ".

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2019 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -1121,19 +1121,24 @@ MagickExport MagickPassFail ModulateImage(Image *image,const char *modulate)
   unsigned int
     is_grayscale;
 
+  int
+    param_num;
+
   MagickPassFail
     status=MagickPass;
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   if (modulate == (char *) NULL)
-    return(MagickFail);
+    ThrowBinaryException(OptionError,MissingArgument,modulate);
   is_grayscale=image->is_grayscale;
   param.percent_brightness=100.0;
   param.percent_saturation=100.0;
   param.percent_hue=100.0;
-  (void) sscanf(modulate,"%lf%*[,/]%lf%*[,/]%lf",&param.percent_brightness,
-    &param.percent_saturation,&param.percent_hue);
+  param_num=sscanf(modulate,"%lf%*[,/]%lf%*[,/]%lf",&param.percent_brightness,
+                   &param.percent_saturation,&param.percent_hue);
+  if (param_num <= 0)
+    ThrowBinaryException(OptionError,MissingArgument,modulate);
   /*
     Ensure that adjustment values are positive so they don't need to
     be checked in Modulate.
@@ -1142,27 +1147,38 @@ MagickExport MagickPassFail ModulateImage(Image *image,const char *modulate)
   param.percent_saturation=AbsoluteValue(param.percent_saturation);
   param.percent_hue=AbsoluteValue(param.percent_hue);
 
-  FormatString(progress_message,"[%%s] Modulate %g/%g/%g...",
-               param.percent_brightness,param.percent_saturation,
-               param.percent_hue);
-  TransformColorspace(image,RGBColorspace);
+  MagickFormatString(progress_message,sizeof(progress_message),
+                     "[%%s] Modulate %g/%g/%g...",
+                     param.percent_brightness,param.percent_saturation,
+                     param.percent_hue);
+  status&=TransformColorspace(image,RGBColorspace);
+
+  if (status == MagickFail)
+    goto modulate_image_error;
+
   if (image->storage_class == PseudoClass)
     {
-      (void) ModulateImagePixels(NULL,&param,image,image->colormap,
-                                 (IndexPacket *) NULL,image->colors,
-                                 &image->exception);
-      status=MagickMonitorFormatted(image->colors,(size_t) image->colors+1,&image->exception,
-                             progress_message,image->filename);
+      status&=ModulateImagePixels(NULL,&param,image,image->colormap,
+                                  (IndexPacket *) NULL,image->colors,
+                                  &image->exception);
+      status&=MagickMonitorFormatted(image->colors,(size_t) image->colors+1,&image->exception,
+                                     progress_message,image->filename);
       status&=SyncImage(image);
     }
   else
     {
-      status=PixelIterateMonoModify(ModulateImagePixels,NULL,progress_message,
-                                    NULL,&param,0,0,image->columns,image->rows,
-                                    image,&image->exception);
+      status&=PixelIterateMonoModify(ModulateImagePixels,NULL,progress_message,
+                                     NULL,&param,0,0,image->columns,image->rows,
+                                     image,&image->exception);
     }
 
+  if (status == MagickFail)
+    goto modulate_image_error;
+
   image->is_grayscale=is_grayscale;
+
+ modulate_image_error:
+
   return(status);
 }
 

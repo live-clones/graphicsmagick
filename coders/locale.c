@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -41,12 +41,20 @@
 #include "magick/log.h"
 #include "magick/magick.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 
 /*
   Forward declarations.
 */
 static unsigned int
-  WriteLOCALEImage(const ImageInfo *,Image *);
+WriteLOCALEImage(const ImageInfo *,Image *);
+
+static void
+WriteBlobStringEOL(Image *image);
+
+static void
+WriteBlobStringWithEOL(Image *image,const char *s);
+
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -647,93 +655,93 @@ static void accumulate(const char **buf, int siz, struct locale_str **locstr)
  */
 static void output_switches(Image *image,struct locale_str *locstr, int indent, int elseflag)
 {
-   char
-     message[10*MaxTextExtent];
+  char
+    message[10*MaxTextExtent];
 
-    int flag;
-    struct locale_str *xl;
-    char *p, *field = (char *) "NEXT_FIELD";
+  int flag;
+  struct locale_str *xl;
+  char *p, *field = (char *) "NEXT_FIELD";
 
-    if (!locstr)
+  if (!locstr)
     {
-        (void) fprintf(stderr, "NULL locstr in output_switches\n");
-        return;
+      (void) fprintf(stderr, "NULL locstr in output_switches\n");
+      return;
     }
 
-    if (elseflag < 0)
-        field = (char *) "locale", elseflag = 0;
+  if (elseflag < 0)
+    field = (char *) "locale", elseflag = 0;
 
-    if (!locstr->next)     /* output simpler code for a single case */
+  if (!locstr->next)     /* output simpler code for a single case */
     {
-        p = EscapeLocaleString(locstr->name);
-        if (!locstr->lower)
-          {
-            FormatString(message, "%*sreturn *np ? tag : \"%s\";\n", indent, "", p);
-            (void) WriteBlobString(image,message);
-          }
-        else
+      p = EscapeLocaleString(locstr->name);
+      if (!locstr->lower)
         {
-            if (elseflag)
-                indent -= INDENT;
-
-            FormatString(message, "%*sif (LocaleNCompare(%s, \"%s\", %ld) || p - tp != %ld)\n%*sreturn tag;\n%*selse\n",
-                    indent, "", field, p, (long) strlen(locstr->name),
-                    (long) strlen(locstr->name), indent+INDENT, "", indent, "");
-            (void) WriteBlobString(image,message);
-
-            output_switches(image, locstr->lower, indent+INDENT, 1);
+          MagickFormatString(message, sizeof(message), "%*sreturn *np ? tag : \"%s\";\n", indent, "", p);
+          (void) WriteBlobString(image,message);
         }
-        MagickFreeMemory(p);
-        return;
+      else
+        {
+          if (elseflag)
+            indent -= INDENT;
+
+          MagickFormatString(message, sizeof(message), "%*sif (LocaleNCompare(%s, \"%s\", %ld) || p - tp != %ld)\n%*sreturn tag;\n%*selse\n",
+                             indent, "", field, p, (long) strlen(locstr->name),
+                             (long) strlen(locstr->name), indent+INDENT, "", indent, "");
+          (void) WriteBlobString(image,message);
+
+          output_switches(image, locstr->lower, indent+INDENT, 1);
+        }
+      MagickFreeMemory(p);
+      return;
     }
 
-    FormatString(message, "%*sswitch (*%s)\n%*s{\n%*sdefault:\n%*sreturn tag;\n",
-                indent, "", field, indent, "", indent, "", indent+INDENT, "");
+  MagickFormatString(message, sizeof(message), "%*sswitch (*%s)\n%*s{\n%*sdefault:\n%*sreturn tag;\n",
+                     indent, "", field, indent, "", indent, "", indent+INDENT, "");
 
-    (void) WriteBlobString(image,message);
-    xl = locstr;
-    if (!xl->lower)
+  (void) WriteBlobString(image,message);
+  xl = locstr;
+  if (!xl->lower)
     {
-        p = EscapeLocaleString(xl->name);
-        FormatString(message, "\n%*scase '\\0':\n%*sreturn \"%s\";\n",
-                indent, "", indent+INDENT, "", p);
-        (void) WriteBlobString(image,message);
-        MagickFreeMemory(p);
-        xl = xl->next;
+      p = EscapeLocaleString(xl->name);
+      MagickFormatString(message, sizeof(message), "\n%*scase '\\0':\n%*sreturn \"%s\";\n",
+                         indent, "", indent+INDENT, "", p);
+      (void) WriteBlobString(image,message);
+      MagickFreeMemory(p);
+      xl = xl->next;
     }
 
-    for (flag = 1; xl; xl = xl->next)
+  for (flag = 1; xl; xl = xl->next)
     {
-        if (flag)
-          {
-            FormatString(message, "\n%*scase '%c':  case '%c':\n",
-                         indent, "", tolower((int) *xl->name), toupper((int) *xl->name));
-            (void) WriteBlobString(image,message);
-          }
+      if (flag)
+        {
+          MagickFormatString(message, sizeof(message), "\n%*scase '%c':  case '%c':\n",
+                             indent, "", tolower((int) *xl->name), toupper((int) *xl->name));
+          (void) WriteBlobString(image,message);
+        }
 
-        p = EscapeLocaleString(xl->name);
-        FormatString(message, "%*sif (p - tp == %ld && !LocaleNCompare(tp, \"%s\", %ld))\n",
-                indent+INDENT, "", (long) strlen(xl->name), p, (long) strlen(xl->name));
-        (void) WriteBlobString(image,message);
-        MagickFreeMemory(p);
+      p = EscapeLocaleString(xl->name);
+      MagickFormatString(message, sizeof(message), "%*sif (p - tp == %ld && !LocaleNCompare(tp, \"%s\", %ld))\n",
+                         indent+INDENT, "", (long) strlen(xl->name), p, (long) strlen(xl->name));
+      (void) WriteBlobString(image,message);
+      MagickFreeMemory(p);
 
-        output_switches(image,xl->lower, indent+INDENT+INDENT, 0);
-        FormatString(message, "%*selse\n", indent+INDENT, "");
-        (void) WriteBlobString(image,message);
+      output_switches(image,xl->lower, indent+INDENT+INDENT, 0);
+      MagickFormatString(message, sizeof(message), "%*selse\n", indent+INDENT, "");
+      (void) WriteBlobString(image,message);
 
-        flag = xl->next == 0 || tolower((int) *xl->name) != tolower((int) *xl->next->name);
-        if (flag)
-          {
-            FormatString(message, "%*sreturn tag;\n", indent+INDENT+INDENT, "");
-            (void) WriteBlobString(image,message);
-          }
+      flag = xl->next == 0 || tolower((int) *xl->name) != tolower((int) *xl->next->name);
+      if (flag)
+        {
+          MagickFormatString(message, sizeof(message), "%*sreturn tag;\n", indent+INDENT+INDENT, "");
+          (void) WriteBlobString(image,message);
+        }
     }
 
-    FormatString(message, "%*s}\n", indent, "");
-    (void) WriteBlobString(image,message);
+  MagickFormatString(message, sizeof(message), "%*s}\n", indent, "");
+  (void) WriteBlobString(image,message);
 }
 
-void WriteBlobStringEOL(Image *image)
+static void WriteBlobStringEOL(Image *image)
 {
 #if defined(MSWINDOWS)
   (void) WriteBlobString(image,"\r\n");
@@ -742,7 +750,7 @@ void WriteBlobStringEOL(Image *image)
 #endif
 }
 
-void WriteBlobStringWithEOL(Image *image,const char *s)
+static void WriteBlobStringWithEOL(Image *image,const char *s)
 {
   (void) WriteBlobString(image,s);
 #if defined(MSWINDOWS)
@@ -816,51 +824,53 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
         Write microsoft message compiler message file format.
       */
       for (i=0; i < count; i++)
-      {
-        char
-          *fields[4],
-          text[MaxTextExtent],
-          path[MaxTextExtent];
+        {
+          char
+            *fields[4],
+            text[MaxTextExtent],
+            path[MaxTextExtent],
+            emptystr[1];
 
-        unsigned int
-          index;
+          unsigned int
+            index;
 
-        register char
-          *p;
+          register char
+            *p;
 
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < 4) && (p > path); p--)
+          (void) strlcpy(path,locale[i],sizeof(path));
+          emptystr[0]='\0';
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]=emptystr;
+              for (index=0; (index < 4) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[3-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[3-index]=p+1;
+                      index++;
+                    }
                 }
+              (void) WriteBlobString(image,"\r\n");
+              if (i == 0)
+                {
+                  (void) WriteBlobString(image,"MessageId       = 0\r\nSymbolicName    = GENERIC_MESSAGE\r\nLanguage        = English\r\n%1\r\n.\r\n");
+                  (void) WriteBlobString(image,"MessageId       = 1\r\n");
+                }
+              else
+                (void) WriteBlobString(image,"MessageId       = +1\r\n");
+              MagickFormatString(text, sizeof(text), "SymbolicName    = %s%s%s\r\n", fields[0],fields[1],fields[2]);
+              (void) WriteBlobString(image,text);
+              (void) WriteBlobString(image,"Language        = English\r\n");
+              MagickFormatString(text, sizeof(text), "%s\r\n", fields[3]);
+              (void) WriteBlobString(image,text);
+              (void) WriteBlobString(image,".\r\n");
             }
-            (void) WriteBlobString(image,"\r\n");
-            if (i == 0)
-              {
-               (void) WriteBlobString(image,"MessageId       = 0\r\nSymbolicName    = GENERIC_MESSAGE\r\nLanguage        = English\r\n%1\r\n.\r\n");
-               (void) WriteBlobString(image,"MessageId       = 1\r\n");
-              }
-            else
-              (void) WriteBlobString(image,"MessageId       = +1\r\n");
-            FormatString(text, "SymbolicName    = %s%s%s\r\n", fields[0],fields[1],fields[2]);
-            (void) WriteBlobString(image,text);
-            (void) WriteBlobString(image,"Language        = English\r\n");
-            FormatString(text, "%s\r\n", fields[3]);
-            (void) WriteBlobString(image,text);
-            (void) WriteBlobString(image,".\r\n");
-          }
-      }
+        }
     }
   else if (LocaleCompare(image_info->magick,"LOCALEH") == 0)
     {
@@ -892,36 +902,36 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       WriteBlobStringEOL(image);
       WriteBlobStringWithEOL(image,"extern MagickExport const char *GetLocaleMessageFromID(const int) MAGICK_FUNC_CONST;");
       WriteBlobStringEOL(image);
-      FormatString(text, "#define MAX_LOCALE_MSGS %d",count);
+      MagickFormatString(text, sizeof(text), "#define MAX_LOCALE_MSGS %d",count);
       WriteBlobStringWithEOL(image,text);
       WriteBlobStringEOL(image);
       /*
         Write series of #defines for all the messages in the system.
       */
       for (i=0; i < count; i++)
-      {
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
+        {
+          (void) strlcpy(path,locale[i],sizeof(path));
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]="";
+              for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[4-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[4-index]=p+1;
+                      index++;
+                    }
                 }
+              MagickFormatString(text, sizeof(text), "#define MGK_%s%s%s%s %d",fields[0],fields[1],
+                                 fields[2],fields[3],i+1);
+              WriteBlobStringWithEOL(image,text);
             }
-            FormatString(text, "#define MGK_%s%s%s%s %d",fields[0],fields[1],
-              fields[2],fields[3],i+1);
-            WriteBlobStringWithEOL(image,text);
-          }
-      }
+        }
       /*
         Write a table that maps category strings over to severity id's
       */
@@ -940,41 +950,41 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       last2[0]='\0';
       severityindex=0;
       for (i=0; i < count; i++)
-      {
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
+        {
+          (void) strlcpy(path,locale[i],sizeof(path));
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]="";
+              for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[4-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[4-index]=p+1;
+                      index++;
+                    }
+                }
+              MagickFormatString(category, sizeof(text), "%s%s",fields[0], fields[1]);
+              MagickFormatString(severity, sizeof(text), "%s%s%s",fields[0], fields[1], fields[2]);
+              if (LocaleCompare(severity,last2) != 0)
+                {
+                  severityindex++;
+                  (void) strlcpy(last2,severity,MaxTextExtent);
+                }
+              if (LocaleCompare(category,last) != 0)
+                {
+                  MagickFormatString(text, sizeof(text), "    { \"%s%s%s\", %d },", fields[0],
+                               strlen(fields[0]) ? "/" : "", fields[1], severityindex-1);
+                  WriteBlobStringWithEOL(image,text);
+                  (void) strlcpy(last,category,MaxTextExtent);
                 }
             }
-            FormatString(category, "%s%s",fields[0], fields[1]);
-            FormatString(severity, "%s%s%s",fields[0], fields[1], fields[2]);
-            if (LocaleCompare(severity,last2) != 0)
-              {
-                severityindex++;
-                (void) strlcpy(last2,severity,MaxTextExtent);
-              }
-           if (LocaleCompare(category,last) != 0)
-              {
-                FormatString(text, "    { \"%s%s%s\", %d },", fields[0],
-                  strlen(fields[0]) ? "/" : "", fields[1], severityindex-1);
-                WriteBlobStringWithEOL(image,text);
-                (void) strlcpy(last,category,MaxTextExtent);
-              }
-          }
-      }
-      FormatString(text, "    { \"\", %d }",severityindex-1);
+        }
+      MagickFormatString(text, sizeof(text), "    { \"\", %d }",severityindex-1);
       WriteBlobStringWithEOL(image,text);
       WriteBlobStringWithEOL(image,"  };");
       WriteBlobStringWithEOL(image,"#endif");
@@ -993,36 +1003,36 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       WriteBlobStringWithEOL(image,"  {");
       last[0]='\0';
       for (i=0; i < count; i++)
-      {
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
+        {
+          (void) strlcpy(path,locale[i],sizeof(path));
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]="";
+              for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[4-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[4-index]=p+1;
+                      index++;
+                    }
+                }
+              MagickFormatString(severity, sizeof(severity), "%s%s%s",fields[0], fields[1], fields[2]);
+              if (LocaleCompare(severity,last) != 0)
+                {
+                  MagickFormatString(text, sizeof(text), "    { \"%s%s%s/%s\", %d, %s },", fields[0],
+                               strlen(fields[0]) ? "/" : "", fields[1], fields[2], i,
+                               severity);
+                  WriteBlobStringWithEOL(image,text);
+                  (void) strlcpy(last,severity,MaxTextExtent);
                 }
             }
-            FormatString(severity, "%s%s%s",fields[0], fields[1], fields[2]);
-            if (LocaleCompare(severity,last) != 0)
-              {
-                FormatString(text, "    { \"%s%s%s/%s\", %d, %s },", fields[0],
-                  strlen(fields[0]) ? "/" : "", fields[1], fields[2], i,
-                             severity);
-                WriteBlobStringWithEOL(image,text);
-                (void) strlcpy(last,severity,MaxTextExtent);
-              }
-          }
-      }
-      FormatString(text, "    { \"\", %d, UndefinedException }",count);
+        }
+      MagickFormatString(text, sizeof(text), "    { \"\", %d, UndefinedException }",count);
       WriteBlobStringWithEOL(image,text);
       WriteBlobStringWithEOL(image,"  };");
       WriteBlobStringWithEOL(image,"#endif");
@@ -1040,29 +1050,29 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       WriteBlobStringWithEOL(image,"static const MessageInfo message_map[] =");
       WriteBlobStringWithEOL(image,"  {");
       for (i=0; i < count; i++)
-      {
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
+        {
+          (void) strlcpy(path,locale[i],sizeof(path));
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]="";
+              for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[4-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[4-index]=p+1;
+                      index++;
+                    }
                 }
+              MagickFormatString(text, sizeof(text), "    { \"%s\", MGK_%s%s%s%s },", fields[3],
+                           fields[0],fields[1],fields[2],fields[3]);
+              WriteBlobStringWithEOL(image,text);
             }
-            FormatString(text, "    { \"%s\", MGK_%s%s%s%s },", fields[3],
-                         fields[0],fields[1],fields[2],fields[3]);
-            WriteBlobStringWithEOL(image,text);
-          }
-      }
+        }
       WriteBlobStringWithEOL(image,"    { \"\", 0 }");
       WriteBlobStringWithEOL(image,"  };");
       WriteBlobStringWithEOL(image,"#endif /* if defined(_INCLUDE_TAGMAP_TABLE_) */");
@@ -1076,28 +1086,28 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       /* message 0 is reserved as the generic windows event message */
       WriteBlobStringWithEOL(image,"    \"%1\\0\"");
       for (i=0; i < count; i++)
-      {
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
+        {
+          (void) strlcpy(path,locale[i],sizeof(path));
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]="";
+              for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[4-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[4-index]=p+1;
+                      index++;
+                    }
                 }
+              MagickFormatString(text, sizeof(text), "    \"%s\\0\"",fields[4]);
+              WriteBlobStringWithEOL(image,text);
             }
-            FormatString(text, "    \"%s\\0\"",fields[4]);
-            WriteBlobStringWithEOL(image,text);
-          }
-      }
+        }
       /* WriteBlobStringWithEOL(image,"    0"); */
       /* WriteBlobStringWithEOL(image,"  };"); */
       WriteBlobStringWithEOL(image,"  ;");
@@ -1106,44 +1116,44 @@ static unsigned int WriteLOCALEImage(const ImageInfo *image_info,Image *image)
       WriteBlobStringWithEOL(image,"static const unsigned short message_dat_offsets[] =");
       WriteBlobStringWithEOL(image,"  {");
       offset=0;
-      FormatString(text, "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
+      MagickFormatString(text, sizeof(text), "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
       WriteBlobStringWithEOL(image,text);
       /* message 0 is reserved as the generic windows event message */
       /* WriteBlobStringWithEOL(image,"    \"%1\","); */
       offset += strlen("%1")+1;
-      FormatString(text, "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
+      MagickFormatString(text, sizeof(text), "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
       WriteBlobStringWithEOL(image,text);
       for (i=0; i < count; i++)
-      {
-        (void) strlcpy(path,locale[i],sizeof(path));
-        if (*path != '\0')
-          {
-            p=path+strlen(path)-1;
-            if (*p == '/')
-              *p='\0';
-            for (index=0; index < ArraySize(fields) ; index++)
-              fields[index]="";
-            for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
+        {
+          (void) strlcpy(path,locale[i],sizeof(path));
+          if (*path != '\0')
             {
+              p=path+strlen(path)-1;
               if (*p == '/')
+                *p='\0';
+              for (index=0; index < ArraySize(fields) ; index++)
+                fields[index]="";
+              for (index=0; (index < TREE_LEVELS_SUPPORTED) && (p > path); p--)
                 {
-                  *p='\0';
-                  fields[4-index]=p+1;
-                  index++;
+                  if (*p == '/')
+                    {
+                      *p='\0';
+                      fields[4-index]=p+1;
+                      index++;
+                    }
                 }
+              /* MagickFormatString(text, sizeof(text), "    \"%s\",",fields[4]); */
+              offset += strlen(fields[4])+1;
+              MagickFormatString(text, sizeof(text), "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
+              WriteBlobStringWithEOL(image,text);
             }
-            /* FormatString(text, "    \"%s\",",fields[4]); */
-            offset += strlen(fields[4])+1;
-            FormatString(text, "    %" MAGICK_SIZE_T_F "u,",(MAGICK_SIZE_T) offset);
-            WriteBlobStringWithEOL(image,text);
-          }
-      }
+        }
       WriteBlobStringWithEOL(image,"    0");
       WriteBlobStringWithEOL(image,"  };");
       WriteBlobStringWithEOL(image,"#endif /* if defined(_INCLUDE_MESSAGE_TABLE_) */");
-   }
+    }
   else if ((LocaleCompare(image_info->magick,"LOCALE") == 0) ||
-      (LocaleCompare(image_info->magick,"LOCALEC") == 0))
+           (LocaleCompare(image_info->magick,"LOCALEC") == 0))
     {
       /*
         Write locale comments.

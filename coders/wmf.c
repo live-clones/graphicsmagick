@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -51,6 +51,7 @@
 #include "magick/transform.h"
 #include "magick/utility.h"
 #include "magick/version.h"
+#include "magick/static.h"
 
 #if defined(MSWINDOWS)
 /* The need for this under Visual C++ is a mystery to me */
@@ -317,7 +318,7 @@ static void draw_pattern_push(wmfAPI* API,
   char
     pattern_id[MaxTextExtent];
 
-  FormatString(pattern_id,"brush_%lu",id);
+  MagickFormatString(pattern_id,sizeof(pattern_id),"brush_%lu",id);
   DrawPushPattern(WmfDrawContext,pattern_id,0,0,columns,rows);
 }
 
@@ -544,7 +545,7 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
       char
         size[MaxTextExtent];
 
-      FormatString(size,"%ux%u",bmp_read->width,bmp_read->height);
+      MagickFormatString(size,sizeof(size),"%ux%u",bmp_read->width,bmp_read->height);
       (void) CloneString(&image_info->size,size);
     }
 #if 0
@@ -562,7 +563,7 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
       char
         description[MaxTextExtent];
 
-      FormatString(description,"packed DIB at offset %ld", bmp_read->offset);
+      MagickFormatString(description,sizeof(description),"packed DIB at offset %ld", bmp_read->offset);
       ThrowException2(&ddata->image->exception,CorruptImageError,
                       exception.reason,exception.description);
       DestroyExceptionInfo(&exception);
@@ -642,7 +643,7 @@ static void ipa_device_begin(wmfAPI * API)
 
   DrawSetViewbox(WmfDrawContext, 0, 0, ddata->image->columns, ddata->image->rows);
 
-  FormatString(comment,"Created by %s",
+  MagickFormatString(comment,sizeof(comment),"Created by %s",
                GetMagickVersion((unsigned long *) NULL));
   DrawComment(WmfDrawContext,comment);
 
@@ -692,7 +693,7 @@ static void ipa_device_begin(wmfAPI * API)
           DrawComposite(WmfDrawContext, CopyCompositeOp, 0, 0, image->columns, image->rows, image);
           DrawPopPattern(WmfDrawContext);
           DrawPopDefs(WmfDrawContext);
-          FormatString(pattern_id,"#brush_%lu",ddata->pattern_id);
+          MagickFormatString(pattern_id,sizeof(pattern_id),"#brush_%lu",ddata->pattern_id);
           DrawSetFillPatternURL(WmfDrawContext,pattern_id);
           ++ddata->pattern_id;
 
@@ -1144,7 +1145,7 @@ static void ipa_region_clip(wmfAPI *API, wmfPolyRectangle_t *poly_rect)
       /* Define clip path */
       ddata->clip_path_id++;
       DrawPushDefs(WmfDrawContext);
-      FormatString(clip_path_id,"clip_%lu",ddata->clip_path_id);
+      MagickFormatString(clip_path_id,sizeof(clip_path_id),"clip_%lu",ddata->clip_path_id);
       DrawPushClipPath(WmfDrawContext,clip_path_id);
       DrawPushGraphicContext(WmfDrawContext);
       for (i = 0; i < poly_rect->count; i++)
@@ -1663,7 +1664,7 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
           char
             pattern_id[MaxTextExtent];
 
-          FormatString(pattern_id, "#brush_%lu", ddata->pattern_id);
+          MagickFormatString(pattern_id, sizeof(pattern_id), "#brush_%lu", ddata->pattern_id);
 
           if (brush_apply == BrushApplyStroke)
             DrawSetStrokePatternURL(WmfDrawContext,pattern_id);
@@ -1687,18 +1688,26 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
       }
     case BS_DIBPATTERN /* 5 */:
       {
-        wmfBMP
+        wmfBMP  /* struct _wmfBMP { U16 width; U16 height; void* data; } */
           *brush_bmp = WMF_BRUSH_BITMAP(brush);
-
         if (brush_bmp && brush_bmp->data != 0)
           {
+            /*
+              oss-fuzz 482160523 reveals that brush_bmp->data can be non-zero without being set-up by ipa_bmp_read()!
+              It seems that libwmf does not enforce an order of operations.
+            */
+#if 0
             CompositeOperator
               mode;
 
             const Image
               *image;
 
+            /* This is supposed to be set to a decoded image by ipa_bmp_read() */
             image = (Image*)brush_bmp->data;
+
+            assert(image != (Image *) NULL);
+            assert(image->signature == MagickSignature);
 
             mode = CopyCompositeOp;  /* Default is copy */
             switch (WMF_DC_ROP(dc))
@@ -1769,7 +1778,7 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
               char
                 pattern_id[MaxTextExtent];
 
-              FormatString(pattern_id, "#brush_%lu", ddata->pattern_id);
+              MagickFormatString(pattern_id, sizeof(pattern_id), "#brush_%lu", ddata->pattern_id);
 
               if (brush_apply == BrushApplyStroke)
                 DrawSetStrokePatternURL(WmfDrawContext,pattern_id);
@@ -1777,6 +1786,7 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
                 DrawSetFillPatternURL(WmfDrawContext,pattern_id);
               ++ddata->pattern_id;
             }
+#endif
           }
         else
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),"util_set_brush: no BMP image data!");
@@ -2386,6 +2396,28 @@ static long ipa_blob_tell(void* context)
   return (long)TellBlob((Image*)context);
 }
 
+static void *api_malloc(void* context,size_t size)
+{
+  (void) context;
+  /* return MagickMallocCleared(size); */
+  return MagickAllocateResourceLimitedClearedMemory(void *,size);
+}
+
+static void *api_realloc(void* context,void* memory,size_t size)
+{
+  (void) context;
+  /* return MagickRealloc(memory,size); */
+  return MagickReallocateResourceLimitedMemory(void *,memory,size);
+}
+
+static void api_free(void* context,void* memory)
+{
+  (void) context;
+  /* MagickFree(mem); */
+  MagickFreeResourceLimitedMemory(void *,memory);
+  return;
+}
+
 static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * exception)
 {
   Image
@@ -2448,6 +2480,12 @@ static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * excepti
   /* Register callbacks */
   wmf_options_flags |= WMF_OPT_FUNCTION;
   (void) memset(&wmf_api_options, 0, sizeof(wmf_api_options));
+
+  wmf_api_options.context = 0;
+  wmf_api_options.malloc = api_malloc;
+  wmf_api_options.realloc = api_realloc;
+  wmf_api_options.free = api_free;
+
   wmf_api_options.function = ipa_functions;
 
   /* Ignore non-fatal errors */
@@ -2828,6 +2866,7 @@ ModuleExport void RegisterWMFImage(void)
   entry->blob_support = True;
   entry->seekable_stream=True;
   entry->module = "WMF";
+  entry->coder_class=UnstableCoderClass;
   (void) RegisterMagickInfo(entry);
 #endif /* HasWMF || HasWMFlite */
 }

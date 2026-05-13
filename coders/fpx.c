@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 %
@@ -56,6 +56,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/utility.h"
+#include "magick/static.h"
 #if defined(HasFPX)
 #  if defined(POSIX)
 #    include <fpxlib.h>
@@ -537,7 +538,7 @@ static Image *ReadFPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
             (long) tile_height,&fpx_info);
         if (fpx_status == FPX_LOW_MEMORY_ERROR)
           {
-            MagickFreeResourceLimitedMemory(scanline);
+            MagickFreeResourceLimitedMemory(unsigned char *,scanline);
             (void) FPX_CloseImage(flashpix);
             FPX_ClearSystem();
             ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
@@ -583,7 +584,7 @@ static Image *ReadFPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                   image->columns,image->rows))
         break;
   }
-  MagickFreeResourceLimitedMemory(scanline);
+  MagickFreeResourceLimitedMemory(unsigned char *,scanline);
   (void) FPX_CloseImage(flashpix);
   FPX_ClearSystem();
   StopTimer(&image->timer);
@@ -950,7 +951,8 @@ static unsigned int WriteFPXImage(const ImageInfo *image_info,Image *image)
 
   (void) memset(&summary_info,0,sizeof(summary_info));
   image->depth=8;
-  (void) TransformColorspace(image,RGBColorspace);
+  if (TransformColorspace(image,RGBColorspace) == MagickFail)
+    ThrowWriterException(CoderError,UnableToTransformColorspace,image);
   tile_width=64;
   tile_height=64;
   colorspace.numberOfComponents=3;
@@ -1209,7 +1211,7 @@ static unsigned int WriteFPXImage(const ImageInfo *image_info,Image *image)
 #endif /* if DEAD_CODE */
   (void) FPX_CloseImage(flashpix);
   FPX_ClearSystem();
-  MagickFreeResourceLimitedMemory(pixels);
+  MagickFreeResourceLimitedMemory(unsigned char *,pixels);
   return(True);
 }
 #else

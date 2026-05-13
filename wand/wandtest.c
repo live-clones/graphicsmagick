@@ -111,7 +111,7 @@ int main(int argc,char **argv)
     *background,
     *fill;
 
-  register long
+  long
     i;
 
   unsigned int

@@ -198,6 +198,14 @@ follows (execute 'configure --help' to see all options).
 Optional Features
 ~~~~~~~~~~~~~~~~~
 
+--disable-openmp
+
+    disable use of OpenMP (automatic multi-threaded loops) at all
+
+--enable-openmp-slow
+
+    enable OpenMP for algorithms which sometimes run slower
+
 --disable-compressed-files
 
     disable reading and writing of gzip/bzip stream files
@@ -211,6 +219,39 @@ Optional Features
     file can take much more resources than expected.  Use this option
     to reject such files.
 
+--disable-largefile
+
+    disable support for large (64 bit) file offsets
+
+--enable-shared
+
+    build shared libraries [default=no]
+
+--enable-static
+
+    build static libraries [default=yes]
+
+--enable-pic
+
+    try to use only PIC/non-PIC objects. Position independent code is
+    normally required in shared libraries.
+
+--disable-installed
+
+    disable building an installed GraphicsMagick (default enabled)
+
+--enable-broken-coders
+
+    enable broken/dangerous file formats support
+
+--enable-maintainer-mode
+
+    enable additional Makefile rules which update generated files
+    included in the distribution. Requires GNU make, Python 3, as well
+    as a number of common development utilities and tools.  Python 3
+    Docutils (0.17.1 or later) are required to format ".rst"
+    reStructuredText files to HTML format.
+
 --enable-prof
 
     enable 'prof' profiling support (default disabled)
@@ -223,41 +264,14 @@ Optional Features
 
     enable 'gcov' profiling support (default disabled)
 
---disable-installed
-
-    disable building an installed GraphicsMagick (default enabled)
-
---enable-broken-coders
-
-    enable broken/dangerous file formats support
-
---disable-largefile
-
-    disable support for large (64 bit) file offsets
-
---disable-openmp
-
-    disable use of OpenMP (automatic multi-threaded loops) at all
-
---enable-openmp-slow
-
-    enable OpenMP for algorithms which sometimes run slower
-
 --enable-symbol-prefix
 
-    enable prefixing library symbols with "Gm"
+    enable prefixing library symbols with "Gm".
 
 --enable-magick-compat
 
-    install ImageMagick utility shortcuts (default disabled)
-
---enable-maintainer-mode
-
-    enable additional Makefile rules which update generated files
-    included in the distribution. Requires GNU make, Python 3, as well
-    as a number of common development utilities and tools.  Python 3
-    Docutils (0.17.1 or later) are required to format ".rst"
-    reStructuredText files to HTML format.
+    install ImageMagick (version 6 and earlier) utility shortcuts (default
+    disabled).
 
 --enable-quantum-library-names
 
@@ -265,22 +279,30 @@ Optional Features
     libraries with different quantum depths to co-exist in same
     directory (only one can be used for development)
 
+--enable-year2038
+
+    support timestamps after 2038.  Many 32-bit operating systems used
+    a 32-bit integer to store 'time_t' values. The 'time_t' values
+    would wrap-around in 2038, causing a reversal in time (back to
+    1970). This option enables (or disables) a 64-bit 'time_t' on
+    32-bit operating systems.
+
 
 Optional Packages/Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
---with-quantum-depth
+--without-threads
 
-    number of bits in a pixel quantum (default 8).  Also see
-    '--enable-quantum-library-names.'
+    disable POSIX threads API support
 
 --with-modules
 
     enable building dynamically loadable modules
 
---without-threads
+--with-quantum-depth
 
-    disable POSIX threads API support
+    number of bits in a pixel quantum (default 8).  Also see
+    '--enable-quantum-library-names.'
 
 --with-frozenpaths
 
@@ -310,6 +332,14 @@ Optional Packages/Options
 
     enable FlashPIX support
 
+--without-gdi32
+
+   disable Windows gdi32/user32 (clipboard) support
+
+--without-gs
+
+   disable Ghostscript support
+
 --without-jbig
 
     disable JBIG support
@@ -318,6 +348,14 @@ Optional Packages/Options
 
     disable WEBP support
 
+--without-heif
+
+    disable HEIF (e.g. AVCI, AVIF, HEIC, MP4) support
+
+--without-jpeg
+
+    disable JPEG support
+
 --without-jp2
 
     disable JPEG v2 support
@@ -325,10 +363,6 @@ Optional Packages/Options
 --with-jxl
 
     enable JPEG-XL support
-
---without-jpeg
-
-    disable JPEG support
 
 --without-jp2
 
@@ -352,7 +386,7 @@ Optional Packages/Options
 
 --with-trio
 
-    enable TRIO library support
+    enable TRIO (C'99 printf/scanf) library support
 
 --without-ttf
 
@@ -385,15 +419,15 @@ Optional Packages/Options
 
 --with-gs-font-dir
 
-    directory containing Ghostscript fonts
+    directory containing legacy Ghostscript fonts (type-ghostscript.mgk)
 
---with-gs-font-dir
+--with-urwbase35otf-font-dir
 
    directory containing Artifex URW Base35 OTF fonts
 
 --with-windows-font-dir
 
-    directory containing MS-Windows fonts
+    directory containing Microsoft Windows fonts (type-windows.mgk)
 
 --without-xml
 
@@ -407,17 +441,13 @@ Optional Packages/Options
 
     disable Zstd support
 
---with-x
-
-    use the X Window System
-
---with-share-path=DIR
-
-    Alternate path to share directory (default share/GraphicsMagick)
-
 --with-libstdc=DIR
 
     use libstdc++ in DIR (for GNU C++)
+
+--with-x
+
+    use the X Window System
 
 GraphicsMagick options represent either features to be enabled, disabled,
 or packages to be included in the build.  When a feature is enabled (via
@@ -557,14 +587,24 @@ Several configure options require special note:
 
 --enable-magick-compat
 
-  Normally GraphicsMagick installs only the 'gm' utility from which all
-  commands may be accessed. Existing packages may be designed to invoke
-  ImageMagick utilities (e.g. "convert"). Specify this option to
-  install ImageMagick utility compatibility links to allow
-  GraphicsMagick to substitute directly for ImageMagick. Take care when
-  selecting this option since if there is an existing ImageMagick
+  Normally GraphicsMagick installs only the 'gm' utility from which
+  all commands may be accessed. Existing packages may be designed to
+  invoke bare ImageMagick utilities (e.g. "convert"). Specify this
+  option to install ImageMagick utility compatibility links to allow
+  GraphicsMagick to substitute directly for ImageMagick. Take care
+  when selecting this option since if there is an existing ImageMagick
   installation installed in the same directory, its utilities will be
   replaced when GraphicsMagick is installed.
+
+  While GraphicsMagick is able to emulate a great many useful
+  ImageMagick commands (given its origin from ImageMagick), be aware
+  that ImageMagick has diverged considerably from its roots, and
+  testing with some version of ImageMagick is not evidence that the
+  commands will work with GraphicsMagick (or even with a subsequent
+  version of ImageMagick).  It is necessary to verify the intended
+  usages before using this option.  Furthermore, ImageMagick 7 has
+  removed the individual commands and expects that all commands are
+  subordinate to its 'magick' utility.
 
 --with-quantum-depth
 
@@ -819,8 +859,14 @@ Several configure options require special note:
 
 --with-windows-font-dir
 
-  Specify the directory containing MS-Windows-compatible fonts. This is
-  not necessary when GraphicsMagick is running under MS-Windows.
+  Specify the directory containing MS-Windows-compatible fonts. This
+  is not necessary when GraphicsMagick is running under Microsoft
+  Windows.  Unfortunately, the fonts provided with Microsoft Windows
+  have changed dramatically over the years. Font names and files from
+  older versions of Windows (e.g. Windows XP from 2001) are simply not
+  available any more.  This means that reading/rendering files
+  (e.g. WMF) which request certain font names will fail because those
+  fonts are no longer provided.
 
 --with-tcmalloc
 
@@ -860,10 +906,12 @@ Several configure options require special note:
 JPEG XL
 -------
 
-JPEG XL seems to be a work in progress, with previous APIs being
-deprecated, and replacement APIs introduced.  We have taken an
-approach to use the latest recommended APIs.  For development testing
-with it (0.7.0 or later) we build it as described on its git page
+The Google Chrome browser now supports the JPEG XL format! Libjxl
+supports the JPEG XL format, which produces smaller files with higher
+quality than JPEG. Most modern open-source based systems provide an
+installable package for libjxl.
+
+For development we build libjxl as described on its Github page
 (https://github.com/libjxl/libjxl), but configure and build it like::
 
   git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules
@@ -878,7 +926,7 @@ with it (0.7.0 or later) we build it as described on its git page
   make install
 
 While the JPEG XL project recommends using Clang, it is observed to
-work without known issues when compiled using GCC 9.4.0.
+work without known issues when compiled using GCC.
 
 Popular Distribution Packages
 -----------------------------
@@ -896,10 +944,10 @@ a full GraphicsMagick.  Most of these are optional depending on the
 features desired::
 
   gcc (and/or clang), make, libbz2-dev, libfreetype6-dev, libjbig-dev,
-  liblcms2-dev, liblzma-dev, libpng-dev, libtiff-dev, libtool,
-  libwebp-dev, libwmf-dev, libx11-dev, libxdmcp-dev, libxext-dev,
-  libxft-dev, libxml2-dev, libxt-dev, libzstd-dev, zlib1g-dev,
-  libperl-dev
+  libjxl-dev, libheif-dev, liblcms2-dev, liblzma-dev, libpng-dev,
+  libtiff-dev, libtool, libwebp-dev, libwmf-dev, libx11-dev,
+  libxdmcp-dev, libxext-dev, libxft-dev, libxml2-dev, libxt-dev,
+  libzstd-dev, zlib1g-dev, libperl-dev
 
 These additional packages are useful in order to improve the run-time
 features of the software (and could be installed prior to building
@@ -945,37 +993,70 @@ Building under MinGW-W64 & MSYS2
 --------------------------------
 
 GraphicsMagick may easily be built using the free `MSYS2
-<https://www.msys2.org/>`_ distribution which provides GCC compilers,
-libraries, and headers, targeting native Windows along with a
-Unix-like command shell and a package manager ('pacman') to install
+<https://www.msys2.org/>`_ distribution which provides GCC or Clang
+compilers, libraries, and headers, targeting native Windows along with
+a Unix-like command shell and a package manager ('pacman') to install
 pre-compiled components.  Using the pre-compiled packages, it is as
 easy to compile GraphicsMagick under MSYS2 as it is under Linux!
 
-When using MSYS2, requesting to install these packages using 'pacman
--S' should result in getting up to speed very quicky with a featureful
-64-bit build:
+When using MSYS2, installing developer packages using 'pacman' results
+in getting up to speed very quickly with a featureful 64-bit build.
 
-mingw-w64-x86_64-toolchain, mingw-w64-x86_64-bzip2,
-mingw-w64-x86_64-freetype, mingw-w64-x86_64-ghostscript,
-mingw-w64-x86_64-jasper, mingw-w64-x86_64-jbigkit,
-mingw-w64-x86_64-lcms2, mingw-w64-x86_64-libheif,
-mingw-w64-x86_64-libjpeg-turbo, mingw-w64-x86_64-libjxl,
-mingw-w64-x86_64-libpng, mingw-w64-x86_64-libtiff,
-mingw-w64-x86_64-libtool, mingw-w64-x86_64-libwebp,
-mingw-w64-x86_64-libwmf, mingw-w64-x86_64-libxml2,
-mingw-w64-x86_64-libzip, mingw-w64-x86_64-zlib,
+MSYS2 installs multiple build environments.  The original build
+environment based on the classic msvcrt.dll (works for Windows 7/8 and
+usually later) is called "MSYS2 MINGW64", and the modern build
+environment based on ucrtbase.dll (works for Windows 10/11) is called
+"MSYS2 UCRT64".  There are also build environments based on the Clang
+compiler ("MSYS2 CLANG64"), and targetting the ARM64 CPU ("MSYS2
+CLANGARM64").
 
-and/or use the following to add support for a 32-bit build:
+If support for older Windows is not needed, then targetting UCRT64
+will result in more performant, more reliable, and more capable
+software since ucrtbase.dll supports more/updated interfaces such as
+C'99 and does not require the "shim" wrapper layer that msvcrt.dll
+does.
 
-mingw-w64-i686-toolchain, mingw-w64-i686-bzip2,
-mingw-w64-i686-freetype, mingw-w64-i686-ghostscript,
-mingw-w64-i686-jasper, mingw-w64-i686-jbigkit,
-mingw-w64-i686-lcms2, mingw-w64-i686-libheif,
-mingw-w64-i686-libjpeg-turbo, mingw-w64-i686-libjxl,
-mingw-w64-i686-libpng, mingw-w64-i686-libtiff,
-mingw-w64-i686-libtool, mingw-w64-i686-libwebp,
-mingw-w64-i686-libwmf, mingw-w64-i686-libxml2,
-mingw-w64-i686-libzip, mingw-w64-i686-zlib,
+Packages targetting MINGW64 use an architecture specification of
+"mingw-w64-x86_64" in package names whereas packages targetting UCRT64
+use "mingw-w64-ucrt-x86_64".
+
+If you have not yet updated MSYS2 after the initial install, or have
+not updated for several months, then enter the MSYS2 shell, and update
+MSYS2 first using 'pacman -Syuu'. Once 'pacman -Syuu' completes, exit
+the MSYS2 shell, open a MSYS2 shell, and execute 'pacman -Syuu' again
+to ensure that all packages are up to date.
+
+Use 'pacman -S' to install packages.  The following package names are
+an example and should be ammended when targetting UCRT64, or other
+MSYS2 development target.
+
+These packages are needed for a complete 64-bit x86_64 build:
+
+base-devel mingw-w64-x86_64-autotools mingw-w64-x86_64-gcc
+mingw-w64-x86_64-toolchain mingw-w64-x86_64-bzip2
+mingw-w64-x86_64-freetype mingw-w64-x86_64-ghostscript
+mingw-w64-x86_64-jasper mingw-w64-x86_64-jbigkit
+mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libheif
+mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-libjxl
+mingw-w64-x86_64-libpng mingw-w64-x86_64-libtiff
+mingw-w64-x86_64-libtool mingw-w64-x86_64-libwebp
+mingw-w64-x86_64-libwmf mingw-w64-x86_64-libxml2
+mingw-w64-x86_64-libzip mingw-w64-x86_64-zlib
+
+And/or use the following to add support for a 32-bit i686 build:
+
+base-devel mingw-w64-i686-toolchain mingw-w64-i686-bzip2
+mingw-w64-i686-freetype mingw-w64-i686-ghostscript
+mingw-w64-i686-jasper mingw-w64-i686-jbigkit mingw-w64-i686-lcms2
+mingw-w64-i686-libheif mingw-w64-i686-libjpeg-turbo
+mingw-w64-i686-libjxl mingw-w64-i686-libpng mingw-w64-i686-libtiff
+mingw-w64-i686-libtool mingw-w64-i686-libwebp mingw-w64-i686-libwmf
+mingw-w64-i686-libxml2 mingw-w64-i686-libzip mingw-w64-i686-zlib
+
+If you would like to install Mercurial in order to access the
+GraphicsMagick source repository, then install 'mercurial'. If you
+would like to use Clang for development, then install
+'mingw-w64-clang-x86_64-toolchain.'
 
 Note that the default installation prefix is MSYS's notion of
 ``/usr/local`` which installs the package into a MSYS directory. To
@@ -1062,7 +1143,7 @@ Common causes of configure failures are:
 If all reasonable corrective actions have been tried and the problem
 appears to be due to a flaw in the configure script, please send a
 bug report to the configure script maintainer (currently
-bfriesen@graphicsmagick.org). All bug reports should contain the
+graphicsmagick.project@gmail.com). All bug reports should contain the
 operating system type (as reported by 'uname -a') and the
 compiler/compiler-version. A copy of the configure script output
 and/or the config.log file may be valuable in order to find the

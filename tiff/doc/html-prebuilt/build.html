@@ -3,14 +3,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Building the TIFF Software Distribution &#8212; LibTIFF 4.5.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <title>Building the TIFF Software Distribution &#8212; LibTIFF 4.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b849a4e9" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=0a676766" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=3b5d5a7b"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Terminology" href="terms.html" />
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="images.html" title="TIFF Test Images"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Building the TIFF Software Distribution</a></li> 
       </ul>
     </div>  
@@ -127,7 +127,7 @@ recommended)</p></li>
 <code class="docutils literal notranslate"><span class="pre">NMake</span> <span class="pre">Makefiles</span></code> or <code class="docutils literal notranslate"><span class="pre">MSBuild</span></code> depending upon the setup.
 Run <strong class="command">cmake --help</strong> to list all the
 generators available for your platform.  For example, to use the Ninja
-<a class="reference external" href="https://martine.github.io/ninja/">build system</a> on UNIX or
+<a class="reference external" href="https://ninja-build.org/">build system</a> on UNIX or
 Windows:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-G<span class="w"> </span>Ninja
 cmake<span class="w"> </span>--build<span class="w"> </span>.
@@ -145,7 +145,7 @@ ctest<span class="w"> </span>-V<span class="w"> </span>-C<span class="w"> </span
 cmake<span class="w"> </span>--build<span class="w"> </span>.<span class="w"> </span>--config<span class="w"> </span>Release<span class="w"> </span>--target<span class="w"> </span>install
 </pre></div>
 </div>
-<p>With the above configuration, it’s also possible to open the generated
+<p>With the above configuration, it's also possible to open the generated
 solution file with the Visual Studio IDE as well as building on the
 command-line.</p>
 </section>
@@ -320,7 +320,7 @@ and then <strong class="command">make install</strong> to do the installation; f
 <p>Supplied Makefiles are dependent on a <strong class="program">make</strong> utility and a C
 (and optionally a C++ compiler), so you will need these tools.</p>
 <p>In general, the software is designed such that the following
-should be “make-able” in each directory:</p>
+should be &quot;make-able&quot; in each directory:</p>
 <blockquote>
 <div><table class="docutils align-default" id="id10">
 <caption><span class="caption-text">Make targets</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
@@ -671,7 +671,7 @@ of the codecs in the library; especially the Group 3 and 4 decoder.
 If you encounter problems try disabling support for a particular
 codec; consult the <a class="reference internal" href="internals.html"><span class="doc">Modifying The TIFF Library</span></a>.</p>
 <p>Programs in the tools directory are written to assume an ANSI C
-compilation environment. There may be a few POSIX’isms as well. The
+compilation environment. There may be a few POSIX'isms as well. The
 code in the <code class="file docutils literal notranslate"><span class="pre">port</span></code> directory is provided to emulate routines
 that may be missing on some systems. On UNIX systems the
 <strong class="program">configure</strong> script automatically figures out which routines
@@ -686,7 +686,7 @@ it to view any of the sample images available for testing, or try
 <a class="reference internal" href="tools/tiffinfo.html"><span class="doc">tiffinfo</span></a> to display the file metadata.  See the
 <a class="reference internal" href="images.html"><span class="doc">TIFF Test Images</span></a> section on obtaining the test images.  Otherwise, you can
 do a cursory check of the library with the <a class="reference internal" href="tools/tiffcp.html"><span class="doc">tiffcp</span></a> and
-<a class="reference internal" href="tools/tiffcmp.html"><span class="doc">tiff2cmp</span></a> programs. For example,</p>
+<a class="reference internal" href="tools/tiffcmp.html"><span class="doc">tiffcmp</span></a> programs. For example,</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>tiffcp<span class="w"> </span>-lzw<span class="w"> </span>cramps.tif<span class="w"> </span>x.tif
 tiffcmp<span class="w"> </span>cramps.tif<span class="w"> </span>x.tif
 </pre></div>
@@ -768,7 +768,7 @@ correctly).</p>
 <td><p>directory writing code</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="file docutils literal notranslate"><span class="pre">libtiff/tif_dumpmode.c</span></code></p></td>
-<td><p>“no” compression codec</p></td>
+<td><p>&quot;no&quot; compression codec</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="file docutils literal notranslate"><span class="pre">libtiff/tif_error.c</span></code></p></td>
 <td><p>library error handler</p></td>
@@ -960,13 +960,13 @@ correctly).</p>
         <li class="right" >
           <a href="images.html" title="TIFF Test Images"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">LibTIFF 4.5.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">LibTIFF 4.7.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Building the TIFF Software Distribution</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 1988-2022, LibTIFF contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    &#169; Copyright 1988-2025, LibTIFF contributors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
     </div>
   </body>
 </html>
