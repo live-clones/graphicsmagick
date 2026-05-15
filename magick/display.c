@@ -12523,7 +12523,8 @@ static Image *MagickXTileImage(Display *display,MagickXResourceInfo *resource_in
   if (id < 0)
     return((Image *) NULL);
   q=p;
-  while ((*q != '\n') && (*q != '\0'))
+  while ((*q != '\n') && (*q != '\0') &&
+         ((size_t) (q-p) < sizeof(filename)))
     q++;
   (void) strncpy(filename,p,q-p);
   filename[q-p]='\0';
@@ -12613,7 +12614,8 @@ static Image *MagickXTileImage(Display *display,MagickXResourceInfo *resource_in
       for (p=image->directory; *p != '\0'; p++)
       {
         q=p;
-        while ((*q != '\n') && (*q != '\0'))
+        while ((*q != '\n') && (*q != '\0') &&
+               ((size_t) (q-p+1) < sizeof(filename)))
           q++;
         (void) strncpy(filename,p,q-p);
         filename[q-p]='\0';

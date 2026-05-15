@@ -1,3 +1,15 @@
+2026-05-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/display.c (MagickXTileImage): Address ImageMagick CVE
+        CVE-2026-42050, ImageMagick security advisory GHSA-7mxf-ff4f-jj7p
+        "A malicious MIFF file could trigger an overflow when a user opens
+        it in the display tool and right-clicks a tile to invoke the Load
+        / Update menu item.".  The problem is that the 'filename' buffer
+        on the stack could overflow if the associated file data is too
+        long.  While this is definitely a bug it does not appear to be
+        CVE-worthy. Much thanks to Petr Gajdos for bringing this to my
+        attention.
+
 2026-05-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * GraphicsMagick 1.3.47 was released!
