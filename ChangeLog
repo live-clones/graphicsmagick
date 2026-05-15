@@ -1,5 +1,8 @@
 2026-05-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * www/miff.rst: Document that each montage image directory name is
+        limited to 2052 characters.
+
         * magick/display.c (MagickXTileImage): Address ImageMagick CVE
         CVE-2026-42050, ImageMagick security advisory GHSA-7mxf-ff4f-jj7p
         "A malicious MIFF file could trigger an overflow when a user opens
