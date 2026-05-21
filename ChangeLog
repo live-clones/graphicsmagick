@@ -1,3 +1,8 @@
+2026-05-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/coder_list.cc: Exclude "BIE" since it is the same as
+        "JBIG".
+
 2026-05-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/miff.rst: Document that each montage image directory name is
