@@ -984,31 +984,15 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
             else it is a byte.
           end;
       */
-#if 0
+
       /*
-        Brutal implementation which cannot read files written by older
-        IM/GM versions.
+        Files written by older IM/GM versions with PixMap
+        rowBytes=[201..250] will not be able to be read.
       */
       if (bytes_per_line > 250) /* Was 200 */
         scanline_length=ReadBlobMSBShort(blob);
       else
         scanline_length=ReadBlobByte(blob);
-#else
-      /* Intuit when byteCount must be a word */
-      if (bytes_per_line > 200)
-        {
-          scanline_length=ReadBlobByte(blob);
-          if (scanline_length == 0)
-            {
-              scanline_length <<= 8;
-              scanline_length |= ReadBlobByte(blob);
-            }
-        }
-      else
-        {
-          scanline_length=ReadBlobByte(blob);
-        }
-#endif
 #if 0
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
