@@ -1032,13 +1032,12 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                     if (new_values == (char *) NULL)
                       {
                         MagickFreeResourceLimitedMemory(char *,values);
+                        ThrowMIFFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
                         break;
                       }
                     values=new_values;
                     p=values+strlen(values);
                   }
-                if (values == (char *) NULL)
-                  ThrowMIFFReaderException(ResourceLimitError,MemoryAllocationFailed,image);
                 *p++=c;
                 c=ReadBlobByte(image);
                 if (!in_brace)

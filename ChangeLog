@@ -1,3 +1,11 @@
+2026-05-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/miff.c (ReadMIFFImage): Correct scope of 'values'
+        reallocation error handling.  Addresses "[security] GraphicsMagick
+        MIFF reader: heap-use-after-free WRITE via stale cursor on
+        values-buffer realloc failure (coders/miff.c:1048)" from David
+        Korczynski. Credit to Anthropic Claude and Ada Logics.
+
 2026-05-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/pict.c (DecodeImage): Do not attempt to intuit byteCount
