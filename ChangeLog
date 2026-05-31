@@ -1,3 +1,11 @@
+2026-05-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/locale.c (ReadConfigureFile): Bound the length passed to
+        strncpy() and string terminator. Addresses "[security]
+        GraphicsMagick LOCALE coder: stack-buffer-overflow WRITE in
+        ReadConfigureFile reached from gm convert (coders/locale.c:257)"
+        from David Korczynski. Credit to Anthropic Claude and Ada Logics.
+
 2026-05-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/miff.c (ReadMIFFImage): Correct scope of 'values'

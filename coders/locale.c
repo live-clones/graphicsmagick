@@ -253,8 +253,9 @@ static unsigned int ReadConfigureFile(Image *image,const char *basename,
         for (p=q; (*q != '<') && (*q != '\0'); q++)
           { /* nada */ };
         {
-          (void) strncpy(message,p,(size_t)(q-p));
-          message[q-p]='\0';
+          length=Min((size_t)(q-p),MaxTextExtent-1);
+          (void) strncpy(message,p,length);
+          message[length]='\0';
           (void) MagickStripString(message);
           (void) strlcat(locale,message,sizeof(locale));
           (void) strlcat(locale,"\n",sizeof(locale));
