@@ -1,5 +1,11 @@
 2026-05-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/pcx.c (WritePCXImage): If image has more than 256 colors,
+        save as a DirectClass type.  Addresses "[security] GraphicsMagick
+        PCX writer: heap-buffer-overflow WRITE in WritePCXImage colormap
+        fill (coders/pcx.c:1186)" from David Korczynski. Credit to
+        Anthropic Claude and Ada Logics.
+
         * coders/locale.c (ReadConfigureFile): Bound the length passed to
         strncpy() and string terminator. Addresses "[security]
         GraphicsMagick LOCALE coder: stack-buffer-overflow WRITE in

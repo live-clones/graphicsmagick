@@ -41,6 +41,11 @@
 <p>2026-05-31  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/pcx.c (WritePCXImage): If image has more than 256 colors,
+save as a DirectClass type.  Addresses &quot;[security] GraphicsMagick
+PCX writer: heap-buffer-overflow WRITE in WritePCXImage colormap
+fill (coders/pcx.c:1186)&quot; from David Korczynski. Credit to
+Anthropic Claude and Ada Logics.</p></li>
 <li><p>coders/locale.c (ReadConfigureFile): Bound the length passed to
 strncpy() and string terminator. Addresses &quot;[security]
 GraphicsMagick LOCALE coder: stack-buffer-overflow WRITE in
