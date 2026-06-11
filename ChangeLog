@@ -1,3 +1,9 @@
+2026-06-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/display.c (MagickXTileImage): Correct bounds checking for
+        'filename' length. Thanks to Petr Gajdos for a heads-up regarding
+        the disparity.
+
 2026-05-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/pcx.c (WritePCXImage): If image has more than 256 colors,
