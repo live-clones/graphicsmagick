@@ -39162,7 +39162,6 @@ printf "Windows fonts     --with-windows-font-dir=$with_windows_font_dir\t$resul
 printf "WMF               --with-wmf=$with_wmf          \t$have_wmf" ; if test -n "$LIB_WMF_LIBS" ; then printf " ($LIB_WMF_LIBS)\n" ; else printf "\n" ; fi
 printf "X11               --with-x=$with_x              \t$have_x" ; if test -n "$LIB_X11_LIBS" ; then printf " ($LIB_X11_LIBS)\n" ; else printf "\n" ; fi
 printf "XML               --with-xml=$with_xml          \t$have_xml" ; if test -n "$LIB_XML_LIBS" ; then printf " ($LIB_XML_LIBS)\n" ; else printf "\n" ; fi
-printf "ZIP               --with-libzip=$with_libzip       \t$have_libzip" ; if test -n "$LIB_ZIP" ; then printf " ($LIB_ZIP)\n" ; else printf "\n" ; fi
 printf "ZLIB              --with-zlib=$with_zlib        \t$have_zlib" ; if test -n "$LIB_ZLIB" ; then printf " ($LIB_ZLIB)\n" ; else printf "\n" ; fi
 printf "ZSTD              --with-zstd=$with_zstd        \t$have_zstd" ; if test -n "$LIB_ZSTD" ; then printf " ($LIB_ZSTD)\n" ; else printf "\n" ; fi
 printf "\n"

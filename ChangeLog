@@ -1,3 +1,8 @@
+2026-06-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac: Eliminte redundant report regarding libzip in
+        configuration summary.
+
 2026-06-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/display.c (MagickXTileImage): Correct bounds checking for
