@@ -2,6 +2,12 @@
 
         * NEWS.txt: Update the news.
 
+        * coders/tiff.c (AddIFDExifFields): Add many more validations and
+        safeguards to EXIF in TIFF writer. Addresses "[security] GraphicsMagick
+        TIFF writer: heap-buffer-overflow WRITE in AddIFDExifFields via
+        32-bit count*2 wrap on EXIF SHORT array (coders/tiff.c)" from
+        David Korczynski. Credit to Anthropic Claude and Ada Logics.
+
         * coders/pcd.c (ReadPCDImage): Over-provision the per-channel
         Huffman decode buffers and detect any attempt to overflow
         them. Fixes are inspired by fixes in ImageMagick, but retaining

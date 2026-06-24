@@ -64,6 +64,12 @@ Security Fixes:
   detect any attempt to overflow them. Discovered and reported by
   Cipher - Causal Security (https://causalsecurity.com/).
 
+* TIFF: Add many more validations and safeguards to EXIF in TIFF
+  writer. Addresses "[security] GraphicsMagick TIFF writer:
+  heap-buffer-overflow WRITE in AddIFDExifFields via 32-bit count*2
+  wrap on EXIF SHORT array (coders/tiff.c)" from David
+  Korczynski. Credit to Anthropic Claude and Ada Logics.
+
 Bug fixes:
 
 * PICT: Remove the attempt to intuit byteCount must be a word because
