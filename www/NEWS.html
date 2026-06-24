@@ -147,6 +147,11 @@ writer. Addresses &quot;[security] GraphicsMagick TIFF writer:
 heap-buffer-overflow WRITE in AddIFDExifFields via 32-bit count*2
 wrap on EXIF SHORT array (coders/tiff.c)&quot; from David
 Korczynski. Credit to Anthropic Claude and Ada Logics.</p></li>
+<li><p>GradientImage(): Fix 'pixel_packets' and 'indexes' addressing logic
+for NorthGravity.  Addresses &quot;[security] GraphicsMagick
+GradientImage: heap-buffer-overflow READ in NorthGravity branch
+reached from gm convert (magick/gradient.c:284)&quot; from David
+Korczynski. Credit to Anthropic Claude and Ada Logics.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">

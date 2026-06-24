@@ -70,6 +70,12 @@ Security Fixes:
   wrap on EXIF SHORT array (coders/tiff.c)" from David
   Korczynski. Credit to Anthropic Claude and Ada Logics.
 
+* GradientImage(): Fix 'pixel_packets' and 'indexes' addressing logic
+  for NorthGravity.  Addresses "[security] GraphicsMagick
+  GradientImage: heap-buffer-overflow READ in NorthGravity branch
+  reached from gm convert (magick/gradient.c:284)" from David
+  Korczynski. Credit to Anthropic Claude and Ada Logics.
+
 Bug fixes:
 
 * PICT: Remove the attempt to intuit byteCount must be a word because

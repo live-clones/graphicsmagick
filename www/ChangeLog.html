@@ -42,6 +42,12 @@
 <blockquote>
 <ul class="simple">
 <li><p>NEWS.txt: Update the news.</p></li>
+<li><p>magick/gradient.c (GradientImage): Fix 'pixel_packets' and 'indexes'
+addressing logic for NorthGravity.  Addresses &quot;[security]
+GraphicsMagick GradientImage: heap-buffer-overflow READ in
+NorthGravity branch reached from gm convert
+(magick/gradient.c:284)&quot; from David Korczynski. Credit to
+Anthropic Claude and Ada Logics.</p></li>
 <li><p>coders/tiff.c (AddIFDExifFields): Add many more validations and
 safeguards to EXIF in TIFF writer. Addresses &quot;[security] GraphicsMagick
 TIFF writer: heap-buffer-overflow WRITE in AddIFDExifFields via

@@ -2,6 +2,13 @@
 
         * NEWS.txt: Update the news.
 
+        * magick/gradient.c (GradientImage): Fix 'pixel_packets' and 'indexes'
+        addressing logic for NorthGravity.  Addresses "[security]
+        GraphicsMagick GradientImage: heap-buffer-overflow READ in
+        NorthGravity branch reached from gm convert
+        (magick/gradient.c:284)" from David Korczynski. Credit to
+        Anthropic Claude and Ada Logics.
+
         * coders/tiff.c (AddIFDExifFields): Add many more validations and
         safeguards to EXIF in TIFF writer. Addresses "[security] GraphicsMagick
         TIFF writer: heap-buffer-overflow WRITE in AddIFDExifFields via
