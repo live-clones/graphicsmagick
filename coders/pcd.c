@@ -87,8 +87,10 @@ static unsigned int
 %
 %
 */
-static void Upsample(const unsigned long width,const unsigned long height,
-                     const unsigned long scaled_width,unsigned char *pixels)
+static void Upsample(const unsigned long width,
+                     const unsigned long height,
+                     const unsigned long scaled_width,
+                     unsigned char * restrict pixels)
 {
   register long
     x,
@@ -198,8 +200,11 @@ static void Upsample(const unsigned long width,const unsigned long height,
   if (EOFBlob(image)) \
     break; \
 }
-static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
-  unsigned char *chroma1,unsigned char *chroma2)
+static MagickPassFail DecodeImage(Image *image,
+                                  const size_t channel_alloc_size,
+                                  unsigned char * restrict luma,
+                                  unsigned char * restrict chroma1,
+                                  unsigned char * restrict chroma2)
 {
   typedef struct PCDTable
   {
@@ -236,7 +241,8 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
     length;
 
   unsigned char
-    *buffer;
+    *buffer,
+    *plane_end;
 
   unsigned int
     bits,
@@ -332,6 +338,7 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
   plane=0;
   row=0;
   q=luma;
+  plane_end=luma+channel_alloc_size;
   for ( ; ; )
   {
     if (IsSync)
@@ -351,12 +358,14 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
           case 0:
           {
             q=luma+row*(size_t)image->columns;
+            plane_end=luma+channel_alloc_size;
             /* count=(long) image->columns; */
             break;
           }
           case 2:
           {
             q=chroma1+(row >> 1)*(size_t)image->columns;
+            plane_end=chroma1+channel_alloc_size;
             /* count=(long) (image->columns >> 1); */
             plane--;
             break;
@@ -364,6 +373,7 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
           case 3:
           {
             q=chroma2+(row >> 1)*(size_t)image->columns;
+            plane_end=chroma2+channel_alloc_size;
             /* count=(long) (image->columns >> 1); */
             plane--;
             break;
@@ -404,6 +414,17 @@ static MagickPassFail DecodeImage(Image *image,unsigned char *luma,
         while (!IsSync)
           PCDGetBits(1);
         continue;
+      }
+    /* Detect overflow */
+    if (q >= plane_end)
+      {
+        if (image->logging)
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Plane buffer overflow detected!");
+        ThrowException(&image->exception,CorruptImageError,
+                         UnableToUncompressImage,image->filename);
+        status=MagickFail;
+        goto decode_image_error;
       }
     if (r->key < 128U)
       quantum=(long) (*q)+r->key;
@@ -564,7 +585,8 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
 
   size_t
     number_pixels,
-    count;
+    count,
+    channel_alloc_size;
 
   unsigned char
     *chroma1 = NULL,
@@ -661,9 +683,13 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   number_pixels=MagickArraySize(image->columns,image->rows);
   if (number_pixels == 0 || number_pixels+1 < number_pixels)
     ThrowPCDReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-  chroma1=MagickAllocateResourceLimitedMemory(unsigned char *,number_pixels+1);
-  chroma2=MagickAllocateResourceLimitedMemory(unsigned char *,number_pixels+1);
-  luma=MagickAllocateResourceLimitedMemory(unsigned char *,number_pixels+1);
+  channel_alloc_size=MagickArraySize(number_pixels,10);
+  if (channel_alloc_size == 0 || channel_alloc_size+1 < channel_alloc_size)
+    ThrowPCDReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+  channel_alloc_size++;
+  chroma1=MagickAllocateResourceLimitedClearedMemory(unsigned char *,channel_alloc_size);
+  chroma2=MagickAllocateResourceLimitedClearedMemory(unsigned char *,channel_alloc_size);
+  luma=MagickAllocateResourceLimitedClearedMemory(unsigned char *,channel_alloc_size);
   if ((chroma1 == (unsigned char *) NULL) ||
       (chroma2 == (unsigned char *) NULL) ||
       (luma == (unsigned char *) NULL))
@@ -741,6 +767,12 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
             q->red=ScaleCharToQuantum(*yy++);
             q->green=ScaleCharToQuantum(*c1++);
             q->blue=ScaleCharToQuantum(*c2++);
+            if (((size_t) (yy-luma) >= channel_alloc_size) ||
+                ((size_t) (c1-chroma1) >= channel_alloc_size) ||
+                ((size_t) (c2-chroma2) >= channel_alloc_size))
+              {
+                ThrowPCDReaderException(CorruptImageError,UnableToUncompressImage,image);
+              }
             q++;
           }
           if (!SyncImagePixels(image))
@@ -812,7 +844,7 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
       image->rows=1024;
       for (i=0; i < (4*0x800); i++)
         (void) ReadBlobByte(image);
-      status=DecodeImage(image,luma,chroma1,chroma2);
+      status=DecodeImage(image,channel_alloc_size,luma,chroma1,chroma2);
       if ((subimage >= 5) && status)
         {
           /*
@@ -824,7 +856,7 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
           image->rows=2048;
           offset=TellBlob(image)/0x800+12;
           (void) SeekBlob(image,offset*0x800,SEEK_SET);
-          status=DecodeImage(image,luma,chroma1,chroma2);
+          status=DecodeImage(image,channel_alloc_size,luma,chroma1,chroma2);
           if ((subimage >= 6) && status)
             {
               /*
@@ -860,6 +892,12 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
       q->red=ScaleCharToQuantum(*yy++);
       q->green=ScaleCharToQuantum(*c1++);
       q->blue=ScaleCharToQuantum(*c2++);
+      if (((size_t) (yy-luma) >= channel_alloc_size) ||
+          ((size_t) (c1-chroma1) >= channel_alloc_size) ||
+          ((size_t) (c2-chroma2) >= channel_alloc_size))
+        {
+          ThrowPCDReaderException(CorruptImageError,UnableToUncompressImage,image);
+        }
       q++;
     }
     if (!SyncImagePixels(image))

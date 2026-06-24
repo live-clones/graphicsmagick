@@ -38,6 +38,18 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-06-24  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>NEWS.txt: Update the news.</p></li>
+<li><p>coders/pcd.c (ReadPCDImage): Over-provision the per-channel
+Huffman decode buffers and detect any attempt to overflow
+them. Fixes are inspired by fixes in ImageMagick, but retaining
+the original planar design. Discovered and reported by Cipher -
+Causal Security (<a class="reference external" href="https://causalsecurity.com/">https://causalsecurity.com/</a>) via email on June
+14, 2026.</p></li>
+</ul>
+</blockquote>
 <p>2026-06-23  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

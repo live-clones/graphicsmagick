@@ -1,3 +1,14 @@
+2026-06-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * coders/pcd.c (ReadPCDImage): Over-provision the per-channel
+        Huffman decode buffers and detect any attempt to overflow
+        them. Fixes are inspired by fixes in ImageMagick, but retaining
+        the original planar design. Discovered and reported by Cipher -
+        Causal Security (https://causalsecurity.com/) via email on June
+        14, 2026.
+
 2026-06-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * configure.ac: Eliminte redundant report regarding libzip in
