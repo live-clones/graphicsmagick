@@ -2062,10 +2062,10 @@ BenchmarkImageCommand(ImageInfo *image_info,
             count = 0;
 
 #if defined(HAVE_OPENMP)
-#  if (_OPENMP < 201811)
+#  if _OPENMP < 200805
           omp_set_nested(MagickTrue); /* Deprecated by OpenMP 5.0 */
 #  else
-          omp_set_max_active_levels(2); /* Levels of nesting, OpenMP 5.0+ */
+          omp_set_max_active_levels(2); /* Added by OpenMP 3.0 */
 #  endif /* if (_OPENMP < 201811) */
 #endif /* if defined(HAVE_OPENMP) */
           if (duration > 0)
