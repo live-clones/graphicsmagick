@@ -17417,6 +17417,9 @@ static MagickPassFail VersionCommand(ImageInfo *image_info_ignored,
       case 201307: omp_ver = "4.0"; break; /* 4.0 July 2013 */
       case 201511: omp_ver = "4.5"; break; /* 4.5 Nov 2015 */
       case 201811: omp_ver = "5.0"; break; /* 5.0 Nov 2018 */
+      case 202011: omp_ver = "5.1"; break; /* 5.1 Nov 2020 */
+      case 202111: omp_ver = "5.2"; break; /* 5.2 Nov 2021 */
+      case 202411: omp_ver = "6.0"; break; /* 6.0 Nov 2024 */
       default: omp_ver = "?"; break;
       }
     supported=MagickTrue;
