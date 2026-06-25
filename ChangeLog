@@ -1,3 +1,9 @@
+2026-06-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/command.c (BenchmarkImageCommand): omp_set_nested() was
+        deprecated by OpenMP 5.0. Use omp_set_max_active_levels(2) for
+        modern OpenMP.
+
 2026-06-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.
