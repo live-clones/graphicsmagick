@@ -1,3 +1,18 @@
+2026-07-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/attribute.c (GenerateIPTCAttribute): Prevent reading past
+        the end of a truncated/short IPTC profile. While the issue is
+        limited to reading, the program could crash if it attempts to
+        access outside of the process address space.  Issue was reported
+        via email by Bin Luo on July 1, 2026 and the proposed patch is
+        part of this fix.
+
+        * coders/meta.c (GetIPTCStream): Prevent reading past the end of a
+        truncated/short IPTC profile. While the issue is limited to
+        reading, the program could crash if it attempts to access outside
+        of the process address space. Issue was reported via email by Bin
+        Luo on July 1, 2026.
+
 2026-06-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * utilities/tests/gen-tiff-images/genimages (GM): If the 'GM'

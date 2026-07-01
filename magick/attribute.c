@@ -307,35 +307,50 @@ GenerateIPTCAttribute(Image *image,const char *key)
   };
 #endif
 
+  const unsigned char
+    *profile;
+
   char
     *attribute;
+
+  size_t
+    attribute_length,
+    profile_length;
+
+  register long
+    i;
 
   int
     count,
     dataset,
     record;
 
-  register long
-    i;
+  MagickPassFail
+    status = MagickFail;
 
-  size_t
-    length;
-
-  const unsigned char
-    *profile;
-
-  size_t
-    profile_length;
-
-  if((profile=GetImageProfile(image,"IPTC",&profile_length)) == 0)
-    return(False);
+  if ((profile=GetImageProfile(image,"IPTC",&profile_length)) == 0)
+    return(MagickFail);
+  if (profile_length < 5U)
+    {
+      if (image->logging)
+        LogMagickEvent(TransformEvent,GetMagickModule(),
+                       "IPTC profile is too short (%zu)!",
+                       profile_length);
+      return(MagickFail);
+    }
   count=sscanf(key,"IPTC:%d:%d",&dataset,&record);
   if (count != 2)
-    return(False);
+    return(MagickFail);
   for (i=0; i < (long) profile_length; i++)
     {
       if (profile[i] != 0x1cU)
         continue;
+      if ((profile_length - (size_t) i) < 5U)
+        {
+          LogMagickEvent(TransformEvent,GetMagickModule(),
+                         "IPTC profile, remaining length is too short!");
+          return(MagickFail);
+        }
       if (profile[i+1] != dataset)
         {
           /* fprintf(stderr,"Skipping dataset %d\n",profile[i+1]); */
@@ -346,17 +361,28 @@ GenerateIPTCAttribute(Image *image,const char *key)
           /* fprintf(stderr,"Skipping record %d\n",profile[i+2]); */
           continue;
         }
-      length=(size_t) profile[i+3] << 8;
-      length|=(size_t) profile[i+4];
-      attribute=MagickAllocateMemory(char *,length+1);
+      attribute_length=(size_t) profile[i+3] << 8;
+      attribute_length|=(size_t) profile[i+4];
+      if (attribute_length > (profile_length - (size_t) i - 5U))
+        {
+          LogMagickEvent(TransformEvent,GetMagickModule(),
+                         "IPTC profile out of bounds!");
+          continue;
+        }
+      attribute_length += 1;
+      attribute=MagickAllocateResourceLimitedMemory(char *,attribute_length);
       if (attribute == (char *) NULL)
-        continue;
-      (void) strlcpy(attribute,(char *) profile+i+5,length+1);
-      (void) SetImageAttribute(image,key,(const char *) attribute);
-      MagickFreeMemory(attribute);
+        {
+          LogMagickEvent(TransformEvent,GetMagickModule(),
+                         "IPTC profile, failed to allocate %zu bytes!", attribute_length);
+          continue;
+        }
+      (void) strlcpy(attribute,(char *) profile+(size_t)i+5U,attribute_length);
+      status = SetImageAttribute(image,key,(const char *) attribute);
+      MagickFreeResourceLimitedMemory(char *,attribute);
       break;
     }
-  return(i < (long) profile_length);
+  return status;
 }
 
 static unsigned char
@@ -937,7 +963,7 @@ Generate8BIMAttribute(Image *image,const char *key)
     profile_length;
 
   if ((profile=GetImageProfile(image,"IPTC",&profile_length)) == 0)
-    return(False);
+    return(MagickFail);
 
   /*
     There may be spaces in resource names, but there are no newlines,
@@ -945,7 +971,7 @@ Generate8BIMAttribute(Image *image,const char *key)
   */
   count=sscanf(key,"8BIM:%d,%d:%[^\n]\n%[^\n]",&start,&stop,name,format);
   if ((count != 2) && (count != 3) && (count != 4))
-    return(False);
+    return(MagickFail);
   if (count < 4)
     (void)strlcpy(format,"SVG",sizeof(format));
   if (count < 3)
@@ -2714,10 +2740,10 @@ GenerateEXIFAttribute(Image *image,const char *specification)
   (void) SetImageAttribute(image,specification,(const char *) NULL);
   (void) SetImageAttribute(image,specification,(const char *) final);
   MagickFreeMemory(final);
-  return(True);
+  return(MagickPass);
  generate_attribute_failure:
   MagickFreeMemory(final);
-  return False;
+  return MagickFail;
 }
 
 /*
@@ -2800,7 +2826,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "IPTC:*" with all matching
         key=values and return it.
       */
-      if (GenerateIPTCAttribute((Image *) image,key) == True)
+      if (GenerateIPTCAttribute((Image *) image,key) == MagickPass)
         return(GetImageAttribute(image,key));
     }
   else if (LocaleNCompare("8BIM:",key,5) == 0)
@@ -2809,7 +2835,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "8BIM:*" with all matching
         key=values and return it.
       */
-      if (Generate8BIMAttribute((Image *) image,key) == True)
+      if (Generate8BIMAttribute((Image *) image,key) == MagickPass)
         return(GetImageAttribute(image,key));
     }
   else if (LocaleNCompare("EXIF:",key,5) == 0)
@@ -2818,7 +2844,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "EXIF:*" with all matching
         key=values and return it.
       */
-      if (GenerateEXIFAttribute((Image *) image,key) == True)
+      if (GenerateEXIFAttribute((Image *) image,key) == MagickPass)
         return(GetImageAttribute(image,key));
     }
   else if ((key_length >=2) && (key[key_length-1] == '*'))
@@ -2827,7 +2853,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "foo:*" with all matching
         key=values and return it.
       */
-      if (GenerateWildcardAttribute((Image *) image,key) == True)
+      if (GenerateWildcardAttribute((Image *) image,key) == MagickPass)
         return(GetImageAttribute(image,key));
     }
   else if ((key_length ==1) && (key[0] == '*'))
@@ -2836,7 +2862,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "*" with all key=values and return
         it.
       */
-      if (GenerateWildcardAttribute((Image *) image,key) == True)
+      if (GenerateWildcardAttribute((Image *) image,key) == MagickPass)
         return(GetImageAttribute(image,key));
     }
   return(p);
@@ -3560,7 +3586,7 @@ SetImageAttribute(Image *image,const char *key,const char *value)
         if (LocaleCompare(key,p->key) == 0)
           break;
       if (p == (ImageAttribute *) NULL)
-        return(False);
+        return(MagickFail);
       if (p->previous != (ImageAttribute *) NULL)
         p->previous->next=p->next;
       else
