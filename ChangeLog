@@ -2,9 +2,13 @@
 
         * coders/tiff.c (CheckAndStoreStr): If EXIF profile string is not
         already NUL terminated, assure that it is NUL terminated before
-        passing it to libtiff. Addresses "GraphicsMagick EXIF
-        CheckAndStoreStr Heap Out-of-Bounds Read" as provided by Tristan
-        via email on June, 27 2026.
+        passing it to libtiff. Addresses
+        "vuln-1-exif-unterminated-string-oob-read.txt" as provided by
+        Tristan via email on June, 27 2026.
+        (AddIFDExifFields): Address possible out of bounds read (2 bytes)
+        beyond the end of the allocated profile buffer.  Addresses
+        "vuln-5-exif-ifd-offby2-oob-read.txt" as provided by Tristan via
+        email on June, 27 2026.
 
         * NEWS.txt: Update the news.
 

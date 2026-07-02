@@ -4885,7 +4885,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
       if (logging /* && (Flags & FLAG_BASE) != 0 */)
         (void)LogMagickEvent(CoderEvent,GetMagickModule(),
                              "IFD EntryNum %u", (unsigned) EntryNum);
-      if (profile_length < (size_t)(IFD_data-profile_data)+(EntryNum*12))
+      if (profile_length < (size_t)(IFD_data-profile_data)+2+((size_t)EntryNum*12))
         return 0;
       IFD_data += 2;
 
