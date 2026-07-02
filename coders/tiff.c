@@ -4824,7 +4824,7 @@ static int CheckAndStoreStr(TIFF *tiff, const magick_uint16_t Tag, const char *S
         {
           memcpy(StringDup,String,StrSize);
           StringDup[StrSize] = 0;
-          i = TIFFSetField(tiff, Tag, String);
+          i = TIFFSetField(tiff, Tag, StringDup);
           MagickFreeResourceLimitedMemory(char *,StringDup);
           return i;
         }

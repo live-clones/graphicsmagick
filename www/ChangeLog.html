@@ -41,6 +41,11 @@
 <p>2026-07-02  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/tiff.c (CheckAndStoreStr): If EXIF profile string is not
+already NUL terminated, assure that it is NUL terminated before
+passing it to libtiff. Addresses &quot;GraphicsMagick EXIF
+CheckAndStoreStr Heap Out-of-Bounds Read&quot; as provided by Tristan
+via email on June, 27 2026.</p></li>
 <li><p>NEWS.txt: Update the news.</p></li>
 </ul>
 </blockquote>

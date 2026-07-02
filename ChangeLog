@@ -1,5 +1,11 @@
 2026-07-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/tiff.c (CheckAndStoreStr): If EXIF profile string is not
+        already NUL terminated, assure that it is NUL terminated before
+        passing it to libtiff. Addresses "GraphicsMagick EXIF
+        CheckAndStoreStr Heap Out-of-Bounds Read" as provided by Tristan
+        via email on June, 27 2026.
+
         * NEWS.txt: Update the news.
 
 2026-07-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
