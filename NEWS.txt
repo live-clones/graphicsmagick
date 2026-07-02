@@ -39,6 +39,13 @@ Security Fixes:
   buffer overflow.  This is really a minor issue since it requires X11
   keyboard input and causes no harm.
 
+* DCM: In RLE decoder, detect and report end of input. Problem was
+  reported by Tristan.
+
+* DCM: Convert from ASCII numeric value to unsigned value, with error
+  detection. Avoid problems caused by negative values. Problem was
+  reported by Tristan.
+
 * display: Correct bounds checking for 'filename' length. Thanks to
   Petr Gajdos for a heads-up regarding the disparity.
 
@@ -63,6 +70,9 @@ Security Fixes:
   failure (coders/miff.c:1048)" from David Korczynski. Credit to
   Anthropic Claude and Ada Logics.
 
+* MSL: Properly log warnings and errors using LogMagickEventList()
+  given a va_list. Problem was reported by Tristan.
+
 * PCD: Over-provision the per-channel Huffman decode buffers and
   detect any attempt to overflow them. Discovered and reported by
   Cipher - Causal Security (https://causalsecurity.com/).
@@ -73,11 +83,22 @@ Security Fixes:
   (coders/pcx.c:1186)" from David Korczynski. Credit to Anthropic
   Claude and Ada Logics.
 
+* SVG: Properly log warnings and errors using LogMagickEventList()
+  given a va_list. Problem was reported by Tristan.
+
 * TIFF: Add many more validations and safeguards to EXIF in TIFF
   writer. Addresses "[security] GraphicsMagick TIFF writer:
   heap-buffer-overflow WRITE in AddIFDExifFields via 32-bit count*2
   wrap on EXIF SHORT array (coders/tiff.c)" from David
   Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+* TIFF: If EXIF profile string is not already NUL terminated, assure
+  that it is NUL terminated before passing it to libtiff. Problem was
+  reported by Tristan.
+
+* TIFF: In AddIFDExifFields(), address possible out of bounds read (2
+  bytes) beyond the end of the allocated profile buffer. Problem was
+  reported by Tristan.
 
 Bug fixes:
 

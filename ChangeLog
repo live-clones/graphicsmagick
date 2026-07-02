@@ -1,5 +1,7 @@
 2026-07-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * coders/dcm.c (DCM_RLE_ReadByte): If frag_bytes is already 0,
         then return 0 and a corrupt image exception. Addresses
         "vuln-2-dcm-rle-fragment-oob-read.txt" provided by Tristan via
@@ -28,8 +30,6 @@
         beyond the end of the allocated profile buffer.  Addresses
         "vuln-5-exif-ifd-offby2-oob-read.txt" as provided by Tristan via
         email on June, 27 2026.
-
-        * NEWS.txt: Update the news.
 
 2026-07-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
