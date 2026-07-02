@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to June 24, 2026.
+This file was last updated to reflect changes up to July 2, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -39,11 +39,14 @@ Security Fixes:
   buffer overflow.  This is really a minor issue since it requires X11
   keyboard input and causes no harm.
 
-* MIFF: Correct scope of 'values' reallocation error
-  handling. Addresses "[security] GraphicsMagick MIFF reader:
-  heap-use-after-free WRITE via stale cursor on values-buffer realloc
-  failure (coders/miff.c:1048)" from David Korczynski. Credit to
-  Anthropic Claude and Ada Logics.
+* display: Correct bounds checking for 'filename' length. Thanks to
+  Petr Gajdos for a heads-up regarding the disparity.
+
+* GradientImage(): Fix 'pixel_packets' and 'indexes' addressing logic
+  for NorthGravity.  Addresses "[security] GraphicsMagick
+  GradientImage: heap-buffer-overflow READ in NorthGravity branch
+  reached from gm convert (magick/gradient.c:284)" from David
+  Korczynski. Credit to Anthropic Claude and Ada Logics.
 
 * LOCALE: Bound the length passed to strncpy() and string
   terminator. Addresses "[security] GraphicsMagick LOCALE coder:
@@ -51,29 +54,29 @@ Security Fixes:
   convert (coders/locale.c:257)" from David Korczynski. Credit to
   Anthropic Claude and Ada Logics.
 
+* META/IPTC: Prevent reading past the end of a truncated/short IPTC
+  profile.
+
+* MIFF: Correct scope of 'values' reallocation error
+  handling. Addresses "[security] GraphicsMagick MIFF reader:
+  heap-use-after-free WRITE via stale cursor on values-buffer realloc
+  failure (coders/miff.c:1048)" from David Korczynski. Credit to
+  Anthropic Claude and Ada Logics.
+
+* PCD: Over-provision the per-channel Huffman decode buffers and
+  detect any attempt to overflow them. Discovered and reported by
+  Cipher - Causal Security (https://causalsecurity.com/).
+
 * PCX: If image has more than 256 colors, save as a DirectClass
   type. Addresses "[security] GraphicsMagick PCX writer:
   heap-buffer-overflow WRITE in WritePCXImage colormap fill
   (coders/pcx.c:1186)" from David Korczynski. Credit to Anthropic
   Claude and Ada Logics.
 
-* display: Correct bounds checking for 'filename' length. Thanks to
-  Petr Gajdos for a heads-up regarding the disparity.
-
-* PCD: Over-provision the per-channel Huffman decode buffers and
-  detect any attempt to overflow them. Discovered and reported by
-  Cipher - Causal Security (https://causalsecurity.com/).
-
 * TIFF: Add many more validations and safeguards to EXIF in TIFF
   writer. Addresses "[security] GraphicsMagick TIFF writer:
   heap-buffer-overflow WRITE in AddIFDExifFields via 32-bit count*2
   wrap on EXIF SHORT array (coders/tiff.c)" from David
-  Korczynski. Credit to Anthropic Claude and Ada Logics.
-
-* GradientImage(): Fix 'pixel_packets' and 'indexes' addressing logic
-  for NorthGravity.  Addresses "[security] GraphicsMagick
-  GradientImage: heap-buffer-overflow READ in NorthGravity branch
-  reached from gm convert (magick/gradient.c:284)" from David
   Korczynski. Credit to Anthropic Claude and Ada Logics.
 
 Bug fixes:

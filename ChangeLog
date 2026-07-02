@@ -1,3 +1,7 @@
+2026-07-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
 2026-07-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/attribute.c (GenerateIPTCAttribute): Prevent reading past
