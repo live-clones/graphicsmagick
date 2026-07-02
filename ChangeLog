@@ -1,5 +1,15 @@
 2026-07-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/msl.c (MSLWarning, MSLError): Use LogMagickEventList()
+        rather than LogMagickEvent() to log va_list. Addresses
+        "vuln-4-svg-msl-valist-ub.txt" provided by Tristan via email on
+        June, 27 2026.
+
+        * coders/svg.c (SVGWarning, SVGError): Use LogMagickEventList()
+        rather than LogMagickEvent() to log va_list. Addresses
+        "vuln-4-svg-msl-valist-ub.txt" provided by Tristan via email on
+        June, 27 2026.
+
         * coders/tiff.c (CheckAndStoreStr): If EXIF profile string is not
         already NUL terminated, assure that it is NUL terminated before
         passing it to libtiff. Addresses

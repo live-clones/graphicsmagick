@@ -3495,7 +3495,7 @@ SVGWarning(void *context,const char *format,...)
   svg_info=(SVGInfo *) parser->_private;
   assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.warning: ");
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
+  (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
 #if !defined(HAVE_VSNPRINTF)
   (void) vsprintf(reason,format,operands);
 #else
@@ -3532,7 +3532,7 @@ SVGError(void *context,const char *format,...)
   svg_info=(SVGInfo *) parser->_private;
   assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.error: ");
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
+  (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
 #if !defined(HAVE_VSNPRINTF)
   (void) vsprintf(reason,format,operands);
 #else

@@ -3940,7 +3940,7 @@ MSLWarning(void *context,const char *format,...)
   */
   va_start(operands,format);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.warning: ");
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
+  (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
   parser=(xmlParserCtxtPtr) context;
   msl_info=(MSLInfo *) parser->_private;
   assert(msl_info->signature == MagickSignature);
@@ -3974,7 +3974,7 @@ MSLError(void *context,const char *format,...)
   */
   va_start(operands,format);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.error: ");
-  (void) LogMagickEvent(CoderEvent,GetMagickModule(),format,operands);
+  (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
   parser=(xmlParserCtxtPtr) context;
   msl_info=(MSLInfo *) parser->_private;
   assert(msl_info->signature == MagickSignature);
