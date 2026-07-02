@@ -5724,8 +5724,7 @@ static MagickPassFail funcDCM_NumberOfFrames(Image *image,DicomStream *dcm,Excep
       return MagickFail;
     }
 
-  dcm->number_scenes=MagickAtoI((char *) dcm->data);
-  return MagickPass;
+  return MagickAtoUIChk((char *) dcm->data,&dcm->number_scenes);
 }
 
 static MagickPassFail funcDCM_Rows(Image *image,DicomStream *dcm,ExceptionInfo *exception)

@@ -44,7 +44,11 @@
 <li><p>coders/dcm.c (DCM_RLE_ReadByte): If frag_bytes is already 0,
 then return 0 and a corrupt image exception. Addresses
 &quot;vuln-2-dcm-rle-fragment-oob-read.txt&quot; provided by Tristan via
-email on June, 27 2026.</p></li>
+email on June, 27 2026.
+(funcDCM_NumberOfFrames): Use MagickAtoUIChk() rather than
+MagickAtoI() in order to check for error, and to produce an
+unsigned value. Addresses &quot;vuln-3-dcm-negative-frames-dos.txt&quot;
+provided by Tristan via email on June, 27 2026.</p></li>
 <li><p>coders/msl.c (MSLWarning, MSLError): Use LogMagickEventList()
 rather than LogMagickEvent() to log va_list. Addresses
 &quot;vuln-4-svg-msl-valist-ub.txt&quot; provided by Tristan via email on

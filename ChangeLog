@@ -4,6 +4,10 @@
         then return 0 and a corrupt image exception. Addresses
         "vuln-2-dcm-rle-fragment-oob-read.txt" provided by Tristan via
         email on June, 27 2026.
+        (funcDCM_NumberOfFrames): Use MagickAtoUIChk() rather than
+        MagickAtoI() in order to check for error, and to produce an
+        unsigned value. Addresses "vuln-3-dcm-negative-frames-dos.txt"
+        provided by Tristan via email on June, 27 2026.
 
         * coders/msl.c (MSLWarning, MSLError): Use LogMagickEventList()
         rather than LogMagickEvent() to log va_list. Addresses
