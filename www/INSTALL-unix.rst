@@ -1026,11 +1026,22 @@ MSYS2 first using 'pacman -Syuu'. Once 'pacman -Syuu' completes, exit
 the MSYS2 shell, open a MSYS2 shell, and execute 'pacman -Syuu' again
 to ensure that all packages are up to date.
 
-Use 'pacman -S' to install packages.  The following package names are
-an example and should be ammended when targetting UCRT64, or other
-MSYS2 development target.
+Use 'pacman -S' to install packages.
 
-These packages are needed for a complete 64-bit x86_64 build:
+These packages are needed for a complete 64-bit w64-ucrt x86_64 build:
+
+base-devel mingw-w64-ucrt-autotools mingw-w64-ucrt-gcc
+mingw-w64-ucrt-toolchain mingw-w64-ucrt-bzip2
+mingw-w64-ucrt-freetype mingw-w64-ucrt-ghostscript
+mingw-w64-ucrt-jasper mingw-w64-ucrt-jbigkit
+mingw-w64-ucrt-lcms2 mingw-w64-ucrt-libheif
+mingw-w64-ucrt-libjpeg-turbo mingw-w64-ucrt-libjxl
+mingw-w64-ucrt-libpng mingw-w64-ucrt-libtiff
+mingw-w64-ucrt-libtool mingw-w64-ucrt-libwebp
+mingw-w64-ucrt-libwmf mingw-w64-ucrt-libxml2
+mingw-w64-ucrt-libzip mingw-w64-ucrt-zlib
+
+These packages are needed for a complete 64-bit mingw-w64 x86_64 build:
 
 base-devel mingw-w64-x86_64-autotools mingw-w64-x86_64-gcc
 mingw-w64-x86_64-toolchain mingw-w64-x86_64-bzip2
@@ -1043,7 +1054,7 @@ mingw-w64-x86_64-libtool mingw-w64-x86_64-libwebp
 mingw-w64-x86_64-libwmf mingw-w64-x86_64-libxml2
 mingw-w64-x86_64-libzip mingw-w64-x86_64-zlib
 
-And/or use the following to add support for a 32-bit i686 build:
+And/or use the following to add support for a 32-bit mingw-w64 i686 build:
 
 base-devel mingw-w64-i686-toolchain mingw-w64-i686-bzip2
 mingw-w64-i686-freetype mingw-w64-i686-ghostscript
@@ -1052,6 +1063,7 @@ mingw-w64-i686-libheif mingw-w64-i686-libjpeg-turbo
 mingw-w64-i686-libjxl mingw-w64-i686-libpng mingw-w64-i686-libtiff
 mingw-w64-i686-libtool mingw-w64-i686-libwebp mingw-w64-i686-libwmf
 mingw-w64-i686-libxml2 mingw-w64-i686-libzip mingw-w64-i686-zlib
+
 
 If you would like to install Mercurial in order to access the
 GraphicsMagick source repository, then install 'mercurial'. If you

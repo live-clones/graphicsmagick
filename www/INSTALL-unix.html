@@ -1009,10 +1009,19 @@ not updated for several months, then enter the MSYS2 shell, and update
 MSYS2 first using 'pacman -Syuu'. Once 'pacman -Syuu' completes, exit
 the MSYS2 shell, open a MSYS2 shell, and execute 'pacman -Syuu' again
 to ensure that all packages are up to date.</p>
-<p>Use 'pacman -S' to install packages.  The following package names are
-an example and should be ammended when targetting UCRT64, or other
-MSYS2 development target.</p>
-<p>These packages are needed for a complete 64-bit x86_64 build:</p>
+<p>Use 'pacman -S' to install packages.</p>
+<p>These packages are needed for a complete 64-bit w64-ucrt x86_64 build:</p>
+<p>base-devel mingw-w64-ucrt-autotools mingw-w64-ucrt-gcc
+mingw-w64-ucrt-toolchain mingw-w64-ucrt-bzip2
+mingw-w64-ucrt-freetype mingw-w64-ucrt-ghostscript
+mingw-w64-ucrt-jasper mingw-w64-ucrt-jbigkit
+mingw-w64-ucrt-lcms2 mingw-w64-ucrt-libheif
+mingw-w64-ucrt-libjpeg-turbo mingw-w64-ucrt-libjxl
+mingw-w64-ucrt-libpng mingw-w64-ucrt-libtiff
+mingw-w64-ucrt-libtool mingw-w64-ucrt-libwebp
+mingw-w64-ucrt-libwmf mingw-w64-ucrt-libxml2
+mingw-w64-ucrt-libzip mingw-w64-ucrt-zlib</p>
+<p>These packages are needed for a complete 64-bit mingw-w64 x86_64 build:</p>
 <p>base-devel mingw-w64-x86_64-autotools mingw-w64-x86_64-gcc
 mingw-w64-x86_64-toolchain mingw-w64-x86_64-bzip2
 mingw-w64-x86_64-freetype mingw-w64-x86_64-ghostscript
@@ -1023,7 +1032,7 @@ mingw-w64-x86_64-libpng mingw-w64-x86_64-libtiff
 mingw-w64-x86_64-libtool mingw-w64-x86_64-libwebp
 mingw-w64-x86_64-libwmf mingw-w64-x86_64-libxml2
 mingw-w64-x86_64-libzip mingw-w64-x86_64-zlib</p>
-<p>And/or use the following to add support for a 32-bit i686 build:</p>
+<p>And/or use the following to add support for a 32-bit mingw-w64 i686 build:</p>
 <p>base-devel mingw-w64-i686-toolchain mingw-w64-i686-bzip2
 mingw-w64-i686-freetype mingw-w64-i686-ghostscript
 mingw-w64-i686-jasper mingw-w64-i686-jbigkit mingw-w64-i686-lcms2
