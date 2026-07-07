@@ -83,6 +83,14 @@ Security Fixes:
   (coders/pcx.c:1186)" from David Korczynski. Credit to Anthropic
   Claude and Ada Logics.
 
+* PNG: Use only values from GetImageCharacteristics() since
+  IsMonochromeImage() and IsGrayImage() may produce different
+  answers. Addresses "[security] GraphicsMagick MNG re-encode:
+  heap-buffer-overflow WRITE in ExportGrayAlphaQuantumType reached
+  from gm convert (magick/export.c:1105)" as reported by David
+  Korczynski via email on May 28, 2026. Credit to Anthropic Claude and
+  Ada Logics.
+
 * SVG: Properly log warnings and errors using LogMagickEventList()
   given a va_list. Reported-by: Tristan Madani.
 

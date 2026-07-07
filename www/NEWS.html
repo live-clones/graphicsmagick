@@ -156,6 +156,13 @@ type. Addresses &quot;[security] GraphicsMagick PCX writer:
 heap-buffer-overflow WRITE in WritePCXImage colormap fill
 (coders/pcx.c:1186)&quot; from David Korczynski. Credit to Anthropic
 Claude and Ada Logics.</p></li>
+<li><p>PNG: Use only values from GetImageCharacteristics() since
+IsMonochromeImage() and IsGrayImage() may produce different
+answers. Addresses &quot;[security] GraphicsMagick MNG re-encode:
+heap-buffer-overflow WRITE in ExportGrayAlphaQuantumType reached
+from gm convert (magick/export.c:1105)&quot; as reported by David
+Korczynski via email on May 28, 2026. Credit to Anthropic Claude and
+Ada Logics.</p></li>
 <li><p>SVG: Properly log warnings and errors using LogMagickEventList()
 given a va_list. Reported-by: Tristan Madani.</p></li>
 <li><p>TIFF: Add many more validations and safeguards to EXIF in TIFF

@@ -1,3 +1,19 @@
+2026-07-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * coders/png.c (WriteOneJNGImage): Use GetImageCharacteristics().
+
+        * coders/png.c (WritePNGImage): Eliminate a disparity caused by
+        the difference between GetImageCharacteristics() results and
+        IsMonochromeImage(), IsGrayImage() results by only using values
+        from GetImageCharacteristics(). This might also improve
+        performance. Addresses "[security] GraphicsMagick MNG re-encode:
+        heap-buffer-overflow WRITE in ExportGrayAlphaQuantumType reached
+        from gm convert (magick/export.c:1105)" as reported by David
+        Korczynski via email on May 28, 2026. Credit to Anthropic Claude
+        and Ada Logics.
+
 2026-07-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/INSTALL-unix.rst: Document the packages required for a

@@ -7220,6 +7220,21 @@ png_write_raw_profile(const ImageInfo *image_info,png_struct *ping,
   return status;
 }
 
+#define SetPNGColortype(logging,ping_colortype_var,new_ping_colortype)  \
+  {                                                                     \
+    int prev_ping_colortype = ping_colortype_var;                       \
+    ping_colortype_var = new_ping_colortype;                            \
+    if (logging && (prev_ping_colortype != ping_colortype_var))         \
+      {                                                                 \
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),             \
+                              "    PNG color type: %s (%d) --> %s (%d)", \
+                              PngColorTypeToString(prev_ping_colortype), \
+                              prev_ping_colortype,                      \
+                              PngColorTypeToString(ping_colortype_var), \
+                              ping_colortype_var);                      \
+      }                                                                 \
+  }
+
 static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                                        const ImageInfo *image_info,Image *imagep)
 {
@@ -7447,7 +7462,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
     Analyze image to be written.
   */
   if (!GetImageCharacteristics(image,&characteristics,
-                               (OptimizeType == image_info->type),
+                               /* (OptimizeType == image_info->type), */
+                               MagickTrue,
                                &image->exception))
     {
       CloseBlob(image);
@@ -7460,12 +7476,12 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
   if (logging)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "  Image Characteristics:\n"
-                            "    CMYK:       %u\n"
-                            "    Grayscale:  %u\n"
-                            "    Monochrome: %u\n"
-                            "    Opaque:     %u\n"
-                            "    Palette:    %u",
+                            "    Image Characteristics:"
+                            " CMYK %u,"
+                            " Grayscale %u,"
+                            " Monochrome %u,"
+                            " Opaque %u,"
+                            " Palette %u",
                             characteristics.cmyk,
                             characteristics.grayscale ,
                             characteristics.monochrome,
@@ -7533,7 +7549,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "    image->depth=%u",image_depth);
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "  image_colors=%u",image_colors);
+                            "    image_colors=%u",image_colors);
     }
 
 
@@ -7542,11 +7558,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
   save_image_depth=image_depth;
   ping_bit_depth=(png_byte) save_image_depth;
   if (logging)
-    {
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "    ping_bit_depth=%u",
-                            ping_bit_depth);
-    }
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "    ping_bit_depth=%u", ping_bit_depth);
   /*
     Select the color type.
   */
@@ -7563,8 +7576,11 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "    Entering PNG8 block");
 
-      ping_colortype=PNG_COLOR_TYPE_PALETTE;
+      SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
       ping_bit_depth=8;
+      if (logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "    ping_bit_depth=%u", ping_bit_depth);
 
       number_colors=image_colors;
       if ((number_colors == 0) || (number_colors > 256))
@@ -7754,7 +7770,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
       /*
         Set image palette.
       */
-      ping_colortype=PNG_COLOR_TYPE_PALETTE;
+      SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
 
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -7922,63 +7938,91 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
   else if (mng_info->write_png24 || mng_info->write_png48)
     {
       image_matte=MagickFalse;
-      ping_colortype=PNG_COLOR_TYPE_RGB;
+      SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB);
     }
   else if (mng_info->write_png32 || mng_info->write_png64)
     {
       image_matte=MagickTrue;
-      ping_colortype=PNG_COLOR_TYPE_RGB_ALPHA;
+      SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB_ALPHA);
     }
   else
     {
       if (ping_bit_depth < 8)
-        ping_bit_depth=8;
+        {
+          ping_bit_depth=8;
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "    ping_bit_depth=%u", ping_bit_depth);
+        }
 
-      ping_colortype=PNG_COLOR_TYPE_RGB;
+      /* SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB); */
       if (characteristics.monochrome)
         {
           if (characteristics.opaque)
             {
-              ping_colortype=PNG_COLOR_TYPE_GRAY;
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
               ping_bit_depth=1;
+              if (logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "    ping_bit_depth=%u", ping_bit_depth);
             }
           else
             {
-              ping_colortype=PNG_COLOR_TYPE_GRAY_ALPHA;
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
             }
         }
       else if (characteristics.grayscale)
         {
           if (characteristics.opaque)
-            ping_colortype=PNG_COLOR_TYPE_GRAY;
+            {
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
+            }
           else
-            ping_colortype=PNG_COLOR_TYPE_GRAY_ALPHA;
+            {
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
+            }
         }
       else if (characteristics.palette && image_colors <= 256)
         {
-          ping_colortype=PNG_COLOR_TYPE_PALETTE;
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
           ping_bit_depth=8;
+          if (logging)
+            (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                  "    ping_bit_depth=%u", ping_bit_depth);
           mng_info->IsPalette=MagickTrue;
         }
       else
         {
           if (characteristics.opaque)
-            ping_colortype=PNG_COLOR_TYPE_RGB;
+            {
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB);
+            }
           else
-            ping_colortype=PNG_COLOR_TYPE_RGB_ALPHA;
+            {
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB_ALPHA);
+            }
         }
       if (image_info->type == BilevelType)
         {
           if (characteristics.monochrome)
             {
               if (!image_matte)
-                ping_bit_depth=1;
+                {
+                  ping_bit_depth=1;
+                  if (logging)
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "    ping_bit_depth=%u", ping_bit_depth);
+                }
             }
         }
       if (image_info->type == GrayscaleType)
-        ping_colortype=PNG_COLOR_TYPE_GRAY;
+        {
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
+        }
       if (image_info->type == GrayscaleMatteType)
-        ping_colortype=PNG_COLOR_TYPE_GRAY_ALPHA;
+        {
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
+        }
 
       if (logging)
         {
@@ -8007,7 +8051,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 and unset the ping_valid_trns flag.
               */
               image_matte=MagickFalse;
-              ping_colortype&=0x03;
+              /* ping_colortype&=0x03; */
+              SetPNGColortype(logging,ping_colortype,ping_colortype & 0x03);
               ping_valid_trns=0;
             }
           else
@@ -8126,7 +8171,8 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
             }
           if (ping_valid_trns != 0)
             {
-              ping_colortype &= 0x03;  /* changes 4 or 6 to 0 or 2 */
+              /* ping_colortype &= 0x03; */  /* changes 4 or 6 to 0 or 2 */
+              SetPNGColortype(logging,ping_colortype,ping_colortype & 0x03);
               if (image_depth == 8)
                 {
                   ping_trans_color.red&=0xff;
@@ -8143,10 +8189,12 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
           characteristics.grayscale && (!image_matte || image_depth >= 8))
         {
           if (image_matte)
-            ping_colortype=PNG_COLOR_TYPE_GRAY_ALPHA;
+            {
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
+            }
           else
             {
-              ping_colortype=PNG_COLOR_TYPE_GRAY;
+              SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
               if (save_image_depth == 16 && image_depth == 8)
                 ping_trans_color.gray*=0x0101;
             }
@@ -8179,7 +8227,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 /*
                   Set image palette.
                 */
-                ping_colortype=PNG_COLOR_TYPE_PALETTE;
+                SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
                 if (mng_info->have_write_global_plte && !matte)
                   {
                     png_set_PLTE(ping,ping_info,NULL,0);
@@ -8279,7 +8327,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                       }
                     else
                       {
-                        ping_colortype=PNG_COLOR_TYPE_RGB_ALPHA;
+                        SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB_ALPHA);
                         ping_num_trans=0;
                         if (ping_bit_depth < 8)
                           ping_bit_depth=8;
@@ -8369,8 +8417,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         Adjust background and transparency samples in sub-8-bit
         grayscale files.
       */
-      if (ping_bit_depth < 8 && ping_colortype ==
-          PNG_COLOR_TYPE_GRAY)
+      if (ping_bit_depth < 8 && ping_colortype == PNG_COLOR_TYPE_GRAY)
         {
           png_uint_16
             maxval;
@@ -8867,7 +8914,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
       else if (mng_info->write_png32)
         rowbytes*=4;
       else if (!mng_info->write_png8 && (mng_info->IsPalette &&
-                                         IsGrayImage(image,&image->exception)))
+                                         characteristics.grayscale))
         rowbytes*=(image_matte ? 2 : 1);
       else
         {
@@ -8875,7 +8922,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
             rowbytes*=(image_matte ? 4 : 3);
         }
     }
-  else
+  else /* PNG does not support a colormap with more than 256 entries */
     {
       if (mng_info->write_png48)
         rowbytes*=6;
@@ -8884,7 +8931,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         rowbytes*=8;
 
       else if (mng_info->IsPalette &&
-               IsGrayImage(image,&image->exception))
+               characteristics.grayscale)
         rowbytes*=(image_matte ? 4 : 2);
 
       else
@@ -8906,8 +8953,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
        !mng_info->write_png32 && !mng_info->write_png48 &&
        !mng_info->write_png64) && (mng_info->IsPalette ||
                                    image_info->type == BilevelType) &&
-      !image_matte &&
-      IsMonochromeImage(image,&image->exception))
+      !image_matte && characteristics.monochrome)
     for (pass=0; pass < num_passes; pass++)
       {
         /*
@@ -8952,7 +8998,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
              !mng_info->write_png64) &&
             (!image_matte || (ping_bit_depth >= QuantumDepth)) &&
             mng_info->IsPalette &&
-            IsGrayImage(image,&image->exception))
+            characteristics.grayscale)
           {
             if (logging)
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -9539,6 +9585,9 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
   unsigned long
     jng_quality;
 
+  ImageCharacteristics
+    characteristics;
+
   logging=LogMagickEvent(CoderEvent,GetMagickModule(),
                          "  enter WriteOneJNGImage()");
 
@@ -9566,6 +9615,34 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
   jpeg_image_info=(ImageInfo *) NULL;
 
   status=MagickTrue;
+
+  /*
+    Analyze image to be written.
+  */
+  if (!GetImageCharacteristics(image,&characteristics,
+                               /* (OptimizeType == image_info->type), */
+                               MagickTrue,
+                               &image->exception))
+    {
+      return MagickFail;
+    }
+
+  if (logging)
+    {
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "    Image Characteristics:"
+                            " CMYK %u,"
+                            " Grayscale %u,"
+                            " Monochrome %u,"
+                            " Opaque %u,"
+                            " Palette %u",
+                            characteristics.cmyk,
+                            characteristics.grayscale ,
+                            characteristics.monochrome,
+                            characteristics.opaque,
+                            characteristics.palette);
+    }
+
   transparent=image_info->type==GrayscaleMatteType ||
     image_info->type==TrueColorMatteType;
   jng_color_type=10;
@@ -9632,7 +9709,7 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
 
   /* Check if image is grayscale. */
   if (image_info->type != TrueColorMatteType && image_info->type !=
-      TrueColorType && IsGrayImage(image,&image->exception))
+      TrueColorType && characteristics.grayscale)
     jng_color_type-=2;
 
   if (transparent)
