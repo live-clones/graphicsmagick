@@ -1,3 +1,9 @@
+2026-07-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac: Fixes so zlib and lcms2 may still be detected if
+        pkg-config is not available.  Addresses SourceForge issue #773
+        "Missing -lz when using alternative to pkg-config for libz".
+
 2026-07-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.
