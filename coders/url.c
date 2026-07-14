@@ -174,7 +174,7 @@ static Image *ReadURLImage(const ImageInfo *image_info,ExceptionInfo *exception)
     }
   else
     {
-      clone_info->blob=(_BlobInfoPtr_) NULL;
+      clone_info->blob=(void *) NULL;
       clone_info->length=0;
       file=AcquireTemporaryFileStream(clone_info->filename,BinaryFileIOMode);
       if (file == (FILE *) NULL)

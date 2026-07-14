@@ -1931,7 +1931,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                 ThrowPICTReaderException(ResourceLimitError,MemoryAllocationFailed,image);
               blob=blob_alloc;
               clone_info=CloneImageInfo(image_info);
-              clone_info->blob=(_BlobInfoPtr_) NULL;
+              clone_info->blob=(void *) NULL;
               clone_info->length=0;
               (void) strlcpy(clone_info->filename,"JPEG:",sizeof(clone_info->filename));
               if (ReadBlobZC(image,blob_alloc_size,&blob) != blob_alloc_size)

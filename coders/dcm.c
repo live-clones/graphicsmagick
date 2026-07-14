@@ -7331,7 +7331,7 @@ static MagickPassFail DCM_ReadNonNativeImages(Image **image,const ImageInfo *ima
       if (status == MagickPass)
         {
           clone_info=CloneImageInfo(image_info);
-          clone_info->blob=(_BlobInfoPtr_) NULL;
+          clone_info->blob=(void *) NULL;
           clone_info->length=0;
           if (dcm->transfer_syntax == DCM_TS_JPEG_2000)
             MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"jp2:%.1024s",filename);

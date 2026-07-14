@@ -7211,7 +7211,7 @@ Ping(ref,...)
         list[n]=(char *) SvPV(ST(i+1),length);
         if ((items >= 3) && strEQcase(list[n],"blob"))
           {
-            package_info->image_info->blob=(_BlobInfoPtr_) (SvPV(ST(i+2),length));
+            package_info->image_info->blob=(void *) (SvPV(ST(i+2),length));
             package_info->image_info->length=(size_t) length;
             continue;
           }
@@ -7990,7 +7990,7 @@ Read(ref,...)
               length;
 
             i++;
-            package_info->image_info->blob=(_BlobInfoPtr_) (SvPV(ST(i),length));
+            package_info->image_info->blob=(void *) (SvPV(ST(i),length));
             package_info->image_info->length=length;
           }
         if ((items >= 3) && strEQcase(list[n],"filename"))

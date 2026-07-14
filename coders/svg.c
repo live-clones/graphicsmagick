@@ -3788,7 +3788,7 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
       DestroyImage(image);
       image=(Image *) NULL;
       clone_info=CloneImageInfo(image_info);
-      clone_info->blob=(_BlobInfoPtr_) NULL;
+      clone_info->blob=(void *) NULL;
       clone_info->length=0;
       MagickFormatString(geometry,sizeof(geometry),"%ldx%ld",svg_info.width,svg_info.height);
       (void) CloneString(&clone_info->size,geometry);

@@ -175,7 +175,7 @@ static Image *ReadVIDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   image=(Image *) NULL;
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(_BlobInfoPtr_) NULL;
+  clone_info->blob=(void *) NULL;
   clone_info->length=0;
   if (clone_info->size == (char *) NULL)
     (void) CloneString(&clone_info->size,DefaultTileGeometry);

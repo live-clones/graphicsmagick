@@ -745,7 +745,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
       return((Image *) NULL);
     }
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(_BlobInfoPtr_) blob;
+  clone_info->blob=(void *) blob;
   clone_info->length=length;
   /*
     Set file magick based on file name or file header if magick was
@@ -802,7 +802,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
 
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Using temporary file");
-    clone_info->blob=(_BlobInfoPtr_) NULL;
+    clone_info->blob=(void *) NULL;
     clone_info->length=0;
 
     if (!AcquireTemporaryFileName(temporary_file))
@@ -2341,10 +2341,16 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
     {
       /*
         Native blob support for this image format.
-        FIXME: This results in a memory leak if the blob is not opened.
+
+        In WriteImage() if ImageInfo blob is not NULL, OpenBlob() uses
+        AttachBlob() to attach the blob ('blob' and 'length') to
+        image->blob. The 'blob value is assigned to BlobInfo 'data'
+        and the 'length' value is assigned to BlobInfo 'length' and
+        'extent'. Likewise, DetachBlob() sets BlobInfo 'data' to NULL,
+        and BlobInfo 'length' and 'extent' are set to zero.
       */
       clone_info->blob=MagickAllocateMemory(_BlobInfoPtr_,65535L);
-      if (clone_info->blob == (_BlobInfoPtr_) NULL)
+      if (clone_info->blob == (void *) NULL)
         {
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,
                          MagickMsg(BlobError,UnableToCreateBlob));
@@ -2357,7 +2363,7 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
       /* Blob length is initially zero */
       clone_info->length=0;
       /* Blob file descriptor should not be closed */
-      image->blob->exempt=True;
+      image->blob->exempt=MagickTrue;
       /* There is no filename for a memory blob */
       *image->filename='\0';
       /* Write the image to the blob */
@@ -2368,8 +2374,16 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
           if (image->exception.severity == UndefinedException)
             ThrowException(exception,BlobError,UnableToWriteBlob,
                            clone_info->magick);
-          MagickFreeMemory(image->blob->data);
-          DestroyImageInfo(clone_info);
+          if (image->blob->data)
+            {
+              MagickFreeMemory(image->blob->data); /* May be realloced clone_info->blob */
+              clone_info->blob=(void *) NULL;
+            }
+          else
+            {
+              MagickFreeMemory(clone_info->blob); /* Original blob allocation */;
+            }
+          DestroyImageInfo(clone_info); /* Does not free blob allocation */
           if (image->blob->logging)
             (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                                   "Exiting ImageToBlob");

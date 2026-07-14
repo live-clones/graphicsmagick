@@ -1,5 +1,9 @@
 2026-07-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/blob.c (ImageToBlob): Fix memory leak which may occur if
+        WriteImage() fails.  Addresses oss-fuzz issue 529154719
+        "graphicsmagick:coder_WMF_fuzzer: Direct-leak in MagickMalloc".
+
         * magick/common.h (MAGICK_MEMBER_DEPRECATED): Add
         MAGICK_MEMBER_DEPRECATED to mark deprecated structure members.
 
