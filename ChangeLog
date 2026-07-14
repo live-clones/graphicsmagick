@@ -1,3 +1,8 @@
+2026-07-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/common.h (MAGICK_MEMBER_DEPRECATED): Add
+        MAGICK_MEMBER_DEPRECATED to mark deprecated structure members.
+
 2026-07-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * configure.ac: Fixes so zlib and lcms2 may still be detected if
