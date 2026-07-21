@@ -5,6 +5,11 @@
         MagickAllocateResourceLimitedArray() where possible. Re-flow the
         source code to match the intentation used by the rest of the
         project.
+        (ReadVIFFImage): Fixes so the Khoros VIFF sample files from the
+        Encyclopedia Of Graphics File Formats which are based on integer
+        data storage types read correctly. The files 'HEAD.XV' and
+        'LABLABEL.XV' still do not read correctly since they use single
+        and double data storage types, respectively.
 
 2026-07-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

@@ -100,8 +100,8 @@ typedef struct _ViffInfo
     y_offset;
 
   float
-    x_pixel_size,
-    y_pixel_size;
+    x_pixel_size, /* X bits per pixel */
+    y_pixel_size; /* Y bits per pixel */
 
   magick_uint32_t
     location_type,
@@ -169,14 +169,14 @@ static void LogVIFFInfo(const ViffInfo *viff_info)
                         viff_info->number_of_images,
                         viff_info->number_data_bands,
                         viff_info->data_storage_type,
-                        viff_info->data_storage_type == 0x00 ? "Bit" :
-                        viff_info->data_storage_type == 0x01 ? "BYTE" :
-                        viff_info->data_storage_type == 0x02 ? "WORD" :
-                        viff_info->data_storage_type == 0x04 ? "DWORD" :
-                        viff_info->data_storage_type == 0x05 ? "Single-precision float" :
-                        viff_info->data_storage_type == 0x06 ? "Complex float" :
-                        viff_info->data_storage_type == 0x09 ? "Double-precision float" :
-                        viff_info->data_storage_type == 0x0A ? "Complex double" :
+                        viff_info->data_storage_type == VFF_TYP_BIT /* 0 / 0x00 */ ? "Bit" :
+                        viff_info->data_storage_type == VFF_TYP_1_BYTE /* 1 / 0x01 */ ? "BYTE" :
+                        viff_info->data_storage_type == VFF_TYP_2_BYTE /* 2 / 0x02 */ ? "WORD" :
+                        viff_info->data_storage_type == VFF_TYP_4_BYTE /* 4 / 0x04 */ ? "DWORD" :
+                        viff_info->data_storage_type == VFF_TYP_FLOAT /* 5 / 0x05 */ ? "Single-precision float" :
+                        viff_info->data_storage_type == 0x06 /* 6 / 0x06 */ ? "Complex float" :
+                        viff_info->data_storage_type == VFF_TYP_DOUBLE /* 9 / 0x09 */ ? "Double-precision float" :
+                        viff_info->data_storage_type == 0x0A /* 10 / 0x0A */ ? "Complex double" :
                         "???",
                         viff_info->data_encode_scheme,
                         viff_info->data_encode_scheme == 0x00 ? "No compression" :
@@ -323,7 +323,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
   unsigned char
     *viff_pixels;
 
-  unsigned int
+  MagickPassFail
     status;
 
   unsigned long
@@ -349,7 +349,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
   assert(exception->signature == MagickSignature);
   image=AllocateImage(image_info);
   status=OpenBlob(image_info,image,ReadBinaryBlobMode,exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   /*
     Read VIFF header (1024 bytes).
@@ -388,9 +388,15 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
         (void) SetImageAttribute(image,"comment",viff_info.comment);
       if ((viff_info.machine_dependency == VFF_DEP_DECORDER) ||
           (viff_info.machine_dependency == VFF_DEP_NSORDER))
-        ReadHeaderLong=ReadBlobLSBLong;
+        {
+          ReadHeaderLong=ReadBlobLSBLong;
+          image->endian=LSBEndian;
+        }
       else
-        ReadHeaderLong=ReadBlobMSBLong;
+        {
+          ReadHeaderLong=ReadBlobMSBLong;
+          image->endian=MSBEndian;
+        }
       viff_info.rows=(ReadHeaderLong)(image);
       viff_info.columns=(ReadHeaderLong)(image);
       viff_info.subrows=(ReadHeaderLong)(image);
@@ -469,6 +475,11 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
                 image->colors=image->depth <= 8 ? 256 : 65536L;
                 if (viff_info.data_storage_type == VFF_TYP_BIT)
                   image->colors=2;
+                else
+                  if (viff_info.data_storage_type == VFF_MAPTYP_1_BYTE)
+                    image->colors=256UL;
+                  else
+                    image->colors=image->depth <= 8 ? 256UL : 65536UL;
                 if (!AllocateImageColormap(image,image->colors))
                   ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
                                        image);
@@ -569,8 +580,8 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
             break;
           }
         default:
-          ThrowReaderException(CoderError,ColormapTypeNotSupported,image)
-            }
+          ThrowReaderException(CoderError,ColormapTypeNotSupported,image);
+        }
       /*
         Initialize image structure.
       */
@@ -1004,8 +1015,8 @@ ModuleExport void UnregisterVIFFImage(void)
 %
 %  A description of each parameter follows.
 %
-%    o status: Method WriteVIFFImage return True if the image is written.
-%      False is returned is there is a memory shortage or if the image file
+%    o status: Method WriteVIFFImage return MagickPass if the image is written.
+%      MagickFail is returned is there is a memory shortage or if the image file
 %      fails to write.
 %
 %    o image_info: Specifies a pointer to a ImageInfo structure.
@@ -1051,7 +1062,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
   unsigned char
     *viff_pixels;
 
-  unsigned int
+  MagickPassFail
     status;
 
   unsigned long
@@ -1076,7 +1087,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
   assert(image->signature == MagickSignature);
   image_list_length=GetImageListLength(image);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   (void) memset(&viff_info,0,sizeof(ViffInfo));
   scene=0;
@@ -1381,7 +1392,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
       status=MagickMonitorFormatted(scene++,image_list_length,
                                     &image->exception,SaveImagesText,
                                     image->filename);
-      if (status == False)
+      if (status == MagickFail)
         break;
     } while (image_info->adjoin);
   if (image_info->adjoin)
