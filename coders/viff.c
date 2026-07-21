@@ -19,6 +19,7 @@
 %                                                                             %
 %                                                                             %
 %               Read/Write Khoros Visualization Image Format.                 %
+%                          Circa 1990 - 2001                                  %
 %                                                                             %
 %                                                                             %
 %                              Software Design                                %
@@ -281,7 +282,7 @@ static unsigned int IsVIFF(const unsigned char *magick,const size_t length)
 %
 */
 static Image *ReadVIFFImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                            ExceptionInfo *exception)
 {
 
   double
@@ -355,562 +356,560 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
   */
   count=ReadBlob(image,1,(char *) &viff_info.identifier);
   do
-  {
-    /*
-      Verify VIFF identifier.
-    */
-    if ((count != 1) || ((unsigned char) viff_info.identifier != 0xabU))
-      ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-    /*
-      Initialize VIFF image.
-    */
-    if (ReadBlob(image,sizeof(viff_info.file_type),&viff_info.file_type)
-        != sizeof(viff_info.file_type))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    if (ReadBlob(image,sizeof(viff_info.release),&viff_info.release)
-        != sizeof(viff_info.release))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    if (ReadBlob(image,sizeof(viff_info.version),&viff_info.version)
-        != sizeof(viff_info.version))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    if (ReadBlob(image,sizeof(viff_info.machine_dependency),
-                 &viff_info.machine_dependency)
-        != sizeof(viff_info.machine_dependency))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    if (ReadBlob(image,sizeof(viff_info.reserve),&viff_info.reserve)
-        != sizeof(viff_info.reserve))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    if (ReadBlob(image,512,(char *) viff_info.comment) != 512)
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    viff_info.comment[511]='\0';
-    if (strlen(viff_info.comment) > 4)
-      (void) SetImageAttribute(image,"comment",viff_info.comment);
-    if ((viff_info.machine_dependency == VFF_DEP_DECORDER) ||
-        (viff_info.machine_dependency == VFF_DEP_NSORDER))
-      ReadHeaderLong=ReadBlobLSBLong;
-    else
-      ReadHeaderLong=ReadBlobMSBLong;
-    viff_info.rows=(ReadHeaderLong)(image);
-    viff_info.columns=(ReadHeaderLong)(image);
-    viff_info.subrows=(ReadHeaderLong)(image);
-    viff_info.x_offset=(int) (ReadHeaderLong)(image);
-    viff_info.y_offset=(int) (ReadHeaderLong)(image);
-    viff_info.x_pixel_size=(float) (ReadHeaderLong)(image);
-    viff_info.y_pixel_size=(float) (ReadHeaderLong)(image);
-    viff_info.location_type=(ReadHeaderLong)(image);
-    viff_info.location_dimension=(ReadHeaderLong)(image);
-    viff_info.number_of_images=(ReadHeaderLong)(image);
-    viff_info.number_data_bands=(ReadHeaderLong)(image);
-    viff_info.data_storage_type=(ReadHeaderLong)(image);
-    viff_info.data_encode_scheme=(ReadHeaderLong)(image);
-    viff_info.map_scheme=(ReadHeaderLong)(image);
-    viff_info.map_storage_type=(ReadHeaderLong)(image);
-    viff_info.map_rows=(ReadHeaderLong)(image);
-    viff_info.map_columns=(ReadHeaderLong)(image);
-    viff_info.map_subrows=(ReadHeaderLong)(image);
-    viff_info.map_enable=(ReadHeaderLong)(image);
-    viff_info.maps_per_cycle=(ReadHeaderLong)(image);
-    viff_info.color_space_model=(ReadHeaderLong)(image);
-    for (i=0; i < 420; i++)
-      (void) ReadBlobByte(image);
-    if (EOFBlob(image))
-      ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-    LogVIFFInfo(&viff_info);
-    image->columns=viff_info.rows;
-    image->rows=viff_info.columns;
-    image->depth=viff_info.x_pixel_size <= 8 ? 8 : QuantumDepth;
-    if (CheckImagePixelLimits(image, exception) != MagickPass)
-      ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
-    /*
-      Verify that we can read this VIFF image.
-    */
-    number_pixels=MagickArraySize(viff_info.columns,viff_info.rows);
-    if (number_pixels == 0)
-      ThrowReaderException(CoderError,ImageColumnOrRowSizeIsNotSupported,
-        image);
-    if (viff_info.number_data_bands < 1 || viff_info.number_data_bands > 4)
-      ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-    if ((viff_info.data_storage_type != VFF_TYP_BIT) &&
-        (viff_info.data_storage_type != VFF_TYP_1_BYTE) &&
-        (viff_info.data_storage_type != VFF_TYP_2_BYTE) &&
-        (viff_info.data_storage_type != VFF_TYP_4_BYTE) &&
-        (viff_info.data_storage_type != VFF_TYP_FLOAT) &&
-        (viff_info.data_storage_type != VFF_TYP_DOUBLE))
-      ThrowReaderException(CoderError,DataStorageTypeIsNotSupported,image);
-    if (viff_info.data_encode_scheme != VFF_DES_RAW)
-      ThrowReaderException(CoderError,DataEncodingSchemeIsNotSupported,image);
-    if ((viff_info.map_storage_type != VFF_MAPTYP_NONE) &&
-        (viff_info.map_storage_type != VFF_MAPTYP_1_BYTE) &&
-        (viff_info.map_storage_type != VFF_MAPTYP_2_BYTE) &&
-        (viff_info.map_storage_type != VFF_MAPTYP_4_BYTE) &&
-        (viff_info.map_storage_type != VFF_MAPTYP_FLOAT) &&
-        (viff_info.map_storage_type != VFF_MAPTYP_DOUBLE))
-      ThrowReaderException(CoderError,MapStorageTypeIsNotSupported,image);
-    if ((viff_info.color_space_model != VFF_CM_NONE) &&
-        (viff_info.color_space_model != VFF_CM_ntscRGB) &&
-        (viff_info.color_space_model != VFF_CM_genericRGB))
-      ThrowReaderException(CoderError,ColorspaceModelIsNotSupported,image);
-    if (viff_info.location_type != VFF_LOC_IMPLICIT)
-      ThrowReaderException(CoderError,LocationTypeIsNotSupported,image);
-    if (viff_info.number_of_images != 1)
-      ThrowReaderException(CoderError,NumberOfImagesIsNotSupported,image);
-    if (viff_info.map_rows == 0)
-      viff_info.map_scheme=VFF_MS_NONE;
-    switch ((int) viff_info.map_scheme)
     {
-      case VFF_MS_NONE:
-      {
-        if (viff_info.number_data_bands < 3)
+      /*
+        Verify VIFF identifier.
+      */
+      if ((count != 1) || ((unsigned char) viff_info.identifier != 0xabU))
+        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+      /*
+        Initialize VIFF image.
+      */
+      if (ReadBlob(image,sizeof(viff_info.file_type),&viff_info.file_type)
+          != sizeof(viff_info.file_type))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      if (ReadBlob(image,sizeof(viff_info.release),&viff_info.release)
+          != sizeof(viff_info.release))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      if (ReadBlob(image,sizeof(viff_info.version),&viff_info.version)
+          != sizeof(viff_info.version))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      if (ReadBlob(image,sizeof(viff_info.machine_dependency),
+                   &viff_info.machine_dependency)
+          != sizeof(viff_info.machine_dependency))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      if (ReadBlob(image,sizeof(viff_info.reserve),&viff_info.reserve)
+          != sizeof(viff_info.reserve))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      if (ReadBlob(image,512,(char *) viff_info.comment) != 512)
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      viff_info.comment[511]='\0';
+      if (strlen(viff_info.comment) > 4)
+        (void) SetImageAttribute(image,"comment",viff_info.comment);
+      if ((viff_info.machine_dependency == VFF_DEP_DECORDER) ||
+          (viff_info.machine_dependency == VFF_DEP_NSORDER))
+        ReadHeaderLong=ReadBlobLSBLong;
+      else
+        ReadHeaderLong=ReadBlobMSBLong;
+      viff_info.rows=(ReadHeaderLong)(image);
+      viff_info.columns=(ReadHeaderLong)(image);
+      viff_info.subrows=(ReadHeaderLong)(image);
+      viff_info.x_offset=(int) (ReadHeaderLong)(image);
+      viff_info.y_offset=(int) (ReadHeaderLong)(image);
+      viff_info.x_pixel_size=(float) (ReadHeaderLong)(image);
+      viff_info.y_pixel_size=(float) (ReadHeaderLong)(image);
+      viff_info.location_type=(ReadHeaderLong)(image);
+      viff_info.location_dimension=(ReadHeaderLong)(image);
+      viff_info.number_of_images=(ReadHeaderLong)(image);
+      viff_info.number_data_bands=(ReadHeaderLong)(image);
+      viff_info.data_storage_type=(ReadHeaderLong)(image);
+      viff_info.data_encode_scheme=(ReadHeaderLong)(image);
+      viff_info.map_scheme=(ReadHeaderLong)(image);
+      viff_info.map_storage_type=(ReadHeaderLong)(image);
+      viff_info.map_rows=(ReadHeaderLong)(image);
+      viff_info.map_columns=(ReadHeaderLong)(image);
+      viff_info.map_subrows=(ReadHeaderLong)(image);
+      viff_info.map_enable=(ReadHeaderLong)(image);
+      viff_info.maps_per_cycle=(ReadHeaderLong)(image);
+      viff_info.color_space_model=(ReadHeaderLong)(image);
+      for (i=0; i < 420; i++)
+        (void) ReadBlobByte(image);
+      if (EOFBlob(image))
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+      LogVIFFInfo(&viff_info);
+      image->columns=viff_info.rows;
+      image->rows=viff_info.columns;
+      image->depth=viff_info.x_pixel_size <= 8 ? 8 : QuantumDepth;
+      if (CheckImagePixelLimits(image, exception) != MagickPass)
+        ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
+      /*
+        Verify that we can read this VIFF image.
+      */
+      number_pixels=MagickArraySize(viff_info.columns,viff_info.rows);
+      if (number_pixels == 0)
+        ThrowReaderException(CoderError,ImageColumnOrRowSizeIsNotSupported,
+                             image);
+      if (viff_info.number_data_bands < 1 || viff_info.number_data_bands > 4)
+        ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+      if ((viff_info.data_storage_type != VFF_TYP_BIT) &&
+          (viff_info.data_storage_type != VFF_TYP_1_BYTE) &&
+          (viff_info.data_storage_type != VFF_TYP_2_BYTE) &&
+          (viff_info.data_storage_type != VFF_TYP_4_BYTE) &&
+          (viff_info.data_storage_type != VFF_TYP_FLOAT) &&
+          (viff_info.data_storage_type != VFF_TYP_DOUBLE))
+        ThrowReaderException(CoderError,DataStorageTypeIsNotSupported,image);
+      if (viff_info.data_encode_scheme != VFF_DES_RAW)
+        ThrowReaderException(CoderError,DataEncodingSchemeIsNotSupported,image);
+      if ((viff_info.map_storage_type != VFF_MAPTYP_NONE) &&
+          (viff_info.map_storage_type != VFF_MAPTYP_1_BYTE) &&
+          (viff_info.map_storage_type != VFF_MAPTYP_2_BYTE) &&
+          (viff_info.map_storage_type != VFF_MAPTYP_4_BYTE) &&
+          (viff_info.map_storage_type != VFF_MAPTYP_FLOAT) &&
+          (viff_info.map_storage_type != VFF_MAPTYP_DOUBLE))
+        ThrowReaderException(CoderError,MapStorageTypeIsNotSupported,image);
+      if ((viff_info.color_space_model != VFF_CM_NONE) &&
+          (viff_info.color_space_model != VFF_CM_ntscRGB) &&
+          (viff_info.color_space_model != VFF_CM_genericRGB))
+        ThrowReaderException(CoderError,ColorspaceModelIsNotSupported,image);
+      if (viff_info.location_type != VFF_LOC_IMPLICIT)
+        ThrowReaderException(CoderError,LocationTypeIsNotSupported,image);
+      if (viff_info.number_of_images != 1)
+        ThrowReaderException(CoderError,NumberOfImagesIsNotSupported,image);
+      if (viff_info.map_rows == 0)
+        viff_info.map_scheme=VFF_MS_NONE;
+      switch ((int) viff_info.map_scheme)
+        {
+        case VFF_MS_NONE:
           {
+            if (viff_info.number_data_bands < 3)
+              {
+                /*
+                  Create linear color ramp.
+                */
+                image->colors=image->depth <= 8 ? 256 : 65536L;
+                if (viff_info.data_storage_type == VFF_TYP_BIT)
+                  image->colors=2;
+                if (!AllocateImageColormap(image,image->colors))
+                  ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
+                                       image);
+              }
+            break;
+          }
+        case VFF_MS_ONEPERBAND:
+        case VFF_MS_SHARED:
+          {
+            unsigned char
+              *viff_colormap;
+
+            size_t
+              viff_colormap_size;
+
             /*
-              Create linear color ramp.
+              Allocate VIFF colormap.
             */
-            image->colors=image->depth <= 8 ? 256 : 65536L;
-            if (viff_info.data_storage_type == VFF_TYP_BIT)
-              image->colors=2;
+            switch ((int) viff_info.map_storage_type)
+              {
+              case VFF_MAPTYP_1_BYTE: bytes_per_pixel=1; break;
+              case VFF_MAPTYP_2_BYTE: bytes_per_pixel=2; break;
+              case VFF_MAPTYP_4_BYTE: bytes_per_pixel=4; break;
+              case VFF_MAPTYP_FLOAT: bytes_per_pixel=4; break;
+              case VFF_MAPTYP_DOUBLE: bytes_per_pixel=8; break;
+              default: bytes_per_pixel=1; break;
+              }
+            image->colors=viff_info.map_columns;
             if (!AllocateImageColormap(image,image->colors))
               ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
-                image);
-          }
-        break;
-      }
-      case VFF_MS_ONEPERBAND:
-      case VFF_MS_SHARED:
-      {
-        unsigned char
-          *viff_colormap;
+                                   image);
 
-        size_t
-          viff_colormap_size;
+            viff_colormap_size=MagickArraySize(MagickArraySize(bytes_per_pixel,
+                                                               image->colors),
+                                               viff_info.map_rows);
+            if (BlobIsSeekable(image) &&
+                (GetBlobSize(image)-TellBlob(image) < (magick_off_t) viff_colormap_size))
+              ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+            viff_colormap=MagickAllocateResourceLimitedMemory(unsigned char *,viff_colormap_size);
+            if (viff_colormap == (unsigned char *) NULL)
+              ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+            /*
+              Read VIFF raster colormap.
+            */
+            if (ReadBlob(image,viff_colormap_size,(char *) viff_colormap) != viff_colormap_size)
+              {
+                MagickFreeResourceLimitedMemory(unsigned char *,viff_colormap);
+                ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+              }
 
-        /*
-          Allocate VIFF colormap.
-        */
-        switch ((int) viff_info.map_storage_type)
-        {
-          case VFF_MAPTYP_1_BYTE: bytes_per_pixel=1; break;
-          case VFF_MAPTYP_2_BYTE: bytes_per_pixel=2; break;
-          case VFF_MAPTYP_4_BYTE: bytes_per_pixel=4; break;
-          case VFF_MAPTYP_FLOAT: bytes_per_pixel=4; break;
-          case VFF_MAPTYP_DOUBLE: bytes_per_pixel=8; break;
-          default: bytes_per_pixel=1; break;
-        }
-        image->colors=viff_info.map_columns;
-        if (!AllocateImageColormap(image,image->colors))
-          ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
-            image);
-
-        viff_colormap_size=MagickArraySize(MagickArraySize(bytes_per_pixel,
-                                                           image->colors),
-                                           viff_info.map_rows);
-        if (BlobIsSeekable(image) &&
-            (GetBlobSize(image)-TellBlob(image) < (magick_off_t) viff_colormap_size))
-          ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-        viff_colormap=MagickAllocateResourceLimitedMemory(unsigned char *,viff_colormap_size);
-        if (viff_colormap == (unsigned char *) NULL)
-          ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
-                               image);
-        /*
-          Read VIFF raster colormap.
-        */
-        if (ReadBlob(image,viff_colormap_size,(char *) viff_colormap)
-            != viff_colormap_size)
-          {
+            lsb_first=1;
+            if (*(char *) &lsb_first &&
+                ((viff_info.machine_dependency != VFF_DEP_DECORDER) &&
+                 (viff_info.machine_dependency != VFF_DEP_NSORDER)))
+              switch ((int) viff_info.map_storage_type)
+                {
+                case VFF_MAPTYP_2_BYTE:
+                  {
+                    MSBOrderShort(viff_colormap,((size_t)bytes_per_pixel*image->colors*
+                                                 viff_info.map_rows));
+                    break;
+                  }
+                case VFF_MAPTYP_4_BYTE:
+                case VFF_MAPTYP_FLOAT:
+                  {
+                    MSBOrderLong(viff_colormap,((size_t)bytes_per_pixel*image->colors*
+                                                viff_info.map_rows));
+                    break;
+                  }
+                default: break;
+                }
+            for (i=0; i < (long) (viff_info.map_rows*image->colors); i++)
+              {
+                switch ((int) viff_info.map_storage_type)
+                  {
+                  case VFF_MAPTYP_2_BYTE: value=((short *) viff_colormap)[i]; break;
+                  case VFF_MAPTYP_4_BYTE: value=((int *) viff_colormap)[i]; break;
+                  case VFF_MAPTYP_FLOAT: value=((float *) viff_colormap)[i]; break;
+                  case VFF_MAPTYP_DOUBLE: value=((double *) viff_colormap)[i]; break;
+                  default: value=viff_colormap[i]; break;
+                  }
+                if (i < (long) image->colors)
+                  {
+                    image->colormap[i].red=ScaleCharToQuantum((unsigned int) value);
+                    image->colormap[i].green=ScaleCharToQuantum((unsigned int) value);
+                    image->colormap[i].blue=ScaleCharToQuantum((unsigned int) value);
+                  }
+                else
+                  if (i < (long) (2*image->colors))
+                    image->colormap[i % image->colors].green=
+                      ScaleCharToQuantum((unsigned int) value);
+                  else
+                    if (i < (long) (3*image->colors))
+                      image->colormap[i % image->colors].blue=
+                        ScaleCharToQuantum((unsigned int) value);
+              }
             MagickFreeResourceLimitedMemory(unsigned char *,viff_colormap);
-            ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+            break;
           }
+        default:
+          ThrowReaderException(CoderError,ColormapTypeNotSupported,image)
+            }
+      /*
+        Initialize image structure.
+      */
+      image->matte=(viff_info.number_data_bands == 4);
+      image->storage_class=
+        (viff_info.number_data_bands < 3 ? PseudoClass : DirectClass);
+      image->columns=viff_info.rows;
+      image->rows=viff_info.columns;
+      if (image_info->ping && (image_info->subrange != 0))
+        if (image->scene >= (image_info->subimage+image_info->subrange-1))
+          break;
 
-        lsb_first=1;
-        if (*(char *) &lsb_first &&
-            ((viff_info.machine_dependency != VFF_DEP_DECORDER) &&
-             (viff_info.machine_dependency != VFF_DEP_NSORDER)))
-          switch ((int) viff_info.map_storage_type)
-          {
-            case VFF_MAPTYP_2_BYTE:
-            {
-              MSBOrderShort(viff_colormap,((size_t)bytes_per_pixel*image->colors*
-                viff_info.map_rows));
-              break;
-            }
-            case VFF_MAPTYP_4_BYTE:
-            case VFF_MAPTYP_FLOAT:
-            {
-              MSBOrderLong(viff_colormap,((size_t)bytes_per_pixel*image->colors*
-                viff_info.map_rows));
-              break;
-            }
-            default: break;
-          }
-        for (i=0; i < (long) (viff_info.map_rows*image->colors); i++)
+      if (viff_info.data_storage_type == VFF_TYP_BIT)
         {
-          switch ((int) viff_info.map_storage_type)
-          {
-            case VFF_MAPTYP_2_BYTE: value=((short *) viff_colormap)[i]; break;
-            case VFF_MAPTYP_4_BYTE: value=((int *) viff_colormap)[i]; break;
-            case VFF_MAPTYP_FLOAT: value=((float *) viff_colormap)[i]; break;
-            case VFF_MAPTYP_DOUBLE: value=((double *) viff_colormap)[i]; break;
-            default: value=viff_colormap[i]; break;
-          }
-          if (i < (long) image->colors)
-            {
-              image->colormap[i].red=ScaleCharToQuantum((unsigned int) value);
-              image->colormap[i].green=ScaleCharToQuantum((unsigned int) value);
-              image->colormap[i].blue=ScaleCharToQuantum((unsigned int) value);
-            }
-          else
-            if (i < (long) (2*image->colors))
-              image->colormap[i % image->colors].green=
-                ScaleCharToQuantum((unsigned int) value);
-            else
-              if (i < (long) (3*image->colors))
-                image->colormap[i % image->colors].blue=
-                  ScaleCharToQuantum((unsigned int) value);
+          /*
+            Allocate bi-level colormap
+          */
+          if (AllocateImageColormap(image,2) == MagickFail)
+            ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+          image->colorspace=GRAYColorspace;
         }
-        MagickFreeResourceLimitedMemory(unsigned char *,viff_colormap);
-        break;
-      }
-      default:
-        ThrowReaderException(CoderError,ColormapTypeNotSupported,image)
-    }
-    /*
-      Initialize image structure.
-    */
-    image->matte=(viff_info.number_data_bands == 4);
-    image->storage_class=
-      (viff_info.number_data_bands < 3 ? PseudoClass : DirectClass);
-    image->columns=viff_info.rows;
-    image->rows=viff_info.columns;
-    if (image_info->ping && (image_info->subrange != 0))
-      if (image->scene >= (image_info->subimage+image_info->subrange-1))
-        break;
-
-    if (viff_info.data_storage_type == VFF_TYP_BIT)
-      {
-        /*
-          Allocate bi-level colormap
-        */
-        if (AllocateImageColormap(image,2) == MagickFail)
-          ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-        image->colorspace=GRAYColorspace;
-      }
-    /*
-      Allocate VIFF pixels.
-    */
-    switch ((int) viff_info.data_storage_type)
-    {
-      case VFF_TYP_2_BYTE: bytes_per_pixel=2; break;
-      case VFF_TYP_4_BYTE: bytes_per_pixel=4; break;
-      case VFF_TYP_FLOAT: bytes_per_pixel=4; break;
-      case VFF_TYP_DOUBLE: bytes_per_pixel=8; break;
-      default: bytes_per_pixel=1; break;
-    }
-    if (viff_info.data_storage_type == VFF_TYP_BIT)
-      {
-        max_packets=MagickArraySize(((image->columns+7) >> 3),image->rows);
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Alloc Bytes: %" MAGICK_SIZE_T_F "u, "
-                              "Max Packets: %" MAGICK_SIZE_T_F "u, "
-                              "Columns: %" MAGICK_SIZE_T_F "u ,"
-                              "Rows: %" MAGICK_SIZE_T_F "u",
-                              (MAGICK_SIZE_T) MagickArraySize(((image->columns+7) >> 3),
-                                                              image->rows),
-                              (MAGICK_SIZE_T) max_packets,
-                              (MAGICK_SIZE_T) image->columns,
-                              (MAGICK_SIZE_T) image->rows);
-      }
-    else
-      {
-        max_packets=MagickArraySize(number_pixels,viff_info.number_data_bands);
-        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                              "Alloc Bytes: %" MAGICK_SIZE_T_F "u, "
-                              "Max Packets: %" MAGICK_SIZE_T_F "u, "
-                              "Number Pixels: %" MAGICK_SIZE_T_F "u, "
-                              "Columns: %" MAGICK_SIZE_T_F "u, "
-                              "Rows: %" MAGICK_SIZE_T_F "u, "
-                              "Number Data Bands: %" MAGICK_SIZE_T_F "u",
-                              (MAGICK_SIZE_T) MagickArraySize(number_pixels,
-                                                              viff_info.number_data_bands),
-                              (MAGICK_SIZE_T) max_packets,
-                              (MAGICK_SIZE_T) number_pixels,
-                              (MAGICK_SIZE_T) image->columns,
-                              (MAGICK_SIZE_T) image->rows,
-                              (MAGICK_SIZE_T) viff_info.number_data_bands);
-      }
-    alloc_size=MagickArraySize(bytes_per_pixel,max_packets);
-    if (BlobIsSeekable(image) &&
-        (GetBlobSize(image)-TellBlob(image) < (magick_off_t) alloc_size))
-      ThrowReaderException(CorruptImageError,InsufficientImageDataInFile,image);
-    viff_pixels=MagickAllocateResourceLimitedArray(unsigned char *,
-                                    MagickArraySize(bytes_per_pixel,
-                                                    max_packets),
-                                    sizeof(Quantum));
-    if (viff_pixels == (unsigned char *) NULL)
-      ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
-    if (ReadBlob(image,bytes_per_pixel*max_packets,(char *) viff_pixels)
-        != bytes_per_pixel*max_packets)
-      {
-        MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
-        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
-      }
-    lsb_first=1;
-    if (*(char *) &lsb_first &&
-        ((viff_info.machine_dependency != VFF_DEP_DECORDER) &&
-         (viff_info.machine_dependency != VFF_DEP_NSORDER)))
+      /*
+        Allocate VIFF pixels.
+      */
       switch ((int) viff_info.data_storage_type)
-      {
-        case VFF_TYP_2_BYTE:
         {
-          MSBOrderShort(viff_pixels,bytes_per_pixel*max_packets);
-          break;
+        case VFF_TYP_2_BYTE: bytes_per_pixel=2; break;
+        case VFF_TYP_4_BYTE: bytes_per_pixel=4; break;
+        case VFF_TYP_FLOAT: bytes_per_pixel=4; break;
+        case VFF_TYP_DOUBLE: bytes_per_pixel=8; break;
+        default: bytes_per_pixel=1; break;
         }
-        case VFF_TYP_4_BYTE:
-        case VFF_TYP_FLOAT:
+      if (viff_info.data_storage_type == VFF_TYP_BIT)
         {
-          MSBOrderLong(viff_pixels,bytes_per_pixel*max_packets);
-          break;
+          max_packets=MagickArraySize(((image->columns+7) >> 3),image->rows);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Alloc Bytes: %" MAGICK_SIZE_T_F "u, "
+                                "Max Packets: %" MAGICK_SIZE_T_F "u, "
+                                "Columns: %" MAGICK_SIZE_T_F "u ,"
+                                "Rows: %" MAGICK_SIZE_T_F "u",
+                                (MAGICK_SIZE_T) MagickArraySize(((image->columns+7) >> 3),
+                                                                image->rows),
+                                (MAGICK_SIZE_T) max_packets,
+                                (MAGICK_SIZE_T) image->columns,
+                                (MAGICK_SIZE_T) image->rows);
         }
-        default: break;
-      }
-    min_value=0.0;
-    scale_factor=1.0;
-    if ((viff_info.data_storage_type != VFF_TYP_1_BYTE) &&
-        (viff_info.map_scheme == VFF_MS_NONE))
-      {
-        double
-          max_value;
-
-        /*
-          Determine scale factor.
-        */
+      else
+        {
+          max_packets=MagickArraySize(number_pixels,viff_info.number_data_bands);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "Alloc Bytes: %" MAGICK_SIZE_T_F "u, "
+                                "Max Packets: %" MAGICK_SIZE_T_F "u, "
+                                "Number Pixels: %" MAGICK_SIZE_T_F "u, "
+                                "Columns: %" MAGICK_SIZE_T_F "u, "
+                                "Rows: %" MAGICK_SIZE_T_F "u, "
+                                "Number Data Bands: %" MAGICK_SIZE_T_F "u",
+                                (MAGICK_SIZE_T) MagickArraySize(number_pixels,
+                                                                viff_info.number_data_bands),
+                                (MAGICK_SIZE_T) max_packets,
+                                (MAGICK_SIZE_T) number_pixels,
+                                (MAGICK_SIZE_T) image->columns,
+                                (MAGICK_SIZE_T) image->rows,
+                                (MAGICK_SIZE_T) viff_info.number_data_bands);
+        }
+      alloc_size=MagickArraySize(bytes_per_pixel,max_packets);
+      if (BlobIsSeekable(image) &&
+          (GetBlobSize(image)-TellBlob(image) < (magick_off_t) alloc_size))
+        ThrowReaderException(CorruptImageError,InsufficientImageDataInFile,image);
+      viff_pixels=MagickAllocateResourceLimitedArray(unsigned char *,
+                                                     MagickArraySize(bytes_per_pixel,
+                                                                     max_packets),
+                                                     sizeof(Quantum));
+      if (viff_pixels == (unsigned char *) NULL)
+        ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+      if (ReadBlob(image,bytes_per_pixel*max_packets,(char *) viff_pixels)
+          != bytes_per_pixel*max_packets)
+        {
+          MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
+          ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
+        }
+      lsb_first=1;
+      if (*(char *) &lsb_first &&
+          ((viff_info.machine_dependency != VFF_DEP_DECORDER) &&
+           (viff_info.machine_dependency != VFF_DEP_NSORDER)))
         switch ((int) viff_info.data_storage_type)
+          {
+          case VFF_TYP_2_BYTE:
+            {
+              MSBOrderShort(viff_pixels,bytes_per_pixel*max_packets);
+              break;
+            }
+          case VFF_TYP_4_BYTE:
+          case VFF_TYP_FLOAT:
+            {
+              MSBOrderLong(viff_pixels,bytes_per_pixel*max_packets);
+              break;
+            }
+          default: break;
+          }
+      min_value=0.0;
+      scale_factor=1.0;
+      if ((viff_info.data_storage_type != VFF_TYP_1_BYTE) &&
+          (viff_info.map_scheme == VFF_MS_NONE))
         {
-          case VFF_TYP_2_BYTE: value=((short *) viff_pixels)[0]; break;
-          case VFF_TYP_4_BYTE: value=((int *) viff_pixels)[0]; break;
-          case VFF_TYP_FLOAT: value=((float *) viff_pixels)[0]; break;
-          case VFF_TYP_DOUBLE: value=((double *) viff_pixels)[0]; break;
-          default: value=viff_pixels[0]; break;
+          double
+            max_value;
+
+          /*
+            Determine scale factor.
+          */
+          switch ((int) viff_info.data_storage_type)
+            {
+            case VFF_TYP_2_BYTE: value=((short *) viff_pixels)[0]; break;
+            case VFF_TYP_4_BYTE: value=((int *) viff_pixels)[0]; break;
+            case VFF_TYP_FLOAT: value=((float *) viff_pixels)[0]; break;
+            case VFF_TYP_DOUBLE: value=((double *) viff_pixels)[0]; break;
+            default: value=viff_pixels[0]; break;
+            }
+          max_value=value;
+          min_value=value;
+          for (i=0; i < (long) max_packets; i++)
+            {
+              switch ((int) viff_info.data_storage_type)
+                {
+                case VFF_TYP_2_BYTE: value=((short *) viff_pixels)[i]; break;
+                case VFF_TYP_4_BYTE: value=((int *) viff_pixels)[i]; break;
+                case VFF_TYP_FLOAT: value=((float *) viff_pixels)[i]; break;
+                case VFF_TYP_DOUBLE: value=((double *) viff_pixels)[i]; break;
+                default: value=viff_pixels[i]; break;
+                }
+              if (value > max_value)
+                max_value=value;
+              else
+                if (value < min_value)
+                  min_value=value;
+            }
+          if ((min_value == 0) && (max_value == 0))
+            scale_factor=0;
+          else
+            if (min_value == max_value)
+              {
+                scale_factor=MaxRGB/min_value;
+                min_value=0;
+              }
+            else
+              scale_factor=MaxRGB/(max_value-min_value);
         }
-        max_value=value;
-        min_value=value;
-        for (i=0; i < (long) max_packets; i++)
+      /*
+        Convert pixels to Quantum size.
+      */
+      p=(unsigned char *) viff_pixels;
+      for (i=0; i < (long) max_packets; i++)
         {
           switch ((int) viff_info.data_storage_type)
-          {
+            {
             case VFF_TYP_2_BYTE: value=((short *) viff_pixels)[i]; break;
             case VFF_TYP_4_BYTE: value=((int *) viff_pixels)[i]; break;
             case VFF_TYP_FLOAT: value=((float *) viff_pixels)[i]; break;
             case VFF_TYP_DOUBLE: value=((double *) viff_pixels)[i]; break;
             default: value=viff_pixels[i]; break;
-          }
-          if (value > max_value)
-            max_value=value;
-          else
-            if (value < min_value)
-              min_value=value;
-        }
-        if ((min_value == 0) && (max_value == 0))
-          scale_factor=0;
-        else
-          if (min_value == max_value)
-            {
-              scale_factor=MaxRGB/min_value;
-              min_value=0;
             }
-          else
-            scale_factor=MaxRGB/(max_value-min_value);
-      }
-    /*
-      Convert pixels to Quantum size.
-    */
-    p=(unsigned char *) viff_pixels;
-    for (i=0; i < (long) max_packets; i++)
-    {
-      switch ((int) viff_info.data_storage_type)
-      {
-        case VFF_TYP_2_BYTE: value=((short *) viff_pixels)[i]; break;
-        case VFF_TYP_4_BYTE: value=((int *) viff_pixels)[i]; break;
-        case VFF_TYP_FLOAT: value=((float *) viff_pixels)[i]; break;
-        case VFF_TYP_DOUBLE: value=((double *) viff_pixels)[i]; break;
-        default: value=viff_pixels[i]; break;
-      }
-      if (viff_info.map_scheme == VFF_MS_NONE)
-        {
-          value=(value-min_value)*scale_factor;
+          if (viff_info.map_scheme == VFF_MS_NONE)
+            {
+              value=(value-min_value)*scale_factor;
+            }
+          *p=RoundDoubleToQuantumN(value);
+          p++;
         }
-      *p=RoundDoubleToQuantumN(value);
-      p++;
-    }
-    /*
-      Convert VIFF raster image to pixel packets.
-    */
-    p=(unsigned char *) viff_pixels;
-    if (viff_info.data_storage_type == VFF_TYP_BIT)
-      {
-        unsigned int
-          polarity;
+      /*
+        Convert VIFF raster image to pixel packets.
+      */
+      p=(unsigned char *) viff_pixels;
+      if (viff_info.data_storage_type == VFF_TYP_BIT)
+        {
+          unsigned int
+            polarity;
 
-        /*
-          Convert bitmap scanline.
-        */
-        polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
-        if (image->colors >= 2)
-          polarity=PixelIntensityToQuantum(&image->colormap[0]) >
-            PixelIntensityToQuantum(&image->colormap[1]);
-        for (y=0; y < (long) image->rows; y++)
-        {
-          q=SetImagePixels(image,0,y,image->columns,1);
-          if (q == (PixelPacket *) NULL)
-            break;
-          indexes=AccessMutableIndexes(image);
-          for (x=0; x < (long) (image->columns-7); x+=8)
-          {
-            for (bit=0; bit < 8; bit++)
-              {
-                index=((*p) & (0x01 << bit) ? !polarity : polarity);
-                VerifyColormapIndex(status,image,index);
-                if (status == MagickFail)
-                  break;
-                indexes[x+bit]=(IndexPacket) index;
-              }
-            p++;
-          }
-          if ((image->columns % 8) != 0)
+          /*
+            Convert bitmap scanline.
+          */
+          polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
+          if (image->colors >= 2)
+            polarity=PixelIntensityToQuantum(&image->colormap[0]) >
+              PixelIntensityToQuantum(&image->colormap[1]);
+          for (y=0; y < (long) image->rows; y++)
             {
-              for (bit=0; bit < (long) (image->columns % 8); bit++)
+              q=SetImagePixels(image,0,y,image->columns,1);
+              if (q == (PixelPacket *) NULL)
+                break;
+              indexes=AccessMutableIndexes(image);
+              for (x=0; x < (long) (image->columns-7); x+=8)
                 {
-                  index=((*p) & (0x01 << bit) ? !polarity : polarity);
-                  VerifyColormapIndex(status,image,index);
-                  if (status == MagickFail)
-                    break;
-                  indexes[x+bit]=(IndexPacket) index;
+                  for (bit=0; bit < 8; bit++)
+                    {
+                      index=((*p) & (0x01 << bit) ? !polarity : polarity);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
+                      indexes[x+bit]=(IndexPacket) index;
+                    }
+                  p++;
                 }
-              p++;
+              if ((image->columns % 8) != 0)
+                {
+                  for (bit=0; bit < (long) (image->columns % 8); bit++)
+                    {
+                      index=((*p) & (0x01 << bit) ? !polarity : polarity);
+                      VerifyColormapIndex(status,image,index);
+                      if (status == MagickFail)
+                        break;
+                      indexes[x+bit]=(IndexPacket) index;
+                    }
+                  p++;
+                }
+              if (!SyncImagePixels(image))
+                break;
+              if (image->previous == (Image *) NULL)
+                if (QuantumTick(y,image->rows))
+                  if (!MagickMonitorFormatted(y,image->rows,exception,
+                                              LoadImageText,image->filename,
+                                              image->columns,image->rows))
+                    break;
             }
-          if (!SyncImagePixels(image))
-            break;
-          if (image->previous == (Image *) NULL)
-            if (QuantumTick(y,image->rows))
-              if (!MagickMonitorFormatted(y,image->rows,exception,
-                                          LoadImageText,image->filename,
-                                          image->columns,image->rows))
-                break;
-        }
-      }
-    else
-      if (image->storage_class == PseudoClass)
-        for (y=0; y < (long) image->rows; y++)
-        {
-          q=SetImagePixels(image,0,y,image->columns,1);
-          if (q == (PixelPacket *) NULL)
-            break;
-          indexes=AccessMutableIndexes(image);
-          for (x=0; x < (long) image->columns; x++)
-            {
-              index=(*p++);
-              VerifyColormapIndex(status,image,index);
-              if (status == MagickFail)
-                break;
-              indexes[x]=index;
-            }
-          if (!SyncImagePixels(image))
-            break;
-          if (image->previous == (Image *) NULL)
-            if (QuantumTick(y,image->rows))
-              if (!MagickMonitorFormatted(y,image->rows,exception,
-                                          LoadImageText,image->filename,
-                                          image->columns,image->rows))
-                break;
         }
       else
+        if (image->storage_class == PseudoClass)
+          for (y=0; y < (long) image->rows; y++)
+            {
+              q=SetImagePixels(image,0,y,image->columns,1);
+              if (q == (PixelPacket *) NULL)
+                break;
+              indexes=AccessMutableIndexes(image);
+              for (x=0; x < (long) image->columns; x++)
+                {
+                  index=(*p++);
+                  VerifyColormapIndex(status,image,index);
+                  if (status == MagickFail)
+                    break;
+                  indexes[x]=index;
+                }
+              if (!SyncImagePixels(image))
+                break;
+              if (image->previous == (Image *) NULL)
+                if (QuantumTick(y,image->rows))
+                  if (!MagickMonitorFormatted(y,image->rows,exception,
+                                              LoadImageText,image->filename,
+                                              image->columns,image->rows))
+                    break;
+            }
+        else
+          {
+            /*
+              Convert DirectColor scanline.
+            */
+            number_pixels=(size_t)image->columns*image->rows;
+            for (y=0; y < (long) image->rows; y++)
+              {
+                q=SetImagePixels(image,0,y,image->columns,1);
+                if (q == (PixelPacket *) NULL)
+                  break;
+                for (x=0; x < (long) image->columns; x++)
+                  {
+                    q->red=ScaleCharToQuantum(*p);
+                    q->green=ScaleCharToQuantum(*(p+number_pixels));
+                    q->blue=ScaleCharToQuantum(*(p+2*number_pixels));
+                    if (image->colors != 0)
+                      {
+                        index=q->red;
+                        VerifyColormapIndex(status,image,index);
+                        if (status == MagickFail)
+                          break;
+                        q->red=image->colormap[index].red;
+                        index=q->green;
+                        VerifyColormapIndex(status,image,index);
+                        if (status == MagickFail)
+                          break;
+                        q->green=image->colormap[index].green;
+                        index=q->blue;
+                        VerifyColormapIndex(status,image,index);
+                        if (status == MagickFail)
+                          break;
+                        q->blue=image->colormap[index].blue;
+                      }
+                    q->opacity=(Quantum) (image->matte ? MaxRGB-
+                                          ScaleCharToQuantum(*(p+number_pixels*3)) : OpaqueOpacity);
+                    p++;
+                    q++;
+                  }
+                if (!SyncImagePixels(image))
+                  break;
+                if (image->previous == (Image *) NULL)
+                  if (QuantumTick(y,image->rows))
+                    if (!MagickMonitorFormatted(y,image->rows,exception,
+                                                LoadImageText,image->filename,
+                                                image->columns,image->rows))
+                      break;
+              }
+          }
+      MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
+      if (EOFBlob(image))
+        {
+          ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
+                         image->filename);
+        }
+      if (image->exception.severity >= ErrorException)
+        {
+          CloseBlob(image);
+          GetImageException(image,exception);
+          DestroyImageList(image);
+          return((Image *) NULL);
+        }
+      if (image->storage_class == PseudoClass)
+        (void) SyncImage(image);
+      StopTimer(&image->timer);
+      /*
+        Proceed to next image.
+      */
+      if (image_info->subrange != 0)
+        if (image->scene >= (image_info->subimage+image_info->subrange-1))
+          break;
+      count=ReadBlob(image,1,(char *) &viff_info.identifier);
+      if ((count == 1) && (viff_info.identifier == 0xab))
         {
           /*
-            Convert DirectColor scanline.
+            Allocate next image structure.
           */
-          number_pixels=(size_t)image->columns*image->rows;
-          for (y=0; y < (long) image->rows; y++)
-          {
-            q=SetImagePixels(image,0,y,image->columns,1);
-            if (q == (PixelPacket *) NULL)
-              break;
-            for (x=0; x < (long) image->columns; x++)
+          AllocateNextImage(image_info,image);
+          if (image->next == (Image *) NULL)
             {
-              q->red=ScaleCharToQuantum(*p);
-              q->green=ScaleCharToQuantum(*(p+number_pixels));
-              q->blue=ScaleCharToQuantum(*(p+2*number_pixels));
-              if (image->colors != 0)
-                {
-                  index=q->red;
-                  VerifyColormapIndex(status,image,index);
-                  if (status == MagickFail)
-                    break;
-                  q->red=image->colormap[index].red;
-                  index=q->green;
-                  VerifyColormapIndex(status,image,index);
-                  if (status == MagickFail)
-                    break;
-                  q->green=image->colormap[index].green;
-                  index=q->blue;
-                  VerifyColormapIndex(status,image,index);
-                  if (status == MagickFail)
-                    break;
-                  q->blue=image->colormap[index].blue;
-                }
-              q->opacity=(Quantum) (image->matte ? MaxRGB-
-                ScaleCharToQuantum(*(p+number_pixels*3)) : OpaqueOpacity);
-              p++;
-              q++;
+              DestroyImageList(image);
+              return((Image *) NULL);
             }
-            if (!SyncImagePixels(image))
-              break;
-            if (image->previous == (Image *) NULL)
-              if (QuantumTick(y,image->rows))
-                if (!MagickMonitorFormatted(y,image->rows,exception,
-                                            LoadImageText,image->filename,
-                                            image->columns,image->rows))
-                  break;
-          }
+          image=SyncNextImageInList(image);
+          if (!MagickMonitorFormatted(TellBlob(image),GetBlobSize(image),
+                                      exception,LoadImagesText,
+                                      image->filename))
+            break;
         }
-    MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
-    if (EOFBlob(image))
-      {
-        ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-          image->filename);
-      }
-    if (image->exception.severity >= ErrorException)
-      {
-        CloseBlob(image);
-        GetImageException(image,exception);
-        DestroyImageList(image);
-        return((Image *) NULL);
-      }
-    if (image->storage_class == PseudoClass)
-      (void) SyncImage(image);
-    StopTimer(&image->timer);
-    /*
-      Proceed to next image.
-    */
-    if (image_info->subrange != 0)
-      if (image->scene >= (image_info->subimage+image_info->subrange-1))
-        break;
-    count=ReadBlob(image,1,(char *) &viff_info.identifier);
-    if ((count == 1) && (viff_info.identifier == 0xab))
-      {
-        /*
-          Allocate next image structure.
-        */
-        AllocateNextImage(image_info,image);
-        if (image->next == (Image *) NULL)
-          {
-            DestroyImageList(image);
-            return((Image *) NULL);
-          }
-        image=SyncNextImageInList(image);
-        if (!MagickMonitorFormatted(TellBlob(image),GetBlobSize(image),
-                                    exception,LoadImagesText,
-                                    image->filename))
-          break;
-      }
-  } while ((count != 0) && (viff_info.identifier == 0xab));
+    } while ((count != 0) && (viff_info.identifier == 0xab));
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);
@@ -1026,11 +1025,6 @@ ModuleExport void UnregisterVIFFImage(void)
 #define VFF_MS_ONEPERBAND  1
 #define VFF_TYP_BIT  0
 #define VFF_TYP_1_BYTE  1
-#define ThrowVIFFWriterException(code_,reason_,image_)             \
-  {                                                                \
-    MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);  \
-    ThrowWriterException(code_,reason_,image_);                    \
-  }
 static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
 {
   const ImageAttribute
@@ -1055,7 +1049,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
     *q;
 
   unsigned char
-    *viff_pixels = (unsigned char *) NULL;
+    *viff_pixels;
 
   unsigned int
     status;
@@ -1083,7 +1077,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
   image_list_length=GetImageListLength(image);
   status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
   if (status == False)
-    ThrowVIFFWriterException(FileOpenError,UnableToOpenFile,image);
+    ThrowWriterException(FileOpenError,UnableToOpenFile,image);
   (void) memset(&viff_info,0,sizeof(ViffInfo));
   scene=0;
   do
@@ -1095,14 +1089,14 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
         Ensure that image is in an RGB space.
       */
       if (TransformColorspace(image,RGBColorspace) == MagickFail)
-        ThrowVIFFWriterException(CoderError,UnableToTransformColorspace,image);
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
       /*
         Analyze image to be written.
       */
       if (GetImageCharacteristics(image,&characteristics,
                                   (OptimizeType == image_info->type),
                                   &image->exception) == MagickFail)
-        ThrowVIFFWriterException(CoderError,UnableToGetImageCharacteristics,image);
+        ThrowWriterException(CoderError,UnableToGetImageCharacteristics,image);
       /*
         Initialize VIFF image structure.
       */
@@ -1226,7 +1220,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
       */
       viff_pixels=MagickAllocateResourceLimitedMemory(unsigned char *,packets);
       if (viff_pixels == (unsigned char *) NULL)
-        ThrowVIFFWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+        ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
       q=viff_pixels;
       if (image->storage_class == DirectClass)
         {
@@ -1266,11 +1260,13 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
             /*
               Dump colormap to file.
             */
-            viff_colormap=MagickAllocateResourceLimitedMemory(unsigned char *,
-                                                              MagickArraySize(3,image->colors));
+            viff_colormap=MagickAllocateResourceLimitedArray(unsigned char *,
+                                                             image->colors,3);
             if (viff_colormap == (unsigned char *) NULL)
-              ThrowVIFFWriterException(ResourceLimitError,MemoryAllocationFailed,
-                                       image);
+              {
+                MagickFreeResourceLimitedMemory(unsigned char *,viff_pixels);
+                ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+              }
             q=viff_colormap;
             for (i=0; i < (long) image->colors; i++)
               *q++=ScaleQuantumToChar(image->colormap[i].red);
@@ -1316,7 +1312,7 @@ static unsigned int WriteVIFFImage(const ImageInfo *image_info,Image *image)
                 Convert PseudoClass image to a VIFF monochrome image.
               */
               if (SetImageType(image,BilevelType) == MagickFail)
-                ThrowVIFFWriterException(CoderError,UnableToSetImageType,image);
+                ThrowWriterException(CoderError,UnableToSetImageType,image);
               polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
               if (image->colors == 2)
                 polarity=PixelIntensityToQuantum(&image->colormap[0]) <

@@ -1,3 +1,11 @@
+2026-07-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/viff.c (WriteVIFFImage): Narrow the scope of the
+        'viff_pixels' allocation handling added yesterday. Use
+        MagickAllocateResourceLimitedArray() where possible. Re-flow the
+        source code to match the intentation used by the rest of the
+        project.
+
 2026-07-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/viff.c (WriteVIFFImage): Assure that 'viff_pixels'
