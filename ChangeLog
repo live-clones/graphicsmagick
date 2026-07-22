@@ -1,9 +1,14 @@
+2026-07-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (png_read_raw_profile): Add more tracing regarding
+        raw profiles.
+
 2026-07-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/viff.c (WriteVIFFImage): Narrow the scope of the
         'viff_pixels' allocation handling added yesterday. Use
         MagickAllocateResourceLimitedArray() where possible. Re-flow the
-        source code to match the intentation used by the rest of the
+        source code to match the indentation used by the rest of the
         project.
         (ReadVIFFImage): Fixes so the Khoros VIFF sample files from the
         Encyclopedia Of Graphics File Formats which are based on integer

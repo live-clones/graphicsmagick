@@ -1298,7 +1298,7 @@ png_read_raw_profile(Image *image, const ImageInfo *image_info,
     }
 
   /* We have already read "Raw profile type " */
-  if(!memcmp(&text[ii].key[17], "iptc\0",5))
+  if (!memcmp(&text[ii].key[17], "iptc\0",5))
     {
       strlcpy(profile_name,"IPTC",sizeof(profile_name));
       strlcpy(profile_description,"IPTC profile.",sizeof(profile_description));
@@ -1318,9 +1318,13 @@ png_read_raw_profile(Image *image, const ImageInfo *image_info,
       strlcat(profile_description,&text[ii].key[17],
               sizeof(profile_description));
     }
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "    Raw profile[%ld] \"%s\" is of type \"%.1024s\"",
+                          ii, profile_name, profile_description);
   if (image_info->verbose)
     (void) printf(" Found a %.1024s\n",profile_description);
-  if(SetImageProfile(image,profile_name,info,length) == MagickFail)
+  if (SetImageProfile(image,profile_name,info,length) == MagickFail)
     {
       MagickFreeMemory(info);
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -8745,7 +8749,9 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                       if (logging)
                         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                               "  Setting up text chunk with"
-                                              " iCCP Profile");
+                                              " iCCP Profile (%u byte%s)",
+                                              (unsigned int) profile_length,
+                                              profile_length > 1 ? "s" : "");
                       (void) png_write_raw_profile(image_info,ping,ping_info,
                                                    "icm",
                                                    "ICC Profile",
@@ -8761,7 +8767,9 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 if (logging)
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "  Setting up text chunk with"
-                                        " iPTC Profile");
+                                        " iPTC Profile (%u byte%s)",
+                                        (unsigned int) profile_length,
+                                        profile_length > 1 ? "s" : "");
                 (void) png_write_raw_profile(image_info,ping,ping_info,
                                              "iptc",
                                              "IPTC profile",
@@ -8777,8 +8785,10 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 if (logging)
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "  Setting up text chunk with"
-                                        " %s profile",
-                                        profile_name);
+                                        " %s profile (%u byte%s)",
+                                        profile_name,
+                                        (unsigned int) profile_length,
+                                        profile_length > 1 ? "s" : "");
                 (void) png_write_raw_profile(image_info,ping,ping_info,
                                              profile_name,
                                              "generic profile",
