@@ -2,6 +2,10 @@
 
         * NEWS.txt: Update the news.
 
+        * coders/svg.c (SVGValidateElementId): Try to eliminate warning
+        regarding indexing an array using a 'char' reported by Cygwin GCC
+        14.4.0.
+
         * coders/heif.c (GetHEIFDecoders): Only include GetHEIFDecoders
         function if HEIF is supported.
 

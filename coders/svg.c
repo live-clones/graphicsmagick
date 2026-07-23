@@ -716,15 +716,15 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
    MagickPassFail
      status = MagickPass;
 
-   /* Cannot be empty */
-   if (id_size == 0)
+   /* Id cannot be empty or NULL */
+   if (((void *)id == NULL) || (id_size == 0))
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
        status=MagickFail;
      }
    /* Must begin with a letter, an underscore (_), or a colon (:) */
-   else if (!(isalpha(id[0]) || ('_' == id[0]) || (':' == id[0])))
+   else if (!(isalpha((int)id[0U]) || ('_' == id[0U]) || (':' == id[0U])))
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
@@ -732,7 +732,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      }
 #if 0
    /* Names cannot start with the letters xml, XML, Xml, etc., but some files use this! */
-   else if ((id_size >= 3) && (LocaleNCompare(id,"XML",3) == 0))
+   else if ((id_size >= 3U) && (LocaleNCompare(id,"XML",3U) == 0))
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
@@ -755,7 +755,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
 
    if (MagickPass != status)
      {
-       id[0]='\0';
+       id[0U]='\0';
      }
 
    return status;
