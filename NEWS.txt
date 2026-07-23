@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to July 2, 2026.
+This file was last updated to reflect changes up to July 23, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -54,6 +54,8 @@ Security Fixes:
   GradientImage: heap-buffer-overflow READ in NorthGravity branch
   reached from gm convert (magick/gradient.c:284)" from David
   Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+* ImageToBlob(): Fix memory leak which may occur if WriteImage() fails.
 
 * LOCALE: Bound the length passed to strncpy() and string
   terminator. Addresses "[security] GraphicsMagick LOCALE coder:
@@ -108,12 +110,21 @@ Security Fixes:
   bytes) beyond the end of the allocated profile buffer. Reported-by:
   Tristan Madani.
 
+* VIFF: Memory leak fix (ImageMagick CVE-2026-61870).
+
 Bug fixes:
+
+* configure.ac: Fixes so Freetype and zlib may be detected if
+  pkg-config is not available.
 
 * PICT: Remove the attempt to intuit byteCount must be a word because
   the approach used does not work reliably. This means that defective
   PICT files previously written by ImageMagick or GraphicsMagick may
   fail to be read.
+
+* VIFF: Fixes so remaining Khoros VIFF sample files sample files from
+  the Encyclopedia Of Graphics File Formats which are based on integer
+  data storage types read correctly.
 
 API Updates:
 
@@ -133,7 +144,10 @@ Build Changes:
 
 Windows Delegate Updates/Additions:
 
-* None
+* None. Please note that most of the bundled 3rd-party source packages
+  have known security issues, even if they represent the latest
+  release. Bundling source files in this manner does not make sense in
+  today's hostile/aware world.
 
 1.3.47 (May 13, 2026)
 ===========================

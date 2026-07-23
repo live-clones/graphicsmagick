@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to July 2, 2026.</p>
+<p>This file was last updated to reflect changes up to July 23, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -134,6 +134,7 @@ for NorthGravity.  Addresses &quot;[security] GraphicsMagick
 GradientImage: heap-buffer-overflow READ in NorthGravity branch
 reached from gm convert (magick/gradient.c:284)&quot; from David
 Korczynski. Credit to Anthropic Claude and Ada Logics.</p></li>
+<li><p>ImageToBlob(): Fix memory leak which may occur if WriteImage() fails.</p></li>
 <li><p>LOCALE: Bound the length passed to strncpy() and string
 terminator. Addresses &quot;[security] GraphicsMagick LOCALE coder:
 stack-buffer-overflow WRITE in ReadConfigureFile reached from gm
@@ -176,13 +177,19 @@ Tristan Madani.</p></li>
 <li><p>TIFF: In AddIFDExifFields(), address possible out of bounds read (2
 bytes) beyond the end of the allocated profile buffer. Reported-by:
 Tristan Madani.</p></li>
+<li><p>VIFF: Memory leak fix (ImageMagick CVE-2026-61870).</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
+<li><p>configure.ac: Fixes so Freetype and zlib may be detected if
+pkg-config is not available.</p></li>
 <li><p>PICT: Remove the attempt to intuit byteCount must be a word because
 the approach used does not work reliably. This means that defective
 PICT files previously written by ImageMagick or GraphicsMagick may
 fail to be read.</p></li>
+<li><p>VIFF: Fixes so remaining Khoros VIFF sample files sample files from
+the Encyclopedia Of Graphics File Formats which are based on integer
+data storage types read correctly.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
@@ -202,7 +209,10 @@ fail to be read.</p></li>
 </ul>
 <p>Windows Delegate Updates/Additions:</p>
 <ul class="simple">
-<li><p>None</p></li>
+<li><p>None. Please note that most of the bundled 3rd-party source packages
+have known security issues, even if they represent the latest
+release. Bundling source files in this manner does not make sense in
+today's hostile/aware world.</p></li>
 </ul>
 </section>
 <section id="may-13-2026">

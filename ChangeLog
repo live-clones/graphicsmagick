@@ -1,3 +1,10 @@
+2026-07-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * coders/heif.c (GetHEIFDecoders): Only include GetHEIFDecoders
+        function if HEIF is supported.
+
 2026-07-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/png.c (png_read_raw_profile): Add more tracing regarding
