@@ -1,5 +1,7 @@
 2026-07-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * version.sh: Updates in preparation for the 1.3.48 release
+
         * NEWS.txt: Update the news.
 
         * coders/svg.c (SVGValidateElementId): Try to eliminate warning

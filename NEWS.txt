@@ -19,7 +19,7 @@ release and not attempt to patch older releases.
 .. contents::
   :local:
 
-1.3.48 (????, 2026)
+1.3.48 (July 23, 2026)
 ===========================
 
 Special Issues:
