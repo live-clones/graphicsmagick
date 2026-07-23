@@ -166,7 +166,7 @@ static Image *ReadPWPImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if ((count != 5) || (LocaleNCompare((char *) magick,"SFW95",5) != 0))
     ThrowReaderException(CorruptImageError,ImproperImageHeader,pwp_image);
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(_BlobInfoPtr_) NULL;
+  clone_info->blob=(void *) NULL;
   clone_info->length=0;
   for ( ; ; )
     {

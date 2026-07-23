@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to May 13, 2026.
+This file was last updated to reflect changes up to July 23, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -18,6 +18,136 @@ release and not attempt to patch older releases.
 
 .. contents::
   :local:
+
+1.3.48 (July 23, 2026)
+===========================
+
+Special Issues:
+
+* GraphicsMagick needs some additional productive volunteers.  For
+  several years now, the burden has entirely been on me (Bob
+  Friesenhahn).  I have been sheparding the project for 24 years
+  already (and contributed to ImageMagick and GraphicsMagick combined
+  for 30 years already).  Volunteers are needed to add/improve
+  new/existing file format support, and to assure correct operation on
+  all targets.
+
+Security Fixes:
+
+* Address ImageMagick CVE CVE-2026-42050, ImageMagick security
+  advisory GHSA-7mxf-ff4f-jj7p, which is related to an X11 display
+  buffer overflow.  This is really a minor issue since it requires X11
+  keyboard input and causes no harm.
+
+* DCM: In RLE decoder, detect and report end of input. Reported-by:
+  Tristan Madani.
+
+* DCM: Convert from ASCII numeric value to unsigned value, with error
+  detection. Avoid problems caused by negative values. Reported-by:
+  Tristan Madani.
+
+* display: Correct bounds checking for 'filename' length. Thanks to
+  Petr Gajdos for a heads-up regarding the disparity.
+
+* GradientImage(): Fix 'pixel_packets' and 'indexes' addressing logic
+  for NorthGravity.  Addresses "[security] GraphicsMagick
+  GradientImage: heap-buffer-overflow READ in NorthGravity branch
+  reached from gm convert (magick/gradient.c:284)" from David
+  Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+* ImageToBlob(): Fix memory leak which may occur if WriteImage() fails.
+
+* LOCALE: Bound the length passed to strncpy() and string
+  terminator. Addresses "[security] GraphicsMagick LOCALE coder:
+  stack-buffer-overflow WRITE in ReadConfigureFile reached from gm
+  convert (coders/locale.c:257)" from David Korczynski. Credit to
+  Anthropic Claude and Ada Logics.
+
+* META/IPTC: Prevent reading past the end of a truncated/short IPTC
+  profile.
+
+* MIFF: Correct scope of 'values' reallocation error
+  handling. Addresses "[security] GraphicsMagick MIFF reader:
+  heap-use-after-free WRITE via stale cursor on values-buffer realloc
+  failure (coders/miff.c:1048)" from David Korczynski. Credit to
+  Anthropic Claude and Ada Logics.
+
+* MSL: Properly log warnings and errors using LogMagickEventList()
+  given a va_list. Reported-by: Tristan Madani.
+
+* PCD: Over-provision the per-channel Huffman decode buffers and
+  detect any attempt to overflow them. Discovered and reported by
+  Cipher - Causal Security (https://causalsecurity.com/).
+
+* PCX: If image has more than 256 colors, save as a DirectClass
+  type. Addresses "[security] GraphicsMagick PCX writer:
+  heap-buffer-overflow WRITE in WritePCXImage colormap fill
+  (coders/pcx.c:1186)" from David Korczynski. Credit to Anthropic
+  Claude and Ada Logics.
+
+* PNG: Use only values from GetImageCharacteristics() since
+  IsMonochromeImage() and IsGrayImage() may produce different
+  answers. Addresses "[security] GraphicsMagick MNG re-encode:
+  heap-buffer-overflow WRITE in ExportGrayAlphaQuantumType reached
+  from gm convert (magick/export.c:1105)" as reported by David
+  Korczynski via email on May 28, 2026. Credit to Anthropic Claude and
+  Ada Logics.
+
+* SVG: Properly log warnings and errors using LogMagickEventList()
+  given a va_list. Reported-by: Tristan Madani.
+
+* TIFF: Add many more validations and safeguards to EXIF in TIFF
+  writer. Addresses "[security] GraphicsMagick TIFF writer:
+  heap-buffer-overflow WRITE in AddIFDExifFields via 32-bit count*2
+  wrap on EXIF SHORT array (coders/tiff.c)" from David
+  Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+* TIFF: If EXIF profile string is not already NUL terminated, assure
+  that it is NUL terminated before passing it to libtiff. Reported-by:
+  Tristan Madani.
+
+* TIFF: In AddIFDExifFields(), address possible out of bounds read (2
+  bytes) beyond the end of the allocated profile buffer. Reported-by:
+  Tristan Madani.
+
+* VIFF: Memory leak fix (ImageMagick CVE-2026-61870).
+
+Bug fixes:
+
+* configure.ac: Fixes so Freetype and zlib may be detected if
+  pkg-config is not available.
+
+* PICT: Remove the attempt to intuit byteCount must be a word because
+  the approach used does not work reliably. This means that defective
+  PICT files previously written by ImageMagick or GraphicsMagick may
+  fail to be read.
+
+* VIFF: Fixes so remaining Khoros VIFF sample files sample files from
+  the Encyclopedia Of Graphics File Formats which are based on integer
+  data storage types read correctly.
+
+API Updates:
+
+* None
+
+New Features:
+
+* None
+
+Behavior Changes:
+
+* None
+
+Build Changes:
+
+* None
+
+Windows Delegate Updates/Additions:
+
+* None. Please note that most of the bundled 3rd-party source packages
+  have known security issues, even if they represent the latest
+  release. Bundling source files in this manner does not make sense in
+  today's hostile/aware world.
 
 1.3.47 (May 13, 2026)
 ===========================

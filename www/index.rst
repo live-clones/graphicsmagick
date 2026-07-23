@@ -28,7 +28,7 @@ GraphicsMagick Image Processing System
 .. _programming : programming.html
 
 ===========================  =========================================================
-Current Release              1.3.46 (Released October 29, 2025) `download release`__
+Current Release              1.3.48 (Released July 23, 2026) `download release`__
 Development Snapshots        (Updated frequently) `download development snapshots`__
 Mercurial Repository         (Updated frequently) `visit Mercurial repository`__
 ===========================  =========================================================
@@ -136,9 +136,9 @@ other popular software:
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (379,091 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (380,545 total
     lines included) according to `Coverity Analysis Metrics`_ on
-    March 20, 2026.
+    July 2, 2026.
 
   * GM has zero issues detected by Clang 15 scan-build.
 

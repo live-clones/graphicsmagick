@@ -997,11 +997,14 @@ typedef struct _ImageInfo
   MagickBool
     affirm;                  /* Private, when true do not intuit image format */
 
-  _BlobInfoPtr_
-    blob;                    /* Private, used to pass in open blob */
+
+  /* The pair of 'blob' and 'length' are used to pass an in-memory blob */
+
+  void
+    *blob;                   /* Private, used to pass pointer to open blob (also see 'length') */
 
   size_t
-    length;                  /* Private, used to pass in open blob length */
+    length;                  /* Private, used to pass in open blob length (also see 'blob') */
 
   char
     unique[MaxTextExtent],   /* Private, passes temporary filename to TranslateText */

@@ -294,8 +294,9 @@ the following table if the keyword indicates that they exist.
 +----------------+----------------+-------------------------------------------+
 | Image          |    montage     | The directory consists of a name for each |
 | directory      |                | tile of the composite image separated by  |
-|                |                | a newline character. The list is          |
-|                |                | terminated with a NULL character.         |
+|                |                | a newline character. Each name may be no  |
+|                |                | more than 2052 characters long. The list  |
+|                |                | is terminated with a NULL character.      |
 +----------------+----------------+-------------------------------------------+
 | ICC Profile    | profile-icc    | Binary color profile.                     |
 +----------------+----------------+-------------------------------------------+

@@ -124,7 +124,7 @@ static Image *ReadPlasmaImage(const ImageInfo *image_info,
     Recursively apply plasma to the image.
   */
   clone_info=CloneImageInfo(image_info);
-  clone_info->blob=(_BlobInfoPtr_) NULL;
+  clone_info->blob=(void *) NULL;
   clone_info->length=0;
   (void) MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"gradient:%.1024s",
     image_info->filename);

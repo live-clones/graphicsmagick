@@ -422,7 +422,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
         *clone_info;
 
       clone_info=CloneImageInfo(image_info);
-      clone_info->blob=(_BlobInfoPtr_) NULL;
+      clone_info->blob=(void *) NULL;
       clone_info->length=0;
       clone_info->magick[0]='\0';
       clone_info->subimage=0;

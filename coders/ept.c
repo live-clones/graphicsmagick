@@ -401,7 +401,7 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
         *clone_info;
 
       clone_info=CloneImageInfo(image_info);
-      clone_info->blob=(_BlobInfoPtr_) NULL;
+      clone_info->blob=(void *) NULL;
       clone_info->length=0;
       clone_info->magick[0]='\0';
       image=ReadImage(clone_info,exception);

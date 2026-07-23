@@ -1,11 +1,17 @@
 #!/bin/sh
-# Copyright (C) 2004-2023 GraphicsMagick Group
+# Copyright (C) 2004-2026 GraphicsMagick Group
 #
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
 # package; otherwise see http://www.graphicsmagick.org/www/Copyright.html.
 #
-# Use GraphicsMagick to produce a wide-variety of uncompressed TIFF formats.
+# Use GraphicsMagick to produce a wide-variety of uncompressed or many
+# lossless-compressed (rle, lzw, zip, zstd, lzma) TIFF formats. The
+# Fax, Group3, Group4 compression algorithms could be added, but need
+# to be restricted to gray bilevel images.
+#
+# It is easy enough to add lossy compression formats, but then the
+# expected amount of error upon read needs to be well understood.
 #
 # A "Q32" build of GraphicsMagick is recommended in order to write
 # true deep images, although a "Q16" build should be able to do almost
@@ -19,10 +25,15 @@
 # some editing may be desirable, such as to use a special GraphicsMagick
 # build or your favorite input image.
 
+# The program 'gm' is used by default.  Set the 'GM' environment
+# variable if something different is wanted.
+
 # The output file "summary.txt" summarizes the files which were generated.
 
 #GM=${HOME}/build/GM-32-static/utilities/gm
-GM=gm
+#GM=${HOME}/build/GM-32-static-debug-asan-clang/utilities/gm
+#GM=gm
+GM=${GM:-gm}
 GM_STD_OPT=""
 MASTER_IMAGE_ORIGINAL=../sunrise.miff  #${HOME}/Downloads/IMG_20170904_182108.jpg
 MASTER_IMAGE_GRAY=master_gray.miff

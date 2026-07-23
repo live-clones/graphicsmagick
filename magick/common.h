@@ -141,6 +141,7 @@ extern "C" {
 #    if ((MAGICK_HAS_ATTRIBUTE(__deprecated__)) || \
          (((__GNUC__) > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))) /* 3.1+ */
 #      define MAGICK_FUNC_DEPRECATED MAGICK_ATTRIBUTE((__deprecated__))
+#      define MAGICK_MEMBER_DEPRECATED MAGICK_ATTRIBUTE((__deprecated__))
 #    endif
 #    if ((MAGICK_HAS_ATTRIBUTE(__malloc__)) || \
          (__GNUC__ >= 3))  /* 3.0+ */

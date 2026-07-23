@@ -517,9 +517,14 @@ libwmf
 Sources come from https://github.com/caolanm/libwmf
 
   git clone https://github.com/caolanm/libwmf.git ~/src/libwmf
-
+  cd ~/src/libwmf
   autoreconf -fiv
-  ./configure \
+
+  rm -rf ~/build/libwmf
+  mkdir -p ~/build/libwmf
+  cd ~/build/libwmf
+
+  ~/src/libwmf/configure \
         --prefix=/usr/local \
         --enable-heavy \
         --enable-shared \
@@ -528,3 +533,5 @@ Sources come from https://github.com/caolanm/libwmf
         CPPFLAGS='-I/usr/local/include' \
         CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' \
         LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'
+  make
+  make install

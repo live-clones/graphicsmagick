@@ -4824,7 +4824,7 @@ static int CheckAndStoreStr(TIFF *tiff, const magick_uint16_t Tag, const char *S
         {
           memcpy(StringDup,String,StrSize);
           StringDup[StrSize] = 0;
-          i = TIFFSetField(tiff, Tag, String);
+          i = TIFFSetField(tiff, Tag, StringDup);
           MagickFreeResourceLimitedMemory(char *,StringDup);
           return i;
         }
@@ -4885,7 +4885,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
       if (logging /* && (Flags & FLAG_BASE) != 0 */)
         (void)LogMagickEvent(CoderEvent,GetMagickModule(),
                              "IFD EntryNum %u", (unsigned) EntryNum);
-      if (profile_length < (size_t)(IFD_data-profile_data)+(EntryNum*12))
+      if (profile_length < (size_t)(IFD_data-profile_data)+2+((size_t)EntryNum*12))
         return 0;
       IFD_data += 2;
 
@@ -5000,8 +5000,18 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                     }
                   else
                     {
-                      if ((Value > (Value+Long2)) || (Value+Long2 >= profile_length-1))
-                        break;             /* String outside EXIF boundary. */
+                      if (Value > (Value+Long2))
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (overflow)");
+                          break;             /* String outside EXIF boundary. */
+                        }
+                      if (Value+(size_t)Long2 >= profile_length-1)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (outside of profile)");
+                          break;             /* String outside EXIF boundary. */
+                        }
                       if (CheckAndStoreStr(tiff, Tag, (const char *) profile_data+Value, Long2))
                         FieldCount++;
                     }
@@ -5021,15 +5031,35 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                                  FipFieldTypeToStr((TIFFDataType) Field));
                           break;                      /* Fixed size arrays not handled. */
                         }
-                      if ((Value > (Value+2U*Long2)) || (Value+2U*Long2 >= profile_length-1))
-                        break;
                       if (Long2 == 0)
-                        break;
-                      Array = MagickAllocateResourceLimitedMemory(magick_uint16_t *, 2*Long2);
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Field count is zero!");
+                          break;
+                        }
+                      if (Long2 >= profile_length-1)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Field count (%u) exceeds profile length!",Long2);
+                          break;
+                        }
+                      if (Value > (Value+2U*Long2))
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (overflow)");
+                          break;
+                        }
+                      if (Value+(size_t)2U*Long2 >= profile_length-1)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (outside of profile)");
+                          break;
+                        }
+                      Array = MagickAllocateResourceLimitedArray(magick_uint16_t *, /*count*/ Long2, /*size*/ 2);
                       if (Array == NULL)
                         break;
                       for (i=0; i < Long2; i++)
-                        Array[i] = LD_UINT16(profile_data+Value+2*i);
+                        Array[i] = LD_UINT16(profile_data+Value+(size_t)2*i);
                       if (WriteCount == TIFF_VARIABLE)
                         {
                           if (TIFFSetField(tiff, Tag, (int)Long2, Array))     /* Argument 3 type int, argument 4 uint16_t*. */
@@ -5058,11 +5088,31 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                                                  FipFieldTypeToStr((TIFFDataType) Field));
                           break;                      /* Fixed size arrays not handled. */
                         }
-                      if ((Value > (Value+4U*Long2)) || (Value+4U*Long2 >= profile_length-1))
-                        break;
                       if (Long2==0)
-                        break;
-                      Array = MagickAllocateResourceLimitedMemory(magick_uint32_t *, 4*Long2);
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Field count is zero!");
+                          break;
+                        }
+                      if (Long2 >= profile_length-1)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Field count (%u) exceeds profile length!",Long2);
+                          break;
+                        }
+                      if (Value > (Value+4U*Long2))
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (overflow)");
+                          break;
+                        }
+                      if (Value+(size_t)4U*Long2 >= profile_length-1)
+                        {
+                          if (logging && (Flags & FLAG_BASE) != 0)
+                            (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (outside of profile)");
+                          break;
+                        }
+                      Array = MagickAllocateResourceLimitedArray(magick_uint32_t *, /*count*/ Long2, /*size*/ 4);
                       if (Array == NULL)
                         break;
                       for (i=0; i < Long2; i++)
@@ -5099,8 +5149,18 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                             }
                           else
                             {
-                              if ((Value > (Value+Long2)) || (Value+Long2 >= profile_length-1))
-                                break;
+                              if (Value > (Value+Long2))
+                                {
+                                  if (logging && (Flags & FLAG_BASE) != 0)
+                                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (overflow)");
+                                  break;
+                                }
+                              if (Value+(size_t)Long2 >= profile_length-1)
+                                {
+                                  if (logging && (Flags & FLAG_BASE) != 0)
+                                    (void)LogMagickEvent(CoderEvent,GetMagickModule(),"Skipping tag (outside of profile)");
+                                  break;
+                                }
                               if (TIFFSetField(tiff, Tag, profile_data+Value))  /* Argument 3 uint8_t[4]. */
                                 FieldCount++;
                             }
@@ -5146,7 +5206,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                         {
                           if (Long2 < (magick_uint32_t)WriteCount)
                             break;       /* Too small amount of mandatory items. */
-                          if ((Value > (Value+8*WriteCount)) || (Value+8*WriteCount >= profile_length-1))
+                          if ((Value > (Value+8*WriteCount)) || (Value+(size_t)8*WriteCount >= profile_length-1))
                             break;    /* Array falls over blob boundary. */
 #if TIFFLIB_VERSION >= 20230609
                           {
@@ -5156,7 +5216,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                               case 8:                /* double array is required in input. */
                                 {
                                   double *ArrayD;
-                                  ArrayD = MagickAllocateResourceLimitedMemory(double *, sizeof(double)*WriteCount);
+                                  ArrayD = MagickAllocateResourceLimitedArray(double *, /*count*/ WriteCount, /*size*/ sizeof(double));
                                   if (ArrayD == NULL)
                                     break;
                                   for (i=0; i < WriteCount; i++)
@@ -5172,7 +5232,7 @@ static int AddIFDExifFields(TIFF *tiff, unsigned int *ifds_handled,
                               case 4:                /* float array is required in input. */
                                 {
                                   float *ArrayF;
-                                  ArrayF = MagickAllocateResourceLimitedMemory(float *, sizeof(float)*WriteCount);
+                                  ArrayF = MagickAllocateResourceLimitedArray(float *, /*count*/ WriteCount, /*size*/ sizeof(float));
                                   if (ArrayF==NULL)
                                     break;
                                   for (i=0; i < WriteCount; i++)

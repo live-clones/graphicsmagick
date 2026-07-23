@@ -2062,8 +2062,12 @@ BenchmarkImageCommand(ImageInfo *image_info,
             count = 0;
 
 #if defined(HAVE_OPENMP)
-          omp_set_nested(MagickTrue);
-#endif
+#  if _OPENMP < 200805
+          omp_set_nested(MagickTrue); /* Deprecated by OpenMP 5.0 */
+#  else
+          omp_set_max_active_levels(2); /* Added by OpenMP 3.0 */
+#  endif /* if (_OPENMP < 201811) */
+#endif /* if defined(HAVE_OPENMP) */
           if (duration > 0)
             {
               count=0;
@@ -17413,6 +17417,9 @@ static MagickPassFail VersionCommand(ImageInfo *image_info_ignored,
       case 201307: omp_ver = "4.0"; break; /* 4.0 July 2013 */
       case 201511: omp_ver = "4.5"; break; /* 4.5 Nov 2015 */
       case 201811: omp_ver = "5.0"; break; /* 5.0 Nov 2018 */
+      case 202011: omp_ver = "5.1"; break; /* 5.1 Nov 2020 */
+      case 202111: omp_ver = "5.2"; break; /* 5.2 Nov 2021 */
+      case 202411: omp_ver = "6.0"; break; /* 6.0 Nov 2024 */
       default: omp_ver = "?"; break;
       }
     supported=MagickTrue;

@@ -1,6 +1,224 @@
+2026-07-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * version.sh: Updates in preparation for the 1.3.48 release
+
+        * NEWS.txt: Update the news.
+
+        * coders/svg.c (SVGValidateElementId): Try to eliminate warning
+        regarding indexing an array using a 'char' reported by Cygwin GCC
+        14.4.0.
+
+        * coders/heif.c (GetHEIFDecoders): Only include GetHEIFDecoders
+        function if HEIF is supported.
+
+2026-07-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (png_read_raw_profile): Add more tracing regarding
+        raw profiles.
+
+2026-07-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/viff.c (WriteVIFFImage): Narrow the scope of the
+        'viff_pixels' allocation handling added yesterday. Use
+        MagickAllocateResourceLimitedArray() where possible. Re-flow the
+        source code to match the indentation used by the rest of the
+        project.
+        (ReadVIFFImage): Fixes so the Khoros VIFF sample files from the
+        Encyclopedia Of Graphics File Formats which are based on integer
+        data storage types read correctly. The files 'HEAD.XV' and
+        'LABLABEL.XV' still do not read correctly since they use single
+        and double data storage types, respectively.
+
+2026-07-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/viff.c (WriteVIFFImage): Assure that 'viff_pixels'
+        allocation is not leaked in error case. This corresponds to
+        ImageMagick CVE-2026-61870.
+
+2026-07-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/blob.c (ImageToBlob): Fix memory leak which may occur if
+        WriteImage() fails.  Addresses oss-fuzz issue 529154719
+        "graphicsmagick:coder_WMF_fuzzer: Direct-leak in MagickMalloc".
+
+        * magick/common.h (MAGICK_MEMBER_DEPRECATED): Add
+        MAGICK_MEMBER_DEPRECATED to mark deprecated structure members.
+
+2026-07-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac: Fixes so zlib and lcms2 may still be detected if
+        pkg-config is not available.  Addresses SourceForge issue #773
+        "Missing -lz when using alternative to pkg-config for libz".
+        Fixes so Freetype may be detected if pkg-config.is not available.
+
+2026-07-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * coders/png.c (WriteOneJNGImage): Use GetImageCharacteristics().
+
+        * coders/png.c (WritePNGImage): Eliminate a disparity caused by
+        the difference between GetImageCharacteristics() results and
+        IsMonochromeImage(), IsGrayImage() results by only using values
+        from GetImageCharacteristics(). This might also improve
+        performance. Addresses "[security] GraphicsMagick MNG re-encode:
+        heap-buffer-overflow WRITE in ExportGrayAlphaQuantumType reached
+        from gm convert (magick/export.c:1105)" as reported by David
+        Korczynski via email on May 28, 2026. Credit to Anthropic Claude
+        and Ada Logics.
+
+2026-07-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/INSTALL-unix.rst: Document the packages required for a
+        Microsoft Windows 64-bit w64-ucrt x86_64 build.
+
+2026-07-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * coders/dcm.c (DCM_RLE_ReadByte): If frag_bytes is already 0,
+        then return 0 and a corrupt image exception. Addresses
+        "vuln-2-dcm-rle-fragment-oob-read.txt" reported by Tristan Madani
+        via email on June, 27 2026.
+        (funcDCM_NumberOfFrames): Use MagickAtoUIChk() rather than
+        MagickAtoI() in order to check for error, and to produce an
+        unsigned value. Addresses "vuln-3-dcm-negative-frames-dos.txt"
+        reported by Tristan Madani via email on June, 27 2026.
+
+        * coders/msl.c (MSLWarning, MSLError): Use LogMagickEventList()
+        rather than LogMagickEvent() to log va_list. Addresses
+        "vuln-4-svg-msl-valist-ub.txt" reported by Tristan Madani via
+        email on June, 27 2026.
+
+        * coders/svg.c (SVGWarning, SVGError): Use LogMagickEventList()
+        rather than LogMagickEvent() to log va_list. Addresses
+        "vuln-4-svg-msl-valist-ub.txt" reported by Tristan Madani via
+        email on June, 27 2026.
+
+        * coders/tiff.c (CheckAndStoreStr): If EXIF profile string is not
+        already NUL terminated, assure that it is NUL terminated before
+        passing it to libtiff. Addresses
+        "vuln-1-exif-unterminated-string-oob-read.txt" as reported by
+        Tristan Madani via email on June, 27 2026.
+        (AddIFDExifFields): Address possible out of bounds read (2 bytes)
+        beyond the end of the allocated profile buffer.  Addresses
+        "vuln-5-exif-ifd-offby2-oob-read.txt" as reported by Tristan
+        Madani via email on June, 27 2026.
+
+2026-07-01  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/attribute.c (GenerateIPTCAttribute): Prevent reading past
+        the end of a truncated/short IPTC profile. While the issue is
+        limited to reading, the program could crash if it attempts to
+        access outside of the process address space.  Issue was reported
+        via email by Bin Luo on July 1, 2026 and the proposed patch is
+        part of this fix.
+
+        * coders/meta.c (GetIPTCStream): Prevent reading past the end of a
+        truncated/short IPTC profile. While the issue is limited to
+        reading, the program could crash if it attempts to access outside
+        of the process address space. Issue was reported via email by Bin
+        Luo on July 1, 2026.
+
+2026-06-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * utilities/tests/gen-tiff-images/genimages (GM): If the 'GM'
+        environment variable is set, it is used as the path to the
+        GraphicsMagick binary to use, otherwise 'gm' is invoked.
+
+2026-06-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/command.c (BenchmarkImageCommand): omp_set_nested() was
+        deprecated by OpenMP 5.0. Use omp_set_max_active_levels(2) for
+        OpenMP 3.0 and later.
+        (VersionCommand): Update the table of OpenMP versions.
+
+2026-06-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * magick/gradient.c (GradientImage): Fix 'pixel_packets' and 'indexes'
+        addressing logic for NorthGravity.  Addresses "[security]
+        GraphicsMagick GradientImage: heap-buffer-overflow READ in
+        NorthGravity branch reached from gm convert
+        (magick/gradient.c:284)" from David Korczynski. Credit to
+        Anthropic Claude and Ada Logics.
+
+        * coders/tiff.c (AddIFDExifFields): Add many more validations and
+        safeguards to EXIF in TIFF writer. Addresses "[security] GraphicsMagick
+        TIFF writer: heap-buffer-overflow WRITE in AddIFDExifFields via
+        32-bit count*2 wrap on EXIF SHORT array (coders/tiff.c)" from
+        David Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+        * coders/pcd.c (ReadPCDImage): Over-provision the per-channel
+        Huffman decode buffers and detect any attempt to overflow
+        them. Fixes are inspired by fixes in ImageMagick, but retaining
+        the original planar design. Discovered and reported by Cipher -
+        Causal Security (https://causalsecurity.com/) via email on June
+        14, 2026.
+
+2026-06-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac: Eliminte redundant report regarding libzip in
+        configuration summary.
+
+2026-06-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/display.c (MagickXTileImage): Correct bounds checking for
+        'filename' length. Thanks to Petr Gajdos for a heads-up regarding
+        the disparity.
+
+2026-05-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/pcx.c (WritePCXImage): If image has more than 256 colors,
+        save as a DirectClass type.  Addresses "[security] GraphicsMagick
+        PCX writer: heap-buffer-overflow WRITE in WritePCXImage colormap
+        fill (coders/pcx.c:1186)" from David Korczynski. Credit to
+        Anthropic Claude and Ada Logics.
+
+        * coders/locale.c (ReadConfigureFile): Bound the length passed to
+        strncpy() and string terminator. Addresses "[security]
+        GraphicsMagick LOCALE coder: stack-buffer-overflow WRITE in
+        ReadConfigureFile reached from gm convert (coders/locale.c:257)"
+        from David Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+2026-05-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/miff.c (ReadMIFFImage): Correct scope of 'values'
+        reallocation error handling.  Addresses "[security] GraphicsMagick
+        MIFF reader: heap-use-after-free WRITE via stale cursor on
+        values-buffer realloc failure (coders/miff.c:1048)" from David
+        Korczynski. Credit to Anthropic Claude and Ada Logics.
+
+2026-05-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/pict.c (DecodeImage): Do not attempt to intuit byteCount
+        must be a word because the approach used does not work.  Fixes
+        SourceForge issue #772 "pict file fails with gm 1.3.47".
+
+2026-05-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/coder_list.cc: Exclude "BIE" since it is the same as
+        "JBIG".
+
+2026-05-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/miff.rst: Document that each montage image directory name is
+        limited to 2052 characters.
+
+        * magick/display.c (MagickXTileImage): Address ImageMagick CVE
+        CVE-2026-42050, ImageMagick security advisory GHSA-7mxf-ff4f-jj7p
+        "A malicious MIFF file could trigger an overflow when a user opens
+        it in the display tool and right-clicks a tile to invoke the Load
+        / Update menu item.".  The problem is that the 'filename' buffer
+        on the stack could overflow if the associated file data is too
+        long.  While this is definitely a bug it does not appear to be
+        CVE-worthy. Much thanks to Petr Gajdos for bringing this to my
+        attention.
+
 2026-05-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-        * version.sh: Merge changes for the 1.3.47 release.
+        * GraphicsMagick 1.3.47 was released!
 
         * NEWS.txt: Update the news.
 

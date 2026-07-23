@@ -30,6 +30,7 @@ int main(int argc,char **argv) {
   excludedCoders.push_back("XC");
 
   // Formats which are simple aliases for the same thing (e.g. "TIF" vs "TIFF")
+  excludedCoders.push_back("BIE");    // Same as JBIG
   excludedCoders.push_back("CACHE");  // Same as MPC
   excludedCoders.push_back("ICM");    // Same as ICC
   excludedCoders.push_back("ICO");    // Same as ICON

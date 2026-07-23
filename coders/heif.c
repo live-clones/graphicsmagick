@@ -2515,6 +2515,7 @@ static Image *ReadHEIFImage(const ImageInfo *image_info,
 %      RegisterHEIFImage(void)
 %
 */
+#if defined(HasHEIF)
 static void GetHEIFDecoders(enum heif_compression_format compression_format,
                             char *output_str,
                             const size_t sizeof_output_str)
@@ -2550,6 +2551,7 @@ static void GetHEIFDecoders(enum heif_compression_format compression_format,
         }
     }
 }
+#endif /* HasHEIF */
 ModuleExport void RegisterHEIFImage(void)
 {
 #if defined(HasHEIF)

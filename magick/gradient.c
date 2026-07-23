@@ -281,10 +281,10 @@ MagickExport MagickPassFail GradientImage(Image *restrict image,
             case NorthGravity:
               {
                 for (x=0; x < image->columns; x++)
-                  q[x] = pixel_packets[image->columns-y];
+                  q[x] = pixel_packets[image->rows-1-y];
                 if (indexes)
                   for (x=0; x < image->columns; x++)
-                    indexes[x]=(IndexPacket) image->columns-y;
+                    indexes[x]=(IndexPacket) image->rows-1-y;
                 break;
               }
             case WestGravity:

@@ -5724,8 +5724,7 @@ static MagickPassFail funcDCM_NumberOfFrames(Image *image,DicomStream *dcm,Excep
       return MagickFail;
     }
 
-  dcm->number_scenes=MagickAtoI((char *) dcm->data);
-  return MagickPass;
+  return MagickAtoUIChk((char *) dcm->data,&dcm->number_scenes);
 }
 
 static MagickPassFail funcDCM_Rows(Image *image,DicomStream *dcm,ExceptionInfo *exception)
@@ -6030,8 +6029,15 @@ static MagickPassFail funcDCM_Palette(Image *image,DicomStream *dcm,ExceptionInf
   return MagickPass;
 }
 
-static magick_uint8_t DCM_RLE_ReadByte(Image *image, DicomStream *dcm)
+/* https://dicom.nema.org/medical/dicom/current/output/html/part05.html#chapter_G */
+static magick_uint8_t DCM_RLE_ReadByte(Image *image, DicomStream *dcm) /* RLE Lossless: 1.2.840.10008.1.2.5 */
 {
+  if (dcm->frag_bytes == 0)
+    {
+      ThrowException(&image->exception,CorruptImageError,UnableToUncompressImage,image->filename);
+      return 0;
+    }
+
   if (dcm->rle_rep_ct == 0)
     {
       int
@@ -6040,7 +6046,7 @@ static magick_uint8_t DCM_RLE_ReadByte(Image *image, DicomStream *dcm)
 
       /* We need to read the next command pair */
       if (dcm->frag_bytes <= 2)
-        dcm->frag_bytes = 0;
+        dcm->frag_bytes = 0; /* Fragment exhausted */
       else
         dcm->frag_bytes -= 2;
 
@@ -6049,22 +6055,25 @@ static magick_uint8_t DCM_RLE_ReadByte(Image *image, DicomStream *dcm)
       if (rep_ct == 128)
         {
           /* Illegal value */
+          ThrowException(&image->exception,CorruptImageError,UnableToUncompressImage,image->filename);
           return 0;
         }
       else
-      if (rep_ct < 128)
         {
-          /* (rep_ct+1) literal bytes */
-          dcm->rle_rep_ct=rep_ct;
-          dcm->rle_rep_char=-1;
-          return (magick_uint8_t)rep_char;
-        }
-      else
-        {
-          /* (257-rep_ct) repeated bytes */
-          dcm->rle_rep_ct=256-rep_ct;
-          dcm->rle_rep_char=rep_char;
-          return (magick_uint8_t)rep_char;
+          if (rep_ct < 128)
+            {
+              /* (rep_ct+1) literal bytes */
+              dcm->rle_rep_ct=rep_ct;
+              dcm->rle_rep_char=-1;
+              return (magick_uint8_t)rep_char;
+            }
+          else
+            {
+              /* (257-rep_ct) repeated bytes */
+              dcm->rle_rep_ct=256-rep_ct;
+              dcm->rle_rep_char=rep_char;
+              return (magick_uint8_t)rep_char;
+            }
         }
     }
 
@@ -7322,7 +7331,7 @@ static MagickPassFail DCM_ReadNonNativeImages(Image **image,const ImageInfo *ima
       if (status == MagickPass)
         {
           clone_info=CloneImageInfo(image_info);
-          clone_info->blob=(_BlobInfoPtr_) NULL;
+          clone_info->blob=(void *) NULL;
           clone_info->length=0;
           if (dcm->transfer_syntax == DCM_TS_JPEG_2000)
             MagickFormatString(clone_info->filename,sizeof(clone_info->filename),"jp2:%.1024s",filename);

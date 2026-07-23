@@ -1081,282 +1081,291 @@ static unsigned int WritePCXImage(const ImageInfo *image_info,Image *image)
   adjoin=(image_info->adjoin) && (image->next != (const Image *) NULL) && (write_dcx);
   scene=0;
   do
-  {
-    if (logging && write_dcx)
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Writing DCX frame %lu...",scene);
-    /*
-      Ensure that image is in RGB space.
-    */
-    if (TransformColorspace(image,RGBColorspace) == MagickFail)
-      ThrowPCXWriterException(CoderError,UnableToTransformColorspace,image);
-    /*
-      Analyze image to be written.
-    */
-    if (!GetImageCharacteristics(image,&characteristics,
-                                 (OptimizeType == image_info->type),
-                                 &image->exception))
-      {
-        LiberatePCXAllocations();
-        CloseBlob(image);
-        return MagickFail;
-      }
-    if (page_table != (ExtendedSignedIntegralType *) NULL)
-      page_table[scene]=TellBlob(image);
-    /*
-      Initialize PCX raster file header.
-    */
-    pcx_info.identifier=0x0a;
-    pcx_info.version=5;
-    /* Please note that uncompressed PCX in quite rare and some applications cannot open it.
-       So the compressed PCX needs to be default. */
-    pcx_info.encoding = (image->compression==RLECompression || image->compression==UndefinedCompression) ? 1 : 0;
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "Using %s compression",
-                          pcx_info.encoding == 1 ? "RLE" : "No");
-    pcx_info.bits_per_pixel=8;
-    if (characteristics.palette && characteristics.monochrome)
-      pcx_info.bits_per_pixel=1;
-    pcx_info.left=0;
-    pcx_info.top=0;
-    pcx_info.right=(unsigned short) (image->columns-1);
-    pcx_info.bottom=(unsigned short) (image->rows-1);
-    pcx_info.horizontal_resolution=72;
-    pcx_info.vertical_resolution=72;
-    switch (image->units)
-      {
-      case UndefinedResolution:
-      case PixelsPerInchResolution:
-        {
-          pcx_info.horizontal_resolution=(unsigned short) image->x_resolution;
-          pcx_info.vertical_resolution=(unsigned short) image->y_resolution;
-          break;
-        }
-      case PixelsPerCentimeterResolution:
-        {
-          pcx_info.horizontal_resolution=(unsigned short) (2.54*image->x_resolution+0.5);
-          pcx_info.vertical_resolution=(unsigned short) (2.54*image->y_resolution+0.5);
-          break;
-        }
-      }
-    pcx_info.reserved=0;
-    pcx_info.planes=1;
-    if (image->storage_class == DirectClass)
-      {
-        pcx_info.planes=3;
-        if (image->matte)
-          pcx_info.planes++;
-      }
-
-    /* image->columns*pcx_info.bits_per_pixel+7)/8 */
-    bytes_per_line=MagickArraySize(image->columns,pcx_info.bits_per_pixel);
-    if (bytes_per_line && (~((size_t)0)-7 > bytes_per_line))
-      bytes_per_line += 7;
-    bytes_per_line /= 8;
-    pcx_info.bytes_per_line=(unsigned short) bytes_per_line;
-    if ((pcx_info.bytes_per_line == 0) ||
-        ((size_t) pcx_info.bytes_per_line != bytes_per_line))
-      ThrowPCXWriterException(CoderError,UnsupportedNumberOfColumns,image);
-    pcx_info.palette_info=1;
-    pcx_info.colormap_signature=0x0c;
-    /*
-      Write PCX header.
-    */
-    (void) WriteBlobByte(image,pcx_info.identifier);
-    (void) WriteBlobByte(image,pcx_info.version);
-    (void) WriteBlobByte(image,pcx_info.encoding);
-    (void) WriteBlobByte(image,pcx_info.bits_per_pixel);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.left);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.top);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.right);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.bottom);
-    (void) WriteBlobLSBShort(image,(unsigned int)
-      pcx_info.horizontal_resolution);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.vertical_resolution);
-    /*
-      Dump colormap to file.
-    */
-    pcx_colormap=MagickAllocateResourceLimitedClearedArray(unsigned char *,3,256);
-    if (pcx_colormap == (unsigned char *) NULL)
-      ThrowPCXWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-    q=pcx_colormap;
-    if (image->storage_class == PseudoClass)
-      for (i=0; i < (long) image->colors; i++)
-      {
-        *q++=ScaleQuantumToChar(image->colormap[i].red);
-        *q++=ScaleQuantumToChar(image->colormap[i].green);
-        *q++=ScaleQuantumToChar(image->colormap[i].blue);
-      }
-    (void) WriteBlob(image,3*16,(char *) pcx_colormap);
-    (void) WriteBlobByte(image,pcx_info.reserved);
-    (void) WriteBlobByte(image,pcx_info.planes);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.bytes_per_line);
-    (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.palette_info);
-    for (i=0; i < 58; i++)
-      (void) WriteBlobByte(image,'\0');
-    /* Allocate memory for one pixel row. */
-    pcx_pixels=MagickAllocateResourceLimitedClearedArray(unsigned char *,
-                                                         bytes_per_line,
-                                                         pcx_info.planes);
-    if (pcx_pixels == (unsigned char *) NULL)
-      ThrowPCXWriterException(ResourceLimitError,MemoryAllocationFailed,image);
-    q=pcx_pixels;
-    if (image->storage_class == DirectClass)
-      {
-        /*
-          Convert DirectClass image to PCX raster pixels.
-        */
-
-        /* For each row ... */
-        for (y=0; y < (long) image->rows; y++)
-        {
-          const PixelPacket *
-            row_pixels;
-
-          row_pixels=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-          if (row_pixels == (const PixelPacket *) NULL)
-            break;
-
-          q=pcx_pixels;
-
-          /* For each color plane ... */
-          for (i=0; i < pcx_info.planes; i++)
-          {
-            p=row_pixels;
-            switch ((int) i)
-              {
-              case 0:
-                {
-                  /* For each column ... */
-                  for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
-                    *q++=ScaleQuantumToChar(p++->red);
-                  break;
-                }
-              case 1:
-                {
-                  /* For each column ... */
-                  for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
-                    *q++=ScaleQuantumToChar(p++->green);
-                  break;
-                }
-              case 2:
-                {
-                  /* For each column ... */
-                  for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
-                    *q++=ScaleQuantumToChar(p++->blue);
-                  break;
-                }
-              case 3:
-              default:
-                {
-                  /* For each column ... */
-                  for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
-                    *q++=ScaleQuantumToChar(MaxRGB-p++->opacity);
-                  break;
-                }
-              }
-          }
-          if (WritePCXPixels(image,&pcx_info,pcx_pixels) == MagickFail)
-            break;
-          if (QuantumTick(y,image->rows))
-            if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                        SaveImageText,image->filename,
-                                        image->columns,image->rows))
-              break;
-        }
-      }
-    else
+    {
+      if (logging && write_dcx)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Writing DCX frame %lu...",scene);
       /*
-        Convert PseudoClass image to a PCX grayscale image.
+        Ensure that image is in RGB space.
       */
-      if (pcx_info.bits_per_pixel > 1)
-        /* For each row ... */
-        for (y=0; y < (long) image->rows; y++)
+      if (TransformColorspace(image,RGBColorspace) == MagickFail)
+        ThrowPCXWriterException(CoderError,UnableToTransformColorspace,image);
+      /*
+        Analyze image to be written.
+      */
+      if (!GetImageCharacteristics(image,&characteristics,
+                                   (OptimizeType == image_info->type),
+                                   &image->exception))
         {
-          p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-          if (p == (const PixelPacket *) NULL)
-            break;
-          indexes=AccessImmutableIndexes(image);
-          q=pcx_pixels;
-          /* For each column ... */
-          for (x=0; x < (long) image->columns; x++)
-            *q++=indexes[x];
-          if (WritePCXPixels(image,&pcx_info,pcx_pixels) == MagickFail)
-            break;
-          if (image->previous == (Image *) NULL)
-            if (QuantumTick(y,image->rows))
-              if (!MagickMonitorFormatted(y,image->rows,&image->exception,
-                                          SaveImageText,image->filename,
-                                          image->columns,image->rows))
-                break;
+          LiberatePCXAllocations();
+          CloseBlob(image);
+          return MagickFail;
         }
-      else
+      if (((image->storage_class == PseudoClass) && (image->colors > 256)))
         {
-          register unsigned char
-            bit,
-            byte,
-            polarity;
+          if ((status &= SetImageType(image,TrueColorType)) == MagickFail)
+            {
+              LiberatePCXAllocations();
+              CloseBlob(image);
+              return MagickFail;
+            }
+        }
+      if (page_table != (ExtendedSignedIntegralType *) NULL)
+        page_table[scene]=TellBlob(image);
+      /*
+        Initialize PCX raster file header.
+      */
+      pcx_info.identifier=0x0a;
+      pcx_info.version=5;
+      /* Please note that uncompressed PCX in quite rare and some applications cannot open it.
+         So the compressed PCX needs to be default. */
+      pcx_info.encoding = (image->compression==RLECompression || image->compression==UndefinedCompression) ? 1 : 0;
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                            "Using %s compression",
+                            pcx_info.encoding == 1 ? "RLE" : "No");
+      pcx_info.bits_per_pixel=8;
+      if (characteristics.palette && characteristics.monochrome)
+        pcx_info.bits_per_pixel=1;
+      pcx_info.left=0;
+      pcx_info.top=0;
+      pcx_info.right=(unsigned short) (image->columns-1);
+      pcx_info.bottom=(unsigned short) (image->rows-1);
+      pcx_info.horizontal_resolution=72;
+      pcx_info.vertical_resolution=72;
+      switch (image->units)
+        {
+        case UndefinedResolution:
+        case PixelsPerInchResolution:
+          {
+            pcx_info.horizontal_resolution=(unsigned short) image->x_resolution;
+            pcx_info.vertical_resolution=(unsigned short) image->y_resolution;
+            break;
+          }
+        case PixelsPerCentimeterResolution:
+          {
+            pcx_info.horizontal_resolution=(unsigned short) (2.54*image->x_resolution+0.5);
+            pcx_info.vertical_resolution=(unsigned short) (2.54*image->y_resolution+0.5);
+            break;
+          }
+        }
+      pcx_info.reserved=0;
+      pcx_info.planes=1;
+      if (image->storage_class == DirectClass)
+        {
+          pcx_info.planes=3;
+          if (image->matte)
+            pcx_info.planes++;
+        }
 
+      /* image->columns*pcx_info.bits_per_pixel+7)/8 */
+      bytes_per_line=MagickArraySize(image->columns,pcx_info.bits_per_pixel);
+      if (bytes_per_line && (~((size_t)0)-7 > bytes_per_line))
+        bytes_per_line += 7;
+      bytes_per_line /= 8;
+      pcx_info.bytes_per_line=(unsigned short) bytes_per_line;
+      if ((pcx_info.bytes_per_line == 0) ||
+          ((size_t) pcx_info.bytes_per_line != bytes_per_line))
+        ThrowPCXWriterException(CoderError,UnsupportedNumberOfColumns,image);
+      pcx_info.palette_info=1;
+      pcx_info.colormap_signature=0x0c;
+      /*
+        Write PCX header.
+      */
+      (void) WriteBlobByte(image,pcx_info.identifier);
+      (void) WriteBlobByte(image,pcx_info.version);
+      (void) WriteBlobByte(image,pcx_info.encoding);
+      (void) WriteBlobByte(image,pcx_info.bits_per_pixel);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.left);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.top);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.right);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.bottom);
+      (void) WriteBlobLSBShort(image,(unsigned int)
+                               pcx_info.horizontal_resolution);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.vertical_resolution);
+      /*
+        Dump colormap to file.
+      */
+      pcx_colormap=MagickAllocateResourceLimitedClearedArray(unsigned char *,3,256);
+      if (pcx_colormap == (unsigned char *) NULL)
+        ThrowPCXWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+      q=pcx_colormap;
+      if (image->storage_class == PseudoClass)
+        for (i=0; i < (long) image->colors; i++)
+          {
+            *q++=ScaleQuantumToChar(image->colormap[i].red);
+            *q++=ScaleQuantumToChar(image->colormap[i].green);
+            *q++=ScaleQuantumToChar(image->colormap[i].blue);
+          }
+      (void) WriteBlob(image,3*16,(char *) pcx_colormap);
+      (void) WriteBlobByte(image,pcx_info.reserved);
+      (void) WriteBlobByte(image,pcx_info.planes);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.bytes_per_line);
+      (void) WriteBlobLSBShort(image,(unsigned int) pcx_info.palette_info);
+      for (i=0; i < 58; i++)
+        (void) WriteBlobByte(image,'\0');
+      /* Allocate memory for one pixel row. */
+      pcx_pixels=MagickAllocateResourceLimitedClearedArray(unsigned char *,
+                                                           bytes_per_line,
+                                                           pcx_info.planes);
+      if (pcx_pixels == (unsigned char *) NULL)
+        ThrowPCXWriterException(ResourceLimitError,MemoryAllocationFailed,image);
+      q=pcx_pixels;
+      if (image->storage_class == DirectClass)
+        {
           /*
-            Convert PseudoClass image to a PCX monochrome image.
+            Convert DirectClass image to PCX raster pixels.
           */
-          polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
-          if (image->colors == 2)
-            polarity=PixelIntensityToQuantum(&image->colormap[0]) <
-              PixelIntensityToQuantum(&image->colormap[1]);
+
           /* For each row ... */
           for (y=0; y < (long) image->rows; y++)
-          {
-            p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
-            if (p == (const PixelPacket *) NULL)
-              break;
-            indexes=AccessImmutableIndexes(image);
-            bit=0;
-            byte=0;
-            q=pcx_pixels;
-            /* For each column ... */
-            for (x=0; x < (long) image->columns; x++)
             {
-              byte<<=1;
-              if (indexes[x] == polarity)
-                byte|=0x01;
-              bit++;
-              if (bit == 8)
+              const PixelPacket *
+                row_pixels;
+
+              row_pixels=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+              if (row_pixels == (const PixelPacket *) NULL)
+                break;
+
+              q=pcx_pixels;
+
+              /* For each color plane ... */
+              for (i=0; i < pcx_info.planes; i++)
                 {
-                  *q++=byte;
-                  bit=0;
-                  byte=0;
+                  p=row_pixels;
+                  switch ((int) i)
+                    {
+                    case 0:
+                      {
+                        /* For each column ... */
+                        for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
+                          *q++=ScaleQuantumToChar(p++->red);
+                        break;
+                      }
+                    case 1:
+                      {
+                        /* For each column ... */
+                        for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
+                          *q++=ScaleQuantumToChar(p++->green);
+                        break;
+                      }
+                    case 2:
+                      {
+                        /* For each column ... */
+                        for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
+                          *q++=ScaleQuantumToChar(p++->blue);
+                        break;
+                      }
+                    case 3:
+                    default:
+                      {
+                        /* For each column ... */
+                        for (x=(long) pcx_info.bytes_per_line; x > 0; x--)
+                          *q++=ScaleQuantumToChar(MaxRGB-p++->opacity);
+                        break;
+                      }
+                    }
                 }
-              p++;
-            }
-            if (bit != 0)
-              *q++=byte << (8-bit);
-            if (WritePCXPixels(image,&pcx_info,pcx_pixels) == MagickFail)
-            break;
-            if (image->previous == (Image *) NULL)
+              if (WritePCXPixels(image,&pcx_info,pcx_pixels) == MagickFail)
+                break;
               if (QuantumTick(y,image->rows))
                 if (!MagickMonitorFormatted(y,image->rows,&image->exception,
                                             SaveImageText,image->filename,
                                             image->columns,image->rows))
                   break;
-          }
+            }
         }
+      else
+        /*
+          Convert PseudoClass image to a PCX grayscale image.
+        */
+        if (pcx_info.bits_per_pixel > 1)
+          /* For each row ... */
+          for (y=0; y < (long) image->rows; y++)
+            {
+              p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+              if (p == (const PixelPacket *) NULL)
+                break;
+              indexes=AccessImmutableIndexes(image);
+              q=pcx_pixels;
+              /* For each column ... */
+              for (x=0; x < (long) image->columns; x++)
+                *q++=indexes[x];
+              if (WritePCXPixels(image,&pcx_info,pcx_pixels) == MagickFail)
+                break;
+              if (image->previous == (Image *) NULL)
+                if (QuantumTick(y,image->rows))
+                  if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                              SaveImageText,image->filename,
+                                              image->columns,image->rows))
+                    break;
+            }
+        else
+          {
+            register unsigned char
+              bit,
+              byte,
+              polarity;
 
-    (void) WriteBlobByte(image,pcx_info.colormap_signature);
-    (void) WriteBlob(image,3*256,(char *) pcx_colormap);
-    MagickFreeResourceLimitedMemory(unsigned char *,pcx_pixels);
-    MagickFreeResourceLimitedMemory(unsigned char *,pcx_colormap);
-    if (image->next == (Image *) NULL)
-      break;
-    image=SyncNextImageInList(image);
-    status=MagickMonitorFormatted(scene++,Min(max_scenes,image_list_length),
-                                  &image->exception,SaveImagesText,
-                                  image->filename);
-    if (status == False)
-      break;
-    if (scene >= max_scenes-1)
-      break;
-  } while (adjoin);
+            /*
+              Convert PseudoClass image to a PCX monochrome image.
+            */
+            polarity=PixelIntensityToQuantum(&image->colormap[0]) < (MaxRGB/2);
+            if (image->colors == 2)
+              polarity=PixelIntensityToQuantum(&image->colormap[0]) <
+                PixelIntensityToQuantum(&image->colormap[1]);
+            /* For each row ... */
+            for (y=0; y < (long) image->rows; y++)
+              {
+                p=AcquireImagePixels(image,0,y,image->columns,1,&image->exception);
+                if (p == (const PixelPacket *) NULL)
+                  break;
+                indexes=AccessImmutableIndexes(image);
+                bit=0;
+                byte=0;
+                q=pcx_pixels;
+                /* For each column ... */
+                for (x=0; x < (long) image->columns; x++)
+                  {
+                    byte<<=1;
+                    if (indexes[x] == polarity)
+                      byte|=0x01;
+                    bit++;
+                    if (bit == 8)
+                      {
+                        *q++=byte;
+                        bit=0;
+                        byte=0;
+                      }
+                    p++;
+                  }
+                if (bit != 0)
+                  *q++=byte << (8-bit);
+                if (WritePCXPixels(image,&pcx_info,pcx_pixels) == MagickFail)
+                  break;
+                if (image->previous == (Image *) NULL)
+                  if (QuantumTick(y,image->rows))
+                    if (!MagickMonitorFormatted(y,image->rows,&image->exception,
+                                                SaveImageText,image->filename,
+                                                image->columns,image->rows))
+                      break;
+              }
+          }
+
+      (void) WriteBlobByte(image,pcx_info.colormap_signature);
+      (void) WriteBlob(image,3*256,(char *) pcx_colormap);
+      MagickFreeResourceLimitedMemory(unsigned char *,pcx_pixels);
+      MagickFreeResourceLimitedMemory(unsigned char *,pcx_colormap);
+      if (image->next == (Image *) NULL)
+        break;
+      image=SyncNextImageInList(image);
+      status=MagickMonitorFormatted(scene++,Min(max_scenes,image_list_length),
+                                    &image->exception,SaveImagesText,
+                                    image->filename);
+      if (status == False)
+        break;
+      if (scene >= max_scenes-1)
+        break;
+    } while (adjoin);
   if (adjoin)
     while (image->previous != (Image *) NULL)
       image=image->previous;

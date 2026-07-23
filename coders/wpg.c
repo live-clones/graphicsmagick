@@ -1000,7 +1000,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       return(image);
     }
-  clone_info->blob=(_BlobInfoPtr_) NULL;
+  clone_info->blob=(void *) NULL;
   /* clone_info->length=0; */
   (void) strlcpy(clone_info->magick, format, sizeof(clone_info->magick));
   (void) strlcpy(clone_info->filename, "", sizeof(clone_info->filename));

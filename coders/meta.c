@@ -1721,6 +1721,8 @@ static size_t GetIPTCStream(const unsigned char *blob, size_t blob_length, size_
     blob_remaining;
 
   *offset=0;
+  if (blob_length < 5U) /* Structural minimum for IPTC NewsPhoto is 5 bytes */
+    return 0;
   p=blob;
   blob_remaining=blob_length;
   if ((*p == 0x1c) && (*(p+1) == 0x02))
