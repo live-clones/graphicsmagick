@@ -26,9 +26,12 @@ GraphicsMagick Image Processing System
 .. _`visit Mercurial repository`: https://foss.heptapod.net/graphicsmagick/graphicsmagick
 
 .. _programming : programming.html
+.. |packaging| image:: https://repology.org/badge/tiny-repos/graphicsmagick.svg
+    :target: https://repology.org/project/graphicsmagick/versions
+    :alt: packaging status
 
 ===========================  =========================================================
-Current Release              1.3.47 (Released May 13, 2026) `download release`__
+Current Release              1.3.48 (Released July 23, 2026 |packaging|) `download release`__
 Development Snapshots        (Updated frequently) `download development snapshots`__
 Mercurial Repository         (Updated frequently) `visit Mercurial repository`__
 ===========================  =========================================================

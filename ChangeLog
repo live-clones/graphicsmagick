@@ -1,4 +1,11 @@
+2026-07-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/index.rst: Add a Repology badge showing available free
+        software repositories.
+
 2026-07-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/index.rst, www/Changes.rst: Record that 1.3.48 was released.
 
         * version.sh: Updates in preparation for the 1.3.48 release
 
