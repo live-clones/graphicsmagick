@@ -5147,10 +5147,27 @@ MagickXImportImage(const ImageInfo *image_info,
             {
               /*
                 Initialize image filename.
+                Ignores XTextProperty 'encoding' (e.g. STRING, COMPOUND_TEXT, UTF8_STRING)
               */
-              (void) strlcpy(image->filename,(char *) window_name.value,
-                (int) window_name.nitems+1);
-              image->filename[window_name.nitems]='\0';
+              if (window_name.format == 8)
+                {
+                  if (window_name.nitems >= sizeof(image->filename))
+                    (void) LogMagickEvent(X11Event,GetMagickModule(),
+                                          "Window name length is %lu bytes but the limit is %zu!",
+                                          window_name.nitems, sizeof(image->filename)-1);
+                  (void) strlcpy(image->filename,
+                                 (char *) window_name.value,
+                                 Min((size_t) window_name.nitems+1,sizeof(image->filename)));
+
+                  (void) LogMagickEvent(X11Event,GetMagickModule(),
+                                        "Window (file) name set to \"%s\"\n", image->filename);
+                }
+              else
+                {
+                  (void) LogMagickEvent(X11Event,GetMagickModule(),
+                                        "Window name item size of %d bits is not supported!",
+                                        window_name.format);
+                }
             }
           (void) XFree((void *) window_name.value);
         }

@@ -1,3 +1,18 @@
+2026-07-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/xwindow.c (MagickXImportImage): Avoid heap buffer
+        overflow of image filename field if X11 window name is longer than
+        MaxTextExtent-1.  Addresses ImageMagick CVE-2026-61464
+        (GHSA-76q6-2p6h-xjqr). In order to exploit this, the attacker must
+        have access to the X11 display, would need to set an X11 window
+        title with text longer than 2052 bytes (e.g. use 'xdotool
+        selectwindow set_window --name FOO', execute 'gm import x:', guide
+        the mouse cursor to the window, and click in it, or use '-window
+        id' where 'id' is the identity of the window to be imported (e.g.
+        reported by 'xwininfo'). If this issue is exploitable, then the
+        system has much more serious issues.  Issue was reported to me via
+        an email from Petr Gajdos on July 27, 2026.
+
 2026-07-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/index.rst: Add a Repology badge showing available free
