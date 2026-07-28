@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2023 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002, 2003 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -52,9 +52,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  AppendImageToList() appends an image to the end of the list.  Please
-%  note that this API allows the list pointer to be updated and in fact
-%  it now updates the list pointer to be the image (or the end of the
-%  image list) which was just added.
+%  note that this API allows the list pointer ('images') to be updated
+%  and in fact it now updates the list pointer to be the image (or the
+%  end of the image list) which was just added. This means that
+%  GetFirstImageInList() must be used to retrieve the head of the list.
+%
+%  If image is NULL, then there is no effect
 %
 %  The format of the AppendImageToList method is:
 %
@@ -102,7 +105,12 @@ MagickExport void AppendImageToList(Image **images,Image *image)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  CloneImageList() returns a duplicate of the image list.
+%  CloneImageList() returns a duplicate of the image list. Although all
+%  image metadata and the colormap are duplicated (deep copy), the image
+%  pixel caches (which contain the pixel data) use reference counting so
+%  duplicating the list does not double the resource consumption.
+%
+%  If images is NULL, then NULL is returned.
 %
 %  The format of the CloneImageList method is:
 %
@@ -164,7 +172,10 @@ MagickExport Image *CloneImageList(const Image *images,ExceptionInfo *exception)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  DeleteImageFromList() deletes an image from the list.
+%  DeleteImageFromList() deletes the currently-referenced image from the list
+%  and destroys it.
+%
+%  If images is NULL, then there is no effect.
 %
 %  The format of the DeleteImageFromList method is:
 %
@@ -215,8 +226,9 @@ MagickExport void DeleteImageFromList(Image **images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  DestroyImageList() destroys an image list.  There is no effect if the
-%  image pointer is null.
+%  DestroyImageList() destroys an image list.
+%
+%  If the image pointer is NULL, then there is no effect.
 %
 %  The format of the DestroyImageList method is:
 %
@@ -258,7 +270,12 @@ MagickExport void DestroyImageList(Image *images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetFirstImageInList() returns a pointer to the first image in the list
+%  GetFirstImageInList() returns a pointer to the first image in the list.
+%  If the images list is NULL, then NULL is returned.
+%
+%  If images have been appended to the list using AppendImageToList(),
+%  then using GetFirstImageInList() is necessary to get the head of the
+%  list.
 %
 %  The format of the GetFirstImageInList method is:
 %
@@ -292,7 +309,10 @@ MagickExport Image *GetFirstImageInList(const Image *images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetImageFromList() returns an image at the specified offset from the list.
+%  GetImageFromList() returns an image at the specified offset from the head
+%  of the list.  Negative 'offset' values currently have no meaning.
+%
+%  If the images list is NULL, then NULL is returned.
 %
 %  The format of the GetImageFromList method is:
 %
@@ -337,7 +357,10 @@ MagickExport Image *GetImageFromList(const Image *images,const long offset)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetImageIndexInList() returns the offset in the list of the specified image.
+%  GetImageIndexInList() returns the offset in the list of the specified
+%  image.
+%
+%  If the images list is NULL, then the value negative one (-1) is returned.
 %
 %  The format of the GetImageIndexInList method is:
 %
@@ -373,8 +396,11 @@ MagickExport long GetImageIndexInList(const Image *images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetImageListLength() returns the length of the list (the number of images in
-%  the list).
+%  GetImageListLength() returns the length of the list (the number of images
+%  in the whole list). This function may be performed given any member of
+%  the list.
+%
+%  If the images list is NULL, then the value zero (0) is returned.
 %
 %  The format of the GetImageListLength method is:
 %
@@ -412,7 +438,10 @@ MagickExport unsigned long GetImageListLength(const Image *images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetLastImageInList() returns a pointer to the last image in the list
+%  GetLastImageInList() returns a pointer to the last image in the list,
+%  given a pointer to any image in the list.
+%
+%  If the images list is NULL, then NULL is returned.
 %
 %  The format of the GetLastImageInList method is:
 %
@@ -446,7 +475,10 @@ MagickExport Image *GetLastImageInList(const Image *images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetNextImageInList() returns the next image in the list.
+%  GetNextImageInList() returns the next image in the list given a pointer
+%  to an image in the list.
+%
+%  If the images list is NULL, then NULL is returned.
 %
 %  The format of the GetNextImageInList method is:
 %
@@ -477,7 +509,10 @@ MagickExport Image *GetNextImageInList(const Image *images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  GetPreviousImageInList() returns the previous image in the list.
+%  GetPreviousImageInList() returns the previous image in the list given
+%  a pointer to an image in the list.
+%
+%  If the images list is NULL, then NULL is returned.
 %
 %  The format of the GetPreviousImageInList method is:
 %
@@ -501,18 +536,33 @@ MagickExport Image *GetPreviousImageInList(const Image *images)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
 %                                                                             %
-%     I m a g e L i s t T o A r r a y                                         %
++     I m a g e L i s t T o A r r a y                                         %
 %                                                                             %
 %                                                                             %
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  ImageListToArray() is a convenience method that converts an image list to
-%  a sequential array.  For example,
+%  ImageListToArray() is a convenience method that creates a linear/sequential
+%  array duplicating pointers to members of the image list. An extra NULL
+%  pointer entry is added to indicate the end of the list.  The array is in
+%  the same order as the list. Without great care, dire problems will result
+%  if image list members are freed while using the returned array since the
+%  array contains a copy of the list pointer values.
 %
+%  If the images list is NULL, then NULL is returned.
+%
+%  This function is useful if array indexing is more convenient or more
+%  efficent. For example,
+%
+%    Image **group;
+%    size_t i;
 %    group = ImageListToArray(images, exception);
-%    for (i = 0; i < n; i++)
-%      puts(group[i]->filename);
+%    if (group != NULL)
+%    {
+%      for (i = 0; group[i] != NULL; i++)
+%        puts(group[i]->filename);
+%      MagickFreeMemory(group);
+%    }
 %
 %  The format of the ImageListToArray method is:
 %
@@ -564,7 +614,9 @@ MagickExport Image **ImageListToArray(const Image *images,
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  InsertImageInList() inserts an image in the list.
+%  InsertImageInList() inserts an image in the list at the current position.
+%
+%  If the images list is NULL, then there is no effect.
 %
 %  The format of the InsertImageInList method is:
 %
@@ -661,6 +713,11 @@ MagickExport void PrependImageToList(Image **images,Image *image)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  RemoveFirstImageFromList() removes an image from the beginning of the list.
+%  A pointer to the removed image is returned and should be destroyed when no
+%  longer needed.  In conjunction with AppendImageToList(), this could be
+%  used to implement a producer/consumer model.
+%
+%  If the images list is NULL then NULL is returned.
 %
 %  The format of the RemoveFirstImageFromList method is:
 %
@@ -705,7 +762,11 @@ MagickExport Image *RemoveFirstImageFromList(Image **images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  RemoveLastImageFromList() removes the last image from the list.
+%  RemoveLastImageFromList() removes the last image from the list.  A pointer
+%  to the removed image is returned and should be destroyed when no longer
+%  needed.
+%
+%  If the images list is NULL then NULL is returned.
 %
 %  The format of the RemoveLastImageFromList method is:
 %
@@ -750,7 +811,10 @@ MagickExport Image *RemoveLastImageFromList(Image **images)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  ReplaceImageInList() replaces an image in the list.
+%  ReplaceImageInList() replaces an image in the list.  The image which was
+%  replaced is destroyed.
+%
+%  If the images list is NULL then there is no effect.
 %
 %  The format of the ReplaceImageInList method is:
 %
@@ -801,6 +865,8 @@ MagickExport void ReplaceImageInList(Image **images,Image *image)
 %
 %  ReverseImageList() reverses the image list.
 %
+%  If the images list is NULL then there is no effect.
+%
 %  The format of the ReverseImageList method is:
 %
 %       ReverseImageList(const Image **images)
@@ -845,7 +911,10 @@ MagickExport void ReverseImageList(Image **images)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  SpliceImageIntoList() removes 'length' images from the list and replaces
-%  them with the specified splice.
+%  them with the specified splice.  The images which were removed are
+%  destroyed.
+%
+%  If the images list is NULL then there is no effect.
 %
 %  The format of the SpliceImageIntoList method is:
 %
@@ -897,7 +966,11 @@ MagickExport void SpliceImageIntoList(Image **images,const unsigned long length,
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  SplitImageList() splits an image into two lists.
+%  SplitImageList() splits an image list into two lists at the current
+%  position in the list.  The new list is returned.
+%
+%  If the images list is NULL, or the images next image is NULL then
+%  NULL is returned.
 %
 %  The format of the SplitImageList method is:
 %
@@ -931,7 +1004,9 @@ MagickExport Image *SplitImageList(Image *images)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  SyncNextImageInList() returns the next image in the list after the blob
-%  referenced is synchronized with the current image.
+%  (I/O representation) referenced is synchronized with the current image.
+%
+%  If the images list is NULL, then NULL is returned.
 %
 %  The format of the SyncNextImageInList method is:
 %

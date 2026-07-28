@@ -1,3 +1,12 @@
+2026-07-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/list.c: Improve documentation for all the list functions.
+
+        * www/api/api.rst: Update API code example to show use of
+        GetFirstImageInList() after using AppendImageToList().  This is in
+        response to Debian bug #1142941: "libgraphicsmagick1-dev: can't
+        generate GIF animations using demo API code."
+
 2026-07-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/xwindow.c (MagickXImportImage): Avoid heap buffer
