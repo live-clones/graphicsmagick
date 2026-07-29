@@ -717,7 +717,13 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      status = MagickPass;
 
    /* Id cannot be empty or NULL */
-   if (((void *)id == NULL) || (id_size == 0))
+   if ((void *)id == NULL)
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+   else if (id_size == 0)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
@@ -728,6 +734,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
+       id[0U]='\0';
        status=MagickFail;
      }
 #if 0
@@ -736,6 +743,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
+       id[0U]='\0';
        status=MagickFail;
      }
 #endif
@@ -744,18 +752,15 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
+       id[0U]='\0';
        status=MagickFail;
      }
    else if (strchr(id,'\"') != NULL)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
-       status=MagickFail;
-     }
-
-   if (MagickPass != status)
-     {
        id[0U]='\0';
+       status=MagickFail;
      }
 
    return status;

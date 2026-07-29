@@ -1,3 +1,9 @@
+2026-07-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/svg.c (SVGValidateElementId): Address Coverity 504982
+        "Dereference after null check".  Luckily, it is very unlikely that
+        libxml produces NULL.
+
 2026-07-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/list.c: Improve documentation for all the list functions.
