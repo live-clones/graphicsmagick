@@ -1,4 +1,18 @@
+2026-07-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/svg.c: Address ImageMagick CVE-2026-56379. A description
+        is "CVE-2026-56379 is a command injection vulnerability in
+        ImageMagick versions before 7.1.2-15 and 6.9.13-40. It allows
+        attackers to execute arbitrary code via crafted SVG files
+        containing malicious drawing commands.".  This issue was reported
+        to me via email from Petr Gajdos on July 28, 2026. The fix is
+        based on a modified patch from Petr Gajdos.
+
 2026-07-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Temporarily disable 'vvdec' and
+        'vvenc' in the oss-fuzz build in order to hopefully overcome
+        oss-fuzz's inability to automatically close related issues.
 
         * coders/svg.c (SVGValidateElementId): Address Coverity 504982
         "Dereference after null check".  Luckily, it is very unlikely that

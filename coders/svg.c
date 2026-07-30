@@ -906,10 +906,10 @@ SVGStartElement(void *context,const xmlChar *name,
           'font-family' argument.  Should we be concerned about that?
          */
 
-        if (strchr(value,'\'') != NULL)
+        if (strpbrk(value,"'\n\r") != NULL)
           {
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Skipping attribute '%s' due to quoted value (%s)\n",
+                                  "Skipping attribute '%s' due to invalid value (%s)\n",
                                   keyword, value);
             ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
             continue;
@@ -1349,10 +1349,10 @@ SVGStartElement(void *context,const xmlChar *name,
           'font-family' argument.  Should we be concerned about that?
          */
 
-        if (strchr(value,'\'') != NULL)
+        if (strpbrk(value,"'\n\r") != NULL)
           {
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Skipping attribute '%s' due to quoted value (%s)\n",
+                                  "Skipping attribute '%s' due to invalid value (%s)\n",
                                   keyword, value);
             ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
             continue;
@@ -1921,10 +1921,10 @@ SVGStartElement(void *context,const xmlChar *name,
                             'font-family' argument.  Should we be concerned about that?
                           */
 
-                          if (strchr(value,'\'') != NULL)
+                          if (strpbrk(value,"'\n\r") != NULL)
                             {
                               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                                    "Skipping style attribute '%s' due to quoted value (%s)\n",
+                                                    "Skipping style attribute '%s' due to invalid value (%s)\n",
                                                     keyword, value);
                               ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
                               continue;
@@ -2727,10 +2727,10 @@ void    ProcessStyleClassDefs (
             'font-family' argument.  Should we be concerned about that?
           */
 
-          if (strchr(value,'\'') != NULL)
+          if (strpbrk(value,"'\n\r") != NULL)
             {
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Skipping class '%s' keyword '%s' due to quoted value (%s)\n",
+                                    "Skipping class '%s' keyword '%s' due to invalid value (%s)\n",
                                     pClassDef->pName, keyword, value);
               ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
               continue;
