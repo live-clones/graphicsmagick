@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2012 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -200,11 +200,7 @@ WandExport int FormatMagickStringList(char *string,const size_t length,
   int
     count;
 
-#if defined(HAVE_VSNPRINTF)
   count=vsnprintf(string,length,format,operands);
-#else
-  count=vsprintf(string,format,operands);
-#endif
 
   return(count);
 }

@@ -1117,10 +1117,6 @@ AC_CHECK_DECLS([pread, pwrite],[],[],[
 AC_CHECK_DECLS([strlcpy],[],[],[
 #include <strings.h>])
 
-AC_CHECK_DECLS([vsnprintf],[],[],[
-#include <stdio.h>
-#include <stdarg.h>])
-
 #######
 #
 # Check for /dev/urandom device

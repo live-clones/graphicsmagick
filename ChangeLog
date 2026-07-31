@@ -1,3 +1,9 @@
+2026-07-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac, magick/studio.h, etc.: Remove legacy vsprintf()
+        from the code since vsnprintf() is required to be available and
+        vsprintf() is insecure.
+
 2026-07-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/svg.c: Address ImageMagick CVE-2026-56379. A description

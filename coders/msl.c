@@ -3944,11 +3944,7 @@ MSLWarning(void *context,const char *format,...)
   parser=(xmlParserCtxtPtr) context;
   msl_info=(MSLInfo *) parser->_private;
   assert(msl_info->signature == MagickSignature);
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,MaxTextExtent,format,operands);
-#endif
   ThrowException2(msl_info->exception,CoderError,reason,(char *) NULL);
   va_end(operands);
 }
@@ -3981,11 +3977,7 @@ MSLError(void *context,const char *format,...)
 #if defined(NDEBUG)
   (void) msl_info;
 #endif
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,MaxTextExtent,format,operands);
-#endif
   ThrowException2(msl_info->exception,DelegateFatalError,reason,(char *) NULL);
   va_end(operands);
   xmlStopParser(parser);

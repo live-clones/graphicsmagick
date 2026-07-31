@@ -3501,11 +3501,7 @@ SVGWarning(void *context,const char *format,...)
   assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.warning: ");
   (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,sizeof(reason),format,operands);
-#endif
   ThrowException2(svg_info->exception,CoderWarning,reason,(char *) NULL);
   va_end(operands);
 }
@@ -3538,11 +3534,7 @@ SVGError(void *context,const char *format,...)
   assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.error: ");
   (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,sizeof(reason),format,operands);
-#endif
   ThrowException2(svg_info->exception,CoderError,reason,(char *) NULL);
   va_end(operands);
   xmlStopParser(parser);

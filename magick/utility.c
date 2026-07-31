@@ -1294,11 +1294,7 @@ MagickExport size_t FormatStringList(char *string,const char *format,
   int
     fli;
 
-#if defined(HAVE_VSNPRINTF)
   fli=vsnprintf(string,MaxTextExtent,format,operands);
-#else
-  fli=vsprintf(string,format,operands);
-#endif
   if (fli >= MaxTextExtent)
     fls=MaxTextExtent-1;
   else if (fli > 0)
@@ -4124,11 +4120,7 @@ MagickExport size_t MagickFormatStringList(char *string,
 
   if (length > 0)
     {
-#if defined(HAVE_VSNPRINTF)
       fli=vsnprintf(string,length,format,operands);
-#else
-      fli=vsprintf(string,format,operands);
-#endif
       if (fli > 0)
         {
           if ((size_t) fli >= length)

@@ -24044,20 +24044,6 @@ fi
 printf "%s\n" "#define HAVE_DECL_STRLCPY $ac_have_decl" >>confdefs.h
 
 
-ac_fn_check_decl "$LINENO" "vsnprintf" "ac_cv_have_decl_vsnprintf" "
-#include <stdio.h>
-#include <stdarg.h>
-" "$ac_c_undeclared_builtin_options" "CFLAGS"
-if test "x$ac_cv_have_decl_vsnprintf" = xyes
-then :
-  ac_have_decl=1
-else case e in #(
-  e) ac_have_decl=0 ;;
-esac
-fi
-printf "%s\n" "#define HAVE_DECL_VSNPRINTF $ac_have_decl" >>confdefs.h
-
-
 #######
 #
 # Check for /dev/urandom device

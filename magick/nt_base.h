@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2016 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -38,7 +38,6 @@ extern "C" {
 #define R_OK 4
 #define W_OK 2
 #define RW_OK 6
-#define HAVE_VSNPRINTF 1
 #define HAVE_RAISE 1
 #define HAVE_SPAWNVP 1
 #define HAVE_PROCESS_H 1
