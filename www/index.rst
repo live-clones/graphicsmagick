@@ -153,7 +153,7 @@ other popular software:
   * GM is available for free, and may be used to support both open and
     proprietary applications.
 
-  * GM is distributed under an X11-style license (`MIT License`_),
+  * GM is distributed under an MIT-style license (`MIT License`_),
     approved by the `Open Source Initiative`_, recommended for use by
     the `OSSCC`_, and compatible with the `GNU GPL`_.
 
