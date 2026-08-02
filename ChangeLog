@@ -1,3 +1,7 @@
+2026-08-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawRoundLinecap): Assure that coordinates were provided.  Update drawing status.
+
 2026-07-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * configure.ac, magick/studio.h, etc.: Remove legacy vsprintf()

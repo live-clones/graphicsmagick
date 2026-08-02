@@ -6713,7 +6713,7 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
 %
 %  The format of the DrawStrokePolygon method is:
 %
-%      unsigned int DrawStrokePolygon(Image *image,const DrawInfo *draw_info,
+%      MagickPassFail DrawStrokePolygon(Image *image,const DrawInfo *draw_info,
 %        const PrimitiveInfo *primitive_info)
 %
 %  A description of each parameter follows:
@@ -6727,7 +6727,7 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
 %
 */
 
-static void
+static MagickPassFail
 DrawRoundLinecap(Image *image,const DrawInfo *draw_info,
                  const PrimitiveInfo *primitive_info)
 {
@@ -6737,6 +6737,8 @@ DrawRoundLinecap(Image *image,const DrawInfo *draw_info,
   register long
     i;
 
+  if (primitive_info->coordinates < 1)
+    return(MagickFail);
   for (i=0; i < 4; i++)
     linecap[i]=(*primitive_info);
   linecap[0].coordinates=4;
@@ -6745,7 +6747,7 @@ DrawRoundLinecap(Image *image,const DrawInfo *draw_info,
   linecap[2].point.y+=10.0*MagickEpsilon;
   linecap[3].point.y+=10.0*MagickEpsilon;
   linecap[4].primitive=UndefinedPrimitive;
-  (void) DrawPolygonPrimitive(image,draw_info,linecap);
+  return DrawPolygonPrimitive(image,draw_info,linecap);
 }
 
 static MagickPassFail
@@ -6831,8 +6833,8 @@ DrawStrokePolygon(Image *image,const DrawInfo *draw_info,
     closed_path=PRIMINF_GET_IS_CLOSED_SUBPATH(p);
     if ((draw_info->linecap == RoundCap) && !closed_path)
       {
-        DrawRoundLinecap(image,draw_info,p);
-        DrawRoundLinecap(image,draw_info,q);
+        status&=DrawRoundLinecap(image,draw_info,p);
+        status&=DrawRoundLinecap(image,draw_info,q);
       }
   }
   DestroyDrawInfo(clone_info);
