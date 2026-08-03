@@ -2077,6 +2077,7 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
     j,
     n;
 
+#define MaxPolygonCoordinates  67108864 /* 64 MiB */
   assert(draw_info != (const DrawInfo *) NULL);
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),"    begin draw-dash");
   clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);
@@ -2085,9 +2086,9 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
   clone_info->miterlimit=0;
   for (i=0; primitive_info[i].primitive != UndefinedPrimitive; i++);
   number_vertices=i;
-  dash_polygon=MagickAllocateResourceLimitedArray(PrimitiveInfo *,
-                                                  (size_t) 2*number_vertices+1,
-                                                  sizeof(PrimitiveInfo));
+  dash_polygon=MagickAllocateResourceLimitedClearedArray(PrimitiveInfo *,
+                                                         (size_t) 2*number_vertices+1,
+                                                         sizeof(PrimitiveInfo));
   if (dash_polygon == (PrimitiveInfo *) NULL)
     {
       DestroyDrawInfo(clone_info);
@@ -2096,109 +2097,114 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
       return(MagickFail);
     }
   dash_polygon[0]=primitive_info[0];
-  scale=ExpandAffine(&draw_info->affine); /* oss-fuzz 24236 scale=121287375, total_length=542727042660000, maximum_length=605375610468750! */
+  scale=ExpandAffine(&draw_info->affine);
   length=scale*draw_info->dash_pattern[0];
-  offset=draw_info->dash_offset != 0.0 ? scale*draw_info->dash_offset : 0.0;
+  offset=fabs(draw_info->dash_offset) >= MagickEpsilon ?
+    scale*draw_info->dash_offset : 0.0;
   j=1;
   for (n=0; offset > 0.0; j=0)
-  {
-    if (draw_info->dash_pattern[n] <= 0.0)
-      break;
-    length=scale*draw_info->dash_pattern[n];
-    if (offset > length)
-      {
-        offset-=length;
-        n++;
-        length=scale*draw_info->dash_pattern[n];
-        continue;
-      }
-    if (offset < length)
-      {
-        length-=offset;
-        offset=0.0;
+    {
+      if (draw_info->dash_pattern[n] <= 0.0)
         break;
-      }
-    offset=0.0;
-    n++;
-  }
+      length=scale*(draw_info->dash_pattern[n]+(n == 0 ? -0.5 : 0.5));
+      if (offset > length)
+        {
+          offset-=length;
+          n++;
+          length=scale*draw_info->dash_pattern[n];
+          continue;
+        }
+      if (offset < length)
+        {
+          length-=offset;
+          offset=0.0;
+          break;
+        }
+      offset=0.0;
+      n++;
+    }
   maximum_length=0.0;
   total_length=0.0;
   maximum_length_limit=100.0*sqrt((double)image->columns*(double)image->columns+
                                   (double) image->rows*(double) image->rows+
                                   +MagickEpsilon);
   for (i=1; (i < number_vertices) && (length >= 0.0); i++)
-  {
-    dx=primitive_info[i].point.x-primitive_info[i-1].point.x;
-    dy=primitive_info[i].point.y-primitive_info[i-1].point.y;
-    maximum_length=sqrt(dx*dx+dy*dy+MagickEpsilon);
-    /*
-      Apply an arbitrary limit on maximum length in order to avoid
-      seemingly unending iterations due to affine and other factors
-      (e.g. oss-fuzz 10614 & 24236).
-
-      FIXME: It is TBD if the arbitrary limit factors used have any
-      basis in reality!  Please report if this limit causes issues
-      with valid files.
-    */
-    if (maximum_length > maximum_length_limit)
-      {
-        char message[MaxTextExtent];
-        MagickFormatString(message,sizeof(message),"Maximum length: %g, Scale: %g", maximum_length, scale);
-        ThrowException(&image->exception,DrawError,UnreasonableDashPolygonLength,message);
-        status=MagickFail;
-        goto draw_dash_polygon_fail;
-      }
-    if (length == 0.0)
-      {
-        if (draw_info->dash_pattern[n] != 0.0)
-          n++;
-        if (draw_info->dash_pattern[n] == 0.0)
-          n=0;
-        length=scale*draw_info->dash_pattern[n];
-      }  /* oss-fuzz 10614 maximum_length = 2120554, length = 0.5 yields 4,241,108 iterations*/
-    for (total_length=0.0; (length >= 0.0) && (maximum_length >= (length+total_length)); )
     {
-      total_length+=length;
+      dx=primitive_info[i].point.x-primitive_info[i-1].point.x;
+      dy=primitive_info[i].point.y-primitive_info[i-1].point.y;
+      maximum_length=hypot(dx,dy);
+      if (maximum_length > (double) (MaxPolygonCoordinates >> 2))
+        continue;
+
+      /*
+        Apply an arbitrary limit on maximum length in order to avoid
+        seemingly unending iterations due to affine and other factors
+        (e.g. oss-fuzz 10614 & 24236).
+
+        FIXME: It is TBD if the arbitrary limit factors used have any
+        basis in reality!  Please report if this limit causes issues
+        with valid files.
+      */
+      if (maximum_length > maximum_length_limit)
+        {
+          char message[MaxTextExtent];
+          MagickFormatString(message,sizeof(message),"Maximum length: %g, Scale: %g", maximum_length, scale);
+          ThrowException(&image->exception,DrawError,UnreasonableDashPolygonLength,message);
+          status=MagickFail;
+          goto draw_dash_polygon_fail;
+        }
+      if (fabs(length) < MagickEpsilon)
+        {
+          if (fabs(draw_info->dash_pattern[n]) >= MagickEpsilon)
+            n++;
+          if (fabs(draw_info->dash_pattern[n]) < MagickEpsilon)
+            n=0;
+          length=scale*draw_info->dash_pattern[n];
+        }  /* oss-fuzz 10614 maximum_length = 2120554, length = 0.5 yields 4,241,108 iterations*/
+      for (total_length=0.0; (length >= 0.0) && (maximum_length >= (length+total_length)); )
+        {
+          total_length+=length;
+          if (n & 0x01)
+            {
+              dash_polygon[0]=primitive_info[0];
+              dash_polygon[0].point.x=primitive_info[i-1].point.x+
+                dx*total_length/maximum_length;
+              dash_polygon[0].point.y=primitive_info[i-1].point.y+
+                dy*total_length/maximum_length;
+              j=1;
+            }
+          else
+            {
+              if (j+1 > number_vertices)
+                break;
+              dash_polygon[j]=primitive_info[i-1];
+              dash_polygon[j].point.x=primitive_info[i-1].point.x+
+                dx*total_length/maximum_length;
+              dash_polygon[j].point.y=primitive_info[i-1].point.y+
+                dy*total_length/maximum_length;
+              dash_polygon[j].coordinates=1;
+              j++;
+              dash_polygon[0].coordinates=j;
+              dash_polygon[j].primitive=UndefinedPrimitive;
+              status &= DrawStrokePolygon(image,clone_info,dash_polygon);
+              if (status == MagickFail)
+                break;
+            }
+          if (fabs(draw_info->dash_pattern[n]) >= MagickEpsilon)
+            n++;
+          if (fabs(draw_info->dash_pattern[n]) < MagickEpsilon)
+            n=0;
+          length=scale*draw_info->dash_pattern[n];
+        }
+      length-=(maximum_length-total_length);
       if (n & 0x01)
-        {
-          dash_polygon[0]=primitive_info[0];
-          dash_polygon[0].point.x=primitive_info[i-1].point.x+
-            dx*total_length/maximum_length;
-          dash_polygon[0].point.y=primitive_info[i-1].point.y+
-            dy*total_length/maximum_length;
-          j=1;
-        }
-      else
-        {
-          if (j+1 > number_vertices)
-            break;
-          dash_polygon[j]=primitive_info[i-1];
-          dash_polygon[j].point.x=primitive_info[i-1].point.x+
-            dx*total_length/maximum_length;
-          dash_polygon[j].point.y=primitive_info[i-1].point.y+
-            dy*total_length/maximum_length;
-          dash_polygon[j].coordinates=1;
-          j++;
-          dash_polygon[0].coordinates=j;
-          dash_polygon[j].primitive=UndefinedPrimitive;
-          status &= DrawStrokePolygon(image,clone_info,dash_polygon);
-          if (status == MagickFail)
-            break;
-        }
-      if (draw_info->dash_pattern[n] != 0.0)
-        n++;
-      if (draw_info->dash_pattern[n] == 0.0)
-        n=0;
-      length=scale*draw_info->dash_pattern[n];
+        continue;
+      dash_polygon[j]=primitive_info[i];
+      dash_polygon[j].coordinates=1;
+      j++;
     }
-    length-=(maximum_length-total_length);
-    if (n & 0x01)
-      continue;
-    dash_polygon[j]=primitive_info[i];
-    dash_polygon[j].coordinates=1;
-    j++;
-  }
-  if ((status != MagickFail) && (total_length < maximum_length) && ((n & 0x01) == 0) && (j > 1))
+  if ((status != MagickFail) && (total_length < maximum_length) &&
+      ((n & 0x01) == 0) && (j > 1))
     {
       dash_polygon[j]=primitive_info[i-1];
       dash_polygon[j].point.x+=MagickEpsilon;

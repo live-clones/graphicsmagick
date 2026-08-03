@@ -1,3 +1,10 @@
+2026-08-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawDashPolygon): Place a hard limit on the
+        number of polygon coordinates.  Appears to address oss-fuzz
+        461953780 "graphicsmagick:coder_WMF_fuzzer: Timeout in
+        coder_WMF_fuzzer".
+
 2026-08-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * LICENSE: Update the license year.
