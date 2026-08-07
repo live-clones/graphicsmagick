@@ -1,3 +1,8 @@
+2026-08-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Makefile.am (coverity-build): Compile utilities/gm for Coverity
+        build.
+
 2026-08-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/render.c (DrawDashPolygon): Place a hard limit on the

@@ -445,7 +445,7 @@ endif # HasGRAPHICSMAGICK_SNAPSHOT_COPY
 coverity-build:
 	$(MAKE) clean
 	$(RM) -rf $(COVERITY_COV_INT)
-	cov-build --dir $(COVERITY_COV_INT) $(MAKE) $(all) $(check_PROGRAMS)
+	cov-build --dir $(COVERITY_COV_INT) $(MAKE) $(all) $(UTILITIES_PGMS) $(check_PROGRAMS)
 
 # Build under Coverity, and submit the results
 coverity: coverity-build
