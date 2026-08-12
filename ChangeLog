@@ -1,3 +1,13 @@
+2026-08-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/mat.c (ReadMATImage): Avoid the possible dereference of a
+        null image pointer.
+
+2026-08-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Makefile.am: Obtain the submitter's Coverity email address from
+        the file '.coverity_email_gm' in the user's home directory.
+
 2026-08-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh (enable_heif): Temporarily disable

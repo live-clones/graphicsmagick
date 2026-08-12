@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright (C) 2004-2024 GraphicsMagick Group
+# Copyright (C) 2004-2026 GraphicsMagick Group
 #
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -2787,7 +2787,6 @@ MODULECOMMONCPPFLAGS = $(AM_CPPFLAGS)
 # FIXME: Could use info from /etc/os-release, or output from
 # lsb_release.
 # New URL is https://scan.coverity.com/projects/graphicsmagick?tab=overview
-COVERITY_EMAIL = bobjfriesenhahn@gmail.com
 COVERITY_TARBALL = GraphicsMagick.xz
 COVERITY_VERSION = snapshot-@PACKAGE_CHANGE_DATE@
 COVERITY_DESCRIPTION = 'Ubuntu Q@QuantumDepth@'
@@ -11627,11 +11626,14 @@ coverity-build:
 	cov-build --dir $(COVERITY_COV_INT) $(MAKE) $(all) $(UTILITIES_PGMS) $(check_PROGRAMS)
 
 # Build under Coverity, and submit the results
+#
+# Put the Coverity submission key in $(HOME)/.coverity_key_gm
+# Put your email address in $(HOME)/.coverity_email_gm
 coverity: coverity-build
 	tar caf $(COVERITY_TARBALL) $(COVERITY_COV_INT)
 	curl \
 	--form token=`cat $$HOME/.coverity_key_gm` \
-	--form email=$(COVERITY_EMAIL) \
+	--form email=`cat $$HOME/.coverity_email_gm` \
 	--form file=@$(COVERITY_TARBALL) \
 	--form version=$(COVERITY_VERSION) \
 	--form description=$(COVERITY_DESCRIPTION) \
@@ -11656,9 +11658,16 @@ release: distcheck
 # In order for this to work, you must have first installed the 'clang'
 # and 'clang-tools' packages on your system.
 # The project should have been configured to use clang.
-#	-enable-checker security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+#
+# The '-enable-checker
+# security.insecureAPI.DeprecatedOrUnsafeBufferHandling' option
+# deprecates the memcpy, memmove, memset, snprintf, sprintf, sscanf,
+# strncpy, vsnprintf, etc., ANSI C'11 "_s" functions, which GNU libc
+# did not implement and Microsoft's compiler has implemented
+# differently.  Don't bother trying to use it.
+#
 scan-build:
-	scan-build-15 -k --html-title='GraphicsMagick' \
+	scan-build-20 -k --html-title='GraphicsMagick scan-build' \
 	-maxloop 10000 \
 	-disable-checker deadcode.DeadStores \
 	-enable-checker security.insecureAPI.bcmp \

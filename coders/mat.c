@@ -1452,7 +1452,8 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
         image2 = NULL;
 
       if (image_info->subrange != 0)
-        if (image->scene >= (image_info->subimage+image_info->subrange-1))
+        if ((image == (Image *) NULL) ||
+            (image->scene >= (image_info->subimage+image_info->subrange-1)))
           break;
 
       /* Allocate next image structure. */

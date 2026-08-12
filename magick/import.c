@@ -1997,8 +1997,8 @@ ImportAlphaQuantumType(const unsigned char *source,
   if (image->colorspace == CMYKColorspace)
     {
       if (indexes == (IndexPacket *) NULL)
-          ThrowBinaryException3(ImageError,CMYKAImageLacksAlphaChannel,
-                                UnableToImportImagePixels);
+        ThrowBinaryException3(ImageError,CMYKAImageLacksAlphaChannel,
+                              UnableToImportImagePixels);
 
       if (sample_type == UnsignedQuantumSampleType)
         {
@@ -2007,7 +2007,7 @@ ImportAlphaQuantumType(const unsigned char *source,
               /*
                 Modulo-8 sample sizes
               */
-              if( QuantumDepth == sample_bits)
+              if (QuantumDepth == sample_bits)
                 {
                   /* Unity scale */
                   for (x = number_pixels; x != 0; --x)
@@ -2016,7 +2016,7 @@ ImportAlphaQuantumType(const unsigned char *source,
                       *indexes++=(IndexPacket) MaxRGB-unsigned_value;
                     }
                 }
-              else if (QuantumDepth >  sample_bits)
+              else if (QuantumDepth > sample_bits)
                 {
                   /* Scale up */
                   for (x = number_pixels; x != 0; --x)
