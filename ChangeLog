@@ -1,3 +1,7 @@
+2026-08-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Re-enable libheif in oss-fuzz build.
+
 2026-08-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/mat.c (ReadMATImage): Avoid the possible dereference of a

@@ -503,7 +503,7 @@ release: distcheck
 # differently.  Don't bother trying to use it.
 #
 scan-build:
-	scan-build-20 -k --html-title='GraphicsMagick scan-build' \
+	scan-build -k --html-title='GraphicsMagick scan-build' \
 	-maxloop 10000 \
 	-disable-checker deadcode.DeadStores \
 	-enable-checker security.insecureAPI.bcmp \
