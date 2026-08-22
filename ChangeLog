@@ -1,3 +1,10 @@
+2026-08-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * bootstrap (build_aux): Update gnulib build-aux config.guess and
+        config.sub files from a 'gnulib' git repository checkout adjacent
+        to the GM source directory.  If there is no adjacent 'gnulib'
+        directory, then the files provided by Autotools are used.
+
 2026-08-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * fuzzing/oss-fuzz-build.sh: Re-enable libheif in oss-fuzz build.
