@@ -227,6 +227,7 @@ static unsigned int WriteMPRImage(const ImageInfo *image_info,Image *image)
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  ARG_NOT_USED(image_info);
   GetExceptionInfo(&exception);
   registry_image=GetImageFromMagickRegistry(image->filename,&id,&exception);
   DestroyExceptionInfo(&exception);

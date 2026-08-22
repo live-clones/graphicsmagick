@@ -4507,6 +4507,7 @@ GetPixelCacheInCore(const Image *image)
       if ((image->cache->type == MemoryCache) ||
           ((image->cache->type == MapCache) && (image->cache->read_only)))
         status=MagickTrue;
+      ARG_NOT_USED(cache_info);
     }
 
   return status;

@@ -1398,6 +1398,7 @@ IsMagickConflict(const char *magick)
 #if defined(MSWINDOWS) || defined(__CYGWIN__)
   return(NTIsMagickConflict(magick));
 #endif
+  ARG_NOT_USED(magick);
   return(MagickFalse);
 }
 

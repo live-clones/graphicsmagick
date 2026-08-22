@@ -2664,6 +2664,7 @@ MagickXError(Display *display,XErrorEvent *error)
 {
   assert(display != (Display *) NULL);
   assert(error != (XErrorEvent *) NULL);
+  ARG_NOT_USED(display);
   xerror_alert=True;
   switch (error->request_code)
   {
@@ -7638,6 +7639,7 @@ MagickXMakePixmap(Display *display,
   assert(display != (Display *) NULL);
   assert(resource_info != (MagickXResourceInfo *) NULL);
   assert(window != (MagickXWindowInfo  *) NULL);
+  ARG_NOT_USED(resource_info);
   if (window->pixmap != (Pixmap) NULL)
     {
       /*

@@ -3247,6 +3247,7 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
       if (option_info->compose != CopyOpacityCompositeOp)
         (*image)->matte=matte;
     }
+  ARG_NOT_USED(image_info);
   return(status);
 }
 

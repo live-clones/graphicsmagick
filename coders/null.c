@@ -230,5 +230,7 @@ static unsigned int WriteNULLImage(const ImageInfo *image_info,Image *image)
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  ARG_NOT_USED(image_info);
+  ARG_NOT_USED(image);
   return(True);
 }

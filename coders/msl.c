@@ -3914,6 +3914,7 @@ MSLCharacters(void *context,const xmlChar *c,int length)
   parser=(xmlParserCtxtPtr) context;
   msl_info=(MSLInfo *) parser->_private;
   assert(msl_info->signature == MagickSignature);
+  ARG_NOT_USED(msl_info);
 }
 
 static void
