@@ -1,3 +1,11 @@
+2026-08-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/wpg.c (ReadWPGImage): Limit recursion under
+        ExtractPostscript() to avoid stack exhaustion given crafted WPG
+        files which are self-referencing or otherwise create
+        loops. Addresses issue reported by 参赛选手 (Lylan, from QI-ANXIN
+        Technology Research Institute) via email on August 22, 2026.
+
 2026-08-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/*, magick/*: Eliminate unused parameter warnings for the

@@ -1132,6 +1132,7 @@ extern MagickPassFail _UpdateMagickResourceHighwater(const ResourceType type,
                                 info->name,f_highwater,info->units);
           status=MagickPass;
         }
+#if 0 /* defined(DEBUG_MAGICK_RESOURCES) && DEBUG_MAGICK_RESOURCES */
       else
         {
           (void) LogMagickEvent(ResourceEvent,GetMagickModule(),
@@ -1139,6 +1140,7 @@ extern MagickPassFail _UpdateMagickResourceHighwater(const ResourceType type,
                                 " %" MAGICK_INTMAX_F "d%s",
                                 info->name,highwater,info->units);
         }
+#endif
       UnlockSemaphoreInfo(info->semaphore);
     }
 

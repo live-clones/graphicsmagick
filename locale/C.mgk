@@ -566,6 +566,9 @@
         <Message name="ImageFileHasNoScenes">
           Image file has no scenes
         </Message>
+        <Message name="RecursionDetected">
+          excessive recursion detected
+        </Message>
      </Error>
       <FatalError>
         <Message name="UnableToPersistKey">

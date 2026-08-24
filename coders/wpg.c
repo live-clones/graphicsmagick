@@ -45,11 +45,23 @@
 #include "magick/pixel_cache.h"
 #include "magick/shear.h"
 #include "magick/tempfile.h"
+#include "magick/tsd.h"
 #include "magick/transform.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
 #include "magick/static.h"
 
+/*
+  Global declarations.
+*/
+#define ExtractPostscriptRecursionLimit 64
+static MagickTsdKey_t tsd_key = (MagickTsdKey_t) 0;
+
+
+typedef struct
+{
+  size_t ps_recursion;
+} WPG_TSD;
 
 typedef struct
 {
@@ -847,6 +859,9 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
   Image
     *image2;
 
+  WPG_TSD
+    *tsd;
+
   unsigned char
     header_magick[2*MaxTextExtent];
 
@@ -867,6 +882,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "ExtractPostscript(): PS_Offset=%" MAGICK_OFF_F "d, PS_Size=%" MAGICK_SIZE_T_F "u",
                           (magick_off_t) PS_Offset, (MAGICK_SIZE_T) PS_Size);
+
 
   /*
     Validate that claimed subordinate image data is contained in file size
@@ -992,6 +1008,42 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     SeekBlob(image,PS_Offset,SEEK_SET);
   }
 #endif
+
+  /*
+    Support detecting the case where the "Postscript" blob is an
+    embedded WPG which is self-referencing or is otherwise constructed
+    to produce non-terminal looping.  If recursion occurs, it will
+    occur under BlobToImage.
+  */
+  tsd = (WPG_TSD *) MagickTsdGetSpecific(tsd_key);
+  if (tsd == (WPG_TSD *) NULL)
+    {
+      /*
+        Allocate and set thread specific data
+      */
+      tsd = MagickMallocCleared(sizeof(WPG_TSD));
+      if (tsd == (WPG_TSD *) NULL)
+        {
+          ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);
+          return image;
+        }
+      tsd->ps_recursion = 0;
+      (void) MagickTsdSetSpecific(tsd_key,(void *) tsd);
+    }
+  tsd->ps_recursion++;
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Recursion level %" MAGICK_SIZE_T_F "u", tsd->ps_recursion);
+  if (tsd->ps_recursion > ExtractPostscriptRecursionLimit)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Excessive recursion detected!");
+      ThrowException(exception,CorruptImageError,RecursionDetected,image->filename);
+      MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
+      return image;
+    }
+
   /*
     Read nested image from blob, forcing read as Postscript format
   */
@@ -1000,13 +1052,18 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       return(image);
     }
+
   clone_info->blob=(void *) NULL;
   /* clone_info->length=0; */
   (void) strlcpy(clone_info->magick, format, sizeof(clone_info->magick));
   (void) strlcpy(clone_info->filename, "", sizeof(clone_info->filename));
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Reading embedded \"%s\" content from blob...", clone_info->magick);
-  image2 = BlobToImage(clone_info, ps_data, PS_Size, &image->exception );
+  image2 = BlobToImage(clone_info, ps_data, PS_Size, exception );
+  tsd->ps_recursion--;
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Recursion level %" MAGICK_SIZE_T_F "u", tsd->ps_recursion);
   MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
   if (!image2)
     {
@@ -2353,6 +2410,15 @@ ModuleExport void RegisterWPGImage(void)
 {
   MagickInfo
     *entry;
+
+  /*
+    Initialize thread specific data key with destructor.
+
+    Thread-specific allocations are freed using the specified
+    destructor function when the thread is destroyed.
+  */
+  if (tsd_key == (MagickTsdKey_t) 0)
+    (void) MagickTsdKeyCreate2(&tsd_key,MagickFree);
 
   entry=SetMagickInfo("WPG");
   entry->decoder=(DecoderHandler) ReadWPGImage;
