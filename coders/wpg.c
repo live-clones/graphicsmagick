@@ -883,7 +883,6 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
                           "ExtractPostscript(): PS_Offset=%" MAGICK_OFF_F "d, PS_Size=%" MAGICK_SIZE_T_F "u",
                           (magick_off_t) PS_Offset, (MAGICK_SIZE_T) PS_Size);
 
-
   /*
     Validate that claimed subordinate image data is contained in file size
   */
@@ -897,6 +896,13 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
     }
+
+  /*
+    FIXME: Validate that claimed subordinate image data is contained
+    in the narrowed range of a previous ExtractPostscript() offset and
+    size (if any).  The assumption is that as we recurse in, the
+    bounds are constrained by the "parent" blob range.
+  */
 
   /*
     Get subordinate file header magick and use it to identify file format
