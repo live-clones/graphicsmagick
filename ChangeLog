@@ -1,3 +1,12 @@
+2026-08-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/tiff.c (TIFFCloseBlob): Respect adjoin mode while closing
+        blob as is done for other formats. Fixes Debian Bug#1146076:
+        "graphicsmagick: decomposing three or more frames with +adjoin
+        aborts with double free or corruption".
+
+        * magick/blob.c: Add more tracing.
+
 2026-08-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/wpg.c (ReadWPGImage): Limit recursion under

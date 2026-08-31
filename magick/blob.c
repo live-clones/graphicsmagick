@@ -71,6 +71,10 @@
 #define MagickMaxFileSystemBlockSize 4194304
 #endif /* if !defined(MagickMaxFileSystemBlockSize) */
 
+#if !defined(DEBUG_VBUF)
+#  define DEBUG_VBUF 1 /* Enable to debug stdio vbuf */
+#endif /* if !defined(DEBUG_VBUF) */
+
 /*
   Enum declarations.
 */
@@ -955,9 +959,9 @@ MagickExport MagickPassFail CloseBlob(Image *image)
     {
       LockSemaphoreInfo(image->blob->semaphore);
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                            "Closing %sStream blob: image %p, blob %p, ref %lu",
+                            "Closing %sStream blob: image %p, blob %p, ref %lu, filename \"%s\"",
                             BlobStreamTypeToString(blob->type),
-                            image,blob,blob->reference_count);
+                            image,blob,blob->reference_count,image->filename);
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Blob "
                             "wrote %" MAGICK_UINTMAX_F "u bytes, "
@@ -1072,6 +1076,10 @@ MagickExport MagickPassFail CloseBlob(Image *image)
                       blob->first_errno=errno;
                   }
               }
+#if DEBUG_VBUF
+            if (blob->logging)
+              (void) LogMagickEvent(BlobEvent,GetMagickModule(),"Freeing blob stdio vbuf...");
+#endif /* if DEBUG_VBUF */
             MagickFreeMemory(image->blob->vbuf);
             break;
           }
@@ -1336,6 +1344,10 @@ MagickExport void DetachBlob(BlobInfo *blob_info)
         (void) UnmapBlob(blob_info->data,blob_info->length);
       LiberateMagickResource(MapResource,blob_info->length);
     }
+#if DEBUG_VBUF
+  if (blob_info->logging)
+    (void) LogMagickEvent(BlobEvent,GetMagickModule(),"Freeing blob stdio vbuf...");
+#endif /* if DEBUG_VBUF */
   MagickFreeMemory(blob_info->vbuf);
   blob_info->mapped=MagickFalse;
   blob_info->length=0;
@@ -3001,8 +3013,14 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                   size_t
                     vbuf_size;
 
+                  assert( image->blob->vbuf == (char *) NULL);
                   vbuf_size=image->blob->block_size;
-                  MagickFreeMemory(image->blob->vbuf);
+#if DEBUG_VBUF
+                  if (image->blob->logging)
+                    (void) LogMagickEvent(BlobEvent,GetMagickModule(),
+                                          "Allocating blob stdio vbuf of "
+                                          "%" MAGICK_SIZE_T_F "u bytes ...", vbuf_size);
+#endif /* if DEBUG_VBUF */
                   image->blob->vbuf=MagickAllocateClearedMemory(char *, vbuf_size);
                   if ((0 != vbuf_size) && (image->blob->vbuf != (char *) NULL))
                     {
@@ -3014,6 +3032,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                                                   " bytes returns failure!",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
+#if DEBUG_VBUF
                       else
                         {
                           if (image->blob->logging)
@@ -3022,6 +3041,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                                                   "%" MAGICK_SIZE_T_F "u bytes",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
+#endif /* if DEBUG_VBUF */
                     }
                   /*
                     Enable fsync-on-close mode if requested.

@@ -944,6 +944,9 @@ TIFFCloseBlob(thandle_t image_handle)
   Image
     *image = ((Magick_TIFF_ClientData *) image_handle)->image;
 
+  const ImageInfo
+    *image_info = ((Magick_TIFF_ClientData *) image_handle)->image_info;
+
   int
     status = MagickPass;
 
@@ -951,8 +954,9 @@ TIFFCloseBlob(thandle_t image_handle)
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),"TIFF close blob");
 #endif /* LOG_TIFF_BLOB_IO */
-  while (image->previous != (Image *) NULL)
-    image=image->previous;
+  if (image_info->adjoin)
+    while (image->previous != (Image *) NULL)
+      image=image->previous;
   status &= CloseBlob(image);
   return(status);
 }

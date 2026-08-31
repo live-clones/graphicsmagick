@@ -141,7 +141,7 @@ other popular software:
 
   * GM has 0.00 (zero) defects per 1000 lines of code (380,756 total
     lines of code analyzed) according to `Coverity Analysis Metrics`_
-    on August 24, 2026.
+    on August 31, 2026.
 
   * GM has zero issues detected by Clang 15 scan-build.
 
