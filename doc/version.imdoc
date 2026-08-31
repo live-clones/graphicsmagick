@@ -56,8 +56,8 @@ software was configured and the host system.</p>
 <p>To display the version information:</p>
 
 <pp><pre>
-  GraphicsMagick 1.3.37 2021-12-12 Q16 http://www.GraphicsMagick.org/
-  Copyright (C) 2002-2021 GraphicsMagick Group.
+  GraphicsMagick 1.3.48 2026-07-23 Q16 http://www.GraphicsMagick.org/
+  Copyright (C) 2002-2026 GraphicsMagick Group.
   Additional copyrights and licenses apply to this software.
   See http://www.GraphicsMagick.org/www/Copyright.html for details.
 
@@ -66,14 +66,16 @@ software was configured and the host system.</p>
     Large Files (> 32 bit)     yes
     Large Memory (> 32 bit)    yes
     BZIP                       yes
-    FlashPix                   no
+    FlashPix                   yes
     FreeType                   yes
     Ghostscript (Library)      no
+    HEIF/HVEC ("HEIC")         yes
     JBIG                       yes
     JPEG-2000                  yes
     JPEG                       yes
+    JPEG XL                    yes
     Little CMS                 yes
-    Loadable Modules           no
+    Loadable Modules           yes
     Solaris mtmalloc           no
     Google perftools tcmalloc  no
     OpenMP                     yes (201511 "4.5")
@@ -87,7 +89,7 @@ software was configured and the host system.</p>
     XML                        yes
     ZLIB                       yes
 
-  Host type: x86_64-unknown-linux-gnu
+  Host type: x86_64-pc-linux-gnu
 
   Configured using the command:
     ./configure  ...
@@ -119,16 +121,7 @@ software was configured and the host system.</p>
 <format type=man>
 <sect NAME="version-also">SEE ALSO
 <p>
-GraphicsMagick(1),
-animate(1),
-compare(1),
-conjure(1),
-convert(1),
-display(1),
-identify(1),
-import(1),
-mogrify(1),
-montage(1)
+gm(1),
 </p>
 </sect>
 </format>

@@ -2721,8 +2721,8 @@ width=15><b><font face="Helvetica, Arial"
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 When used with the <strong>mogrify</strong> utility,
 this option will convert any image to the image format you specify.
-See <em>GraphicsMagick(1)</em> for a list of image format types supported by
-<strong>GraphicsMagick</strong>, or see the output of 'gm -list format'.</font></td></tr></table>
+See <em>gm(1)</em> for a list of image format types supported by
+<strong>GraphicsMagick</strong>, or see the output of 'gm convert -list format'.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 By default the file is written to its original name.  However, if the
 filename extension matches a supported format, the extension is replaced
@@ -6702,7 +6702,7 @@ To help prevent color flashing on X server visuals that have colormaps,
 creates a single colormap from the image sequence. This can be rather time
 consuming. You can speed this operation up by reducing the colors in the
 image before you "animate" them. Use <strong>mogrify</strong> to color reduce the
-images to a single colormap. See <strong>mogrify(1)</strong> for details. Alternatively,
+images to a single colormap. See <strong>mogrify</strong> for details. Alternatively,
 you can use a Standard Colormap; or a static, direct, or true color visual.
 You can define a Standard Colormap with <em>xstdcmap</em>. See <strong>xstdcmap(1)</strong>
 for details. This method is recommended for colormapped X server because
@@ -7448,7 +7448,7 @@ any key or button to erase the information.</dd>
 <dd>This information is printed: image name;  image size;
 and the total number of unique colors in the image.</dd>
 <dt><strong>F1</strong></dt>
-<dd>Press to display helpful information about <strong>animate(1)</strong>.</dd>
+<dd>Press to display helpful information about <strong>animate</strong>.</dd>
 <dt><strong>Ctl-q</strong></dt>
 <dd>Press to discard all images and exit program.</dd>
 </dl>
@@ -9492,7 +9492,7 @@ color="#00B04F"><font size="+1">
 file with a differing image format. In addition, various types of image
 processing can be performed on the converted image during the conversion
 process. <strong>Convert</strong> recognizes the image formats listed in
-<em>GraphicsMagick(1)</em>.
+<em>gm(1)</em>.
 <br>&nbsp;<br>
 </td></tr></table>
      <p>
@@ -9578,7 +9578,7 @@ To tile a 640x480 image with a JPEG texture with bumps use:
     gm convert -size 640x480 tile:bumps.jpg tiled.png
 </pre>
 <p>
-To surround an icon with an ornamental border to use with Mosaic(1), use:
+To surround an icon with an ornamental border to use with a web browser, use:
 <pre>
     gm convert -mattecolor "#697B8F" -frame 6x6 bird.jpg
             icon.png
@@ -11459,7 +11459,7 @@ uniform resource locator <strong>(URL)</strong>, use:
 <p>
 To display histogram of an image, use:
 <pre>
-    gm gm convert file.jpg HISTOGRAM:- | gm display -
+    gm convert file.jpg HISTOGRAM:- | gm display -
 </pre>
 </td></tr></table>
      <p>
@@ -12444,7 +12444,7 @@ width=15><b><font face="Helvetica, Arial"
     3
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>
-Press and drag to choose from a select set of <strong>display(1)</strong>
+Press and drag to choose from a select set of <strong>display</strong>
 commands. This button behaves differently if the image being displayed
 is a visual image directory. Choose a particular tile of the directory
 and press this button and drag to select a command from a pop-up menu.
@@ -12840,7 +12840,7 @@ width=15><b><font face="Helvetica, Arial"
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>
 Specifies the name of the preferred browser when displaying GraphicsMagick
-documentation. The default is <tt>netscape %s</tt>.</td></tr></table>
+documentation. The default is <tt>xdg-open %s</tt>, which uses the system default.</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 
@@ -14781,7 +14781,7 @@ color="#00B04F"><font size="+1">
 <table width="94%" border="0" cellspacing="0" cellpadding="8">
 <tr><td width="3%"><br></td><td>
 <p>
-Preferences affect the default behavior of <strong>display(1)</strong>. The preferences
+Preferences affect the default behavior of <strong>display</strong>. The preferences
 are either true or false and are stored in your home directory
 as <tt>.displayrc</tt>:
 <dl>
@@ -14795,7 +14795,7 @@ for details.</dd>
 <dt>
 <strong>confirm on program exit</strong></dt>
 <dd>
-Ask for a confirmation before exiting the <strong>display(1)</strong> program.</dd>
+Ask for a confirmation before exiting the <strong>display</strong> program.</dd>
 <dt>
 <strong>correct image for display gamma</strong></dt>
 <dd>
@@ -15713,7 +15713,7 @@ option such as
 filename.
 <br>&nbsp;<br>
 The graphics formats supported by <strong>mogrify</strong> are listed in
-<em>GraphicsMagick(1)</em>.
+<em>gm(1)</em>.
 </td></tr></table>
      <p>
 <i><a href="#top">Back to Contents</a></i> 
@@ -17400,7 +17400,7 @@ in each image, then the images are tiled onto the composite in the order
 of their scene number. Finally, the last argument on the command line is
 the name assigned to the composite image. By default, the image is written
 in the <strong>MIFF</strong> format and can be viewed or printed with
-<em>display(1)</em>.
+<em>gm display</em>.
 <br>&nbsp;<br>
 <p>
 Note, that if the number of tiles exceeds the default number of 20 (5 per
@@ -17412,10 +17412,10 @@ Finally, to create one or more empty spaces in the sequence of tiles, use
 the <strong>"NULL:"</strong> image format.
 <p>
 Note, a composite MIFF image displayed to an X server with
-<strong>display</strong>
+<strong>gm display</strong>
 behaves differently than other images. You can think of the composite as
 a visual image directory. Choose a particular tile of the composite and
-press a button to display it. See <strong>display(1)</strong> and <strong>miff(5)</strong>
+press a button to display it. See <strong>gm</strong> and <strong>miff(5)</strong>
 </td></tr></table>
      <p>
 <i><a href="#top">Back to Contents</a></i> 
@@ -18541,8 +18541,8 @@ color="#00B04F"><font size="+1">
 <tr><td width="3%"><br></td><td>
 <p>To display the version information:
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1"><pre>
-  GraphicsMagick 1.3.37 2021-12-12 Q16 http://www.GraphicsMagick.org/
-  Copyright (C) 2002-2021 GraphicsMagick Group.
+  GraphicsMagick 1.3.48 2026-07-23 Q16 http://www.GraphicsMagick.org/
+  Copyright (C) 2002-2026 GraphicsMagick Group.
   Additional copyrights and licenses apply to this software.
   See http://www.GraphicsMagick.org/www/Copyright.html for details.
   Feature Support:
@@ -18550,14 +18550,16 @@ color="#00B04F"><font size="+1">
     Large Files (&gt; 32 bit)     yes
     Large Memory (&gt; 32 bit)    yes
     BZIP                       yes
-    FlashPix                   no
+    FlashPix                   yes
     FreeType                   yes
     Ghostscript (Library)      no
+    HEIF/HVEC ("HEIC")         yes
     JBIG                       yes
     JPEG-2000                  yes
     JPEG                       yes
+    JPEG XL                    yes
     Little CMS                 yes
-    Loadable Modules           no
+    Loadable Modules           yes
     Solaris mtmalloc           no
     Google perftools tcmalloc  no
     OpenMP                     yes (201511 "4.5")
@@ -18570,7 +18572,7 @@ color="#00B04F"><font size="+1">
     X11                        yes
     XML                        yes
     ZLIB                       yes
-  Host type: x86_64-unknown-linux-gnu
+  Host type: x86_64-pc-linux-gnu
   Configured using the command:
     ./configure  ...
   Final Build Parameters:

@@ -351,9 +351,7 @@ The latter can appear after the final group of input images.</p>
 <format type=man>
 <sect NAME="also">SEE ALSO
 <p>
-GraphicsMagick(1),
-animate(1), display(1), animate(1), display(1), identify(1), import(1),
-montage(1), mogrify(1), composite(1)
+gm(1)
 </p>
 </sect>
 </format>

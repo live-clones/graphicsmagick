@@ -86,17 +86,7 @@ execute.</p>
 <format type=man>
 <sect NAME="time-also">SEE ALSO
 <p>
-GraphicsMagick(1),
-animate(1),
-compare(1),
-conjure(1),
-convert(1),
-display(1),
-identify(1),
-import(1),
-mogrify(1),
-montage(1)
-</p>
+gm(1)</p>
 </sect>
 </format>
 </im>

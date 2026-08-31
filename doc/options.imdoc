@@ -2587,8 +2587,8 @@ option.</pp>
 <pp>
 When used with the <s>mogrify</s> utility,
 this option will convert any image to the image format you specify.
-See <i>GraphicsMagick(1)</i> for a list of image format types supported by
-<s>GraphicsMagick</s>, or see the output of 'gm -list format'.</pp>
+See <i>gm(1)</i> for a list of image format types supported by
+<s>GraphicsMagick</s>, or see the output of 'gm convert -list format'.</pp>
 
 <pp>
 By default the file is written to its original name.  However, if the

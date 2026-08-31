@@ -1,5 +1,9 @@
 2026-08-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * doc/: Freshen documentation and remove stale references to old
+        ImageMagick manual pages. Addresses Debian bug #1006272
+        "graphicsmagick: gm(1) refers to nonexistant mogrify(1)".
+
         * coders/tiff.c (TIFFCloseBlob): Respect adjoin mode while closing
         blob as is done for other formats. Fixes Debian Bug#1146076:
         "graphicsmagick: decomposing three or more frames with +adjoin

@@ -1,4 +1,4 @@
-.TH gm 1 "2026/05/12" "GraphicsMagick"
+.TH gm 1 "2026/08/31" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -2747,8 +2747,8 @@ option.
 
 When used with the \fBmogrify\fP utility,
 this option will convert any image to the image format you specify.
-See \fIGraphicsMagick(1)\fP for a list of image format types supported by
-\fBGraphicsMagick\fP, or see the output of 'gm -list format'.
+See \fIgm(1)\fP for a list of image format types supported by
+\fBGraphicsMagick\fP, or see the output of 'gm convert -list format'.
 
 By default the file is written to its original name.  However, if the
 filename extension matches a supported format, the extension is replaced
@@ -5575,7 +5575,7 @@ To help prevent color flashing on X server visuals that have colormaps,
 creates a single colormap from the image sequence. This can be rather time
 consuming. You can speed this operation up by reducing the colors in the
 image before you "animate" them. Use \fBmogrify\fP to color reduce the
-images to a single colormap. See \fBmogrify(1)\fP for details. Alternatively,
+images to a single colormap. See \fBmogrify\fP for details. Alternatively,
 you can use a Standard Colormap; or a static, direct, or true color visual.
 You can define a Standard Colormap with \fIxstdcmap\fP. See \fBxstdcmap(1)\fP
 for details. This method is recommended for colormapped X server because
@@ -5876,7 +5876,7 @@ and the total number of unique colors in the image.
 .in 20
  \fR
 .in 20
-Press to display helpful information about \fBanimate(1)\fP.
+Press to display helpful information about \fBanimate\fP.
 .in 15
 .in 15
 .B "\fBCtl-q\fP"
@@ -7192,7 +7192,7 @@ To remove a specified profile use "!" as the filename eg
 file with a differing image format. In addition, various types of image
 processing can be performed on the converted image during the conversion
 process. \fBConvert\fP recognizes the image formats listed in
-\fIGraphicsMagick(1)\fP.
+\fIgm(1)\fP.
 
 .SH EXAMPLES
 
@@ -7274,7 +7274,7 @@ To tile a 640x480 image with a JPEG texture with bumps use:
     gm convert -size 640x480 tile:bumps.jpg tiled.png
 .fi
 
-To surround an icon with an ornamental border to use with Mosaic(1), use:
+To surround an icon with an ornamental border to use with a web browser, use:
 
 .nf
     gm convert -mattecolor "#697B8F" -frame 6x6 bird.jpg
@@ -7889,7 +7889,7 @@ uniform resource locator \fB(URL)\fP, use:
 To display histogram of an image, use:
 
 .nf
-    gm gm convert file.jpg HISTOGRAM:- | gm display -
+    gm convert file.jpg HISTOGRAM:- | gm display -
 .fi
 .SH OPTIONS
 
@@ -8177,7 +8177,7 @@ Press and drag to define a region of the image to magnify.
 .TP
 .B "3"
 \fR
-Press and drag to choose from a select set of \fBdisplay(1)\fP
+Press and drag to choose from a select set of \fBdisplay\fP
 commands. This button behaves differently if the image being displayed
 is a visual image directory. Choose a particular tile of the directory
 and press this button and drag to select a command from a pop-up menu.
@@ -8505,7 +8505,7 @@ Specifies the width in pixels of the image window border. The default is
 .B "browseCommand \fI(class browseCommand)"\fP
 \fR
 Specifies the name of the preferred browser when displaying GraphicsMagick
-documentation. The default is netscape %s.
+documentation. The default is xdg-open %s, which uses the system default.
 .TP
 .B "confirmExit \fI(class ConfirmExit)"\fP
 \fR
@@ -9876,7 +9876,7 @@ The panning icon is withdrawn if the image becomes smaller than the dimensions
 of the X server screen.
 .SH USER PREFERENCES
 
-Preferences affect the default behavior of \fBdisplay(1)\fP. The preferences
+Preferences affect the default behavior of \fBdisplay\fP. The preferences
 are either true or false and are stored in your home directory
 as .displayrc:
 .in 15
@@ -9900,7 +9900,7 @@ for details.
  \fR
 .in 20
 
-Ask for a confirmation before exiting the \fBdisplay(1)\fP program.
+Ask for a confirmation before exiting the \fBdisplay\fP program.
 .in 15
 .in 15
 .B "
@@ -10280,7 +10280,7 @@ option such as
 filename.
 
 The graphics formats supported by \fBmogrify\fP are listed in
-\fIGraphicsMagick(1)\fP.
+\fIgm(1)\fP.
 .SH EXAMPLES
 
 To convert all the TIFF files in a particular directory to JPEG, use:
@@ -10794,7 +10794,7 @@ in each image, then the images are tiled onto the composite in the order
 of their scene number. Finally, the last argument on the command line is
 the name assigned to the composite image. By default, the image is written
 in the \fBMIFF\fP format and can be viewed or printed with
-\fIdisplay(1)\fP.
+\fIgm display\fP.
 
 
 Note, that if the number of tiles exceeds the default number of 20 (5 per
@@ -10806,10 +10806,10 @@ Finally, to create one or more empty spaces in the sequence of tiles, use
 the \fB"NULL:"\fP image format.
 
 Note, a composite MIFF image displayed to an X server with
-\fBdisplay\fP
+\fBgm display\fP
 behaves differently than other images. You can think of the composite as
 a visual image directory. Choose a particular tile of the composite and
-press a button to display it. See \fBdisplay(1)\fP and \fBmiff(5)\fP
+press a button to display it. See \fBgm\fP and \fBmiff(5)\fP
 .SH EXAMPLES
 
 To create a montage of a cockatoo, a parrot, and a hummingbird and write
@@ -11182,8 +11182,8 @@ software was configured and the host system.
 To display the version information:
 
 .nf
-  GraphicsMagick 1.3.37 2021-12-12 Q16 http://www.GraphicsMagick.org/
-  Copyright (C) 2002-2021 GraphicsMagick Group.
+  GraphicsMagick 1.3.48 2026-07-23 Q16 http://www.GraphicsMagick.org/
+  Copyright (C) 2002-2026 GraphicsMagick Group.
   Additional copyrights and licenses apply to this software.
   See http://www.GraphicsMagick.org/www/Copyright.html for details.
   Feature Support:
@@ -11191,14 +11191,16 @@ To display the version information:
     Large Files (> 32 bit)     yes
     Large Memory (> 32 bit)    yes
     BZIP                       yes
-    FlashPix                   no
+    FlashPix                   yes
     FreeType                   yes
     Ghostscript (Library)      no
+    HEIF/HVEC ("HEIC")         yes
     JBIG                       yes
     JPEG-2000                  yes
     JPEG                       yes
+    JPEG XL                    yes
     Little CMS                 yes
-    Loadable Modules           no
+    Loadable Modules           yes
     Solaris mtmalloc           no
     Google perftools tcmalloc  no
     OpenMP                     yes (201511 "4.5")
@@ -11211,7 +11213,7 @@ To display the version information:
     X11                        yes
     XML                        yes
     ZLIB                       yes
-  Host type: x86_64-unknown-linux-gnu
+  Host type: x86_64-pc-linux-gnu
   Configured using the command:
     ./configure  ...
   Final Build Parameters:
