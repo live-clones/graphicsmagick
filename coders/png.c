@@ -5953,9 +5953,10 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
       if (((mng_info->magn_methx > 0) && (mng_info->magn_methx <= 5)) &&
           ((mng_info->magn_methy > 0) && (mng_info->magn_methy <= 5)))
         {
-          png_uint_32
+          size_t
             magnified_height,
-            magnified_width;
+            magnified_width,
+            prev_value;
 
           if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -6000,18 +6001,37 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               if (image->columns > 1)
                 magnified_width += mng_info->magn_mr;
               if (image->columns > 2)
-                magnified_width += (image->columns-2)*(mng_info->magn_mx);
+                {
+                  prev_value=magnified_width;
+                  magnified_width += MagickArraySize(image->columns-2,mng_info->magn_mx);
+                  if (magnified_width <= prev_value)
+                    magnified_width=0;
+                }
             }
           else
             {
               magnified_width=image->columns;
-              if (image->columns > 1)
-                magnified_width += mng_info->magn_ml-1;
-              if (image->columns > 2)
-                magnified_width += mng_info->magn_mr-1;
-              if (image->columns > 3)
-                magnified_width += (image->columns-3)*
-                  (mng_info->magn_mx-1);
+              if ((magnified_width) && (image->columns > 1) && (mng_info->magn_ml > 1))
+                {
+                  prev_value=magnified_width;
+                  magnified_width += mng_info->magn_ml-1;
+                  if (magnified_width <= prev_value) /* overflow */
+                    magnified_width=0;
+                }
+              if ((magnified_width) && (image->columns > 2) && (mng_info->magn_mr > 1))
+                {
+                  prev_value=magnified_width;
+                  magnified_width += mng_info->magn_mr-1;
+                  if (magnified_width <= prev_value) /* overflow */
+                    magnified_width=0;
+                }
+              if ((magnified_width) && (image->columns > 3) && (mng_info->magn_mx > 1))
+                {
+                  prev_value=magnified_width;
+                  magnified_width += MagickArraySize(image->columns-3,mng_info->magn_mx-1);
+                  if (magnified_width <= prev_value) /* overflow */
+                    magnified_width=0;
+                }
             }
           if (mng_info->magn_methy == 1)
             {
@@ -6019,20 +6039,40 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               if (image->rows > 1)
                 magnified_height += mng_info->magn_mb;
               if (image->rows > 2)
-                magnified_height += (image->rows-2)*(mng_info->magn_my);
+                {
+                  prev_value=magnified_height;
+                  magnified_height += MagickArraySize(image->rows-2,mng_info->magn_my);
+                  if (magnified_height <= prev_value) /* overflow */
+                    magnified_height=0;
+                }
             }
           else
             {
               magnified_height=image->rows;
-              if (image->rows > 1)
-                magnified_height += mng_info->magn_mt-1;
-              if (image->rows > 2)
-                magnified_height += mng_info->magn_mb-1;
-              if (image->rows > 3)
-                magnified_height += (image->rows-3)*(mng_info->magn_my-1);
+              if ((magnified_height) && (image->rows > 1) && (mng_info->magn_mt > 1))
+                {
+                  prev_value=magnified_height;
+                  magnified_height += mng_info->magn_mt-1;
+                  if (magnified_height <= prev_value) /* overflow */
+                    magnified_height=0;
+                }
+              if ((magnified_height) && (image->rows > 2) && (mng_info->magn_mb > 1))
+                {
+                  prev_value=magnified_height;
+                  magnified_height += mng_info->magn_mb-1;
+                  if (magnified_height <= prev_value) /* overflow */
+                    magnified_height=0;
+                }
+              if ((magnified_height) && (image->rows > 3) && (mng_info->magn_my > 1))
+                {
+                  prev_value=magnified_height;
+                  magnified_height += MagickArraySize(image->rows-3,mng_info->magn_my-1);
+                  if (magnified_height <= prev_value) /* overflow */
+                    magnified_height=0;
+                }
             }
-          if (magnified_height > image->rows ||
-              magnified_width > image->columns)
+          if (((magnified_width != 0) && (magnified_height > image->rows)) ||
+              ((magnified_height != 0) && (magnified_width > image->columns)))
             {
               Image
                 *large_image;

@@ -1,3 +1,10 @@
+2026-09-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (ReadMNGImage): Guard against integer overflow and
+        underflow in MNG MAGN chunk handling.  Addresses the same issue as
+        ImageMagick CVE CVE-2025-55154.  Much thanks to Petr Gajdos for
+        making me aware of this issue.
+
 2026-08-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * doc/: Freshen documentation and remove stale references to old
