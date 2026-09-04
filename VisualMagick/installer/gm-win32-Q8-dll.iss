@@ -14,9 +14,9 @@
 #define  public QuantumDepth "8"
 #define  public InstallPerlMagick 0
 ;#define  public VC_2010
-;#define  public VC_2013
+#define  public VC_2013
 ;#define  public VC_2019
-#define  public VC_2022
+;#define  public VC_2022
 
 #include "inc\body.isx"
 

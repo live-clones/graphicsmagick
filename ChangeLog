@@ -1,3 +1,13 @@
+2026-09-04 Fojtik Jaroslav  <JaFojtik@yandex.com>
+
+        * VisualMagick/installer/{gm-win32-Q8-dll.iss:
+        gm-win64-Q8-dll.iss, inc/files-base.isx, inc/files-dlls.isx}: This
+        commit is neccessary to make installation of gm running on
+        ReactOS. Provide the deprecated msvbvm60.dll required by
+        contrib/win32/PathTool/PathTool.exe. Support installing the
+        redistributables for Visual Studio 2010 and 2013.
+        https://reactos.org/forum/viewtopic.php?p=152649&hilit=graphics+magick#p152649
+
 2026-09-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/png.c (ReadMNGImage): Guard against integer overflow and
