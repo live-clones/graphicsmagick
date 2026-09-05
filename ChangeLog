@@ -1,3 +1,12 @@
+2026-09-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/attribute.c (GenerateIPTCAttribute): Address heap buffer
+        over-reads in GenerateIPTCAttribute().  Issue was reported by
+        David Korczynski, Ada Logics (david@adalogics.com) on September 3,
+        2026. Credit to Claude and Ada Logics -- found by Anthropic using
+        agents to study the security of open-source projects, with Ada
+        Logics validating and reporting.
+
 2026-09-04 Fojtik Jaroslav  <JaFojtik@yandex.com>
 
         * VisualMagick/installer/{gm-win32-Q8-dll.iss:
