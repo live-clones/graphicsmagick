@@ -24,6 +24,7 @@ Source: "..\bin\dcraw.exe"; DestDir: {#MagickAppDirectory}; Flags: ignoreversion
 
 ; Path Tool
 Source: "..\..\contrib\win32\PathTool\PathTool.exe"; DestDir: "{app}\uninstall"; Flags: ignoreversion
+; msvbvm60.dll is required by contrib/win32/PathTool/PathTool.exe. It is commented out to resemble potential installation problem.
 ;Source: "..\..\contrib\win32\PathTool\msvbvm60.dll"; DestDir: "{app}\uninstall"; Flags: ignoreversion
 Source: "..\..\contrib\win32\PathTool\PathTool.pdf"; DestDir: "{app}\uninstall"; Flags: ignoreversion
 
