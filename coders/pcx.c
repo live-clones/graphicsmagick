@@ -491,29 +491,31 @@ static Image *ReadPCXImage(const ImageInfo *image_info,ExceptionInfo *exception)
     /*
       Check that filesize is reasonable given header
     */
-    {
-      double
-        uncompressed_size;
+    if (file_size > 0)
+      {
+        double
+          uncompressed_size;
 
-      uncompressed_size=((double) image->rows*pcx_info.bytes_per_line*pcx_info.planes);
-      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                            "Uncompressed size: %.0f", uncompressed_size);
-      if (pcx_info.encoding == 0)
-        {
-          /* Not compressed */
-          if (uncompressed_size > file_size)
-            ThrowPCXReaderException(CorruptImageError,InsufficientImageDataInFile,
-                                    image);
-        }
-      else
-        {
-          /* RLE compressed */
-          if (uncompressed_size > file_size*254.0)
-            ThrowPCXReaderException(CorruptImageError,InsufficientImageDataInFile,
-                                    image);
-        }
-    }
-
+        uncompressed_size=((double) image->rows*pcx_info.bytes_per_line*pcx_info.planes);
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "File size: %" MAGICK_INTMAX_F "d, Uncompressed size: %.0f"
+                              " Ratio: %g",
+                              (magick_intmax_t) file_size, uncompressed_size,uncompressed_size/file_size);
+        if (pcx_info.encoding == 0)
+          {
+            /* Not compressed */
+            if (uncompressed_size > file_size)
+              ThrowPCXReaderException(CorruptImageError,InsufficientImageDataInFile,
+                                      image);
+          }
+        else
+          {
+            /* RLE compressed */
+            if (((size_t)image->columns*image->rows/255) > (size_t)file_size)
+              ThrowPCXReaderException(CorruptImageError,InsufficientImageDataInFile,
+                                      image);
+          }
+      }
 
     /*
       Read image data.

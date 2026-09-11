@@ -1,3 +1,9 @@
+2026-09-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/pcx.c (ReadPCXImage): Fix file size reasonableness check
+        for RLE compressed files, which was rejecting many sample DCX
+        files from "http://sembiance.com/fileFormatSamples/image/dcx".
+
 2026-09-06  Fojtik Jaroslav  <JaFojtik@yandex.com>
 
         * VisualMagick/installer/inc/files-base.isx: Add a comment

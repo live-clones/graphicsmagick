@@ -447,6 +447,8 @@ Project page is at https://proj4.org/
 
 Sources come from https://github.com/OSGeo/PROJ.git
 
+  git clone https://github.com/OSGeo/PROJ.git ~/src/PROJ
+
   rm -rf ~/build/PROJ
   mkdir -p ~/build/PROJ
   cd ~/build/PROJ
@@ -460,6 +462,8 @@ Geotiff
 Geotiff is part of libheif's CMakePresets.json but it is not yet supported by CMakeLists.txt
 
 Sources come from https://github.com/OSGeo/libgeotiff.git
+
+  git clone https://github.com/OSGeo/libgeotiff.git ~/src/libgeotiff
 
   cd ~/src/libgeotiff/libgeotiff
 
@@ -529,6 +533,7 @@ Sources come from https://github.com/caolanm/libwmf
         --enable-heavy \
         --enable-shared \
         --enable-static \
+        --with-libxml2 \
         CC=gcc-13 CXX=g++-13 \
         CPPFLAGS='-I/usr/local/include' \
         CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' \
