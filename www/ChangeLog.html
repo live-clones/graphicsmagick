@@ -38,6 +38,24 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-09-18  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>PerlMagick/Magick.xs: For AddDefinition(), AddDefinitions(),
+assure that ExceptionInfo is initialized prior to use.</p></li>
+<li><p>magick/image.h: Add image.h function __attribute__(__nonnull__)
+declarations for GCC, Clang, or other compilers which support the
+syntax. This helps produce useful warnings in code using those
+functions.</p></li>
+<li><p>magick/image.c: Add missing asserts, such as for NULL pointers.</p></li>
+</ul>
+</blockquote>
+<p>2026-09-16  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>Makefile.am: Updated Automake to 1.19.</p></li>
+</ul>
+</blockquote>
 <p>2026-09-11  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

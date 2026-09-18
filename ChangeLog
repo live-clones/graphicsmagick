@@ -1,3 +1,19 @@
+2026-09-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * PerlMagick/Magick.xs: For AddDefinition(), AddDefinitions(),
+        assure that ExceptionInfo is initialized prior to use.
+
+        * magick/image.h: Add image.h function __attribute__(__nonnull__)
+        declarations for GCC, Clang, or other compilers which support the
+        syntax. This helps produce useful warnings in code using those
+        functions.
+
+        * magick/image.c: Add missing asserts, such as for NULL pointers.
+
+2026-09-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Makefile.am: Updated Automake to 1.19.
+
 2026-09-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/pcx.c (ReadPCXImage): Fix file size reasonableness check
