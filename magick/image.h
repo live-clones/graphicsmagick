@@ -1023,72 +1023,72 @@ extern MagickExport ExceptionType
 
 extern MagickExport Image
   *AllocateImage(const ImageInfo *),
-  *AppendImages(const Image *,const unsigned int,ExceptionInfo *),
+  *AppendImages(const Image *,const unsigned int,ExceptionInfo *) MAGICK_FUNC_NONNULL,
   *CloneImage(const Image *,const unsigned long,const unsigned long,
-   const unsigned int,ExceptionInfo *),
-  *GetImageClipMask(const Image *,ExceptionInfo *),
-  *GetImageCompositeMask(const Image *,ExceptionInfo *),  /*to support SVG masks*/
-  *ReferenceImage(Image *);
+   const unsigned int,ExceptionInfo *) MAGICK_FUNC_NONNULL,
+  *GetImageClipMask(const Image *,ExceptionInfo *) MAGICK_FUNC_NONNULL,
+  *GetImageCompositeMask(const Image *,ExceptionInfo *) MAGICK_FUNC_NONNULL,  /*to support SVG masks*/
+  *ReferenceImage(Image *) MAGICK_FUNC_NONNULL;
 
 extern MagickExport ImageInfo
   *CloneImageInfo(const ImageInfo *);
 
 extern MagickExport const char
   *AccessDefinition(const ImageInfo *image_info,const char *magick,
-     const char *key);
+     const char *key) MAGICK_FUNC_NONNULL;
 
 extern MagickExport int
   GetImageGeometry(const Image *,const char *,const unsigned int,
-  RectangleInfo *);
+  RectangleInfo *) MAGICK_FUNC_NONNULL;
 
 /* Functions which return unsigned int as a True/False boolean value */
 extern MagickExport MagickBool
-  IsTaintImage(const Image *),
+  IsTaintImage(const Image *) MAGICK_FUNC_NONNULL,
   IsSubimage(const char *,const MagickBool);
 
 /* Functions which return unsigned int to indicate operation pass/fail */
 extern MagickExport MagickPassFail
   AddDefinition(ImageInfo *image_info,const char *magick, const char *key,
-    const char *value, ExceptionInfo *exception),
+    const char *value, ExceptionInfo *exception) MAGICK_FUNC_NONNULL,
   AddDefinitions(ImageInfo *image_info,const char *options,
     ExceptionInfo *exception),
-  AnimateImages(const ImageInfo *image_info,Image *image),
-  ClipImage(Image *image),
-  ClipPathImage(Image *image,const char *pathname,const MagickBool inside),
+  AnimateImages(const ImageInfo *image_info,Image *image) MAGICK_FUNC_NONNULL,
+  ClipImage(Image *image) MAGICK_FUNC_NONNULL,
+  ClipPathImage(Image *image,const char *pathname,const MagickBool inside) MAGICK_FUNC_NONNULL,
   CompositeMaskImage(Image *image),   /*to support SVG masks*/
   CompositePathImage(Image *image,const char *pathname,const MagickBool inside),  /*to support SVG masks*/
-  DisplayImages(const ImageInfo *image_info,Image *image),
-  RemoveDefinitions(const ImageInfo *image_info,const char *options),
-  ResetImagePage(Image *image,const char *page),
-  SetImage(Image *image,const Quantum),
-  SetImageEx(Image *image,const Quantum opacity,ExceptionInfo *exception),
-  SetImageColor(Image *image,const PixelPacket *pixel),
+  DisplayImages(const ImageInfo *image_info,Image *image) MAGICK_FUNC_NONNULL,
+  RemoveDefinitions(const ImageInfo *image_info,const char *options) MAGICK_FUNC_NONNULL,
+  ResetImagePage(Image *image,const char *page) MAGICK_FUNC_NONNULL,
+  SetImage(Image *image,const Quantum) MAGICK_FUNC_NONNULL,
+  SetImageEx(Image *image,const Quantum opacity,ExceptionInfo *exception) MAGICK_FUNC_NONNULL,
+  SetImageColor(Image *image,const PixelPacket *pixel) MAGICK_FUNC_NONNULL,
   SetImageColorRegion(Image *image,long x,long y,unsigned long width,
-                      unsigned long height,const PixelPacket *pixel),
+                      unsigned long height,const PixelPacket *pixel) MAGICK_FUNC_NONNULL,
   SetImageClipMask(Image *image,const Image *clip_mask),
   SetImageCompositeMask(Image *image,const Image *composite_mask),  /*to support SVG masks*/
-  SetImageDepth(Image *image,const unsigned long),
-  SetImageInfo(ImageInfo *image_info,const unsigned int flags,ExceptionInfo *exception),
-  SetImageOpacity(Image *,const unsigned int),
-  SetImageType(Image *image,const ImageType),
-  StripImage(Image *image),
-  SyncImage(Image *image);
+  SetImageDepth(Image *image,const unsigned long) MAGICK_FUNC_NONNULL,
+  SetImageInfo(ImageInfo *image_info,const unsigned int flags,ExceptionInfo *exception) MAGICK_FUNC_NONNULL,
+  SetImageOpacity(Image *,const unsigned int) MAGICK_FUNC_NONNULL,
+  SetImageType(Image *image,const ImageType) MAGICK_FUNC_NONNULL,
+  StripImage(Image *image) MAGICK_FUNC_NONNULL,
+  SyncImage(Image *image) MAGICK_FUNC_NONNULL;
 
 extern MagickExport void
-  AllocateNextImage(const ImageInfo *,Image *),
-  DestroyImage(Image *),
-  DestroyImageInfo(ImageInfo *),
-  GetImageException(Image *,ExceptionInfo *),
-  GetImageInfo(ImageInfo *),
-  ModifyImage(Image **,ExceptionInfo *);
+  AllocateNextImage(const ImageInfo *image_info,Image *image),
+  DestroyImage(Image *image),
+  DestroyImageInfo(ImageInfo *image_info),
+  GetImageException(Image *,ExceptionInfo *) MAGICK_FUNC_NONNULL,
+  GetImageInfo(ImageInfo *) MAGICK_FUNC_NONNULL,
+  ModifyImage(Image **image,ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
 
 /* provide public access to the clip_mask member of Image */
 extern MagickExport Image
-  **ImageGetClipMask(const Image *) MAGICK_FUNC_PURE;
+  **ImageGetClipMask(const Image *) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
 
 /* provide public access to the composite_mask member of Image */
 extern MagickExport Image
-  **ImageGetCompositeMask(const Image *) MAGICK_FUNC_PURE;
+  **ImageGetCompositeMask(const Image *) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
 
 #if defined(MAGICK_IMPLEMENTATION)
   /*
