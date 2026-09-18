@@ -83,6 +83,9 @@ MagickParseSubImageSpecification(const char *subimage_spec,
 MagickExport Image **
 ImageGetClipMask(const Image * image)
 {
+  assert(image != (const Image *) NULL);
+  assert(image->signature == MagickSignature);
+
   return ImageGetClipMaskInlined(image);
 }
 
@@ -90,6 +93,9 @@ ImageGetClipMask(const Image * image)
 MagickExport Image **
 ImageGetCompositeMask(const Image * image)
 {
+  assert(image != (const Image *) NULL);
+  assert(image->signature == MagickSignature);
+
   return ImageGetCompositeMaskInlined(image);
 }
 
@@ -132,6 +138,9 @@ MagickExport const char *AccessDefinition(const ImageInfo *image_info,
 
   char
     search_key[MaxTextExtent];
+
+  assert(image_info != (const ImageInfo *) NULL);
+  assert(image_info->signature == MagickSignature);
 
   if (image_info->definitions)
     {
@@ -184,6 +193,14 @@ AddDefinition(ImageInfo *image_info,const char *magick, const char *key,
 
   char
     search_key[MaxTextExtent];
+
+  assert(image_info != (const ImageInfo *) NULL);
+  assert(image_info->signature == MagickSignature);
+  assert(magick != (const char *) NULL);
+  assert(key != (const char *) NULL);
+  assert(value != (const char *) NULL);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
 
   if (image_info->definitions == 0)
     image_info->definitions=MagickMapAllocateMap(MagickMapCopyString,
@@ -254,6 +271,11 @@ AddDefinitions(ImageInfo *image_info,const char *definitions,
     length;
 
   status=MagickPass;
+
+  assert(image_info != (const ImageInfo *) NULL);
+  assert(image_info->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
 
   if (image_info->definitions == 0)
     image_info->definitions=MagickMapAllocateMap(MagickMapCopyString,
@@ -504,7 +526,8 @@ MagickExport void AllocateNextImage(const ImageInfo *image_info,Image *image)
   */
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-#if 0
+
+#if 0 /* Could be enabled to detect overwritting live pointer */
   assert(image->next == (Image *) NULL);
 #endif
   image->next=AllocateImage(image_info);
@@ -566,6 +589,7 @@ MagickExport MagickPassFail AnimateImages(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   display=XOpenDisplay((char *) NULL);
   if (display == (Display *) NULL)
     return(False);
@@ -797,6 +821,9 @@ MagickExport ExceptionType CatchImageException(Image *image)
 */
 MagickExport MagickPassFail ClipImage(Image *image)
 {
+  assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
+
   return(ClipPathImage(image,"#1",True));
 }
 
@@ -868,6 +895,7 @@ MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
   assert(image != (const Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(pathname != NULL);
+
   MagickFormatString(key,sizeof(key),"8BIM:1999,2998:%s",pathname);
   attribute=GetImageAttribute(image,key);
   if (attribute == (const ImageAttribute *) NULL)
@@ -1605,6 +1633,7 @@ MagickExport MagickPassFail DisplayImages(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   display=XOpenDisplay((char *) NULL);
   if (display == (Display *) NULL)
     return(MagickFail);
@@ -1692,6 +1721,11 @@ MagickExport unsigned int DisplayImages(const ImageInfo *image_info,
 */
 MagickExport Image *GetImageClipMask(const Image *image, ExceptionInfo *exception)
 {
+  assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
+
   if (image->extra->clip_mask)
     return CloneImage(image->extra->clip_mask,0,0,True,exception);
 
@@ -1742,6 +1776,11 @@ MagickExport Image *GetImageClipMask(const Image *image, ExceptionInfo *exceptio
 */
 MagickExport Image *GetImageCompositeMask(const Image *image, ExceptionInfo *exception)
 {
+  assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
+
   if (image->extra->composite_mask)
     return CloneImage(image->extra->composite_mask,0,0,True,exception);
 
@@ -1784,6 +1823,7 @@ MagickExport void GetImageException(Image *image,ExceptionInfo *exception)
   assert(image->signature == MagickSignature);
   assert(exception != (ExceptionInfo *) NULL);
   assert(exception->signature == MagickSignature);
+
   for (next=image; next != (Image *) NULL; next=next->next)
   {
     if (next->exception.severity == UndefinedException)
@@ -1836,6 +1876,11 @@ MagickExport int GetImageGeometry(const Image *image,const char *geometry,
 
   int
     flags;
+
+  assert(image != (const Image *) NULL);
+  assert(image->signature == MagickSignature);
+  assert(geometry != (const char *) NULL);
+  assert(region_info != (RectangleInfo *) NULL);
 
   region_info->width=image->columns;
   region_info->height=image->rows;
@@ -1933,6 +1978,7 @@ MagickExport void GetImageInfo(ImageInfo *image_info)
     File and image dimension members.
   */
   assert(image_info != (ImageInfo *) NULL);
+
   (void) memset(image_info,0,sizeof(ImageInfo));
   image_info->adjoin=MagickTrue;
   image_info->depth=QuantumDepth;
@@ -1992,7 +2038,7 @@ MagickExport MagickBool IsSubimage(const char *spec,
     subrange;
 
   if (spec == (const char *) NULL)
-    return False;
+    return MagickFalse;
   return MagickParseSubImageSpecification(spec,
                                           &subimage,
                                           &subrange,
@@ -2086,6 +2132,7 @@ MagickExport void ModifyImage(Image **image,ExceptionInfo *exception)
   assert(image != (Image **) NULL);
   assert(*image != (Image *) NULL);
   assert((*image)->signature == MagickSignature);
+
   clone=False;
   LockSemaphoreInfo((SemaphoreInfo *) (*image)->semaphore);
   if ((*image)->reference_count > 1)
@@ -2182,6 +2229,10 @@ RemoveDefinitions(const ImageInfo *image_info,const char *keys)
   size_t
     length;
 
+  assert(image_info != (const ImageInfo *) NULL);
+  assert(image_info->signature == MagickSignature);
+  assert(keys != (const char *) NULL);
+
   if (image_info->definitions == 0)
     return(False);
 
@@ -2253,6 +2304,7 @@ ResetImagePage(Image *image,const char *page)
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  assert(page != (const char *) NULL);
 
   /* Parse page geometry */
   page_geometry.x=0;
@@ -2388,6 +2440,9 @@ MagickExport MagickPassFail SetImageEx(Image *image,const Quantum opacity,
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
+
   status=MagickPass;
   background_color=image->background_color;
   if (opacity != OpaqueOpacity)
@@ -2441,6 +2496,9 @@ MagickExport MagickPassFail SetImageEx(Image *image,const Quantum opacity,
 */
 MagickExport MagickPassFail SetImage(Image *image,const Quantum opacity)
 {
+  assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
+
   return SetImageEx(image,opacity,&image->exception);
 }
 /*
@@ -2472,6 +2530,10 @@ MagickExport MagickPassFail SetImage(Image *image,const Quantum opacity)
 MagickExport MagickPassFail SetImageColor(Image *image,
                                           const PixelPacket *pixel)
 {
+  assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
+  assert(pixel != (const PixelPacket *) NULL);
+
   image->is_grayscale=IsGray(*pixel);
   image->is_monochrome=IsMonochrome(*pixel);
   return SetImageColorRegion(image,0,0,image->columns,image->rows,pixel);
@@ -2527,8 +2589,9 @@ SetImageColorRegion(Image *image,
     is_monochrome;
 
   assert(image != (Image *) NULL);
-  assert(pixel != (PixelPacket *) NULL);
   assert(image->signature == MagickSignature);
+  assert(pixel != (PixelPacket *) NULL);
+
   status=MagickPass;
 
   is_grayscale=(image->is_grayscale && IsGray(*pixel));
@@ -2589,10 +2652,14 @@ MagickExport MagickPassFail SetImageClipMask(Image *image,const Image *clip_mask
 {
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   if (clip_mask != (const Image *) NULL)
-    if ((clip_mask->columns != image->columns) ||
-        (clip_mask->rows != image->rows))
-      ThrowBinaryException3(ImageError,UnableToSetClipMask,ImageSizeDiffers);
+    {
+      assert(clip_mask->signature == MagickSignature);
+      if ((clip_mask->columns != image->columns) ||
+          (clip_mask->rows != image->rows))
+        ThrowBinaryException3(ImageError,UnableToSetClipMask,ImageSizeDiffers);
+    }
   if (image->extra->clip_mask != (Image *) NULL)
     DestroyImage(image->extra->clip_mask);
   image->extra->clip_mask=(Image *) NULL;
@@ -2647,10 +2714,14 @@ MagickExport MagickPassFail SetImageCompositeMask(Image *image,const Image *comp
 {
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   if (composite_mask != (const Image *) NULL)
-    if ((composite_mask->columns != image->columns) ||
-        (composite_mask->rows != image->rows))
-      ThrowBinaryException3(ImageError,UnableToSetCompositeMask,ImageSizeDiffers);
+    {
+      assert(composite_mask->signature == MagickSignature);
+      if ((composite_mask->columns != image->columns) ||
+          (composite_mask->rows != image->rows))
+        ThrowBinaryException3(ImageError,UnableToSetCompositeMask,ImageSizeDiffers);
+    }
   if (image->extra->composite_mask != (Image *) NULL)
     DestroyImage(image->extra->composite_mask);
   image->extra->composite_mask=(Image *) NULL;
@@ -2703,6 +2774,7 @@ MagickExport MagickPassFail SetImageDepth(Image *image,const unsigned long depth
     is_grayscale = image->is_grayscale;
 
   assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
 
   status &= QuantumOperatorImage(image,AllChannels,DepthQuantumOp,(double) depth,
                                  &image->exception);
@@ -3063,6 +3135,8 @@ SetImageInfo(ImageInfo *image_info,const unsigned int flags,
 
   assert(image_info != (ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
 
   /*
     Ensure backward compatibility with previous flags which used
@@ -3435,6 +3509,7 @@ MagickExport MagickPassFail SetImageOpacity(Image *image,const unsigned int opac
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   is_grayscale=image->is_grayscale;
   is_monochrome=image->is_monochrome;
   image->storage_class=DirectClass;
@@ -3507,6 +3582,7 @@ MagickExport MagickPassFail SetImageType(Image *image,const ImageType image_type
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   xform_logging=IsEventLogged(TransformEvent);
   switch (image_type)
   {
@@ -3769,6 +3845,7 @@ StripImage(Image *image)
     i;
 
   assert(image != (Image *) NULL);
+  assert(image->signature == MagickSignature);
 
   /* Strip all profiles */
   (void) ProfileImage(image,"*",NULL,0,MagickFalse);
@@ -3873,6 +3950,7 @@ MagickExport MagickPassFail SyncImage(Image *image)
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+
   if (image->storage_class == DirectClass)
     return (status);
   assert(image->colormap != (PixelPacket *) NULL);
