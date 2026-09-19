@@ -1,3 +1,9 @@
+2026-09-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/security.rst: Add more information regarding what the
+        GraphicsMagick project does as pertains to security testing, and
+        its response to security issues.
+
 2026-09-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * PerlMagick/Magick.xs: For AddDefinition(), AddDefinitions(),
