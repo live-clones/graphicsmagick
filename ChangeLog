@@ -1,3 +1,8 @@
+2026-09-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/image.c (AnimateImages, DisplayImages): Fix compilation
+        warnings which now appear when X11 is not available.
+
 2026-09-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/security.rst: Add more information regarding what the

@@ -89,7 +89,7 @@ modern general purpose operating system that runs on 32-bit or 64-bit
 CPUs and which provides a C'99 compatible compiler (e.g. supports
 `stdint.h`).  GraphicsMagick is available for Unix or Unix-like
 systems, including Linux. It also runs under `Windows
-<INSTALL-windows.html>`_ 8 and later (8.X, 10, 11), and MacOS-X.
+<INSTALL-windows.html>`_ 10 and later (10, 11), and MacOS-X.
 
 GraphicsMagick supports huge images and has been tested with
 gigapixel-size images. GraphicsMagick can create new images on the

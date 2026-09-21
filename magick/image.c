@@ -613,9 +613,11 @@ MagickExport MagickPassFail AnimateImages(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  ThrowBinaryException(MissingDelegateError,XWindowLibraryIsNotAvailable,
-    image->filename);
-  return(False);
+
+  ThrowException(&image->exception,MissingDelegateError,XWindowLibraryIsNotAvailable,
+                 image->filename);
+
+  return(MagickFail);
 }
 #endif
 
@@ -1674,8 +1676,8 @@ MagickExport unsigned int DisplayImages(const ImageInfo *image_info,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
-  ThrowBinaryException(MissingDelegateError,XWindowLibraryIsNotAvailable,
-    image->filename);
+  ThrowException(&image->exception,MissingDelegateError,XWindowLibraryIsNotAvailable,
+                 image->filename);
   return(MagickFail);
 }
 #endif
