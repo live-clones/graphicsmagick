@@ -769,7 +769,7 @@ MagickExport MagickPassFail DescribeImage(Image *image,FILE *file,
       *profile_name;
 
     size_t
-      profile_length;
+      profile_length=0;
 
     const unsigned char *
       profile_info;

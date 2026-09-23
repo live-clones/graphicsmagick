@@ -1878,16 +1878,22 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
                             {
                               (void) BZ2_bzDecompressEnd(&bzip_info);
                               ThrowMIFFReaderException(CorruptImageError,UnexpectedEndOfFile,
-                                                   image);
+                                                       image);
                             }
                         }
                       else
                         {
+                          magick_off_t current_offset;
+                          current_offset=TellBlob(image);
                           length=ReadBlobMSBLong(image);
                           if (image->logging)
                             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                                  "length = %" MAGICK_SIZE_T_F "u",
-                                                  (MAGICK_SIZE_T) length);
+                                                  "length offset = %" MAGICK_OFF_F "u, "
+                                                  "length = %" MAGICK_SIZE_T_F "u"
+                                                  " (compressed length = %" MAGICK_SIZE_T_F "u)",
+                                                  current_offset,
+                                                  (MAGICK_SIZE_T) length,
+                                                  (MAGICK_SIZE_T) compressed_length);
                           if ((length == 0) || (length > compressed_length))
                             {
                               (void) BZ2_bzDecompressEnd(&bzip_info);
@@ -2544,6 +2550,8 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
           break;
 #endif /* defined(HasZLIB) */
         }
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),"compression=%s",
+                            CompressionTypeToString(compression));
       if (*buffer != '\0')
         (void) WriteBlobString(image,buffer);
       MagickFormatString(buffer,sizeof(buffer),"columns=%lu  rows=%lu  depth=%u\n",image->columns,
@@ -2660,15 +2668,19 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
       */
       if ((GetImageProfile(image,"ICM",&profile_length)))
         {
-          MagickFormatString(buffer,sizeof(buffer),"profile-icc=%lu\n",(unsigned long)
+          MagickFormatString(buffer,sizeof(buffer),"profile-icc=%lu",(unsigned long)
                              profile_length);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s",buffer);
           (void) WriteBlobString(image,buffer);
+          (void) WriteBlobString(image,"\n");
         }
       if ((GetImageProfile(image,"IPTC",&profile_length)))
         {
-          MagickFormatString(buffer,sizeof(buffer),"profile-iptc=%lu\n",(unsigned long)
+          MagickFormatString(buffer,sizeof(buffer),"profile-iptc=%lu",(unsigned long)
                              profile_length);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s",buffer);
           (void) WriteBlobString(image,buffer);
+          (void) WriteBlobString(image,"\n");
         }
 
       /*
@@ -2685,17 +2697,21 @@ static unsigned int WriteMIFFImage(const ImageInfo *image_info,Image *image)
                   (LocaleCompare(profile_name,"IPTC") == 0) ||
                   (LocaleCompare(profile_name,"8BIM") == 0))
                 continue;
-              MagickFormatString(buffer,sizeof(buffer),"profile-%.1024s=%lu\n",
+              MagickFormatString(buffer,sizeof(buffer),"profile-%.1024s=%lu",
                                  profile_name,(unsigned long) profile_length);
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s",buffer);
               (void) WriteBlobString(image,buffer);
+              (void) WriteBlobString(image,"\n");
             }
           DeallocateImageProfileIterator(profile_iterator);
         }
 
       if (image->montage != (char *) NULL)
         {
-          MagickFormatString(buffer,sizeof(buffer),"montage=%.1024s\n",image->montage);
+          MagickFormatString(buffer,sizeof(buffer),"montage=%.1024s",image->montage);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"%s",buffer);
           (void) WriteBlobString(image,buffer);
+          (void) WriteBlobString(image,"\n");
         }
       attribute=GetImageAttribute(image,(char *) NULL);
       for ( ; attribute != (ImageAttribute *) NULL; attribute=attribute->next)

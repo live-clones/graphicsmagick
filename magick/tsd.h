@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005,2012 GraphicsMagick Group
+  Copyright (C) 2005-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -25,7 +25,7 @@ extern MagickExport MagickPassFail
   MagickTsdKeyCreate2(MagickTsdKey_t *key,MagickFreeFunc destructor),
   MagickTsdKeyCreate(MagickTsdKey_t *key),
   MagickTsdKeyDelete(MagickTsdKey_t key),
-  MagickTsdSetSpecific(MagickTsdKey_t key, const void *value);
+  MagickTsdSetSpecific(MagickTsdKey_t key, const void *value) /* Not a pure function! */;
 
 extern MagickExport void
   *MagickTsdGetSpecific(MagickTsdKey_t key);

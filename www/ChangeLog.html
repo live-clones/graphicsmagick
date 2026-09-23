@@ -38,6 +38,50 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-09-23  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>PerlMagick/MANIFEST: Remove t/heif/heif-avc-rgb-8.avci from the
+PerlMagick manifest.</p></li>
+<li><p>magick/tsd.h: Add a helpful comment that MagickTsdSetSpecific()
+cannot be a 'pure' function.</p></li>
+<li><p>magick/semaphore.c (LockSemaphoreInfo, UnlockSemaphoreInfo): Use
+cascading 'elif' pre-processor logic to avoid warnings in
+single-threaded build.</p></li>
+<li><p>magick/resize.c (Bessel): Bessel() and the other resize filter
+functions are indicated to be 'const' functions.</p></li>
+<li><p>magick/pixel_cache.h: AccessImmutableIndexes(), GetPixels(),
+AccessMutablePixels(), GetIndexes(), AccessMutableIndexes(), and
+GetPixelCacheArea() are indicated to be 'pure' functions.</p></li>
+<li><p>magick/pixel_cache-private.h (AccessDefaultCacheView): Indicate
+that this is a 'pure' function.</p></li>
+<li><p>magick/omp_data_view.h (AccessThreadViewData): Indicate that
+this is a 'pure' function.</p></li>
+<li><p>magick/map.h: Add a useful comment.</p></li>
+<li><p>magick/map.c (MagickMapCloneMap): Assure that 'size' is
+initialized.</p></li>
+<li><p>magick/log.c (IsEventLogged, LogMagickEventList)
+(ReadLogConfigureFile): Add some useful fatal errors for the case
+that log_info is not initialized.  This helps GCC's -fanalyzer to
+not uselessly complain.</p></li>
+<li><p>magick/describe.c (DescribeImage): Assure that profile_length is
+initialized.</p></li>
+<li><p>magick/common.h: Add useful comments for requirements to be a
+'const' or 'pure' function.</p></li>
+<li><p>coders/wpg.c (ExtractPostscript): Add cast required by C++.</p></li>
+<li><p>coders/url.c: Move inclusion of magick/static.h toward the top
+of the module.</p></li>
+<li><p>coders/tga.c (ValidateHeaderTGA): Indicate that this is a 'pure'
+function.</p></li>
+<li><p>coders/svg.c (ADD_NEW_STRUCT): Deal with memory allocation
+failure.</p></li>
+<li><p>coders/msl.c (MSLStartElement): Assure that profile_length is
+initialized.</p></li>
+<li><p>coders/mpc.c (WriteMPCImage): Assure that profile_length is
+initialized.</p></li>
+<li><p>coders/miff.c (WriteMIFFImage): Add more tracing.</p></li>
+</ul>
+</blockquote>
 <p>2026-09-21  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

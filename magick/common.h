@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009-2022 GraphicsMagick Group
+  Copyright (C) 2009-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -170,10 +170,21 @@ extern "C" {
      Linux headers are riddled with it. */
 #    if (defined(__clang__) || \
          (((__GNUC__) > 3) || ((__GNUC__ == 2) && (__GNUC_MINOR__ >= 5)))) /* 2.5+ */
+  /* Function is strictly mathematical and free of side effects, meaning it
+     does not examine any data outside of its arguments and does not modify
+     any global state. A const function cannot read global memory or
+     dereference pointers passed to it.
+   */
 #      define MAGICK_FUNC_CONST MAGICK_ATTRIBUTE((__const__))
 #    endif
 #    if ((MAGICK_HAS_ATTRIBUTE(__pure__)) || \
          ((__GNUC__) >= 3)) /* 2.96+ */
+  /* Function that has no observable side effects on the state of the program
+     and whose return value depends only on its input parameters and/or global
+     variables. A pure function is allowed to read global memory and
+     dereference pointers, as long as it does not modify any state (it has no
+     side effects) and its return value depends only on its arguments and/or
+     global variables. */
 #      define MAGICK_FUNC_PURE MAGICK_ATTRIBUTE((__pure__))
 #    endif
 #    if ((MAGICK_HAS_ATTRIBUTE(__unused__)) || \

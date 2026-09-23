@@ -37,6 +37,7 @@
   Include declarations.
 */
 #include "magick/studio.h"
+#include "magick/static.h"
 #if defined(HasXML)
 #include "magick/attribute.h"
 #include "magick/blob.h"
@@ -60,7 +61,6 @@
 #include "magick/texture.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
-#include "magick/static.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)
@@ -2112,7 +2112,7 @@ MSLStartElement(void *context,const xmlChar *name,
                       *profile_name;
 
                     size_t
-                      profile_length;
+                      profile_length=0;
 
                     const unsigned char *
                       profile_data;

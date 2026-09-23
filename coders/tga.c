@@ -268,6 +268,13 @@ static int LoadHeaderTGA(TGAInfo *tga_info, Image *image)
   return 0;
 }
 
+/*
+  This function is not viable for GCC 'const' attribute because it
+  de-references pointers to data which may have been updated.
+  However, it is viable for the 'pure' attribute since it only
+  dereferences data via the pointer provided to it.
+*/
+static int ValidateHeaderTGA(const TGAInfo *tga_info) MAGICK_FUNC_PURE;
 
 static int ValidateHeaderTGA(const TGAInfo *tga_info)
 {

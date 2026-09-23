@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 %
 % This program is covered by multiple licenses, which are described in
@@ -657,6 +657,8 @@ MagickExport Image *MinifyImage(const Image * restrict image,ExceptionInfo *exce
 %
 */
 
+static double Bessel(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Bessel(const double x,const double support)
 {
   ARG_NOT_USED(support);
@@ -664,6 +666,8 @@ static double Bessel(const double x,const double support)
     return(MagickPI/4.0);
   return(BesselOrderOne(MagickPI*x)/(2.0*x));
 }
+
+static double Sinc(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Sinc(const double x,const double support)
 {
@@ -673,21 +677,29 @@ static double Sinc(const double x,const double support)
   return(sin(MagickPI*x)/(MagickPI*x));
 }
 
+static double Blackman(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Blackman(const double x,const double support)
 {
   ARG_NOT_USED(support);
   return(0.42+0.5*cos(MagickPI*x)+0.08*cos(2*MagickPI*x));
 }
 
+static double BlackmanBessel(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double BlackmanBessel(const double x,const double support)
 {
   return(Blackman(x/support,support)*Bessel(x,support));
 }
 
+static double BlackmanSinc(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double BlackmanSinc(const double x,const double support)
 {
   return(Blackman(x/support,support)*Sinc(x,support));
 }
+
+static double Box(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Box(const double x,const double support)
 {
@@ -698,6 +710,8 @@ static double Box(const double x,const double support)
     return(1.0);
   return(0.0);
 }
+
+static double Catrom(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Catrom(const double x,const double support)
 {
@@ -715,6 +729,8 @@ static double Catrom(const double x,const double support)
   return(0.0);
 }
 
+static double Cubic(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Cubic(const double x,const double support)
 {
   ARG_NOT_USED(support);
@@ -731,11 +747,15 @@ static double Cubic(const double x,const double support)
   return(0.0);
 }
 
+static double Gaussian(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Gaussian(const double x,const double support)
 {
   ARG_NOT_USED(support);
   return(exp(-2.0*x*x)*sqrt(2.0/MagickPI));
 }
+
+static double Hanning(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Hanning(const double x,const double support)
 {
@@ -743,11 +763,15 @@ static double Hanning(const double x,const double support)
   return(0.5+0.5*cos(MagickPI*x));
 }
 
+static double Hamming(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Hamming(const double x,const double support)
 {
   ARG_NOT_USED(support);
   return(0.54+0.46*cos(MagickPI*x));
 }
+
+static double Hermite(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Hermite(const double x,const double support)
 {
@@ -761,6 +785,8 @@ static double Hermite(const double x,const double support)
   return(0.0);
 }
 
+static double Lanczos(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Lanczos(const double x,const double support)
 {
   if (x < -3.0)
@@ -771,6 +797,8 @@ static double Lanczos(const double x,const double support)
     return(Sinc(x,support)*Sinc(x/3.0,support));
   return(0.0);
 }
+
+static double Mitchell(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Mitchell(const double x,const double support)
 {
@@ -798,6 +826,8 @@ static double Mitchell(const double x,const double support)
   return(0.0);
 }
 
+static double Quadratic(const double x,const double support) MAGICK_FUNC_CONST;
+
 static double Quadratic(const double x,const double support)
 {
   ARG_NOT_USED(support);
@@ -811,6 +841,8 @@ static double Quadratic(const double x,const double support)
     return(0.5*(x-1.5)*(x-1.5));
   return(0.0);
 }
+
+static double Triangle(const double x,const double support) MAGICK_FUNC_CONST;
 
 static double Triangle(const double x,const double support)
 {

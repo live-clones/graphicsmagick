@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2018 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -19,7 +19,7 @@
     Access the default view
   */
   extern MagickExport ViewInfo
-  *AccessDefaultCacheView(const Image *image);
+  *AccessDefaultCacheView(const Image *image) MAGICK_FUNC_PURE;
 
   /*
     Destroy a thread view set.

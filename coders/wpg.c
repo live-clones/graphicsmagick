@@ -1027,7 +1027,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       /*
         Allocate and set thread specific data
       */
-      tsd = MagickMallocCleared(sizeof(WPG_TSD));
+      tsd = (WPG_TSD *) MagickMallocCleared(sizeof(WPG_TSD));
       if (tsd == (WPG_TSD *) NULL)
         {
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);

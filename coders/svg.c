@@ -2522,12 +2522,24 @@ void    ProcessStyleClassDefs (
   memset(&ClassDefHead,0,sizeof(ClassDefHead));
   memset(&ClassDefActiveHead,0,sizeof(ClassDefActiveHead));
 
-  /* a macro to allocate an zero out a new struct instance,
-      and add it to the end of a linked list */
-  /* FIXME: Does not deal with allocation failure! */
+  /*
+    A macro to allocate an zero out a new struct instance, and add it
+    to the end of a linked list. Deal with allocation failure.
+  */
 #define ADD_NEW_STRUCT(pNew,pLast,TheTypeDef)                           \
   pNew = MagickAllocateClearedMemory(TheTypeDef *,sizeof(TheTypeDef));  \
-  pLast = pLast->pNext = pNew
+  if (pNew == (TheTypeDef *) NULL)                                      \
+    {                                                                   \
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),               \
+                            "    memory allocation failure!");          \
+      ThrowException3(svg_info->exception,ResourceLimitError,           \
+                      MemoryAllocationFailed,UnableToDrawOnImage);      \
+      goto process_style_class_defs_abort;                              \
+    }                                                                   \
+  else                                                                  \
+    {                                                                   \
+      pLast = pLast->pNext = pNew;                                      \
+    }
 
   /* we will get a modifiable value of the string, and delimit
       substrings by storing null characters */
@@ -2580,6 +2592,7 @@ void    ProcessStyleClassDefs (
               if  ( pClassDef == 0 )
                 { /* new class name */
                   ADD_NEW_STRUCT(pClassDef,pClassDefLast,ClassDef);
+                  /* FIXME: pClassDef might be null! */
                   pClassDef->pElementValueLast = &pClassDef->ElementValueHead;
                   pClassDef->pName = pClassName;
                   pClassDef->pActiveNext = 0;

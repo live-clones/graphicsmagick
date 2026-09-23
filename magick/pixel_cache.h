@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2018 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -55,7 +55,7 @@ extern "C" {
     AcquireImagePixels().
   */
   extern MagickExport const IndexPacket
-  *AccessImmutableIndexes(const Image *image);
+  *AccessImmutableIndexes(const Image *image) MAGICK_FUNC_PURE;
 
   /*
     Return one DirectClass pixel at the the specified (x,y) location.
@@ -92,9 +92,9 @@ extern "C" {
   */
   extern MagickExport PixelPacket
   *GetPixels(const Image *image)
-    MAGICK_FUNC_DEPRECATED; /* Prefer AccessMutablePixels instead */
+     MAGICK_FUNC_PURE MAGICK_FUNC_DEPRECATED; /* Prefer AccessMutablePixels instead */
   extern MagickExport PixelPacket
-  *AccessMutablePixels(Image *image);
+  *AccessMutablePixels(Image *image) MAGICK_FUNC_PURE;
 
   /*
     GetIndexes() and AccessMutableIndexes() return the colormap
@@ -103,9 +103,9 @@ extern "C" {
   */
   extern MagickExport IndexPacket
   *GetIndexes(const Image *image)
-    MAGICK_FUNC_DEPRECATED; /* Prefer AccessMutableIndexes() instead */
+     MAGICK_FUNC_PURE MAGICK_FUNC_DEPRECATED; /* Prefer AccessMutableIndexes() instead */
   extern MagickExport IndexPacket
-  *AccessMutableIndexes(Image *image);
+  *AccessMutableIndexes(Image *image) MAGICK_FUNC_PURE;
 
   /*
     GetOnePixel() returns a single DirectClass pixel at the specified
@@ -123,7 +123,7 @@ extern "C" {
     consumed by the current pixel cache.
   */
   extern MagickExport magick_off_t
-  GetPixelCacheArea(const Image *image);
+  GetPixelCacheArea(const Image *image) MAGICK_FUNC_PURE;
 
   /*
     SetImagePixels() and SetImagePixelsEx() initialize a pixel region

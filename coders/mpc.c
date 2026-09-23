@@ -1144,7 +1144,7 @@ static MagickPassFail WriteMPCImage(const ImageInfo *image_info,Image *image)
     *profile_info;
 
   size_t
-    profile_length;
+    profile_length=0;
 
   size_t
     image_list_length;
