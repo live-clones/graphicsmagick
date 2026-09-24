@@ -277,6 +277,19 @@ Applicability
 Important Notes
 ---------------
 
+  Note that the following instructions may not work correctly under
+  Windows 11 due to a severe mis-feature called "Smart App Control"
+  which (seemingly) randomly disables access to executables, causing
+  parts of the compiler and just-built apps to not be
+  "accessible". The feature causes random compilation and test-suite
+  failures. To disable "Smart App Control" for the entire system, use
+  these steps:
+
+  #. Open the ``Start`` menu, type ``Windows Security``, and open the app.
+  #. Click on ``App & browser control`` on the left menu.
+  #. Click ``Smart App Control settings``.
+  #. Select ``Off``.
+
   On some platforms Visual C++ may fail with an internal compiler
   error.  If this happens to you, then make sure that your compiler is
   updated with the latest fixes from the Microsoft web site and the

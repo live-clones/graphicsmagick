@@ -1002,6 +1002,18 @@ easy to compile GraphicsMagick under MSYS2 as it is under Linux!
 When using MSYS2, installing developer packages using 'pacman' results
 in getting up to speed very quickly with a featureful 64-bit build.
 
+Note that the following instructions may not work correctly under
+Windows 11 due to a severe mis-feature called "Smart App Control"
+which (seemingly) randomly disables access to executables, causing
+parts of the compiler and just-built apps to not be "accessible". The
+feature causes random compilation and test-suite failures. To disable
+"Smart App Control" for the entire system, use these steps:
+
+#. Open the ``Start`` menu, type ``Windows Security``, and open the app.
+#. Click on ``App & browser control`` on the left menu.
+#. Click ``Smart App Control settings``.
+#. Select ``Off``.
+
 MSYS2 installs multiple build environments.  The original build
 environment based on the classic msvcrt.dll (works for Windows 7/8 and
 usually later) is called "MSYS2 MINGW64", and the modern build
