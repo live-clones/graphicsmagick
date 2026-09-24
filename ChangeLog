@@ -1,5 +1,12 @@
 2026-09-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/common.h: Update comments regarding 'const' and 'pure'
+        functions.
+
+        * Magick++/tests/attributes.cpp, Magick++/tests/exceptions.cpp:
+        C++20 deprecated used of var++ or var-- on volatile variables. Use
+        var=var+1 or var=var-1 syntax instead.
+
         * www/INSTALL-unix.rst, www/INSTALL-windows.rst: Add notes about
         Windows 11 "App & browser control" "Smart App Control settings".
 

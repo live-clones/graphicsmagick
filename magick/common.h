@@ -106,7 +106,8 @@ extern "C" {
   in strict ANSI mode which is indicated by __STRICT_ANSI__ being
   defined.
 
-  http://www.ohse.de/uwe/articles/gcc-attributes.html
+  https://gcc.gnu.org/onlinedocs/gcc-16.2.0/gcc/Common-Attributes.html
+  https://www.ohse.de/uwe/articles/gcc-attributes.html
 
   Note that GCC 3.2 on MinGW does not define __GNUC__ or __GNUC_MINOR__.
 
@@ -170,21 +171,25 @@ extern "C" {
      Linux headers are riddled with it. */
 #    if (defined(__clang__) || \
          (((__GNUC__) > 3) || ((__GNUC__ == 2) && (__GNUC_MINOR__ >= 5)))) /* 2.5+ */
-  /* Function is strictly mathematical and free of side effects, meaning it
-     does not examine any data outside of its arguments and does not modify
-     any global state. A const function cannot read global memory or
-     dereference pointers passed to it.
+  /*
+    Function is strictly mathematical and free of side effects. A const
+    function may not read any memory other than its immediate argument
+    values. A const function is not allowed to dereference pointers. A const
+    function cannot return void. A const function may only call other const
+    functions. A const function may not modify any global state.
    */
 #      define MAGICK_FUNC_CONST MAGICK_ATTRIBUTE((__const__))
 #    endif
 #    if ((MAGICK_HAS_ATTRIBUTE(__pure__)) || \
          ((__GNUC__) >= 3)) /* 2.96+ */
-  /* Function that has no observable side effects on the state of the program
-     and whose return value depends only on its input parameters and/or global
-     variables. A pure function is allowed to read global memory and
-     dereference pointers, as long as it does not modify any state (it has no
-     side effects) and its return value depends only on its arguments and/or
-     global variables. */
+  /*
+    Function that has no observable side effects on the state of the program
+    and whose return value depends only on its input parameters and/or global
+    variables. A pure function is allowed to read global memory and
+    dereference pointers, as long as it does not modify any state (it has no
+    side effects) and its return value depends only on its arguments and/or
+    global variables.
+  */
 #      define MAGICK_FUNC_PURE MAGICK_ATTRIBUTE((__pure__))
 #    endif
 #    if ((MAGICK_HAS_ATTRIBUTE(__unused__)) || \
