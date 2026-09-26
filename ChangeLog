@@ -1,5 +1,7 @@
 2026-09-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/png.c (WriteOneJNGImage): Tidy the code.
+
         * magick/xwindow.c (MagickXMakeImage): Avoid dereference of NULL
         ximage pointer. Issue was discovered using GCC 14's -fanalyzer
         mode.

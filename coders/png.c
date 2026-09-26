@@ -9609,16 +9609,16 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
                                        const ImageInfo *image_info,Image *image)
 {
   Image
-    *jpeg_image;
+    *jpeg_image=(Image *) NULL;
 
   ImageInfo
-    *jpeg_image_info;
+    *jpeg_image_info=(ImageInfo *) NULL;
 
   char
-    *blob;
+    *blob=(char *) NULL;
 
   size_t
-    length;
+    length=0;
 
   unsigned char
     chunk[80],
@@ -9660,17 +9660,10 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
                            image);
     }
 
-  blob=(char *) NULL;
-  jpeg_image=(Image *) NULL;
-  jpeg_image_info=(ImageInfo *) NULL;
-
-  status=MagickTrue;
-
   /*
-    Analyze image to be written.
+    Analyze image to be written (force full analysis for consistency).
   */
   if (!GetImageCharacteristics(image,&characteristics,
-                               /* (OptimizeType == image_info->type), */
                                MagickTrue,
                                &image->exception))
     {
@@ -9717,8 +9710,7 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
                               "  Creating jpeg_image_info for opacity.");
       jpeg_image_info=(ImageInfo *) CloneImageInfo(image_info);
       if (jpeg_image_info == (ImageInfo *) NULL)
-        ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                             image);
+        ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "  Creating jpeg_image.");
@@ -9726,11 +9718,8 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
       if (jpeg_image == (Image *) NULL)
         {
           if (jpeg_image_info != (ImageInfo *)NULL)
-            {
-              DestroyImageInfo(jpeg_image_info);
-            }
-          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                               image);
+            DestroyImageInfo(jpeg_image_info);
+          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
         }
       DestroyBlob(jpeg_image);
       jpeg_image->blob=CloneBlobInfo((BlobInfo *) NULL);
@@ -9741,8 +9730,7 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
         {
           DestroyImage(jpeg_image);
           DestroyImageInfo(jpeg_image_info);
-          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,
-                               image);
+          ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
         }
       jpeg_image->matte=MagickFalse;
       if (jng_quality >= 1000)
@@ -9758,12 +9746,15 @@ static MagickPassFail WriteOneJNGImage(MngInfo *mng_info,
   /* To do: check bit depth of PNG alpha channel */
 
   /* Check if image is grayscale. */
-  if (image_info->type != TrueColorMatteType && image_info->type !=
-      TrueColorType && characteristics.grayscale)
+  if ((image_info->type != TrueColorMatteType) &&
+      (image_info->type != TrueColorType) &&
+      (characteristics.grayscale))
     jng_color_type-=2;
 
   if (transparent)
     {
+      assert(jpeg_image_info != (ImageInfo *) NULL);
+      assert(jpeg_image != (Image *) NULL);
       if (jng_alpha_compression_method==0)
         {
           const ImageAttribute
