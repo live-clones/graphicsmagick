@@ -5771,6 +5771,7 @@ MagickXMakeImage(Display *display,
     Allocate X image pixel data.
   */
 #if defined(HasSharedMemory)
+  window->shared_memory &= (ximage != (XImage *) NULL);
   if (window->shared_memory)
     {
       XShmSegmentInfo
