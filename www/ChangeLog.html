@@ -38,9 +38,19 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-09-27  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>coders/heif.c: Fallback definitions for LIBHEIF_MAKE_VERSION and
+LIBHEIF_HAVE_VERSION should be after including &lt;libheif/heif.h&gt;,
+and the check for the minimal 1.14.0 version should come after
+that.</p></li>
+</ul>
+</blockquote>
 <p>2026-09-26  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/png.c (WriteOneJNGImage): Tidy the code.</p></li>
 <li><p>magick/xwindow.c (MagickXMakeImage): Avoid dereference of NULL
 ximage pointer. Issue was discovered using GCC 14's -fanalyzer
 mode.</p></li>

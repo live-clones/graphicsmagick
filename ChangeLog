@@ -1,3 +1,10 @@
+2026-09-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c: Fallback definitions for LIBHEIF_MAKE_VERSION and
+        LIBHEIF_HAVE_VERSION should be after including <libheif/heif.h>,
+        and the check for the minimal 1.14.0 version should come after
+        that.
+
 2026-09-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/png.c (WriteOneJNGImage): Tidy the code.
