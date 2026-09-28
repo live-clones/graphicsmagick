@@ -420,6 +420,7 @@ MagickExport void AttachBlob(BlobInfo *blob_info,const void *blob,
   const size_t length)
 {
   assert(blob_info != (BlobInfo *) NULL);
+  assert(blob != (const void *) NULL);
   blob_info->length=length;
   blob_info->extent=length;
   blob_info->quantum=DefaultBlobQuantum;
@@ -733,6 +734,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
 
   assert(image_info != (ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
+  assert(blob != (const void *) NULL);
   assert(exception != (ExceptionInfo *) NULL);
 
   image=(Image *) NULL;
@@ -740,7 +742,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
                         "Entering BlobToImage: blob=%p,"
                         " length=%" MAGICK_SIZE_T_F "u",
                         blob, (MAGICK_SIZE_T) length);
-  if ((blob == (const void *) NULL) || (length == 0))
+  if (length == 0)
     {
       ThrowException(exception,OptionError,NullBlobArgument,
                      image_info->magick);
@@ -2317,6 +2319,7 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  assert(length != (size_t *) NULL);
   assert(exception != (ExceptionInfo *) NULL);
 
   if (image->blob->logging)
@@ -2522,6 +2525,7 @@ MagickExport MagickPassFail ImageToFile(Image *image,const char *filename,
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(filename != (const char *) NULL);
+  assert(exception != (ExceptionInfo *) NULL);
 
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
@@ -2838,6 +2842,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
   image->blob->logging = IsEventLogged(BlobEvent);
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
@@ -3260,6 +3265,7 @@ MagickExport Image *PingBlob(const ImageInfo *image_info,const void *blob,
 
   assert(image_info != (ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
+  assert(blob != (const void *) NULL);
   assert(exception != (ExceptionInfo *) NULL);
   clone_info=CloneImageInfo(image_info);
   clone_info->ping=MagickTrue;

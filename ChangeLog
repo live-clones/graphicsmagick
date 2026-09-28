@@ -1,3 +1,10 @@
+2026-09-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/blob.h, magick/blob.c: Add blob.h function
+        __attribute__(__nonnull__) declarations for GCC, Clang, or other
+        compilers which support the syntax. This helps produce useful
+        warnings in code using those functions.
+
 2026-09-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/heif.c: Fallback definitions for LIBHEIF_MAKE_VERSION and
