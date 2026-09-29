@@ -523,8 +523,9 @@ MagickMapCloneMap(MagickMap map,ExceptionInfo *exception)
     }
   while(MagickMapIterateNext(iterator,&key))
   {
+    const void *object;
     size=0;
-    const void *object=MagickMapDereferenceIterator(iterator,&size);
+    object=MagickMapDereferenceIterator(iterator,&size);
     /* Add clones key and object on insertion */
     if (MagickMapAddEntry(map_clone,key,object,size,exception) == False)
       {

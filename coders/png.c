@@ -55,6 +55,7 @@
 #include "magick/colormap.h"
 #include "magick/constitute.h"
 #include "magick/enhance.h"
+#include "magick/enum_strings.h"
 #include "magick/log.h"
 #include "magick/magick.h"
 #include "magick/monitor.h"
@@ -7999,11 +8000,17 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                                   "    ping_bit_depth=%u", ping_bit_depth);
         }
 
+      /*
+        The following code-block *must* ensure that 'image_matte' is
+        compatible with 'ping_colortype'.
+      */
+
       /* SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB); */
       if (characteristics.monochrome)
         {
           if (characteristics.opaque)
             {
+              image_matte=MagickFalse;
               SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
               ping_bit_depth=1;
               if (logging)
@@ -8012,6 +8019,7 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
             }
           else
             {
+              image_matte=MagickTrue;
               SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
             }
         }
@@ -8019,15 +8027,24 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         {
           if (characteristics.opaque)
             {
+              image_matte=MagickFalse;
               SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
             }
           else
             {
+              image_matte=MagickTrue;
               SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
             }
         }
       else if (characteristics.palette && image_colors <= 256)
         {
+          if (characteristics.opaque)
+            image_matte=MagickFalse;
+#if 0
+          else
+            /* Does not work.  Needs one transparent color. */
+            image_matte=MagickTrue; /* Using optional ancillary tRNS chunk */
+#endif
           SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
           ping_bit_depth=8;
           if (logging)
@@ -8039,13 +8056,16 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
         {
           if (characteristics.opaque)
             {
+              image_matte=MagickFalse;
               SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB);
             }
           else
             {
+              image_matte=MagickTrue;
               SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB_ALPHA);
             }
         }
+
       if (image_info->type == BilevelType)
         {
           if (characteristics.monochrome)
@@ -8059,13 +8079,38 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                 }
             }
         }
-      if (image_info->type == GrayscaleType)
+      else if (image_info->type == GrayscaleType)
         {
+          image_matte=MagickFalse;
           SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY);
         }
-      if (image_info->type == GrayscaleMatteType)
+      else if (image_info->type == GrayscaleMatteType)
         {
+          image_matte=MagickTrue;
           SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_GRAY_ALPHA);
+        }
+
+      else if (image_info->type == PaletteType)
+        {
+          image_matte=MagickFalse;
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
+        }
+#if 0 /* Does not work.  Needs one transparent color.  */
+      else if (image_info->type == PaletteMatteType)
+        {
+          image_matte=MagickTrue;  /* Using optional ancillary tRNS chunk */
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_PALETTE);
+        }
+#endif
+      else if (image_info->type == TrueColorType)
+        {
+          image_matte=MagickFalse;
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB);
+        }
+      else if (image_info->type == TrueColorMatteType)
+        {
+          image_matte=MagickTrue;
+          SetPNGColortype(logging,ping_colortype,PNG_COLOR_TYPE_RGB_ALPHA);
         }
 
       if (logging)
@@ -8075,12 +8120,14 @@ static MagickPassFail WriteOnePNGImage(MngInfo *mng_info,
                                 PngColorTypeToString(ping_colortype),
                                 ping_colortype);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "    image_info->type: %d",image_info->type);
+                                "    image_info->type: %s (%d)",
+                                ImageTypeToString(image_info->type),image_info->type);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                 "    image->depth: %u",image_depth);
           (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                "    ping_bit_depth: %d",
-                                ping_bit_depth);
+                                "    ping_bit_depth: %d",ping_bit_depth);
+          (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                "    image_matte: %u",image_matte);
         }
 
       if (matte && mng_info->IsPalette)
