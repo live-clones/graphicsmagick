@@ -222,6 +222,7 @@ static MagickPassFail DecodeImage(Image *image,const long opacity)
                         break;
                       c=packet;
                     }
+                  /* FIXME: Clang analyzer says 'bits' can become >=32, leading to undefined behavior. */
                   datum+=((unsigned int) *c) << bits;
                   bits+=8;
                   c++;
