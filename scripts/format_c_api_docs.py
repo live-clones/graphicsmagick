@@ -57,7 +57,7 @@ def main(argv=None):
         return 1
 
     if argv[1] in ('-h', '--help'):
-        print __doc__
+        print (__doc__)
         return 0
 
     whatis_file = argv[1]
@@ -107,7 +107,7 @@ def main(argv=None):
         htmlfile_path = os.path.join(outfile_dir, htmlfile)
 
         args = ['-w', whatis_file, srcfile_path, rstfile_path]
-        print 'format_c_api_doc.py', ' '.join(args)
+        print ('format_c_api_doc.py', ' '.join(args))
         format_c_api_doc.main(args)
 
         # Now generate HTML from the .rst files
@@ -115,9 +115,9 @@ def main(argv=None):
                 '--url-prefix=%s' % url_prefix,
                 rstfile_path,
                 htmlfile_path]
-        print 'rst2htmldeco.py %s' % ' '.join(args)
+        print ('rst2htmldeco.py %s' % ' '.join(args))
         rst2htmldeco.main(args)
-        print 'rm', rstfile_path
+        print ('rm', rstfile_path)
         os.unlink(rstfile_path)
     f.close()
 

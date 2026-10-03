@@ -1,5 +1,8 @@
 2026-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * scripts/format_c_api_docs.py: Fix some gross Python 3 syntax
+        issues.
+
         * coders/wpg.c (ExtractPostscript): Avoid passing NULL 'ps_data'
         to BlobToImage().
 
