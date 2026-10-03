@@ -1,5 +1,12 @@
 2026-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/list.h: Add list __attribute__(__nonnull__) declarations
+        for GCC, Clang, or other compilers which support the syntax. This
+        helps produce useful warnings in code using those functions.
+
+        * magick/list.c: Add useful assertions for null exception, or
+        exception->signature != MagickSignature.
+
         * magick/annotate.c (RenderFreetype): Add more thorough error
         handling and clean-up.
 

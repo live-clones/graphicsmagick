@@ -136,6 +136,8 @@ MagickExport Image *CloneImageList(const Image *images,ExceptionInfo *exception)
   if (images == (Image *) NULL)
     return((Image *) NULL);
   assert(images->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
   while (images->previous != (Image *) NULL)
     images=images->previous;
   image=(Image *) NULL;
@@ -588,6 +590,8 @@ MagickExport Image **ImageListToArray(const Image *images,
   if (images == (Image *) NULL)
     return((Image **) NULL);
   assert(images->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
+  assert(exception->signature == MagickSignature);
   group=MagickAllocateArray(Image **,((size_t) GetImageListLength(images)+1),sizeof(Image *));
   if (group == (Image **) NULL)
     {
