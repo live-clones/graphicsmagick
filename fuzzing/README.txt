@@ -185,11 +185,331 @@ Building A Starter Corpus
 Building dependencies for development
 -------------------------------------
 
+libjpeg-turbo
++++++++++++++
+
+Sources come from https://github.com/libjpeg-turbo/libjpeg-turbo.
+
+  git clone https://github.com/libjpeg-turbo/libjpeg-turbo ~/src/libjpeg-turbo
+
+With sources under ~/src/libjpeg-turbo::
+
+  cd ~/src/libjpeg-turbo
+  git pull
+  rm -rf  ~/build/libjpeg-turbo
+  mkdir -p ~/build/libjpeg-turbo
+  cd ~/build/libjpeg-turbo
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DWITH_JPEG8=1 ~/src/libjpeg-turbo
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+Lerc
+++++
+
+Sources come from https://github.com/Esri/lerc
+
+  cd ~/src/lerc
+  git pull
+  rm -rf ~/build/lerc
+  mkdir -p ~/build/lerc
+  cd ~/build/lerc
+  cmake -G "Unix Makefiles" \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER=g++ \
+              -DCMAKE_CXX_FLAGS='-O -g' \
+              -DCMAKE_C_COMPILER=gcc \
+              -DCMAKE_C_FLAGS='-O -g' \
+              -DCMAKE_INSTALL_RPATH='/usr/local/lib'\
+              -DCMAKE_INSTALL_PREFIX=/usr/local \
+              -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
+              -DBUILD_SHARED_LIBS=on \
+              ~/src/lerc
+  make -j 8
+  make install
+
+Building libheif (and dependencies) for development
+---------------------------------------------------
+
+de265
++++++
+
+Sources come from https://github.com/strukturag/libde265.
+
+This library provides both decoder and encoder for H.265/HEVC.
+
+With sources under ~/src/libde265::
+
+  cd ~/src/libde265
+  git pull
+  rm -rf ~/build/libde265
+  mkdir -p ~/build/libde265
+  cd ~/build/libde265
+  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=OFF ~/src/libde265
+  make -j 8
+  make install
+
+x265
+++++
+
+Sources come from https://bitbucket.org/multicoreware/x265_git/src/master.
+
+This library provides a H.265/HEVC encoder.
+
+With sources under ~/src/x265-stable::
+
+  [ May need to do 'mv .git .git-mv' ]
+
+  cd ~/src/x265-stable
+  git pull
+  rm -rf ~/build/x265-stable
+  mkdir -p ~/build/x265-stable
+  cd ~/build/x265-stable
+  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DENABLE_ASSEMBLY:BOOL=ON -DX265_LATEST_TAG=TRUE ~/src/x265-stable/source
+  make -j 8
+  make install
+
+openh264
+++++++++
+
+Sources come from https://github.com/cisco/openh264.
+
+The openh264 build is based on a well-designed pure GNU Makefile.
+
+  git clone https://github.com/cisco/openh264 ~/src/openh264
+
+With sources under ~/src/openh264::
+
+  cd ~/src/openh264
+  git pull
+  rm -rf ~/build/openh264
+  mkdir -p ~/build/openh264
+  cd ~/build/openh264
+  make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local clean
+  make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local
+  make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local install
+
+aom
++++
+
+Sources come from https://aomedia.googlesource.com/aom.
+
+  git clone --depth 1 --branch main https://aomedia.googlesource.com/aom ~/src/aom
+
+With sources under ~/src/aom::
+
+  cd  ~/src/aom
+  git pull
+  rm -rf ~/build/aom
+  mkdir -p ~/build/aom
+  cd ~/build/aom
+  cmake -DAOM_TARGET_CPU=generic -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/aom
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+openjpeg
+++++++++
+
+Sources come from https://github.com/uclouvain/openjpeg.
+
+  git clone https://github.com/uclouvain/openjpeg ~/src/openjpeg
+
+With sources under ~/src/openjpeg::
+
+  cd ~/src/openjpeg
+  git pull
+  rm -rf ~/build/openjpeg
+  mkdir -p ~/build/openjpeg
+  cd ~/build/openjpeg
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ~/src/openjpeg
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+libjxl
++++++++
+
+Sources come from https://github.com/libjxl/libjxl.git.
+
+The initial git checkout (from project at https://github.com/libjxl) looks like::
+
+  git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules ~/src/libjxl
+
+After the initial checkout, 'git pull' will automatically take care of submodules.
+
+Then see procedure in libjxl/BUILDING.md.  Based on that, do this::
+
+  cd ~/src/libjxl
+  git pull
+  rm -rf ~/build/libjxl
+  mkdir -p ~/build/libjxl
+  cd ~/build/libjxl
+  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE ~/src/libjxl
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+vvdec
++++++
+
+Project is at https://github.com/fraunhoferhhi/vvdec
+
+The initial git checkout (from project at https://github.com/fraunhoferhhi/vvdec) looks like::
+
+  git clone https://github.com/fraunhoferhhi/vvdec.git ~/src/vvdec
+
+  cd ~/src/vvdec
+  git pull
+  rm -rf ~/build/vvdec
+  mkdir -p ~/build/vvdec
+  cd ~/build/vvdec
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DVVDEC_ENABLE_BITSTREAM_DOWNLOAD=OFF -DBUILD_SHARED_LIBS=TRUE ~/src/vvdec
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+vvenc
++++++
+
+Project is at https://github.com/fraunhoferhhi/vvenc
+
+The initial git checkout (from project at https://github.com/fraunhoferhhi/vvenc) looks like::
+
+  git clone https://github.com/fraunhoferhhi/vvenc.git ~/src/vvenc
+
+  cd ~/src/vvenc
+  git pull
+  rm -rf ~/build/vvenc
+  mkdir -p ~/build/vvenc
+  cd ~/build/vvenc
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/vvenc
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+libx264
++++++++
+
+Project is at https://code.videolan.org/videolan/x264
+
+  libx264 provides only a H.264 encoder
+
+  git clone https://code.videolan.org/videolan/x264.git/ ~/src/x264
+
+  While 'configure' is provided, it is not an Autoconf configure script!
+
+  cd ~/src/x264
+  git pull
+  rm -rf ~/build/x264
+  mkdir -p ~/build/x264
+  cd ~/build/x264
+  CC=gcc-15 CXX=g++-15 LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib' ~/src/x264/configure --prefix=/usr/local --enable-shared --enable-static
+  make -j 8
+  make install
+
+OpenJPH
++++++++
+
+Project is at https://github.com/aous72/OpenJPH
+
+  git clone https://github.com/aous72/OpenJPH.git ~/src/OpenJPH
+
+  cd ~/src/OpenJPH
+  git pull
+  rm -rf ~/build/OpenJPH
+  mkdir -p ~/build/OpenJPH
+  cd ~/build/OpenJPH
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/OpenJPH
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+PROJ
+++++
+
+PROJ is needed by Geotiff, which may eventually be used by libheif.
+
+Project page is at https://proj4.org/
+
+Sources come from https://github.com/OSGeo/PROJ.git
+
+  git clone https://github.com/OSGeo/PROJ.git ~/src/PROJ
+
+  cd ~/src/PROJ
+  git pull
+  rm -rf ~/build/PROJ
+  mkdir -p ~/build/PROJ
+  cd ~/build/PROJ
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/PROJ
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+Geotiff
++++++++
+
+Geotiff is part of libheif's CMakePresets.json but it is not yet supported by CMakeLists.txt
+
+Sources come from https://github.com/OSGeo/libgeotiff.git
+
+  git clone https://github.com/OSGeo/libgeotiff.git ~/src/libgeotiff
+
+  Using the Autoconf support:
+
+  cd ~/src/libgeotiff/libgeotiff
+  git pull
+  ./autogen.sh
+  rm -rf ~/build/libgeotiff
+  mkdir -p ~/build/libgeotiff
+  cd ~/build/libgeotiff
+  ~/src/libgeotiff/libgeotiff/configure --with-zip=yes --with-jpeg=/usr/local --with-libtiff=/usr/local --prefix=/usr/local CC=gcc CXX=g++ CPPFLAGS='-I/usr/local/include' CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'
+  make -j$(nproc)
+  make install
+
+  Using the cmake support
+
+  cd ~/src/libgeotiff/libgeotiff
+  git pull
+  rm -rf ~/build/libgeotiff
+  mkdir -p ~/build/libgeotiff
+  cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TIFF=on -DWITH_ZLIB=on -DWITH_JPEG=on -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/libgeotiff/libgeotiff
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+libheif
++++++++
+
+Sources come from https://github.com/strukturag/libheif.git
+
+  git clone https://github.com/strukturag/libheif.git ~/src/libheif
+
+  cd ~/src/libheif
+  git pull
+  rm -rf ~/build/libheif
+  mkdir -p ~/build/libheif
+  cd ~/build/libheif
+  cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER_PLUGIN=off -DWITH_OpenJPEG_DECODER=on -DWITH_OpenJPEG_ENCODER_PLUGIN=off -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off -DWITH_GEOTIFF=off -DENABLE_PARALLEL_TILE_DECODING=on -DENABLE_EXPERIMENTAL_FEATURES=on ~/src/libheif
+  cmake --build . -- -j$(nproc)
+  cmake --install .
+
+Cmake should produce this in its configuration summary::
+
+  === Supported formats ===
+  format        decoding   encoding
+  AVC             YES        YES
+  AVIF            YES        YES
+  HEIC            YES        YES
+  JPEG            YES        YES
+  JPEG2000        YES        YES
+  JPEG2000-HT     YES        YES
+  Uncompressed    YES        YES
+  VVC             YES        YES
+
+Check for expected configuration using::
+
+  heif-enc --list-encoders
+  heif-dec --list-decoders
+
 Jasper
 ++++++
 
   git clone https://github.com/jasper-software/jasper.git jasper
 
+  cd ~/src/jasper
+  git pull
   rm -rf ~/build/jasper
   mkdir -p ~/build/jasper
   cd ~/build/jasper
@@ -228,300 +548,15 @@ Jasper
   make -j"$(nproc)"
   make install
 
-Lerc
-++++
-
-Sources come from https://github.com/Esri/lerc
-
-  rm -rf ~/build/lerc
-  mkdir -p ~/build/lerc
-  cd ~/build/lerc
-  cmake -G "Unix Makefiles" \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_CXX_COMPILER=g++ \
-              -DCMAKE_CXX_FLAGS='-O -g' \
-              -DCMAKE_C_COMPILER=gcc \
-              -DCMAKE_C_FLAGS='-O -g' \
-              -DCMAKE_INSTALL_RPATH='/usr/local/lib'\
-              -DCMAKE_INSTALL_PREFIX=/usr/local \
-              -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
-              -DBUILD_SHARED_LIBS=on \
-              ~/src/lerc
-  make -j 8
-  make install
-
-Building libheif (and dependencies) for development
----------------------------------------------------
-
-de265
-+++++
-
-Sources come from https://github.com/strukturag/libde265.
-
-This library provides both decoder and encoder for H.265/HEVC.
-
-With sources under ~/src/libde265::
-
-  rm -rf ~/build/libde265
-  mkdir -p ~/build/libde265
-  cd ~/build/libde265
-  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DENABLE_SDL=OFF -DENABLE_DECODER=ON -DENABLE_ENCODER=OFF ~/src/libde265
-  make -j 8
-  make install
-
-x265
-++++
-
-Sources come from https://bitbucket.org/multicoreware/x265_git/src/master.
-
-This library provides a H.265/HEVC encoder.
-
-With sources under ~/src/x265-stable::
-
-  [ May need to do 'mv .git .git-mv' ]
-
-  rm -rf ~/build/x265-stable
-  mkdir -p ~/build/x265-stable
-  cd ~/build/x265-stable
-  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DENABLE_ASSEMBLY:BOOL=ON -DX265_LATEST_TAG=TRUE ~/src/x265-stable/source
-  make -j 8
-  make install
-
-openh264
-++++++++
-
-Sources come from https://github.com/cisco/openh264.
-
-The openh264 build is based on a well-designed pure GNU Makefile.
-
-  git clone https://github.com/cisco/openh264 ~/src/openh264
-
-With sources under ~/src/openh264::
-
-  rm -rf ~/build/openh264
-  mkdir -p ~/build/openh264
-  cd ~/build/openh264
-  make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local clean
-  make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local
-  make -j 8 -f ~/src/openh264/Makefile OS=linux CC=gcc CXX=g++ CFLAGS_OPT='-O3' LDFLAGS='-Wl,-rpath=/usr/local/lib' ARCH=x86_64 USE_ASM=No BUILDTYPE=Release PREFIX=/usr/local install
-
-aom
-+++
-
-Sources come from https://aomedia.googlesource.com/aom.
-
-  git clone --depth 1 --branch main https://aomedia.googlesource.com/aom ~/src/aom
-
-With sources under ~/src/aom::
-
-  rm -rf ~/build/aom
-  mkdir -p ~/build/aom
-  cd ~/build/aom
-  cmake -DAOM_TARGET_CPU=generic -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/aom
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-libjpeg-turbo
-+++++++++++++
-
-Sources come from https://github.com/libjpeg-turbo/libjpeg-turbo.
-
-  git clone https://github.com/libjpeg-turbo/libjpeg-turbo ~/src/libjpeg-turbo
-
-With sources under ~/src/libjpeg-turbo::
-
-  rm -rf  ~/build/libjpeg-turbo
-  mkdir -p ~/build/libjpeg-turbo
-  cd ~/build/libjpeg-turbo
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DWITH_JPEG8=1 ~/src/libjpeg-turbo
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-openjpeg
-++++++++
-
-Sources come from https://github.com/uclouvain/openjpeg.
-
-  git clone https://github.com/uclouvain/openjpeg ~/src/openjpeg
-
-With sources under ~/src/openjpeg::
-
-  rm -rf ~/build/openjpeg
-  mkdir -p ~/build/openjpeg
-  cd ~/build/openjpeg
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ~/src/openjpeg
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-libjxl
-+++++++
-
-Sources come from https://github.com/libjxl/libjxl.git.
-
-The initial git checkout (from project at https://github.com/libjxl) looks like::
-
-  git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules ~/src/libjxl
-
-After the initial checkout, 'git pull' will automatically take care of submodules.
-
-Then see procedure in libjxl/BUILDING.md.  Based on that, do this::
-
-  rm -rf ~/build/libjxl
-  mkdir -p ~/build/libjxl
-  cd ~/build/libjxl
-  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE ~/src/libjxl
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-vvdec
-+++++
-
-Project is at https://github.com/fraunhoferhhi/vvdec
-
-The initial git checkout (from project at https://github.com/fraunhoferhhi/vvdec) looks like::
-
-  git clone https://github.com/fraunhoferhhi/vvdec.git ~/src/vvdec
-
-  rm -rf ~/build/vvdec
-  mkdir -p ~/build/vvdec
-  cd ~/build/vvdec
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DVVDEC_ENABLE_BITSTREAM_DOWNLOAD=OFF -DBUILD_SHARED_LIBS=TRUE ~/src/vvdec
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-vvenc
-+++++
-
-Project is at https://github.com/fraunhoferhhi/vvenc
-
-The initial git checkout (from project at https://github.com/fraunhoferhhi/vvenc) looks like::
-
-  git clone https://github.com/fraunhoferhhi/vvenc.git ~/src/vvenc
-
-  rm -rf ~/build/vvenc
-  mkdir -p ~/build/vvenc
-  cd ~/build/vvenc
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/vvenc
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-libx264
-+++++++
-
-Project is at https://code.videolan.org/videolan/x264
-
-  libx264 provides only a H.264 encoder
-
-  git clone https://code.videolan.org/videolan/x264.git/ ~/src/x264
-
-  While 'configure' is provided, it is not an Autoconf configure script!
-
-  cd ~/src/x264
-  rm -rf ~/build/x264
-  mkdir -p ~/build/x264
-  cd ~/build/x264
-  CC=gcc-13 CXX=g++-13 LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib' ~/src/x264/configure --prefix=/usr/local --enable-shared --enable-static
-  make -j 8
-  make install
-
-OpenJPH
-+++++++
-
-Project is at https://github.com/aous72/OpenJPH
-
-  git clone https://github.com/aous72/OpenJPH.git ~/src/OpenJPH
-
-  rm -rf ~/build/OpenJPH
-  mkdir -p ~/build/OpenJPH
-  cd ~/build/OpenJPH
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/OpenJPH
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-PROJ
-++++
-
-PROJ is needed by Geotiff, which may eventually be used by libheif.
-
-Project page is at https://proj4.org/
-
-Sources come from https://github.com/OSGeo/PROJ.git
-
-  git clone https://github.com/OSGeo/PROJ.git ~/src/PROJ
-
-  rm -rf ~/build/PROJ
-  mkdir -p ~/build/PROJ
-  cd ~/build/PROJ
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/PROJ
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-Geotiff
-+++++++
-
-Geotiff is part of libheif's CMakePresets.json but it is not yet supported by CMakeLists.txt
-
-Sources come from https://github.com/OSGeo/libgeotiff.git
-
-  git clone https://github.com/OSGeo/libgeotiff.git ~/src/libgeotiff
-
-  cd ~/src/libgeotiff/libgeotiff
-
-  Using the Autoconf support:
-
-  ./autogen.sh
-  rm -rf ~/build/libgeotiff
-  mkdir -p ~/build/libgeotiff
-  cd ~/build/libgeotiff
-  ~/src/libgeotiff/libgeotiff/configure --with-zip=yes --with-jpeg=/usr/local --with-libtiff=/usr/local --prefix=/usr/local CC=gcc CXX=g++ CPPFLAGS='-I/usr/local/include' CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'
-  make -j$(nproc)
-  make install
-
-  Using the cmake support
-
-  cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TIFF=on -DWITH_ZLIB=on -DWITH_JPEG=on -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=TRUE ~/src/libgeotiff/libgeotiff
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-libheif
-+++++++
-
-Sources come from https://github.com/strukturag/libheif.git
-
-  git clone https://github.com/strukturag/libheif.git ~/src/libheif
-
-  rm -rf ~/build/libheif
-  mkdir -p ~/build/libheif
-  cd ~/build/libheif
-  cmake -DBUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='-O -g' -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-O -g' -DCMAKE_INSTALL_RPATH='/usr/local/lib' -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE -DBUILD_SHARED_LIBS=on -DWITH_JPEG_DECODER=on -DWITH_JPEG_ENCODER=on -DWITH_OpenJPEG_ENCODER=on -DWITH_OpenJPEG_DECODER_PLUGIN=off -DWITH_OpenJPEG_DECODER=on -DWITH_OpenJPEG_ENCODER_PLUGIN=off -DWITH_UNCOMPRESSED_CODEC=on -DWITH_OPENJPH_ENCODER=on -DWITH_OPENJPH_ENCODER_PLUGIN=off -DWITH_VVDEC=on -DWITH_VVDEC_PLUGIN=off -DWITH_VVENC=on -DWITH_VVENC_PLUGIN=off -DWITH_GEOTIFF=off -DENABLE_PARALLEL_TILE_DECODING=on -DENABLE_EXPERIMENTAL_FEATURES=on ~/src/libheif
-  cmake --build . -- -j$(nproc)
-  cmake --install .
-
-Cmake should produce this in its configuration summary::
-
-  === Supported formats ===
-  format        decoding   encoding
-  AVC             YES        YES
-  AVIF            YES        YES
-  HEIC            YES        YES
-  JPEG            YES        YES
-  JPEG2000        YES        YES
-  JPEG2000-HT     YES        YES
-  Uncompressed    YES        YES
-  VVC             YES        YES
-
-Check for expected configuration using::
-
-  heif-enc --list-encoders
-  heif-dec --list-decoders
-
 libwmf
 ++++++
 
 Sources come from https://github.com/caolanm/libwmf
 
   git clone https://github.com/caolanm/libwmf.git ~/src/libwmf
+
   cd ~/src/libwmf
+  git pull
   autoreconf -fiv
 
   rm -rf ~/build/libwmf
@@ -534,7 +569,7 @@ Sources come from https://github.com/caolanm/libwmf
         --enable-shared \
         --enable-static \
         --with-libxml2 \
-        CC=gcc-13 CXX=g++-13 \
+        CC=gcc-15 CXX=g++-15 \
         CPPFLAGS='-I/usr/local/include' \
         CFLAGS='-g -fPIC -Wall -Winline -W -Wformat-security -Wpointer-arith -Wdisabled-optimization -Wmissing-noreturn -Wno-unknown-pragmas -Wunused-but-set-variable -Wsign-compare' \
         LDFLAGS='-L/usr/local/lib -Wl,-rpath,/usr/local/lib'
