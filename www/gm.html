@@ -5750,16 +5750,18 @@ width=15><b><font face="Helvetica, Arial"
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>the image type</td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 Choose from:
-<strong>Bilevel</strong>, <strong>Grayscale</strong>, <strong>Palette</strong>,
-<strong>PaletteMatte</strong>, <strong>TrueColor</strong>, <strong>TrueColorMatte</strong>,
-<strong>ColorSeparation</strong>, <strong>ColorSeparationMatte</strong>, or <strong>Optimize</strong>.</font></td></tr></table>
+<strong>Bilevel</strong>, <strong>Grayscale</strong>, <strong>GrayscaleMatte</strong>,
+<strong>Palette</strong>, <strong>PaletteMatte</strong>, <strong>TrueColor</strong>,
+<strong>TrueColorMatte</strong>, <strong>ColorSeparation</strong>,
+<strong>ColorSeparationMatte</strong>, or <strong>Optimize</strong>.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 Normally, when a format supports different subformats such as bilevel,
-grayscale, palette, truecolor, and truecolor+alpha, the encoder will try
-to choose a suitable subformat based on the nature of the image. The
-<strong>-type</strong> option may be used to tailor the output subformat. By
-default the output subformat is based on readily available image
-information and is usually similar to the input format.</font></td></tr></table>
+grayscale, grayscale+alpha, palette, truecolor, and truecolor+alpha,
+the encoder will try to choose a suitable subformat based on the
+nature of the image. The <strong>-type</strong> option may be used to tailor the
+output subformat. By default the output subformat is based on readily
+available image information and is usually similar to the input
+format.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 Specify <tt>-type Optimize</tt> in order to enable inspecting all pixels
 (if necessary) in order to find the most efficient subformat. Inspecting

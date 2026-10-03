@@ -1,3 +1,8 @@
+2026-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/annotate.c (RenderFreetype): Add more thorough error
+        handling and clean-up.
+
 2026-09-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/png.c (WriteOnePNGImage): Ensure that 'image_matte' is

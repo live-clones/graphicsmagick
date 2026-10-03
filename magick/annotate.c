@@ -1058,8 +1058,42 @@ static int TraceQuadraticBezier(FT_Vector *control,FT_Vector *to,
   return(0);
 }
 
+#define RenderFreetypeCleanup()                         \
+  do                                                    \
+    {                                                   \
+      if (glyph.image)                                  \
+        {                                               \
+          FT_Done_Glyph(glyph.image);                   \
+          glyph.image = (FT_Glyph) NULL;                \
+        }                                               \
+                                                        \
+      MagickFreeMemory(text);                           \
+      DestroyDrawInfo(clone_info);                      \
+      clone_info=(DrawInfo *) NULL;                     \
+                                                        \
+      if (face)                                         \
+        {                                               \
+          (void) FT_Done_Face(face);                    \
+          face = (FT_Face) NULL;                        \
+        }                                               \
+                                                        \
+      if (library)                                      \
+        {                                               \
+          (void) FT_Done_FreeType(library);             \
+          library = (FT_Library) NULL;                  \
+        }                                               \
+    } while (0);
+
+#define ThrowRenderFreetypeBinaryException(severity_,reason_,description_) \
+  do                                                                    \
+    {                                                                   \
+      RenderFreetypeCleanup();                                          \
+      ThrowBinaryException(severity_,reason_,description_);             \
+    } while (0);
+
 static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
-  const char *encoding,const PointInfo *offset,TypeMetric *metrics)
+                                     const char *encoding,const PointInfo *offset,
+                                     TypeMetric *metrics)
 {
   typedef struct _GlyphInfo
   {
@@ -1073,17 +1107,8 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
       image;
   } GlyphInfo;
 
-  double
-    opacity;
-
   DrawInfo
-    *clone_info;
-
-  FT_BBox
-    bounds;
-
-  FT_BitmapGlyph
-    bitmap;
+    *clone_info = (DrawInfo *) NULL;
 
   FT_Encoding
     encoding_type;
@@ -1092,10 +1117,10 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     ft_status;
 
   FT_Face
-    face = (FT_Face) 0;
+    face = (FT_Face) NULL;
 
   FT_Library
-    library;
+    library = (FT_Library) NULL;
 
   FT_Matrix
     affine;
@@ -1104,11 +1129,11 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     origin;
 
   GlyphInfo
-    glyph,
-    last_glyph;
+    glyph = { 0 },
+    last_glyph = { 0 };
 
   Image
-    *pattern;
+    *pattern = (Image *) NULL;
 
   long
     y;
@@ -1147,7 +1172,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     active;
 
   magick_code_point_t
-    *text;
+    *text = (magick_code_point_t *) NULL;
 
   const char
     *font;
@@ -1170,23 +1195,29 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
   */
   if (MagickConfirmAccess(FileReadConfirmAccessMode,font,
                           &image->exception) == MagickFail)
-      return MagickFail;
-
-  glyph.image=(FT_Glyph) 0;
-  last_glyph.image=(FT_Glyph) 0;
+    return MagickFail;
 
   /*
     Initialize Truetype library.
+
+    See https://freetype.org/freetype2/docs/reference/index.html for the documentation.
   */
   ft_status=FT_Init_FreeType(&library);
   if (ft_status)
-    ThrowBinaryException(TypeError,UnableToInitializeFreetypeLibrary,
-                         draw_info->font);
-  ft_status=FT_New_Face(library,font,0,&face);
-  if ((ft_status != 0) || (face == (FT_Face) 0))
     {
-      (void) FT_Done_FreeType(library);
-      ThrowBinaryException(TypeError,UnableToReadFont,draw_info->font)
+      (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                            "FT_Init_FreeType() failed (ft_err_code=%d)",ft_status);
+      ThrowRenderFreetypeBinaryException(TypeError,UnableToInitializeFreetypeLibrary,
+                                         draw_info->font);
+    }
+  ft_status=FT_New_Face(library,font,0,&face);
+  if (ft_status)
+    (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                          "FT_New_Face() failed (ft_err_code=%d)",ft_status);
+  if ((ft_status) || (face == (FT_Face) 0))
+    {
+      /* (void) FT_Done_FreeType(library); */
+      ThrowRenderFreetypeBinaryException(TypeError,UnableToReadFont,draw_info->font);
     }
   /*
     Select a charmap
@@ -1195,8 +1226,10 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     /* ft_status= */ (void) FT_Set_Charmap(face,face->charmaps[0]);
   encoding_type=ft_encoding_unicode;
   ft_status=FT_Select_Charmap(face,encoding_type);
-  if (ft_status != 0)
+  if (ft_status)
     {
+      (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                            "FT_Select_Charmap() failed (ft_err_code=%d)",ft_status);
       encoding_type=ft_encoding_none;
       /* ft_status= */ (void) FT_Select_Charmap(face,encoding_type);
     }
@@ -1237,8 +1270,12 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
       if (LocaleCompare(encoding,"Wansung") == 0)
         encoding_type=ft_encoding_wansung;
       ft_status=FT_Select_Charmap(face,encoding_type);
-      if (ft_status != 0)
-        ThrowBinaryException(TypeError,UnrecognizedFontEncoding,encoding);
+      if (ft_status)
+        {
+          (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                                "FT_Select_Charmap() failed (ft_err_code=%d)",ft_status);
+          ThrowRenderFreetypeBinaryException(TypeError,UnrecognizedFontEncoding,encoding);
+        }
     }
   /*
     Set text size.
@@ -1252,8 +1289,8 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
         resolution.y=resolution.x;
     }
   (void) FT_Set_Char_Size(face,(FT_F26Dot6) (64.0*draw_info->pointsize),
-    (FT_F26Dot6) (64.0*draw_info->pointsize),(FT_UInt) resolution.x,
-    (FT_UInt) resolution.y);
+                          (FT_F26Dot6) (64.0*draw_info->pointsize),(FT_UInt) resolution.x,
+                          (FT_UInt) resolution.y);
   metrics->pixels_per_em.x=face->size->metrics.x_ppem;
   metrics->pixels_per_em.y=face->size->metrics.y_ppem;
   metrics->ascent=(double) face->size->metrics.ascender/64.0;
@@ -1284,41 +1321,39 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     bits) as prescribed by the encoding.
   */
   switch (encoding_type)
-  {
+    {
     case ft_encoding_sjis:
-    {
-      text=EncodeSJIS(draw_info->text,&length);
-      break;
-    }
+      {
+        text=EncodeSJIS(draw_info->text,&length);
+        break;
+      }
     case ft_encoding_unicode:
-    {
-      text=EncodeUnicode(draw_info->text,&length);
-      break;
-    }
+      {
+        text=EncodeUnicode(draw_info->text,&length);
+        break;
+      }
     default:
-    {
-      if (draw_info->encoding != (char *) NULL)
-        {
-          if (LocaleCompare(draw_info->encoding,"SJIS") == 0)
-            {
-              text=EncodeSJIS(draw_info->text,&length);
-              break;
-            }
-          if ((LocaleCompare(draw_info->encoding,"UTF-8") == 0) ||
-              (encoding_type != ft_encoding_none))
-            {
-              text=EncodeUnicode(draw_info->text,&length);
-              break;
-            }
-        }
-      text=EncodeText(draw_info->text,&length);
-      break;
+      {
+        if (draw_info->encoding != (char *) NULL)
+          {
+            if (LocaleCompare(draw_info->encoding,"SJIS") == 0)
+              {
+                text=EncodeSJIS(draw_info->text,&length);
+                break;
+              }
+            if ((LocaleCompare(draw_info->encoding,"UTF-8") == 0) ||
+                (encoding_type != ft_encoding_none))
+              {
+                text=EncodeUnicode(draw_info->text,&length);
+                break;
+              }
+          }
+        text=EncodeText(draw_info->text,&length);
+        break;
+      }
     }
-  }
   if (text == (magick_code_point_t *) NULL)
     {
-      (void) FT_Done_Face(face);
-      (void) FT_Done_FreeType(library);
       (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
                             "Text encoding failed: encoding_type=%ld "
                             "draw_info->encoding=\"%s\" draw_info->text=\"%s\" length=%ld",
@@ -1326,18 +1361,17 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
                             (draw_info->encoding ? draw_info->encoding : "(null)"),
                             (draw_info->text ? draw_info->text : "(null)"),
                             (long) length);
-      ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
-        draw_info->font)
+      ThrowRenderFreetypeBinaryException(ResourceLimitError,MemoryAllocationFailed,draw_info->font);
     }
   /*
     Compute bounding box.
   */
   (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
-    "Font %.1024s; font-encoding %.1024s; text-encoding %.1024s; pointsize %g",
-    draw_info->font != (char *) NULL ? draw_info->font : "none",
-    encoding != (char *) NULL ? encoding : "none",
-    draw_info->encoding != (char *) NULL ? draw_info->encoding : "none",
-    draw_info->pointsize);
+                        "Font %.1024s; font-encoding %.1024s; text-encoding %.1024s; pointsize %g",
+                        draw_info->font != (char *) NULL ? draw_info->font : "none",
+                        encoding != (char *) NULL ? encoding : "none",
+                        draw_info->encoding != (char *) NULL ? draw_info->encoding : "none",
+                        draw_info->pointsize);
   glyph.id=0;
   last_glyph.id=0;
   origin.x=0;
@@ -1351,224 +1385,244 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
   (void) CloneString(&clone_info->primitive,"path '");
   pattern=draw_info->fill_pattern;
   for (i=0; i < (long) length; i++)
-  {
-    glyph.id=FT_Get_Char_Index(face,text[i]);
-    if ((glyph.id != 0) && (last_glyph.id != 0) && FT_HAS_KERNING(face))
-      {
-        FT_Vector
-          kerning;
-
-        (void) FT_Get_Kerning(face,last_glyph.id,glyph.id,ft_kerning_default,
-          &kerning);
-        origin.x+=kerning.x;
-      }
-    glyph.origin=origin;
-    glyph.image=0;
-    ft_status=FT_Load_Glyph(face,glyph.id,FT_LOAD_DEFAULT);
-    if (ft_status != False) /* 0 means success */
-      continue;
-    ft_status=FT_Get_Glyph(face->glyph,&glyph.image);
-    if (ft_status != False) /* 0 means success */
-      continue;
-#if 0
-    /*
-      Obtain glyph's control box. Usually faster than computing the
-      exact bounding box but may be slightly larger in some
-      situations.
-    */
-    (void) FT_Glyph_Get_CBox(glyph.image,FT_GLYPH_BBOX_SUBPIXELS,&bounds);
-#else
-    /*
-      Compute exact bounding box for scaled outline. If necessary, the
-      outline Bezier arcs are walked over to extract their extrema.
-    */
-    (void) FT_Outline_Get_BBox(&((FT_OutlineGlyph) glyph.image)->outline,&bounds);
-#endif
-    if ((i == 0) || (bounds.xMin < metrics->bounds.x1))
-      metrics->bounds.x1=bounds.xMin;
-    if ((i == 0) || (bounds.yMin < metrics->bounds.y1))
-      metrics->bounds.y1=bounds.yMin;
-    if ((i == 0) || (bounds.xMax > metrics->bounds.x2))
-      metrics->bounds.x2=bounds.xMax;
-    if ((i == 0) || (bounds.yMax > metrics->bounds.y2))
-      metrics->bounds.y2=bounds.yMax;
-    if (draw_info->render)
-      if ((draw_info->stroke.opacity != TransparentOpacity) ||
-          (draw_info->stroke_pattern != (Image *) NULL))
+    {
+      glyph.id=FT_Get_Char_Index(face,text[i]);
+      if ((glyph.id != 0) && (last_glyph.id != 0) && FT_HAS_KERNING(face))
         {
-          /*
-            Trace the glyph.
-          */
-          clone_info->affine.tx=glyph.origin.x/64.0;
-          clone_info->affine.ty=glyph.origin.y/64.0;
-          (void) FT_Outline_Decompose(&((FT_OutlineGlyph) glyph.image)->outline,
-            &OutlineMethods,clone_info);
+          FT_Vector
+            kerning;
+
+          (void) FT_Get_Kerning(face,last_glyph.id,glyph.id,ft_kerning_default,&kerning);
+          origin.x+=kerning.x;
         }
-    FT_Vector_Transform(&glyph.origin,&affine);
-    (void) FT_Glyph_Transform(glyph.image,&affine,&glyph.origin);
-    if (draw_info->render)
+      glyph.origin=origin;
+      glyph.image=0;
+      ft_status=FT_Load_Glyph(face,glyph.id,FT_LOAD_DEFAULT);
+      if (ft_status) /* 0 means success */
+        {
+          (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                                "FT_Load_Glyph() failed (ft_err_code=%d)",ft_status);
+          continue;
+        }
+      ft_status=FT_Get_Glyph(face->glyph,&glyph.image);
+      if (ft_status) /* 0 means success */
+        {
+          (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                                "FT_Get_Glyph() failed (ft_err_code=%d)",ft_status);
+          continue;
+        }
       {
-        status &= ModifyCache(image,&image->exception);
-        if ((draw_info->fill.opacity != TransparentOpacity) ||
-            (pattern != (Image *) NULL))
-          {
-            /*
-              Rasterize the glyph.
-            */
-            ft_status=FT_Glyph_To_Bitmap(&glyph.image,ft_render_mode_normal,
-              (FT_Vector *) NULL,True);
-            if (ft_status != False)
-              continue;
-            bitmap=(FT_BitmapGlyph) glyph.image;
-            image->storage_class=DirectClass;
-            if (bitmap->bitmap.pixel_mode == ft_pixel_mode_mono)
-              {
-                point.x=offset->x+(origin.x >> 6);
-              }
-            else
-              {
-                point.x=offset->x+bitmap->left;
-              }
-            point.y=offset->y-bitmap->top;
-            p=bitmap->bitmap.buffer;
-            /* FIXME: OpenMP */
-            for (y=0; y < (long) bitmap->bitmap.rows; y++)
+        FT_BBox
+          bounds;
+
+        (void) memset(&bounds,0,sizeof(bounds));
+#if 0
+        /*
+          Obtain glyph's control box. Usually faster than computing the
+          exact bounding box but may be slightly larger in some
+          situations.
+        */
+        (void) FT_Glyph_Get_CBox(glyph.image,FT_GLYPH_BBOX_SUBPIXELS,&bounds);
+#else
+        /*
+          Compute exact bounding box for scaled outline. If necessary, the
+          outline Bezier arcs are walked over to extract their extrema.
+        */
+        (void) FT_Outline_Get_BBox(&((FT_OutlineGlyph) glyph.image)->outline,&bounds);
+#endif
+        if ((i == 0) || (bounds.xMin < metrics->bounds.x1))
+          metrics->bounds.x1=bounds.xMin;
+        if ((i == 0) || (bounds.yMin < metrics->bounds.y1))
+          metrics->bounds.y1=bounds.yMin;
+        if ((i == 0) || (bounds.xMax > metrics->bounds.x2))
+          metrics->bounds.x2=bounds.xMax;
+        if ((i == 0) || (bounds.yMax > metrics->bounds.y2))
+          metrics->bounds.y2=bounds.yMax;
+      }
+      if (draw_info->render)
+        {
+          if ((draw_info->stroke.opacity != TransparentOpacity) ||
+              (draw_info->stroke_pattern != (Image *) NULL))
             {
-              int pc = y * bitmap->bitmap.pitch;
-              int pcr = pc;
-              if ((ceil(point.y+y-0.5) < 0) ||
-                  (ceil(point.y+y-0.5) >= image->rows))
+              /*
+                Trace the glyph.
+              */
+              clone_info->affine.tx=glyph.origin.x/64.0;
+              clone_info->affine.ty=glyph.origin.y/64.0;
+              (void) FT_Outline_Decompose(&((FT_OutlineGlyph) glyph.image)->outline,
+                                          &OutlineMethods,clone_info);
+            }
+        }
+      FT_Vector_Transform(&glyph.origin,&affine);
+      (void) FT_Glyph_Transform(glyph.image,&affine,&glyph.origin);
+      if (draw_info->render)
+        {
+          status &= ModifyCache(image,&image->exception);
+          if ((draw_info->fill.opacity != TransparentOpacity) ||
+              (pattern != (Image *) NULL))
+            {
+              FT_BitmapGlyph
+                bitmap;
+
+              /*
+                Rasterize the glyph.
+              */
+              if (glyph.image->format != FT_GLYPH_FORMAT_BITMAP)
                 {
+                  ft_status=FT_Glyph_To_Bitmap(&glyph.image,FT_RENDER_MODE_NORMAL,
+                                               (FT_Vector *) NULL,1);
+                }
+              if (ft_status)
+                {
+                  (void) LogMagickEvent(AnnotateEvent,GetMagickModule(),
+                                        "FT_Glyph_To_Bitmap() failed (ft_err_code=%d)",
+                                        ft_status);
                   continue;
                 }
-              /*
-                Try to get whole span.  May fail.
-              */
-              q=GetImagePixels(image,(long) ceil(point.x-0.5),
-                (long) ceil(point.y+y-0.5),bitmap->bitmap.width,1);
-              active=q != (PixelPacket *) NULL;
-              for (x=0; x < (long) bitmap->bitmap.width; x++, pc++)
+              bitmap=(FT_BitmapGlyph) glyph.image;
+              image->storage_class=DirectClass;
+              if (bitmap->bitmap.pixel_mode == ft_pixel_mode_mono)
+                point.x=offset->x+(origin.x >> 6);
+              else
+                point.x=offset->x+bitmap->left;
+              point.y=offset->y-bitmap->top;
+              p=bitmap->bitmap.buffer;
+              /* FIXME: OpenMP */
+              for (y=0; y < (long) bitmap->bitmap.rows; y++)
                 {
-                  if (((long) ceil(point.x+x-0.5) < 0) ||
-                      ((unsigned long) ceil(point.x+x-0.5) >= image->columns))
+                  int pc = y * bitmap->bitmap.pitch;
+                  int pcr = pc;
+                  if ((ceil(point.y+y-0.5) < 0) ||
+                      (ceil(point.y+y-0.5) >= image->rows))
                     {
-                      if (active)
-                        q++;
                       continue;
                     }
-                  /* 8-bit gray-level pixmap */
-                  if (bitmap->bitmap.pixel_mode == ft_pixel_mode_grays)
+                  /*
+                    Try to get whole span.  May fail.
+                  */
+                  q=GetImagePixels(image,(long) ceil(point.x-0.5),
+                                   (long) ceil(point.y+y-0.5),bitmap->bitmap.width,1);
+                  active=q != (PixelPacket *) NULL;
+                  for (x=0; x < (long) bitmap->bitmap.width; x++, pc++)
                     {
-                      if (draw_info->text_antialias)
-                        opacity=ScaleCharToQuantum((double) p[pc]);
-                      else
-                        opacity=(p[pc] < 127 ? OpaqueOpacity : TransparentOpacity);
-                    }
-                  /* 1-bit monochrome bitmap */
-                  else if (bitmap->bitmap.pixel_mode == ft_pixel_mode_mono)
-                    {
-                      opacity=((p[(x >> 3) + pcr] & (1 << (~x & 0x07))) ?
-                               TransparentOpacity : OpaqueOpacity);
-                    }
-                  else
-                    {
-                      continue; /* ignore it? */
-                    }
-                  fill_color=draw_info->fill;
-                  if (pattern != (Image *) NULL)
-                    {
-                      if (AcquireOnePixelByReference
-                          (pattern,&fill_color,
-                           (long) (point.x+x-pattern->tile_info.x) % pattern->columns,
-                           (long) (point.y+y-pattern->tile_info.y) % pattern->rows,
-                           &image->exception) == MagickFail)
+                      double
+                        opacity;
+
+                      if (((long) ceil(point.x+x-0.5) < 0) ||
+                          ((unsigned long) ceil(point.x+x-0.5) >= image->columns))
                         {
-                          status=MagickFail;
+                          if (active)
+                            q++;
+                          continue;
                         }
-                    }
-                  /*
-                    If not full span, then get one pixel.
-                  */
-                  if (!active)
-                    q=GetImagePixels(image,(long) ceil(point.x+x-0.5),
-                                     (long) ceil(point.y+y-0.5),1,1);
-                  if (q == (PixelPacket *) NULL)
-                    {
-                      continue;
-                    }
-                  /*
-                    At this point, opacity is 0==transparent to MaxRGB==opaque, and represents an
-                    anti-aliasing edge blending value.  The computation below integrates in the
-                    fill color opacity, and converts the result to 0=opaque to MaxRGB=transparent.
-                  */
-                  opacity=MaxRGB-(opacity*(MaxRGB-fill_color.opacity)+/*round*/(MaxRGB>>1))/MaxRGB;
-                  AlphaCompositePixel(q,&fill_color,opacity,q,
-                                      image->matte ? q->opacity : OpaqueOpacity);
-                  if (!active)
-                    {
+                      /* 8-bit gray-level pixmap */
+                      if (bitmap->bitmap.pixel_mode == ft_pixel_mode_grays)
+                        {
+                          if (draw_info->text_antialias)
+                            opacity=ScaleCharToQuantum((double) p[pc]);
+                          else
+                            opacity=(p[pc] < 127 ? OpaqueOpacity : TransparentOpacity);
+                        }
+                      /* 1-bit monochrome bitmap */
+                      else if (bitmap->bitmap.pixel_mode == ft_pixel_mode_mono)
+                        {
+                          opacity=((p[(x >> 3) + pcr] & (1 << (~x & 0x07))) ?
+                                   TransparentOpacity : OpaqueOpacity);
+                        }
+                      else
+                        {
+                          continue; /* ignore it? */
+                        }
+                      fill_color=draw_info->fill;
+                      if (pattern != (Image *) NULL)
+                        {
+                          if (AcquireOnePixelByReference
+                              (pattern,&fill_color,
+                               (long) (point.x+x-pattern->tile_info.x) % pattern->columns,
+                               (long) (point.y+y-pattern->tile_info.y) % pattern->rows,
+                               &image->exception) == MagickFail)
+                            {
+                              status=MagickFail;
+                            }
+                        }
                       /*
-                        Sync the one pixel
+                        If not full span, then get one pixel.
                       */
-                      if (SyncImagePixels(image) != MagickPass)
-                        status=MagickFail;
+                      if (!active)
+                        q=GetImagePixels(image,(long) ceil(point.x+x-0.5),
+                                         (long) ceil(point.y+y-0.5),1,1);
+                      if (q == (PixelPacket *) NULL)
+                        {
+                          continue;
+                        }
+                      /*
+                        At this point, opacity is 0==transparent to MaxRGB==opaque, and represents an
+                        anti-aliasing edge blending value.  The computation below integrates in the
+                        fill color opacity, and converts the result to 0=opaque to MaxRGB=transparent.
+                      */
+                      opacity=MaxRGB-(opacity*(MaxRGB-fill_color.opacity)+/*round*/(MaxRGB>>1))/MaxRGB;
+                      AlphaCompositePixel(q,&fill_color,opacity,q,
+                                          image->matte ? q->opacity : OpaqueOpacity);
+                      if (!active)
+                        {
+                          /*
+                            Sync the one pixel
+                          */
+                          if (SyncImagePixels(image) != MagickPass)
+                            status=MagickFail;
+                        }
+                      else
+                        {
+                          q++;
+                        }
+                      if (status == MagickFail)
+                        break;
                     }
-                  else
-                    {
-                      q++;
-                    }
+                  /*
+                    Sync the full span
+                  */
+                  if (active)
+                    if (SyncImagePixels(image) != MagickPass)
+                      status=MagickFail;
                   if (status == MagickFail)
                     break;
                 }
-              /*
-                Sync the full span
-              */
-              if (active)
-                if (SyncImagePixels(image) != MagickPass)
-                  status=MagickFail;
-              if (status == MagickFail)
-                break;
             }
-          }
-      }
-    origin.x+=face->glyph->advance.x;
-    if (origin.x > metrics->width)
-      metrics->width=origin.x;
-    if (last_glyph.image != 0)
-      {
-        FT_Done_Glyph(last_glyph.image);
-        last_glyph.image=0;
-      }
-    last_glyph=glyph;
-  }
+        }
+      origin.x+=face->glyph->advance.x;
+      if (origin.x > metrics->width)
+        metrics->width=origin.x;
+      if (last_glyph.image != 0)
+        {
+          FT_Done_Glyph(last_glyph.image);
+          last_glyph.image = (FT_Glyph) NULL;
+        }
+      last_glyph=glyph;
+    }
   metrics->width/=64.0;
   metrics->bounds.x1/=64.0;
   metrics->bounds.y1/=64.0;
   metrics->bounds.x2/=64.0;
   metrics->bounds.y2/=64.0;
   if ((status != MagickFail)&& (draw_info->render))
-    if ((draw_info->stroke.opacity != TransparentOpacity) ||
-        (draw_info->stroke_pattern != (Image *) NULL))
-      {
-        /*
-          Draw text stroke.
-        */
-        clone_info->affine.tx=offset->x;
-        clone_info->affine.ty=offset->y;
-        (void) ConcatenateString(&clone_info->primitive,"'");
-        (void) DrawImage(image,clone_info);
-      }
-  if (glyph.image != 0)
     {
-      FT_Done_Glyph(glyph.image);
-      glyph.image=0;
+      if ((draw_info->stroke.opacity != TransparentOpacity) ||
+          (draw_info->stroke_pattern != (Image *) NULL))
+        {
+          /*
+            Draw text stroke.
+          */
+          clone_info->affine.tx=offset->x;
+          clone_info->affine.ty=offset->y;
+          (void) ConcatenateString(&clone_info->primitive,"'");
+          (void) DrawImage(image,clone_info);
+        }
     }
+
   /*
     Free resources.
   */
-  MagickFreeMemory(text);
-  DestroyDrawInfo(clone_info);
-  (void) FT_Done_Face(face);
-  (void) FT_Done_FreeType(library);
+  RenderFreetypeCleanup();
   return(status);
 }
 #else

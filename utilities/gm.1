@@ -1,4 +1,4 @@
-.TH gm 1 "2026/08/31" "GraphicsMagick"
+.TH gm 1 "2026/09/29" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -5005,16 +5005,18 @@ are nearly the same color as the corner pixels.
 \fRthe image type
 
 Choose from:
-\fBBilevel\fP, \fBGrayscale\fP, \fBPalette\fP,
-\fBPaletteMatte\fP, \fBTrueColor\fP, \fBTrueColorMatte\fP,
-\fBColorSeparation\fP, \fBColorSeparationMatte\fP, or \fBOptimize\fP.
+\fBBilevel\fP, \fBGrayscale\fP, \fBGrayscaleMatte\fP,
+\fBPalette\fP, \fBPaletteMatte\fP, \fBTrueColor\fP,
+\fBTrueColorMatte\fP, \fBColorSeparation\fP,
+\fBColorSeparationMatte\fP, or \fBOptimize\fP.
 
 Normally, when a format supports different subformats such as bilevel,
-grayscale, palette, truecolor, and truecolor+alpha, the encoder will try
-to choose a suitable subformat based on the nature of the image. The
-\fB-type\fP option may be used to tailor the output subformat. By
-default the output subformat is based on readily available image
-information and is usually similar to the input format.
+grayscale, grayscale+alpha, palette, truecolor, and truecolor+alpha,
+the encoder will try to choose a suitable subformat based on the
+nature of the image. The \fB-type\fP option may be used to tailor the
+output subformat. By default the output subformat is based on readily
+available image information and is usually similar to the input
+format.
 
 Specify -type Optimize in order to enable inspecting all pixels
 (if necessary) in order to find the most efficient subformat. Inspecting
