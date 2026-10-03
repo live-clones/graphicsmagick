@@ -1,5 +1,17 @@
 2026-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/wpg.c (ExtractPostscript): Avoid passing NULL 'ps_data'
+        to BlobToImage().
+
+        * coders/mat.c (WriteMATLABImage): Avoid doing a CloseBlob() on a
+        NULL image.
+
+        * coders/bmp.c (ReadBMPImage): Avoid doing a CloseBlob() on a NULL
+        image.
+
+        * coders/mat.c (WriteMATLABImage): Avoid the possibility of
+        calling CloseBlob() on a null image pointer.
+
         * magick/list.h: Add list __attribute__(__nonnull__) declarations
         for GCC, Clang, or other compilers which support the syntax. This
         helps produce useful warnings in code using those functions.

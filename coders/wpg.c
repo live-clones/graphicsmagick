@@ -866,7 +866,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     header_magick[2*MaxTextExtent];
 
   void
-    *ps_data,
+    *ps_data = (unsigned char *) NULL,
     *ps_data_alloc = (unsigned char *) NULL;
 
   char
@@ -974,17 +974,23 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
         }
     }
   /*
-    Use a zero-copy read when possible to access data
+    Use a zero-copy read when possible to access data.
+
+    When zero-copy due to the image being memory-resident, 'ps_data'
+    is updated to point into the 'file' already in memory so that it
+    is no longer the same as 'ps_data_alloc', otherwise, data is
+    copied into the explicitly allocated 'ps_data_alloc' buffer.
   */
   ps_data=ps_data_alloc;
-  if (ReadBlobZC(image,PS_Size,&ps_data) != PS_Size)
+  if ((ReadBlobZC(image,PS_Size,&ps_data) != PS_Size) || (ps_data == (unsigned char *) NULL))
     {
-      MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "ExtractPostscript(): Failed to read %" MAGICK_SIZE_T_F "u bytes of data at"
                               " offset=%" MAGICK_OFF_F "d",
                               (MAGICK_SIZE_T) PS_Size, (magick_off_t) PS_Offset);
+      ps_data=(unsigned char *) NULL;
+      MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image; /* return (Image *) NULL; */
     }
@@ -1030,6 +1036,8 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       tsd = (WPG_TSD *) MagickMallocCleared(sizeof(WPG_TSD));
       if (tsd == (WPG_TSD *) NULL)
         {
+          ps_data=(unsigned char *) NULL;
+          MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
           ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);
           return image;
         }
@@ -1046,6 +1054,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "Excessive recursion detected!");
       ThrowException(exception,CorruptImageError,RecursionDetected,image->filename);
+      ps_data=(unsigned char *) NULL;
       MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       return image;
     }
@@ -1055,6 +1064,7 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
   */
   if ((clone_info=CloneImageInfo(image_info)) == NULL)
     {
+      ps_data=(unsigned char *) NULL;
       MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       return(image);
     }
@@ -1065,11 +1075,13 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
   (void) strlcpy(clone_info->filename, "", sizeof(clone_info->filename));
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Reading embedded \"%s\" content from blob...", clone_info->magick);
+  assert(ps_data != (unsigned char *) NULL);
   image2 = BlobToImage(clone_info, ps_data, PS_Size, exception );
   tsd->ps_recursion--;
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Recursion level %" MAGICK_SIZE_T_F "u", tsd->ps_recursion);
+  ps_data=(unsigned char *) NULL;
   MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
   if (!image2)
     {

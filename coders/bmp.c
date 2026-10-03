@@ -1932,6 +1932,7 @@ CheckBitSize:
         }
     } while (IsBMP(magick,2));
 ExitLoop:
+  CloseBlob(image);
 
   {
     Image *p;
@@ -1965,7 +1966,6 @@ ExitLoop:
   while (image->previous != (Image *) NULL)
     image=image->previous;
 */
-  CloseBlob(image);
 #if 0
   if (logging)
     {

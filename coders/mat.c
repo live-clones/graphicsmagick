@@ -1663,7 +1663,7 @@ static MagickPassFail WriteMATLABImage(const ImageInfo *image_info,Image *image)
   (void) WriteBlob(image,sizeof(MATLAB_HDR),MATLAB_HDR);
 
   pixels=(unsigned char *) NULL;
-  while (image!=NULL)
+  while (1)
     {
       pixels=MagickAllocateResourceLimitedMemory(unsigned char *,image->rows);
       if (pixels == (unsigned char *) NULL)
@@ -1744,12 +1744,15 @@ static MagickPassFail WriteMATLABImage(const ImageInfo *image_info,Image *image)
         (void) WriteBlobByte(image,0);
 
       MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-      if (status == MagickFail || image->next==NULL)
+      if (status == MagickFail)
+        break;
+      if (image->next == (const Image*) NULL)
         break;
       image=SyncNextImageInList(image);
-    }
+    } /* while (1) */
 
-  status &= CloseBlob(image);
+  if (image != (const Image *) NULL)
+    status &= CloseBlob(image);
   MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
   if (logging)
