@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to July 23, 2026.
+This file was last updated to reflect changes up to October 4, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -18,6 +18,103 @@ release and not attempt to patch older releases.
 
 .. contents::
   :local:
+
+1.3.49 (???? ??, 2026)
+===========================
+
+Special Issues:
+
+* GraphicsMagick needs some additional productive volunteers.  For
+  several years now, the burden has entirely been on me (Bob
+  Friesenhahn).  I have been sheparding the project for 24 years
+  already (and contributed to ImageMagick and GraphicsMagick combined
+  for 30 years already).  Volunteers are needed to add/improve
+  new/existing file format support, and to assure correct operation on
+  all targets.
+
+Security Fixes:
+
+* IPTC attributes: Address heap buffer over-reads in
+  GenerateIPTCAttribute().
+
+* Import: MagickXImportImage(), Avoid heap buffer overflow. Addresses
+  ImageMagick CVE-2026-61464 (GHSA-76q6-2p6h-xjqr).
+
+* MAT: Avoid the possible dereference of a null image pointer.
+
+* MNG: Address ImageMagick CVE CVE-2025-55154. Guard against integer
+  overflow and underflow in MNG MAGN chunk handling.
+
+* SVG: Address ImageMagick CVE-2026-56379, which is about a command
+  injection vulnerability which allows attackers to execute arbitrary
+  code via crafted SVG files containing malicious drawing commands.
+
+* SVG: SVGValidateElementId(): Address Coverity 504982 "Dereference
+  after null check".
+
+* TIFF: Respect adjoin mode while closing blob as is done for other
+  formats. Fixes Debian Bug#1146076: "graphicsmagick: decomposing
+  three or more frames with +adjoin aborts with double free or
+  corruption".
+
+* WPG: Limit recursion under ExtractPostscript() to avoid stack
+  exhaustion
+
+* X11 MagickXMakeImage(): Avoid dereference of NULL ximage pointer.
+
+Bug fixes:
+
+* BMP: ReadBMPImage(), Avoid doing a CloseBlob() on a NULL image.
+
+* DCX: Fix file size reasonableness check for RLE compressed files,
+  which was rejecting many sample DCX files.
+
+* HEIF: Fix an ordering issue which broke the check for the minimal
+  1.14.0 version.
+
+* MAT: WriteMATLABImage(), Avoid doing a CloseBlob() on a NULL image.
+
+* PNG writer: Ensure that 'image_matte' is compatible with
+  'ping_colortype' in order to avoid a corrupt image. Add direct
+  support for -type Bilevel, Grayscale, GrayscaleMatte, Palette,
+  TrueColor, TrueColorMatte.
+
+* PerlMagick: For AddDefinition(), AddDefinitions(), assure that
+  ExceptionInfo is initialized prior to use.
+
+* WPG: ExtractPostscript(), Avoid passing NULL 'ps_data' to
+  BlobToImage().
+
+* draw: Assure that DrawRoundLinecap coordinates were provided.
+
+* draw: Place a hard limit on the number of DrawDashPolygon polygon
+  coordinates.
+
+API Updates:
+
+* GCC/Clang: Added more __attribute__(__nonnull__) declarations for
+  GCC, Clang, or other compilers which support the syntax. This helps
+  produce useful warnings in code using those functions.
+
+New Features:
+
+* None
+
+Behavior Changes:
+
+* None
+
+Build Changes:
+
+* None
+
+Windows Delegate Updates/Additions:
+
+* None. Please note that most of the bundled 3rd-party source packages
+  have known security issues, even if they represent the latest
+  release. Bundling source files in this manner does not make sense in
+  today's hostile/aware world.
+
 
 1.3.48 (July 23, 2026)
 ===========================

@@ -1,5 +1,7 @@
 2026-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * format_c_api_doc.py, format_c_api_docs.py, html_fragments.py:
         * make_www.py, named_colors.py, omp_decimal_align.py, relpath.py:
         * rst2html5.py: Update script syntax to target Python 3.10 or
