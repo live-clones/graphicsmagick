@@ -949,6 +949,12 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
       for (y=0; y < image->rows; y++)
         {
           q=pixels+(size_t)y*width;
+          if (q < pixels)
+          {
+            ThrowException(&image->exception,CoderError,ArithmeticOverflow,
+                           image->filename);
+            goto decode_error_exit;
+          }
           number_pixels=bytes_per_line;
           if (ReadBlob(blob,number_pixels,(char *) scanline) != number_pixels)
             {
@@ -968,6 +974,12 @@ static unsigned char *DecodeImage(const ImageInfo *image_info,
   for (y=0; y < image->rows; y++)
     {
       q=pixels+(size_t)y*width;
+      if (q < pixels)
+          {
+            ThrowException(&image->exception,CoderError,ArithmeticOverflow,
+                             image->filename);
+            goto decode_error_exit;
+          }
       /*
         From page 119 of Inside Macintosh: Volume V
         (https://vintageapple.org/inside_o/pdf/Inside_Macintosh_Volume_V_1986.pdf):

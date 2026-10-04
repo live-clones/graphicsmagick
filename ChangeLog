@@ -1,5 +1,8 @@
 2026-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/pict.c (DecodeImage): Detect arithmetic overflow while
+        decoding pixels.
+
         * NEWS.txt: Update the news.
 
         * format_c_api_doc.py, format_c_api_docs.py, html_fragments.py:
