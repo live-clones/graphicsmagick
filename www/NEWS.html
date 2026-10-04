@@ -126,6 +126,7 @@ ImageMagick CVE-2026-61464 (GHSA-76q6-2p6h-xjqr).</p></li>
 <li><p>MAT: Avoid the possible dereference of a null image pointer.</p></li>
 <li><p>MNG: Address ImageMagick CVE CVE-2025-55154. Guard against integer
 overflow and underflow in MNG MAGN chunk handling.</p></li>
+<li><p>PICT: Detect arithmetic overflow while decoding pixels.</p></li>
 <li><p>SVG: Address ImageMagick CVE-2026-56379, which is about a command
 injection vulnerability which allows attackers to execute arbitrary
 code via crafted SVG files containing malicious drawing commands.</p></li>
@@ -136,7 +137,7 @@ formats. Fixes Debian Bug#1146076: &quot;graphicsmagick: decomposing
 three or more frames with +adjoin aborts with double free or
 corruption&quot;.</p></li>
 <li><p>WPG: Limit recursion under ExtractPostscript() to avoid stack
-exhaustion</p></li>
+exhaustion (CVE-2026-103118).</p></li>
 <li><p>X11 MagickXMakeImage(): Avoid dereference of NULL ximage pointer.</p></li>
 </ul>
 <p>Bug fixes:</p>

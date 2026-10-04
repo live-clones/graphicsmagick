@@ -45,6 +45,8 @@ Security Fixes:
 * MNG: Address ImageMagick CVE CVE-2025-55154. Guard against integer
   overflow and underflow in MNG MAGN chunk handling.
 
+* PICT: Detect arithmetic overflow while decoding pixels.
+
 * SVG: Address ImageMagick CVE-2026-56379, which is about a command
   injection vulnerability which allows attackers to execute arbitrary
   code via crafted SVG files containing malicious drawing commands.
@@ -58,7 +60,7 @@ Security Fixes:
   corruption".
 
 * WPG: Limit recursion under ExtractPostscript() to avoid stack
-  exhaustion
+  exhaustion (CVE-2026-103118).
 
 * X11 MagickXMakeImage(): Avoid dereference of NULL ximage pointer.
 
