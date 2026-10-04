@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
 # License: see __license__ below.
-
-# Use Python 3 print function in Python >= 2.6
-from __future__ import print_function
 
 __doc__ = """
 Reads a GraphicsMagick source file and parses the specially formatted
@@ -292,7 +288,7 @@ def parse(srcfilepath):
     state = state_init
     linecnt = 0
     ftitle = None
-    f = open(srcfilepath, 'r')
+    f = open(srcfilepath)
     for line in f:
         linecnt += 1
         if not (line.startswith('%') or line.startswith('+') or re.search(r'\*/', line)):
@@ -346,7 +342,7 @@ def parse(srcfilepath):
         elif state == state_found_fcndoc:
             # extract function prototype
             if line.startswith('% '):
-                line = re.sub(r'^%\s{0,2}', '', line, 1)
+                line = re.sub(r'^%\s{0,2}', '', line, count=1)
                 # if empty args (), it's not the prototype, but the one-line summary
                 if re.search(r'%s\(\)' % ftitle, line):
                     if para is None:
@@ -404,7 +400,7 @@ def parse(srcfilepath):
             if re.match(r'%.+%', line):
                 # really this should raise a warning of "incomplete prototype"
                 continue
-            line = re.sub(r'^%\s{0,2}', '', line, 1)
+            line = re.sub(r'^%\s{0,2}', '', line, count=1)
             if re.search(r'^\s*$', line):
                 dtrace('Line %d: end of more prototype' % linecnt)
                 state = state_found_prototype
@@ -450,7 +446,7 @@ def parse(srcfilepath):
                 state = state_init
                 continue
 
-            line = re.sub(r'^%\s{0,2}', '', line, 1)
+            line = re.sub(r'^%\s{0,2}', '', line, count=1)
             if line:
                 # look for list item, which starts with 'o'
                 m = re.search(r'^\s+o\s+([^:]+:|o|[0-9]\.)\s(.*)', line)
@@ -529,7 +525,7 @@ def process_srcfile(srcfilepath, basename, whatis, outfile, include_rst):
 
 def find_val(key, keyval_file):
     val = None
-    f = open(keyval_file, 'r')
+    f = open(keyval_file)
     cnt = 0
     for line in f:
         cnt += 1

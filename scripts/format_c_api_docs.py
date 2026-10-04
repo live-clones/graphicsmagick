@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
@@ -44,7 +43,7 @@ import rst2htmldeco
 # assume standard GM directory layout
 stylesheet_file = 'docutils-api.css'
 url_prefix = '../../'
-stylesheet_url = '%swww/%s' % (url_prefix, stylesheet_file)
+stylesheet_url = '{}www/{}'.format(url_prefix, stylesheet_file)
 
 
 

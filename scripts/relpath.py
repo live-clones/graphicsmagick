@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
 # All rights reserved.
 # License:  same as Python itself
-
-# Use Python 3 print function in Python >= 2.6
-from __future__ import print_function
 
 import sys
 import os, os.path
@@ -60,8 +56,8 @@ if __name__ == '__main__':
     subdir = os.path.abspath(sys.argv[2])
     prefix = os.path.commonprefix([topdir, subdir])
     if prefix != topdir:
-        print("'%s' is not a subordinate path of '%s'" % (subdir, topdir), file=sys.stderr)
+        print("'{}' is not a subordinate path of '{}'".format(subdir, topdir), file=sys.stderr)
         sys.exit(1)
 
-    print((rel_to_top(topdir, subdir)))
+    print(rel_to_top(topdir, subdir))
     sys.exit(0)

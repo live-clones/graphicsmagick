@@ -1,3 +1,12 @@
+2026-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * format_c_api_doc.py, format_c_api_docs.py, html_fragments.py:
+        * make_www.py, named_colors.py, omp_decimal_align.py, relpath.py:
+        * rst2html5.py: Update script syntax to target Python 3.10 or
+        later using 'pyupgrade --py310-plus', plus additional edits to
+        address Python 3.13 re.sub positional argument deprecation
+        warnings.
+
 2026-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * scripts/format_c_api_docs.py: Fix some gross Python 3 syntax
