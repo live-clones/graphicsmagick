@@ -45,25 +45,26 @@ Check http://www.GraphicsMagick.org/ or
 https://graphicsmagick.sourceforge.io/index.html for the latest
 version of this page.
 
-.. _FSF : http://www.fsf.org/
+.. _FSF : https://www.fsf.org/
 .. _`GNU GPL` :  https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
-.. _ImageMagick : http://www.imagemagick.org/
-.. _Open Source Initiative : http://www.opensource.org/
-.. _`MIT License` : http://opensource.org/licenses/MIT
-.. _OSSCC : http://www.osscc.net/en/index.html
-.. _OpenMP : http://www.openmp.org/
+.. _ImageMagick : https://www.imagemagick.org/
+.. _Open Source Initiative : https://www.opensource.org/
+.. _`MIT License` : https://opensource.org/licenses/MIT
+.. _`Apache-2.0 License` : https://opensource.org/license/apache-2.0
+.. _OSSCC : https://www.osscc.net/en/index.html
+.. _OpenMP : https://www.openmp.org/
 .. _`read about OpenMP in GraphicsMagick` : OpenMP.html
 .. _`ChangeLog` : ChangeLog.html
-.. _`Flickr` : http://www.kitchensoap.com/2009/04/03/slides-from-web20-expo-2009-and-somethin-else-interestin/
-.. _`Etsy` : http://codeascraft.etsy.com/2010/07/09/batch-processing-millions-of-images/
-.. _`John Allspaw's presentation` : http://www.kitchensoap.com/2009/04/03/slides-from-web20-expo-2009-and-somethin-else-interestin/
+.. _`Flickr` : https://www.kitchensoap.com/2009/04/03/slides-from-web20-expo-2009-and-somethin-else-interestin/
+.. _`Etsy` : https://codeascraft.etsy.com/2010/07/09/batch-processing-millions-of-images/
+.. _`John Allspaw's presentation` : https://www.kitchensoap.com/2009/04/03/slides-from-web20-expo-2009-and-somethin-else-interestin/
 .. _Mercurial : https://www.mercurial-scm.org/
 .. _`NEWS` : NEWS.html
 .. _`SLOCCount` : https://dwheeler.com/sloccount/
 .. _`authors` : authors.html
 .. _`benchmarks` : benchmarks.html
 .. _`manual page` : GraphicsMagick.html
-.. _`valgrind` : http://www.valgrind.org/
+.. _`valgrind` : https://www.valgrind.org/
 .. _`ASan` : https://github.com/google/sanitizers/wiki/AddressSanitizer
 .. _`UBSan` : https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
 .. _`oss-fuzz` : https://github.com/google/oss-fuzz
@@ -133,15 +134,17 @@ other popular software:
 
   * GM participates in Google's `oss-fuzz`_ project since 2018 (see `oss-fuzz open issues`_).
 
+  * GM's Google `oss-fuzz`_ historical metrics are much better (e.g. 9/925 vs 62/2597 open).
+
   * GM `valgrind`_'s 100% clean (memcheck and helgrind).
 
   * GM passes rigorous memory error testing using `ASan`_.
 
   * GM passes undefined behavior testing using `UBSan`_.
 
-  * GM has 0.00 (zero) defects per 1000 lines of code (380,756 total
+  * GM has 0.00 (zero) defects per 1000 lines of code (381,050 total
     lines of code analyzed) according to `Coverity Analysis Metrics`_
-    on August 31, 2026.
+    on September 30, 2026.
 
   * GM has zero issues detected by Clang 15 scan-build.
 
@@ -155,7 +158,10 @@ other popular software:
 
   * GM is distributed under an MIT-style license (`MIT License`_),
     approved by the `Open Source Initiative`_, recommended for use by
-    the `OSSCC`_, and compatible with the `GNU GPL`_.
+    the `OSSCC`_, and compatible with all versions of the `GNU
+    GPL`_. ImageMagick's license is based on the `Apache-2.0
+    License`_, which is much more restrictive than the MIT-style
+    license and not compatible with all GNU GPL license versions.
 
   * GM source code is managed in Mercurial_, a distributed source
     control management tool which supports management of local
