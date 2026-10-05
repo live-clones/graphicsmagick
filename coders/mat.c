@@ -1751,8 +1751,7 @@ static MagickPassFail WriteMATLABImage(const ImageInfo *image_info,Image *image)
       image=SyncNextImageInList(image);
     } /* while (1) */
 
-  if (image != (const Image *) NULL)
-    status &= CloseBlob(image);
+  status &= CloseBlob(image);
   MagickFreeResourceLimitedMemory(unsigned char *,pixels);
 
   if (logging)
