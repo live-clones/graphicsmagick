@@ -6515,8 +6515,21 @@ width=15><b><font face="Helvetica, Arial"
     MAGICK_TMPDIR
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>Path to directory where GraphicsMagick should write temporary
-files. The default is to use the system default, or the location set by
-<strong>TMPDIR</strong>.</td></tr></table>
+files. The default is to use the system default, or the location set
+by <strong>TMPDIR</strong>.
+Warning: Linux and some other systems often mount the default
+temporary file directory ("/tmp") as a memory-based filesystem
+(e.g. "tmpfs"), which is paged out to the "swap" partition when there
+is memory pressure. When GraphicsMagick writes large pixel-cache
+files, this causes memory contention with other processes, and
+GraphicsMagick (or another program!) may encounter a SIGBUS signal
+when swap becomes full. The user may create a directory on a normal
+"disk" based filesystem, which has plenty of free space (e.g. using
+'mktemp -d $HOME/tmp') and use MAGICK_TMPDIR to cause GraphicsMagick
+to use it.
+Note that while GraphicsMagick makes every effort to free temporary
+files it creates, a memory-based temporary file directory has the
+security advantage of forgetting everything after a reboot.</td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 

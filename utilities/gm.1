@@ -1,4 +1,4 @@
-.TH gm 1 "2026/09/29" "GraphicsMagick"
+.TH gm 1 "2026/10/05" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -5475,8 +5475,21 @@ looping structures, or when data is being read from a stream
 .TP
 .B "MAGICK_TMPDIR"
 \fRPath to directory where GraphicsMagick should write temporary
-files. The default is to use the system default, or the location set by
-\fBTMPDIR\fP.
+files. The default is to use the system default, or the location set
+by \fBTMPDIR\fP.
+Warning: Linux and some other systems often mount the default
+temporary file directory ("/tmp") as a memory-based filesystem
+(e.g. "tmpfs"), which is paged out to the "swap" partition when there
+is memory pressure. When GraphicsMagick writes large pixel-cache
+files, this causes memory contention with other processes, and
+GraphicsMagick (or another program!) may encounter a SIGBUS signal
+when swap becomes full. The user may create a directory on a normal
+"disk" based filesystem, which has plenty of free space (e.g. using
+\'mktemp -d $HOME/tmp') and use MAGICK_TMPDIR to cause GraphicsMagick
+to use it.
+Note that while GraphicsMagick makes every effort to free temporary
+files it creates, a memory-based temporary file directory has the
+security advantage of forgetting everything after a reboot.
 .TP
 .B "TMPDIR"
 \fRFor POSIX-compatible systems (Unix-compatible), the path to the

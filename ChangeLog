@@ -1,3 +1,14 @@
+2026-10-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/pixel_cache.c (ExtendCache): Use posix_fallocate() to
+        extend the cache, and report an error immediately if ENOSPC is
+        reported.
+
+        * doc/environment.imdoc (MAGICK_TMPDIR): Document the problem that
+        the default temporary file directory used by the system is often
+        memory-based, and it may run out of memory.  Advise that
+        MAGICK_TMPDIR may be used to avoid this issue.
+
 2026-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.

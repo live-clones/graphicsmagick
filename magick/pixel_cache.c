@@ -2425,6 +2425,42 @@ ExtendCache(int file,magick_off_t length)
   magick_off_t
     offset;
 
+#if defined(HAVE_POSIX_FALLOCATE)
+  {
+    /*
+      Extend file length using posix_fallocate().  Some filesystems do
+      not support posix_fallocate(), or perhaps they do something
+      terrible like write all of the physical bytes so we can write
+      them again.
+
+      We hope for an immediate ENOSPC if the filesystem can not
+      support the file size we ask for.
+    */
+    int err;
+    if ((err=posix_fallocate(file,0,length)) != 0)
+      {
+        (void) LogMagickEvent(CacheEvent,GetMagickModule(),
+                              "posix_fallocate() %" MAGICK_OFF_F "d bytes returns %d (%s)!\n",
+                              (MAGICK_SSIZE_T) length, err, strerror(err));
+        switch (err)
+          {
+          case EFBIG:
+          case ENOSPC:
+            {
+              (void) LogMagickEvent(CacheEvent,GetMagickModule(),
+                                    "There is not enough space left on the device!");
+              return MagickFail;
+            }
+          default:
+            {
+              /*
+                Ignore EBADF, EINTR, EINVAL, ENODEV, EOPNOTSUPP, ESPIPE
+              */
+            }
+          }
+      }
+  }
+#endif /* HAVE_POSIX_FALLOCATE */
   offset=MagickSeek(file,0,SEEK_END);
   if (offset < 0)
     return(MagickFail);
@@ -2742,6 +2778,8 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
     }
   if (!ExtendCache(file,(magick_off_t) cache_info->length+cache_info->offset))
     {
+      char cache_filename[MaxTextExtent];
+      (void) strlcpy(cache_filename,cache_info->cache_filename,sizeof(cache_filename));
       (void) LogMagickEvent(CacheEvent,GetMagickModule(),
                             "Unable to extend pixel cache from %"
                             MAGICK_UINTMAX_F "u bytes "
@@ -2760,7 +2798,7 @@ OpenCache(Image *image,const MapMode mode,ExceptionInfo *exception)
                             cache_info,
                             cache_info->filename);
       LiberateMagickResource(DiskResource,cache_info->length);
-      ThrowException(exception,CacheError,UnableToExtendCache,image->filename);
+      ThrowException(exception,CacheError,UnableToExtendCache,cache_filename);
       status=MagickFail;
       goto open_cache_done;
     }

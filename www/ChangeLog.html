@@ -38,6 +38,18 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-10-05  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/pixel_cache.c (ExtendCache): Use posix_fallocate() to
+extend the cache, and report an error immediately if ENOSPC is
+reported.</p></li>
+<li><p>doc/environment.imdoc (MAGICK_TMPDIR): Document the problem that
+the default temporary file directory used by the system is often
+memory-based, and it may run out of memory.  Advise that
+MAGICK_TMPDIR may be used to avoid this issue.</p></li>
+</ul>
+</blockquote>
 <p>2026-10-04  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
