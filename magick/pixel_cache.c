@@ -2426,12 +2426,19 @@ ExtendCache(int file,magick_off_t length)
     offset;
 
 #if defined(HAVE_POSIX_FALLOCATE)
+#if (!defined(MAGICK_DISABLE_FALLOCATE_CACHE) || \
+  (defined(MAGICK_DISABLE_FALLOCATE_CACHE) && (MAGICK_DISABLE_FALLOCATE_CACHE)))
   {
     /*
       Extend file length using posix_fallocate().  Some filesystems do
       not support posix_fallocate(), or perhaps they do something
-      terrible like write all of the physical bytes so we can write
-      them again.
+      terrible like individually zero all of the physical bytes so we
+      can overwrite them. Use of posix_fallocate() provides a Denial
+      Of Service (DOS) opportunity, while warding off other DOS
+      opportunities. A particular concern is if input files falsely
+      claim large dimensions (and immediately claim backing store for
+      those dimensions), but we provide multiple means to defend
+      against that.
 
       We hope for an immediate ENOSPC if the filesystem can not
       support the file size we ask for.
@@ -2460,6 +2467,7 @@ ExtendCache(int file,magick_off_t length)
           }
       }
   }
+#endif /* MAGICK_DISABLE_FALLOCATE_CACHE */
 #endif /* HAVE_POSIX_FALLOCATE */
   offset=MagickSeek(file,0,SEEK_END);
   if (offset < 0)
