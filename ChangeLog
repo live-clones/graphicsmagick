@@ -1,5 +1,8 @@
 2026-10-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * www/FAQ.rst: Add several new FAQ entries, and remove some stale
+        ones.
+
         * magick/pixel_cache.c (ExtendCache): Provide
         MAGICK_DISABLE_FALLOCATE_CACHE C pre-processor logic to allow a
         build to disable using posix_fallocate() to extend the cache.

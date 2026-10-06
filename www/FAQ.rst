@@ -8,6 +8,7 @@ GraphicsMagick FAQ
 
 .. URL links
 .. _animate: animate.html
+.. _batch: batch.html
 .. _composite: composite.html
 .. _convert: convert.html
 .. _display: display.html
@@ -63,7 +64,7 @@ by ImageMagick Studio LLC. Not long after the GraphicsMagick project
 was started in November 2002, ImageMagick from ImageMagick Studio LLC
 abandoned the MIT X11 style license it had been using since 1992, and
 switched between several different licenses until it ended up with one
-based on the Apache license, which is intended to penalize projects
+based on the Apache-2.0 license, which is intended to penalize projects
 which borrow some of its source code, or fork from it. Since that
 time, GraphicsMagick has not incorporated any ImageMagick source code.
 
@@ -81,42 +82,43 @@ encumberment.  In order for a work to be accepted, it must have been
 developed entirely outside the ImageMagick source base to avoid any
 possibility of copyright taint.
 
+How does Wayland Impact GraphicsMagick?
+---------------------------------------
+
+Wayland is a modern display server protocol that acts as a lightweight
+replacement for the legacy X11 window system (invented in the late
+1980s) on Linux. Some popular Linux (or other) systems have replaced
+the X11-based desktop with a Wayland-based desktop, which provides a
+communication prototol with a Wayland display server. Applications
+based on a high-level toolkit can be compiled to support Wayland
+rather than X11.
+
+X11 is inherently network-based (although providing local extensions
+for performance) whereas Wayland is inherently local (while sometimes
+providing extensions for use over a network).
+
+GraphicsMagick does not currently offer any special support for
+Wayland.  Wayland implementations typically provide a built-in X11
+server (which translates between X11 and Wayland), in which all X11
+applications share the same X11 server.  An immediate impact is that
+'gm import' can no longer import any window on the display since it
+can only access X11 windows displayed via the X11 server.  While X11
+used to provide excellent font rendering capabilities, it is noticed
+that X11 font quality may now be severely degraded (at least for the
+KWin compositor) such that fonts rendered for the GraphicsMagick GUI
+look very poor.
+
+In the future GraphicsMagick may implement a new GUI based on a
+portable toolkit capable of supporting Wayland or X11.
+
 Are there any plans to use OpenCL or CUDA to use a GPU?
 -------------------------------------------------------
 
-It is well known that some math-intensive algorithms run very quickly
-on video-card (and stand-alone) GPUs.  Video card vendors encourage
-you to buy an expensive video card with quite a lot of installed RAM
-and modify applications to use the GPU via their proprietary or
-limited-purpose APIs.  GPUs are quite effective at producing images
-for real-time display, such as for video games and virtual reality.
-GraphicsMagick has been significantly updated to use multiple CPU
-cores to speed up the image processing, and work continues to thread
-the few remaining algorithms, or remove inefficiencies in algorithms
-which don't see as much speed-up as they should.  Linear speedup as
-cores are added is typical for CPU-bound algorithms on well-designed
-CPUs.  Regardless, `Amdahl's law
-<https://en.wikipedia.org/wiki/Amdal%27s_law>`_ is a significant factor
-in GraphicsMagick, with non-parallelizable code paths often dominating
-the time.
-
-It is my belief that stand-alone GPUs are a poor design for general
-computing tasks (expensive, inefficient, failure-prone, bandwidth
-bottlenecked, lack functionality, are insecure, and are not supported
-in servers) and that multi-core CPUs will continue to dominate the
-computing market.  Functionality which currently works best in a GPU
-will simply be integrated into tomorrow's multi-core CPUs and C
-compilers will naturally support that functionality.  Once GPU
-capabilities are integrated into CPUs, there will be no more need to
-develop specialized code for a GPU.  Today 16 core CPUs are readily
-available for purchase in systems at reasonable prices, and this trend
-is certain to continue.
-
-Future multi-core CPUs will use a similar amount of power to today's
-CPUs, will idle at very low power consumption levels, and will fit
-into a very small chassis.  Due to this trend, there is no value
-obtained by expending energy toward developing specialized code for
-today's GPUs in GraphicsMagick.
+OpenCL, CUDA, and other GPU APIs are not compatible with
+GraphicsMagick's objective to be able to run anywhwere with a minimum
+amount of fuss. GraphicsMagick supports OpenMP, which is mature, and
+provides substantial speed-up on modern multi-core CPUs.  There is no
+plan to support GPU-based accelleration.
 
 What is the meaning of "magick"?
 --------------------------------
@@ -362,8 +364,8 @@ example, ::
     gm composite -geometry +0+375 composite.miff image4.gif composite.miff
 
 
-How do I create a GIF animation sequence to display within Firefox?
--------------------------------------------------------------------
+How do I create a GIF animation sequence to display in a web browser?
+---------------------------------------------------------------------
 
 Use convert_ with the *-delay* and *-page* options. The *-delay* option
 is used to specify the delay in *1/100ths of a second* between the
@@ -527,19 +529,6 @@ them with your image.
 
     gm convert -mattecolor gray -frame 25x25+0+25 image.jpg image.gif
     gm convert -mattecolor gray -frame 25x25+25+0 image.jpg image.gif
-
-I try to launch display from my window manager and it fails. What's up?
------------------------------------------------------------------------
-
-Display_ determines if it is executing interactively and behaves
-differently depending on the result. To convince display <display.html>
-you are running in an interactive environment when launching from a
-window manager, use either of ::
-
-  display logo:Untitled
-  display < /dev/console
-
-Note that this issue no longer exists as of GraphicsMagick 1.2.
 
 How can I make Postscript text look good?
 -----------------------------------------
@@ -760,3 +749,51 @@ By default `identify` reports only the most basic properties::
   seaworld.jpg JPEG 1530x1020+0+0 DirectClass 8-bit 204.0K 0.000u 0:01
 
 but with -verbose it can report on a large number of properties.
+
+Why does GraphicsMagick not provide a time resource limit?
+----------------------------------------------------------
+
+Currently GraphicsMagick does not provide a time resource limit (as
+ImageMagick does). The GraphicsMagick API (primarily originating from
+ImageMagick) is poorly designed to support the needs of a per-request
+time resource limit, since, given simultaneous requests from multiple
+originating threads in the same program, there is no way to identify
+which requests should be aborted.  The implementation in ImageMagick
+is based on polling, but polling is not a reliable mechanism.
+
+Until a time resource limit is added, it is recommended to use an
+external mechanism which executes a subordinate GraphicsMagick utility
+command, and terminates it using a SIGTERM signal if it does not
+complete in the expected time. GNU coreutils provides a 'timeout'
+command which supports this.  For example::
+
+  timeout 60 gm convert ...
+
+How does the European Union's Cyber Resilience Act (CRA) apply to GraphicsMagick?
+---------------------------------------------------------------------------------
+
+The first deadline in the European Union's Cyber Resilience Act came
+into effect on September 11, 2026.  Full enforcement starts on
+December 11, 2027.
+
+For purpose of the CRA, GraphicsMagick falls under the Non-Commercial
+Exemption so it is is generally exempt from the CRA’s strict
+compliance and CE-marking mandates. This means that its FOSS authors
+are not subject to any obligation or penalty, including those who
+reside in the EU.
+
+If GraphicsMagick is sold, or packaged in a commercial product then it
+becomes subject to the CRA under the definition of a "product with
+digital elements".
+
+Manufacturers who integrate GraphicsMagick into products sold on the
+EU market carry the legal burden of compliance, vulnerability
+tracking, and providing a Software Bill of Materials (SBOM).
+
+While the GraphicsMagick project continues to be a FOSS project, it
+does recognize the needs of commercial software distributions
+(e.g. Linux distributions) and vendors who include GraphicsMagick as
+part of their product. Commercial vendors who need to comply with the
+CRA are encouraged to submit or contribute content, or support, to the
+GraphicsMagick project to make it easier to adopt and support
+according to the CRA.
