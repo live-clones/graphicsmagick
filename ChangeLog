@@ -1,3 +1,8 @@
+2026-10-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Added SPDX-License-Identifier declarations to most source files
+        to make automated license identification easy.
+
 2026-10-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/FAQ.rst: Add several new FAQ entries, and remove some stale

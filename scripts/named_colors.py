@@ -3,6 +3,7 @@
 
 #* Author: Mark Mitchell
 #* Copyright 2008  Mark Mitchell
+#* SPDX-License-Identifier: MIT
 #* License: see __license__ below.
 
 import sys

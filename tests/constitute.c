@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2025 GraphicsMagick Group
+* SPDX-License-Identifier: MIT
  *
  * Test DispatchImage/ConstituteImage operations via
  * write/read/write/read sequence to detect any data corruption

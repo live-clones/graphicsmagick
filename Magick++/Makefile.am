@@ -2,6 +2,7 @@
 # Top Makefile for Magick++
 #
 # Copyright (C) 1999-2024 Bob Friesenhahn
+# SPDX-License-Identifier: MIT
 #
 
 #AM_CPPFLAGS += -I$(top_srcdir)/Magick++/lib

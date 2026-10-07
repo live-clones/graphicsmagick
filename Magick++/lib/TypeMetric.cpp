@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 2001
+// SPDX-License-Identifier: MIT
 //
 // TypeMetric implementation
 //

@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 2000-2024
+// SPDX-License-Identifier: MIT
 //
 // Demo of text annotation with gravity.  Produces an animation showing
 // the effect of rotated text along with various gravity specifications.

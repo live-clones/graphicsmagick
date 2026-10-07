@@ -3,6 +3,7 @@
 
 # Copyright 2008 Mark Mitchell
 # All rights reserved.
+# SPDX-License-Identifier: Python-2.0.1
 # License:  same as Python itself
 
 import sys

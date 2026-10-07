@@ -1,6 +1,7 @@
 #!/bin/sh
 # -*- shell-script -*-
 # Copyright (C) 2004-2012 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 # Test preview generation
 . ./common.shi
 . ${top_srcdir}/utilities/tests/common.sh

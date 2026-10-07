@@ -1,6 +1,7 @@
 # vim:ts=4:sw=4:expandtab:tw=100:
 
 #* Author: Mark Mitchell
+#* SPDX-License-Identifier: MIT
 #* License: Same as GraphicsMagick.
 
 __doc__ = """

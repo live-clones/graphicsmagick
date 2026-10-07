@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2012 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # Print the package version based on content of $srcdir/version.sh.
 #

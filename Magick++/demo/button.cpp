@@ -2,6 +2,7 @@
 // Magick++ demo to generate a simple text button
 //
 // Copyright Bob Friesenhahn, 1999-2024
+// SPDX-License-Identifier: MIT
 //
 
 #include <Magick++.h>

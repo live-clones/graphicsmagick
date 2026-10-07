@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2009-2026 GraphicsMagick Group
 % Copyright (C) 2005 Eskil Steenberg.  All rights reserved.
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this

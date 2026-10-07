@@ -2,6 +2,7 @@
 
 #* Author: Mark Mitchell
 #* Copyright 2008-2022  Mark Mitchell, All Rights Reserved
+#* SPDX-License-Identifier: MIT
 #* License: see __license__ below.
 
 """Renders reStructuredText files to HTML with some custom HTML parts included,

@@ -2,6 +2,7 @@
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
+# SPDX-License-Identifier: MIT
 # License: Same as GraphicsMagick.
 
 import sys

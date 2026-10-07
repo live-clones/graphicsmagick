@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2021 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # Copy GraphicsMagick snapshot release files to a different host to make them available.
 # Then use rsync to send them to SourceForge.

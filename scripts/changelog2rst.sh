@@ -1,4 +1,7 @@
 #!/bin/sh
+# Copyright (C) 2011-2024 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
+#
 # Simple filter to filter a ChangeLog to something in reStructuredText.
 #
 if [ -n "$1" ]

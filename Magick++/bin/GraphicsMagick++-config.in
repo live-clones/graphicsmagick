@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright Bob Friesenhahn, 2002-2023
+# SPDX-License-Identifier: MIT
 #
 # Configure options script for re-calling compilation
 # options required to use the Magick++ library.

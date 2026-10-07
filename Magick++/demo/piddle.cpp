@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 1999-2024
+// SPDX-License-Identifier: MIT
 //
 // PerlMagick "piddle" demo re-implemented using Magick++ methods.
 // The PerlMagick "piddle" demo is written by John Cristy

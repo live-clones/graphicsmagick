@@ -1,6 +1,7 @@
 # -*- shell-script -*-
 #
 # Copyright (C) 2012 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # TAP-test implementation functions specific to GraphicsMagick.
 #

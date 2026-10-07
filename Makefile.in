@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 # Copyright (C) 2004-2026 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -35,6 +36,7 @@
 #
 
 # Copyright (C) 2004-2024 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -45,6 +47,7 @@
 #
 
 # Copyright (C) 2004-2025 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -55,6 +58,7 @@
 #
 
 # Copyright (C) 2004-2014 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -68,6 +72,7 @@
 # Top Makefile for Magick++
 #
 # Copyright (C) 1999-2024 Bob Friesenhahn
+# SPDX-License-Identifier: MIT
 #
 
 #AM_CPPFLAGS += -I$(top_srcdir)/Magick++/lib
@@ -81,7 +86,8 @@
 # Makefile for GraphicsMagick tests invoked via the C API
 #
 
-# Copyright (C) 2004 - 2014 GraphicsMagick Group
+# Copyright (C) 2004-2014 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -128,6 +134,7 @@
 #
 
 # Copyright (C) 2004-2010 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 #
 # This program is covered by multiple licenses, which are described in
 # Copyright.txt. You should have received a copy of Copyright.txt with this

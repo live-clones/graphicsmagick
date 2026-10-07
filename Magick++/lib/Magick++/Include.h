@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 1999-2026
+// SPDX-License-Identifier: MIT
 //
 // Inclusion of GraphicsMagick headers (with namespace magic)
 

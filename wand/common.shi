@@ -1,3 +1,6 @@
+# Copyright (C) 2012 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
+#
 # Common code fragment for wand tests
 #
 subdir=wand

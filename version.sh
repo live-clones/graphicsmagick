@@ -1,3 +1,6 @@
+# Copyright (C) 2003-2026 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
+
 #
 # Package name and versioning information for GraphicsMagick
 #

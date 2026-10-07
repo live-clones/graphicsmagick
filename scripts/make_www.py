@@ -2,6 +2,7 @@
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
+# SPDX-License-Identifier: MIT
 # License: Same as GraphicsMagick.
 
 __doc__ = """Runs rst2htmldeco.py on all files in the rst_pagelist.txt list.

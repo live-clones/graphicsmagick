@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 2001-2024
+// SPDX-License-Identifier: MIT
 //
 // Resize image using specified resize algorithm with Magick++ API
 //
