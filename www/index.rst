@@ -31,7 +31,7 @@ GraphicsMagick Image Processing System
     :alt: packaging status
 
 ===========================  =========================================================
-Current Release              1.3.48 (Released July 23, 2026 |packaging|) `download release`__
+Current Release              1.3.49 (Released October 8, 2026 |packaging|) `download release`__
 Development Snapshots        (Updated frequently) `download development snapshots`__
 Mercurial Repository         (Updated frequently) `visit Mercurial repository`__
 ===========================  =========================================================
