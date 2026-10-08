@@ -1,4 +1,5 @@
 /* Copyright (C) 2003-2010 GraphicsMagick Group */
+/* SPDX-License-Identifier: MIT */
 /*
  *
  * Test program for C drawing API

@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2003-2018 GraphicsMagick Group
+  SPDX-License-Identifier: MIT
 
   GraphicsMagick Wand API Methods
 */

@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -37,6 +38,7 @@
   Include declarations.
 */
 #include "magick/studio.h"
+#include "magick/static.h"
 #if defined(HasXML)
 #include "magick/attribute.h"
 #include "magick/blob.h"
@@ -60,7 +62,6 @@
 #include "magick/texture.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
-#include "magick/static.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)
@@ -2112,7 +2113,7 @@ MSLStartElement(void *context,const xmlChar *name,
                       *profile_name;
 
                     size_t
-                      profile_length;
+                      profile_length=0;
 
                     const unsigned char *
                       profile_data;
@@ -3914,6 +3915,7 @@ MSLCharacters(void *context,const xmlChar *c,int length)
   parser=(xmlParserCtxtPtr) context;
   msl_info=(MSLInfo *) parser->_private;
   assert(msl_info->signature == MagickSignature);
+  ARG_NOT_USED(msl_info);
 }
 
 static void
@@ -3944,11 +3946,7 @@ MSLWarning(void *context,const char *format,...)
   parser=(xmlParserCtxtPtr) context;
   msl_info=(MSLInfo *) parser->_private;
   assert(msl_info->signature == MagickSignature);
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,MaxTextExtent,format,operands);
-#endif
   ThrowException2(msl_info->exception,CoderError,reason,(char *) NULL);
   va_end(operands);
 }
@@ -3981,11 +3979,7 @@ MSLError(void *context,const char *format,...)
 #if defined(NDEBUG)
   (void) msl_info;
 #endif
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,MaxTextExtent,format,operands);
-#endif
   ThrowException2(msl_info->exception,DelegateFatalError,reason,(char *) NULL);
   va_end(operands);
   xmlStopParser(parser);

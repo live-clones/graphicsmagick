@@ -917,6 +917,12 @@ Not enough tiles found in level
 .
 
 MessageId       = +1
+SymbolicName    = ImageErrorRecursionDetected
+Language        = English
+excessive recursion detected
+.
+
+MessageId       = +1
 SymbolicName    = ImageErrorStaticPlanesValueNotEqualToOne
 Language        = English
 Static planes value not equal to 1

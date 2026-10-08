@@ -72,7 +72,7 @@ To help prevent color flashing on X server visuals that have colormaps,
 creates a single colormap from the image sequence. This can be rather time
 consuming. You can speed this operation up by reducing the colors in the
 image before you "animate" them. Use <s>mogrify</s> to color reduce the
-images to a single colormap. See <s>mogrify(1)</s> for details. Alternatively,
+images to a single colormap. See <s>mogrify</s> for details. Alternatively,
 you can use a Standard Colormap; or a static, direct, or true color visual.
 You can define a Standard Colormap with <i>xstdcmap</i>. See <s>xstdcmap(1)</s>
 for details. This method is recommended for colormapped X server because
@@ -110,10 +110,10 @@ Options, above.
 </gm>
 <im>
 <format type=man,tex>
-<i>GraphicsMagick(1)</i>.
+<i>gm(1)</i>.
 </format>
 <format type=html>
-<a href="GraphicsMagick.html"><i>GraphicsMagick(1)</i></a>.
+<a href="GraphicsMagick.html"><i>GraphicsMagick</i></a>.
 </format>
 </im>
 </p>
@@ -126,10 +126,10 @@ Options, above.
 </gm>
 <im>
 <format type=man,tex>
-<i>GraphicsMagick(1)</i>.
+<i>gm(1)</i>.
 </format>
 <format type=html>
-<a href="GraphicsMagick.html"><i>GraphicsMagick(1)</i></a>.
+<a href="GraphicsMagick.html"><i>GraphicsMagick</i></a>.
 </format>
 </im>
 </p>
@@ -221,7 +221,7 @@ any key or button to erase the information.</dd>
 <dd>This information is printed: image name;  image size;
 and the total number of unique colors in the image.</dd>
 <dt><s>F1</s></dt>
-<dd>Press to display helpful information about <s>animate(1)</s>.</dd>
+<dd>Press to display helpful information about <s>animate</s>.</dd>
 <dt><s>Ctl-q</s></dt>
 <dd>Press to discard all images and exit program.</dd>
 </dl>
@@ -309,17 +309,7 @@ of header identifying the window. The default is the image file name.</dd>
 <format type=man>
 <sect NAME="also">SEE ALSO
 <p>
-GraphicsMagick(1),
-compare(1),
-composite(1),
-conjure(1),
-convert(1),
-display(1),
-identify(1),
-import(1),
-mogrify(1),
-montage(1)
-</p>
+gm(1)</p>
 </sect>
 </format>
 </im>

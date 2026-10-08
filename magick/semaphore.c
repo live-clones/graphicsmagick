@@ -1,6 +1,7 @@
 /*
-% Copyright (C) 2003-2012 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -602,13 +603,13 @@ MagickExport void LockSemaphoreInfo(SemaphoreInfo *semaphore_info)
   assert(semaphore_info->signature == MagickSignature);
 #if defined(USE_OPENMP_LOCKS)
   omp_set_lock(&semaphore_info->mutex);
-#endif /* defined(USE_OPENMP_LOCKS) */
-#if defined(USE_PTHREAD_LOCKS)
+#elif defined(USE_PTHREAD_LOCKS)
   PTHREAD_MUTEX_LOCK(&semaphore_info->mutex);
-#endif /* defined(USE_PTHREAD_LOCKS) */
-#if defined(USE_WIN32_LOCKS)
+#elif defined(USE_WIN32_LOCKS)
   EnterCriticalSection(&semaphore_info->mutex);
-#endif /* defined(USE_WIN32_LOCKS) */
+#else
+  ARG_NOT_USED(semaphore_info);
+#endif
 }
 
 /*
@@ -641,11 +642,11 @@ MagickExport void UnlockSemaphoreInfo(SemaphoreInfo *semaphore_info)
 
 #if defined(USE_OPENMP_LOCKS)
   omp_unset_lock(&semaphore_info->mutex);
-#endif /* defined(USE_OPENMP_LOCKS) */
-#if defined(USE_PTHREAD_LOCKS)
+#elif defined(USE_PTHREAD_LOCKS)
   PTHREAD_MUTEX_UNLOCK(&semaphore_info->mutex);
-#endif /* defined(USE_PTHREAD_LOCKS) */
-#if defined(USE_WIN32_LOCKS)
+#elif defined(USE_WIN32_LOCKS)
   LeaveCriticalSection(&semaphore_info->mutex);
-#endif /* defined(USE_WIN32_LOCKS) */
+#else
+  ARG_NOT_USED(semaphore_info);
+#endif
 }

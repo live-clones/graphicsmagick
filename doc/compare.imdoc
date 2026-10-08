@@ -97,10 +97,10 @@ Options, above.
 </gm>
 <im>
 <format type=man,tex>
-<i>GraphicsMagick(1)</i>.
+<i>gm(1)</i>.
 </format>
 <format type=html>
-<a href="GraphicsMagick.html"><i>GraphicsMagick(1)</i></a>.
+<a href="GraphicsMagick.html"><i>GraphicsMagick</i></a>.
 </format>
 </im>
 </p>
@@ -117,10 +117,10 @@ Options, above.
 </gm>
 <im>
 <format type=man,tex>
-<i>GraphicsMagick(1)</i>.
+<i>gm(1)</i>.
 </format>
 <format type=html>
-<a href="GraphicsMagick.html"><i>GraphicsMagick(1)</i></a>.
+<a href="GraphicsMagick.html"><i>GraphicsMagick</i></a>.
 </format>
 </im>
 </p>
@@ -132,16 +132,7 @@ Options, above.
 <format type=man>
 <sect NAME="comp-also">SEE ALSO
 <p>
-GraphicsMagick(1),
-animate(1),
-compare(1),
-conjure(1),
-convert(1),
-display(1),
-identify(1),
-import(1),
-mogrify(1),
-montage(1)
+gm(1)
 </p>
 </sect>
 </format>

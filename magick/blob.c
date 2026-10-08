@@ -2,6 +2,7 @@
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -70,6 +71,10 @@
 #if !defined(MagickMaxFileSystemBlockSize)
 #define MagickMaxFileSystemBlockSize 4194304
 #endif /* if !defined(MagickMaxFileSystemBlockSize) */
+
+#if !defined(DEBUG_VBUF)
+#  define DEBUG_VBUF 1 /* Enable to debug stdio vbuf */
+#endif /* if !defined(DEBUG_VBUF) */
 
 /*
   Enum declarations.
@@ -416,6 +421,7 @@ MagickExport void AttachBlob(BlobInfo *blob_info,const void *blob,
   const size_t length)
 {
   assert(blob_info != (BlobInfo *) NULL);
+  assert(blob != (const void *) NULL);
   blob_info->length=length;
   blob_info->extent=length;
   blob_info->quantum=DefaultBlobQuantum;
@@ -729,6 +735,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
 
   assert(image_info != (ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
+  assert(blob != (const void *) NULL);
   assert(exception != (ExceptionInfo *) NULL);
 
   image=(Image *) NULL;
@@ -736,7 +743,7 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
                         "Entering BlobToImage: blob=%p,"
                         " length=%" MAGICK_SIZE_T_F "u",
                         blob, (MAGICK_SIZE_T) length);
-  if ((blob == (const void *) NULL) || (length == 0))
+  if (length == 0)
     {
       ThrowException(exception,OptionError,NullBlobArgument,
                      image_info->magick);
@@ -955,9 +962,9 @@ MagickExport MagickPassFail CloseBlob(Image *image)
     {
       LockSemaphoreInfo(image->blob->semaphore);
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
-                            "Closing %sStream blob: image %p, blob %p, ref %lu",
+                            "Closing %sStream blob: image %p, blob %p, ref %lu, filename \"%s\"",
                             BlobStreamTypeToString(blob->type),
-                            image,blob,blob->reference_count);
+                            image,blob,blob->reference_count,image->filename);
       (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                             "Blob "
                             "wrote %" MAGICK_UINTMAX_F "u bytes, "
@@ -1072,6 +1079,10 @@ MagickExport MagickPassFail CloseBlob(Image *image)
                       blob->first_errno=errno;
                   }
               }
+#if DEBUG_VBUF
+            if (blob->logging)
+              (void) LogMagickEvent(BlobEvent,GetMagickModule(),"Freeing blob stdio vbuf...");
+#endif /* if DEBUG_VBUF */
             MagickFreeMemory(image->blob->vbuf);
             break;
           }
@@ -1336,6 +1347,10 @@ MagickExport void DetachBlob(BlobInfo *blob_info)
         (void) UnmapBlob(blob_info->data,blob_info->length);
       LiberateMagickResource(MapResource,blob_info->length);
     }
+#if DEBUG_VBUF
+  if (blob_info->logging)
+    (void) LogMagickEvent(BlobEvent,GetMagickModule(),"Freeing blob stdio vbuf...");
+#endif /* if DEBUG_VBUF */
   MagickFreeMemory(blob_info->vbuf);
   blob_info->mapped=MagickFalse;
   blob_info->length=0;
@@ -2305,6 +2320,7 @@ MagickExport void *ImageToBlob(const ImageInfo *image_info,Image *image,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  assert(length != (size_t *) NULL);
   assert(exception != (ExceptionInfo *) NULL);
 
   if (image->blob->logging)
@@ -2510,6 +2526,7 @@ MagickExport MagickPassFail ImageToFile(Image *image,const char *filename,
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(filename != (const char *) NULL);
+  assert(exception != (ExceptionInfo *) NULL);
 
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
@@ -2826,6 +2843,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  assert(exception != (ExceptionInfo *) NULL);
   image->blob->logging = IsEventLogged(BlobEvent);
   if (image->blob->logging)
     (void) LogMagickEvent(BlobEvent,GetMagickModule(),
@@ -3001,8 +3019,14 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                   size_t
                     vbuf_size;
 
+                  assert( image->blob->vbuf == (char *) NULL);
                   vbuf_size=image->blob->block_size;
-                  MagickFreeMemory(image->blob->vbuf);
+#if DEBUG_VBUF
+                  if (image->blob->logging)
+                    (void) LogMagickEvent(BlobEvent,GetMagickModule(),
+                                          "Allocating blob stdio vbuf of "
+                                          "%" MAGICK_SIZE_T_F "u bytes ...", vbuf_size);
+#endif /* if DEBUG_VBUF */
                   image->blob->vbuf=MagickAllocateClearedMemory(char *, vbuf_size);
                   if ((0 != vbuf_size) && (image->blob->vbuf != (char *) NULL))
                     {
@@ -3014,6 +3038,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                                                   " bytes returns failure!",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
+#if DEBUG_VBUF
                       else
                         {
                           if (image->blob->logging)
@@ -3022,6 +3047,7 @@ MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,Image *image,
                                                   "%" MAGICK_SIZE_T_F "u bytes",
                                                   (MAGICK_SIZE_T) vbuf_size);
                         }
+#endif /* if DEBUG_VBUF */
                     }
                   /*
                     Enable fsync-on-close mode if requested.
@@ -3240,6 +3266,7 @@ MagickExport Image *PingBlob(const ImageInfo *image_info,const void *blob,
 
   assert(image_info != (ImageInfo *) NULL);
   assert(image_info->signature == MagickSignature);
+  assert(blob != (const void *) NULL);
   assert(exception != (ExceptionInfo *) NULL);
   clone_info=CloneImageInfo(image_info);
   clone_info->ping=MagickTrue;

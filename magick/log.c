@@ -1,6 +1,7 @@
 /*
-% Copyright (C) 2003 - 2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -511,6 +512,10 @@ MagickExport MagickBool IsEventLogged(const ExceptionType type)
   MagickBool
     enabled = MagickFalse;
 
+  if (log_info == (LogInfo *) NULL)
+    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
+      UnableToAllocateLogInfo);
+
   /* Short-circuit for when not logging at all */
   if (log_info->events == NoEventsMask)
     return MagickFalse;
@@ -629,6 +634,10 @@ LogMagickEventList(const ExceptionType type,
 
   time_t
     seconds;
+
+  if (log_info == (LogInfo *) NULL)
+    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
+      UnableToAllocateLogInfo);
 
   if (!IsEventLogged(type))
     return MagickFalse;
@@ -1022,6 +1031,10 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
 
   MagickPassFail
     status=MagickPass;
+
+  if (log_info == (LogInfo *) NULL)
+    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
+      UnableToAllocateLogInfo);
 
   /*
     Read the log configure file.

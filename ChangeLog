@@ -1,4 +1,374 @@
+2026-10-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * version.sh: Updates in preparation for the 1.3.48 release.
+
+        * www/index.rst: Updates in preparation for the 1.3.48 release.
+
+        * www/Changes.rst: Updates in preparation for the 1.3.48 release.
+
+        * NEWS.txt: Update the news.
+
+2026-10-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Added SPDX-License-Identifier declarations to most source files
+        to make automated license identification easy.
+
+2026-10-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/FAQ.rst: Add several new FAQ entries, and remove some stale
+        ones.
+
+        * magick/pixel_cache.c (ExtendCache): Provide
+        MAGICK_DISABLE_FALLOCATE_CACHE C pre-processor logic to allow a
+        build to disable using posix_fallocate() to extend the cache.
+
+2026-10-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/pixel_cache.c (ExtendCache): Use posix_fallocate() to
+        extend the cache, and report an error immediately if ENOSPC is
+        reported.
+
+        * doc/environment.imdoc (MAGICK_TMPDIR): Document the problem that
+        the default temporary file directory used by the system is often
+        memory-based, and it may run out of memory.  Advise that
+        MAGICK_TMPDIR may be used to avoid this issue.
+
+2026-10-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * NEWS.txt: Update the news.
+
+        * coders/pict.c (DecodeImage): Detect arithmetic overflow while
+        decoding pixels.
+
+        * format_c_api_doc.py, format_c_api_docs.py, html_fragments.py:
+        * make_www.py, named_colors.py, omp_decimal_align.py, relpath.py:
+        * rst2html5.py: Update script syntax to target Python 3.10 or
+        later using 'pyupgrade --py310-plus', plus additional edits to
+        address Python 3.13 re.sub positional argument deprecation
+        warnings.
+
+2026-10-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * scripts/format_c_api_docs.py: Fix some gross Python 3 syntax
+        issues.
+
+        * coders/wpg.c (ExtractPostscript): Avoid passing NULL 'ps_data'
+        to BlobToImage().
+
+        * coders/mat.c (WriteMATLABImage): Avoid doing a CloseBlob() on a
+        NULL image.
+
+        * coders/bmp.c (ReadBMPImage): Avoid doing a CloseBlob() on a NULL
+        image.
+
+        * coders/mat.c (WriteMATLABImage): Avoid the possibility of
+        calling CloseBlob() on a null image pointer.
+
+        * magick/list.h: Add list __attribute__(__nonnull__) declarations
+        for GCC, Clang, or other compilers which support the syntax. This
+        helps produce useful warnings in code using those functions.
+
+        * magick/list.c: Add useful assertions for null exception, or
+        exception->signature != MagickSignature.
+
+        * magick/annotate.c (RenderFreetype): Add more thorough error
+        handling and clean-up.
+
+2026-09-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (WriteOnePNGImage): Ensure that 'image_matte' is
+        compatible with 'ping_colortype' in order to avoid a corrupt
+        image. Add direct support for -type Bilevel, Grayscale,
+        GrayscaleMatte, Palette, TrueColor, TrueColorMatte. Addresses
+        SourceForge issue "#779 GraphicsMagick >= 1.3.48 broke png
+        conversion". What really happened here is that there was an
+        existing bug and changes for 1.3.48 caused it to be evident.
+
+2026-09-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/blob.h, magick/blob.c: Add blob.h function
+        __attribute__(__nonnull__) declarations for GCC, Clang, or other
+        compilers which support the syntax. This helps produce useful
+        warnings in code using those functions.
+
+2026-09-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/heif.c: Fallback definitions for LIBHEIF_MAKE_VERSION and
+        LIBHEIF_HAVE_VERSION should be after including <libheif/heif.h>,
+        and the check for the minimal 1.14.0 version should come after
+        that.
+
+2026-09-26  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (WriteOneJNGImage): Tidy the code.
+
+        * magick/xwindow.c (MagickXMakeImage): Avoid dereference of NULL
+        ximage pointer. Issue was discovered using GCC 14's -fanalyzer
+        mode.
+
+2026-09-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/common.h: Update comments regarding 'const' and 'pure'
+        functions.
+
+        * Magick++/tests/attributes.cpp, Magick++/tests/exceptions.cpp:
+        C++20 deprecated used of var++ or var-- on volatile variables. Use
+        var=var+1 or var=var-1 syntax instead.
+
+        * www/INSTALL-unix.rst, www/INSTALL-windows.rst: Add notes about
+        Windows 11 "App & browser control" "Smart App Control settings".
+
+2026-09-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * PerlMagick/MANIFEST: Remove t/heif/heif-avc-rgb-8.avci from the
+        PerlMagick manifest.
+
+        * magick/tsd.h: Add a helpful comment that MagickTsdSetSpecific()
+        cannot be a 'pure' function.
+
+        * magick/semaphore.c (LockSemaphoreInfo, UnlockSemaphoreInfo): Use
+        cascading 'elif' pre-processor logic to avoid warnings in
+        single-threaded build.
+
+        * magick/resize.c (Bessel): Bessel() and the other resize filter
+        functions are indicated to be 'const' functions.
+
+        * magick/pixel_cache.h: AccessImmutableIndexes(), GetPixels(),
+        AccessMutablePixels(), GetIndexes(), AccessMutableIndexes(), and
+        GetPixelCacheArea() are indicated to be 'pure' functions.
+
+        * magick/pixel_cache-private.h (AccessDefaultCacheView): Indicate
+        that this is a 'pure' function.
+
+        * magick/omp_data_view.h (AccessThreadViewData): Indicate that
+        this is a 'pure' function.
+
+        * magick/map.h: Add a useful comment.
+
+        * magick/map.c (MagickMapCloneMap): Assure that 'size' is
+        initialized.
+
+        * magick/log.c (IsEventLogged, LogMagickEventList)
+        (ReadLogConfigureFile): Add some useful fatal errors for the case
+        that log_info is not initialized.  This helps GCC's -fanalyzer to
+        not uselessly complain.
+
+        * magick/describe.c (DescribeImage): Assure that profile_length is
+        initialized.
+
+        * magick/common.h: Add useful comments for requirements to be a
+        'const' or 'pure' function.
+
+        * coders/wpg.c (ExtractPostscript): Add cast required by C++.
+
+        * coders/url.c: Move inclusion of magick/static.h toward the top
+        of the module.
+
+        * coders/tga.c (ValidateHeaderTGA): Indicate that this is a 'pure'
+        function.
+
+        * coders/svg.c (ADD_NEW_STRUCT): Deal with memory allocation
+        failure.
+
+        * coders/msl.c (MSLStartElement): Assure that profile_length is
+        initialized.
+
+        * coders/mpc.c (WriteMPCImage): Assure that profile_length is
+        initialized.
+
+        * coders/miff.c (WriteMIFFImage): Add more tracing.
+
+2026-09-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/image.c (AnimateImages, DisplayImages): Fix compilation
+        warnings which now appear when X11 is not available.
+
+2026-09-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/security.rst: Add more information regarding what the
+        GraphicsMagick project does as pertains to security testing, and
+        its response to security issues.
+
+2026-09-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * PerlMagick/Magick.xs: For AddDefinition(), AddDefinitions(),
+        assure that ExceptionInfo is initialized prior to use.
+
+        * magick/image.h: Add image.h function __attribute__(__nonnull__)
+        declarations for GCC, Clang, or other compilers which support the
+        syntax. This helps produce useful warnings in code using those
+        functions.
+
+        * magick/image.c: Add missing asserts, such as for NULL pointers.
+
+2026-09-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Makefile.am: Updated Automake to 1.19.
+
+2026-09-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/pcx.c (ReadPCXImage): Fix file size reasonableness check
+        for RLE compressed files, which was rejecting many sample DCX
+        files from "http://sembiance.com/fileFormatSamples/image/dcx".
+
+2026-09-06  Fojtik Jaroslav  <JaFojtik@yandex.com>
+
+        * VisualMagick/installer/inc/files-base.isx: Add a comment
+        regarding msvbvm60.dll, which is required by
+        contrib/win32/PathTool/PathTool.exe.
+
+2026-09-05  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/attribute.c (GenerateIPTCAttribute): Address heap buffer
+        over-reads in GenerateIPTCAttribute().  Issue was reported by
+        David Korczynski, Ada Logics (david@adalogics.com) on September 3,
+        2026. Credit to Claude and Ada Logics -- found by Anthropic using
+        agents to study the security of open-source projects, with Ada
+        Logics validating and reporting.
+
+2026-09-04 Fojtik Jaroslav  <JaFojtik@yandex.com>
+
+        * VisualMagick/installer/{gm-win32-Q8-dll.iss:
+        gm-win64-Q8-dll.iss, inc/files-base.isx, inc/files-dlls.isx}: This
+        commit is neccessary to make installation of gm running on
+        ReactOS. Document the deprecated msvbvm60.dll required by
+        contrib/win32/PathTool/PathTool.exe for ReactOS. Support
+        installing the redistributables for Visual Studio 2010 and 2013.
+        https://reactos.org/forum/viewtopic.php?p=152649&hilit=graphics+magick#p152649
+
+2026-09-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (ReadMNGImage): Guard against integer overflow and
+        underflow in MNG MAGN chunk handling.  Addresses the same issue as
+        ImageMagick CVE CVE-2025-55154.  Much thanks to Petr Gajdos for
+        making me aware of this issue.
+
+2026-08-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * doc/: Freshen documentation and remove stale references to old
+        ImageMagick manual pages. Addresses Debian bug #1006272
+        "graphicsmagick: gm(1) refers to nonexistant mogrify(1)".
+
+        * coders/tiff.c (TIFFCloseBlob): Respect adjoin mode while closing
+        blob as is done for other formats. Fixes Debian Bug#1146076:
+        "graphicsmagick: decomposing three or more frames with +adjoin
+        aborts with double free or corruption".
+
+        * magick/blob.c: Add more tracing.
+
+2026-08-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/wpg.c (ReadWPGImage): Limit recursion under
+        ExtractPostscript() to avoid stack exhaustion given crafted WPG
+        files which are self-referencing or otherwise create
+        loops. Addresses issue reported by 参赛选手 (Lylan, from QI-ANXIN
+        Technology Research Institute) via email on August 22, 2026.
+
+2026-08-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/*, magick/*: Eliminate unused parameter warnings for the
+        case where the assert macro is disabled (e.g. via -DNDEBUG).
+
+        * bootstrap (build_aux): Update gnulib build-aux config.guess and
+        config.sub files from a 'gnulib' git repository checkout adjacent
+        to the GM source directory.  If there is no adjacent 'gnulib'
+        directory, then the files provided by Autotools are used.
+
+2026-08-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Re-enable libheif in oss-fuzz build.
+
+2026-08-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/mat.c (ReadMATImage): Avoid the possible dereference of a
+        null image pointer.
+
+2026-08-08  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * Makefile.am: Obtain the submitter's Coverity email address from
+        the file '.coverity_email_gm' in the user's home directory.
+
+2026-08-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh (enable_heif): Temporarily disable
+        libheif in oss-fuzz build to hopefully shake loose vvdec issues
+        that oss-fuzz is not automatically closing.
+
+        * Makefile.am (coverity-build): Compile utilities/gm for Coverity
+        build.
+
+2026-08-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawDashPolygon): Place a hard limit on the
+        number of polygon coordinates.  Appears to address oss-fuzz
+        461953780 "graphicsmagick:coder_WMF_fuzzer: Timeout in
+        coder_WMF_fuzzer".
+
+2026-08-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * LICENSE: Update the license year.
+
+        * magick/render.c (DrawRoundLinecap): Assure that coordinates were
+        provided.  Update drawing status.
+
+2026-07-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac, magick/studio.h, etc.: Remove legacy vsprintf()
+        from the code since vsnprintf() is required to be available and
+        vsprintf() is insecure.
+
+2026-07-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/svg.c: Address ImageMagick CVE-2026-56379. A description
+        is "CVE-2026-56379 is a command injection vulnerability in
+        ImageMagick versions before 7.1.2-15 and 6.9.13-40. It allows
+        attackers to execute arbitrary code via crafted SVG files
+        containing malicious drawing commands.".  This issue was reported
+        to me via email from Petr Gajdos on July 28, 2026. The fix is
+        based on a modified patch from Petr Gajdos.
+
+2026-07-29  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * fuzzing/oss-fuzz-build.sh: Temporarily disable 'vvdec' and
+        'vvenc' in the oss-fuzz build in order to hopefully overcome
+        oss-fuzz's inability to automatically close related issues.
+
+        * coders/svg.c (SVGValidateElementId): Address Coverity 504982
+        "Dereference after null check".  Luckily, it is very unlikely that
+        libxml produces NULL.
+
+2026-07-28  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/list.c: Improve documentation for all the list functions.
+
+        * www/api/api.rst: Update API code example to show use of
+        GetFirstImageInList() after using AppendImageToList().  This is in
+        response to Debian bug #1142941: "libgraphicsmagick1-dev: can't
+        generate GIF animations using demo API code."
+
+2026-07-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/xwindow.c (MagickXImportImage): Avoid heap buffer
+        overflow of image filename field if X11 window name is longer than
+        MaxTextExtent-1.  Addresses ImageMagick CVE-2026-61464
+        (GHSA-76q6-2p6h-xjqr). In order to exploit this, the attacker must
+        have access to the X11 display, would need to set an X11 window
+        title with text longer than 2052 bytes (e.g. use 'xdotool
+        selectwindow set_window --name FOO', execute 'gm import x:', guide
+        the mouse cursor to the window, and click in it, or use '-window
+        id' where 'id' is the identity of the window to be imported (e.g.
+        reported by 'xwininfo'). If this issue is exploitable, then the
+        system has much more serious issues.  Issue was reported to me via
+        an email from Petr Gajdos on July 27, 2026.
+
+2026-07-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/index.rst: Add a Repology badge showing available free
+        software repositories.
+
 2026-07-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/index.rst, www/Changes.rst: Record that 1.3.48 was released.
 
         * version.sh: Updates in preparation for the 1.3.48 release
 

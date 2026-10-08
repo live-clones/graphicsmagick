@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -363,10 +364,16 @@ GenerateIPTCAttribute(Image *image,const char *key)
         }
       attribute_length=(size_t) profile[i+3] << 8;
       attribute_length|=(size_t) profile[i+4];
-      if (attribute_length > (profile_length - (size_t) i - 5U))
+      if (0 == attribute_length)
         {
           LogMagickEvent(TransformEvent,GetMagickModule(),
-                         "IPTC profile out of bounds!");
+                         "IPTC profile attribute has zero length!");
+          continue;
+        }
+      else if (attribute_length >= (profile_length - (size_t) i - 5U))
+        {
+          LogMagickEvent(TransformEvent,GetMagickModule(),
+                         "IPTC profile attribute extends beyond profile bounds!");
           continue;
         }
       attribute_length += 1;

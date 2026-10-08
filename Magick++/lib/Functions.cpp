@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 1999, 2002, 2003
+// SPDX-License-Identifier: MIT
 //
 // Simple C++ function wrappers for ImageMagick equivalents
 //

@@ -224,12 +224,14 @@ int main(int argc,char **argv)
       if (image)
         (void) AppendImageToList(&amp;images,image);
     }
+  images=GetFirstImageInList(images);
 
   if (!images)
     {
       printf(&quot;Failed to read any images!\n&quot;);
       exit(1);
     }
+
   /*
     Create a thumbnail image sequence
   */
@@ -245,6 +247,7 @@ int main(int argc,char **argv)
         }
       (void) AppendImageToList(&amp;thumbnails,resize_image);
     }
+  thumbnails=GetFirstImageInList(thumbnails);
   /*
     Write the thumbnail image sequence to file
   */

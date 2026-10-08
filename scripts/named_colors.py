@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:expandtab
 
 #* Author: Mark Mitchell
 #* Copyright 2008  Mark Mitchell
+#* SPDX-License-Identifier: MIT
 #* License: see __license__ below.
-
-# Use Python 3 print function in Python >= 2.6
-from __future__ import print_function
 
 import sys
 import re

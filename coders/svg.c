@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -717,7 +718,13 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      status = MagickPass;
 
    /* Id cannot be empty or NULL */
-   if (((void *)id == NULL) || (id_size == 0))
+   if ((void *)id == NULL)
+     {
+       ThrowException(svg_info->exception,DrawError,
+                      InvalidElementIdentifier,id);
+       status=MagickFail;
+     }
+   else if (id_size == 0)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
@@ -728,6 +735,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
+       id[0U]='\0';
        status=MagickFail;
      }
 #if 0
@@ -736,6 +744,7 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
+       id[0U]='\0';
        status=MagickFail;
      }
 #endif
@@ -744,18 +753,15 @@ SVGValidateElementId(SVGInfo *svg_info, char *id,const size_t id_size)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
+       id[0U]='\0';
        status=MagickFail;
      }
    else if (strchr(id,'\"') != NULL)
      {
        ThrowException(svg_info->exception,DrawError,
                       InvalidElementIdentifier,id);
-       status=MagickFail;
-     }
-
-   if (MagickPass != status)
-     {
        id[0U]='\0';
+       status=MagickFail;
      }
 
    return status;
@@ -901,10 +907,10 @@ SVGStartElement(void *context,const xmlChar *name,
           'font-family' argument.  Should we be concerned about that?
          */
 
-        if (strchr(value,'\'') != NULL)
+        if (strpbrk(value,"'\n\r") != NULL)
           {
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Skipping attribute '%s' due to quoted value (%s)\n",
+                                  "Skipping attribute '%s' due to invalid value (%s)\n",
                                   keyword, value);
             ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
             continue;
@@ -1344,10 +1350,10 @@ SVGStartElement(void *context,const xmlChar *name,
           'font-family' argument.  Should we be concerned about that?
          */
 
-        if (strchr(value,'\'') != NULL)
+        if (strpbrk(value,"'\n\r") != NULL)
           {
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "Skipping attribute '%s' due to quoted value (%s)\n",
+                                  "Skipping attribute '%s' due to invalid value (%s)\n",
                                   keyword, value);
             ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
             continue;
@@ -1916,10 +1922,10 @@ SVGStartElement(void *context,const xmlChar *name,
                             'font-family' argument.  Should we be concerned about that?
                           */
 
-                          if (strchr(value,'\'') != NULL)
+                          if (strpbrk(value,"'\n\r") != NULL)
                             {
                               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                                    "Skipping style attribute '%s' due to quoted value (%s)\n",
+                                                    "Skipping style attribute '%s' due to invalid value (%s)\n",
                                                     keyword, value);
                               ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
                               continue;
@@ -2517,12 +2523,24 @@ void    ProcessStyleClassDefs (
   memset(&ClassDefHead,0,sizeof(ClassDefHead));
   memset(&ClassDefActiveHead,0,sizeof(ClassDefActiveHead));
 
-  /* a macro to allocate an zero out a new struct instance,
-      and add it to the end of a linked list */
-  /* FIXME: Does not deal with allocation failure! */
+  /*
+    A macro to allocate an zero out a new struct instance, and add it
+    to the end of a linked list. Deal with allocation failure.
+  */
 #define ADD_NEW_STRUCT(pNew,pLast,TheTypeDef)                           \
   pNew = MagickAllocateClearedMemory(TheTypeDef *,sizeof(TheTypeDef));  \
-  pLast = pLast->pNext = pNew
+  if (pNew == (TheTypeDef *) NULL)                                      \
+    {                                                                   \
+      (void) LogMagickEvent(CoderEvent,GetMagickModule(),               \
+                            "    memory allocation failure!");          \
+      ThrowException3(svg_info->exception,ResourceLimitError,           \
+                      MemoryAllocationFailed,UnableToDrawOnImage);      \
+      goto process_style_class_defs_abort;                              \
+    }                                                                   \
+  else                                                                  \
+    {                                                                   \
+      pLast = pLast->pNext = pNew;                                      \
+    }
 
   /* we will get a modifiable value of the string, and delimit
       substrings by storing null characters */
@@ -2575,6 +2593,7 @@ void    ProcessStyleClassDefs (
               if  ( pClassDef == 0 )
                 { /* new class name */
                   ADD_NEW_STRUCT(pClassDef,pClassDefLast,ClassDef);
+                  /* FIXME: pClassDef might be null! */
                   pClassDef->pElementValueLast = &pClassDef->ElementValueHead;
                   pClassDef->pName = pClassName;
                   pClassDef->pActiveNext = 0;
@@ -2722,10 +2741,10 @@ void    ProcessStyleClassDefs (
             'font-family' argument.  Should we be concerned about that?
           */
 
-          if (strchr(value,'\'') != NULL)
+          if (strpbrk(value,"'\n\r") != NULL)
             {
               (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                    "Skipping class '%s' keyword '%s' due to quoted value (%s)\n",
+                                    "Skipping class '%s' keyword '%s' due to invalid value (%s)\n",
                                     pClassDef->pName, keyword, value);
               ThrowException(svg_info->exception,DrawError,InvalidAttributeArgument,value);
               continue;
@@ -3496,11 +3515,7 @@ SVGWarning(void *context,const char *format,...)
   assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.warning: ");
   (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,sizeof(reason),format,operands);
-#endif
   ThrowException2(svg_info->exception,CoderWarning,reason,(char *) NULL);
   va_end(operands);
 }
@@ -3533,11 +3548,7 @@ SVGError(void *context,const char *format,...)
   assert(svg_info->signature == MagickSignature);
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  SAX.error: ");
   (void) LogMagickEventList(CoderEvent,GetMagickModule(),format,operands);
-#if !defined(HAVE_VSNPRINTF)
-  (void) vsprintf(reason,format,operands);
-#else
   (void) vsnprintf(reason,sizeof(reason),format,operands);
-#endif
   ThrowException2(svg_info->exception,CoderError,reason,(char *) NULL);
   va_end(operands);
   xmlStopParser(parser);

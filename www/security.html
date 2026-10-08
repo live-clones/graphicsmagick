@@ -43,24 +43,30 @@
 <!-- See https://docutils.sourceforge.net/rst.html for details. -->
 <section id="background">
 <h1>Background</h1>
-<p>Although GraphicsMagick is image processing software, security is a
-very important consideration for GraphicsMagick.  GraphicsMagick may
-be used to open files and URLs produced by an untrusted party.  Given
-a suitable weakness (which we make every effort to prevent), an
-intentionally constructed file might be able to cause the software to
-crash, leak memory, request huge amounts of memory, run forever, or in
-the worst case execute arbitrary code, including shell code.
-GraphicsMagick is very powerful and complex software supporting many
-capabilities and so untrusted parties should never be allowed to
-submit arbitrary requests into it.</p>
-<p>GraphicsMagick may include the ability to access arbitrary http and
-ftp URLs as well as local image, font, and SVG files.  The SVG
-renderer may support read access to http and ftp URLs as well as local
-files according to the SVG specification.  Since URLs and local file
-paths may be included in SVG files, untrusted SVG files may create a
-Server Side Request Forgery (<a class="reference external" href="https://cwe.mitre.org/data/definitions/918.html">SSRF</a>) vulnerability since URL requests
-are done by the computer executing the SVG, which may be in a realm of
-trust (e.g. inside the firewall and able to access &quot;localhost&quot;
+<p>Security is a very important consideration for
+GraphicsMagick. GraphicsMagick is tested for memory and undefined
+behavior issues every day via Google's <a class="reference external" href="https://github.com/google/oss-fuzz">OSS-Fuzz</a>, source code is
+routinely submitted for analysis by <a class="reference external" href="https://scan.coverity.com/projects/graphicsmagick">Coverity</a>, and analyzed locally
+via Clang's <a class="reference external" href="https://clang.llvm.org/docs/analyzer/user-docs/CommandLineUsage.html#scan-build">scan-build</a>, GCC's <a class="reference external" href="https://developers.redhat.com/articles/2024/04/03/improvements-static-analysis-gcc-14-compiler">-fanalyzer</a> feature, as well as
+private build testing using Clang's ASAN/UBSAN and valgrind's
+'memcheck'.  The goal is for GraphicsMagick to be naturally secure
+within the bounds of the resource limits which have been configured.</p>
+<p>GraphicsMagick may be used to open files and URLs produced by an
+untrusted party.  Given a suitable weakness (which we make every
+effort to prevent), an intentionally constructed file might be able to
+cause the software to crash, leak memory, request huge amounts of
+memory, run forever, or in the worst case execute arbitrary code,
+including shell code.  GraphicsMagick is very powerful and complex
+software supporting many capabilities and so untrusted parties should
+never be allowed to submit arbitrary requests into it.</p>
+<p>GraphicsMagick may include the ability to access arbitrary URLs as
+well as local image, font, and SVG files.  The SVG renderer may
+support read access to network-based URLs as well as local files
+according to the SVG specification.  Since URLs and local file paths
+may be included in SVG files, untrusted SVG files may create a Server
+Side Request Forgery (<a class="reference external" href="https://cwe.mitre.org/data/definitions/918.html">SSRF</a>) vulnerability since URL requests are
+performed by the computer executing the SVG, which may be in a realm
+of trust (e.g. inside the firewall and able to access &quot;localhost&quot;
 addresses).</p>
 <p>The <cite>-comment</cite>, <cite>-draw</cite>, <cite>-format</cite>, and <cite>-label</cite> utility options
 support a <cite>&#64;filename</cite> syntax to incorporate any readable file on the
@@ -78,14 +84,14 @@ then it may be addressed by email directly to the GraphicsMagick
 maintainers or to the <a class="reference external" href="mailto:bobjfriesenhahn&#37;&#52;&#48;gmail&#46;com">GraphicsMagick Security</a> mail address.  More
 minor issues are best addressed via the <a class="reference external" href="https://sourceforge.net/p/graphicsmagick/bugs/">GraphicsMagick Bug Tracker</a>
 at SourceForge.  Please remember to set the bug to 'private' if you
-use the bug tracker or else someone may acquire a zero-day exploit from
-your report!  We will set the bug to 'public' as soon as a remedy has
-been made available..</p>
+use the SourceForge bug tracker or else someone may acquire a zero-day
+exploit from your report!  We will set the bug to 'public' as soon as
+a remedy has been made available.</p>
 <p>Reporting an issue will allow us to fix it so that future releases of
 the software won't suffer from the problem.</p>
 <p>The current state of free software is that security-sensitive free
 software projects have been undergoing automated testing by machines
-(and sometimes what might be hundreds of machines).  Machines do not
+(and sometimes that might be hundreds of machines).  Machines do not
 need to work at a day job, take care of families, rest, or eat, but we
 do.  Any bug report which comes with a patch or changeset to fix the
 problem is greatly appreciated and helps to move the project forward.</p>
@@ -96,6 +102,10 @@ issue will become public knowledge as soon as we commit a fix to the
 source code repository.  Only in exceedingly rare and dire
 circumstances (e.g a previously-unknown zero-day shell exploit) might
 we do anything different.</p>
+<p>GraphicsMagick does not currently author and submit CVEs. Development
+resources are limited, and the process associated with CVEs requires
+time and attention which is not currently available.  Debian and
+openSUSE have authored CVEs pertaining to GraphicsMagick.</p>
 </section>
 <section id="safe-use-of-the-software">
 <h1>Safe Use Of The Software</h1>
@@ -149,7 +159,7 @@ constrain the supported file formats to the subsets selected by
 (e.g. <cite>export MAGICK_CODER_STABILITY=PRIMARY</cite>), use <cite>gm
 convert -list format</cite> and verify that the format support you need
 is enabled.  Selecting the <cite>PRIMARY</cite> or <cite>STABLE</cite> options blocks
-access of http and ftp URLs (<a class="reference external" href="https://cwe.mitre.org/data/definitions/918.html">SSRF</a> vulnerability), but does not
+access of network-based URLs (<a class="reference external" href="https://cwe.mitre.org/data/definitions/918.html">SSRF</a> vulnerability), but does not
 block SVG renderer access to read local image files.</p></li>
 </ol>
 </section>

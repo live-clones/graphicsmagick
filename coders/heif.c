@@ -1,5 +1,6 @@
 /*
 % Copyright (C) 2023-2026 GraphicsMagick Group
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -88,20 +89,6 @@
 /* Set to 1 to enable RGB(A) decode in interleaved format */
 #define HEIF_SUPPORT_INTERLEAVED 1
 
-/*
-  Libheif added LIBHEIF_MAKE_VERSION in 1.14.0 (October 31, 2021).
-  Duplicate its definition so we can detect versions lower than
-  1.14.0.
- */
-#if !defined(LIBHEIF_HAVE_VERSION)
-#define LIBHEIF_MAKE_VERSION(h, m, l) (((h) << 24 | (m) << 16 | (l) << 8) | 0)
-#define LIBHEIF_HAVE_VERSION(h, m, l) (LIBHEIF_NUMERIC_VERSION >= LIBHEIF_MAKE_VERSION(h, m, l))
-#endif /* if !defined(LIBHEIF_HAVE_VERSION) */
-
-#if LIBHEIF_HAVE_VERSION(1,14,0)
-#  error "Libheif must be at least 1.14.0!"
-#endif
-
 /* FIXME: It would be nice to use MagickSizeStrToInt64(), but it does
    not provide error status */
 #define MagickAttributeToU32(image_info, magick, name, out_val)         \
@@ -158,6 +145,21 @@
   }
 
 #include <libheif/heif.h>
+
+/*
+  Libheif added LIBHEIF_MAKE_VERSION in 1.14.0 (October 31, 2021).
+  Duplicate its definition so we can detect versions lower than
+  1.14.0.
+ */
+#if !defined(LIBHEIF_HAVE_VERSION)
+#define LIBHEIF_MAKE_VERSION(h, m, l) (((h) << 24 | (m) << 16 | (l) << 8) | 0)
+#define LIBHEIF_HAVE_VERSION(h, m, l) (LIBHEIF_NUMERIC_VERSION >= LIBHEIF_MAKE_VERSION(h, m, l))
+#endif /* if !defined(LIBHEIF_HAVE_VERSION) */
+
+#if !LIBHEIF_HAVE_VERSION(1,14,0)
+#  error "Libheif must be at least 1.14.0!"
+#endif
+
 #if defined(HEIF_SUPPORT_SEQUENCES) && HEIF_SUPPORT_SEQUENCES
 #include <libheif/heif_sequences.h>
 #endif /* if defined(HEIF_SUPPORT_SEQUENCES) */

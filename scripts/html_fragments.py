@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
 # vim:ts=4:sw=4:expandtab:tw=100:
 
 #* Author: Mark Mitchell
+#* SPDX-License-Identifier: MIT
 #* License: Same as GraphicsMagick.
-
-# Use Python 3 print function in Python >= 2.6
-from __future__ import print_function
 
 __doc__ = """
 HTML fragments which are used as the banner and navigation menu in
@@ -71,7 +68,7 @@ nav_template = """
 
 # hr class was "divider".  Changed to "docutils"
 # footer div class was "footer".  Changed to "document" so text style matches document.
-footer_template = u"""
+footer_template = """
 <hr class="docutils">
 <div class="document">
     <p><a href="%(url_prefix)sCopyright.html">Copyright</a> © GraphicsMagick Group 2002-2026%(sponsor_logo_html)s</p>
@@ -104,6 +101,6 @@ footer = None
 
 # test
 if __name__ == '__main__':
-    print((make_banner()))
-    print((make_nav()))
-    print((make_footer()))
+    print(make_banner())
+    print(make_nav())
+    print(make_footer())

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2025 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
 
   This program is covered by multiple licenses, which are described in
@@ -266,9 +266,7 @@ extern "C" {
 #if defined(HasTRIO)
 #  include <trio.h>
 #  define snprintf trio_snprintf
-#  define HAVE_SNPRINTF 1
 #  define vsnprintf trio_vsnprintf
-#  define HAVE_VSNPRINTF 1
 #endif
 
 /*
@@ -289,9 +287,9 @@ ssize_t pwrite(int fildes, const void *buf, size_t nbyte, off_t offset);
 extern size_t strlcpy(char *dst, const char *src, size_t dstsize);
 #endif
 
-#if defined(HAVE_VSNPRINTF) && defined(HAVE_DECL_VSNPRINTF) && !HAVE_DECL_VSNPRINTF
-extern int vsnprintf(char *s, size_t n, const char *format, va_list ap);
-#endif
+/* #if defined(HAVE_DECL_VSNPRINTF) && !HAVE_DECL_VSNPRINTF */
+/* extern int vsnprintf(char *s, size_t n, const char *format, va_list ap); */
+/* #endif */
 
 /*
   Some 64-bit int support.

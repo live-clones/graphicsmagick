@@ -10,26 +10,37 @@ Background
 ----------
 
 .. _`SSRF` : https://cwe.mitre.org/data/definitions/918.html
+.. _`OSS-Fuzz` : https://github.com/google/oss-fuzz
+.. _`Coverity` : https://scan.coverity.com/projects/graphicsmagick
+.. _`-fanalyzer` : https://developers.redhat.com/articles/2024/04/03/improvements-static-analysis-gcc-14-compiler
+.. _`scan-build` : https://clang.llvm.org/docs/analyzer/user-docs/CommandLineUsage.html#scan-build
 
-Although GraphicsMagick is image processing software, security is a
-very important consideration for GraphicsMagick.  GraphicsMagick may
-be used to open files and URLs produced by an untrusted party.  Given
-a suitable weakness (which we make every effort to prevent), an
-intentionally constructed file might be able to cause the software to
-crash, leak memory, request huge amounts of memory, run forever, or in
-the worst case execute arbitrary code, including shell code.
-GraphicsMagick is very powerful and complex software supporting many
-capabilities and so untrusted parties should never be allowed to
-submit arbitrary requests into it.
+Security is a very important consideration for
+GraphicsMagick. GraphicsMagick is tested for memory and undefined
+behavior issues every day via Google's `OSS-Fuzz`_, source code is
+routinely submitted for analysis by `Coverity`_, and analyzed locally
+via Clang's `scan-build`_, GCC's `-fanalyzer`_ feature, as well as
+private build testing using Clang's ASAN/UBSAN and valgrind's
+'memcheck'.  The goal is for GraphicsMagick to be naturally secure
+within the bounds of the resource limits which have been configured.
 
-GraphicsMagick may include the ability to access arbitrary http and
-ftp URLs as well as local image, font, and SVG files.  The SVG
-renderer may support read access to http and ftp URLs as well as local
-files according to the SVG specification.  Since URLs and local file
-paths may be included in SVG files, untrusted SVG files may create a
-Server Side Request Forgery (`SSRF`_) vulnerability since URL requests
-are done by the computer executing the SVG, which may be in a realm of
-trust (e.g. inside the firewall and able to access "localhost"
+GraphicsMagick may be used to open files and URLs produced by an
+untrusted party.  Given a suitable weakness (which we make every
+effort to prevent), an intentionally constructed file might be able to
+cause the software to crash, leak memory, request huge amounts of
+memory, run forever, or in the worst case execute arbitrary code,
+including shell code.  GraphicsMagick is very powerful and complex
+software supporting many capabilities and so untrusted parties should
+never be allowed to submit arbitrary requests into it.
+
+GraphicsMagick may include the ability to access arbitrary URLs as
+well as local image, font, and SVG files.  The SVG renderer may
+support read access to network-based URLs as well as local files
+according to the SVG specification.  Since URLs and local file paths
+may be included in SVG files, untrusted SVG files may create a Server
+Side Request Forgery (`SSRF`_) vulnerability since URL requests are
+performed by the computer executing the SVG, which may be in a realm
+of trust (e.g. inside the firewall and able to access "localhost"
 addresses).
 
 The `-comment`, `-draw`, `-format`, and `-label` utility options
@@ -54,16 +65,16 @@ then it may be addressed by email directly to the GraphicsMagick
 maintainers or to the `GraphicsMagick Security`_ mail address.  More
 minor issues are best addressed via the `GraphicsMagick Bug Tracker`_
 at SourceForge.  Please remember to set the bug to 'private' if you
-use the bug tracker or else someone may acquire a zero-day exploit from
-your report!  We will set the bug to 'public' as soon as a remedy has
-been made available..
+use the SourceForge bug tracker or else someone may acquire a zero-day
+exploit from your report!  We will set the bug to 'public' as soon as
+a remedy has been made available.
 
 Reporting an issue will allow us to fix it so that future releases of
 the software won't suffer from the problem.
 
 The current state of free software is that security-sensitive free
 software projects have been undergoing automated testing by machines
-(and sometimes what might be hundreds of machines).  Machines do not
+(and sometimes that might be hundreds of machines).  Machines do not
 need to work at a day job, take care of families, rest, or eat, but we
 do.  Any bug report which comes with a patch or changeset to fix the
 problem is greatly appreciated and helps to move the project forward.
@@ -75,6 +86,11 @@ issue will become public knowledge as soon as we commit a fix to the
 source code repository.  Only in exceedingly rare and dire
 circumstances (e.g a previously-unknown zero-day shell exploit) might
 we do anything different.
+
+GraphicsMagick does not currently author and submit CVEs. Development
+resources are limited, and the process associated with CVEs requires
+time and attention which is not currently available.  Debian and
+openSUSE have authored CVEs pertaining to GraphicsMagick.
 
 
 Safe Use Of The Software
@@ -144,7 +160,7 @@ risk.  These are steps which can be taken:
    (e.g. `export MAGICK_CODER_STABILITY=PRIMARY`), use `gm
    convert -list format` and verify that the format support you need
    is enabled.  Selecting the `PRIMARY` or `STABLE` options blocks
-   access of http and ftp URLs (`SSRF`_ vulnerability), but does not
+   access of network-based URLs (`SSRF`_ vulnerability), but does not
    block SVG renderer access to read local image files.
 
 PGP Public Key

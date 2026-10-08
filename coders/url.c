@@ -1,6 +1,7 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -36,6 +37,7 @@
   Include declarations.
 */
 #include "magick/studio.h"
+#include "magick/static.h"
 #if defined(HasXML)
 #include "magick/blob.h"
 #include "magick/confirm_access.h"
@@ -43,7 +45,6 @@
 #include "magick/magick.h"
 #include "magick/tempfile.h"
 #include "magick/utility.h"
-#include "magick/static.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)

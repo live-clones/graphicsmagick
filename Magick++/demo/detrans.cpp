@@ -6,6 +6,7 @@
 // transparency.
 //
 // Copyright Bob Friesenhahn, 2000-2024
+// SPDX-License-Identifier: MIT
 //
 // Usage: detrans color file...
 //

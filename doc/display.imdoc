@@ -304,7 +304,7 @@ uniform resource locator <s>(URL)</s>, use:</p>
 To display histogram of an image, use:</p>
 
 <pre>
-    gm gm convert file.jpg HISTOGRAM:- | gm display -
+    gm convert file.jpg HISTOGRAM:- | gm display -
 </pre>
 
 </sect>
@@ -341,10 +341,10 @@ Options, above.
 </gm>
 <im>
 <format type=man,tex>
-<i>GraphicsMagick(1)</i>.
+<i>gm(1)</i>.
 </format>
 <format type=html>
-<a href="GraphicsMagick.html"><i>GraphicsMagick(1)</i></a>.
+<a href="GraphicsMagick.html"><i>GraphicsMagick</i></a>.
 </format>
 </im>
 </p>
@@ -359,10 +359,10 @@ Options, above.
 </gm>
 <im>
 <format type=man,tex>
-<i>GraphicsMagick(1)</i>.
+<i>gm(1)</i>.
 </format>
 <format type=html>
-<a href="GraphicsMagick.html"><i>GraphicsMagick(1)</i></a>.
+<a href="GraphicsMagick.html"><i>GraphicsMagick</i></a>.
 </format>
 </im>
 </p>
@@ -391,7 +391,7 @@ Press and drag to define a region of the image to magnify.</abs>
 <opt>3</opt>
 
 <abs>
-Press and drag to choose from a select set of <s>display(1)</s>
+Press and drag to choose from a select set of <s>display</s>
 commands. This button behaves differently if the image being displayed
 is a visual image directory. Choose a particular tile of the directory
 and press this button and drag to select a command from a pop-up menu.
@@ -842,7 +842,7 @@ Specifies the width in pixels of the image window border. The default is
 <opt>browseCommand (class browseCommand)</opt>
 <abs>
 Specifies the name of the preferred browser when displaying GraphicsMagick
-documentation. The default is <tt>netscape %s</tt>.</abs>
+documentation. The default is <tt>xdg-open %s</tt>, which uses the system default.</abs>
 
 <opt>confirmExit (class ConfirmExit)</opt>
 <abs>
@@ -2677,7 +2677,7 @@ of the X server screen.</p>
 <sect NAME="disp-pref">User Preferences
 
 <p>
-Preferences affect the default behavior of <s>display(1)</s>. The preferences
+Preferences affect the default behavior of <s>display</s>. The preferences
 are either true or false and are stored in your home directory
 as <tt>.displayrc</tt>:</p>
 
@@ -2695,7 +2695,7 @@ for details.</dd>
 <s>confirm on program exit</s></dt>
 
 <dd>
-Ask for a confirmation before exiting the <s>display(1)</s> program.</dd>
+Ask for a confirmation before exiting the <s>display</s> program.</dd>
 
 <dt>
 <s>correct image for display gamma</s></dt>
@@ -2751,16 +2751,7 @@ are considered a precious resource, use them with discretion.</dd>
 <format type=man>
 <sect NAME="disp-also">SEE ALSO
 <p>
-GraphicsMagick(1),
-animate(1),
-compare(1),
-composite(1),
-conjure(1),
-convert(1),
-identify(1),
-import(1),
-mogrify(1),
-montage(1)
+gm(1)
 </p>
 </sect>
 </im>

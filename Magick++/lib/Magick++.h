@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
 // Copyright Bob Friesenhahn, 1999, 2000
+// SPDX-License-Identifier: MIT
 //
 // Simplified includes for Magick++.
 // Inclusion of this header is sufficient to use all Magick++ APIs.

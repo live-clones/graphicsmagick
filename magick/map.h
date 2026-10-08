@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003-2021 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -135,10 +135,12 @@ extern MagickExport unsigned int
 /*
   Access an element via the iterator
   Object_size is updated with the object size.
+
+  This cannot be a 'pure' function!
 */
 extern MagickExport const void
   *MagickMapDereferenceIterator(const MagickMapIterator iterator,
-    size_t *object_size);
+                                size_t *object_size);
 
 /*
   Function to copy a string

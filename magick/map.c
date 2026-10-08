@@ -1,5 +1,6 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -523,7 +524,9 @@ MagickMapCloneMap(MagickMap map,ExceptionInfo *exception)
     }
   while(MagickMapIterateNext(iterator,&key))
   {
-    const void *object=MagickMapDereferenceIterator(iterator,&size);
+    const void *object;
+    size=0;
+    object=MagickMapDereferenceIterator(iterator,&size);
     /* Add clones key and object on insertion */
     if (MagickMapAddEntry(map_clone,key,object,size,exception) == False)
       {

@@ -1,6 +1,7 @@
 // This may look like C code, but it is really -*- C++ -*-
 //
-// Copyright Bob Friesenhahn, 1999-2024
+// Copyright Bob Friesenhahn, 1999-2026
+// SPDX-License-Identifier: MIT
 //
 // Tests for throwing exceptions
 //
@@ -31,7 +32,7 @@ int main( int /*argc*/, char ** argv)
     // Basic exception test
     try
       {
-        failures++;
+        failures = failures+1;
         cout << "Throwing native 'int' exception" << endl;
         cout.flush();
         throw int(100);
@@ -40,13 +41,13 @@ int main( int /*argc*/, char ** argv)
       {
         cout << "Successfully caught native 'int' exception" << endl;
         cout.flush();
-        failures--;
+        failures = failures-1;
       }
 
     // Throw a Magick++ exception class.
     try
       {
-        failures++;
+        failures = failures+1;
         cout << "Throwing 'Magick::WarningResourceLimit' exception" << endl;
         cout.flush();
         throw WarningResourceLimit("How now brown cow?");
@@ -55,7 +56,7 @@ int main( int /*argc*/, char ** argv)
       {
         cout << "Successfully caught 'Magick::WarningResourceLimit' exception" << endl;
         cout.flush();
-        failures--;
+        failures = failures-1;
       }
 
     // A more complex test
@@ -69,7 +70,7 @@ int main( int /*argc*/, char ** argv)
         {
           try
             {
-              failures++;
+              failures = failures+1;
               cout << "Throwing library 'Magick::Exception' exception" << endl;
               cout.flush();
               image.directory();
@@ -78,7 +79,7 @@ int main( int /*argc*/, char ** argv)
             {
               cout << "Successfully caught library 'Magick::Exception' exception" << endl;
               cout.flush();
-              failures--;
+              failures = failures-1;
             }
         }
 

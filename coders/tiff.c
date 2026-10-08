@@ -2,6 +2,7 @@
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -944,6 +945,9 @@ TIFFCloseBlob(thandle_t image_handle)
   Image
     *image = ((Magick_TIFF_ClientData *) image_handle)->image;
 
+  const ImageInfo
+    *image_info = ((Magick_TIFF_ClientData *) image_handle)->image_info;
+
   int
     status = MagickPass;
 
@@ -951,8 +955,9 @@ TIFFCloseBlob(thandle_t image_handle)
   if (image->logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),"TIFF close blob");
 #endif /* LOG_TIFF_BLOB_IO */
-  while (image->previous != (Image *) NULL)
-    image=image->previous;
+  if (image_info->adjoin)
+    while (image->previous != (Image *) NULL)
+      image=image->previous;
   status &= CloseBlob(image);
   return(status);
 }

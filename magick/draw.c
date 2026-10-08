@@ -2,6 +2,7 @@
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -428,16 +429,8 @@ static int MvgPrintf(struct _DrawContext * context, const char *format, ...)
       if (space_available > 0)
         {
           va_start(argp, format);
-#if defined(HAVE_VSNPRINTF)
           formatted_length =
             vsnprintf(context->mvg + context->mvg_length,(size_t) space_available, format, argp);
-#else
-#  if defined(HAVE_VSPRINTF)
-          formatted_length = vsprintf(context->mvg + context->mvg_length, format, argp);
-#  else
-#    error Neither vsnprintf or vsprintf is available.
-#  endif
-#endif
           va_end(argp);
         }
 
@@ -478,15 +471,7 @@ static int MvgAutoWrapPrintf(struct _DrawContext * context, const char *format, 
     buffer[MaxTextExtent];
 
   va_start(argp, format);
-#if defined(HAVE_VSNPRINTF)
   formatted_length = vsnprintf(buffer, sizeof(buffer) - 1, format, argp);
-#else
-#  if defined(HAVE_VSPRINTF)
-  formatted_length = vsprintf(buffer, format, argp);
-#  else
-#    error Neither vsnprintf or vsprintf is available.
-#  endif
-#endif
   va_end(argp);
   buffer[sizeof(buffer)-1]=0;
 

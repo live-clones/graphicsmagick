@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
+# SPDX-License-Identifier: MIT
 # License: Same as GraphicsMagick.
-
-# Use Python 3 print function in Python >= 2.6
-from __future__ import print_function
 
 __doc__ = """Runs rst2htmldeco.py on all files in the rst_pagelist.txt list.
 

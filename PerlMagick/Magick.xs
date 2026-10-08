@@ -2,6 +2,7 @@
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright (C) 1991-1999 E. I. du Pont de Nemours and Company
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -2263,6 +2264,7 @@ AddDefinition(ref,...)
       }
     reference=SvRV(ST(0));
     (void)SetupList(aTHX_ reference,&info,(SV ***) NULL);
+    GetExceptionInfo(&exception);
     if (info && items == 4) {
       magick = SvPV(ST(1),na);
       key    = SvPV(ST(2),na);
@@ -2270,7 +2272,6 @@ AddDefinition(ref,...)
       return_value = AddDefinition( info->image_info, magick, key, value, &exception );
     }
 
-    GetExceptionInfo(&exception);
     if (exception.severity != UndefinedException) {
       CatchException(&exception);
       return_value = MagickFail;
@@ -2332,12 +2333,12 @@ AddDefinitions(ref,...)
       }
     reference=SvRV(ST(0));
     (void)SetupList(aTHX_ reference,&info,(SV ***) NULL);
+    GetExceptionInfo(&exception);
     if (info && items == 2) {
       values = SvPV(ST(1),na);
       return_value = AddDefinitions( info->image_info, values, &exception );
     }
 
-    GetExceptionInfo(&exception);
     if (exception.severity != UndefinedException) {
       CatchException(&exception);
       return_value = MagickFail;

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009-2026 GraphicsMagick Group
+ * SPDX-License-Identifier: MIT
  *
  * American Society of Cinematographers Color Decision List (ASC-CDL)
  * implementation.

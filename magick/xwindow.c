@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -2664,6 +2665,7 @@ MagickXError(Display *display,XErrorEvent *error)
 {
   assert(display != (Display *) NULL);
   assert(error != (XErrorEvent *) NULL);
+  ARG_NOT_USED(display);
   xerror_alert=True;
   switch (error->request_code)
   {
@@ -5147,10 +5149,27 @@ MagickXImportImage(const ImageInfo *image_info,
             {
               /*
                 Initialize image filename.
+                Ignores XTextProperty 'encoding' (e.g. STRING, COMPOUND_TEXT, UTF8_STRING)
               */
-              (void) strlcpy(image->filename,(char *) window_name.value,
-                (int) window_name.nitems+1);
-              image->filename[window_name.nitems]='\0';
+              if (window_name.format == 8)
+                {
+                  if (window_name.nitems >= sizeof(image->filename))
+                    (void) LogMagickEvent(X11Event,GetMagickModule(),
+                                          "Window name length is %lu bytes but the limit is %zu!",
+                                          window_name.nitems, sizeof(image->filename)-1);
+                  (void) strlcpy(image->filename,
+                                 (char *) window_name.value,
+                                 Min((size_t) window_name.nitems+1,sizeof(image->filename)));
+
+                  (void) LogMagickEvent(X11Event,GetMagickModule(),
+                                        "Window (file) name set to \"%s\"\n", image->filename);
+                }
+              else
+                {
+                  (void) LogMagickEvent(X11Event,GetMagickModule(),
+                                        "Window name item size of %d bits is not supported!",
+                                        window_name.format);
+                }
             }
           (void) XFree((void *) window_name.value);
         }
@@ -5753,6 +5772,7 @@ MagickXMakeImage(Display *display,
     Allocate X image pixel data.
   */
 #if defined(HasSharedMemory)
+  window->shared_memory &= (ximage != (XImage *) NULL);
   if (window->shared_memory)
     {
       XShmSegmentInfo
@@ -7621,6 +7641,7 @@ MagickXMakePixmap(Display *display,
   assert(display != (Display *) NULL);
   assert(resource_info != (MagickXResourceInfo *) NULL);
   assert(window != (MagickXWindowInfo  *) NULL);
+  ARG_NOT_USED(resource_info);
   if (window->pixmap != (Pixmap) NULL)
     {
       /*

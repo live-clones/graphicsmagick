@@ -35,11 +35,11 @@ extern "C" {
 */
 #define MagickPackageName "GraphicsMagick"
 #define MagickCopyright  "Copyright (C) 2002-2026 GraphicsMagick Group.\nAdditional copyrights and licenses apply to this software.\nSee http://www.GraphicsMagick.org/www/Copyright.html for details."
-#define MagickLibVersion  0x302701
-#define MagickLibVersionText  "1.3.48"
-#define MagickLibVersionNumber 30,27,1
-#define MagickChangeDate   "20260723"
-#define MagickReleaseDate  "2026-07-23"
+#define MagickLibVersion  0x302702
+#define MagickLibVersionText  "1.3.49"
+#define MagickLibVersionNumber 30,27,2
+#define MagickChangeDate   "20261008"
+#define MagickReleaseDate  "2026-10-08"
 
 /*
   The MagickLibInterfaceNewest and MagickLibInterfaceOldest defines

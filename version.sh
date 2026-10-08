@@ -1,3 +1,6 @@
+# Copyright (C) 2003-2026 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
+
 #
 # Package name and versioning information for GraphicsMagick
 #
@@ -17,7 +20,7 @@ PACKAGE_BUGREPORT='graphicsmagick-bugs@lists.sourceforge.net'
 
 # Package base version.  This is is the numeric version suffix applied to
 # PACKAGE_NAME (e.g. "1.2").
-PACKAGE_VERSION='1.3.48'
+PACKAGE_VERSION='1.3.49'
 
 #
 # Package name plus version string.
@@ -27,7 +30,7 @@ PACKAGE_STRING="$PACKAGE_NAME $PACKAGE_VERSION"
 #
 # Formal Package release date
 # Set to string "unreleased" if package is not a formal release.
-PACKAGE_RELEASE_DATE="2026-07-23"
+PACKAGE_RELEASE_DATE="2026-10-08"
 #PACKAGE_RELEASE_DATE="unreleased"
 
 #
@@ -87,19 +90,19 @@ HG_BRANCH_TAG=default
 # Magick library versioning
 #
 MAGICK_LIBRARY_CURRENT=30
-MAGICK_LIBRARY_REVISION=1
+MAGICK_LIBRARY_REVISION=2
 MAGICK_LIBRARY_AGE=27
 
 #
 # Magick++ library versioning
 #
 MAGICK_PLUS_PLUS_LIBRARY_CURRENT=21
-MAGICK_PLUS_PLUS_LIBRARY_REVISION=0
+MAGICK_PLUS_PLUS_LIBRARY_REVISION=1
 MAGICK_PLUS_PLUS_LIBRARY_AGE=9
 
 #
 # Magick Wand library versioning
 #
 MAGICK_WAND_LIBRARY_CURRENT=13
-MAGICK_WAND_LIBRARY_REVISION=0
+MAGICK_WAND_LIBRARY_REVISION=1
 MAGICK_WAND_LIBRARY_AGE=11

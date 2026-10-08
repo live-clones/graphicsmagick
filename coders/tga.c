@@ -2,6 +2,7 @@
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002-2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -268,6 +269,13 @@ static int LoadHeaderTGA(TGAInfo *tga_info, Image *image)
   return 0;
 }
 
+/*
+  This function is not viable for GCC 'const' attribute because it
+  de-references pointers to data which may have been updated.
+  However, it is viable for the 'pure' attribute since it only
+  dereferences data via the pointer provided to it.
+*/
+static int ValidateHeaderTGA(const TGAInfo *tga_info) MAGICK_FUNC_PURE;
 
 static int ValidateHeaderTGA(const TGAInfo *tga_info)
 {

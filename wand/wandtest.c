@@ -1,4 +1,5 @@
 /* Copyright (C) 2003-2025 GraphicsMagick Group */
+/* SPDX-License-Identifier: MIT */
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %

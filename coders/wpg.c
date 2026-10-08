@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -45,11 +46,23 @@
 #include "magick/pixel_cache.h"
 #include "magick/shear.h"
 #include "magick/tempfile.h"
+#include "magick/tsd.h"
 #include "magick/transform.h"
 #include "magick/quantize.h"
 #include "magick/utility.h"
 #include "magick/static.h"
 
+/*
+  Global declarations.
+*/
+#define ExtractPostscriptRecursionLimit 64
+static MagickTsdKey_t tsd_key = (MagickTsdKey_t) 0;
+
+
+typedef struct
+{
+  size_t ps_recursion;
+} WPG_TSD;
 
 typedef struct
 {
@@ -847,11 +860,14 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
   Image
     *image2;
 
+  WPG_TSD
+    *tsd;
+
   unsigned char
     header_magick[2*MaxTextExtent];
 
   void
-    *ps_data,
+    *ps_data = (unsigned char *) NULL,
     *ps_data_alloc = (unsigned char *) NULL;
 
   char
@@ -881,6 +897,13 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image;
     }
+
+  /*
+    FIXME: Validate that claimed subordinate image data is contained
+    in the narrowed range of a previous ExtractPostscript() offset and
+    size (if any).  The assumption is that as we recurse in, the
+    bounds are constrained by the "parent" blob range.
+  */
 
   /*
     Get subordinate file header magick and use it to identify file format
@@ -952,17 +975,23 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
         }
     }
   /*
-    Use a zero-copy read when possible to access data
+    Use a zero-copy read when possible to access data.
+
+    When zero-copy due to the image being memory-resident, 'ps_data'
+    is updated to point into the 'file' already in memory so that it
+    is no longer the same as 'ps_data_alloc', otherwise, data is
+    copied into the explicitly allocated 'ps_data_alloc' buffer.
   */
   ps_data=ps_data_alloc;
-  if (ReadBlobZC(image,PS_Size,&ps_data) != PS_Size)
+  if ((ReadBlobZC(image,PS_Size,&ps_data) != PS_Size) || (ps_data == (unsigned char *) NULL))
     {
-      MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       if (image->logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                               "ExtractPostscript(): Failed to read %" MAGICK_SIZE_T_F "u bytes of data at"
                               " offset=%" MAGICK_OFF_F "d",
                               (MAGICK_SIZE_T) PS_Size, (magick_off_t) PS_Offset);
+      ps_data=(unsigned char *) NULL;
+      MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,image->filename);
       return image; /* return (Image *) NULL; */
     }
@@ -992,21 +1021,68 @@ static Image *ExtractPostscript(Image *image,const ImageInfo *image_info,
     SeekBlob(image,PS_Offset,SEEK_SET);
   }
 #endif
+
+  /*
+    Support detecting the case where the "Postscript" blob is an
+    embedded WPG which is self-referencing or is otherwise constructed
+    to produce non-terminal looping.  If recursion occurs, it will
+    occur under BlobToImage.
+  */
+  tsd = (WPG_TSD *) MagickTsdGetSpecific(tsd_key);
+  if (tsd == (WPG_TSD *) NULL)
+    {
+      /*
+        Allocate and set thread specific data
+      */
+      tsd = (WPG_TSD *) MagickMallocCleared(sizeof(WPG_TSD));
+      if (tsd == (WPG_TSD *) NULL)
+        {
+          ps_data=(unsigned char *) NULL;
+          MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
+          ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);
+          return image;
+        }
+      tsd->ps_recursion = 0;
+      (void) MagickTsdSetSpecific(tsd_key,(void *) tsd);
+    }
+  tsd->ps_recursion++;
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Recursion level %" MAGICK_SIZE_T_F "u", tsd->ps_recursion);
+  if (tsd->ps_recursion > ExtractPostscriptRecursionLimit)
+    {
+      if (image->logging)
+        (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                              "Excessive recursion detected!");
+      ThrowException(exception,CorruptImageError,RecursionDetected,image->filename);
+      ps_data=(unsigned char *) NULL;
+      MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
+      return image;
+    }
+
   /*
     Read nested image from blob, forcing read as Postscript format
   */
   if ((clone_info=CloneImageInfo(image_info)) == NULL)
     {
+      ps_data=(unsigned char *) NULL;
       MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
       return(image);
     }
+
   clone_info->blob=(void *) NULL;
   /* clone_info->length=0; */
   (void) strlcpy(clone_info->magick, format, sizeof(clone_info->magick));
   (void) strlcpy(clone_info->filename, "", sizeof(clone_info->filename));
   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                         "Reading embedded \"%s\" content from blob...", clone_info->magick);
-  image2 = BlobToImage(clone_info, ps_data, PS_Size, &image->exception );
+  assert(ps_data != (unsigned char *) NULL);
+  image2 = BlobToImage(clone_info, ps_data, PS_Size, exception );
+  tsd->ps_recursion--;
+  if (image->logging)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "Recursion level %" MAGICK_SIZE_T_F "u", tsd->ps_recursion);
+  ps_data=(unsigned char *) NULL;
   MagickFreeResourceLimitedMemory(unsigned char *,ps_data_alloc);
   if (!image2)
     {
@@ -2353,6 +2429,15 @@ ModuleExport void RegisterWPGImage(void)
 {
   MagickInfo
     *entry;
+
+  /*
+    Initialize thread specific data key with destructor.
+
+    Thread-specific allocations are freed using the specified
+    destructor function when the thread is destroyed.
+  */
+  if (tsd_key == (MagickTsdKey_t) 0)
+    (void) MagickTsdKeyCreate2(&tsd_key,MagickFree);
 
   entry=SetMagickInfo("WPG");
   entry->decoder=(DecoderHandler) ReadWPGImage;

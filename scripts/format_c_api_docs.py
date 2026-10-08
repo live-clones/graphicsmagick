@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:expandtab:
 
 # Copyright 2008 Mark Mitchell
+# SPDX-License-Identifier: MIT
 # License: Same as GraphicsMagick.
 
 __doc__ = """Runs format_c_api_doc.py on all files in the whatis list,
@@ -44,7 +44,7 @@ import rst2htmldeco
 # assume standard GM directory layout
 stylesheet_file = 'docutils-api.css'
 url_prefix = '../../'
-stylesheet_url = '%swww/%s' % (url_prefix, stylesheet_file)
+stylesheet_url = '{}www/{}'.format(url_prefix, stylesheet_file)
 
 
 
@@ -57,7 +57,7 @@ def main(argv=None):
         return 1
 
     if argv[1] in ('-h', '--help'):
-        print __doc__
+        print (__doc__)
         return 0
 
     whatis_file = argv[1]
@@ -107,7 +107,7 @@ def main(argv=None):
         htmlfile_path = os.path.join(outfile_dir, htmlfile)
 
         args = ['-w', whatis_file, srcfile_path, rstfile_path]
-        print 'format_c_api_doc.py', ' '.join(args)
+        print ('format_c_api_doc.py', ' '.join(args))
         format_c_api_doc.main(args)
 
         # Now generate HTML from the .rst files
@@ -115,9 +115,9 @@ def main(argv=None):
                 '--url-prefix=%s' % url_prefix,
                 rstfile_path,
                 htmlfile_path]
-        print 'rst2htmldeco.py %s' % ' '.join(args)
+        print ('rst2htmldeco.py %s' % ' '.join(args))
         rst2htmldeco.main(args)
-        print 'rm', rstfile_path
+        print ('rm', rstfile_path)
         os.unlink(rstfile_path)
     f.close()
 

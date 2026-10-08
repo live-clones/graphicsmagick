@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2025 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -227,6 +228,7 @@ static unsigned int WriteMPRImage(const ImageInfo *image_info,Image *image)
   assert(image_info->signature == MagickSignature);
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
+  ARG_NOT_USED(image_info);
   GetExceptionInfo(&exception);
   registry_image=GetImageFromMagickRegistry(image->filename,&id,&exception);
   DestroyExceptionInfo(&exception);

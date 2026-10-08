@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #* Author: Mark Mitchell
 #* Copyright 2008-2022  Mark Mitchell, All Rights Reserved
+#* SPDX-License-Identifier: MIT
 #* License: see __license__ below.
 
 """Renders reStructuredText files to HTML with some custom HTML parts included,
@@ -364,7 +364,7 @@ def main(argv=None):
             try:
                 src_fo = open(src_filename, encoding=ENCODING)
             except Exception as e:
-                logerror("Failed to open %s for reading: %s" % (src_filename, e))
+                logerror("Failed to open {} for reading: {}".format(src_filename, e))
                 return 2
 
             if len(args) >= 2:
@@ -372,7 +372,7 @@ def main(argv=None):
                 try:
                     dest_fo = open(dest_filename, 'w', encoding=ENCODING)
                 except Exception as e:
-                    logerror("Failed to open %s for writing: %s" % (dest_filename, e))
+                    logerror("Failed to open {} for writing: {}".format(dest_filename, e))
                     return 3
 
         return make_html(src_fo, dest_fo, embed_stylesheet=embed_stylesheet,

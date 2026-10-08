@@ -223,16 +223,7 @@ environment variable.</pp>
 <format type=man>
 <sect NAME="bench-also">SEE ALSO
 <p>
-GraphicsMagick(1),
-animate(1),
-compare(1),
-conjure(1),
-convert(1),
-display(1),
-identify(1),
-import(1),
-mogrify(1),
-montage(1)
+gm(1)
 </p>
 </sect>
 </format>

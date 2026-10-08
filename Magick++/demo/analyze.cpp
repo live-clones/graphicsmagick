@@ -3,6 +3,7 @@
 // image statistics.
 //
 // Copyright Bob Friesenhahn, 2003-2024
+// SPDX-License-Identifier: MIT
 //
 // Usage: analyze file...
 //

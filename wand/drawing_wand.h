@@ -1,4 +1,5 @@
 /* Copyright (C) 2003-2026 GraphicsMagick Group */
+/* SPDX-License-Identifier: MIT */
 /*
   GraphicsMagick Drawing Wand API.
 

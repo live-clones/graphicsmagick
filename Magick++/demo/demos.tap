@@ -2,6 +2,7 @@
 # -*- shell-script -*-
 #
 # Copyright 2004-2015 Bob Friesenhahn <bfriesen@simple.dallas.tx.us>
+# SPDX-License-Identifier: MIT
 #
 # This file is part of Magick++, the C++ API for GraphicsMagick and
 # ImageMagick.  Please see the file "COPYING" included with Magick++

@@ -1,6 +1,7 @@
 /*
 % Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
+% SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
 % Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -1452,7 +1453,8 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
         image2 = NULL;
 
       if (image_info->subrange != 0)
-        if (image->scene >= (image_info->subimage+image_info->subrange-1))
+        if ((image == (Image *) NULL) ||
+            (image->scene >= (image_info->subimage+image_info->subrange-1)))
           break;
 
       /* Allocate next image structure. */
@@ -1662,7 +1664,7 @@ static MagickPassFail WriteMATLABImage(const ImageInfo *image_info,Image *image)
   (void) WriteBlob(image,sizeof(MATLAB_HDR),MATLAB_HDR);
 
   pixels=(unsigned char *) NULL;
-  while (image!=NULL)
+  while (1)
     {
       pixels=MagickAllocateResourceLimitedMemory(unsigned char *,image->rows);
       if (pixels == (unsigned char *) NULL)
@@ -1743,10 +1745,12 @@ static MagickPassFail WriteMATLABImage(const ImageInfo *image_info,Image *image)
         (void) WriteBlobByte(image,0);
 
       MagickFreeResourceLimitedMemory(unsigned char *,pixels);
-      if (status == MagickFail || image->next==NULL)
+      if (status == MagickFail)
+        break;
+      if (image->next == (const Image*) NULL)
         break;
       image=SyncNextImageInList(image);
-    }
+    } /* while (1) */
 
   status &= CloseBlob(image);
   MagickFreeResourceLimitedMemory(unsigned char *,pixels);

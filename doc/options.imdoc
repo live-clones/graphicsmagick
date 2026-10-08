@@ -2587,8 +2587,8 @@ option.</pp>
 <pp>
 When used with the <s>mogrify</s> utility,
 this option will convert any image to the image format you specify.
-See <i>GraphicsMagick(1)</i> for a list of image format types supported by
-<s>GraphicsMagick</s>, or see the output of 'gm -list format'.</pp>
+See <i>gm(1)</i> for a list of image format types supported by
+<s>GraphicsMagick</s>, or see the output of 'gm convert -list format'.</pp>
 
 <pp>
 By default the file is written to its original name.  However, if the
@@ -6026,17 +6026,19 @@ are nearly the same color as the corner pixels.</pp>
 <abs>the image type</abs>
 <pp>
 Choose from:
-<s>Bilevel</s>, <s>Grayscale</s>, <s>Palette</s>,
-<s>PaletteMatte</s>, <s>TrueColor</s>, <s>TrueColorMatte</s>,
-<s>ColorSeparation</s>, <s>ColorSeparationMatte</s>, or <s>Optimize</s>.</pp>
+<s>Bilevel</s>, <s>Grayscale</s>, <s>GrayscaleMatte</s>,
+<s>Palette</s>, <s>PaletteMatte</s>, <s>TrueColor</s>,
+<s>TrueColorMatte</s>, <s>ColorSeparation</s>,
+<s>ColorSeparationMatte</s>, or <s>Optimize</s>.</pp>
 
 <pp>
 Normally, when a format supports different subformats such as bilevel,
-grayscale, palette, truecolor, and truecolor+alpha, the encoder will try
-to choose a suitable subformat based on the nature of the image. The
-<s>-type</s> option may be used to tailor the output subformat. By
-default the output subformat is based on readily available image
-information and is usually similar to the input format.</pp>
+grayscale, grayscale+alpha, palette, truecolor, and truecolor+alpha,
+the encoder will try to choose a suitable subformat based on the
+nature of the image. The <s>-type</s> option may be used to tailor the
+output subformat. By default the output subformat is based on readily
+available image information and is usually similar to the input
+format.</pp>
 
 <pp>
 Specify <tt>-type Optimize</tt> in order to enable inspecting all pixels

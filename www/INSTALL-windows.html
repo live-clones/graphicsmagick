@@ -352,6 +352,19 @@ in INSTALL-unix.txt.</p>
 <section id="important-notes">
 <h2><a class="toc-backref" href="#toc-entry-18" role="doc-backlink">Important Notes</a></h2>
 <blockquote>
+<p>Note that the following instructions may not work correctly under
+Windows 11 due to a severe mis-feature called &quot;Smart App Control&quot;
+which (seemingly) randomly disables access to executables, causing
+parts of the compiler and just-built apps to not be
+&quot;accessible&quot;. The feature causes random compilation and test-suite
+failures. To disable &quot;Smart App Control&quot; for the entire system, use
+these steps:</p>
+<ol class="arabic simple">
+<li><p>Open the <span class="docutils literal">Start</span> menu, type <span class="docutils literal">Windows Security</span>, and open the app.</p></li>
+<li><p>Click on <span class="docutils literal">App &amp; browser control</span> on the left menu.</p></li>
+<li><p>Click <span class="docutils literal">Smart App Control settings</span>.</p></li>
+<li><p>Select <span class="docutils literal">Off</span>.</p></li>
+</ol>
 <p>On some platforms Visual C++ may fail with an internal compiler
 error.  If this happens to you, then make sure that your compiler is
 updated with the latest fixes from the Microsoft web site and the
@@ -380,7 +393,7 @@ provided, as well as Visual Studio project files to recompile it
 from source code if needed.</p>
 <p>Once started, the configure program provides this configuration
 dialog after proceeding past the initial notifications screen:</p>
-<img alt="Configure program screen shot" class="align-center" src="configure-target-setup.png" style="width: 498.0px; height: 473.0px;" />
+<img alt="Configure program screen shot" class="align-center" src="configure-target-setup.png" style="width: 498px; height: 473px;" />
 <p>In addition to (or as a replacement to) the above dialog, the
 configure.exe program supports these command-line options:</p>
 <dl class="simple">

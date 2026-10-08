@@ -242,12 +242,14 @@ image frames to 106x80, and writes the resulting animation to disk::
         if (image)
           (void) AppendImageToList(&images,image);
       }
+    images=GetFirstImageInList(images);
 
     if (!images)
       {
         printf("Failed to read any images!\n");
         exit(1);
       }
+
     /*
       Create a thumbnail image sequence
     */
@@ -263,6 +265,7 @@ image frames to 106x80, and writes the resulting animation to disk::
           }
         (void) AppendImageToList(&thumbnails,resize_image);
       }
+    thumbnails=GetFirstImageInList(thumbnails);
     /*
       Write the thumbnail image sequence to file
     */

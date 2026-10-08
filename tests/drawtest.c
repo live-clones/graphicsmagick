@@ -3,6 +3,9 @@
  * Test program for C drawing API
  * Written by Bob Friesenhahn
  *
+ * Copyright (C) 2002-2026 GraphicsMagick Group
+ * SPDX-License-Identifier: MIT
+ *
  */
 
 #include <magick/api.h>

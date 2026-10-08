@@ -1,6 +1,7 @@
 #!/bin/sh
 # -*- shell-script -*-
 # Copyright (C) 2004-2012 GraphicsMagick Group
+# SPDX-License-Identifier: MIT
 # Test I/O using pipes
 # Note that running a test command containing a pipe blows up
 # test_command_fn so we will only check final status.
