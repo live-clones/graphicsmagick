@@ -819,10 +819,8 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
     zero_rows;
 
   unsigned long
-    bytes_to_write,
     scene,
-    density,
-    bytes_per_line;
+    density;
 
   unsigned char
     bits_per_pixel;
@@ -835,6 +833,8 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
     last_row_compression;
 
   size_t
+    bytes_per_line,
+    bytes_to_write,
     image_list_length;
 
   /*
@@ -962,7 +962,7 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
       /*
         Assign row buffer
       */
-      bytes_per_line=(image->columns*bits_per_pixel+7)/8;
+      bytes_per_line=(MagickArraySize(image->columns,bits_per_pixel+7))/8;
       pixels=MagickAllocateResourceLimitedMemory(unsigned char *,bytes_per_line);
       if (pixels == (unsigned char *) NULL)
         ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
