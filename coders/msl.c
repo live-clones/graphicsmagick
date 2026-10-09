@@ -175,11 +175,13 @@ MSLPushImage(MSLInfo *msl_info,Image *image)
   msl_info->n++;
   n=msl_info->n;
   MagickReallocMemory(ImageInfo **,msl_info->image_info,
-                      ((size_t)n+1)*sizeof(ImageInfo *));
+                      MagickArraySize((size_t)n+1,sizeof(ImageInfo *)));
   MagickReallocMemory(DrawInfo **,msl_info->draw_info,
-                      ((size_t)n+1)*sizeof(DrawInfo *));
-  MagickReallocMemory(Image **,msl_info->attributes,((size_t)n+1)*sizeof(Image *));
-  MagickReallocMemory(Image **,msl_info->image,((size_t)n+1)*sizeof(Image *));
+                      MagickArraySize((size_t)n+1,sizeof(DrawInfo *)));
+  MagickReallocMemory(Image **,msl_info->attributes,
+                      MagickArraySize((size_t)n+1,sizeof(Image *)));
+  MagickReallocMemory(Image **,msl_info->image,
+                      MagickArraySize((size_t)n+1,sizeof(Image *)));
   if ((msl_info->image_info == (ImageInfo **) NULL) ||
       (msl_info->draw_info == (DrawInfo **) NULL) ||
       (msl_info->attributes == (Image **) NULL) ||

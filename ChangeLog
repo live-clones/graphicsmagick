@@ -1,5 +1,8 @@
 2026-10-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/msl.c (MSLPushImage): Guard against arithmetic overflow
+        while calculating memory allocation size.
+
         * coders/pcl.c (WritePCLImage): Guard against arithmetic overflow
         while computing bytes per line.
 
