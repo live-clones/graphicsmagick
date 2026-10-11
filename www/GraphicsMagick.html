@@ -3474,19 +3474,24 @@ bi-level equivalent.</font></td></tr></table>
 ALT=">" BORDER=0 height=14
 width=15><b><font face="Helvetica, Arial"
 ><font color="#00B04F"><font size="+1">
-    <a name="details-level"></a>-level <i>&lt;black_point&gt;</i>{<i>,&lt;gamma&gt;</i>}<i></i>{<i>,&lt;white_point&gt;</i>}<i></i>{<i>%</i>}<i></i>
+    <a name="details-level"></a>-level <i>&lt;black_point&gt;</i>{<i>%</i>}<i></i>{<i>,&lt;white_point&gt;</i>{<i>%</i>}<i></i>}<i></i>{<i>,&lt;gamma&gt;</i>}<i></i>
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>adjust the level of image contrast</td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
-Give one, two or three values delimited with commas: black-point, gamma,
-white-point (e.g. 10,1.0,250 or 2%,0.5,98%). The black and white
-points range from 0 to MaxRGB or from 0 to 100%; if the white point is
-omitted it is set to MaxRGB-black_point. If a "%" sign is present
-anywhere in the string, the black and white points are percentages of
-MaxRGB. Gamma is an exponent that ranges from 0.1 to 10.; if it is
-omitted, the default of 1.0 (no gamma correction) is assumed. This
-interface works similar to Photoshop's "Image-&gt;Adjustments-&gt;Levels..."
-"Input Levels" interface.</font></td></tr></table>
+Give one, two or three values delimited with commas: black-point,
+white-point, gamma (e.g. 10,250,1.0 or 2%,98%,0.5). The black and
+white points range from 0 to MaxRGB or from 0 to 100%; if the white
+point is omitted it is set to MaxRGB-black_point. If a "%" sign is
+present anywhere in the string, the black and white points are
+percentages of MaxRGB. Gamma is an exponent that ranges from 0.1 to
+10.; if it is omitted, the default of 1.0 (no gamma correction) is
+assumed. This interface works similar to Photoshop's
+"Image-&gt;Adjustments-&gt;Levels..."  "Input Levels" interface.</font></td></tr></table>
+<table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
+Note that the parameter ordering changed from 'black/mid/white' to
+black/white/mid' after GraphicsMagick 1.3.49. This is an incompatible
+change but was already expected by MagickWand, and ImageMagick since
+August, 2003.</font></td></tr></table>
 <table BORDER=0 WIDTH="94%">
 <tr>
 <td width="3%"><br></td> 

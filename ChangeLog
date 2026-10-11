@@ -1,5 +1,16 @@
 2026-10-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/enhance.c (LevelImage): Change the 'levels' parsing to
+        match the order used in GraphicsMagick's MagickWand() and in
+        ImageMagick since at least August, 2003.  The order of the
+        arguments is changed from 'black/mid/white' to 'black/white/mid'.
+        This is an incompatible change, but seems to match what is most
+        often requested.
+
+        * magick/command.c (ConvertUsage, MogrifyUsage): Update convert
+        and mogrify usage to indicate that -gaussian-blur is already
+        supported, in addition to -gaussian.
+
         * www/index.rst: Provide a link to the benchmarks page.
 
         * www/benchmarks.rst: Update benchmarks page.

@@ -783,16 +783,22 @@ MagickExport MagickPassFail GammaImage(Image *image,const char *level)
 %  in the image. Colors brighter than the white point are set to the maximum
 %  quantum value.
 %
+%  Please note that the 'level' argument was previously documented to accept
+%  black/mid/white but MagickWand() and ImageMagick use black/white/mid as if
+%  a bug was fixed in ImageMagick after the fork in 2002 and before MagickWand
+%  implementation updates stopped in August of 2003.  The ImageMagick version
+%  of this function is now parameterized to avoid string parsing.
+%
 %  The format of the LevelImage method is:
 %
-%      unsigned int LevelImage(Image *image,const char *level)
+%      MagickPassFail LevelImage(Image *image,const char *level)
 %
 %  A description of each parameter follows:
 %
 %    o image: The image.
 %
-%    o levels: Specify the levels as a string of the form "black/mid/white"
-%      (e.g. "10,1.0,65000) where black and white have the range of 0-MaxRGB,
+%    o levels: Specify the levels as a string of the form "black/white/mid"
+%      (e.g. "10,65000,1.0) where black and white have the range of 0-MaxRGB,
 %      and mid has the range 0-10.
 %
 %
@@ -854,8 +860,8 @@ MagickExport MagickPassFail LevelImage(Image *image,const char *levels)
       }
     *cp=0;
 
-    count=sscanf(buffer,"%lf%*[,/]%lf%*[,/]%lf",&black_point,&mid_point,
-                 &white_point);
+    /*  <black_point>{%}{,<white_point>{%}}{,<gamma>} */
+    count=sscanf(buffer,"%lf%*[,/]%lf%*[,/]%lf",&black_point,&white_point,&mid_point);
     if (percent)
       {
         if (count > 0)

@@ -3398,20 +3398,26 @@ bi-level equivalent.</pp>
 <!-- ------------ -level -------------------------------------------- -->
 
 <utils apps=convert,mogrify>
-<dopt>-level <black_point>{,<gamma>}{,<white_point>}{%}</opt>
+<dopt>-level <black_point>{%}{,<white_point>{%}}{,<gamma>}</opt>
 
 <abs>adjust the level of image contrast</abs>
 
 <pp>
-Give one, two or three values delimited with commas: black-point, gamma,
-white-point (e.g. 10,1.0,250 or 2%,0.5,98%). The black and white
-points range from 0 to MaxRGB or from 0 to 100%; if the white point is
-omitted it is set to MaxRGB-black_point. If a "%" sign is present
-anywhere in the string, the black and white points are percentages of
-MaxRGB. Gamma is an exponent that ranges from 0.1 to 10.; if it is
-omitted, the default of 1.0 (no gamma correction) is assumed. This
-interface works similar to Photoshop's "Image->Adjustments->Levels..."
-"Input Levels" interface.</pp>
+Give one, two or three values delimited with commas: black-point,
+white-point, gamma (e.g. 10,250,1.0 or 2%,98%,0.5). The black and
+white points range from 0 to MaxRGB or from 0 to 100%; if the white
+point is omitted it is set to MaxRGB-black_point. If a "%" sign is
+present anywhere in the string, the black and white points are
+percentages of MaxRGB. Gamma is an exponent that ranges from 0.1 to
+10.; if it is omitted, the default of 1.0 (no gamma correction) is
+assumed. This interface works similar to Photoshop's
+"Image->Adjustments->Levels..."  "Input Levels" interface.</pp>
+
+<pp>
+Note that the parameter ordering changed from 'black/mid/white' to
+black/white/mid' after GraphicsMagick 1.3.49. This is an incompatible
+change but was already expected by MagickWand, and ImageMagick since
+August, 2003.</pp>
 
 </utils>
 

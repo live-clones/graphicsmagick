@@ -41,6 +41,15 @@
 <p>2026-10-11  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/enhance.c (LevelImage): Change the 'levels' parsing to
+match the order used in GraphicsMagick's MagickWand() and in
+ImageMagick since at least August, 2003.  The order of the
+arguments is changed from 'black/mid/white' to 'black/white/mid'.
+This is an incompatible change, but seems to match what is most
+often requested.</p></li>
+<li><p>magick/command.c (ConvertUsage, MogrifyUsage): Update convert
+and mogrify usage to indicate that -gaussian-blur is already
+supported, in addition to -gaussian.</p></li>
 <li><p>www/index.rst: Provide a link to the benchmarks page.</p></li>
 <li><p>www/benchmarks.rst: Update benchmarks page.</p></li>
 </ul>

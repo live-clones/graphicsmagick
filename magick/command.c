@@ -6439,7 +6439,9 @@ static void ConvertUsage(void)
   (void) puts("  -frame geometry      surround image with an ornamental border");
   (void) puts("  -fuzz distance       colors within this distance are considered equal");
   (void) puts("  -gamma value         level of gamma correction");
-  (void) puts("  -gaussian geometry   gaussian blur an image");
+  (void) puts("  -gaussian geometry");
+  (void) puts("  -gaussian-blur geometry");
+  (void) puts("                       gaussian blur an image");
   (void) puts("  -geometry geometry   preferred size or location of the image");
   (void) puts("  -green-primary point chomaticity green primary point");
   (void) puts("  -gravity type        horizontal and vertical text/object placement");
@@ -14128,7 +14130,9 @@ static void MogrifyUsage(void)
   (void) puts("  -frame geometry      surround image with an ornamental border");
   (void) puts("  -fuzz distance       colors within this distance are considered equal");
   (void) puts("  -gamma value         level of gamma correction");
-  (void) puts("  -gaussian geometry   gaussian blur an image");
+  (void) puts("  -gaussian geometry");
+  (void) puts("  -gaussian-blur geometry");
+  (void) puts("                       gaussian blur an image");
   (void) puts("  -geometry geometry   preferred size or location of the image");
   (void) puts("  -gravity type        horizontal and vertical text/object placement");
   (void) puts("  -green-primary point chomaticity green primary point");
