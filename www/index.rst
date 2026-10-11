@@ -117,7 +117,7 @@ other popular software:
     documentation (ImageMagick does not).
 
   * GM is more efficient than ImageMagick so it gets the job done
-    faster using fewer resources.
+    faster using fewer resources. See some `benchmarks`_.
 
   * GM is much smaller and lighter than ImageMagick (3-5X smaller
     installation footprint).

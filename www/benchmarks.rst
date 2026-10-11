@@ -2,79 +2,29 @@
 .. This text is in reStucturedText format, so it may look a bit odd.
 .. See https://docutils.sourceforge.net/rst.html for details.
 
-=============================================================
-GraphicsMagick vs ImageMagick Benchmarks
-=============================================================
+==========================================
+ GraphicsMagick vs ImageMagick Benchmarks
+==========================================
 
 .. _`Hyperfine` : https://github.com/sharkdp/hyperfine
 
 .. contents::
   :local:
 
-Foreword
-=========
 
-This page used to document benchmark results which compared
-GraphicsMagick 1.3.8 performance to ImageMagick 6.5.8-10 performance.
-We found that GraphicsMagick was usually considerably faster at
-executing image processing operations from the command line than
-ImageMagick 6.5.8-10 was. One ImageMagick algorithm ran as much as 770
-times slower.  GraphicsMagick clearly ran much more efficiently under
-Microsoft Windows.
+A Simple Benchmark
+==================
 
-We now find that a simple head to head performance comparison between
-GraphicsMagick and recent ImageMagick is no longer possible because
-ImageMagick has changed the meanings of the existing arguments.  In
-particular, we discovered that ImageMagick filter arguments producing
-convolution matrices are now producing lower-order convolution
-matrices representing perhaps an order of magnitude less work given
-the same arguments.  The resulting images are visually substantially
-less filtered.  Using the same command-line filter arguments causes
-GraphicsMagick to appear slower when it is actually doing far more
-work than ImageMagick.
-
-Due to it not being feasible to do a head to head performance
-measurement between GraphicsMagick and ImageMagick, we have decided to
-not post results at the moment.  However, the strategy and a simple
-benchmark driver script are still provided for those who want to do
-their own performance comparisons between GraphicsMagick and
-ImageMagick.
-
-Strategy
-========
-
-The benchmark focuses on the ability to process many medium sized
-HD-resolution (1920x1080 pixels) images. In order to prevent disk I/O
-from being a factor, we use a small input image and tile it to create
-a larger input image via the "tile:" coder. The processed image is
-sent to the "null:" coder so that file writes to a slow disk are also
-not a factor.  Static executables are used and executed via full paths
-in order to minimize variability from the execution environment. In
-order to obtain accurate and useful timing, we use the bash shell to
-execute the command 40 times and see how long it takes. This is a very
-simple benchmark approach which is quite representative of the
-performance that the typical user observes.
-
-This new benchmark reveals the following performance criteria:
-
-  * Basic execution overhead of the software.
-
-  * Image processing algorithmic efficiency.
-
-  * Efficacy of OpenMP enhancements.
-
-The Simple Benchmark
-====================
-
-The benchmark is quite simple. It reads a list of commands to execute
+This benchmark is quite simple. It reads a list of commands to execute
 from a file named "commands.txt" and times how long it takes to
 execute each command 40 times using GraphicsMagick and ImageMagick.
-This script will work with ImageMagick up to version 6.X, but not with
-ImageMagick 7.X given that there is no longer a 'convert' command.
+ImageMagick 7.X no longer provides a 'convert' command since its
+'magick' command is implicitly the same as convert by default.
 
 A sample set of commands to test with (not all of which will work with
 ImageMagick) may be found in the GraphicsMagick source tree as
-"utilities/tests/convert-cmds.txt".
+"utilities/tests/convert-cmds.txt".  You can provide your own list of
+commands based on what you use in your workflow.
 
 Here is the simple benchmark script::
 
@@ -89,11 +39,9 @@ Here is the simple benchmark script::
 
   # GraphicsMagick
   convert1='/usr/local/bin/gm convert'
-  #convert1='/c/Program\ Files/GraphicsMagick-1.3.8-Q16/gm.exe convert'
 
-  # ImageMagick
-  convert2='/usr/local/bin/convert'
-  #convert2='/c/Program\ Files/ImageMagick-6.5.9-Q16/convert.exe'
+  # ImageMagick 7
+  convert2='/usr/local/bin/magick'
 
   # Input file specification
   input_image='-size 1920x1080 tile:model.pnm'
@@ -160,25 +108,42 @@ For example to evaluate the performance of a rotate request::
   gm convert rose: -resize 5000% -verbose rose.pnm
   hyperfine --warmup 2 --min-runs 20 'gm convert rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
   hyperfine --warmup 2 --min-runs 20 'magick rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
-  hyperfine --warmup 2 --min-runs 20 'gm convert rose.pnm -rotate 90 output.pnm' --cleanup 'rm -f output.pnm'
-  hyperfine --warmup 2 --min-runs 20 'magick rose.pnm -rotate 90 output.pnm' --cleanup 'rm -f output.pnm'
 
 produces output like this on my laptop::
 
-  ROSE PPM 70x46=>3500x2300+0+0 DirectClass 8-bit 0.000u 0m:0.000056s
-  rose.pnm PNM 70x46=>3500x2300+0+0 DirectClass 8-bit 23.0Mi 0.130u 0m:0.021209s (148.3Ki pixels/s)
+  % gm convert rose: -resize 5000% -verbose rose.pnm
+  ROSE PPM 70x46=>3500x2300+0+0 DirectClass 8-bit 0.000u 0m:0.000057s
+  rose.pnm PNM 70x46=>3500x2300+0+0 DirectClass 8-bit 23.0Mi 0.120u 0m:0.018557s (169.4Ki pixels/s)
+
+  % hyperfine --warmup 2 --min-runs 20 'gm convert rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
   Benchmark 1: gm convert rose.pnm -rotate 92 output.pnm
-    Time (mean ± σ):     178.0 ms ±  15.4 ms    [User: 787.9 ms, System: 151.0 ms]
-    Range (min … max):   165.6 ms … 224.1 ms    20 runs
+    Time (mean ± σ):     155.1 ms ±   3.9 ms    [User: 712.2 ms, System: 140.5 ms]
+    Range (min … max):   151.2 ms … 170.2 ms    20 runs
 
+  % hyperfine --warmup 2 --min-runs 20 'magick rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
   Benchmark 1: magick rose.pnm -rotate 92 output.pnm
-    Time (mean ± σ):     785.3 ms ±  62.0 ms    [User: 2039.6 ms, System: 93.3 ms]
-    Range (min … max):   714.9 ms … 921.5 ms    20 runs
+    Time (mean ± σ):     623.5 ms ±  44.6 ms    [User: 3621.7 ms, System: 66.5 ms]
+    Range (min … max):   556.7 ms … 724.7 ms    20 runs
 
-  Benchmark 1: gm convert rose.pnm -rotate 90 output.pnm
-    Time (mean ± σ):      77.1 ms ±   3.1 ms    [User: 75.7 ms, System: 63.6 ms]
-    Range (min … max):    70.6 ms …  81.6 ms    41 runs
+From the above, we can see that GraphicsMagick is four times as fast!
 
-  Benchmark 1: magick rose.pnm -rotate 90 output.pnm
-    Time (mean ± σ):     187.8 ms ±   9.5 ms    [User: 128.0 ms, System: 78.3 ms]
-    Range (min … max):   177.0 ms … 206.6 ms    20 runs
+Now we test with an ImageMagick HDRI version by adding
+the --enable-hdri configuration option::
+
+  % hyperfine --warmup 2 --min-runs 20 'magick rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
+  Benchmark 1: magick rose.pnm -rotate 92 output.pnm
+    Time (mean ± σ):     728.7 ms ±  15.3 ms    [User: 3918.3 ms, System: 128.4 ms]
+    Range (min … max):   699.4 ms … 751.7 ms    20 runs
+
+And we see that the GraphicsMagick Q16 build is 4.7 times as fast as a
+q16hdri build of ImageMagick!
+
+Now we test ImageMagick 6.9.13-59 so we can see how legacy ImageMagick fares::
+
+  % hyperfine --warmup 2 --min-runs 20 'convert rose.pnm -rotate 92 output.pnm' --cleanup 'rm -f output.pnm'
+  Benchmark 1: convert rose.pnm -rotate 92 output.pnm
+    Time (mean ± σ):     633.5 ms ±  35.9 ms    [User: 3611.1 ms, System: 88.5 ms]
+    Range (min … max):   571.8 ms … 696.7 ms    20 runs
+
+From the above, we see that legacy ImageMagick 6 is a little bit
+faster than the latest ImageMagick 7, but still very slow.
