@@ -5531,9 +5531,6 @@ WandExport unsigned int MagickLevelImage(MagickWand *wand,
                                          const double gamma,
                                          const double white_point)
 {
-  char
-    levels[MaxTextExtent];
-
   unsigned int
     status;
 
@@ -5541,9 +5538,9 @@ WandExport unsigned int MagickLevelImage(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) MagickFormatString(levels,sizeof(levels),"%g,%g,%g",black_point,
-                            white_point,gamma);
-  status=LevelImage(wand->image,levels);
+
+  status=LevelImageChannel(wand->image,AllChannels,
+                           black_point, gamma, white_point);
   if (status == False)
     CopyException(&wand->exception,&wand->image->exception);
   return(status);

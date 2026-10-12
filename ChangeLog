@@ -1,3 +1,17 @@
+2026-10-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * wand/magick_wand.c (MagickLevelImage): Use LevelImageChannel()
+        with channel=AllChannels rather than using LevelImage().
+
+        * Magick++/lib/Image.cpp (Magick::Image::level): Use
+        LevelImageChannel() with channel=AllChannels rather than using
+        LevelImage().
+
+        * PerlMagick/Magick.xs: Use LevelImageChannel() for 'level' if
+        'level' string argument was not provided. In this case,
+        "black-point", "mid-point", "white-point" double values are
+        optionally provided.
+
 2026-10-11  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/enhance.c (LevelImage): Change the 'levels' parsing to

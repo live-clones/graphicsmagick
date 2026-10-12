@@ -1217,12 +1217,8 @@ void Magick::Image::level ( const double black_point,
                             const double mid_point )
 {
   modifyImage();
-  std::ostringstream levels;
-  levels << std::fixed
-         << black_point << ','
-         << mid_point << ','
-         << white_point;
-  (void) LevelImage( image(), levels.str().c_str() );
+  (void) LevelImageChannel(image(),Magick::AllChannels,
+                           black_point,mid_point,white_point);
   throwImageException();
 }
 

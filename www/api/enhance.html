@@ -145,6 +145,8 @@ black/mid/white but MagickWand() and ImageMagick use black/white/mid as if
 a bug was fixed in ImageMagick after the fork in 2002 and before MagickWand
 implementation updates stopped in August of 2003.  The ImageMagick version
 of this function is now parameterized to avoid string parsing.</p>
+<p>Use LevelImageChannel() with channel=AllChannels if parameterized arguments
+are already available.</p>
 <p>The format of the LevelImage method is:</p>
 <pre class="literal-block">MagickPassFail LevelImage( <a class="reference external" href="../api/types.html#image">Image</a> *image, const char *level );</pre>
 <p>A description of each parameter follows:</p>

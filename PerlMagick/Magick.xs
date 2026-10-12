@@ -6286,21 +6286,26 @@ Mogrify(ref,...)
         }
         case 73:  /* Level */
         {
-          if (!attribute_flag[1])
-            argument_list[1].double_reference=0.0;
-          if (!attribute_flag[2])
-            argument_list[2].double_reference=1.0;
-          if (!attribute_flag[3])
-            argument_list[3].double_reference=MaxRGB;
-          if (!attribute_flag[0])
+          if (attribute_flag[0]) /* level */
             {
-              MagickFormatString(message,sizeof(message),"%g,%g,%g",
-                argument_list[1].double_reference,
-                argument_list[2].double_reference,
-                argument_list[3].double_reference);
-              argument_list[0].string_reference=message;
+              LevelImage(image,argument_list[0].string_reference);
             }
-          LevelImage(image,argument_list[0].string_reference);
+          else
+            {
+              double
+                black_point=0.0,
+                mid_point=1.0,
+                white_point=MaxRGBDouble;
+
+              if (attribute_flag[1]) /* "black-point" */
+                black_point=argument_list[1].double_reference;
+              if (attribute_flag[2]) /* "mid-point" */
+                mid_point=argument_list[2].double_reference;
+              if (attribute_flag[3]) /* "white-point" */
+                white_point=argument_list[3].double_reference;
+              (void) LevelImageChannel(image,AllChannels,
+                                       black_point, mid_point, white_point);
+            }
           break;
         }
         case 74:  /* Clip */

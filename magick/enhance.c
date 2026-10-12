@@ -789,6 +789,9 @@ MagickExport MagickPassFail GammaImage(Image *image,const char *level)
 %  implementation updates stopped in August of 2003.  The ImageMagick version
 %  of this function is now parameterized to avoid string parsing.
 %
+%  Use LevelImageChannel() with channel=AllChannels if parameterized arguments
+%  are already available.
+%
 %  The format of the LevelImage method is:
 %
 %      MagickPassFail LevelImage(Image *image,const char *level)
