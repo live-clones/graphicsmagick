@@ -1130,8 +1130,8 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
     origin;
 
   GlyphInfo
-    glyph = { 0 },
-    last_glyph = { 0 };
+    glyph,
+    last_glyph;
 
   Image
     *pattern = (Image *) NULL;
@@ -1180,6 +1180,9 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
 
   MagickPassFail
     status=MagickPass;
+
+  (void) memset(&glyph,0,sizeof(glyph));
+  (void) memset(&last_glyph,0,sizeof(last_glyph));
 
   if ((draw_info->font == (char *) NULL) ||
       (draw_info->font[0] == '\0') ||

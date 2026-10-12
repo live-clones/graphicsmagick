@@ -1,5 +1,8 @@
 2026-10-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/studio.h, magick/annotate.c: Fixes to compile under GCC
+        15 C++.
+
         * wand/magick_wand.c (MagickLevelImage): Use LevelImageChannel()
         with channel=AllChannels rather than using LevelImage().
 
