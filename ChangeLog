@@ -1,3 +1,10 @@
+2026-10-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/pdf.c (WritePDFImage): Use strftime() to format PDF
+        dates, including the time zone offset from UTC.  Addresses
+        SourceForge issue #780 "[PDF] incorrect timestamp calculation when
+        writing PDF metadata".
+
 2026-10-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/studio.h, magick/annotate.c: Fixes to compile under GCC

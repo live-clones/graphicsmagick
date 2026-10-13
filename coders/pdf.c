@@ -736,10 +736,7 @@ static unsigned int WritePDFImage(const ImageInfo *image_info,Image *image)
 #else
   time_meridian=localtime(&seconds); /* Thread-unsafe version */
 #endif  /* if defined(HAVE_LOCALTIME_R) */
-
-  MagickFormatString(date,sizeof(date),"D:%04d%02d%02d%02d%02d%02d",time_meridian->tm_year+1900,
-                     time_meridian->tm_mon+1,time_meridian->tm_mday,time_meridian->tm_hour,
-                     time_meridian->tm_min,time_meridian->tm_sec);
+  (void) strftime(date,sizeof(date),"D:%Y%m%d%H%M%S%z",time_meridian);
   GetPathComponent(image->filename,BasePath,basename);
 
   MagickFormatString(buffer,sizeof(buffer),"/Title (%.1024s)\n",
