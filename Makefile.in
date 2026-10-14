@@ -11725,6 +11725,9 @@ release: distcheck
 	done
 
 # Run Clang analyzer on the project.
+#
+# https://clang.llvm.org/docs/ClangStaticAnalyzer.html
+#
 # In order for this to work, you must have first installed the 'clang'
 # and 'clang-tools' packages on your system.
 # The project should have been configured to use clang.
@@ -11735,7 +11738,6 @@ release: distcheck
 # strncpy, vsnprintf, etc., ANSI C'11 "_s" functions, which GNU libc
 # did not implement and Microsoft's compiler has implemented
 # differently.  Don't bother trying to use it.
-#
 scan-build:
 	scan-build -k --html-title='GraphicsMagick scan-build' \
 	-maxloop 10000 \
@@ -11747,6 +11749,65 @@ scan-build:
 	-enable-checker valist.CopyToSelf \
 	-enable-checker valist.Uninitialized \
 	-enable-checker valist.Unterminated \
+	--use-cc $(CC) $(MAKE) $(all) $(check_PROGRAMS)
+
+# It may be necessary to execute this like:
+# make CC=clang-21 scan-build
+scan-build-21:
+	scan-build -k --html-title='GraphicsMagick scan-build' \
+	-maxloop 10000 \
+	-disable-checker deadcode.DeadStores \
+	-enable-checker security.insecureAPI.bcmp \
+	-enable-checker security.insecureAPI.bcopy \
+	-enable-checker security.insecureAPI.bzero \
+	-enable-checker security.insecureAPI.strcpy \
+	-enable-checker valist.CopyToSelf \
+	-enable-checker valist.Uninitialized \
+	-enable-checker valist.Unterminated \
+	-enable-checker cplusplus.ArrayDelete \
+	-enable-checker cplusplus.InnerPointer \
+	-enable-checker cplusplus.Move \
+	-enable-checker cplusplus.NewDelete \
+	-enable-checker cplusplus.NewDeleteLeaks \
+	-enable-checker cplusplus.PlacementNew \
+	-enable-checker cplusplus.SelfAssignment \
+	-enable-checker cplusplus.StringChecker \
+	-enable-checker cplusplus.PureVirtualCall \
+	-enable-checker nullability.NullReturnedFromNonnull \
+	-enable-checker optin.core.EnumCastOutOfRange \
+	-enable-checker optin.cplusplus.UninitializedObject \
+	-enable-checker optin.cplusplus.VirtualCall \
+	-enable-checker optin.performance.Padding \
+	-enable-checker optin.portability.UnixAPI \
+	-enable-checker optin.taint.GenericTaint \
+	-enable-checker optin.taint.TaintedAlloc \
+	-enable-checker optin.taint.TaintedDiv \
+	-enable-checker security.ArrayBound  \
+	-enable-checker security.cert.env.InvalidPtr \
+	-enable-checker security.FloatLoopCounter \
+	-enable-checker security.insecureAPI.UncheckedReturn \
+	-enable-checker security.insecureAPI.getpw \
+	-enable-checker security.insecureAPI.gets \
+	-enable-checker security.insecureAPI.mkstemp \
+	-enable-checker security.insecureAPI.mktemp \
+	-enable-checker security.insecureAPI.rand \
+	-enable-checker security.insecureAPI.vfork \
+	-enable-checker security.MmapWriteExec \
+	-enable-checker security.PointerSub \
+	-enable-checker security.PutenvStackArray \
+	-enable-checker security.SetgidSetuidOrder \
+	-enable-checker unix.API \
+	-enable-checker unix.Chroot \
+	-enable-checker unix.Errno \
+	-enable-checker unix.Malloc \
+	-enable-checker unix.MallocSizeof \
+	-enable-checker unix.MismatchedDeallocator \
+	-enable-checker unix.Vfork \
+	-enable-checker unix.cstring.BadSizeArg \
+	-enable-checker unix.cstring.NotNullTerminated \
+	-enable-checker unix.cstring.NullArg \
+	-enable-checker unix.StdCLibraryFunctions \
+	-enable-checker unix.Stream \
 	--use-cc $(CC) $(MAKE) $(all) $(check_PROGRAMS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
