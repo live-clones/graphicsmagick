@@ -1,5 +1,8 @@
 2026-10-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/common.h (MAGICK_FLAG_ENUM): Add support for Clang/GCC
+        __attribute__((flag_enum)).
+
         * coders/logo.c (EmbeddedImageList): Optimize size of
         EmbeddedImageList.
 

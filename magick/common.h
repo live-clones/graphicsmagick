@@ -268,6 +268,9 @@ extern "C" {
          (((__GNUC__) > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7))))  /* 4.7+ */
 #      define MAGICK_ASSUME_ALIGNED_OFFSET(exp,align,offset) __builtin_assume_aligned(exp,align,offset)
 #    endif
+#    if (MAGICK_HAS_ATTRIBUTE(flag_enum)) /* https://clang.llvm.org/docs/AttributeReference.html#flag-enum */
+#      define MAGICK_FLAG_ENUM MAGICK_ATTRIBUTE((__flag_enum__))
+#    endif
 #  endif
 #endif
 #if !defined(MAGICK_FUNC_DEPRECATED)
@@ -332,6 +335,9 @@ extern "C" {
 #endif
 #if !defined(MAGICK_ASSUME_ALIGNED_OFFSET)
 #  define MAGICK_ASSUME_ALIGNED_OFFSET(exp,align,offset) (exp)
+#endif
+#if !defined(MAGICK_FLAG_ENUM)
+#  define MAGICK_FLAG_ENUM /*nothing*/
 #endif
 
   /*
