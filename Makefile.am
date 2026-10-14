@@ -491,7 +491,8 @@ release: distcheck
 	  sha256sum $${file} > $${file}.sum ; \
 	done
 
-# Run Clang analyzer on the project.
+# Run Clang analyzer on the project. It is recommended to configure
+# using the same Clang version as will be used for scan-build.
 #
 # https://clang.llvm.org/docs/ClangStaticAnalyzer.html
 #
@@ -499,30 +500,12 @@ release: distcheck
 # and 'clang-tools' packages on your system.
 # The project should have been configured to use clang.
 #
-# The '-enable-checker
-# security.insecureAPI.DeprecatedOrUnsafeBufferHandling' option
-# deprecates the memcpy, memmove, memset, snprintf, sprintf, sscanf,
-# strncpy, vsnprintf, etc., ANSI C'11 "_s" functions, which GNU libc
-# did not implement and Microsoft's compiler has implemented
-# differently.  Don't bother trying to use it.
-scan-build:
-	scan-build -k --html-title='GraphicsMagick scan-build' \
-	-maxloop 10000 \
-	-disable-checker deadcode.DeadStores \
-	-enable-checker security.insecureAPI.bcmp \
-	-enable-checker security.insecureAPI.bcopy \
-	-enable-checker security.insecureAPI.bzero \
-	-enable-checker security.insecureAPI.strcpy \
-	-enable-checker valist.CopyToSelf \
-	-enable-checker valist.Uninitialized \
-	-enable-checker valist.Unterminated \
-	--use-cc $(CC) $(MAKE) $(all) $(check_PROGRAMS)
+# Ubuntu 22.04 LTS provides clang-11 to clang-15 (clang-15 default)
+# Ubuntu 24.04 LTS provides clang-14 to clang-20 (clang-18 default)
+# Ubuntu 26.04 LTS provides clang-17 to clang-22 (clang-21 default)
 
-
-# It may be necessary to execute this like:
-# make CC=clang-21 scan-build
 scan-build-21:
-	scan-build -k --html-title='GraphicsMagick scan-build' \
+	scan-build-21 -k --html-title='GraphicsMagick scan-build' \
 	-maxloop 10000 \
 	-disable-checker deadcode.DeadStores \
 	-enable-checker security.insecureAPI.bcmp \
@@ -576,4 +559,4 @@ scan-build-21:
 	-enable-checker unix.cstring.NullArg \
 	-enable-checker unix.StdCLibraryFunctions \
 	-enable-checker unix.Stream \
-	--use-cc $(CC) $(MAKE) $(all) $(check_PROGRAMS)
+	$(MAKE) $(all) $(check_PROGRAMS)
