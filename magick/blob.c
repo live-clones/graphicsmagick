@@ -2193,6 +2193,9 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
       FILE
         *file;
 
+      long
+        file_length;
+
       MagickFormatString(test_path,sizeof(test_path),"%.1024s%.256s",
                          (const char *)MagickMapDereferenceIterator(path_map_iterator,0),
                          filename);
@@ -2204,12 +2207,18 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
             (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
                                   "Found: %.1024s",test_path);
           (void) strlcpy(path,test_path,MaxTextExtent);
-          (void) MagickFseek(file,0L,SEEK_END);
-          *length=MagickFtell(file); /* FIXME: ftell returns long, but size_t may be unsigned */
+          *length=0;
+          if (MagickFseek(file,0L,SEEK_END) == 0)
+            {
+              file_length = MagickFtell(file);
+              if (file_length > 0)
+                *length=(size_t) file_length;
+              if (MagickFseek(file,0L,SEEK_SET) != 0)
+                *length=0;
+            }
           if (*length > 0)
             {
-              (void) MagickFseek(file,0L,SEEK_SET);
-              blob=MagickAllocateMemory(unsigned char *,(*length)+1);
+              blob=MagickAllocateMemory(unsigned char *,(*length)+1UL);
               if (blob)
                 {
                   *length=fread((void  *)blob, 1, *length, file);

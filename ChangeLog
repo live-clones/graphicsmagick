@@ -1,5 +1,9 @@
 2026-10-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/blob.c (GetConfigureBlob): Code quality improvements
+        related to detecting and handling errors from MagickFtell(),
+        MagickFseek(), and MagickFtell() better.
+
         * magick/common.h (MAGICK_FLAG_ENUM): Add support for Clang/GCC
         __attribute__((flag_enum)).
 
