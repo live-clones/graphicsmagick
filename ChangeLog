@@ -1,3 +1,8 @@
+2026-10-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/jnx.c (TJNXLevelInfo): Reduce size of 'TJNXLevelInfo' and
+        use sized-types for structure definitions.
+
 2026-10-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.

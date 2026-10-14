@@ -50,7 +50,7 @@
 
 typedef struct
 {
-  int lat, lon;
+  magick_int32_t lat, lon;
 } TJNXPoint;
 
 typedef struct
@@ -60,33 +60,33 @@ typedef struct
 
 typedef struct
 {
-  unsigned Version;
-  unsigned DeviceSN;
+  magick_uint32_t Version;
+  magick_uint32_t DeviceSN;
   TJNXRect MapBounds;
-  unsigned Levels;
-  unsigned Expiration;
-  unsigned ProductID;
-  unsigned CRC;
-  unsigned SigVersion;
-  unsigned SigOffset;
-  unsigned ZOrder;
+  magick_uint32_t Levels;
+  magick_uint32_t Expiration;
+  magick_uint32_t ProductID;
+  magick_uint32_t CRC;
+  magick_uint32_t SigVersion;
+  magick_uint32_t SigOffset;
+  magick_uint32_t ZOrder;
 } TJNXHeader;
 
 typedef struct
 {
-  unsigned TileCount;
-  unsigned TilesOffset;
-  unsigned Scale;
-  char *Copyright;
-  unsigned Dummy;
+  char *Copyright; /* From NUL-terminated string */
+  magick_uint32_t TileCount;
+  magick_uint32_t TilesOffset;
+  magick_uint32_t Scale;
+  magick_uint32_t Dummy;
 } TJNXLevelInfo;
 
 typedef struct
 {
   TJNXRect TileBounds;
-  unsigned short PicWidth, PicHeight;
-  unsigned PicSize;
-  unsigned PicOffset;
+  magick_uint16_t PicWidth, PicHeight;
+  magick_uint32_t PicSize;
+  magick_uint32_t PicOffset;
 } TJNXTileInfo;
 
 
@@ -348,7 +348,7 @@ ReadJNXImage(const ImageInfo * image_info, ExceptionInfo * exception)
         }
       else
         {
-          JNXLevelInfo[i].Copyright = NULL;
+          JNXLevelInfo[i].Copyright = (char *) NULL;
         }
 
       if (EOFBlob(image))
