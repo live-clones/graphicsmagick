@@ -1218,9 +1218,16 @@ MagickExport unsigned int ListDelegateInfo(FILE *file,ExceptionInfo *exception)
       /* Format output so that command spans multiple lines if
          necessary */
       {
+        int
+          new_screen_width;
+
         const char * const columns_env = getenv("COLUMNS");
         if (columns_env)
-          screen_width=MagickAtoI(columns_env)-1;
+          {
+            new_screen_width=MagickAtoI(columns_env)-1;
+            if ((new_screen_width > 63) && (new_screen_width < 2048))
+              screen_width=new_screen_width;
+          }
       }
       command_length=strlen(commands[0]);
       command_start_column=fprintf(file,"%8s%c=%c%s  ",p->decode ? p->decode : "",
