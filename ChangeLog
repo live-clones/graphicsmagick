@@ -1,5 +1,8 @@
 2026-10-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/logo.c (EmbeddedImageList): Optimize size of
+        EmbeddedImageList.
+
         * coders/jnx.c (TJNXLevelInfo): Reduce size of 'TJNXLevelInfo' and
         use sized-types for structure definitions.
 

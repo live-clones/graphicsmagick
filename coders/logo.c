@@ -4878,15 +4878,16 @@ static const unsigned char
   };
 
 
+/* Optimum compaction order is 'blob', 'extent', 'magick', 'name' */
 static const struct
 {
-  char                  name[21];       /* image name */
-  char                  magick[4];      /* blob format */
   const void           *blob;           /* blob data */
   unsigned short        extent;         /* blob size */
+  char                  magick[4];      /* blob format */
+  char                  name[21];       /* image name */
 } EmbeddedImageList[]=
   {
-#define LOGO(name,magick,blob) { name, magick, blob, sizeof(blob) }
+#define LOGO(name,magick,blob) { blob, sizeof(blob), magick, name }
     LOGO("BRICKS", "PBM", BricksImage),
     LOGO("CIRCLES", "PBM", CirclesImage),
     LOGO("CROSSHATCH", "PBM", CrossHatchImage),
