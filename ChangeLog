@@ -1,5 +1,8 @@
 2026-10-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/jxl.c (ReadJXLImage): Comment unnecessary cast to
+        JxlDecoderStatus.
+
         * magick/blob.c (GetConfigureBlob): Code quality improvements
         related to detecting and handling errors from MagickFtell(),
         MagickFseek(), and MagickFtell() better.

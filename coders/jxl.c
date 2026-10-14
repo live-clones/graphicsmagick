@@ -493,7 +493,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
     }
 
   if (JxlDecoderSubscribeEvents(jxl_decoder,
-                                (JxlDecoderStatus)(image_info->ping == MagickTrue
+                                /* (JxlDecoderStatus) */(image_info->ping == MagickTrue
                                                    ? (JXL_DEC_BASIC_INFO |
                                                       JXL_DEC_BOX)
                                                    : (JXL_DEC_BASIC_INFO |
