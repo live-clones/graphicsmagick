@@ -398,13 +398,14 @@ WandExport unsigned int ParseAbsoluteGeometry(const char *geometry,
 %
 %
 */
-static inline char *MoveStringForward(char *dst,const char *src,size_t dstlen)
+/*
+  Move null-terminated string at 'src' forward to 'dst'. Both 'src'
+  and 'dst' reside in the same null-terminated buffer and 'dst' is
+  expected to be a lower address than 'src'.
+ */
+static inline void MoveStringForward(char *dst,const char *src)
 {
-  const size_t srclen = strlen(src);
-  const size_t movelen = Min(dstlen,srclen+1);
-  (void) memmove(dst,src,movelen);
-  dst[movelen-1]='\0';
-  return dst;
+  (void) memmove(dst,src,strlen(src)+1U);
 }
 WandExport unsigned int ParseGeometry(const char *geometry,
   GeometryInfo *geometry_info)
@@ -434,7 +435,7 @@ WandExport unsigned int ParseGeometry(const char *geometry,
   {
     if (isspace((int) (*p)))
       {
-        (void) MoveStringForward(p,p+1,sizeof(pedantic_geometry));
+        MoveStringForward(p,p+1);
         continue;
       }
     switch (*p)
@@ -442,31 +443,31 @@ WandExport unsigned int ParseGeometry(const char *geometry,
       case '%':
       {
         flags|=PercentValue;
-        (void) MoveStringForward(p,p+1,sizeof(pedantic_geometry));
+        MoveStringForward(p,p+1);
         break;
       }
       case '!':
       {
         flags|=AspectValue;
-        (void) MoveStringForward(p,p+1,sizeof(pedantic_geometry));
+        MoveStringForward(p,p+1);
         break;
       }
       case '<':
       {
         flags|=LessValue;
-        (void) MoveStringForward(p,p+1,sizeof(pedantic_geometry));
+        MoveStringForward(p,p+1);
         break;
       }
       case '>':
       {
         flags|=GreaterValue;
-        (void) MoveStringForward(p,p+1,sizeof(pedantic_geometry));
+        MoveStringForward(p,p+1);
         break;
       }
       case '@':
       {
         flags|=AreaValue;
-        (void) MoveStringForward(p,p+1,sizeof(pedantic_geometry));
+        MoveStringForward(p,p+1);
         break;
       }
       case '-':
