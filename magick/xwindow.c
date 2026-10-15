@@ -1473,8 +1473,10 @@ MagickXBestVisualInfo(Display *display,
             visual_info=p;
           else
             if (MagickXVisualColormapSize(p) == MagickXVisualColormapSize(visual_info))
-              if (rank[p->klass] > rank[visual_info->klass])
-                visual_info=p;
+              if ((p->klass < (long)(sizeof(rank)/sizeof(rank[0]))) &&
+                  (visual_info->klass < (long)(sizeof(rank)/sizeof(rank[0]))))
+                if (rank[p->klass] > rank[visual_info->klass])
+                  visual_info=p;
         }
       visual_template.visualid=XVisualIDFromVisual(visual_info->visual);
     }

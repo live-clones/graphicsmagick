@@ -1,5 +1,9 @@
 2026-10-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/xwindow.c (MagickXBestVisualInfo): Prevent a hostile X11
+        server from producing a visual 'class' value which accesses beyond
+        the extent of the 'rank' array and causes the program to crash.
+
         * wand/magick_compat.c (MoveStringForward): Simplify
         implementation and avoid possible off-by-one while terminating
         destination buffer.

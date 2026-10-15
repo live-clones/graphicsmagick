@@ -41,6 +41,9 @@
 <p>2026-10-15  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/xwindow.c (MagickXBestVisualInfo): Prevent a hostile X11
+server from producing a visual 'class' value which accesses beyond
+the extent of the 'rank' array and causes the program to crash.</p></li>
 <li><p>wand/magick_compat.c (MoveStringForward): Simplify
 implementation and avoid possible off-by-one while terminating
 destination buffer.</p></li>
