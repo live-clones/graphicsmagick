@@ -1463,6 +1463,8 @@ MagickExport int EOFBlob(const Image *image)
 %  must be freed by the user in a matter compatible with MagickMalloc()
 %  (e.g. via MagickFree()).
 %
+%  There is currently no limit on the input file length!
+%
 %  The format of the FileToBlob method is:
 %
 %      void *FileToBlob(const char *filename,size_t *length,
@@ -1475,8 +1477,8 @@ MagickExport int EOFBlob(const Image *image)
 %
 %    o filename: The filename.
 %
-%    o length: This pointer to a size_t integer sets the initial length of the
-%      blob.  On return, it reflects the actual length of the blob.
+%    o length: On return, this pointer is updated with the length
+%      of the blob.
 %
 %    o exception: Return any errors or warnings in this structure.
 %
@@ -1537,7 +1539,8 @@ MagickExport void *FileToBlob(const char *filename,size_t *length,
           if ((offset=MagickFtell(file)) != -1)
             {
               *length=(size_t) offset;
-              if ((magick_off_t) *length == offset)
+              /* FIXME: A "large" file can cause almost unbounded memory allocations! */
+              if (((magick_off_t) *length == offset) && (*length < SIZE_MAX))
                 {
                   /* Restore position to beginning of file */
                   if (MagickFseek(file,0L,SEEK_SET) != -1)
@@ -1550,6 +1553,10 @@ MagickExport void *FileToBlob(const char *filename,size_t *length,
                           if (fread(blob,1,*length,file) == *length)
                             {
                               /* Add terminating null byte */
+#if defined(__clang_analyzer__) && (__clang_major__ >= 18)
+                              /* https://github.com/llvm/llvm-project/issues/167887 */
+                              [[clang::suppress]]
+#endif /* if defined(__clang_analyzer__) */
                               blob[*length]='\0';
                             }
                           else
@@ -1930,6 +1937,8 @@ MagickExport MagickBool GetBlobTemporary(const Image *image)
 %
 %  GetConfigureBlob() returns the specified configure file as a blob.
 %
+%  There is currently no limit on the input file length!
+%
 %  The format of the GetConfigureBlob method is:
 %
 %      void *GetConfigureBlob(const char *filename,char *path,
@@ -1941,8 +1950,8 @@ MagickExport MagickBool GetBlobTemporary(const Image *image)
 %
 %    o path: return the full path information of the configure file.
 %
-%    o length: This pointer to a size_t integer sets the initial length of the
-%      blob.  On return, it reflects the actual length of the blob.
+%    o length: On return, this pointer is updated with the length
+%      of the blob.
 %
 %    o exception: Return any errors or warnings in this structure.
 %
@@ -2216,12 +2225,17 @@ MagickExport void *GetConfigureBlob(const char *filename,char *path,
               if (MagickFseek(file,0L,SEEK_SET) != 0)
                 *length=0;
             }
-          if (*length > 0)
+          /* FIXME: A "large" file can cause almost unbounded memory allocations! */
+          if ((*length > 0) && (*length < SIZE_MAX))
             {
               blob=MagickAllocateMemory(unsigned char *,(*length)+1UL);
               if (blob)
                 {
                   *length=fread((void  *)blob, 1, *length, file);
+#if defined(__clang_analyzer__) && (__clang_major__ >= 18)
+                  /* https://github.com/llvm/llvm-project/issues/167887 */
+                  [[clang::suppress]]
+#endif /* if defined(__clang_analyzer__) */
                   blob[*length]='\0';
                 }
             }

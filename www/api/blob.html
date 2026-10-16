@@ -308,6 +308,7 @@ terminating '0' character) is returned via the 'length' parameter.
 If an error occurs, a NULL pointer is returned.  The returned buffer
 must be freed by the user in a matter compatible with MagickMalloc()
 (e.g. via MagickFree()).</p>
+<p>There is currently no limit on the input file length!</p>
 <p>The format of the FileToBlob method is:</p>
 <pre class="literal-block">void *FileToBlob( const char *filename, size_t *length, <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
 <dl class="simple">
@@ -319,8 +320,8 @@ an error occurs NULL is returned.</p>
 <dd><p>The filename.</p>
 </dd>
 <dt>length:</dt>
-<dd><p>This pointer to a size_t integer sets the initial length of the
-blob.  On return, it reflects the actual length of the blob.</p>
+<dd><p>On return, this pointer is updated with the length
+of the blob.</p>
 </dd>
 <dt>exception:</dt>
 <dd><p>Return any errors or warnings in this structure.</p>
@@ -463,6 +464,7 @@ destroyed.</p>
 <section id="description-16">
 <h2>Description</h2>
 <p>GetConfigureBlob() returns the specified configure file as a blob.</p>
+<p>There is currently no limit on the input file length!</p>
 <p>The format of the GetConfigureBlob method is:</p>
 <pre class="literal-block">void *GetConfigureBlob( const char *filename, char *path, size_t *length,
                         <a class="reference external" href="../api/types.html#exceptioninfo">ExceptionInfo</a> *exception );</pre>
@@ -474,8 +476,8 @@ destroyed.</p>
 <dd><p>return the full path information of the configure file.</p>
 </dd>
 <dt>length:</dt>
-<dd><p>This pointer to a size_t integer sets the initial length of the
-blob.  On return, it reflects the actual length of the blob.</p>
+<dd><p>On return, this pointer is updated with the length
+of the blob.</p>
 </dd>
 <dt>exception:</dt>
 <dd><p>Return any errors or warnings in this structure.</p>
