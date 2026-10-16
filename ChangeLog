@@ -1,5 +1,9 @@
 2026-10-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/xwindow.c (MagickXBestVisualInfo): Prevent a hostile X11
+        server from producing a visual 'class' value which underflows the
+        'rank' array and causes the program to crash.
+
         * magick/image.c (SetImageInfo): Assure that p can not underflow
         the bounds of image_info->filename.
 

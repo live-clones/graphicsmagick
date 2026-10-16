@@ -1473,7 +1473,9 @@ MagickXBestVisualInfo(Display *display,
             visual_info=p;
           else
             if (MagickXVisualColormapSize(p) == MagickXVisualColormapSize(visual_info))
-              if ((p->klass < (long)(sizeof(rank)/sizeof(rank[0]))) &&
+              if ((p->klass >= 0) &&
+                  (visual_info->klass >= 0) &&
+                  (p->klass < (long)(sizeof(rank)/sizeof(rank[0]))) &&
                   (visual_info->klass < (long)(sizeof(rank)/sizeof(rank[0]))))
                 if (rank[p->klass] > rank[visual_info->klass])
                   visual_info=p;
