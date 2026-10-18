@@ -1242,6 +1242,10 @@ MagickExport unsigned int ListDelegateInfo(FILE *file,ExceptionInfo *exception)
               char
                 *e;
 
+#if defined(__clang_analyzer__) && (__clang_major__ >= 18)
+                  /* https://github.com/llvm/llvm-project/issues/167887 */
+                  [[clang::suppress]]
+#endif /* if defined(__clang_analyzer__) */
               for(e=s+strip_length; (*e != ' ') && (e > s) ; e--);
               strip_length=e-s;
             }

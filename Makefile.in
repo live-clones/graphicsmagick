@@ -11738,7 +11738,10 @@ release: distcheck
 # Ubuntu 26.04 LTS provides clang-17 to clang-22 (clang-21 default)
 
 scan-build-21:
-	scan-build-21 -k --html-title='GraphicsMagick scan-build' \
+	scan-build-21 -k -v \
+	--html-title='GraphicsMagick scan-build' \
+	--use-cc /usr/bin/clang-21 \
+	--use-c++ /usr/bin/clang++-21 \
 	-maxloop 10000 \
 	-disable-checker deadcode.DeadStores \
 	-enable-checker security.insecureAPI.bcmp \
