@@ -160,7 +160,10 @@ extern "C" {
          (((__GNUC__) >= 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 3))))  /* 3.3+ */
   /* Supports argument syntax like MAGICK_ATTRIBUTE((nonnull (1, 2))) but
      don't know how to support non-GCC fallback. */
+  /* Declare all of the pointer arguments of a function to be non-null */
 #      define MAGICK_FUNC_NONNULL MAGICK_ATTRIBUTE((__nonnull__))
+  /* Declare a list of discrete (by numeric index) pointer arguments to a function to be non-null */
+#      define MAGICK_FUNC_NONNULL_ARGS(...) MAGICK_ATTRIBUTE((__nonnull__(__VA_ARGS__)))
 #    endif
 #    if ((MAGICK_HAS_ATTRIBUTE(__noreturn__)) || \
          (((__GNUC__) > 3) || ((__GNUC__ == 2) && (__GNUC_MINOR__ >= 5)))) /* 2.5+ */
@@ -286,7 +289,10 @@ extern "C" {
 #  define MAGICK_FUNC_MALLOC_2ARG(deallocator,ptrindex) /*nothing*/
 #endif
 #if !defined (MAGICK_FUNC_NONNULL)
-#  define MAGICK_FUNC_NONNULL /*nothing*/
+#  define MAGICK_FUNC_NONNULL(...) /*nothing*/
+#endif
+#if !defined (MAGICK_FUNC_NONNULL_ARGS)
+#   define MAGICK_FUNC_NONNULL_ARGS(...) /*nothing*/
 #endif
 #if !defined (MAGICK_FUNC_NORETURN)
 #  define MAGICK_FUNC_NORETURN /*nothing*/
