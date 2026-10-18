@@ -22,7 +22,7 @@ extern MagickExport Image
   *GetLastImageInList(const Image *images) MAGICK_FUNC_PURE,
   *GetNextImageInList(const Image *images) MAGICK_FUNC_PURE,
   *GetPreviousImageInList(const Image *images) MAGICK_FUNC_PURE,
-  **ImageListToArray(const Image *images, ExceptionInfo *exception),
+  **ImageListToArray(const Image *images, ExceptionInfo *exception) MAGICK_FUNC_NONNULL_ARGS(2),
   *NewImageList(void) MAGICK_FUNC_CONST,
   *RemoveLastImageFromList(Image **images) MAGICK_FUNC_NONNULL,
   *RemoveFirstImageFromList(Image **images) MAGICK_FUNC_NONNULL,

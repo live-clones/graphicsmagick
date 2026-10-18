@@ -1,3 +1,11 @@
+2026-10-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/list.h: Indicate that 'exception' argument to
+        ImageListToArray() may not be null.
+
+        * magick/common.h (MAGICK_FUNC_NONNULL_ARGS): Macro to provide
+        GCC/Clang nonull attribute support for enumerated arguments.
+
 2026-10-16  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/delegate.c (ListDelegateInfo): Suppress invalid Clang
