@@ -9,7 +9,7 @@
 */
 
 extern MagickExport void
-  *MagickCloneMemory(void *destination,const void *source,const size_t size) MAGICK_FUNC_NONNULL,
+  *MagickCloneMemory(void *destination,const void *source,const size_t size) MAGICK_FUNC_NONNULL(),
    MagickFreeAligned(void *memory),
   *MagickMallocAligned(const size_t alignment, const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(2),
   *MagickMallocCleared(const size_t size) MAGICK_FUNC_MALLOC MAGICK_FUNC_ALLOC_SIZE_1ARG(1);

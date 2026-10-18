@@ -22,10 +22,10 @@ extern MagickExport Image
   *GetLastImageInList(const Image *images) MAGICK_FUNC_PURE,
   *GetNextImageInList(const Image *images) MAGICK_FUNC_PURE,
   *GetPreviousImageInList(const Image *images) MAGICK_FUNC_PURE,
-  **ImageListToArray(const Image *images, ExceptionInfo *exception) MAGICK_FUNC_NONNULL_ARGS(2),
+  **ImageListToArray(const Image *images, ExceptionInfo *exception) MAGICK_FUNC_NONNULL(2),
   *NewImageList(void) MAGICK_FUNC_CONST,
-  *RemoveLastImageFromList(Image **images) MAGICK_FUNC_NONNULL,
-  *RemoveFirstImageFromList(Image **images) MAGICK_FUNC_NONNULL,
+  *RemoveLastImageFromList(Image **images) MAGICK_FUNC_NONNULL(),
+  *RemoveFirstImageFromList(Image **images) MAGICK_FUNC_NONNULL(),
   *SplitImageList(Image *images),
   *SyncNextImageInList(const Image *images);
 
@@ -37,13 +37,13 @@ extern MagickExport unsigned long
 
 extern MagickExport void
   AppendImageToList(Image **images,Image *image),
-  DeleteImageFromList(Image **images) MAGICK_FUNC_NONNULL,
+  DeleteImageFromList(Image **images) MAGICK_FUNC_NONNULL(),
   DestroyImageList(Image *images),
-  InsertImageInList(Image **images,Image *image) MAGICK_FUNC_NONNULL,
+  InsertImageInList(Image **images,Image *image) MAGICK_FUNC_NONNULL(),
   PrependImageToList(Image **images,Image *image),
-  ReplaceImageInList(Image **images,Image *image) MAGICK_FUNC_NONNULL,
-  ReverseImageList(Image **images) MAGICK_FUNC_NONNULL,
-  SpliceImageIntoList(Image **images,const unsigned long length,Image *splice) MAGICK_FUNC_NONNULL;
+  ReplaceImageInList(Image **images,Image *image) MAGICK_FUNC_NONNULL(),
+  ReverseImageList(Image **images) MAGICK_FUNC_NONNULL(),
+  SpliceImageIntoList(Image **images,const unsigned long length,Image *splice) MAGICK_FUNC_NONNULL();
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

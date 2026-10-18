@@ -155,9 +155,9 @@ extern MagickExport magick_int64_t
 extern MagickExport size_t
   MagickGetToken(const char *start,char **end,char *token,
                  const size_t buffer_length),
-  MagickStrlCat(char *dst, const char *src, const size_t size) MAGICK_FUNC_NONNULL,
-  MagickStrlCpy(char *dst, const char *src, const size_t size) MAGICK_FUNC_NONNULL,
-  MagickStrlCpyTrunc(char *dst, const char *src, const size_t size) MAGICK_FUNC_NONNULL;
+  MagickStrlCat(char *dst, const char *src, const size_t size) MAGICK_FUNC_NONNULL(),
+  MagickStrlCpy(char *dst, const char *src, const size_t size) MAGICK_FUNC_NONNULL(),
+  MagickStrlCpyTrunc(char *dst, const char *src, const size_t size) MAGICK_FUNC_NONNULL();
 
 #if defined(MAGICK_IMPLEMENTATION)
 #  include "magick/utility-private.h"

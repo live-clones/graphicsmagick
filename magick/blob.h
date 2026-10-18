@@ -44,7 +44,7 @@ extern "C" {
     Increments the reference count associated with the pixel blob,
     returning a pointer to the blob.
   */
-  extern MagickExport BlobInfo* ReferenceBlob(BlobInfo *blob) MAGICK_FUNC_NONNULL;
+  extern MagickExport BlobInfo* ReferenceBlob(BlobInfo *blob) MAGICK_FUNC_NONNULL();
 
   /*
     Deallocate memory associated with the BlobInfo structure.
@@ -55,19 +55,19 @@ extern "C" {
     If BLOB is a memory mapping then unmap it. Reset BlobInfo structure
     to its default state.
   */
-  extern MagickExport void DetachBlob(BlobInfo *blob) MAGICK_FUNC_NONNULL;
+  extern MagickExport void DetachBlob(BlobInfo *blob) MAGICK_FUNC_NONNULL();
 
   /*
     Initialize a BlobInfo structure.
   */
-  extern MagickExport void GetBlobInfo(BlobInfo *blob) MAGICK_FUNC_NONNULL;
+  extern MagickExport void GetBlobInfo(BlobInfo *blob) MAGICK_FUNC_NONNULL();
 
   /*
     Attach memory buffer to a BlobInfo structure.
   */
   extern MagickExport void AttachBlob(BlobInfo *blob_info,
                                       const void *blob,
-                                      const size_t length) MAGICK_FUNC_NONNULL;
+                                      const size_t length) MAGICK_FUNC_NONNULL();
 
   /*
    *
@@ -78,7 +78,7 @@ extern "C" {
   /*
     Deallocate all memory associated with an Image blob (reference counted).
   */
-  extern MagickExport void DestroyBlob(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport void DestroyBlob(Image *image) MAGICK_FUNC_NONNULL();
 
 
   /*
@@ -93,7 +93,7 @@ extern "C" {
   extern MagickExport Image* BlobToImage(const ImageInfo *image_info,
                                          const void *blob,
                                          const size_t length,
-                                         ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                         ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
     Return an Image populated with salient information regarding a
@@ -103,7 +103,7 @@ extern "C" {
   extern MagickExport Image* PingBlob(const ImageInfo *image_info,
                                       const void *blob,
                                       const size_t length,
-                                      ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                      ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
     Writes an Image to a formatted (like a file) in-memory
@@ -112,7 +112,7 @@ extern "C" {
   extern MagickExport void *ImageToBlob(const ImageInfo *image_info,
                                         Image *image,
                                         size_t *length,
-                                        ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                        ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
    *
@@ -139,12 +139,12 @@ extern "C" {
   extern MagickExport MagickPassFail OpenBlob(const ImageInfo *image_info,
                                               Image *image,
                                               const BlobMode mode,
-                                              ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                              ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
     Close I/O to the file or BLOB.
   */
-  extern MagickExport MagickPassFail CloseBlob(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport MagickPassFail CloseBlob(Image *image) MAGICK_FUNC_NONNULL();
 
 
   /*
@@ -152,7 +152,7 @@ extern "C" {
   */
   extern MagickExport size_t ReadBlob(Image *image,
                                       const size_t length,
-                                      void *data) MAGICK_FUNC_NONNULL;
+                                      void *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read data from the file or BLOB into a buffer, but support zero-copy
@@ -160,27 +160,27 @@ extern "C" {
   */
   extern MagickExport size_t ReadBlobZC(Image *image,
                                         const size_t length,
-                                        void **data) MAGICK_FUNC_NONNULL;
+                                        void **data) MAGICK_FUNC_NONNULL();
 
   /*
     Write data from a buffer to the file or BLOB.
   */
   extern MagickExport size_t WriteBlob(Image *image,
                                        const size_t length,
-                                       const void *data) MAGICK_FUNC_NONNULL;
+                                       const void *data) MAGICK_FUNC_NONNULL();
 
   /*
     Move the current read or write offset position in the file or BLOB.
   */
   extern MagickExport magick_off_t SeekBlob(Image *image,
                                             const magick_off_t offset,
-                                            const int whence) MAGICK_FUNC_NONNULL;
+                                            const int whence) MAGICK_FUNC_NONNULL();
 
   /*
     Obtain the current read or write offset position in the file or
     BLOB.
   */
-  extern MagickExport magick_off_t TellBlob(const Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_off_t TellBlob(const Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Test to see if EOF has been detected while reading the file or BLOB.
@@ -191,39 +191,39 @@ extern "C" {
     Test to see if an error has been encountered while doing I/O to the file
     or BLOB.  Non-zero is returned if an error occurred.
   */
-  extern MagickExport int GetBlobStatus(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport int GetBlobStatus(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
   /*
     Return the first errno present when an error has been encountered while
     doing I/O to the file or BLOB.  This is only useful if GetBlobStatus() has
     already reported that an error occurred.
   */
-  extern MagickExport int GetBlobFirstErrno(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport int GetBlobFirstErrno(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
   /*
     Test to see if blob is currently open.
   */
-  extern MagickExport MagickBool GetBlobIsOpen(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport MagickBool GetBlobIsOpen(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
   /*
     Obtain the current size of the file or BLOB.  Zero is returned if
     the size can not be determined.  If BLOB is no longer open, then
     return the size when the BLOB was closed.
   */
-  extern MagickExport magick_off_t GetBlobSize(const Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_off_t GetBlobSize(const Image *image) MAGICK_FUNC_NONNULL();
 
 
   /*
     Obtain the underlying stdio FILE* for the file (if any).
   */
-  extern MagickExport FILE *GetBlobFileHandle(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport FILE *GetBlobFileHandle(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
   /*
     Obtain a pointer to the base of where BLOB data is stored.  The data
     is only available if the data is stored on the heap, or is memory
     mapped.  Otherwise NULL is returned.
   */
-  extern MagickExport unsigned char *GetBlobStreamData(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport unsigned char *GetBlobStreamData(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
 
   /*
@@ -236,203 +236,203 @@ extern "C" {
     Read a single byte from the file or BLOB.  Returns an EOF character if EOF
     has been detected.
   */
-  extern MagickExport int ReadBlobByte(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport int ReadBlobByte(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 16-bit little-endian unsigned "short" value from the file or BLOB.
   */
-  extern MagickExport magick_uint16_t ReadBlobLSBShort(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_uint16_t ReadBlobLSBShort(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 16-bit little-endian signed "short" value from the file or BLOB.
   */
-  extern MagickExport magick_int16_t ReadBlobLSBSignedShort(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_int16_t ReadBlobLSBSignedShort(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of little-endian unsigned 16-bit "short" values from the
     file or BLOB.
   */
   extern MagickExport size_t ReadBlobLSBShorts(Image *image, size_t octets,
-                                               magick_uint16_t *data) MAGICK_FUNC_NONNULL;
+                                               magick_uint16_t *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 16-bit big-endian unsigned "short" value from the file or
     BLOB.
   */
-  extern MagickExport magick_uint16_t ReadBlobMSBShort(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_uint16_t ReadBlobMSBShort(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 16-bit big-endian signed "short" value from the file or BLOB.
   */
-  extern MagickExport magick_int16_t ReadBlobMSBSignedShort(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_int16_t ReadBlobMSBSignedShort(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of big-endian 16-bit "short" values from the file or BLOB.
   */
   extern MagickExport size_t ReadBlobMSBShorts(Image *image, size_t octets,
-                                               magick_uint16_t *data) MAGICK_FUNC_NONNULL;
+                                               magick_uint16_t *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 32-bit little-endian unsigned "long" value from the file or BLOB.
   */
-  extern MagickExport magick_uint32_t ReadBlobLSBLong(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_uint32_t ReadBlobLSBLong(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 32-bit little-endian signed "long" value from the file or BLOB.
   */
-  extern MagickExport magick_int32_t ReadBlobLSBSignedLong(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_int32_t ReadBlobLSBSignedLong(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of little-endian 32-bit "long" values from the file or BLOB.
   */
   extern MagickExport size_t ReadBlobLSBLongs(Image *image, size_t octets,
-                                              magick_uint32_t *data) MAGICK_FUNC_NONNULL;
+                                              magick_uint32_t *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 32-bit big-endian unsigned "long" value from the file or BLOB.
   */
-  extern MagickExport magick_uint32_t ReadBlobMSBLong(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_uint32_t ReadBlobMSBLong(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read a 32-bit big-endian signed "long" value from the file or BLOB.
   */
-  extern MagickExport magick_int32_t ReadBlobMSBSignedLong(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport magick_int32_t ReadBlobMSBSignedLong(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of big-endian 32-bit "long" values from the file or BLOB.
   */
   extern MagickExport size_t ReadBlobMSBLongs(Image *image, size_t octets,
-                                              magick_uint32_t *data) MAGICK_FUNC_NONNULL;
+                                              magick_uint32_t *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a little-endian 32-bit "float" value from the file or BLOB.
   */
-  extern MagickExport float ReadBlobLSBFloat(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport float ReadBlobLSBFloat(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of little-endian 32-bit "float" values from the file or
     BLOB.
   */
   extern MagickExport size_t ReadBlobLSBFloats(Image *image, size_t octets,
-                                               float *data) MAGICK_FUNC_NONNULL;
+                                               float *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a big-endian 32-bit "float" value from the file or BLOB.
   */
-  extern MagickExport float ReadBlobMSBFloat(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport float ReadBlobMSBFloat(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of big-endian 32-bit "float" values from the file or BLOB.
   */
   extern MagickExport size_t ReadBlobMSBFloats(Image *image, size_t octets,
-                                               float *data) MAGICK_FUNC_NONNULL;
+                                               float *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a little-endian 64-bit "double" value from the file or BLOB.
   */
-  extern MagickExport double ReadBlobLSBDouble(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport double ReadBlobLSBDouble(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of little-endian 64-bit "double" values from the file or
     BLOB.
   */
   extern MagickExport size_t ReadBlobLSBDoubles(Image *image, size_t octets,
-                                                double *data) MAGICK_FUNC_NONNULL;
+                                                double *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a big-endian 64-bit "double" value from the file or BLOB.
   */
-  extern MagickExport double ReadBlobMSBDouble(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport double ReadBlobMSBDouble(Image *image) MAGICK_FUNC_NONNULL();
 
   /*
     Read an array of big-endian 64-bit "double" values from the file or BLOB.
   */
   extern MagickExport size_t ReadBlobMSBDoubles(Image *image, size_t octets,
-                                                double *data) MAGICK_FUNC_NONNULL;
+                                                double *data) MAGICK_FUNC_NONNULL();
 
   /*
     Read a string from the file or blob until a newline character is read or
     an end-of-file condition is encountered.
   */
   extern MagickExport char *ReadBlobString(Image *image,
-                                           char *string) MAGICK_FUNC_NONNULL;
+                                           char *string) MAGICK_FUNC_NONNULL();
 
   /*
     Write a single byte to the file or BLOB.
   */
   extern MagickExport size_t WriteBlobByte(Image *image,
-                                           const magick_uint8_t value) MAGICK_FUNC_NONNULL;
+                                           const magick_uint8_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write the content of an entire disk file to the file or BLOB.
   */
   extern MagickExport MagickPassFail WriteBlobFile(Image *image,
-                                                   const char *filename) MAGICK_FUNC_NONNULL;
+                                                   const char *filename) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 16-bit signed "short" value to the file or BLOB in little-endian
     order.
   */
   extern MagickExport size_t WriteBlobLSBShort(Image *image,
-                                               const magick_uint16_t value) MAGICK_FUNC_NONNULL;
+                                               const magick_uint16_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 16-bit signed "short" value to the file or BLOB in little-endian
     order.
   */
   extern MagickExport size_t WriteBlobLSBSignedShort(Image *image,
-                                                     const magick_int16_t value) MAGICK_FUNC_NONNULL;
+                                                     const magick_int16_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 32-bit unsigned "long" value to the file or BLOB in little-endian
     order.
   */
   extern MagickExport size_t WriteBlobLSBLong(Image *image,
-                                              const magick_uint32_t value) MAGICK_FUNC_NONNULL;
+                                              const magick_uint32_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 32-bit signed "long" value to the file or BLOB in little-endian
     order.
   */
   extern MagickExport size_t WriteBlobLSBSignedLong(Image *image,
-                                                    const magick_int32_t value) MAGICK_FUNC_NONNULL;
+                                                    const magick_int32_t value) MAGICK_FUNC_NONNULL();
 
 
-  extern MagickExport size_t WriteBlobLSBDouble(Image *image, double d) MAGICK_FUNC_NONNULL;
+  extern MagickExport size_t WriteBlobLSBDouble(Image *image, double d) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 32-bit unsigned "long" value to the file or BLOB in big-endian
     order.
   */
   extern MagickExport size_t WriteBlobMSBLong(Image *image,
-                                              const magick_uint32_t value) MAGICK_FUNC_NONNULL;
+                                              const magick_uint32_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 32-bit signed "long" value to the file or BLOB in big-endian
     order.
   */
   extern MagickExport size_t WriteBlobMSBSignedLong(Image *image,
-                                                    const magick_int32_t value) MAGICK_FUNC_NONNULL;
+                                                    const magick_int32_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 16-bit unsigned "short" value to the file or BLOB in big-endian
     order.
   */
   extern MagickExport size_t WriteBlobMSBShort(Image *image,
-                                               const magick_uint16_t value) MAGICK_FUNC_NONNULL;
+                                               const magick_uint16_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a 16-bit signed "short" value to the file or BLOB in big-endian
     order.
   */
   extern MagickExport size_t WriteBlobMSBSignedShort(Image *image,
-                                                     const magick_int16_t value) MAGICK_FUNC_NONNULL;
+                                                     const magick_int16_t value) MAGICK_FUNC_NONNULL();
 
   /*
     Write a C string to the file or BLOB, without the terminating NULL byte.
   */
   extern MagickExport size_t WriteBlobString(Image *image,
-                                             const char *string) MAGICK_FUNC_NONNULL;
+                                             const char *string) MAGICK_FUNC_NONNULL();
 
   /*
    *
@@ -444,25 +444,25 @@ extern "C" {
     Blob supports seek operations.  BlobSeek() and BlobTell() may safely be
     used.
   */
-  extern MagickExport MagickBool BlobIsSeekable(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport MagickBool BlobIsSeekable(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
   /*
     Allow file descriptor to be closed (if True).
   */
   extern MagickExport void SetBlobClosable(Image *image,
-                                           MagickBool closable) MAGICK_FUNC_NONNULL;
+                                           MagickBool closable) MAGICK_FUNC_NONNULL();
 
   /*
     Blob is for a temporary file which should be deleted (if True).
   */
   extern MagickExport void SetBlobTemporary(Image *image,
-                                            MagickBool isTemporary) MAGICK_FUNC_NONNULL;
+                                            MagickBool isTemporary) MAGICK_FUNC_NONNULL();
 
   /*
     Returns MagickTrue if the file associated with the blob is a temporary
     file and should be removed when the associated image is destroyed.
   */
-  extern MagickExport MagickBool GetBlobTemporary(const Image *image) MAGICK_FUNC_NONNULL MAGICK_FUNC_PURE;
+  extern MagickExport MagickBool GetBlobTemporary(const Image *image) MAGICK_FUNC_NONNULL() MAGICK_FUNC_PURE;
 
   /*
    *
@@ -484,7 +484,7 @@ extern "C" {
     Release memory mapping for a region.
   */
   extern MagickExport MagickPassFail UnmapBlob(void *map,
-                                               const size_t length) MAGICK_FUNC_NONNULL MAGICK_FUNC_CONST;
+                                               const size_t length) MAGICK_FUNC_NONNULL() MAGICK_FUNC_CONST;
 
   /*
     Perform a requested memory mapping of a file descriptor.
@@ -492,7 +492,7 @@ extern "C" {
   extern MagickExport void *MapBlob(int file,
                                     const MapMode mode,
                                     magick_off_t offset,
-                                    size_t length) MAGICK_FUNC_NONNULL MAGICK_FUNC_CONST;
+                                    size_t length) MAGICK_FUNC_NONNULL() MAGICK_FUNC_CONST;
 
   /*
    *
@@ -506,14 +506,14 @@ extern "C" {
   extern MagickExport MagickPassFail BlobToFile(const char *filename,
                                                 const void *blob,
                                                 const size_t length,
-                                                ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                                ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
     Read the contents of a file into memory.
   */
   extern MagickExport void *FileToBlob(const char *filename,
                                        size_t *length,
-                                       ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                       ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
    *
@@ -524,7 +524,7 @@ extern "C" {
   /*
     Reserve space for a specified output size.
   */
-  extern MagickExport MagickPassFail BlobReserveSize(Image *image, magick_off_t size) MAGICK_FUNC_NONNULL;
+  extern MagickExport MagickPassFail BlobReserveSize(Image *image, magick_off_t size) MAGICK_FUNC_NONNULL();
 
   /*
     Copies data from the input stream to a file.  Useful in case it is
@@ -532,7 +532,7 @@ extern "C" {
   */
   extern MagickExport MagickPassFail ImageToFile(Image *image,
                                                  const char *filename,
-                                                 ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                                 ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
     Search for a configuration file (".mgk" file) using appropriate
@@ -541,27 +541,27 @@ extern "C" {
   extern MagickExport void *GetConfigureBlob(const char *filename,
                                              char *path,
                                              size_t *length,
-                                             ExceptionInfo *exception) MAGICK_FUNC_NONNULL;
+                                             ExceptionInfo *exception) MAGICK_FUNC_NONNULL();
 
   /*
     Converts a least-significant byte first buffer of integers to
     most-significant byte first.
   */
   extern MagickExport void MSBOrderLong(unsigned char *buffer,
-                                        const size_t length) MAGICK_FUNC_NONNULL;
+                                        const size_t length) MAGICK_FUNC_NONNULL();
 
   /*
     Converts a least-significant byte first buffer of integers to
     most-significant byte first.
   */
   extern MagickExport void MSBOrderShort(unsigned char *p,
-                                         const size_t length) MAGICK_FUNC_NONNULL;
+                                         const size_t length) MAGICK_FUNC_NONNULL();
 
   /*
     Checks if the blob of the specified image is referenced by other images. If
     the reference count is higher then 1 a new blob is assigned to the image.
   */
-  extern MagickExport void DisassociateBlob(Image *image) MAGICK_FUNC_NONNULL;
+  extern MagickExport void DisassociateBlob(Image *image) MAGICK_FUNC_NONNULL();
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

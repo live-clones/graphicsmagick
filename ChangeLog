@@ -1,5 +1,8 @@
 2026-10-18  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/common.h (MAGICK_FUNC_NONNULL): Provide only a VA_ARGS
+        version of this macro.
+
         * magick/list.h: Indicate that 'exception' argument to
         ImageListToArray() may not be null.
 
