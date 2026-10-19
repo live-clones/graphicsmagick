@@ -1090,7 +1090,9 @@ build::
   mingw-w64-x86_64-zlib
 
 MSYS2 also provides a mingw-w64-clang-x86_64 environment (using the
-clang compiler), which needs these packages to build::
+clang compiler), which needs these packages to build. GraphicsMagick
+is currently only prepared to static build with it given that it
+requires DLL import/export statements::
 
   base-devel
   mingw-w64-clang-x86_64-autotools
@@ -1101,6 +1103,7 @@ clang compiler), which needs these packages to build::
   mingw-w64-clang-x86_64-jasper
   mingw-w64-clang-x86_64-jbigkit
   mingw-w64-clang-x86_64-lcms2
+  mingw-w64-clang-x86_64-libc++
   mingw-w64-clang-x86_64-libheif
   mingw-w64-clang-x86_64-libjpeg-turbo
   mingw-w64-clang-x86_64-libjxl

@@ -104,7 +104,7 @@ static unsigned int IsJPEG(const unsigned char *magick,const size_t length)
 /*
   Avoid conflicting typedef for INT32
 */
-#if defined(__MINGW32__)
+#if defined(__MINGW32__) && !defined(XMD_H)
 # define XMD_H 1
 #endif
 /*

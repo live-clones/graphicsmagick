@@ -1125,7 +1125,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
 
           if (palm_header.compression_type == PALM_COMPRESSION_RLE)
             {
-              for (i = 0; i < palm_header.bytes_per_row; )
+              for (i = 0; i < (unsigned int) palm_header.bytes_per_row; )
                 {
                   if ((count = ReadBlobByte(image)) == EOF)
                     break;
@@ -1141,7 +1141,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
           else
             if (palm_header.compression_type == PALM_COMPRESSION_SCANLINE)
               {
-                for (i = 0; i < (long) palm_header.bytes_per_row; i += 8)
+                for (i = 0; i < (unsigned int) palm_header.bytes_per_row; i += 8)
                   {
                     if ((count = ReadBlobByte(image)) == EOF)
                       break;
