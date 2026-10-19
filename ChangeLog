@@ -1,5 +1,7 @@
 2026-10-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * www/INSTALL-unix.rst: Update information regarding MSYS2.
+
         * coders/png.c: Assure that 'image_count' is used to quench
         warning.
 

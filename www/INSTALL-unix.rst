@@ -1022,15 +1022,15 @@ environment based on ucrtbase.dll (works for Windows 10/11) is called
 compiler ("MSYS2 CLANG64"), and targetting the ARM64 CPU ("MSYS2
 CLANGARM64").
 
-If support for older Windows is not needed, then targetting UCRT64
-will result in more performant, more reliable, and more capable
+If support for older/obsolete Windows is not needed, then targetting
+UCRT64 will result in more performant, more reliable, and more capable
 software since ucrtbase.dll supports more/updated interfaces such as
 C'99 and does not require the "shim" wrapper layer that msvcrt.dll
 does.
 
-Packages targetting MINGW64 use an architecture specification of
-"mingw-w64-x86_64" in package names whereas packages targetting UCRT64
-use "mingw-w64-ucrt-x86_64".
+Packages targetting the deprecated MINGW64 use an architecture
+specification of "mingw-w64-x86_64" in package names whereas packages
+targetting modern UCRT64 use "mingw-w64-ucrt-x86_64".
 
 If you have not yet updated MSYS2 after the initial install, or have
 not updated for several months, then enter the MSYS2 shell, and update
@@ -1040,42 +1040,79 @@ to ensure that all packages are up to date.
 
 Use 'pacman -S' to install packages.
 
-These packages are needed for a complete 64-bit w64-ucrt x86_64 build:
+These packages are needed for a complete 64-bit w64-ucrt-x86_64 build::
 
-base-devel mingw-w64-ucrt-autotools mingw-w64-ucrt-gcc
-mingw-w64-ucrt-toolchain mingw-w64-ucrt-bzip2
-mingw-w64-ucrt-freetype mingw-w64-ucrt-ghostscript
-mingw-w64-ucrt-jasper mingw-w64-ucrt-jbigkit
-mingw-w64-ucrt-lcms2 mingw-w64-ucrt-libheif
-mingw-w64-ucrt-libjpeg-turbo mingw-w64-ucrt-libjxl
-mingw-w64-ucrt-libpng mingw-w64-ucrt-libtiff
-mingw-w64-ucrt-libtool mingw-w64-ucrt-libwebp
-mingw-w64-ucrt-libwmf mingw-w64-ucrt-libxml2
-mingw-w64-ucrt-libzip mingw-w64-ucrt-zlib
+  base-devel
+  mingw-w64-ucrt-x86_64-bzip2
+  mingw-w64-ucrt-x86_64-freetype
+  mingw-w64-ucrt-x86_64-ghostscript
+  mingw-w64-ucrt-x86_64-jasper
+  mingw-w64-ucrt-x86_64-jbigkit
+  mingw-w64-ucrt-x86_64-lcms2
+  mingw-w64-ucrt-x86_64-libheif
+  mingw-w64-ucrt-x86_64-libjpeg-turbo
+  mingw-w64-ucrt-x86_64-libjxl
+  mingw-w64-ucrt-x86_64-libltdl
+  mingw-w64-ucrt-x86_64-libpng
+  mingw-w64-ucrt-x86_64-libtiff
+  mingw-w64-ucrt-x86_64-libtool
+  mingw-w64-ucrt-x86_64-libwebp
+  mingw-w64-ucrt-x86_64-libwmf
+  mingw-w64-ucrt-x86_64-libxml2
+  mingw-w64-ucrt-x86_64-libzip
+  mingw-w64-ucrt-x86_64-zlib
+  mingw-w64-x86_64-autotools
+  mingw-w64-x86_64-gcc
 
-These packages are needed for a complete 64-bit mingw-w64 x86_64 build:
+These packages are needed for a complete 64-bit mingw-w64-x86_64
+build::
 
-base-devel mingw-w64-x86_64-autotools mingw-w64-x86_64-gcc
-mingw-w64-x86_64-toolchain mingw-w64-x86_64-bzip2
-mingw-w64-x86_64-freetype mingw-w64-x86_64-ghostscript
-mingw-w64-x86_64-jasper mingw-w64-x86_64-jbigkit
-mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libheif
-mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-libjxl
-mingw-w64-x86_64-libpng mingw-w64-x86_64-libtiff
-mingw-w64-x86_64-libtool mingw-w64-x86_64-libwebp
-mingw-w64-x86_64-libwmf mingw-w64-x86_64-libxml2
-mingw-w64-x86_64-libzip mingw-w64-x86_64-zlib
+  base-devel
+  mingw-w64-x86_64-autotools
+  mingw-w64-x86_64-bzip2
+  mingw-w64-x86_64-freetype
+  mingw-w64-x86_64-gcc
+  mingw-w64-x86_64-ghostscript
+  mingw-w64-x86_64-jasper
+  mingw-w64-x86_64-jbigkit
+  mingw-w64-x86_64-lcms2
+  mingw-w64-x86_64-libheif
+  mingw-w64-x86_64-libjpeg-turbo
+  mingw-w64-x86_64-libjxl
+  mingw-w64-x86_64-libltdl
+  mingw-w64-x86_64-libpng
+  mingw-w64-x86_64-libtiff
+  mingw-w64-x86_64-libtool
+  mingw-w64-x86_64-libwebp
+  mingw-w64-x86_64-libwmf
+  mingw-w64-x86_64-libxml2
+  mingw-w64-x86_64-libzip
+  mingw-w64-x86_64-zlib
 
-And/or use the following to add support for a 32-bit mingw-w64 i686 build:
+MSYS has terminated package installation/support for 32-bit
+mingw-w64-i686 builds, but if you have old/existing packages
+available, these are what are needed::
 
-base-devel mingw-w64-i686-toolchain mingw-w64-i686-bzip2
-mingw-w64-i686-freetype mingw-w64-i686-ghostscript
-mingw-w64-i686-jasper mingw-w64-i686-jbigkit mingw-w64-i686-lcms2
-mingw-w64-i686-libheif mingw-w64-i686-libjpeg-turbo
-mingw-w64-i686-libjxl mingw-w64-i686-libpng mingw-w64-i686-libtiff
-mingw-w64-i686-libtool mingw-w64-i686-libwebp mingw-w64-i686-libwmf
-mingw-w64-i686-libxml2 mingw-w64-i686-libzip mingw-w64-i686-zlib
-
+  base-devel
+  mingw-w64-i68-libltdl
+  mingw-w64-i686-bzip2
+  mingw-w64-i686-freetype
+  mingw-w64-i686-ghostscript
+  mingw-w64-i686-jasper
+  mingw-w64-i686-jbigkit
+  mingw-w64-i686-lcms2
+  mingw-w64-i686-libheif
+  mingw-w64-i686-libjpeg-turbo
+  mingw-w64-i686-libjxl
+  mingw-w64-i686-libpng
+  mingw-w64-i686-libtiff
+  mingw-w64-i686-libtool
+  mingw-w64-i686-libwebp
+  mingw-w64-i686-libwmf
+  mingw-w64-i686-libxml2
+  mingw-w64-i686-libzip
+  mingw-w64-i686-toolchain
+  mingw-w64-i686-zlib
 
 If you would like to install Mercurial in order to access the
 GraphicsMagick source repository, then install 'mercurial'. If you
