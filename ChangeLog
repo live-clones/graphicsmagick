@@ -1,5 +1,8 @@
 2026-10-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/png.c: Assure that 'image_count' is used to quench
+        warning.
+
         * coders/pcl.c (WritePCLImage): Address string formatting warnings
         noticed with GCC under MSYS2.
 

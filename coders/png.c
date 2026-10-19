@@ -6787,7 +6787,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
   MngInfoFreeStruct(mng_info,&have_mng_structure);
   have_mng_structure=MagickFalse;
   if (logging)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),"exit ReadMNGImage()");
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "exit ReadMNGImage(), image_count=%ld",image_count);
   return(image);
 }
 #else /* PNG_LIBPNG_VER > 10011 */
