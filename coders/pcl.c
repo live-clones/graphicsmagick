@@ -1081,7 +1081,7 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
 
           if (image_info->compression == NoCompression)
             {
-              MagickFormatString(buffer,sizeof(buffer),"\033*b%luW",bytes_per_line);  /* send row */
+              MagickFormatString(buffer,sizeof(buffer),"\033*b%" MAGICK_SIZE_T_F "uW",bytes_per_line);  /* send row */
               (void) WriteBlobString(image,buffer);
               (void) WriteBlob(image,bytes_per_line,pixels);
             }
@@ -1122,7 +1122,7 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
                           }
                         bytes_to_write=PCL_DeltaCompress(bytes_per_line,pixels,
                                                          last_row_pixels,output_row);
-                        MagickFormatString(buffer,sizeof(buffer),"\033*b%luW",bytes_to_write);
+                        MagickFormatString(buffer,sizeof(buffer),"\033*b%" MAGICK_SIZE_T_F "uW",bytes_to_write);
                         (void) WriteBlobString(image,buffer);
                         WriteBlob(image,bytes_to_write,output_row);
                         break;
@@ -1136,7 +1136,7 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
                             last_row_compression=compression;
                           }
                         bytes_to_write=PCL_TiffRLECompress(bytes_per_line,pixels,output_row);
-                        MagickFormatString(buffer,sizeof(buffer),"\033*b%luW",bytes_to_write);
+                        MagickFormatString(buffer,sizeof(buffer),"\033*b%" MAGICK_SIZE_T_F "uW",bytes_to_write);
                         (void) WriteBlobString(image,buffer);
                         WriteBlob(image,bytes_to_write,output_row);
                         break;
@@ -1150,7 +1150,7 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
                             last_row_compression=compression;
                           }
                         bytes_to_write=PCL_RLECompress(bytes_per_line,pixels,output_row);
-                        MagickFormatString(buffer,sizeof(buffer),"\033*b%luW",bytes_to_write);
+                        MagickFormatString(buffer,sizeof(buffer),"\033*b%" MAGICK_SIZE_T_F "uW",bytes_to_write);
                         (void) WriteBlobString(image,buffer);
                         WriteBlob(image,bytes_to_write,output_row);
                         break;
@@ -1176,7 +1176,7 @@ static unsigned int WritePCLImage(const ImageInfo *image_info,Image *image)
                             (void) WriteBlobString(image,buffer);
                             last_row_compression=compression;
                           }
-                        MagickFormatString(buffer,sizeof(buffer),"\033*b%luW",bytes_per_line);  /* send row */
+                        MagickFormatString(buffer,sizeof(buffer),"\033*b%" MAGICK_SIZE_T_F "uW",bytes_per_line);  /* send row */
                         (void) WriteBlobString(image,buffer);
                         (void) WriteBlob(image,bytes_per_line,pixels);
                         break;
