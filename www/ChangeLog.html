@@ -41,6 +41,9 @@
 <p>2026-10-20  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>magick/magick.c (InitializeMagickEx): Log
+'initialize_magick_options' rather than 'options' to make sure
+that it is considered used.</p></li>
 <li><p>configure.ac: Re-enable actual tests for gdi32 and user32 in
 order to hopefully discover why they are failing. Provide a
 library summary for gdi32 in the configure summary.</p></li>

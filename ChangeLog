@@ -1,5 +1,9 @@
 2026-10-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/magick.c (InitializeMagickEx): Log
+        'initialize_magick_options' rather than 'options' to make sure
+        that it is considered used.
+
         * configure.ac: Re-enable actual tests for gdi32 and user32 in
         order to hopefully discover why they are failing. Provide a
         library summary for gdi32 in the configure summary.

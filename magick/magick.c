@@ -1243,7 +1243,7 @@ InitializeMagickEx(const char *path, unsigned int options,
 
   (void) LogMagickEvent(ConfigureEvent,GetMagickModule(),
                         "Initialize Magick (path=\"%s\", options = 0x%04x)",
-                        path ? path : "(null)", options);
+                        path ? path : "(null)", initialize_magick_options);
 
   /*
     Set the filesystem block size.
