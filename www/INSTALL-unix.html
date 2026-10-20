@@ -1069,8 +1069,9 @@ mingw-w64-x86_64-libzip
 mingw-w64-x86_64-zlib</pre>
 <p>MSYS2 also provides a mingw-w64-clang-x86_64 environment (using the
 clang compiler), which needs these packages to build. GraphicsMagick
-is currently only prepared to static build with it given that it
-requires DLL import/export statements:</p>
+is currently only prepared to static build the C code with it given
+that it requires DLL import/export statements and wrong include paths
+are produced for C++:</p>
 <pre class="literal-block">base-devel
 mingw-w64-clang-x86_64-autotools
 mingw-w64-clang-x86_64-bzip2
@@ -1094,8 +1095,8 @@ mingw-w64-clang-x86_64-libxml2
 mingw-w64-clang-x86_64-libzip
 mingw-w64-clang-x86_64-zlib</pre>
 <p>MSYS has terminated package installation/support for 32-bit
-mingw-w64-i686 builds, but if you have old/existing packages
-available, these are what are needed:</p>
+mingw-w64-i686 builds, but if you have old/existing packages and
+run-time available, these are what are needed:</p>
 <pre class="literal-block">base-devel
 mingw-w64-i68-libltdl
 mingw-w64-i686-bzip2
@@ -1117,9 +1118,7 @@ mingw-w64-i686-libzip
 mingw-w64-i686-toolchain
 mingw-w64-i686-zlib</pre>
 <p>If you would like to install Mercurial in order to access the
-GraphicsMagick source repository, then install 'mercurial'. If you
-would like to use Clang for development, then install
-'mingw-w64-clang-x86_64-toolchain.'</p>
+GraphicsMagick source repository, then install 'mercurial'.</p>
 <p>Note that the default installation prefix is MSYS's notion of
 <span class="docutils literal">/usr/local</span> which installs the package into a MSYS directory. To
 install outside of the MSYS directory tree, you may specify an

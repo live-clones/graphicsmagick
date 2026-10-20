@@ -33316,6 +33316,9 @@ fi
 
 #
 # Check for Windows gdi32/user32 libraries (for Windows clipboard support)
+# gdi32 does not depend on user32
+# user32 is needed for Windows clipboard support
+# gdi32 is needed to deal with DIBs (from clipboard).
 #
 have_gdi32='no'
 if test "$with_gdi32" != 'no' ; then
@@ -33326,8 +33329,8 @@ printf %s "checking for Windows GDI32 support... " >&6; }
 printf '%s\n' "" >&6; }
   failed=0
   passed=0
-  #found_libuser32=0
-  #found_libgdi32=0
+  found_libuser32=0
+  found_libgdi32=0
   ac_fn_c_check_header_compile "$LINENO" "windows.h" "ac_cv_header_windows_h" "$ac_includes_default"
 if test "x$ac_cv_header_windows_h" = xyes
 then :
@@ -33358,14 +33361,108 @@ esac
 fi
 
   # For some reason MSYS2 and Cygwin i686 build fails library tests.
-  #AC_CHECK_LIB([user32],[OpenClipboard],[found_libuser32=`expr $found_libuser32 + 1`],[],[])
-  #AC_CHECK_LIB([gdi32],[CreateDIBSection],[found_libgdi32=`expr $found_libgdi32 + 1`],[],[])
-  #if test $found_libuser32 -gt 0 -a  $found_libgdi32 -gt 0
-  #then
-  #  passed=`expr $passed + 1`
-  #else
-  #  failed=`expr $failed + 1`
-  #fi
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for OpenClipboard in -luser32" >&5
+printf %s "checking for OpenClipboard in -luser32... " >&6; }
+if test ${ac_cv_lib_user32_OpenClipboard+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-luser32  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char OpenClipboard (void);
+int
+main (void)
+{
+return OpenClipboard ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_user32_OpenClipboard=yes
+else case e in #(
+  e) ac_cv_lib_user32_OpenClipboard=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_user32_OpenClipboard" >&5
+printf '%s\n' "$ac_cv_lib_user32_OpenClipboard" >&6; }
+if test "x$ac_cv_lib_user32_OpenClipboard" = xyes
+then :
+  found_libuser32=`expr $found_libuser32 + 1`
+fi
+
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for CreateDIBSection in -lgdi32" >&5
+printf %s "checking for CreateDIBSection in -lgdi32... " >&6; }
+if test ${ac_cv_lib_gdi32_CreateDIBSection+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgdi32  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char CreateDIBSection (void);
+int
+main (void)
+{
+return CreateDIBSection ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_gdi32_CreateDIBSection=yes
+else case e in #(
+  e) ac_cv_lib_gdi32_CreateDIBSection=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gdi32_CreateDIBSection" >&5
+printf '%s\n' "$ac_cv_lib_gdi32_CreateDIBSection" >&6; }
+if test "x$ac_cv_lib_gdi32_CreateDIBSection" = xyes
+then :
+  found_libgdi32=`expr $found_libgdi32 + 1`
+fi
+
+  if test $found_libuser32 -gt 0 -a  $found_libgdi32 -gt 0
+  then
+    passed=`expr $passed + 1`
+  else
+    failed=`expr $failed + 1`
+  fi
   if test "$cygwin_build" = yes -o "$native_win32_build" = yes ; then
         passed=`expr $passed + 1`
   fi
@@ -39289,7 +39386,7 @@ if test "${urwbase35otf_font_dir}x" != 'x' ; then
 fi
 printf "URW Base35 fonts  --with-base35otf-font-dir=$with_gs_font_dir\t$result_urwbase35otf_font_dir\n"
 
-printf "Windows GDI32     --with-gdi32=$with_gdi32      \t$have_gdi32\n"
+printf "Windows GDI32     --with-gdi32=$with_gdi32      \t$have_gdi32" ; if test -n "$LIB_GDI32" ; then printf " ($LIB_GDI32)\n" ; else printf "\n" ; fi
 printf "JBIG              --with-jbig=$with_jbig        \t$have_jbig" ; if test -n "$LIB_JBIG" ; then printf " ($LIB_JBIG)\n" ; else printf "\n" ; fi
 printf "JPEG v1           --with-jpeg=$with_jpeg        \t$have_jpeg" ; if test -n "$LIB_JPEG" ; then printf " ($LIB_JPEG)\n" ; else printf "\n" ; fi
 printf "JPEG-2000         --with-jp2=$with_jp2          \t$have_jp2" ; if test -n "$LIB_JP2" ; then printf " ($LIB_JP2)\n" ; else printf "\n" ; fi

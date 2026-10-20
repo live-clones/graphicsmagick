@@ -1091,8 +1091,9 @@ build::
 
 MSYS2 also provides a mingw-w64-clang-x86_64 environment (using the
 clang compiler), which needs these packages to build. GraphicsMagick
-is currently only prepared to static build with it given that it
-requires DLL import/export statements::
+is currently only prepared to static build the C code with it given
+that it requires DLL import/export statements and wrong include paths
+are produced for C++::
 
   base-devel
   mingw-w64-clang-x86_64-autotools
@@ -1118,8 +1119,8 @@ requires DLL import/export statements::
   mingw-w64-clang-x86_64-zlib
 
 MSYS has terminated package installation/support for 32-bit
-mingw-w64-i686 builds, but if you have old/existing packages
-available, these are what are needed::
+mingw-w64-i686 builds, but if you have old/existing packages and
+run-time available, these are what are needed::
 
   base-devel
   mingw-w64-i68-libltdl
@@ -1143,9 +1144,7 @@ available, these are what are needed::
   mingw-w64-i686-zlib
 
 If you would like to install Mercurial in order to access the
-GraphicsMagick source repository, then install 'mercurial'. If you
-would like to use Clang for development, then install
-'mingw-w64-clang-x86_64-toolchain.'
+GraphicsMagick source repository, then install 'mercurial'.
 
 Note that the default installation prefix is MSYS's notion of
 ``/usr/local`` which installs the package into a MSYS directory. To

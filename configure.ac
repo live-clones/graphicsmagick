@@ -3228,6 +3228,9 @@ AC_SUBST([LIB_JP2])
 
 #
 # Check for Windows gdi32/user32 libraries (for Windows clipboard support)
+# gdi32 does not depend on user32
+# user32 is needed for Windows clipboard support
+# gdi32 is needed to deal with DIBs (from clipboard).
 #
 have_gdi32='no'
 if test "$with_gdi32" != 'no' ; then
@@ -3236,20 +3239,20 @@ if test "$with_gdi32" != 'no' ; then
   AC_MSG_RESULT()
   failed=0
   passed=0
-  #found_libuser32=0
-  #found_libgdi32=0
+  found_libuser32=0
+  found_libgdi32=0
   AC_CHECK_HEADER([windows.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`])
   AC_CHECK_HEADER([winuser.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[#include <windows.h>])
   AC_CHECK_HEADER([wingdi.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[#include <windows.h>])
   # For some reason MSYS2 and Cygwin i686 build fails library tests.
-  #AC_CHECK_LIB([user32],[OpenClipboard],[found_libuser32=`expr $found_libuser32 + 1`],[],[])
-  #AC_CHECK_LIB([gdi32],[CreateDIBSection],[found_libgdi32=`expr $found_libgdi32 + 1`],[],[])
-  #if test $found_libuser32 -gt 0 -a  $found_libgdi32 -gt 0
-  #then
-  #  passed=`expr $passed + 1`
-  #else
-  #  failed=`expr $failed + 1`
-  #fi
+  AC_CHECK_LIB([user32],[OpenClipboard],[found_libuser32=`expr $found_libuser32 + 1`],[],[])
+  AC_CHECK_LIB([gdi32],[CreateDIBSection],[found_libgdi32=`expr $found_libgdi32 + 1`],[],[])
+  if test $found_libuser32 -gt 0 -a  $found_libgdi32 -gt 0
+  then
+    passed=`expr $passed + 1`
+  else
+    failed=`expr $failed + 1`
+  fi
   if test "$cygwin_build" = yes -o "$native_win32_build" = yes ; then
         passed=`expr $passed + 1`
   fi
@@ -4364,7 +4367,7 @@ if test "${urwbase35otf_font_dir}x" != 'x' ; then
 fi
 printf "URW Base35 fonts  --with-base35otf-font-dir=$with_gs_font_dir\t$result_urwbase35otf_font_dir\n"
 
-printf "Windows GDI32     --with-gdi32=$with_gdi32      \t$have_gdi32\n"
+printf "Windows GDI32     --with-gdi32=$with_gdi32      \t$have_gdi32" ; if test -n "$LIB_GDI32" ; then printf " ($LIB_GDI32)\n" ; else printf "\n" ; fi
 printf "JBIG              --with-jbig=$with_jbig        \t$have_jbig" ; if test -n "$LIB_JBIG" ; then printf " ($LIB_JBIG)\n" ; else printf "\n" ; fi
 printf "JPEG v1           --with-jpeg=$with_jpeg        \t$have_jpeg" ; if test -n "$LIB_JPEG" ; then printf " ($LIB_JPEG)\n" ; else printf "\n" ; fi
 printf "JPEG-2000         --with-jp2=$with_jp2          \t$have_jp2" ; if test -n "$LIB_JP2" ; then printf " ($LIB_JP2)\n" ; else printf "\n" ; fi

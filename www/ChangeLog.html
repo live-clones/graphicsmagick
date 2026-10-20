@@ -38,9 +38,20 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-10-20  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>configure.ac: Re-enable actual tests for gdi32 and user32 in
+order to hopefully discover why they are failing. Provide a
+library summary for gdi32 in the configure summary.</p></li>
+</ul>
+</blockquote>
 <p>2026-10-19  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>coders/jpeg.c (XMD_H): Avoid re-declaring XMD_H.</p></li>
+<li><p>coders/palm.c (ReadPALMImage): Fix cast which caused
+signed/unsigned comparison between i and bytes_per_row</p></li>
 <li><p>www/INSTALL-unix.rst: Update information regarding MSYS2.</p></li>
 <li><p>coders/png.c: Assure that 'image_count' is used to quench
 warning.</p></li>
