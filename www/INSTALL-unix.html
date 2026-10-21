@@ -1001,18 +1001,20 @@ feature causes random compilation and test-suite failures. To disable
 <li><p>Click <span class="docutils literal">Smart App Control settings</span>.</p></li>
 <li><p>Select <span class="docutils literal">Off</span>.</p></li>
 </ol>
-<p>MSYS2 installs multiple build environments.  The original build
-environment based on the classic msvcrt.dll (works for Windows 7/8 and
-usually later) is called &quot;MSYS2 MINGW64&quot;, and the modern build
-environment based on ucrtbase.dll (works for Windows 10/11) is called
-&quot;MSYS2 UCRT64&quot;.  There are also build environments based on the Clang
-compiler (&quot;MSYS2 CLANG64&quot;), and targetting the ARM64 CPU (&quot;MSYS2
-CLANGARM64&quot;).</p>
+<p>MSYS2 installs multiple build environments which are selected via
+icons on the Windows Start menu. The modern build environment based on
+ucrtbase.dll (works for Windows 10/11) is called &quot;MSYS2 UCRT64&quot; (shell
+prompt &quot;UCRT64&quot;) whereas the original build environment based on the
+classic msvcrt.dll (works for Windows 7/8 and usually later) is called
+&quot;MSYS2 MINGW64&quot; (shell prompt &quot;MINGW64&quot;.  There are also build
+environments based on the Clang compiler called &quot;MSYS2 CLANG64&quot; (shell
+prompt &quot;CLANG64&quot;), and a cross-compiler targetting the ARM64 CPU
+called &quot;MSYS2 CLANGARM64&quot; (shell prompt &quot;CLANGARM64&quot;).</p>
 <p>If support for older/obsolete Windows is not needed, then targetting
-UCRT64 will result in more performant, more reliable, and more capable
-software since ucrtbase.dll supports more/updated interfaces such as
-C'99 and does not require the &quot;shim&quot; wrapper layer that msvcrt.dll
-does.</p>
+UCRT64 (rather than MINGW64) will result in more performant, more
+reliable, and more capable software since ucrtbase.dll supports
+more/updated interfaces such as C'99 and does not require the &quot;shim&quot;
+wrapper layer that msvcrt.dll does.</p>
 <p>Packages targetting the deprecated MINGW64 use an architecture
 specification of &quot;mingw-w64-x86_64&quot; in package names whereas packages
 targetting modern UCRT64 use &quot;mingw-w64-ucrt-x86_64&quot;.</p>
@@ -1071,7 +1073,7 @@ mingw-w64-x86_64-zlib</pre>
 clang compiler), which needs these packages to build. GraphicsMagick
 is currently only prepared to static build the C code with it given
 that it requires DLL import/export statements and wrong include paths
-are produced for C++:</p>
+are produced for C++.</p>
 <pre class="literal-block">base-devel
 mingw-w64-clang-x86_64-autotools
 mingw-w64-clang-x86_64-bzip2
@@ -1096,7 +1098,7 @@ mingw-w64-clang-x86_64-libzip
 mingw-w64-clang-x86_64-zlib</pre>
 <p>MSYS has terminated package installation/support for 32-bit
 mingw-w64-i686 builds, but if you have old/existing packages and
-run-time available, these are what are needed:</p>
+run-time available, these are what were needed:</p>
 <pre class="literal-block">base-devel
 mingw-w64-i68-libltdl
 mingw-w64-i686-bzip2
@@ -1119,6 +1121,9 @@ mingw-w64-i686-toolchain
 mingw-w64-i686-zlib</pre>
 <p>If you would like to install Mercurial in order to access the
 GraphicsMagick source repository, then install 'mercurial'.</p>
+<p>Take care to open the correct MSYS target from the Windows Start menu,
+and verify that the prompt is what you expect.  It is very easy to
+open the wrong window!</p>
 <p>Note that the default installation prefix is MSYS's notion of
 <span class="docutils literal">/usr/local</span> which installs the package into a MSYS directory. To
 install outside of the MSYS directory tree, you may specify an

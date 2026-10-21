@@ -1014,19 +1014,21 @@ feature causes random compilation and test-suite failures. To disable
 #. Click ``Smart App Control settings``.
 #. Select ``Off``.
 
-MSYS2 installs multiple build environments.  The original build
-environment based on the classic msvcrt.dll (works for Windows 7/8 and
-usually later) is called "MSYS2 MINGW64", and the modern build
-environment based on ucrtbase.dll (works for Windows 10/11) is called
-"MSYS2 UCRT64".  There are also build environments based on the Clang
-compiler ("MSYS2 CLANG64"), and targetting the ARM64 CPU ("MSYS2
-CLANGARM64").
+MSYS2 installs multiple build environments which are selected via
+icons on the Windows Start menu. The modern build environment based on
+ucrtbase.dll (works for Windows 10/11) is called "MSYS2 UCRT64" (shell
+prompt "UCRT64") whereas the original build environment based on the
+classic msvcrt.dll (works for Windows 7/8 and usually later) is called
+"MSYS2 MINGW64" (shell prompt "MINGW64".  There are also build
+environments based on the Clang compiler called "MSYS2 CLANG64" (shell
+prompt "CLANG64"), and a cross-compiler targetting the ARM64 CPU
+called "MSYS2 CLANGARM64" (shell prompt "CLANGARM64").
 
 If support for older/obsolete Windows is not needed, then targetting
-UCRT64 will result in more performant, more reliable, and more capable
-software since ucrtbase.dll supports more/updated interfaces such as
-C'99 and does not require the "shim" wrapper layer that msvcrt.dll
-does.
+UCRT64 (rather than MINGW64) will result in more performant, more
+reliable, and more capable software since ucrtbase.dll supports
+more/updated interfaces such as C'99 and does not require the "shim"
+wrapper layer that msvcrt.dll does.
 
 Packages targetting the deprecated MINGW64 use an architecture
 specification of "mingw-w64-x86_64" in package names whereas packages
@@ -1093,7 +1095,7 @@ MSYS2 also provides a mingw-w64-clang-x86_64 environment (using the
 clang compiler), which needs these packages to build. GraphicsMagick
 is currently only prepared to static build the C code with it given
 that it requires DLL import/export statements and wrong include paths
-are produced for C++::
+are produced for C++. ::
 
   base-devel
   mingw-w64-clang-x86_64-autotools
@@ -1120,7 +1122,7 @@ are produced for C++::
 
 MSYS has terminated package installation/support for 32-bit
 mingw-w64-i686 builds, but if you have old/existing packages and
-run-time available, these are what are needed::
+run-time available, these are what were needed::
 
   base-devel
   mingw-w64-i68-libltdl
@@ -1145,6 +1147,10 @@ run-time available, these are what are needed::
 
 If you would like to install Mercurial in order to access the
 GraphicsMagick source repository, then install 'mercurial'.
+
+Take care to open the correct MSYS target from the Windows Start menu,
+and verify that the prompt is what you expect.  It is very easy to
+open the wrong window!
 
 Note that the default installation prefix is MSYS's notion of
 ``/usr/local`` which installs the package into a MSYS directory. To

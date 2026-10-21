@@ -1,3 +1,7 @@
+2026-10-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * www/INSTALL-unix.rst: Update build notes for Windows MSYS2.
+
 2026-10-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/magick.c (InitializeMagickEx): Log
