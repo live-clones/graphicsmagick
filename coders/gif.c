@@ -223,13 +223,25 @@ static MagickPassFail DecodeImage(Image *image,const long opacity)
                         break;
                       c=packet;
                     }
-                  /* FIXME: Clang analyzer says 'bits' can become >=32, leading to undefined behavior. */
                   datum+=((unsigned int) *c) << bits;
                   bits+=8;
+                  /*
+                    Undefined behavior results if bits >= 32.
+                  */
+                  if (bits >= 32)
+                    {
+                      if (image->logging)
+                    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                          "Decoder 'bits' value %u is greater"
+                                          " than or equal to 32!", bits);
+                      status=MagickFail;
+                      break;
+                    }
                   c++;
                   count--;
                   continue;
                 }
+
               /*
                 Get the next code.
               */

@@ -1,5 +1,8 @@
 2026-10-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/gif.c (DecodeImage): Avoid undefined behavior if decoder
+        'bits' becomes too large.
+
         * magick/compress.c (Ascii85Info): Make Ascii85Info private to
         compress.c.
         (Ascii85Encode): Small optimizations which result in a tangible
