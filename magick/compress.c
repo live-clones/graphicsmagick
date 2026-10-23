@@ -52,9 +52,22 @@
 /*
   Typedef declarations.
 */
-typedef struct HuffmanTable
+typedef struct _Ascii85Info
 {
-  unsigned int
+  long
+    line_break,
+    offset;
+
+  char
+    tuple[6];
+
+  magick_uint8_t
+    buffer[10];
+} Ascii85Info;
+
+typedef struct _HuffmanTable
+{
+ unsigned int
     id;
 
   int
@@ -192,7 +205,8 @@ static const HuffmanTable
 %
 %  Method ASCII85Encode encodes data in ASCII base-85 format.  ASCII base-85
 %  encoding produces five ASCII printing characters from every four bytes of
-%  binary data.
+%  binary data. A six byte tuple allocation is required to allow for a
+%  terminating NUL byte.
 %
 %  The format of the ASCII85Encode method is:
 %
@@ -208,10 +222,21 @@ static const HuffmanTable
 */
 #define MaxLineExtent  36
 
-static char *Ascii85Tuple(char tuple[6], const unsigned char * restrict data)
+/* https://en.wikipedia.org/wiki/Ascii85 */
+static void Ascii85Tuple(char tuple[6], const unsigned char * restrict data)
 {
   magick_uint32_t
     code;
+
+  /*
+    FIXME: Clang 21 scan-build says read overflow (of
+    'image->ascii85->buffer') below, and even if the buffer is
+    arbitrarily enlarged. No problem has been discovered with the
+    code.
+  */
+#if defined(__clang_analyzer__) && (__clang_major__ >= 18)
+  [[clang::suppress]]
+#endif /* if defined(__clang_analyzer__) */
 
   code=((((magick_uint32_t) data[0] << 8) | (magick_uint32_t) data[1]) << 16) |
     ((magick_uint32_t) data[2] << 8) | (magick_uint32_t) data[3];
@@ -232,15 +257,15 @@ static char *Ascii85Tuple(char tuple[6], const unsigned char * restrict data)
       quantum=85U*85U*85U*85U;
       for (i=0; i < 4; i++)
         {
-          x=(magick_int32_t) (code/quantum);
+          x=code/quantum;
           code-=quantum*x;
           tuple[i]=(char) (x+(int) '!');
-          quantum/=85;
+          quantum/=85U;
         }
-      tuple[4]=(char) ((code % 85)+(int) '!');
+      tuple[4]=(char) ((code % 85U)+(int) '!');
       tuple[5]='\0';
     }
-  return(tuple);
+  /* void */
 }
 
 MagickExport void Ascii85Initialize(Image *image)
@@ -250,24 +275,17 @@ MagickExport void Ascii85Initialize(Image *image)
   */
   if (image->ascii85 == (Ascii85Info *) NULL)
     {
-      image->ascii85=MagickAllocateMemory(Ascii85Info *,sizeof(Ascii85Info));
+      image->ascii85=MagickAllocateClearedMemory(Ascii85Info *,sizeof(Ascii85Info));
       if (image->ascii85 == (Ascii85Info *) NULL)
         MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
                           UnableToAllocateAscii85Info);
     }
-  (void) memset(image->ascii85,0,sizeof(Ascii85Info));
   image->ascii85->line_break=MaxLineExtent << 1;
   image->ascii85->offset=0;
 }
 
 MagickExport void Ascii85Flush(Image *image)
 {
-  char
-    tuple_buff[6];
-
-  register char
-    *tuple;
-
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
   assert(image->ascii85 != (Ascii85Info *) NULL);
@@ -276,9 +294,13 @@ MagickExport void Ascii85Flush(Image *image)
       image->ascii85->buffer[image->ascii85->offset]=0;
       image->ascii85->buffer[image->ascii85->offset+1]=0;
       image->ascii85->buffer[image->ascii85->offset+2]=0;
-      tuple=Ascii85Tuple(tuple_buff, image->ascii85->buffer);
+      /*
+        Consumes first 4 chars from 'buffer' and outputs 1 or 5 chars
+        plus terminating NUL to tuple.
+      */
+      Ascii85Tuple(/*output*/ image->ascii85->tuple, /*input*/ image->ascii85->buffer);
       (void) WriteBlob(image,(size_t) image->ascii85->offset+1,
-        *tuple == 'z' ? "!!!!" : tuple);
+        image->ascii85->tuple[0] == 'z' ? "!!!!" : image->ascii85->tuple);
     }
   (void) WriteBlobByte(image,'~');
   (void) WriteBlobByte(image,'>');
@@ -290,14 +312,18 @@ MagickExport void Ascii85Encode(Image *image,const magick_uint8_t code)
   long
     n;
 
-  register char
-    *q;
-
-  register unsigned char
+  register const unsigned char
     *p;
 
-  char
-    tuple_buff[6];
+  register char
+    *tuple;
+
+  /*
+    Ascii85Initialize() initializes image->ascii85->offset to zero.
+    This function then increments image->ascii85->offset and then
+    loops for (n=image->ascii85->offset; n >= 4; n-=4) for each tuple.
+    The remainder of 'n' then stored to image->ascii85->offset.
+   */
 
   assert(image != (Image *) NULL);
   assert(image->signature == MagickSignature);
@@ -307,9 +333,14 @@ MagickExport void Ascii85Encode(Image *image,const magick_uint8_t code)
   if (image->ascii85->offset < 4)
     return;
   p=image->ascii85->buffer;
+  tuple=image->ascii85->tuple;
   for (n=image->ascii85->offset; n >= 4; n-=4)
   {
-    for (q=Ascii85Tuple(tuple_buff,p); *q; q++)
+    register char
+      *q;
+
+    Ascii85Tuple(tuple,p);
+    for (q=tuple; *q; q++)
     {
       image->ascii85->line_break--;
       if ((image->ascii85->line_break < 0) && (*q != '%'))

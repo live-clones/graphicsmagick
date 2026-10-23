@@ -1,3 +1,10 @@
+2026-10-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/compress.c (Ascii85Info): Make Ascii85Info private to
+        compress.c.
+        (Ascii85Encode): Small optimizations which result in a tangible
+        improvement to uncompressed PDF writer performance.
+
 2026-10-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/INSTALL-unix.rst: Update build notes for Windows MSYS2.

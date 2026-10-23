@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2003 - 2009 GraphicsMagick Group
+  Copyright (C) 2003-2026 GraphicsMagick Group
   Copyright (C) 2002 ImageMagick Studio
   Copyright 1991-1999 E. I. du Pont de Nemours and Company
 
@@ -19,16 +19,6 @@ extern "C" {
 /*
   Typedef declaration.
 */
-typedef struct _Ascii85Info
-{
-  long
-    offset,
-    line_break;
-
-  magick_uint8_t
-    buffer[10];
-} Ascii85Info;
-
 /*
   TODO: Clean up the interface between BLOB write functions,
   compression functions, and encoding functions so they
