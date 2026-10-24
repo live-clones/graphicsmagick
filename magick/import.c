@@ -1060,6 +1060,7 @@ ImportGrayQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -1431,6 +1432,7 @@ ImportGrayAlphaQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -1603,6 +1605,7 @@ ImportRedQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -1700,7 +1703,7 @@ ImportGreenQuantumType(const unsigned char *source,
               stream;
 
             MagickBitStreamInitializeRead(&stream,p);
-            if (QuantumDepth >=  sample_bits)
+            if (QuantumDepth >= sample_bits)
               {
                 /* Scale up */
                 for (x = number_pixels; x != 0; --x)
@@ -1775,6 +1778,7 @@ ImportGreenQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -1948,6 +1952,7 @@ ImportBlueQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -1997,70 +2002,81 @@ ImportAlphaQuantumType(const unsigned char *source,
 
   if (image->colorspace == CMYKColorspace)
     {
+      /* For CMYK images, Opacity is stored in the IndexPacket array */
       if (indexes == (IndexPacket *) NULL)
         ThrowBinaryException3(ImageError,CMYKAImageLacksAlphaChannel,
                               UnableToImportImagePixels);
 
       if (sample_type == UnsignedQuantumSampleType)
         {
-          if ( (quantum_size >= 8) && (quantum_size % 8U == 0U) )
+          switch (quantum_size)
             {
-              /*
-                Modulo-8 sample sizes
-              */
-              if (QuantumDepth == sample_bits)
-                {
-                  /* Unity scale */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      ImportModulo8Quantum(unsigned_value,quantum_size,p);
-                      *indexes++=(IndexPacket) MaxRGB-unsigned_value;
-                    }
-                }
-              else if (QuantumDepth > sample_bits)
-                {
-                  /* Scale up */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      ImportModulo8Quantum(unsigned_value,quantum_size,p);
-                      *indexes++=(IndexPacket) MaxRGB-unsigned_value*unsigned_scale;
-                    }
-                }
-              else
-                {
-                  /* Scale down */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      ImportModulo8Quantum(unsigned_value,quantum_size,p);
-                      *indexes++=(IndexPacket) MaxRGB-unsigned_value/unsigned_scale;
-                    }
-                }
-            }
-          else
-            {
-              /*
-                Arbitrary sample size
-              */
-              BitStreamReadHandle
-                stream;
+            case 8:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt8Quantum(unsigned_value,p);
+                    *indexes++=(IndexPacket) ScaleQuantumToIndex(MaxRGB-ScaleCharToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            case 16:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt16Quantum(endian,unsigned_value,p);
+                    *indexes++=(IndexPacket) ScaleQuantumToIndex(MaxRGB-ScaleShortToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            case 32:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt32Quantum(endian,unsigned_value,p);
+                    *indexes++=(IndexPacket) ScaleQuantumToIndex(MaxRGB-ScaleLongToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            case 64:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt64Quantum(endian,unsigned_value,p); /* Stored to 32-bit quantum type */
+                    *indexes++=(IndexPacket) ScaleQuantumToIndex(MaxRGB-ScaleLongToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            default:
+              {
+                /*
+                  Arbitrary sample size
+                */
+                BitStreamReadHandle
+                  stream;
 
-              MagickBitStreamInitializeRead(&stream,p);
-              if (QuantumDepth >=  sample_bits)
-                {
-                  /* Scale up */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      *indexes++=(IndexPacket) MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)*unsigned_scale;
-                    }
-                }
-              else
-                {
-                  /* Scale down */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      *indexes++=(IndexPacket) MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)/unsigned_scale;
-                    }
-                }
+                MagickBitStreamInitializeRead(&stream,p);
+                if (QuantumDepth >= sample_bits)
+                  {
+                    /* Scale up */
+                    for (x = number_pixels; x != 0; --x)
+                      {
+                        *indexes++=(IndexPacket) MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)*unsigned_scale;
+                      }
+                  }
+                else if (QuantumDepth < sample_bits)
+                  {
+                    /* Scale down */
+                    for (x = number_pixels; x != 0; --x)
+                      {
+                        *indexes++=(IndexPacket) MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)/unsigned_scale;
+                      }
+                  }
+              }
             }
         }
       else if (sample_type == FloatQuantumSampleType)
@@ -2121,69 +2137,76 @@ ImportAlphaQuantumType(const unsigned char *source,
       /* RGB */
       if (sample_type == UnsignedQuantumSampleType)
         {
-          if ( (quantum_size >= 8) && (quantum_size % 8U == 0U) )
+          switch (quantum_size)
             {
-              /*
-                Modulo-8 sample sizes
-              */
-              if(QuantumDepth == sample_bits)
-                {
-                  /* Unity scale */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      ImportModulo8Quantum(unsigned_value,quantum_size,p);
-                      SetOpacitySample(q,MaxRGB-unsigned_value);
-                      q++;
-                    }
-                }
-              else if (QuantumDepth >  sample_bits)
-                {
-                  /* Scale up */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      ImportModulo8Quantum(unsigned_value,quantum_size,p);
-                      SetOpacitySample(q,MaxRGB-unsigned_value*unsigned_scale);
-                      q++;
-                    }
-                }
-              else
-                {
-                  /* Scale down */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      ImportModulo8Quantum(unsigned_value,quantum_size,p);
-                      SetOpacitySample(q,MaxRGB-unsigned_value/unsigned_scale);
-                      q++;
-                    }
-                }
-            }
-          else
-            {
-              /*
-                Arbitrary sample size
-              */
-              BitStreamReadHandle
-                stream;
+            case 8:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt8Quantum(unsigned_value,p);
+                    SetOpacitySample(q,MaxRGB-ScaleCharToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            case 16:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt16Quantum(endian,unsigned_value,p);
+                    SetOpacitySample(q,MaxRGB-ScaleShortToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            case 32:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt32Quantum(endian,unsigned_value,p);
+                    SetOpacitySample(q,MaxRGB-ScaleLongToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            case 64:
+              {
+                for (x = number_pixels; x != 0; --x)
+                  {
+                    ImportUInt64Quantum(endian,unsigned_value,p); /* Stored to 32-bit quantum type */
+                    SetOpacitySample(q,MaxRGB-ScaleLongToQuantum(unsigned_value));
+                    q++;
+                  }
+                break;
+              }
+            default:
+              {
+                /*
+                  Arbitrary sample size
+                */
+                BitStreamReadHandle
+                  stream;
 
-              MagickBitStreamInitializeRead(&stream,p);
-              if (QuantumDepth >=  sample_bits)
-                {
-                  /* Scale up */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      SetOpacitySample(q,MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)*unsigned_scale);
-                      q++;
-                    }
-                }
-              else
-                {
-                  /* Scale down */
-                  for (x = number_pixels; x != 0; --x)
-                    {
-                      SetOpacitySample(q,MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)/unsigned_scale);
-                      q++;
-                    }
-                }
+                MagickBitStreamInitializeRead(&stream,p);
+                if (QuantumDepth >= sample_bits)
+                  {
+                    /* Scale up */
+                    for (x = number_pixels; x != 0; --x)
+                      {
+                        SetOpacitySample(q,MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)*unsigned_scale);
+                        q++;
+                      }
+                  }
+                else
+                  {
+                    /* Scale down */
+                    for (x = number_pixels; x != 0; --x)
+                      {
+                        SetOpacitySample(q,MaxRGB-MagickBitStreamMSBRead(&stream,quantum_size)/unsigned_scale);
+                        q++;
+                      }
+                  }
+              }
             }
         }
       else if (sample_type == FloatQuantumSampleType)
@@ -2239,6 +2262,7 @@ ImportAlphaQuantumType(const unsigned char *source,
                 break;
               }
             default:
+              status = MagickFail;
               break;
             }
         }
@@ -2412,6 +2436,7 @@ ImportBlackQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -2647,6 +2672,7 @@ ImportRGBQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -2894,6 +2920,7 @@ ImportRGBAQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -3141,6 +3168,7 @@ ImportCMYKQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }
@@ -3419,6 +3447,7 @@ ImportCMYKAQuantumType(const unsigned char *source,
             break;
           }
         default:
+          status = MagickFail;
           break;
         }
     }

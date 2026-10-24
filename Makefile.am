@@ -506,7 +506,7 @@ release: distcheck
 
 scan-build-21:
 	scan-build-21 -k -v \
-	--html-title='GraphicsMagick scan-build' \
+	--html-title="$(PACKAGE_NAME)"' 'Q$(QuantumDepth)' scan-build' \
 	--use-cc /usr/bin/clang-21 \
 	--use-c++ /usr/bin/clang++-21 \
 	-maxloop 10000 \

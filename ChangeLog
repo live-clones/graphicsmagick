@@ -1,3 +1,9 @@
+2026-10-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/import.c (ImportAlphaQuantumType): Use a more stable
+        algorithm for marshalling the CMYK indexes and RGBA opacity
+        channel values.
+
 2026-10-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/gif.c (DecodeImage): Avoid undefined behavior if decoder
