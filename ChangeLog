@@ -1,5 +1,8 @@
 2026-10-24  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * Magick++/tests/color.cpp (ColorGray): Use integer loop control
+        variable rather than floating point.
+
         * magick/import.c (ImportAlphaQuantumType): Use a more stable
         algorithm for marshalling the CMYK indexes and RGBA opacity
         channel values.

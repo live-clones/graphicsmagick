@@ -114,13 +114,21 @@ int main( int /*argc*/, char **argv)
 #define MagickEpsilon  1.0e-12
       double resolution = 1.0/MaxRGB;
       double max_error = resolution + MagickEpsilon;
+      double value;
+      unsigned long loop, max_loops;
 
       if ( resolution < 0.0001 )
         resolution = 0.0001;
 
-      for( double value = 0; value < 1.0 + MagickEpsilon; value += resolution )
+      max_loops = (1.0 + MagickEpsilon) / resolution;
+
+      //for( double value = 0; value < 1.0 + MagickEpsilon; value += resolution )
+      value = 0.0;
+      cout << "Testing ColorGray with " << max_loops << " loops" << endl;
+      for (loop = 0; loop < max_loops; loop++)
         {
           ColorGray gray(value);
+
           if ( gray.shade() < value - max_error || gray.shade() > value + max_error )
             {
               ++failures;
@@ -131,6 +139,7 @@ int main( int /*argc*/, char **argv)
                    << value
                    << endl;
             }
+          value += resolution;
         }
     }
 
