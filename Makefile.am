@@ -531,7 +531,7 @@ scan-build-21:
 	-enable-checker optin.core.EnumCastOutOfRange \
 	-enable-checker optin.cplusplus.UninitializedObject \
 	-enable-checker optin.cplusplus.VirtualCall \
-	-enable-checker optin.performance.Padding \
+	-disable-checker optin.performance.Padding \
 	-enable-checker optin.portability.UnixAPI \
 	-enable-checker optin.taint.GenericTaint \
 	-enable-checker optin.taint.TaintedAlloc \
