@@ -2993,6 +2993,12 @@ unable to scale image
 .
 
 MessageId       = +1
+SymbolicName    = LimitErrorUnableToSegmentImage
+Language        = English
+unable to segment image
+.
+
+MessageId       = +1
 SymbolicName    = LimitErrorUnableToSelectImage
 Language        = English
 unable to select image
@@ -3086,12 +3092,6 @@ MessageId       = +1
 SymbolicName    = LimitFatalErrorUnableToAllocateDelegateInfo
 Language        = English
 unable to allocate delegate info
-.
-
-MessageId       = +1
-SymbolicName    = LimitFatalErrorUnableToAllocateDerivatives
-Language        = English
-unable to allocate derivates
 .
 
 MessageId       = +1

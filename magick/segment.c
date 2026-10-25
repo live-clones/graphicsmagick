@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2022 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -163,12 +163,16 @@ static const int
   Method prototypes.
 */
 static int
-  DefineRegion(const short *,ExtentPacket *);
+  DefineRegion(const short *extrema,ExtentPacket *extents);
 
 static void
   FreeNodes(IntervalTree *node),
-  ScaleSpace(const long *,const double,double *),
-  ZeroCrossHistogram(double *,const double,short *);
+  ZeroCrossHistogram(double *second_derivative,const double smoothing_threshold,
+                     short *crossings);
+static MagickPassFail
+  ScaleSpace(const long *histogram,const double tau,double *scaled_histogram,
+             ExceptionInfo *exception);
+
 
 #if 0
 static void
@@ -345,8 +349,9 @@ Classify(Image * restrict image,short **extrema,
                 }
               if (cluster == (Cluster *) NULL)
                 {
-                  ThrowException(&image->exception,ResourceLimitError,MemoryAllocationFailed,
-                                 image->filename);
+                  ThrowException3(&image->exception,ResourceLimitError,
+                                  MemoryAllocationFailed,
+                                  UnableToSegmentImage);
                   goto classify_error_exit;
                 }
               /*
@@ -369,8 +374,9 @@ Classify(Image * restrict image,short **extrema,
       cluster=MagickAllocateMemory(Cluster *,sizeof(Cluster));
       if (cluster == (Cluster *) NULL)
         {
-          ThrowException(&image->exception,ResourceLimitError,MemoryAllocationFailed,
-                         image->filename);
+          ThrowException3(&image->exception,ResourceLimitError,
+                                  MemoryAllocationFailed,
+                                  UnableToSegmentImage);
           goto classify_error_exit;
         }
       /*
@@ -393,8 +399,9 @@ Classify(Image * restrict image,short **extrema,
   cluster_array=MagickAllocateArray(Cluster **,number_clusters,sizeof(Cluster *));
   if (cluster_array == (Cluster **) NULL)
     {
-      ThrowException(&image->exception,ResourceLimitError,MemoryAllocationFailed,
-                     image->filename);
+      ThrowException3(&image->exception,ResourceLimitError,
+                                  MemoryAllocationFailed,
+                                  UnableToSegmentImage);
       goto classify_error_exit;
     }
   number_clusters=0;
@@ -576,8 +583,9 @@ Classify(Image * restrict image,short **extrema,
   squares_array=MagickAllocateMemory(double *,513*sizeof(double));
   if (squares_array == (double *) NULL)
     {
-      ThrowException(&image->exception,ResourceLimitError,
-                     MemoryAllocationFailed,image->filename);
+      ThrowException3(&image->exception,ResourceLimitError,
+                                  MemoryAllocationFailed,
+                                  UnableToSegmentImage);
       goto classify_error_exit;
     }
   squares=squares_array+255;
@@ -593,8 +601,9 @@ Classify(Image * restrict image,short **extrema,
     colormap=MagickAllocateMemory(PixelPacket *,number_clusters*sizeof(PixelPacket));
     if (colormap == (PixelPacket *) NULL)
       {
-        ThrowException(&image->exception,ResourceLimitError,
-                       MemoryAllocationFailed,image->filename);
+        ThrowException3(&image->exception,ResourceLimitError,
+                                  MemoryAllocationFailed,
+                                  UnableToSegmentImage);
         goto classify_error_exit;
       }
     MagickFreeMemory(image->colormap);
@@ -1380,12 +1389,12 @@ static double
 OptimalTau(const long *histogram,const double max_tau,
            const double min_tau,const double delta_tau,
            const double smoothing_threshold,
-           short *extrema)
+           short *extrema,ExceptionInfo *exception)
 {
   double
-    average_tau,
-    *derivative,
-    *second_derivative,
+    average_tau = 0.0,
+    *derivative = (double *) NULL,
+    *second_derivative = (double *) NULL,
     tau,
     value;
 
@@ -1396,9 +1405,9 @@ OptimalTau(const long *histogram,const double max_tau,
     x;
 
   IntervalTree
-    **list,
+    **list = (IntervalTree **) NULL,
     *node,
-    *root;
+    *root = (IntervalTree *) NULL;
 
   register long
     i,
@@ -1407,17 +1416,22 @@ OptimalTau(const long *histogram,const double max_tau,
 
   unsigned long
     count,
+    loops,
     number_crossings;
 
   ZeroCrossing
-    *zero_crossing;
+    *zero_crossing = (ZeroCrossing *) NULL;
 
   /*
     Allocate interval tree.
   */
   list=MagickAllocateMemory(IntervalTree **,TreeLength*sizeof(IntervalTree *));
   if (list == (IntervalTree **) NULL)
-    return(0.0);
+    {
+      ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
+                      UnableToSegmentImage);
+      goto optimal_tau_failure;
+    }
   /*
     Allocate zero crossing list.
   */
@@ -1425,8 +1439,9 @@ OptimalTau(const long *histogram,const double max_tau,
   zero_crossing=MagickAllocateMemory(ZeroCrossing *,count*sizeof(ZeroCrossing));
   if (zero_crossing == (ZeroCrossing *) NULL)
     {
-      MagickFreeMemory(list);
-      return(0.0);
+      ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
+                      UnableToSegmentImage);
+      goto optimal_tau_failure;
     }
   for (i=0; i < (long) count; i++)
     zero_crossing[i].tau=(-1);
@@ -1434,20 +1449,33 @@ OptimalTau(const long *histogram,const double max_tau,
     Initialize zero crossing list.
   */
   derivative=MagickAllocateMemory(double *,256*sizeof(double));
+  if (derivative == (double *) NULL)
+    {
+      ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
+                      UnableToSegmentImage);
+      goto optimal_tau_failure;
+    }
   second_derivative=MagickAllocateMemory(double *,256*sizeof(double));
-  if ((derivative == (double *) NULL) || (second_derivative == (double *) NULL))
-    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-                      UnableToAllocateDerivatives);
+  if (second_derivative == (double *) NULL)
+    {
+      ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
+                      UnableToSegmentImage);
+      goto optimal_tau_failure;
+    }
   i=0;
-  for (tau=max_tau; tau >= min_tau; tau-=delta_tau)
+  tau=max_tau;
+  /* emulates: for (tau=max_tau; tau >= min_tau; tau-=delta_tau) */
+  for (loops=1; loops < count ; loops++)
     {
       zero_crossing[i].tau=tau;
-      ScaleSpace(histogram,tau,zero_crossing[i].histogram);
+      if (ScaleSpace(histogram,tau,zero_crossing[i].histogram,exception) == MagickFail)
+        goto optimal_tau_failure;
       DerivativeHistogram(zero_crossing[i].histogram,derivative);
       DerivativeHistogram(derivative,second_derivative);
       ZeroCrossHistogram(second_derivative,smoothing_threshold,
                          zero_crossing[i].crossings);
       i++;
+      tau-=delta_tau;
     }
   /*
     Add an entry for the original histogram.
@@ -1487,9 +1515,9 @@ OptimalTau(const long *histogram,const double max_tau,
   root=InitializeIntervalTree(zero_crossing,number_crossings);
   if (root == (IntervalTree *) NULL)
     {
-      MagickFreeMemory(zero_crossing);
-      MagickFreeMemory(list);
-      return(0.0);
+      ThrowException3(exception,ResourceLimitError,MemoryAllocationFailed,
+                      UnableToSegmentImage);
+      goto optimal_tau_failure;
     }
   /*
     Find active nodes:  stability is greater (or equal) to the mean stability of
@@ -1555,7 +1583,10 @@ OptimalTau(const long *histogram,const double max_tau,
   /*
     Free memory.
   */
+ optimal_tau_failure:;
   FreeNodes(root);
+  MagickFreeMemory(second_derivative);
+  MagickFreeMemory(derivative);
   MagickFreeMemory(zero_crossing);
   MagickFreeMemory(list);
   return(average_tau);
@@ -1590,8 +1621,9 @@ OptimalTau(const long *histogram,const double max_tau,
 %    o scaled_histogram:
 %
 */
-static void
-ScaleSpace(const long *histogram,const double tau,double *scaled_histogram)
+static MagickPassFail
+ScaleSpace(const long *histogram,const double tau,double *scaled_histogram,
+           ExceptionInfo *exception)
 {
   double
     alpha,
@@ -1605,8 +1637,12 @@ ScaleSpace(const long *histogram,const double tau,double *scaled_histogram)
 
   gamma=MagickAllocateMemory(double *,256*sizeof(double));
   if (gamma == (double *) NULL)
-    MagickFatalError3(ResourceLimitFatalError,MemoryAllocationFailed,
-                      UnableToAllocateGammaMap);
+    {
+      ThrowException3(exception,ResourceLimitError,
+                      MemoryAllocationFailed,
+                      UnableToSegmentImage);
+      return MagickFail;
+    }
   alpha=1.0/(tau*sqrt(2.0*MagickPI));
   beta=(-1.0/(2.0*tau*tau));
   for (x=0; x <= 255; x++)
@@ -1625,6 +1661,7 @@ ScaleSpace(const long *histogram,const double tau,double *scaled_histogram)
       scaled_histogram[x]=alpha*sum;
     }
   MagickFreeMemory(gamma);
+  return MagickPass;
 }
 
 /*
@@ -1792,8 +1829,9 @@ SegmentImage(Image *image,
               MagickFreeMemory(extrema[i]);
               MagickFreeMemory(histogram[i]);
             }
-          ThrowBinaryException(ResourceLimitError,MemoryAllocationFailed,
-                               image->filename);
+          ThrowBinaryException3(ResourceLimitError,
+                                MemoryAllocationFailed,
+                                UnableToSegmentImage);
         }
     }
   (void) TransformColorspace(image,colorspace);
@@ -1802,11 +1840,11 @@ SegmentImage(Image *image,
   */
   InitializeHistogram(image,histogram);
   (void) OptimalTau(histogram[Red],Tau,0.2,DeltaTau,smoothing_threshold,
-                    extrema[Red]);
+                    extrema[Red],&image->exception);
   (void) OptimalTau(histogram[Green],Tau,0.2,DeltaTau,smoothing_threshold,
-                    extrema[Green]);
+                    extrema[Green],&image->exception);
   (void) OptimalTau(histogram[Blue],Tau,0.2,DeltaTau,smoothing_threshold,
-                    extrema[Blue]);
+                    extrema[Blue],&image->exception);
   if (verbose > 1)
     {
       FILE

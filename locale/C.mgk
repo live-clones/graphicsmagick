@@ -880,9 +880,6 @@
       <Message name="UnableToResizeImage">
         unable to resize image
       </Message>
-      <Message name="UnableToSegmentImage">
-        unable to segment image
-      </Message>
       <Message name="UnableToGetClipMask">
         Unable to get clip mask
       </Message>
@@ -906,6 +903,9 @@
       </Message>
       <Message name="UnableToImportImagePixels">
         unable to import image pixels
+      </Message>
+      <Message name="UnableToSegmentImage">
+        unable to segment image
       </Message>
     </Error>
     <FatalError>
@@ -1639,6 +1639,9 @@
         <Message name="ImagesLimitExceeded">
           Images limit exceeded (see -limit Images)
         </Message>
+        <Message name="UnableToSegmentImage">
+          unable to segment image
+        </Message>
       </Error>
       <FatalError>
         <Message name="UnableToAllocateAscii85Info">
@@ -1658,9 +1661,6 @@
         </Message>
         <Message name="UnableToAllocateDelegateInfo">
           unable to allocate delegate info
-        </Message>
-        <Message name="UnableToAllocateDerivatives">
-          unable to allocate derivates
         </Message>
         <Message name="UnableToAllocateDrawContext">
           unable to allocate draw context

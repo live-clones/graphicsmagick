@@ -503,23 +503,23 @@ extern MagickExport const char *GetLocaleMessageFromID(const int) MAGICK_FUNC_CO
 #define MGK_ResourceLimitErrorUnableToRotateImage 496
 #define MGK_ResourceLimitErrorUnableToSampleImage 497
 #define MGK_ResourceLimitErrorUnableToScaleImage 498
-#define MGK_ResourceLimitErrorUnableToSelectImage 499
-#define MGK_ResourceLimitErrorUnableToSharpenImage 500
-#define MGK_ResourceLimitErrorUnableToShaveImage 501
-#define MGK_ResourceLimitErrorUnableToShearImage 502
-#define MGK_ResourceLimitErrorUnableToSortImageColormap 503
-#define MGK_ResourceLimitErrorUnableToThresholdImage 504
-#define MGK_ResourceLimitErrorUnableToTransformColorspace 505
-#define MGK_ResourceLimitErrorWriteLimitExceeded 506
-#define MGK_ResourceLimitFatalErrorMemoryAllocationFailed 507
-#define MGK_ResourceLimitFatalErrorSemaporeOperationFailed 508
-#define MGK_ResourceLimitFatalErrorUnableToAllocateAscii85Info 509
-#define MGK_ResourceLimitFatalErrorUnableToAllocateCacheInfo 510
-#define MGK_ResourceLimitFatalErrorUnableToAllocateCacheView 511
-#define MGK_ResourceLimitFatalErrorUnableToAllocateColorInfo 512
-#define MGK_ResourceLimitFatalErrorUnableToAllocateDashPattern 513
-#define MGK_ResourceLimitFatalErrorUnableToAllocateDelegateInfo 514
-#define MGK_ResourceLimitFatalErrorUnableToAllocateDerivatives 515
+#define MGK_ResourceLimitErrorUnableToSegmentImage 499
+#define MGK_ResourceLimitErrorUnableToSelectImage 500
+#define MGK_ResourceLimitErrorUnableToSharpenImage 501
+#define MGK_ResourceLimitErrorUnableToShaveImage 502
+#define MGK_ResourceLimitErrorUnableToShearImage 503
+#define MGK_ResourceLimitErrorUnableToSortImageColormap 504
+#define MGK_ResourceLimitErrorUnableToThresholdImage 505
+#define MGK_ResourceLimitErrorUnableToTransformColorspace 506
+#define MGK_ResourceLimitErrorWriteLimitExceeded 507
+#define MGK_ResourceLimitFatalErrorMemoryAllocationFailed 508
+#define MGK_ResourceLimitFatalErrorSemaporeOperationFailed 509
+#define MGK_ResourceLimitFatalErrorUnableToAllocateAscii85Info 510
+#define MGK_ResourceLimitFatalErrorUnableToAllocateCacheInfo 511
+#define MGK_ResourceLimitFatalErrorUnableToAllocateCacheView 512
+#define MGK_ResourceLimitFatalErrorUnableToAllocateColorInfo 513
+#define MGK_ResourceLimitFatalErrorUnableToAllocateDashPattern 514
+#define MGK_ResourceLimitFatalErrorUnableToAllocateDelegateInfo 515
 #define MGK_ResourceLimitFatalErrorUnableToAllocateDrawContext 516
 #define MGK_ResourceLimitFatalErrorUnableToAllocateDrawInfo 517
 #define MGK_ResourceLimitFatalErrorUnableToAllocateDrawingWand 518
@@ -702,7 +702,7 @@ static const SeverityInfo severity_map[] =
     { "Registry/FatalError", 427, RegistryFatalError },
     { "Registry/Warning", 428, RegistryWarning },
     { "Resource/Limit/Error", 429, ResourceLimitError },
-    { "Resource/Limit/FatalError", 506, ResourceLimitFatalError },
+    { "Resource/Limit/FatalError", 507, ResourceLimitFatalError },
     { "Resource/Limit/Warning", 550, ResourceLimitWarning },
     { "Stream/Error", 551, StreamError },
     { "Stream/FatalError", 557, StreamFatalError },
@@ -1225,6 +1225,7 @@ static const MessageInfo message_map[] =
     { "UnableToRotateImage", MGK_ResourceLimitErrorUnableToRotateImage },
     { "UnableToSampleImage", MGK_ResourceLimitErrorUnableToSampleImage },
     { "UnableToScaleImage", MGK_ResourceLimitErrorUnableToScaleImage },
+    { "UnableToSegmentImage", MGK_ResourceLimitErrorUnableToSegmentImage },
     { "UnableToSelectImage", MGK_ResourceLimitErrorUnableToSelectImage },
     { "UnableToSharpenImage", MGK_ResourceLimitErrorUnableToSharpenImage },
     { "UnableToShaveImage", MGK_ResourceLimitErrorUnableToShaveImage },
@@ -1241,7 +1242,6 @@ static const MessageInfo message_map[] =
     { "UnableToAllocateColorInfo", MGK_ResourceLimitFatalErrorUnableToAllocateColorInfo },
     { "UnableToAllocateDashPattern", MGK_ResourceLimitFatalErrorUnableToAllocateDashPattern },
     { "UnableToAllocateDelegateInfo", MGK_ResourceLimitFatalErrorUnableToAllocateDelegateInfo },
-    { "UnableToAllocateDerivatives", MGK_ResourceLimitFatalErrorUnableToAllocateDerivatives },
     { "UnableToAllocateDrawContext", MGK_ResourceLimitFatalErrorUnableToAllocateDrawContext },
     { "UnableToAllocateDrawInfo", MGK_ResourceLimitFatalErrorUnableToAllocateDrawInfo },
     { "UnableToAllocateDrawingWand", MGK_ResourceLimitFatalErrorUnableToAllocateDrawingWand },
@@ -1843,6 +1843,7 @@ static const char message_dat[] =
     "unable to rotate image\0"
     "unable to sample image\0"
     "unable to scale image\0"
+    "unable to segment image\0"
     "unable to select image\0"
     "unable to sharpen image\0"
     "unable to shave image\0"
@@ -1859,7 +1860,6 @@ static const char message_dat[] =
     "unable to allocate color info\0"
     "unable to allocate dash pattern\0"
     "unable to allocate delegate info\0"
-    "unable to allocate derivates\0"
     "unable to allocate draw context\0"
     "unable to allocate draw info\0"
     "unable to allocate drawing wand\0"
@@ -2460,119 +2460,119 @@ static const unsigned short message_dat_offsets[] =
     14392,
     14415,
     14437,
-    14460,
+    14461,
     14484,
-    14506,
-    14528,
-    14558,
-    14584,
-    14615,
-    14655,
-    14680,
-    14707,
-    14739,
-    14769,
-    14799,
-    14829,
-    14861,
-    14894,
-    14923,
-    14955,
-    14984,
-    15016,
-    15045,
-    15070,
-    15102,
-    15130,
-    15160,
-    15191,
-    15221,
-    15252,
-    15284,
-    15317,
-    15350,
-    15383,
-    15417,
-    15443,
-    15472,
-    15496,
-    15529,
-    15555,
-    15582,
-    15604,
-    15631,
-    15660,
-    15683,
-    15709,
-    15737,
-    15761,
-    15785,
-    15816,
-    15846,
-    15871,
-    15923,
-    15950,
-    15975,
-    16018,
-    16047,
-    16071,
-    16102,
-    16129,
-    16157,
-    16171,
-    16187,
-    16211,
-    16238,
-    16265,
-    16303,
-    16323,
-    16350,
-    16364,
-    16380,
-    16412,
-    16446,
-    16486,
-    16519,
-    16548,
-    16583,
-    16620,
-    16656,
-    16680,
-    16706,
-    16730,
-    16756,
-    16791,
-    16820,
-    16843,
-    16875,
-    16896,
-    16917,
-    16937,
-    16981,
-    17005,
-    17033,
-    17063,
-    17090,
-    17116,
-    17146,
-    17173,
-    17199,
-    17232,
-    17267,
-    17298,
-    17323,
-    17349,
-    17375,
-    17399,
-    17422,
-    17447,
-    17468,
-    17488,
-    17512,
-    17536,
-    17557,
-    17578,
-    17597,
+    14508,
+    14530,
+    14552,
+    14582,
+    14608,
+    14639,
+    14679,
+    14704,
+    14731,
+    14763,
+    14793,
+    14823,
+    14853,
+    14885,
+    14918,
+    14950,
+    14979,
+    15011,
+    15040,
+    15065,
+    15097,
+    15125,
+    15155,
+    15186,
+    15216,
+    15247,
+    15279,
+    15312,
+    15345,
+    15378,
+    15412,
+    15438,
+    15467,
+    15491,
+    15524,
+    15550,
+    15577,
+    15599,
+    15626,
+    15655,
+    15678,
+    15704,
+    15732,
+    15756,
+    15780,
+    15811,
+    15841,
+    15866,
+    15918,
+    15945,
+    15970,
+    16013,
+    16042,
+    16066,
+    16097,
+    16124,
+    16152,
+    16166,
+    16182,
+    16206,
+    16233,
+    16260,
+    16298,
+    16318,
+    16345,
+    16359,
+    16375,
+    16407,
+    16441,
+    16481,
+    16514,
+    16543,
+    16578,
+    16615,
+    16651,
+    16675,
+    16701,
+    16725,
+    16751,
+    16786,
+    16815,
+    16838,
+    16870,
+    16891,
+    16912,
+    16932,
+    16976,
+    17000,
+    17028,
+    17058,
+    17085,
+    17111,
+    17141,
+    17168,
+    17194,
+    17227,
+    17262,
+    17293,
+    17318,
+    17344,
+    17370,
+    17394,
+    17417,
+    17442,
+    17463,
+    17483,
+    17507,
+    17531,
+    17552,
+    17573,
+    17592,
     0
   };
 #endif /* if defined(_INCLUDE_MESSAGE_TABLE_) */
