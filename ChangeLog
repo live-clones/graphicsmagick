@@ -1,5 +1,7 @@
 2026-10-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * www/index.rst: Update Clang scan-build and Coverity metrics.
+
         * magick/segment.c (SegmentImage): Provide proper exceptions,
         clean-up, and return on memory allocation failure. Use integer
         loop expression in OptimalTau().
