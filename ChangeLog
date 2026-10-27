@@ -1,3 +1,8 @@
+2026-10-27  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * configure.ac: Pass desired version to PKG_CHECK_MODULE for some
+        libraries.
+
 2026-10-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/index.rst: Update Clang scan-build and Coverity metrics.

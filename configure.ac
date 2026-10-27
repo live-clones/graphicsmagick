@@ -2837,7 +2837,7 @@ if test "$with_tiff" != 'no' ; then
     OLD_CFLAGS=$CFLAGS
     OLD_CPPFLAGS=$CPPFLAGS
     OLD_LIBS=$LIBS
-    PKG_CHECK_MODULES([TIFF], [libtiff-4], [passed=`expr $passed + 1`], [failed=`expr $failed + 1`])
+    PKG_CHECK_MODULES([TIFF], [libtiff-4 >= 4.0.0], [passed=`expr $passed + 1`], [failed=`expr $failed + 1`])
     #set -x
     if test $failed -eq 0 ; then
         if test -n "$VERBOSE" ; then
@@ -3116,7 +3116,7 @@ if test "$with_heif" != 'no' ; then
     #  -lheif
     # pkg-config --cflags libheif
     #  nada
-    PKG_CHECK_MODULES([HEIF], [libheif], [passed=`expr $passed + 1`], [failed=`expr $failed + 1`])
+    PKG_CHECK_MODULES([HEIF], [libheif >= 1.14.0], [passed=`expr $passed + 1`], [failed=`expr $failed + 1`])
     if test $failed -eq 0 ; then
       if test -n "$VERBOSE" ; then
         printf "HEIF_LIBS=${HEIF_LIBS}\n"

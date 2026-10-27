@@ -31789,19 +31789,19 @@ printf '%s\n' "" >&6; }
     OLD_LIBS=$LIBS
 
 pkg_failed=no
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for libtiff-4" >&5
-printf %s "checking for libtiff-4... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for libtiff-4 >= 4.0.0" >&5
+printf %s "checking for libtiff-4 >= 4.0.0... " >&6; }
 
 if test -n "$TIFF_CFLAGS"; then
     pkg_cv_TIFF_CFLAGS="$TIFF_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libtiff-4\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libtiff-4") 2>&5
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libtiff-4 >= 4.0.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libtiff-4 >= 4.0.0") 2>&5
   ac_status=$?
   printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_TIFF_CFLAGS=`$PKG_CONFIG --cflags "libtiff-4" 2>/dev/null`
+  pkg_cv_TIFF_CFLAGS=`$PKG_CONFIG --cflags "libtiff-4 >= 4.0.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -31813,12 +31813,12 @@ if test -n "$TIFF_LIBS"; then
     pkg_cv_TIFF_LIBS="$TIFF_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libtiff-4\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libtiff-4") 2>&5
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libtiff-4 >= 4.0.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libtiff-4 >= 4.0.0") 2>&5
   ac_status=$?
   printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_TIFF_LIBS=`$PKG_CONFIG --libs "libtiff-4" 2>/dev/null`
+  pkg_cv_TIFF_LIBS=`$PKG_CONFIG --libs "libtiff-4 >= 4.0.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -31839,9 +31839,9 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        TIFF_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libtiff-4" 2>&1`
+	        TIFF_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libtiff-4 >= 4.0.0" 2>&1`
         else
-	        TIFF_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libtiff-4" 2>&1`
+	        TIFF_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libtiff-4 >= 4.0.0" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$TIFF_PKG_ERRORS" >&5
@@ -32806,19 +32806,19 @@ printf '%s\n' "" >&6; }
     #  nada
 
 pkg_failed=no
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for libheif" >&5
-printf %s "checking for libheif... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for libheif >= 1.14.0" >&5
+printf %s "checking for libheif >= 1.14.0... " >&6; }
 
 if test -n "$HEIF_CFLAGS"; then
     pkg_cv_HEIF_CFLAGS="$HEIF_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libheif\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libheif") 2>&5
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libheif >= 1.14.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libheif >= 1.14.0") 2>&5
   ac_status=$?
   printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_HEIF_CFLAGS=`$PKG_CONFIG --cflags "libheif" 2>/dev/null`
+  pkg_cv_HEIF_CFLAGS=`$PKG_CONFIG --cflags "libheif >= 1.14.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -32830,12 +32830,12 @@ if test -n "$HEIF_LIBS"; then
     pkg_cv_HEIF_LIBS="$HEIF_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libheif\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libheif") 2>&5
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libheif >= 1.14.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libheif >= 1.14.0") 2>&5
   ac_status=$?
   printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_HEIF_LIBS=`$PKG_CONFIG --libs "libheif" 2>/dev/null`
+  pkg_cv_HEIF_LIBS=`$PKG_CONFIG --libs "libheif >= 1.14.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -32856,9 +32856,9 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        HEIF_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libheif" 2>&1`
+	        HEIF_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libheif >= 1.14.0" 2>&1`
         else
-	        HEIF_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libheif" 2>&1`
+	        HEIF_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libheif >= 1.14.0" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$HEIF_PKG_ERRORS" >&5
