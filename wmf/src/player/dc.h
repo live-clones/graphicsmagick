@@ -129,6 +129,31 @@ static wmfDC* dc_copy (wmfAPI* API,wmfDC* dc)
 	return (dc_new);
 }
 
+/* Point a device context that selects this object slot at the player's default pen, brush and font.
+   The three share one union, so the slot has a single address whichever type it holds.
+ */
+static void dc_deselect_object (wmfAPI* API,wmfDC* dc,wmfObject* obj)
+{	wmfPlayer_t* P = (wmfPlayer_t*) API->player_data;
+
+	if (dc == 0) return;
+
+	if (dc->brush == &(obj->obj.brush)) WMF_DC_SET_BRUSH (dc,&(P->default_brush));
+	if (dc->pen   == &(obj->obj.pen  )) WMF_DC_SET_PEN   (dc,&(P->default_pen  ));
+	if (dc->font  == &(obj->obj.font )) WMF_DC_SET_FONT  (dc,&(P->default_font ));
+}
+
+/* Clear the object slot from every device context, the current one and the saved ones.
+ */
+static void dc_release_object (wmfAPI* API,wmfObject* obj)
+{	wmfPlayer_t* P = (wmfPlayer_t*) API->player_data;
+
+	int i;
+
+	dc_deselect_object (API,P->dc,obj);
+
+	for (i = 0; i < P->dc_stack_length; i++) dc_deselect_object (API,P->dc_stack[i],obj);
+}
+
 static void dc_stack_push (wmfAPI* API,wmfDC* dc)
 {	wmfPlayer_t* P = (wmfPlayer_t*) API->player_data;
 
@@ -138,6 +163,12 @@ static void dc_stack_push (wmfAPI* API,wmfDC* dc)
 
 	if (dc == 0)
 	{	API->err = wmf_E_Glitch;
+		return;
+	}
+
+	if (P->dc_stack_length >= 1024)
+	{	WMF_ERROR (API,"DC stack depth limit exceeded!");
+		API->err = wmf_E_BadFormat;
 		return;
 	}
 
@@ -152,7 +183,7 @@ static void dc_stack_push (wmfAPI* API,wmfDC* dc)
 	if (P->dc_stack_length == P->dc_stack_maxlen)
 	{	more =  (wmfDC**) wmf_realloc (API,P->dc_stack,(P->dc_stack_maxlen + 8) * sizeof (wmfDC*));
 
-		if (ERR (API)) return;
+		if (more == 0) return;
 
 		P->dc_stack = more;
 		P->dc_stack_maxlen += 8;
@@ -160,6 +191,19 @@ static void dc_stack_push (wmfAPI* API,wmfDC* dc)
 
 	P->dc_stack[P->dc_stack_length] = dc;
 	P->dc_stack_length++;
+}
+
+static void dc_free (wmfAPI* API,wmfDC* dc)
+{	wmfRegion* clip;
+
+	if (dc == 0) return;
+
+	clip = (wmfRegion*) dc->clip;
+
+	if (clip) wmf_free (API,clip->rects);
+
+	wmf_free (API,dc->clip);
+	wmf_free (API,dc);
 }
 
 static wmfDC* dc_stack_pop (wmfAPI* API)
@@ -182,7 +226,7 @@ static void dc_stack_free (wmfAPI* API)
 
 	while (P->dc_stack_length)
 	{	P->dc_stack_length--;
-		wmf_free (API,P->dc_stack[P->dc_stack_length]);
+		dc_free (API,P->dc_stack[P->dc_stack_length]);
 	}
 
 	wmf_free (API,P->dc_stack);

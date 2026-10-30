@@ -44,8 +44,8 @@ static char* _libwmf_get_xtra_fontmap (void)
 	static char retval[1000] = "";
 
 	if (retval[0] == '\0')
-	{	strcpy (retval, _libwmf_get_fontdir ());
-		strcat (retval, "\\share\\libwmf\\fonts\\fontmap");
+	{	snprintf (retval, sizeof (retval), "%s\\share\\libwmf\\fonts\\fontmap",
+			  _libwmf_get_fontdir ());
 	}
 
 	return retval;
@@ -91,7 +91,7 @@ static void ipa_font_add_wmf (wmfAPI* API,wmfFontMap* mapping)
 	if ((i & 0x0f) == (unsigned int) 0x0f)
 	{	more = (wmfFontMap*) wmf_realloc (API,font_data->wmf,(i + 0x11) * sizeof (wmfFontMap));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -131,7 +131,7 @@ static void ipa_font_add_sub (wmfAPI* API,wmfMapping* mapping)
 	if ((i & 0x0f) == (unsigned int) 0x0f)
 	{	more = (wmfMapping*) wmf_realloc (API,font_data->sub,(i + 0x11) * sizeof (wmfMapping));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -168,7 +168,7 @@ static void ipa_font_add_ps (wmfAPI* API,wmfMapping* mapping)
 	if ((i & 0x0f) == (unsigned int) 0x0f)
 	{	more = (wmfFT_Mapping*) wmf_realloc (API,font_data->ps,(i + 0x11) * sizeof (wmfFT_Mapping));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -208,7 +208,7 @@ static void ipa_font_add_cache (wmfAPI* API,wmfFT_CacheEntry* entry)
 	if ((i & 0x0f) == (unsigned int) 0x0f)
 	{	more = (wmfFT_CacheEntry*) wmf_realloc (API,font_data->cache,(i + 0x11) * sizeof (wmfFT_CacheEntry));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -219,11 +219,15 @@ static void ipa_font_add_cache (wmfAPI* API,wmfFT_CacheEntry* entry)
 	font_data->cache[i].name = wmf_strdup (API,entry->name);
 	font_data->cache[i].path = wmf_strdup (API,entry->path);
 	font_data->cache[i].face = entry->face;
+	font_data->cache[i].ipa_font = (wmfIPAFont*) wmf_malloc (API,sizeof (wmfIPAFont));
 
 	if (ERR (API))
 	{	WMF_DEBUG (API,"bailing...");
 		return;
 	}
+
+	font_data->cache[i].ipa_font->ps_name = font_data->cache[i].name;
+	font_data->cache[i].ipa_font->ft_face = entry->face;
 
 	i++;
 	font_data->cache[i].name = 0;
@@ -476,7 +480,7 @@ void wmf_ipa_font_dir (wmfAPI* API,char* fontdir)
 	if ((i & 0x0f) == (unsigned int) 0x0f)
 	{	more = (char**) wmf_realloc (API,font_data->fontdirs,(i + 0x11) * sizeof (char*));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -510,7 +514,7 @@ static void ipa_font_add_api (wmfAPI* API,char* name)
 	if ((i & 0x0f) == (unsigned int) 0x0f)
 	{	more = (char**) wmf_realloc (API,API->fonts,(i + 0x11) * sizeof (char*));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -591,53 +595,43 @@ float wmf_ipa_font_stringwidth (wmfAPI* API,wmfFont* font,char* str)
 	return (width*72/(300*12));
 }
 
-static float ipa_char_position (wmfFont* font,char* str,char* last)
+/* Return the position of ch after the characters already measured into width, then add the
+ * advance of ch to width. width is at 12 point, 300 by 100 dpi, as in wmf_ipa_font_stringwidth.
+ */
+static float ipa_char_position (wmfFont* font,char ch,FT_UInt* previous,float* width)
 {	FT_Face face = WMF_FONT_FTFACE (font);
 
 	if (!face) return 0.0;
 
 	FT_Vector delta;
 
-	FT_Bool use_kerning;
-
 	FT_UInt glyph_index;
-	FT_UInt previous;
 
-	float width;
-
-	char* ptr;
+	float position;
 
 	FT_Set_Char_Size (face,0,12 * 64,300,100);
 
 	FT_Set_Transform (face,0,0);
 
-	use_kerning = FT_HAS_KERNING (face);
+	/* convert character code to glyph index */ /* === Should this be unsigned ?? ==== */
+	glyph_index = FT_Get_Char_Index (face,ch);
 
-	previous = 0;
+	if (FT_HAS_KERNING (face) && (*previous) && glyph_index)
+	{	FT_Get_Kerning (face,(*previous),glyph_index,0,&delta);
 
-	width = 0;
-
-	for (ptr = str; ptr <= last; ptr++)
-	{	/* convert character code to glyph index */ /* === Should this be unsigned ?? ==== */
-		glyph_index = FT_Get_Char_Index (face,(*ptr));
-
-		if (use_kerning && previous && glyph_index)
-		{	FT_Get_Kerning (face,previous,glyph_index,0,&delta);
-
-			width += (float) (delta.x >> 6);
-		}
-
-		if (ptr == last) break;
-
-		/* load glyph image into the slot.  DO NOT RENDER IT! */
-		FT_Load_Glyph (face,glyph_index,FT_LOAD_DEFAULT);
-
-		width += (float) (face->glyph->advance.x >> 6);
-
-		previous = glyph_index;
+		(*width) += (float) (delta.x >> 6);
 	}
 
-	return (width*72/(300*12));
+	position = (*width)*72/(300*12);
+
+	/* load glyph image into the slot.  DO NOT RENDER IT! */
+	FT_Load_Glyph (face,glyph_index,FT_LOAD_DEFAULT);
+
+	(*width) += (float) (face->glyph->advance.x >> 6);
+
+	(*previous) = glyph_index;
+
+	return (position);
 }
 
 void wmf_ipa_draw_text (wmfAPI* API,wmfDrawText_t* draw_text,wmfCharDrawer ipa_draw_text)
@@ -649,6 +643,9 @@ void wmf_ipa_draw_text (wmfAPI* API,wmfDrawText_t* draw_text,wmfCharDrawer ipa_d
 	char buffer[2];
 
 	float text_width;
+	float width = 0;
+
+	FT_UInt previous = 0;
 
 	float cos_theta;
 	float sin_theta;
@@ -668,7 +665,7 @@ void wmf_ipa_draw_text (wmfAPI* API,wmfDrawText_t* draw_text,wmfCharDrawer ipa_d
 		buffer[0] = draw_text->str[i];
 		buffer[1] = 0;
 
-		text_width = ipa_char_position (draw_text->dc->font,draw_text->str,draw_text->str+i);
+		text_width = ipa_char_position (draw_text->dc->font,draw_text->str[i],&previous,&width);
 
 		text_width = (float) ((double) text_width * draw_text->font_height * draw_text->font_ratio);
 
@@ -1094,7 +1091,7 @@ static void ipa_font_gs_add (wmfAPI* API,wmfGS_FontData* FD,char* name,char* ali
 	if (FD->len == FD->max)
 	{	more = (wmfGS_FontInfo*) wmf_realloc (API,FD->FI,(FD->max+0x20) * sizeof (wmfGS_FontInfo));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return;
 		}
@@ -1301,24 +1298,14 @@ static char* ipa_font_gs_readline (wmfAPI* API,FILE* in)
  * postscript font name is hit-and-miss.
  */
 void wmf_ipa_font_map (wmfAPI* API,wmfFont* font)
-{	wmfIPAFont* ipa_font = 0;
-
-	char* mapping = 0;
+{	char* mapping = 0;
 
 	if (font == 0) return;
-	if (font->user_data == 0)
-	{	font->user_data = wmf_malloc (API,sizeof (wmfIPAFont));
 
-		if (ERR (API))
-		{	WMF_DEBUG (API,"bailing...");
-			return;
-		}
-	}
-
-	ipa_font = (wmfIPAFont*) font->user_data;
-
-	ipa_font->ps_name = 0;
-	ipa_font->ft_face = 0;
+/* A face that loads gives the font the cache entry's own wmfIPAFont, so nothing here belongs to
+ * one font and nothing needs freeing when a font goes away.
+ */
+	font->user_data = 0;
 
 /* Check system fonts for match and load font face if found...
  */
@@ -1744,8 +1731,6 @@ static FT_Face ipa_font_face_open (wmfAPI* API,char* ps_name,char* glyphs,char* 
 static FT_Face ipa_font_face_cached (wmfAPI* API,wmfFont* font,char* ps_name)
 {	wmfFontmapData* font_data = (wmfFontmapData*) ((wmfFontData*) API->font_data)->user_data;
 
-	wmfIPAFont* ipa_font = (wmfIPAFont*) font->user_data;
-
 	FT_Face face = 0;
 
 	unsigned int i;
@@ -1762,8 +1747,9 @@ static FT_Face ipa_font_face_cached (wmfAPI* API,wmfFont* font,char* ps_name)
 	}
 
 	if (face)
-	{	ipa_font->ps_name = ps_name;
-		ipa_font->ft_face = face;
+	{	font->user_data = (void*) font_data->cache[i].ipa_font;
+
+		if (font->user_data == 0) face = 0;
 	}
 
 	return (face);

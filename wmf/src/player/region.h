@@ -20,14 +20,24 @@
 #ifndef WMFPLAYER_REGION_H
 #define WMFPLAYER_REGION_H
 
+/* Each region operation reads the whole region, so the time taken grows with this limit.
+ */
+#define WMF_REGION_MAX_RECTS 4096
+
 static wmfD_Rect* rgn_memchk (wmfAPI* API,wmfRegion* rgn)
 {	wmfD_Rect* more = 0;
 
-	if (rgn->numRects < (rgn->size - 1)) return (rgn->rects + rgn->numRects);
+	if (rgn->numRects >= WMF_REGION_MAX_RECTS)
+	{	WMF_ERROR (API,"Region rectangle limit exceeded!");
+		API->err = wmf_E_BadFormat;
+		return (0);
+	}
+
+	if ((rgn->numRects + 1) < rgn->size) return (rgn->rects + rgn->numRects);
 
 	more = wmf_realloc (API,rgn->rects,(rgn->size + 8) * sizeof (wmfD_Rect));
 
-	if ((more == 0) || (ERR (API))) return (0); /* The two conditions are equivalent, I think */
+	if (more == 0) return (0);
 
 	rgn->rects = more;
 	rgn->size += 8; /* The exponential increase in memory allocation in MEMCHECK scares me */
@@ -143,15 +153,18 @@ static void REGION_UnionRegion (wmfAPI* API,wmfRegion* newReg,wmfRegion* reg1,wm
 }
 
 static void REGION_CopyRegion (wmfAPI* API,wmfRegion* dst,wmfRegion* src)
-{	if (dst != src) /*  don't want to copy to itself */
-	{	if (dst->size < src->numRects)
-		{	dst->rects = wmf_realloc (API,dst->rects,src->numRects * sizeof (wmfD_Rect));
+{	wmfD_Rect* more = 0;
 
-			if (ERR (API))
+	if (dst != src) /*  don't want to copy to itself */
+	{	if (dst->size < src->numRects)
+		{	more = wmf_realloc (API,dst->rects,src->numRects * sizeof (wmfD_Rect));
+
+			if (more == 0)
 			{	WMF_DEBUG (API,"bailing...");
 				return;
 			}
 
+			dst->rects = more;
 			dst->size = src->numRects;
 		}
 		dst->numRects = src->numRects;
@@ -163,7 +176,9 @@ static void REGION_CopyRegion (wmfAPI* API,wmfRegion* dst,wmfRegion* src)
 
 		dst->type = src->type;
 
-		memcpy ((char*) dst->rects,(char*) src->rects,(int) (src->numRects * sizeof (wmfD_Rect)));
+		if (src->numRects)
+		{	memcpy ((char*) dst->rects,(char*) src->rects,src->numRects * sizeof (wmfD_Rect));
+		}
 	}
 }
 
@@ -248,6 +263,7 @@ static void REGION_RegionOp (
 
 	if ((newReg->rects = wmf_malloc (API,sizeof (wmfD_Rect) * newReg->size)) == 0)
 	{	newReg->size = 0;
+		wmf_free (API,oldRects);
 		return;
 	}
 
@@ -410,6 +426,7 @@ static void REGION_RegionOp (
 			newReg->size = 1;
 			wmf_free (API,newReg->rects);
 			newReg->rects = wmf_malloc (API,sizeof (wmfD_Rect));
+			if (newReg->rects == 0) newReg->size = 0;
 		}
 	}
 
@@ -850,7 +867,7 @@ static void REGION_SubtractO (
 				pNextRect++;
 			}
 			r1++;
-			left = r1->TL.x;
+			if (r1 != r1End) left = r1->TL.x;
 		}
 	}
 

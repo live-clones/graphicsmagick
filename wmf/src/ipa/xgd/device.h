@@ -56,6 +56,7 @@ static void wmf_gd_device_close (wmfAPI* API)
 	if (gd->brush.image) gdImageDestroy (gd->brush.image);
 	if (gd->pen.image) gdImageDestroy (gd->pen.image);
 	if (gd->image) gdImageDestroy (gd->image);
+	if (gd->flat_pixels) wmf_free (API,gd->flat_pixels);
 }
 
 /* This is called from the beginning of each play for initial page setup
@@ -160,7 +161,7 @@ static void wmf_gd_device_end (wmfAPI* API)
 	if (gd->pen.image) gdImageDestroy (gd->pen.image);
 
 	if (ddata->type == wmf_gd_image)
-	{	gdClipSetReset (gd->image); /* Remove any clipping rectangles */
+	{	wmf_gd_clip_reset (gd->image); /* Remove any clipping rectangles */
 		ddata->gd_image = (void*) gd->image;
 	}
 	else
@@ -207,7 +208,7 @@ static int gd_sink (void* context,const char* buffer,int length)
 	while ((gd->length + (long) length) > gd->max_length)
 	{	more = (char*) wmf_realloc (API,gd->buffer,gd->max_length + 4096);
 
-		if (ERR (API)) break;
+		if (more == 0) break;
 
 		gd->buffer = more;
 		gd->max_length += 4096;

@@ -127,11 +127,13 @@ static int ipa_b64_sink (void* context,const char* buffer,int length)
 	int i = 0;
 
 	while (i < length)
-	{	// coverity[overrun-local : FALSE] - coverity seems to fail to see that ipa_b64_flush resets length to 0
-		b64->buffer[b64->length] = buffer[i];
-		i++;
-		b64->length++;
-		if (b64->length == IPA_B64_BUFLEN) ipa_b64_flush (context);
+	{	while (i < length && b64->length < IPA_B64_BUFLEN)
+			b64->buffer[b64->length++] = buffer[i++];
+
+		if (b64->length == IPA_B64_BUFLEN)
+			ipa_b64_flush (context);
+		else
+			break; /* input consumed */
 	}
 
 	return (i);
@@ -515,6 +517,7 @@ wmfBMP wmf_ipa_bmp_copy (wmfAPI* API,wmfBMP* bmp,unsigned int width,unsigned int
 
 	unsigned int i;
 	unsigned int j;
+	unsigned int bytes_per_line;
 
 	int opacity;
 
@@ -530,6 +533,21 @@ wmfBMP wmf_ipa_bmp_copy (wmfAPI* API,wmfBMP* bmp,unsigned int width,unsigned int
 	if (bmp->data == 0) return (copy);
 
 	data = (BMPData*) bmp->data;
+
+	if ((width == 0) || (height == 0) || (data->bits_per_pixel == 0)
+	 || (width > (UINT_MAX - 31) / data->bits_per_pixel))
+	{	WMF_ERROR (API,"BMP copy dimensions too large");
+		API->err = wmf_E_BadFormat;
+		return (copy);
+	}
+
+	bytes_per_line = 4 * ((width * data->bits_per_pixel + 31) / 32);
+
+	if (bytes_per_line > UINT_MAX / height)
+	{	WMF_ERROR (API,"BMP copy dimensions too large");
+		API->err = wmf_E_BadFormat;
+		return (copy);
+	}
 
 	copy.data = wmf_malloc (API,sizeof (BMPData));
 
@@ -558,9 +576,9 @@ wmfBMP wmf_ipa_bmp_copy (wmfAPI* API,wmfBMP* bmp,unsigned int width,unsigned int
 
 	copy_data->bits_per_pixel = data->bits_per_pixel;
 
-	copy_data->bytes_per_line = 4 * ((width * copy_data->bits_per_pixel + 31) / 32);
+	copy_data->bytes_per_line = bytes_per_line;
 
-	size = height * copy_data->bytes_per_line * sizeof (unsigned char);
+	size = (size_t) bytes_per_line * height;
 
 	copy_data->image = (unsigned char*) wmf_malloc (API,size);
 
@@ -816,12 +834,23 @@ static unsigned int ReadBlobLSBLong (BMPSource* src)
 
 	if (value < 4) return (~value); /* i.e., = -1 */
 
-	value  = buffer[3] << 24;
+	value  = (unsigned int) buffer[3] << 24;
 	value |= buffer[2] << 16;
 	value |= buffer[1] <<  8;
 	value |= buffer[0];
 
 	return (value);
+}
+
+static signed int ReadBlobLSBSignedLong (BMPSource* src)
+{	union
+	{	unsigned int unsigned_value;
+		signed int   signed_value;
+	} quantum;
+
+	quantum.unsigned_value = ReadBlobLSBLong (src);
+
+	return (quantum.signed_value);
 }
 
 static long TellBlob (BMPSource* src)
@@ -852,7 +881,7 @@ static long TellBlob (BMPSource* src)
 %
 %
 */
-static int DecodeImage (wmfBMP* bmp,BMPSource* src,unsigned int compression,unsigned char* pixels)
+static int DecodeImage (wmfBMP* bmp,BMPSource* src,unsigned int compression,unsigned char* pixels,unsigned int number_pixels,unsigned int bytes_per_line)
 {	int byte;
 	int count;
 	int i;
@@ -865,12 +894,12 @@ static int DecodeImage (wmfBMP* bmp,BMPSource* src,unsigned int compression,unsi
 	unsigned char* q;
 	unsigned char* end;
 
-	for (u = 0; u < ((U32) bmp->width * (U32) bmp->height); u++) pixels[u] = 0;
+	for (u = 0; u < number_pixels; u++) pixels[u] = 0;
 
 	byte = 0;
 	x = 0;
 	q = pixels;
-	end = pixels + bmp->width * bmp->height;
+	end = pixels + number_pixels;
 
 	for (y = 0; y < bmp->height; )
 	{	count = ReadBlobByte (src);
@@ -903,7 +932,7 @@ static int DecodeImage (wmfBMP* bmp,BMPSource* src,unsigned int compression,unsi
 				y++;
 				if (y >= bmp->height)
 					return 0;
-				q = pixels + y * bmp->width;
+				q = pixels + y * bytes_per_line;
 				break;
 			 }
 			case 0x02:
@@ -914,7 +943,7 @@ static int DecodeImage (wmfBMP* bmp,BMPSource* src,unsigned int compression,unsi
 					return 0;
 				if (x >= bmp->width)
 					return 0;
-				q = pixels + y * bmp->width + x;
+				q = pixels + y * bytes_per_line + x;
 				break;
 			 }
 			default:
@@ -996,9 +1025,13 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	unsigned int bytes_per_line;
 	unsigned int image_size;
 	unsigned int packet_size;
+	unsigned int colors_in_file;
 	unsigned int i;
 
 	unsigned long u;
+
+	uint64_t remaining;
+	int too_large;
 
 	size_t bytes_read;
 
@@ -1026,8 +1059,14 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	}
 	else
 	{	/* Microsoft Windows BMP image file. */
-		bmp_info.width  = ReadBlobLSBLong (src);
-		bmp_info.height = ReadBlobLSBLong (src);
+		if (bmp_info.size < 40)
+		{	WMF_ERROR (API,"BMP has invalid info-header size");
+			API->err = wmf_E_BadFormat;
+			return;
+		}
+
+		bmp_info.width  = ReadBlobLSBSignedLong (src);
+		bmp_info.height = ReadBlobLSBSignedLong (src);
 		bmp_info.planes = ReadBlobLSBShort (src);
 
 		bmp_info.bits_per_pixel = ReadBlobLSBShort (src);
@@ -1042,7 +1081,9 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 
 		bmp_info.colors_important = ReadBlobLSBLong (src);
 
-		for (u = 0; u < (bmp_info.size - 40); u++) ReadBlobByte (src);
+		for (u = 0; u < (bmp_info.size - 40); u++)
+		{	if (ReadBlobByte (src) == EOF) break;
+		}
 
 		if ( (bmp_info.compression == 3)
 		  && ((bmp_info.bits_per_pixel == 16) || (bmp_info.bits_per_pixel == 32)) )
@@ -1074,6 +1115,18 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 		}
 	}
 
+	if (bmp_info.width <= 0)
+	{	WMF_ERROR (API,"BMP has invalid width");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
+
+	if ((bmp_info.height == 0) || (bmp_info.height < -INT_MAX))
+	{	WMF_ERROR (API,"BMP has invalid height");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
+
 	if (bmp_info.height < 0)
 	{	bmp_info.height = - bmp_info.height;
 		data->flipped = 1;
@@ -1088,8 +1141,20 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	if (bmp->height == 0) bmp->height = (U16) bmp_info.height;
 
 	data->NColors = 0;
-	if ((bmp_info.number_colors != 0) || (bmp_info.bits_per_pixel < 16))
-	{	data->NColors = (unsigned int) bmp_info.number_colors;
+	if ((bmp_info.number_colors != 0) || (bmp_info.bits_per_pixel <= 8))
+	{	/* Pixels index the palette only at 8 bits per pixel or less. 256 entries are
+		   enough at any depth. */
+		unsigned int max_colors = 256;
+
+		if (bmp_info.bits_per_pixel <= 8)
+			max_colors = 1u << (bmp_info.bits_per_pixel & 0x1F);
+
+		colors_in_file = (unsigned int) bmp_info.number_colors;
+
+		data->NColors = colors_in_file;
+
+		if (data->NColors > max_colors)
+			data->NColors = max_colors;
 	}
 
 	if (data->NColors > 0)
@@ -1104,13 +1169,14 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 		if (bmp_info.size == 12) packet_size = 3;
 		else                     packet_size = 4;
 
-		for (i = 0; i < data->NColors; i++)
+		for (i = 0; i < colors_in_file; i++)
 		{	bytes_read = ReadBlob (src,packet_size,packet);
 			if (bytes_read < packet_size)
 			{	WMF_ERROR (API,"Unexpected EOF");
 				API->err = wmf_E_EOF;
 				break;
 			}
+			if (i >= data->NColors) continue;
 			data->rgb[i].b = packet[0];
 			data->rgb[i].g = packet[1];
 			data->rgb[i].r = packet[2];
@@ -1127,9 +1193,44 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	}
 
 	/* Read image data. */
-	if (bmp_info.compression == 2) bmp_info.bits_per_pixel <<= 1;
+	if (bmp_info.bits_per_pixel > 32)
+	{	WMF_ERROR (API,"BMP image has invalid bits_per_pixel");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
+
+	if (bmp_info.compression == 2)
+		bmp_info.bits_per_pixel = (unsigned short) ((bmp_info.bits_per_pixel & 0x3F) << 1);
 
 	bytes_per_line = 4 * ((bmp->width * bmp_info.bits_per_pixel + 31) / 32);
+
+	if ((bmp->width == 0) || (bmp->height == 0))
+	{	WMF_ERROR (API,"BMP image has zero width or height");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
+
+	if (bytes_per_line > UINT_MAX / bmp->height)
+	{	WMF_ERROR (API,"BMP image dimensions too large");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
+
+	/* Run-length encoded data is taken to expand at most 256 times, or 512 times for 4 bits per
+	 * pixel, which compression 2 has already turned into 8 above.
+	 */
+	remaining = (uint64_t) (src->end - src->ptr);
+	if ((bmp_info.compression == 0) || (bmp_info.compression == 3))
+	{	too_large = (remaining / bmp->height) < bytes_per_line;
+	}
+	else
+	{	too_large = (remaining * ((bmp_info.compression == 2) ? 512 : 256) / bmp->height) < bmp->width;
+	}
+	if (too_large)
+	{	WMF_ERROR (API,"BMP image dimensions larger than its data");
+		API->err = wmf_E_BadFormat;
+		return;
+	}
 
 	image_size = bytes_per_line * bmp->height;
 
@@ -1151,7 +1252,7 @@ static void ReadBMPImage (wmfAPI* API,wmfBMP* bmp,BMPSource* src)
 	{
 		if (bmp_info.bits_per_pixel == 8)	/* Convert run-length encoded raster pixels. */
 		{
-			if (!DecodeImage (bmp,src,(unsigned int) bmp_info.compression,data->image))
+			if (!DecodeImage (bmp,src,(unsigned int) bmp_info.compression,data->image,image_size,bytes_per_line))
 			{	WMF_ERROR (API,"corrupt bmp");
 				API->err = wmf_E_BadFormat;
 			}

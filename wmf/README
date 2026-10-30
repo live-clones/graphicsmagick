@@ -1,3 +1,37 @@
+libwmf-0.2.17 Release Notes
+---------------------------
+
+- More parsing and resource handling corrections
+- Text escaped correctly in SVG, EPS and FIG output
+- Faster handling of long text, many colors and complex clip regions
+- New wmf_gd_image_destroy(), and a gdk-pixbuf loader memory fix
+- A security policy
+
+libwmf-0.2.16 Release Notes
+---------------------------
+
+- License file corrected to LGPL
+- Many parsing and resource handling corrections
+- New wmf_gd_get_image_pixels(), and support for the current system libgd
+- Windows, MSYS2 and macOS build fixes
+- A fuzzer, and wider test coverage
+
+libwmf-0.2.15 Release Notes
+---------------------------
+
+- Various image and record parsing fixes
+- Add basic test suite
+- MSVC build fixes
+
+libwmf-0.2.14 Release Notes
+---------------------------
+
+- Fix missing includes on macOS
+- Fix isExponentNegative expectedWidth accounting
+- Fix font installation dir
+- Use pkg-config for libxml2 when no explicit directory given
+- Automake cleanup and distcheck fixes
+
 libwmf-0.2.13 Release Notes
 ---------------------------
 
@@ -35,7 +69,7 @@ build libwmf without any device layers, but this has not been tested extensively
 and is not recommended for general use.)
 
 Special thanks to Bob Friesenhahn, Leonard Rosenthol, David C Sterratt and
-Tomasz K³oczko.
+Tomasz KÅ‚oczko.
 
 Hopefully this release will build on Solaris. My apologies to everyone who had
 problems with libwmf-0.2.1.

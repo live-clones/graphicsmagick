@@ -80,7 +80,7 @@ static void wmf_eps_bmp_draw (wmfAPI* API,wmfBMP_Draw_t* bmp_draw)
 			if (i == 78)
 			{	buffer[i++] = '\n';
 				buffer[i] = 0;
-				wmf_stream_printf (API,out,buffer);
+				wmf_stream_printf (API,out,"%s",buffer);
 				i = 0;
 			}
 
@@ -96,7 +96,7 @@ static void wmf_eps_bmp_draw (wmfAPI* API,wmfBMP_Draw_t* bmp_draw)
 		if (i > 0)
 		{	buffer[i++] = '\n';
 			buffer[i] = 0;
-			wmf_stream_printf (API,out,buffer);
+			wmf_stream_printf (API,out,"%s",buffer);
 		}
 	}
 

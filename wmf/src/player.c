@@ -33,6 +33,7 @@
 #include "wmfdefs.h"
 #include "metadefs.h"
 
+#include <stdint.h>
 #include "player.h"
 #include "player/region.h"   /* Provides: REGION manipulation functions  */
 #include "player/clip.h"     /* Provides: clip function                  */
@@ -42,7 +43,6 @@
 #include "player/defaults.h" /* Provides: default settings               */
 #include "player/record.h"   /* Provides: parameter mechanism            */
 #include "player/meta.h"     /* Provides: record interpreters            */
-#include <stdint.h>
 
 /**
  * @internal
@@ -126,7 +126,13 @@ wmf_error_t wmf_scan (wmfAPI* API,unsigned long flags,wmfD_Rect* d_r)
 	}
 
 	if (API->File->wmfheader->NumOfObjects > 0)
-	{	P->objects = (wmfObject*) wmf_malloc (API,NUM_OBJECTS (API) * sizeof (wmfObject));
+	{	//each object needs a CREATE* record of at least 6 bytes
+		if (wmf_can_supply (API, (long) NUM_OBJECTS (API) * 6) == (-1))
+		{	WMF_DEBUG (API,"bailing...");
+			return (API->err);
+		}
+
+		P->objects = (wmfObject*) wmf_malloc (API,NUM_OBJECTS (API) * sizeof (wmfObject));
 
 		if (ERR (API))
 		{	WMF_DEBUG (API,"bailing...");
@@ -143,25 +149,10 @@ wmf_error_t wmf_scan (wmfAPI* API,unsigned long flags,wmfD_Rect* d_r)
 
 	U32 nMaxRecordSize = (MAX_REC_SIZE(API)  ) * 2 * sizeof (unsigned char);
 	if (nMaxRecordSize)
-	{
-		//before allocating memory do a sanity check on size by seeking
-		//to claimed end to see if its possible. We're constrained here
-		//by the api and existing implementations to not simply seeking
-		//to SEEK_END. So use what we have to skip to the last byte and
-		//try and read it.
-		const long nPos = WMF_TELL (API);
-		WMF_SEEK (API, nPos + nMaxRecordSize - 1);
-		if (ERR (API))
+	{	if (wmf_can_supply (API, (long) nMaxRecordSize) == (-1))
 		{	WMF_DEBUG (API,"bailing...");
 			return (API->err);
 		}
-		int byte = WMF_READ (API);
-		if (byte == (-1))
-		{	WMF_ERROR (API,"Unexpected EOF!");
-		       	API->err = wmf_E_EOF;
-		       	return (API->err);
-		}
-		WMF_SEEK (API, nPos);
 	}
 
  	P->Parameters = (unsigned char*) wmf_malloc (API, nMaxRecordSize);
@@ -457,10 +448,9 @@ static wmf_error_t WmfPlayMetaFile (wmfAPI* API)
 
 	for (i = 0; i < NUM_OBJECTS (API); i++) objects[i].type = 0;
 
-	WMF_SEEK (API,API->File->pos);
-
-	if (ERR (API))
-	{	WMF_DEBUG (API,"bailing...");
+	if (WMF_SEEK (API,API->File->pos) == (-1))
+	{	WMF_ERROR (API,"API's seek() failed on input stream!");
+		API->err = wmf_E_BadFile;
 		return (API->err);
 	}
 
@@ -483,6 +473,10 @@ static wmf_error_t WmfPlayMetaFile (wmfAPI* API)
 
 		Size     = wmf_read_32 (API,0,0);
 		Function = wmf_read_16 (API);
+
+		/* Propagate any current error from the size/function reads as-ism
+		 * so the cleanup at the end of the loop can recognise it. */
+		if (ERR (API)) break;
 
 		if ((Size == 3) && (Function == 0))
 		{	if (SCAN (API)) wmf_write (API, Size, Function, "empty",
@@ -1288,8 +1282,8 @@ static wmf_error_t WmfPlayMetaFile (wmfAPI* API)
 		{	userdata.dc = P->dc;
 			userdata.data = P->dc->userdata;
 
-			if (FR->udata_free) FR->udata_free (API,&userdata);
-			wmf_free (API,P->dc);
+			if (PLAY (API) && FR->udata_free) FR->udata_free (API,&userdata);
+			dc_free (API,P->dc);
 		}
 		P->dc = dc_stack_pop (API);
 	}
@@ -1299,7 +1293,7 @@ static wmf_error_t WmfPlayMetaFile (wmfAPI* API)
 		userdata.data = P->dc->userdata;
 
 		if (PLAY (API) && FR->udata_free) FR->udata_free (API,&userdata);
-		wmf_free (API,P->dc);
+		dc_free (API,P->dc);
 	}
 
 	dc_stack_free (API);

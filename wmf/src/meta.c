@@ -158,6 +158,12 @@ wmf_error_t wmf_header_read (wmfAPI* API)
 
 	if (ERR (API)) return (API->err);
 
+	if (API->File->placeable && (API->File->pmh->Inch == 0))
+	{	WMF_ERROR (API,"wmf_header_read: placeable header has no units per inch");
+		API->err = wmf_E_BadFormat;
+		return (API->err);
+	}
+
 	if (API->File->wmfheader->HeaderSize == 9)
 	{	API->File->wmfheader->Version       = wmf_read_16 (API);
 		API->File->wmfheader->FileSize      = wmf_read_32 (API,0,0);
@@ -209,10 +215,9 @@ static void write_header (wmfAPI* API, long header_start, long header_end)
 		return;
 	}
 
-	WMF_SEEK (API,header_start);
-
-	if (ERR (API))
-	{	WMF_DEBUG (API,"bailing...");
+	if (WMF_SEEK (API,header_start) == (-1))
+	{	WMF_ERROR (API,"API's seek() failed on input stream!");
+		API->err = wmf_E_BadFile;
 		return;
 	}
 
@@ -539,7 +544,7 @@ const char * wmf_attr_add (wmfAPI * API, wmfAttributes * list,
 	if (list->count == list->max)
 	{	more = (char **) wmf_realloc (API, list->atts, 2 * (list->max + 8 + 1) * sizeof (char *));
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API,"bailing...");
 			return 0;
 		}
@@ -547,10 +552,11 @@ const char * wmf_attr_add (wmfAPI * API, wmfAttributes * list,
 		list->atts = more;
 		list->max += 8;
 	}
-	list->atts[list->count++] = copy_name;
-	list->atts[list->count++] = copy_value;
+	list->atts[2 * list->count]     = copy_name;
+	list->atts[2 * list->count + 1] = copy_value;
+	list->count++;
 
-	list->atts[list->count] = 0;
+	list->atts[2 * list->count] = 0;
 
 	return copy_value;
 }

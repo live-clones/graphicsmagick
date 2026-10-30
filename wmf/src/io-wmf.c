@@ -133,10 +133,16 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 	resolution_x = resolution_y = 72.0;
 	width = height = -1;
 
+	/* wmf_api_create only reads argv when WMF_OPT_ARGS is set, which we
+	 * don't request - but Coverity's auto-derived model can't see that
+	 * gate, so give argv a non-null sentinel to silence FORWARD_NULL.
+	 */
+	static char * empty_argv[] = { NULL };
+
 	flags = WMF_OPT_IGNORE_NONFATAL | WMF_OPT_FUNCTION;
 	api_options.function = wmf_gd_function;
 	api_options.argc = 0;
-	api_options.argv = NULL;
+	api_options.argv = empty_argv;
 
 	err = wmf_api_create (&API, flags, &api_options);
 	if (err != wmf_E_None) {
@@ -162,23 +168,27 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 		goto _wmf_error;
 	}
 
-	/* find out how large the app wants the pixbuf to be
+	unsigned int uwidth, uheight;
+	err = wmf_display_size (API, &uwidth, &uheight, resolution_x, resolution_y);
+	width = uwidth;
+	height = uheight;
+	if (err != wmf_E_None || width <= 0 || height <= 0) {
+		g_set_error (error, GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
+			     "Couldn't determine image size");
+		goto _wmf_error;
+	}
+
+	/* advertise natural size and find out how large the app wants the pixbuf to be
 	 */
 	if (context->size_func != NULL)
 		(*context->size_func) (&width, &height, context->user_data);
 
-	/* if these are <= 0, assume user wants the natural size of the wmf
+	/* if these are <= 0, assume user wants to close, as specified in
+	 * GdkPixbufModuleSizeFunc documentation
 	 */
 	if (width <= 0 || height <= 0) {
-		unsigned int uwidth, uheight;
-		err = wmf_display_size (API, &uwidth, &uheight, resolution_x, resolution_y);
-		width = uwidth;
-		height = uheight;
-		if (err != wmf_E_None || width <= 0 || height <= 0) {
-			g_set_error (error, GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
-				     "Couldn't determine image size");
-			goto _wmf_error;
-		}
+		result = TRUE;
+		goto _wmf_error;
 	}
 
 	ddata->bbox          = bbox;        
@@ -194,7 +204,7 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 
 	wmf_mem_close (API);
 
-	if (ddata->gd_image != NULL) gd_pixels = wmf_gd_image_pixels (ddata->gd_image);
+	if (ddata->gd_image != NULL) gd_pixels = wmf_gd_get_image_pixels (API);
 	if (gd_pixels == NULL) {
 		g_set_error (error, GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
 			     "Couldn't decode WMF file - no output (huh?)");
@@ -208,6 +218,7 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 		goto _wmf_error;
 	}
 
+	wmf_gd_image_destroy (API);
 	wmf_api_destroy (API);
 	API = NULL;
 
@@ -215,6 +226,7 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 					   width, height, width * 4,
 					   pixbuf_destroy_function, NULL);
 	if (pixbuf == NULL) {
+		g_free (pixels);
 		g_set_error (error, GDK_PIXBUF_ERROR, GDK_PIXBUF_ERROR_CORRUPT_IMAGE,
 			     "Couldn't decode WMF file");
 		goto _wmf_error;
@@ -228,11 +240,15 @@ gdk_pixbuf__wmf_image_stop_load (gpointer data, GError **error)
 					   gdk_pixbuf_get_width (pixbuf), 
 					   gdk_pixbuf_get_height (pixbuf), 
 					   context->user_data);
+	g_object_unref (pixbuf);
 	result = TRUE;
 
  _wmf_error:
 
-	if (API != NULL) wmf_api_destroy (API);
+	if (API != NULL) {
+		if (ddata != NULL) wmf_gd_image_destroy (API);
+		wmf_api_destroy (API);
+	}
 
 	g_byte_array_free (context->data, TRUE);
 	g_free (context);
@@ -294,6 +310,7 @@ fill_info (GdkPixbufFormat *info)
 		{ NULL, NULL, 0 }
 	};
 	static gchar *mime_types[] = { 
+		"image/wmf",
 		"image/x-wmf",
 		NULL 
 	};

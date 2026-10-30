@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "wmfdefs.h"
@@ -507,7 +508,17 @@ void* wmf_malloc (wmfAPI* API,size_t size)
  *         Sets error state \b wmf_E_InsMem on failure.
  */
 void* wmf_calloc (wmfAPI* API,size_t number,size_t size)
-{	return (wmf_malloc (API,number * size));
+{	void* mem;
+
+	if (size != 0 && number > SIZE_MAX / size)
+	{	WMF_ERROR (API,"wmf_calloc: number * size overflows!");
+		API->err = wmf_E_InsMem;
+		return (0);
+	}
+
+	mem = wmf_malloc (API, number * size);
+	if (mem) memset (mem, 0, number * size);
+	return (mem);
 }
 
 /**
@@ -744,7 +755,7 @@ unsigned long wmf_strbuf_grow (wmfAPI* API)
 
 	more = (char*) wmf_realloc (API,API->string_buffer.buffer,(API->string_buffer.length + 64) * sizeof (char));
 
-	if (ERR (API))
+	if (more == 0)
 	{	WMF_DEBUG (API,"bailing...");
 		return (0);
 	}

@@ -1,3 +1,31 @@
+v. 0.2.17
+	* more parsing and resource handling corrections in the player and the output devices
+	* text escaped as each format needs in the svg, eps and fig output
+	* faster handling of long text, many colors and complex clip regions
+	* new wmf_gd_image_destroy(), and the gdk-pixbuf loader frees each image it loads
+	* a security policy, SECURITY.md
+
+v. 0.2.16
+	* license file corrected to LGPL, as always intended
+	* many parsing and resource handling corrections in the player
+	* eight Coverity reports resolved
+	* new wmf_gd_get_image_pixels(), and support for the current system libgd
+	* symbols exported for Windows and MSYS2 builds
+	* macOS 26 build fixed
+	* a fuzzer added, and wider test coverage
+	* zlib and png found through pkg-config, pixbuf can be disabled on its own
+
+v. 0.2.15
+	* BMP image parsing fixes in embedded DIBs
+	* record size validation for polyline, polygon, polypolygon and text records
+	* fix RLE decoder row-stride mismatch
+	* limit DC stack depth to prevent resource exhaustion
+	* add basic test suite
+	* MSVC build fixes
+
+v. 0.2.14
+	* new release with accumulated fixes
+
 v. 0.2.13
 	* new release with various fixes
 
@@ -117,7 +145,7 @@ v. 0.2.2
 	* update other config stuff to handle autoconf-2.52
 	* update config.sub/guess to libtool-1.4.1
 	* make building/inclusion of GD library optional (fjf)
-	* acinclude fix (Tomasz K³oczko)
+	* acinclude fix (Tomasz KÅ‚oczko)
 	* up the version number (fjf)
 v. 0.2.1
 	* radical IPA fontmap rewrite; GS Fontmap used now also (fjf)

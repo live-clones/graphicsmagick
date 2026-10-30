@@ -72,10 +72,25 @@ struct _wmf_gd_t
 extern void wmf_gd_function (wmfAPI*);
 
 /**
- * If using the wmf_gd_image option to write to a GD image, collected from
- * the void* gd_image member of the device data struct above, the true-color
+ * If using the wmf_gd_image option to write to a GD image, the true-color
  * pixels (stored in a contiguous array of height * width integers) of the
- * image can be retrieved using wmf_gd_image_pixels()
+ * image can be retrieved using wmf_gd_get_image_pixels(). The returned
+ * buffer is owned by the API and is released by wmf_api_destroy(); do not
+ * free() it.
+ */
+extern int * wmf_gd_get_image_pixels (wmfAPI* API);
+
+/**
+ * If using the wmf_gd_image option, the GD image left in the gd_image
+ * member of the device data belongs to the caller. wmf_gd_image_destroy()
+ * destroys it and sets gd_image to 0.
+ */
+extern void wmf_gd_image_destroy (wmfAPI* API);
+
+/**
+ * Deprecated: use wmf_gd_get_image_pixels() instead. When libwmf is built
+ * against system libgd this function returns NULL, as the public libgd API
+ * exposes no contiguous backing store to borrow.
  */
 extern int * wmf_gd_image_pixels (void * gd_image);
 

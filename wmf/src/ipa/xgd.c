@@ -22,6 +22,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <math.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 #include "wmfdefs.h"
 
@@ -126,7 +128,7 @@ void wmf_gd_function (wmfAPI* API)
  */
 	ddata->type = wmf_gd_png;
 
-	ddata->gd_data = (void*) wmf_malloc (API,sizeof (gd_t));
+	ddata->gd_data = (void*) wmf_calloc (API,1,sizeof (gd_t));
 
 	if (ERR (API))
 	{	WMF_DEBUG (API,"bailing...");
@@ -134,8 +136,6 @@ void wmf_gd_function (wmfAPI* API)
 	}
 
 	gd = (gd_t*) ddata->gd_data;
-
-	gd->image = 0;
 
 	ddata->file   = 0;
 	ddata->memory = 0;
@@ -533,12 +533,84 @@ static int setlinestyle (wmfAPI* API,wmfDC* dc)
 }
 #endif /* HAVE_GD */
 
+int * wmf_gd_get_image_pixels (wmfAPI* API)
+{
+	int * pixels = 0;
+#ifdef HAVE_GD
+	wmf_gd_t* ddata = WMF_GD_GetData (API);
+	gdImagePtr img = (gdImagePtr) ddata->gd_image;
+	if (img)
+	{
+#ifdef HAVE_SYS_GD
+		gd_t* gd = (gd_t*) ddata->gd_data;
+
+		int img_w = gdImageSX (img);
+		int img_h = gdImageSY (img);
+		size_t width;
+		size_t height;
+		size_t count;
+		size_t row;
+		size_t col;
+
+		if (img_w <= 0 || img_h <= 0) return (0);
+
+		width = (size_t) img_w;
+		height = (size_t) img_h;
+
+		if (width > SIZE_MAX / height) return (0);
+		count = width * height;
+		if (count > SIZE_MAX / sizeof (int)) return (0);
+
+		if (gd->flat_pixels)
+		{	wmf_free (API,gd->flat_pixels);
+			gd->flat_pixels = 0;
+		}
+
+		gd->flat_pixels = (int*) wmf_malloc (API,count * sizeof (int));
+		if (gd->flat_pixels == 0) return (0);
+
+		for (row = 0; row < height; row++)
+		{	for (col = 0; col < width; col++)
+			{	gd->flat_pixels[(row * width) + col] = gdImageTrueColorPixel (img,col,row);
+			}
+		}
+
+		pixels = gd->flat_pixels;
+#else
+		pixels = img->_tpixels;
+#endif
+	}
+#endif /* HAVE_GD */
+	return (pixels);
+}
+
+void wmf_gd_image_destroy (wmfAPI* API)
+{
+#ifdef HAVE_GD
+	wmf_gd_t* ddata = WMF_GD_GetData (API);
+	if (ddata->gd_image)
+	{	gdImageDestroy ((gdImagePtr) ddata->gd_image);
+		ddata->gd_image = 0;
+	}
+#endif /* HAVE_GD */
+}
+
 int * wmf_gd_image_pixels (void * gd_image)
 {
 	int * pixels = 0;
 #ifdef HAVE_GD
 	gdImagePtr img = (gdImagePtr) gd_image;
-	if (img) pixels = img->_tpixels;
+	if (img)
+	{
+#ifdef HAVE_SYS_GD
+		/* Deprecated. The public libgd API exposes no contiguous backing
+		 * store to borrow, so this returns NULL when libwmf is built
+		 * against system libgd. Use wmf_gd_get_image_pixels() instead.
+		 */
+#else
+		pixels = img->_tpixels;
+#endif
+	}
 #endif /* HAVE_GD */
 	return (pixels);
 }

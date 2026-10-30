@@ -70,7 +70,7 @@ static void cd_append (wmfXML_InputData * data, const char * buffer, unsigned lo
 	{	size = data->cd_length + length;
 		more = (char *) wmf_realloc (data->API, data->cd_buffer, size);
 
-		if (ERR (data->API))
+		if (more == 0)
 		{	WMF_DEBUG (data->API,"bailing...");
 			return;
 		}
@@ -113,7 +113,7 @@ static void mem_append (wmfXML_InputData * data, unsigned char * buffer, unsigne
 	{	size = data->mem_length + length;
 		more = (unsigned char *) wmf_realloc (data->API, data->mem_buffer, size);
 
-		if (ERR (data->API))
+		if (more == 0)
 		{	WMF_DEBUG (data->API,"bailing...");
 			return;
 		}
@@ -163,7 +163,7 @@ static void store_atts (wmfAPI * API, const char * element_name, const char ** a
 	{	size = (API->store.max + 16) * sizeof (wmfAttributes);
 		more = (wmfAttributes *) wmf_realloc (API, API->store.attrlist, size);
 
-		if (ERR (API))
+		if (more == 0)
 		{	WMF_DEBUG (API, "bailing...");
 			return;
 		}
@@ -206,6 +206,8 @@ static void xml_start (void * user_data, const char * name, const char ** atts)
 	}
 	if (input_data->wmfxml != 1) return;
 
+	input_data->depth++;
+
 	store_atts (API, name, atts);
 
 	input_data->cd_bufptr = input_data->cd_buffer;
@@ -244,13 +246,12 @@ static void xml_end (void * user_data, const char * name)
 
 	if (input_data->wmfxml != 1) return;
 
-	if (strcmp (name, "wmfxml") == 0)
-	{	for (i = 0; i < API->store.count; i++)
-		{	attr = API->store.attrlist + i;
-			attr->buffer = input_data->mem_buffer + attr->offset;
-		}
+	if (input_data->depth == 0)
+	{	input_data->wmfxml = 2;
 		return;
 	}
+	input_data->depth--;
+
 	attr = API->store.attrlist + (API->store.count - 1);
 
 	attr->length = 0;
@@ -261,10 +262,10 @@ static void xml_end (void * user_data, const char * name)
 	while (remaining >= 72)
 	{	bufptr = buffer;
 		for (i = 0; i < 18; i++)
-		{	b32 = (unsigned long) (             s_value (*(cd_ptr++)));
-			b32 = (unsigned long) ((b32 << 6) | s_value (*(cd_ptr++)));
-			b32 = (unsigned long) ((b32 << 6) | s_value (*(cd_ptr++)));
-			b32 = (unsigned long) ((b32 << 6) | s_value (*(cd_ptr++)));
+		{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+			b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+			b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+			b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 
 			*bufptr++ = (unsigned char) ((b32 >> 16)       );
 			*bufptr++ = (unsigned char) ((b32 >>  8) & 0xff);
@@ -278,10 +279,10 @@ static void xml_end (void * user_data, const char * name)
 	bufptr = buffer;
 	length = 0;
 	while (remaining >= 4)
-	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
+	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 
 		*bufptr++ = (unsigned char) ((b32 >> 16)       );
 		*bufptr++ = (unsigned char) ((b32 >>  8) & 0xff);
@@ -291,9 +292,9 @@ static void xml_end (void * user_data, const char * name)
 		length += 3;
 	}
 	if (remaining == 3)
-	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
+	{	b32 =              (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 << 6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 		b32 = (b32 << 6);
 
 		*bufptr++ = (unsigned char) ((b32 >> 16)       );
@@ -303,8 +304,8 @@ static void xml_end (void * user_data, const char * name)
 		length += 2;
 	}
 	if (remaining == 2)
-	{	b32 =               (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
-		b32 = (b32 <<  6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)));
+	{	b32 =               (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
+		b32 = (b32 <<  6) | (unsigned long) ((unsigned) s_value (*(cd_ptr++)) & 0x3F);
 		b32 = (b32 << 12);
 
 		*bufptr++ = (unsigned char) ((b32 >> 16)       );
@@ -321,6 +322,32 @@ static void xml_end (void * user_data, const char * name)
 
 	input_data->cd_bufptr = input_data->cd_buffer;
 	input_data->cd_length = 0;
+}
+
+/* Point each stored record at its data, once the whole document is in the import buffer.
+ * Returns wmf_E_BadFormat if the parse failed or the root element never closed.
+ */
+static wmf_error_t xml_finish (wmfXML_InputData * input_data, int parsed)
+{	wmfAPI * API = input_data->API;
+
+	wmfAttributes * attr = 0;
+
+	unsigned long i;
+
+	if (ERR (API)) return API->err;
+
+	if ((!parsed) || (input_data->wmfxml != 2))
+	{	WMF_ERROR (API, "wmf_wmfxml_import: incomplete or badly formed file");
+		API->err = wmf_E_BadFormat;
+		return API->err;
+	}
+
+	for (i = 0; i < API->store.count; i++)
+	{	attr = API->store.attrlist + i;
+		attr->buffer = input_data->mem_buffer + attr->offset;
+	}
+
+	return API->err;
 }
 
 #ifdef HAVE_EXPAT
@@ -356,6 +383,7 @@ wmf_error_t wmf_wmfxml_import (wmfAPI * API, const char * wmfxml_filename)
 	input_data.mem_max    = 0;
 
 	input_data.wmfxml = 0;
+	input_data.depth  = 0;
 
 	if (ERR (API)) return API->err;
 
@@ -395,13 +423,17 @@ wmf_error_t wmf_wmfxml_import (wmfAPI * API, const char * wmfxml_filename)
 			break;
 		}
 	}
-	if ((status == 0) && (API->err == wmf_E_None)) XML_Parse (parser, buffer, 0, 1);
+	if ((status == 0) && (API->err == wmf_E_None))
+	{	if (XML_Parse (parser, buffer, 0, 1) == 0) status = 1;
+	}
 
 	XML_ParserFree (parser);
 
 	fclose (in);
 
 	if (input_data.cd_buffer) wmf_free (API, input_data.cd_buffer);
+
+	xml_finish (&input_data, status == 0);
 
 	if (ERR (API))
 	{	if (input_data.mem_buffer) wmf_free (API, input_data.mem_buffer);
@@ -426,6 +458,8 @@ wmf_error_t wmf_wmfxml_import (wmfAPI * API, const char * wmfxml_filename)
 
 	wmfXML_InputData input_data;
 
+	int parsed;
+
 	input_data.API = API;
 
 	input_data.cd_buffer = 0;
@@ -441,6 +475,7 @@ wmf_error_t wmf_wmfxml_import (wmfAPI * API, const char * wmfxml_filename)
 	input_data.mem_max    = 0;
 
 	input_data.wmfxml = 0;
+	input_data.depth  = 0;
 
 	if (ERR (API)) return API->err;
 
@@ -462,13 +497,15 @@ wmf_error_t wmf_wmfxml_import (wmfAPI * API, const char * wmfxml_filename)
 	ctxt->sax = &sax;
 	ctxt->userData = (void*) (&input_data);
 
-	xmlParseDocument (ctxt);
+	parsed = (xmlParseDocument (ctxt) == 0) && ctxt->wellFormed;
 
 	ctxt->sax = 0;
 
 	xmlFreeParserCtxt (ctxt);
 
 	if (input_data.cd_buffer) wmf_free (API, input_data.cd_buffer);
+
+	xml_finish (&input_data, parsed);
 
 	if (ERR (API))
 	{	if (input_data.mem_buffer) wmf_free (API, input_data.mem_buffer);

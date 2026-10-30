@@ -457,7 +457,7 @@ do_convert (unsigned char *to, unsigned char *from, const char *code)
   if (j >= BUFSIZ)
     {
       error ("output buffer overflow at do_convert()");
-      ustrcpy (to, from);
+      to[BUFSIZ - 1] = '\0';
     }
   else
     to[j] = '\0';
@@ -554,13 +554,16 @@ do_check_and_conv (unsigned char *to, unsigned char *from)
       if (j >= BUFSIZ)
 	{
 	  error ("output buffer overflow at Hankaku --> Zenkaku");
-	  ustrcpy (to, tmp);
+	  to[BUFSIZ - 1] = '\0';
 	}
       else
 	to[j] = '\0';
     }
   else
-    ustrcpy (to, tmp);
+    {
+      ustrncpy (to, tmp, BUFSIZ);
+      to[BUFSIZ - 1] = '\0';
+    }
 
   return kanji;
 }
@@ -590,10 +593,12 @@ any2eucjp (unsigned char *dest, unsigned char *src, unsigned int dest_max)
   if (strlen ((const char *) tmp_dest) >= dest_max)
     {
       error ("output buffer overflow");
-      ustrcpy (dest, src);
+      ustrncpy (dest, src, dest_max);
+      dest[dest_max - 1] = '\0';
       return -1;
     }
-  ustrcpy (dest, tmp_dest);
+  ustrncpy (dest, tmp_dest, dest_max);
+  dest[dest_max - 1] = '\0';
   return ret;
 }
 

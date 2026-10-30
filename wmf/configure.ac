@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([libwmf], [0.2.12], [])
+AC_INIT([libwmf], [0.2.17], [])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([src/player.c])
@@ -19,13 +19,13 @@ dnl
 #
 WMF_MAJOR_VERSION=0
 WMF_MINOR_VERSION=2
-WMF_MICRO_VERSION=13
+WMF_MICRO_VERSION=17
 
-WMF_INTERFACE_AGE=5
-WMF_BINARY_AGE=6
+WMF_INTERFACE_AGE=0
+WMF_BINARY_AGE=10
 
-WMFLITE_INTERFACE_AGE=6
-WMFLITE_BINARY_AGE=6
+WMFLITE_INTERFACE_AGE=10
+WMFLITE_BINARY_AGE=10
 
 dnl spec file substitutions
 LIBWMF_VERSION=$WMF_MAJOR_VERSION.$WMF_MINOR_VERSION.$WMF_MICRO_VERSION
@@ -125,6 +125,25 @@ AC_MSG_RESULT([$os_win32])
 
 AC_SUBST(SYS_LIBM)
 
+dnl Setup DEF file flags for Windows DLL generation
+libwmflite_la_DEF_LDFLAGS=""
+libwmf_la_DEF_LDFLAGS=""
+AC_MSG_NOTICE([CC is $CC])
+if test "x$os_win32" = "xyes"; then
+    case "$CC" in
+		cl* | *cl.exe)
+			libwmflite_la_DEF_LDFLAGS="/DEF:.libs/wmflite.def"
+			libwmf_la_DEF_LDFLAGS="/DEF:.libs/wmf.def"
+			;;
+		*)
+			libwmflite_la_DEF_LDFLAGS="-Wl,--output-def=.libs/wmflite.def"
+			libwmf_la_DEF_LDFLAGS="-Wl,--output-def=.libs/wmf.def"
+			;;
+	esac
+fi
+AC_SUBST(libwmflite_la_DEF_LDFLAGS)
+AC_SUBST(libwmf_la_DEF_LDFLAGS)
+
 dnl Checks for programs.
 
 AC_PROG_AWK
@@ -145,7 +164,7 @@ PKG_PROG_PKG_CONFIG
 dnl Checks for header files.
 AC_CHECK_HEADERS(time.h)
 AC_CHECK_HEADER(unistd.h,[
-	AC_DEFINE([HAVE_UNISTD_H], [], [Header unistd.h is available])
+	AC_DEFINE([HAVE_UNISTD_H], [1], [Header unistd.h is available])
 	GD_DEFS="$GD_DEFS -DHAVE_UNISTD_H"
 ])
 
@@ -455,28 +474,39 @@ if test $LIBWMF_BUILDSTYLE = heavy; then
 
 dnl WMF_Z_CFLAGS are required later on when testing for png, etc.
 
-AC_CHECK_HEADER(zlib.h,[
-	AC_CHECK_LIB(z,gzputs,[
-		if [ test "x$ZLIB_DIR" != "x" ]; then
-			WMF_Z_CONFIG_CFLAGS="-I$ZLIB_DIR/include"
-			WMF_Z_CFLAGS="-I$ZLIB_DIR/include"
-			WMF_Z_LDFLAGS="-L$ZLIB_DIR/lib -lz"
-		else
-			WMF_Z_LDFLAGS="-lz"
-		fi
-	],[	AC_CHECK_LIB(gz,gzputs,[
-			if [ test "x$ZLIB_DIR" != "x" ]; then
-				WMF_Z_CONFIG_CFLAGS="-I$ZLIB_DIR/include"
-				WMF_Z_CFLAGS="-I$ZLIB_DIR/include"
-				WMF_Z_LDFLAGS="-L$ZLIB_DIR/lib -lgz"
-			else
-				WMF_Z_LDFLAGS="-lgz"
-			fi
-		],[	AC_MSG_ERROR(* * * unable to find libz which is required by libwmf * * *)
-		])
-	])
-],[	AC_MSG_ERROR(* * * unable to find "zlib.h" which is required by libwmf * * *)
+PKG_CHECK_MODULES([ZLIB], [zlib], [
+    WMF_Z_CONFIG_CFLAGS="$ZLIB_CFLAGS"
+    WMF_Z_CFLAGS="$ZLIB_CFLAGS"
+    WMF_Z_LDFLAGS="$ZLIB_LIBS"
+    have_zlib=yes
+], [
+    have_zlib=no
 ])
+
+if test "x$have_zlib" != "xyes"; then
+    AC_CHECK_HEADER(zlib.h,[
+        AC_CHECK_LIB(z,gzputs,[
+            if [ test "x$ZLIB_DIR" != "x" ]; then
+                WMF_Z_CONFIG_CFLAGS="-I$ZLIB_DIR/include"
+                WMF_Z_CFLAGS="-I$ZLIB_DIR/include"
+                WMF_Z_LDFLAGS="-L$ZLIB_DIR/lib -lz"
+            else
+                WMF_Z_LDFLAGS="-lz"
+            fi
+        ],[	AC_CHECK_LIB(gz,gzputs,[
+				if [ test "x$ZLIB_DIR" != "x" ]; then
+					WMF_Z_CONFIG_CFLAGS="-I$ZLIB_DIR/include"
+					WMF_Z_CFLAGS="-I$ZLIB_DIR/include"
+					WMF_Z_LDFLAGS="-L$ZLIB_DIR/lib -lgz"
+				else
+					WMF_Z_LDFLAGS="-lgz"
+				fi
+			],[	AC_MSG_ERROR(* * * unable to find libz which is required by libwmf * * *)
+			])
+		])
+	],[ AC_MSG_ERROR(* * * unable to find "zlib.h" which is required by libwmf * * *)
+	])
+fi
 
 fi # $LIBWMF_BUILDSTYLE = heavy
 
@@ -508,18 +538,28 @@ if test $LIBWMF_BUILDSTYLE = heavy; then
 dnl "png.h" includes "zlib.h"
 CPPFLAGS="$CPPFLAGS $WMF_Z_CFLAGS"
 
-AC_CHECK_HEADER(png.h,[
-	AC_CHECK_LIB(png,png_write_image,[
-		if [ test "x$PNG_DIR" != "x" ]; then
-			WMF_PNG_CFLAGS="-I$PNG_DIR/include"
-			WMF_PNG_LDFLAGS="-L$PNG_DIR/lib -lpng"
-		else
-			WMF_PNG_LDFLAGS="-lpng"
-		fi
-	],[	AC_MSG_ERROR(* * * unable to find libpng which is required by libwmf * * *)
-	],-lz -lm)
-],[	AC_MSG_ERROR(* * * unable to find "png.h" which is required by libwmf * * *)
+PKG_CHECK_MODULES([LIBPNG], [libpng], [
+    WMF_PNG_CFLAGS="$LIBPNG_CFLAGS"
+    WMF_PNG_LDFLAGS="$LIBPNG_LIBS"
+    have_png=yes
+], [
+    have_png=no
 ])
+
+if test "x$have_png" != "xyes"; then
+    AC_CHECK_HEADER(png.h,[
+        AC_CHECK_LIB(png,png_write_image,[
+            if [ test "x$PNG_DIR" != "x" ]; then
+                WMF_PNG_CFLAGS="-I$PNG_DIR/include"
+                WMF_PNG_LDFLAGS="-L$PNG_DIR/lib -lpng"
+            else
+                WMF_PNG_LDFLAGS="-lpng"
+            fi
+        ],[ AC_MSG_ERROR(* * * unable to find libpng which is required by libwmf * * *) 
+        ],-lz $SYS_LIBM)
+    ],[ AC_MSG_ERROR(* * * unable to find "png.h" which is required by libwmf * * *) 
+    ])
+fi
 
 AC_DEFINE([HAVE_LIBPNG], [], [Library libpng is available])
 GD_DEFS="$GD_DEFS -DHAVE_LIBPNG"
@@ -634,13 +674,11 @@ if [ test "$search_for_gd" != "no" ]; then
 
 	CPPFLAGS="$CPPFLAGS $WMF_FT_CFLAGS $WMF_PNG_CFLAGS $WMF_Z_CFLAGS"
 	LDFLAGS="$LDFLAGS $WMF_FT_LDFLAGS $WMF_PNG_LDFLAGS $WMF_Z_LDFLAGS"
-	other_libs="$other_libs -lfreetype -lpng -lz -lm"
+	other_libs="$other_libs -lfreetype -lpng -lz $SYS_LIBM"
 
 	AC_CHECK_HEADER(gd.h,[
-		AC_CHECK_LIB(gd,gdClipSetAdd,[
-			AC_CHECK_LIB(gd,gdft_draw_bitmap,[
-				libwmf_gd="sys"
-			],,$other_libs)
+		AC_CHECK_LIB(gd,gdImageSetClip,[
+			libwmf_gd="sys"
 		],,$other_libs)
 	])
 fi
@@ -648,6 +686,9 @@ fi
 if [ test "x$libwmf_gd" != "xnone" ]; then
 	AC_DEFINE([HAVE_GD], [1], [Library gd is available])
 	build_gd_layer=yes
+	if [ test "x$libwmf_gd" = "xsys" ]; then
+		AC_DEFINE([HAVE_SYS_GD], [1], [Build against system libgd])
+	fi
 else
 	build_gd_layer=no
 fi
@@ -731,7 +772,16 @@ GDK_PIXBUF_CFLAGS=""
 GDK_PIXBUF_LIBS=""
 GDK_PIXBUF_DIR=""
 
-if test $LIBWMF_BUILDSTYLE != lite; then
+AC_ARG_ENABLE(pixbuf,[  --disable-pixbuf        don't build gdk-pixbuf plugin],[
+	if [ test "x$enableval" = "xno" ]; then
+		search_for_pixbuf=no
+	else
+		search_for_pixbuf=yes
+	fi
+],[	search_for_pixbuf=yes
+])
+
+if test $LIBWMF_BUILDSTYLE != lite -a $search_for_pixbuf != no; then
 	PKG_CHECK_MODULES(GDK_PIXBUF,gdk-pixbuf-2.0 >= 2.1.2,[
 		GDK_PIXBUF_VERSION=`$PKG_CONFIG --variable=gdk_pixbuf_binary_version gdk-pixbuf-2.0`
 		GDK_PIXBUF_DIR="gdk-pixbuf-2.0/$GDK_PIXBUF_VERSION/loaders"
@@ -837,8 +887,11 @@ AC_SUBST([AM_CFLAGS])
 WMF_CONFIG_CFLAGS="$WMF_FT_CONFIG_CFLAGS $WMF_Z_CONFIG_CFLAGS $WMF_X_CONFIG_CFLAGS"
 AC_SUBST([WMF_CONFIG_CFLAGS])
 
-AM_LDFLAGS="$AM_LDFLAGS $WMF_PLOT_LDFLAGS $WMF_GD_LDFLAGS $WMF_FT_LDFLAGS $WMF_X_LDFLAGS $WMF_XML_LIBS"
-AM_LDFLAGS="$AM_LDFLAGS $WMF_JPEG_LDFLAGS $WMF_PNG_LDFLAGS $WMF_Z_LDFLAGS $SYS_LIBM"
+WMF_DEP_LIBS="$WMF_PLOT_LDFLAGS $WMF_GD_LDFLAGS $WMF_FT_LDFLAGS $WMF_X_LDFLAGS $WMF_XML_LIBS"
+WMF_DEP_LIBS="$WMF_DEP_LIBS $WMF_JPEG_LDFLAGS $WMF_PNG_LDFLAGS $WMF_Z_LDFLAGS $SYS_LIBM"
+AC_SUBST([WMF_DEP_LIBS])
+
+AM_LDFLAGS="$AM_LDFLAGS $WMF_DEP_LIBS"
 AC_SUBST([AM_LDFLAGS])
 
 AC_SUBST(WMF_FONTDIR)
@@ -863,6 +916,7 @@ src/extra/trio/Makefile
 src/extra/gd/Makefile
 src/ipa/Makefile
 src/convert/Makefile
+tests/Makefile
 libwmf.pc
 libwmf.spec
 ])

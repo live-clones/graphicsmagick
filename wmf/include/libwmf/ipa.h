@@ -22,6 +22,16 @@
 #ifndef LIBWMF_IPA_H
 #define LIBWMF_IPA_H
 
+#ifdef _WIN32
+  #ifdef LIBWMF_EXPORTS
+    #define LIBWMF_EXPORT __declspec(dllexport)
+  #else
+    #define LIBWMF_EXPORT __declspec(dllimport)
+  #endif
+#else
+  #define LIBWMF_EXPORT
+#endif
+
 #include <libwmf/types.h>
 
 #ifdef __cplusplus
@@ -74,11 +84,11 @@ extern int    wmf_ipa_bmp_color (wmfAPI*,wmfBMP*,wmfRGB*,unsigned int,unsigned i
 extern void   wmf_ipa_bmp_setcolor (wmfAPI*,wmfBMP*,wmfRGB*,unsigned char,unsigned int,unsigned int);
 extern int    wmf_ipa_bmp_interpolate (wmfAPI*,wmfBMP*,wmfRGB*,float,float);
 
-extern void          wmf_ipa_color_init (wmfAPI*);
-extern void          wmf_ipa_color_add (wmfAPI*,wmfRGB*);
-extern unsigned long wmf_ipa_color_index (wmfAPI*,wmfRGB*);
-extern unsigned long wmf_ipa_color_count (wmfAPI*);
-extern wmfRGB*       wmf_ipa_color (wmfAPI*,unsigned long);
+extern LIBWMF_EXPORT void          wmf_ipa_color_init (wmfAPI*);
+extern LIBWMF_EXPORT void          wmf_ipa_color_add (wmfAPI*,wmfRGB*);
+extern LIBWMF_EXPORT unsigned long wmf_ipa_color_index (wmfAPI*,wmfRGB*);
+extern LIBWMF_EXPORT unsigned long wmf_ipa_color_count (wmfAPI*);
+extern LIBWMF_EXPORT wmfRGB*       wmf_ipa_color (wmfAPI*,unsigned long);
 
 extern char*        wmf_ipa_page_format (wmfAPI*,wmf_page_t);
 extern unsigned int wmf_ipa_page_width  (wmfAPI*,wmf_page_t);
@@ -86,9 +96,9 @@ extern unsigned int wmf_ipa_page_height (wmfAPI*,wmf_page_t);
 
 /* Other useful functions
  */
-extern wmfRGB wmf_rgb_white (void);
-extern wmfRGB wmf_rgb_black (void);
-extern wmfRGB wmf_rgb_color (wmfAPI*,float,float,float);
+extern LIBWMF_EXPORT wmfRGB wmf_rgb_white (void);
+extern LIBWMF_EXPORT wmfRGB wmf_rgb_black (void);
+extern LIBWMF_EXPORT wmfRGB wmf_rgb_color (wmfAPI*,float,float,float);
 
 /* Structure definitions
  */

@@ -27,9 +27,15 @@
 
 extern int gdImageBoundsSafe (gdImage*,int,int);
 
-extern void gdClipSetFree (gdImage*);
+#ifdef HAVE_SYS_GD
+static void wmf_gd_clip_reset (gdImage* image)
+{	gdImageSetClip (image,0,0,gdImageSX (image) - 1,gdImageSY (image) - 1);
+}
+#else
 extern void gdClipSetReset (gdImage*);
 extern void gdClipSetAdd (gdImage*,gdClipRectangle*);
+#define wmf_gd_clip_reset gdClipSetReset
+#endif
 
 typedef enum
 {	gd_arc_ellipse = 0,
@@ -57,6 +63,8 @@ static int setlinestyle (wmfAPI*,wmfDC*);
 
 struct _gd_t
 {	gdImagePtr image;
+
+	int* flat_pixels; /* sys-gd flatten cache for wmf_gd_get_image_pixels */
 
 	int white;
 

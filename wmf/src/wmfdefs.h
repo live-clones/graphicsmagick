@@ -42,7 +42,7 @@
 #define API_FILE_OPEN          (1<<22)
 
 #define API_ENABLE_EDITING     (1<<30)
-#define API_STANDARD_INTERFACE (1<<31)
+#define API_STANDARD_INTERFACE (1U<<31)
 
 /* API-independent defs & macros *only*
  */
@@ -90,5 +90,9 @@
 
 #define ERR(API)  ((API)->err != wmf_E_None)
 #define DIAG(API) ((API)->flags & WMF_OPT_DIAGNOSTICS)
+
+/* Returns 0 if 'requested' more bytes can be read from the current input
+ * position, otherwise -1 with API->err set. Position is preserved. */
+extern int wmf_can_supply (wmfAPI* API, long requested);
 
 #endif /* ! WMFDEFS_H */
