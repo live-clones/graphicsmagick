@@ -931,7 +931,8 @@ be found:
 
  * wmf
 
-   libwmf 0.2.13+ (up to commit ec63c9b as of January 14, 2025).
+   libwmf 0.2.17+ (up to git commit
+   d66567b90190eb3e326426f5a5113cfe3f40fc37 as of October 20, 2026).
 
    This is necessary to parse and read 16-bit Windows Meta Files (WMF)
    files.
