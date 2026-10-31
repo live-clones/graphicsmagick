@@ -1,6 +1,7 @@
 #ECF - this file contains additional configuration info.
 DEFINE = HAVE_CONFIG_H
 DEFINE = _CRT_SECURE_NO_WARNINGS
+DEFINE = LIBWMF_EXPORTS
 
 # src
 EXCLUDE = io-wmf.c

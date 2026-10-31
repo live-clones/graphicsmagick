@@ -1,3 +1,9 @@
+2026-10-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * wmf/include/libwmf/api.h: Restore removing function declaration
+        for wmf_ztream_create() because Visual Studio does not like use of
+        the 'gzFile' typedef for unknown reasons.
+
 2026-10-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * www/INSTALL-windows.rst: Update libwmf to

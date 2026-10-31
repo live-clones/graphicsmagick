@@ -115,7 +115,9 @@ extern LIBWMF_EXPORT wmf_error_t wmf_mem_close (wmfAPI*);
 /**
  * Creates compressed character output file stream
  */
+#if 0 /* FIXME: wmf\include\libwmf\api.h(109,46): error C2081: 'gzFile': name in formal parameter list illegal */
 extern wmfStream* wmf_ztream_create (wmfAPI*,gzFile);
+#endif
 
 /**
  * Creates uncompressed character output file or memory stream
