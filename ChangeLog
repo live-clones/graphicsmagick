@@ -3,6 +3,8 @@
         * wmf/include/libwmf/api.h: Restore removing function declaration
         for wmf_ztream_create() because Visual Studio does not like use of
         the 'gzFile' typedef for unknown reasons.
+        * VisualMagick/wmf: Change from STATICLIB.txt to LIBRARY.txt to
+        build libwmf DLL rather than a static library.
 
 2026-10-30  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
