@@ -74,11 +74,11 @@
 #if defined(HasPNG)
 
 /* Suppress libpng pedantic warnings */
-#define PNG_DEPRECATED  /* Use of this function is deprecated */
-#define PNG_USE_RESULT  /* The result of this function must be checked */
-#define PNG_NORETURN    /* This function does not return */
-/* #define PNG_ALLOCATED */ /* The result of the function is new memory */
-#define PNG_DEPSTRUCT   /* access to this struct member is deprecated */
+/* #define PNG_DEPRECATED */  /* Use of this function is deprecated */
+/* #define PNG_USE_RESULT */  /* The result of this function must be checked */
+/* #define PNG_NORETURN */    /* This function does not return */
+/* #define PNG_ALLOCATED */   /* The result of the function is new memory */
+/* #define PNG_DEPSTRUCT */   /* access to this struct member is deprecated */
 
 #include "png.h"
 #include "zlib.h"
