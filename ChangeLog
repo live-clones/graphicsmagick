@@ -1,3 +1,11 @@
+2026-11-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/blob.c (ReadBlob): It is said that BZ2_bzread() does not
+        reject new reads if there has already been an error on the stream.
+        Return an error if BZ2_bzread() already reported an error. Similar
+        to fixes for ImageMagick CVE-2026-116149. Many thanks to Petr
+        Gajdos for bringing this to my attention.
+
 2026-10-31  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * wmf/include/libwmf/api.h: Restore removing function declaration

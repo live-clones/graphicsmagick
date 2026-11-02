@@ -134,7 +134,7 @@ other popular software:
 
   * GM participates in Google's `oss-fuzz`_ project since 2018 (see `oss-fuzz open issues`_).
 
-  * GM's Google `oss-fuzz`_ historical metrics are much better (e.g. 9/925 vs 62/2597 open).
+  * GM's Google `oss-fuzz`_ historical metrics are much better (e.g. 9/923 vs 56/2334 open).
 
   * GM `valgrind`_'s 100% clean (memcheck and helgrind).
 

@@ -38,6 +38,16 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
+<p>2026-11-02  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<blockquote>
+<ul class="simple">
+<li><p>magick/blob.c (ReadBlob): It is said that BZ2_bzread() does not
+reject new reads if there has already been an error on the stream.
+Return an error if BZ2_bzread() already reported an error. Similar
+to fixes for ImageMagick CVE-2026-116149. Many thanks to Petr
+Gajdos for bringing this to my attention.</p></li>
+</ul>
+</blockquote>
 <p>2026-10-31  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">

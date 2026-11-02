@@ -3448,6 +3448,8 @@ MagickExport size_t ReadBlob(Image *image,const size_t req_length,void *data)
         int
           bz_count = 0;
 
+        if (blob->status != 0)
+          break;
         for (i=0; i < length; i+=bz_count)
           {
             size_t
