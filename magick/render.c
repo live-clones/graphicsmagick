@@ -2098,6 +2098,7 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
       return(MagickFail);
     }
   dash_polygon[0]=primitive_info[0];
+  PRIMINF_SET_IS_CLOSED_SUBPATH(&dash_polygon[0],0);
   scale=ExpandAffine(&draw_info->affine);
   length=scale*draw_info->dash_pattern[0];
   offset=fabs(draw_info->dash_offset) >= MagickEpsilon ?
@@ -2134,6 +2135,8 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
       dx=primitive_info[i].point.x-primitive_info[i-1].point.x;
       dy=primitive_info[i].point.y-primitive_info[i-1].point.y;
       maximum_length=hypot(dx,dy);
+      if (maximum_length < MagickEpsilon)
+        continue;
       if (maximum_length > (double) (MaxPolygonCoordinates >> 2))
         continue;
 
@@ -2162,12 +2165,13 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
             n=0;
           length=scale*draw_info->dash_pattern[n];
         }  /* oss-fuzz 10614 maximum_length = 2120554, length = 0.5 yields 4,241,108 iterations*/
-      for (total_length=0.0; (length >= 0.0) && (maximum_length >= (length+total_length)); )
+      for (total_length=0.0; (length >= MagickEpsilon) && (maximum_length >= (length+total_length)); )
         {
           total_length+=length;
           if (n & 0x01)
             {
               dash_polygon[0]=primitive_info[0];
+              PRIMINF_SET_IS_CLOSED_SUBPATH(&dash_polygon[0],0);
               dash_polygon[0].point.x=primitive_info[i-1].point.x+
                 dx*total_length/maximum_length;
               dash_polygon[0].point.y=primitive_info[i-1].point.y+
@@ -2179,6 +2183,7 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
               if (j+1 > number_vertices)
                 break;
               dash_polygon[j]=primitive_info[i-1];
+              PRIMINF_SET_IS_CLOSED_SUBPATH(&dash_polygon[j],0);
               dash_polygon[j].point.x=primitive_info[i-1].point.x+
                 dx*total_length/maximum_length;
               dash_polygon[j].point.y=primitive_info[i-1].point.y+
@@ -2208,6 +2213,7 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
       ((n & 0x01) == 0) && (j > 1))
     {
       dash_polygon[j]=primitive_info[i-1];
+      PRIMINF_SET_IS_CLOSED_SUBPATH(&dash_polygon[j],0);
       dash_polygon[j].point.x+=MagickEpsilon;
       dash_polygon[j].point.y+=MagickEpsilon;
       dash_polygon[j].coordinates=1;
@@ -4213,7 +4219,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                           {
                             (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                           }
-                        if (graphic_context[n]->dash_pattern[j] < 0.0)
+                        if (graphic_context[n]->dash_pattern[j] <= 0.0)
                           {
                             (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
                             status=MagickFail;
@@ -4224,7 +4230,7 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                         MagickFreeMemory(graphic_context[n]->dash_pattern);
                         break;
                       }
-                    if (x & 0x01)
+                    if (((x & 0x01) != 0) && (j == x))
                       for ( ; j < (2*x); j++)
                         graphic_context[n]->dash_pattern[j]=
                           graphic_context[n]->dash_pattern[j-x];

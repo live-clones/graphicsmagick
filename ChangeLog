@@ -1,3 +1,15 @@
+2026-11-03  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawImage): Detect and reject non-positive dash
+        array values. Prevents 0.0 or negative values in stroke-dasharray
+        from being accepted into the graphics context.
+        (DrawImage): Guard the odd dash pattern duplication loop.
+        (DrawDashPolygon): Explicitly clear closed_subpath on all dash
+        segments. Prevents dashes of circles, ellipses, and closed paths
+        from falsely inheriting the closed-subpath flag, eliminating
+        render defects and degenerate closing lines. Check maximum_length
+        to avoid division-by-zero (NaN) on coincident path vertices.
+
 2026-11-02  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/blob.c (ReadBlob): It is said that BZ2_bzread() does not
