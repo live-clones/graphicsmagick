@@ -475,7 +475,7 @@ extern size_t strlcpy(char *dst, const char *src, size_t dstsize);
 #if defined(HasLTDL)
 #  define SupportMagickModules
 #elif !defined(__MINGW32__) && !defined(__MINGW64__)
-#  if defined(MSWINDOWS) && defined(_DLL)
+#  if defined(MSWINDOWS) && defined(_DLL) && defined(_VISUALC_)
 #    define SupportMagickModules
 #  endif
 #endif

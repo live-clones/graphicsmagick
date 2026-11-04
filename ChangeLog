@@ -1,5 +1,11 @@
 2026-11-04  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/studio.h: Constrain 'SupportMagickModules' pre-processor
+        checks intended for the VisualStudio build by only applying them
+        when _VISUALC_ is defined.  Addresses SourceForge issue "#782
+        configure + MSVC /MD build registers no coders: studio.h enables
+        SupportMagickModules for any `_DLL` build".
+
         * configure.ac: Address SourceForge issue #781 "configure ignores
         pkg-config's PNG library name when it is `-llibpng16` (MSVC builds
         of libpng)".
