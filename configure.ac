@@ -2226,7 +2226,7 @@ if test "$have_zlib" = 'yes' -a "$with_png" = 'yes' ; then
        for png_libs_arg in $PNG_LIBS ; do
          printf "Testing png_libs_arg ${png_libs_arg}\n"
          case $png_libs_arg in
-           -lpng*)
+           -lpng*|-llibpng*)
              pnglibs=$png_libs_arg
              printf "Assigning pnglibs=${pnglibs}\n"
              break 1
