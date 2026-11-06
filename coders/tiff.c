@@ -6723,7 +6723,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
             }
             break;
           }
-#endif /* defined(COMPRESSION_WEBP) */
+#endif /* defined(COMPRESSION_LERC) */
         default:
           {
             break;
