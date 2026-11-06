@@ -875,21 +875,21 @@ space, then the change-image pixel intensities are used.
 
 <abs>the type of image compression</abs>
 <pp>
-Choices are: <i>None</i>, <i>BZip</i>, <i>Fax</i>,
-<i>Group3</i>, <i>Group4</i>,
-<i>JPEG</i>, <i>Lossless</i>,
-<i>LZW</i>, <i>RLE</i>, <i>Zip</i>, <i>LZMA</i>, <i>JPEG2000</i>,
-<i>JPEG2000</i>, <i>JBIG</i>, <i>JBIG2</i>, <i>WebP</i>, or <i>ZSTD</i>.
+Choices are: <i>None</i>, <i>BZip</i>, <i>Fax</i>, <i>Group3</i>,
+<i>Group4</i>, <i>JBIG2</i>, <i>JBIG</i>, <i>JPEG2000</i>,
+<i>JPEG</i>, <i>LERC</i>, <i>LZMA</i>, <i>LZW</i>,
+<i>LosslessJPEG</i>, <i>RLE</i>, <i>WebP</i>, <i>ZSTD</i>, <i>Zip</i>
 </pp>
 
 <pp>
-Specify <s>+compress</s> to store the binary image in an uncompressed format.
-The default is the compression type of the specified image file.</pp>
+Specify <s>+compress</s> or <s>-compress None</s> to store the binary
+image in an uncompressed format.  The default is the compression type
+of the specified image file.</pp>
 
 <pp>
-<i>"Lossless"</i> refers to lossless JPEG, which is only available if
-the JPEG library has been patched to support it. Use of lossless JPEG is
-generally not recommended.</pp>
+<i>Lossless</i> or <i>LosslessJPEG</i> refers to lossless JPEG,
+which is only available if the JPEG library has been patched to
+support it. Use of lossless JPEG is generally not recommended.</pp>
 
 <pp>
 Use the <s>-quality</s> option to set the compression level to be used

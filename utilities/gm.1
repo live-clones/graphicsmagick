@@ -1,4 +1,4 @@
-.TH gm 1 "2026/10/11" "GraphicsMagick"
+.TH gm 1 "2026/11/06" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -1052,19 +1052,19 @@ space, then the change-image pixel intensities are used.
 .B "-compress \fI<type>"\fP
 \fRthe type of image compression
 
-Choices are: \fINone\fP, \fIBZip\fP, \fIFax\fP,
-\fIGroup3\fP, \fIGroup4\fP,
-\fIJPEG\fP, \fILossless\fP,
-\fILZW\fP, \fIRLE\fP, \fIZip\fP, \fILZMA\fP, \fIJPEG2000\fP,
-\fIJPEG2000\fP, \fIJBIG\fP, \fIJBIG2\fP, \fIWebP\fP, or \fIZSTD\fP.
+Choices are: \fINone\fP, \fIBZip\fP, \fIFax\fP, \fIGroup3\fP,
+\fIGroup4\fP, \fIJBIG2\fP, \fIJBIG\fP, \fIJPEG2000\fP,
+\fIJPEG\fP, \fILERC\fP, \fILZMA\fP, \fILZW\fP,
+\fILosslessJPEG\fP, \fIRLE\fP, \fIWebP\fP, \fIZSTD\fP, \fIZip\fP
 
 
-Specify \fB+compress\fP to store the binary image in an uncompressed format.
-The default is the compression type of the specified image file.
+Specify \fB+compress\fP or \fB-compress None\fP to store the binary
+image in an uncompressed format.  The default is the compression type
+of the specified image file.
 
-\fI"Lossless"\fP refers to lossless JPEG, which is only available if
-the JPEG library has been patched to support it. Use of lossless JPEG is
-generally not recommended.
+\fILossless\fP or \fILosslessJPEG\fP refers to lossless JPEG,
+which is only available if the JPEG library has been patched to
+support it. Use of lossless JPEG is generally not recommended.
 
 Use the \fB-quality\fP option to set the compression level to be used
 by the JPEG, JPEG-2000, PNG, MIFF, MPEG, and TIFF encoders. Use the

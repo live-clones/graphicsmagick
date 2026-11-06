@@ -1275,19 +1275,19 @@ width=15><b><font face="Helvetica, Arial"
 </font></font></font></b></td></tr></table>
 <table width="90%" border="0" cellspacing="0"              cellpadding="8">              <tr><td width="6%"><br></td><td>the type of image compression</td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
-Choices are: <em>None</em>, <em>BZip</em>, <em>Fax</em>,
-<em>Group3</em>, <em>Group4</em>,
-<em>JPEG</em>, <em>Lossless</em>,
-<em>LZW</em>, <em>RLE</em>, <em>Zip</em>, <em>LZMA</em>, <em>JPEG2000</em>,
-<em>JPEG2000</em>, <em>JBIG</em>, <em>JBIG2</em>, <em>WebP</em>, or <em>ZSTD</em>.
+Choices are: <em>None</em>, <em>BZip</em>, <em>Fax</em>, <em>Group3</em>,
+<em>Group4</em>, <em>JBIG2</em>, <em>JBIG</em>, <em>JPEG2000</em>,
+<em>JPEG</em>, <em>LERC</em>, <em>LZMA</em>, <em>LZW</em>,
+<em>LosslessJPEG</em>, <em>RLE</em>, <em>WebP</em>, <em>ZSTD</em>, <em>Zip</em>
 </font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
-Specify <strong>+compress</strong> to store the binary image in an uncompressed format.
-The default is the compression type of the specified image file.</font></td></tr></table>
+Specify <strong>+compress</strong> or <strong>-compress None</strong> to store the binary
+image in an uncompressed format.  The default is the compression type
+of the specified image file.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
-<em>"Lossless"</em> refers to lossless JPEG, which is only available if
-the JPEG library has been patched to support it. Use of lossless JPEG is
-generally not recommended.</font></td></tr></table>
+<em>Lossless</em> or <em>LosslessJPEG</em> refers to lossless JPEG,
+which is only available if the JPEG library has been patched to
+support it. Use of lossless JPEG is generally not recommended.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 Use the <strong>-quality</strong> option to set the compression level to be used
 by the JPEG, JPEG-2000, PNG, MIFF, MPEG, and TIFF encoders. Use the
