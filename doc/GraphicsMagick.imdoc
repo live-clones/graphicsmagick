@@ -198,8 +198,9 @@ composites images (blends or merges images together) to create new images.</p>
 <format type=html>
 <a href="conjure.html"><s>conjure</s></a>
 </format>
-interprets and executes scripts in
-the Magick Scripting Language (MSL).</p>
+interprets and executes scripts in the Magick Scripting Language
+(MSL). MSL is an XML-based scripting language used to execute
+sequences of image processing commands.</p>
 
 <p>
 <format type=man,tex>

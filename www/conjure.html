@@ -92,10 +92,26 @@ color="#00B04F"><font size="+1">
 <table width="94%" border="0" cellspacing="0" cellpadding="8">
 <tr><td width="3%"><br></td><td>
 <p>
+The Magick scripting language (MSL) is an XML-based scripting language
+used to execute sequences of image processing commands.
+<br>&nbsp;<br>
+<p>
 The Magick scripting language (MSL) will primarily benefit those that
 want to accomplish custom image processing tasks but do not wish to
 program, or those that do not have access to a Perl interpreter or a
-compiler.  The interpreter is called conjure and here is an example
+compiler.
+<br>&nbsp;<br>
+<p>
+WARNING: MSL scripts can request to read from or write to arbitrary
+locations on the server, or trigger specific coders. Without access
+controls, MSL scripts are able to read files which are expected to be
+private, and render into an image which might be viewed by others.
+MSL scripts are able to overwrite files which are important to the
+user.  MSL scripts are able to open URLs, including to internal
+private servers, resulting in possible Server-Side Request Forgery
+(SSRF).
+<br>&nbsp;<br>
+<p>The interpreter is called conjure and here is an example
 script:
 <pre>
     &lt;?xml version="1.0" encoding="UTF-8"?&gt;

@@ -1,3 +1,8 @@
+2026-11-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * doc/conjure.imdoc: Add a warning about security issues related
+        to 'conjure' and MSL.
+
 2026-11-06  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * doc/options.imdoc: Tidy and clarify -compress options.
