@@ -21,7 +21,7 @@ GraphicsMagick Mercurial
 
 .. _Mercurial : https://www.mercurial-scm.org/
 .. _TortoiseHg : https://tortoisehg.bitbucket.io/
-.. _`GraphicsMagick repository at SourceForge` : http://hg.code.sf.net/p/graphicsmagick/code/
+.. _`GraphicsMagick repository at SourceForge` : https://hg.code.sf.net/p/graphicsmagick/code/
 .. _`GraphicsMagick repository at Heptapod` : https://foss.heptapod.net/graphicsmagick/graphicsmagick
 
 .. contents::

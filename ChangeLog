@@ -1,3 +1,9 @@
+2026-11-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawAffineImage): Address oss-fuzz 583458493
+        "graphicsmagick:coder_SVGZ_fuzzer: Integer-overflow in
+        DrawAffineImage".
+
 2026-11-07  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * doc/conjure.imdoc: Add a warning about security issues related

@@ -148,7 +148,6 @@ static const char jasper_enc_options[][11] =
     "tilewidth",
     "vcausal"
   };
-
 static const char jasper_dec_options[][12] =
   {
     "allow_trunc",

@@ -1239,13 +1239,13 @@ DestroyPolygonInfo(void *polygon_info_void)
 
 static SegmentInfo
 AffineEdge(const Image *image,const AffineMatrix *affine,
-           const long y,const SegmentInfo *edge)
+           const double y,const SegmentInfo *edge)
 {
   double
     intercept,
     z;
 
-  register long
+  double
     x;
 
   SegmentInfo
@@ -1258,32 +1258,32 @@ AffineEdge(const Image *image,const AffineMatrix *affine,
   inverse_edge.y1=0;
   inverse_edge.x2=edge->x2;
   inverse_edge.y2=0;
-  z=affine->ry*(y+0.5)+affine->tx;
-  if (affine->sx > MagickEpsilon)
+  z=affine->ry*y+affine->tx;
+  if (affine->sx >= MagickEpsilon)
     {
       intercept=(-z/affine->sx);
-      x=MagickDoubleToLong(ceil(intercept+MagickEpsilon-0.5)); /* FIXME: validate */
+      x=intercept;
       if (x > inverse_edge.x1)
         inverse_edge.x1=x;
-      intercept=(-z+image->columns)/affine->sx;
-      x=MagickDoubleToLong(ceil(intercept-MagickEpsilon-0.5)); /* FIXME: validate */
+      intercept=(-z+(double) image->columns)/affine->sx;
+      x=intercept;
       if (x < inverse_edge.x2)
         inverse_edge.x2=x;
     }
   else
     if (affine->sx < -MagickEpsilon)
       {
-        intercept=(-z+image->columns)/affine->sx;
-        x=MagickDoubleToLong(ceil(intercept+MagickEpsilon-0.5)); /* FIXME: validate */
+        intercept=(-z+(double) image->columns)/affine->sx;
+        x=intercept;
         if (x > inverse_edge.x1)
           inverse_edge.x1=x;
         intercept=(-z/affine->sx);
-        x=MagickDoubleToLong(ceil(intercept-MagickEpsilon-0.5)); /* FIXME: validate */
+        x=intercept;
         if (x < inverse_edge.x2)
           inverse_edge.x2=x;
       }
     else
-      if ((z < 0.0) || (z >= image->columns))
+      if ((z < 0.0) || ((size_t) floor(z+0.5) >= image->columns))
         {
           inverse_edge.x2=edge->x1;
           return(inverse_edge);
@@ -1291,32 +1291,32 @@ AffineEdge(const Image *image,const AffineMatrix *affine,
   /*
     Determine top and bottom edges.
   */
-  z=affine->sy*(y+0.5)+affine->ty;
-  if (affine->rx > MagickEpsilon)
+  z=affine->sy*y+affine->ty;
+  if (affine->rx >= MagickEpsilon)
     {
       intercept=(-z /affine->rx);
-      x=MagickDoubleToLong(ceil(intercept+MagickEpsilon-0.5)); /* FIXME: validate */
+      x=intercept;
       if (x > inverse_edge.x1)
         inverse_edge.x1=x;
-      intercept=(-z+image->rows)/affine->rx;
-      x=MagickDoubleToLong(ceil(intercept-MagickEpsilon-0.5)); /* FIXME: validate */
+      intercept=(-z+(double) image->rows)/affine->rx;
+      x=intercept;
       if (x < inverse_edge.x2)
         inverse_edge.x2=x;
     }
   else
     if (affine->rx < -MagickEpsilon)
       {
-        intercept=(-z+image->rows)/affine->rx;
-        x=MagickDoubleToLong(ceil(intercept+MagickEpsilon-0.5)); /* FIXME: validate */
+        intercept=(-z+(double) image->rows)/affine->rx;
+        x=intercept;
         if (x > inverse_edge.x1)
           inverse_edge.x1=x;
         intercept=(-z/affine->rx);
-        x=MagickDoubleToLong(ceil(intercept-MagickEpsilon-0.5)); /* FIXME: validate */
+        x=intercept;
         if (x < inverse_edge.x2)
           inverse_edge.x2=x;
       }
     else
-      if ((z < 0) || (z >= image->rows))
+      if ((z < 0) || ((size_t) floor(z+0.5) >= image->rows))
         {
           inverse_edge.x2=edge->x1;
           return(inverse_edge);
@@ -1448,10 +1448,10 @@ DrawAffineImage(Image *image,const Image *composite,
   status &= InverseAffineMatrix(affine,&inverse_affine,&image->exception);
   if (status == MagickFail)
     return status;
-  if (edge.y1 < 0)
+  if (edge.y1 < 0.0)
     edge.y1=0.0;
-  if (edge.y2 > image->rows - 1)
-    edge.y2=image->rows-1;
+  if (edge.y2 > ((double) image->rows-1.0))
+    edge.y2=(double) image->rows-1.0;
   y_min=(long) ceil(edge.y1-0.5);
   y_max=(long) floor(edge.y2+0.5);
 
@@ -1487,14 +1487,14 @@ DrawAffineImage(Image *image,const Image *composite,
         continue;
 
       inverse_edge=AffineEdge(composite,&inverse_affine,y,&edge);
-      if (inverse_edge.x2 < inverse_edge.x1)
+      if ((inverse_edge.x2 < inverse_edge.x1) || (inverse_edge.x1 > (double) LONG_MAX))
         continue;
-      if (inverse_edge.x1 < 0)
+      if (inverse_edge.x1 < 0.0)
         inverse_edge.x1=0.0;
-      if (inverse_edge.x2 > image->columns-1)
-        inverse_edge.x2=image->columns-1;
-      start=(long) ceil(inverse_edge.x1-0.5);
-      stop=(long) floor(inverse_edge.x2+0.5);
+      if (inverse_edge.x2 > ((double) image->columns-1.0))
+        inverse_edge.x2=(double) image->columns-1.0;
+      start=MagickDoubleToLong(ceil(inverse_edge.x1-0.5));
+      stop=MagickDoubleToLong(floor(inverse_edge.x2+0.5));
       if (stop >= start)
         x=start;
       else
