@@ -1,5 +1,8 @@
 2026-11-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/svg.c (ReadSVGImage): Report error if xmlParseChunk()
+        fails. Suggested by Petr Gajdos.
+
         * magick/render.c (DrawDashPolygon): Improve maximum length
         restriction logic. Much thanks to Petr Gajdos and Google's Gemini
         for the proposed fix.  Addresses oss-fuzz 557991883

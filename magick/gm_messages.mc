@@ -725,6 +725,12 @@ WebP failed: invalid parameter
 .
 
 MessageId       = +1
+SymbolicName    = CoderErrorXMLParserFailure
+Language        = English
+XML parser failure
+.
+
+MessageId       = +1
 SymbolicName    = CoderErrorZipCompressionNotSupported
 Language        = English
 ZIP compression is not supported

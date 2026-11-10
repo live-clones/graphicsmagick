@@ -381,6 +381,9 @@
       <Message name="JXLEncoderAPIFailure">
         JXL encoder API failure
       </Message>
+      <Message name="XMLParserFailure">
+        XML parser failure
+      </Message>
     </Error>
     <FatalError>
       <Message name="Default">

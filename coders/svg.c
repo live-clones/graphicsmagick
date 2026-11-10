@@ -3740,7 +3740,13 @@ ReadSVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
           /* fprintf(stderr,"SVG: %s\n", message); */
           status=xmlParseChunk(parser,message,(int) n,False);
           if (status != 0)
-            break;
+            {
+              (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                    "  xmlParseChunk returned error status %d",
+                                    status);
+              ThrowException(svg_info.exception,CoderError,XMLParserFailure,image->filename);
+              break;
+            }
           /*
             The following should not be needed since SVGError invokes
             xmlStopParser() which should stop the parser by causing
