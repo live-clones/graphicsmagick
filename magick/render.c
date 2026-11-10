@@ -2143,16 +2143,19 @@ DrawDashPolygon(const DrawInfo *draw_info,const PrimitiveInfo *primitive_info,
       /*
         Apply an arbitrary limit on maximum length in order to avoid
         seemingly unending iterations due to affine and other factors
-        (e.g. oss-fuzz 10614 & 24236).
+        (e.g. oss-fuzz 10614, 24236, 455298154).
 
         FIXME: It is TBD if the arbitrary limit factors used have any
         basis in reality!  Please report if this limit causes issues
         with valid files.
       */
-      if (maximum_length > maximum_length_limit)
+      if ((maximum_length > maximum_length_limit) ||
+          ((length > 0.0) && (maximum_length > (length * maximum_length_limit))))
         {
           char message[MaxTextExtent];
-          MagickFormatString(message,sizeof(message),"Maximum length: %g, Scale: %g", maximum_length, scale);
+          MagickFormatString(message,sizeof(message),
+                             "Maximum length: %g, Length: %g, Scale: %g",
+                             maximum_length, length, scale);
           ThrowException(&image->exception,DrawError,UnreasonableDashPolygonLength,message);
           status=MagickFail;
           goto draw_dash_polygon_fail;

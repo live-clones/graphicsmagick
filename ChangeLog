@@ -1,3 +1,12 @@
+2026-11-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawDashPolygon): Improve maximum length
+        restriction logic. Much thanks to Petr Gajdos and Google's Gemini
+        for the proposed fix.  Addresses oss-fuzz 557991883
+        "graphicsmagick:coder_WMF_fuzzer: Timeout in coder_WMF_fuzzer" and
+        455298154 "graphicsmagick:coder_SVGZ_fuzzer: Timeout in
+        coder_SVGZ_fuzzer".
+
 2026-11-09  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/render.c (DrawAffineImage): Address oss-fuzz 583458493
