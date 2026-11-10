@@ -1,5 +1,9 @@
 2026-11-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/wmf.c (ReadWMFImage): Add aspect ratio sanity check after
+        wmf_scan(). Trust but verify. Suggested by Google's Gemini and
+        relayed to me by Petr Gajdos.
+
         * coders/svg.c (ReadSVGImage): Report error if xmlParseChunk()
         fails. Suggested by Petr Gajdos.
 

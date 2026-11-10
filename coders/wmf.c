@@ -2559,6 +2559,15 @@ static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * excepti
       ThrowReaderException(DelegateError,FailedToScanFile,image);
     }
 
+  bounding_width  = (double) bbox.BR.x - bbox.TL.x;
+  bounding_height = (double) bbox.BR.y - bbox.TL.y;
+  if ((bounding_width <= 0.0) || (bounding_height <= 0.0))
+    {
+      ipa_device_close(API);
+      (void) wmf_api_destroy(API);
+      ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
+    }
+
   /*
    * Compute dimensions and scale factors
    *
