@@ -75,6 +75,10 @@
 #if !defined(PRIMITIVE_INFO_POINTS_MAX)
 #  define PRIMITIVE_INFO_POINTS_MAX ((~((size_t)0)) >> 8)
 #endif /* !defined(PRIMITIVE_INFO_POINTS_MAX) */
+/* Maximum expansion ratio due to use of "use" and "class" */
+#if !defined(MAX_MNG_EXPANSION_RATIO)
+#  define MAX_MNG_EXPANSION_RATIO 200
+#endif /* if !defined(MAX_MNG_EXPANSION_RATIO) */
 /* Largest double value which can be converted to a long and survive AbsoluteValue() */
 #if LONG_MAX == 2147483647L
 #  define DTOLONG_MAX 2147483647.0
@@ -2453,24 +2457,47 @@ char *  ExtractTokensBetweenPushPop (
 
 
 /*
-  Extract attribute name from input stream, get attribute, and insert it's
-  value into the input stream.  Return updated pointer into input stream.
-  Added to support new elements "use" and "class".
+  Extract attribute name from input stream, get attribute, and insert
+  it's value into the input stream.  Return updated pointer into input
+  stream.  Added to support new elements "use" and "class".
 
-  FIXME: Need to add anti-recursion measures.
+  The parser continues at the point of insertion, and the value
+  inserted may again request to expand same (or previous) "use"
+  (e.g. "use 0") or "class" value. Arbitrarily long looping patterns
+  can be created. This is a functional recursion (but not a call stack
+  recursion) leading to memory exhaustion. It is also possible to
+  construct a MVG which makes extreme use of macro expansion (without
+  recursion) and which leads to high memory usage.
+
+  The solution used to block "recursion", or MVG designed to explode
+  memory usage, is to impose a limit on the amount of expansion over
+  the original MVG size.
 */
 static
-char * InsertAttributeIntoInputStream (
-  const char *keyword,        /* MVG keyword for diagnostics/debugging */
-  char * q,                   /* address of pointer into primitive string*/
-  char ** pprimitive,         /* ptr to ptr to primitive string buffer */
-  size_t * pprimitive_extent,
-  char ** ptoken,             /* ptr to ptr to big enough buffer for extracted string */
-  size_t * ptoken_max_length,
-  Image *image,
-  MagickPassFail * pStatus,
-  MagickBool UndefAttrIsError
-  )
+char * InsertAttributeIntoInputStream
+(
+ /* MVG keyword for diagnostics/debugging */
+ const char *keyword,
+ /* address of pointer into primitive string */
+ char * q,
+ /* ptr to ptr to primitive string buffer */
+ char ** pprimitive,
+ /* primitive string buffer allocation size (minus 1) */
+ size_t * pprimitive_extent,
+ /* ptr to ptr to buffer for token */
+ char ** ptoken,
+ /* ptr to maximum token length which may be returned */
+ size_t * ptoken_max_length,
+ /* Image containing attributes */
+ Image *image,
+ /* Return error status here */
+ MagickPassFail * pStatus,
+ /* True if undefined attribute is reported as error */
+ MagickBool UndefAttrIsError,
+ /* Original primitive string length */
+ const size_t original_primitive_extent,
+ const size_t expansion_ratio_limit
+ )
 {/*InsertAttributeIntoInputStream*/
 
   char AttributeName[MaxTextExtent];
@@ -2496,7 +2523,8 @@ char * InsertAttributeIntoInputStream (
       if  ( UndefAttrIsError )
         {
           char message[MaxTextExtent];
-          MagickFormatString(message,sizeof(message),"Primitive \"%s\" id \"%s\" not defined",keyword,*ptoken);
+          MagickFormatString(message,sizeof(message),
+                             "Primitive \"%s\" id \"%s\" not defined",keyword,*ptoken);
           ThrowException(&image->exception,DrawError,InvalidPrimitiveArgument,message);
           *pStatus = MagickFail;
         }
@@ -2504,8 +2532,9 @@ char * InsertAttributeIntoInputStream (
     }
 
   /*
-    Insert attribute->value into input stream by concatenating it with the remainder
-    of the primitive, and updating the required state variables.
+    Insert attribute->value into input stream by concatenating it with
+    the remainder of the primitive, and updating the required state
+    variables.
   */
   AttributeLength = attribute->length;
   RemainingLength = *pprimitive_extent - (size_t)(q - *pprimitive);
@@ -2521,6 +2550,19 @@ char * InsertAttributeIntoInputStream (
                           RemainingLength, NeededLength);
 #endif
 
+  if ( (NeededLength / original_primitive_extent) > expansion_ratio_limit)
+    {
+      char message[MaxTextExtent];
+      MagickFormatString(message,sizeof(message),
+                         "Excessive primitive expansion detected"
+                         " (original %" MAGICK_SIZE_T_F "u,"
+                         " expanded %" MAGICK_SIZE_T_F "u)",
+                         original_primitive_extent, NeededLength);
+      ThrowException(&image->exception,DrawError,InvalidPrimitiveArgument,message);
+      *pStatus = MagickFail;
+      return(q);
+    }
+
   if  ( NeededLength <= *pprimitive_extent )
     {/*combined strings fit in existing primitive buffer*/
 
@@ -2530,16 +2572,20 @@ char * InsertAttributeIntoInputStream (
     }/*combined strings fit in existing primitive buffer*/
   else
     {/*combined strings need bigger buffer*/
-#if 1
+#if 0
       /*
         Based on original free/new design
       */
       char * primitiveNew;
       char * tokenNew;
+      size_t q_offset;
+      q_offset = q-*pprimitive;
       *pprimitive_extent = NeededLength;
       primitiveNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
       if (primitiveNew == (char *) NULL)
         {
+          ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
+                          UnableToDrawOnImage);
           *pStatus = MagickFail;
           return(q);
         }
@@ -2549,10 +2595,22 @@ char * InsertAttributeIntoInputStream (
 
       MagickFreeResourceLimitedMemory(char *, *pprimitive);
       q = *pprimitive = primitiveNew;
+      q += q_offset;  /* Restore original offset in new buffer */
       MagickFreeResourceLimitedMemory(char *, *ptoken);
       tokenNew = MagickAllocateResourceLimitedMemory(char *,NeededLength+1);
       if (tokenNew == (char *) NULL)
         {
+          if (image->logging)
+            (void) LogMagickEvent(RenderEvent,GetMagickModule(),
+                                  "InsertAttributeIntoInputStream(): keyword \"%s\" "
+                                  "AttributeName \"%s\", AttributeLength=%zu, "
+                                  "RemainingLength=%zu, NeededLength=%zu, "
+                                  "ALLOC FAILURE!",
+                                  keyword, AttributeName, AttributeLength,
+                                  RemainingLength, NeededLength);
+          ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
+                          UnableToDrawOnImage);
+
           *pStatus = MagickFail;
           return(q);
         }
@@ -2565,19 +2623,26 @@ char * InsertAttributeIntoInputStream (
       {
         char * primitiveNew;
         size_t Offset;
+        size_t q_offset;
+        q_offset = q-*pprimitive;
         *pprimitive_extent = NeededLength;
         Offset = q-*pprimitive;
-        primitiveNew = MagickReallocateResourceLimitedMemory(char *,*pprimitive,NeededLength+1);
+        primitiveNew = MagickReallocateResourceLimitedMemory(char *,*pprimitive,
+                                                             NeededLength+1);
         if (primitiveNew == (char *) NULL)
           {
+            ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
+                            UnableToDrawOnImage);
             *pStatus = MagickFail;
             return(q);
           }
-        /* FIXME: Need to verify this! */
-        (void) memmove(/* dest */primitiveNew+AttributeLength,/* source */primitiveNew+Offset,RemainingLength); /* Remaining */
+        (void) memmove(/* dest */primitiveNew+AttributeLength,
+                       /* source */primitiveNew+Offset,
+                       RemainingLength); /* Remaining */
         (void) memcpy(primitiveNew,attribute->value,AttributeLength); /* Attribute value */
         primitiveNew[NeededLength] = '\0';
         q = *pprimitive = primitiveNew;
+        q += q_offset; /* Restore original offset in new buffer */
       }
       {
         char * tokenNew;
@@ -2591,7 +2656,7 @@ char * InsertAttributeIntoInputStream (
         *ptoken_max_length = NeededLength;
       }
 #if 0
-     if (image->logging)
+      if (image->logging)
         (void) LogMagickEvent(RenderEvent,GetMagickModule(),
                               "InsertAttributeIntoInputStream(): \"%s\"", *pprimitive);
 #endif
@@ -2727,8 +2792,10 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     viewbox;
 
   size_t
+    expansion_ratio_limit = MAX_MNG_EXPANSION_RATIO, /* FIXME: Arbitrary limit */
     length,
     token_max_length,
+    original_primitive_extent,
     primitive_extent;
 
   MagickPassFail
@@ -2835,7 +2902,8 @@ DrawImage(Image *image,const DrawInfo *draw_info)
     }
 
   primitive_extent=strlen(original_primitive);
-  primitive = MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
+  original_primitive_extent=primitive_extent;
+  primitive=MagickAllocateResourceLimitedMemory(char *, primitive_extent+1);
   if (primitive == (char *) NULL)
     {
       ThrowException3(&image->exception,ResourceLimitError,MemoryAllocationFailed,
@@ -3048,10 +3116,12 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (LocaleCompare("class",keyword) == 0)
               {/*class*/
-                /* FIXME: Deal with possible recursion */
                 q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
                                                    &token,&token_max_length,image,
-                                                   &status,MagickFalse/*UndefAttrIsError*/);
+                                                   &status,MagickFalse/*UndefAttrIsError*/,
+                                                   original_primitive_extent,
+                                                   expansion_ratio_limit
+                                                   );
                 break;
               }/*class*/
             if (LocaleCompare("clip-path",keyword) == 0)
@@ -4566,10 +4636,12 @@ DrawImage(Image *image,const DrawInfo *draw_info)
           {
             if (LocaleCompare("use",keyword) == 0)
               {
-                /* FIXME: nothing prevents infinite recursion of "use" */
                 q = InsertAttributeIntoInputStream(keyword,q,&primitive,&primitive_extent,
                                                    &token,&token_max_length,image,
-                                                   &status,MagickTrue/*UndefAttrIsError*/);
+                                                   &status,MagickTrue/*UndefAttrIsError*/,
+                                                   original_primitive_extent,
+                                                   expansion_ratio_limit
+                                                   );
                 break;
               }
             LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
@@ -4660,6 +4732,12 @@ DrawImage(Image *image,const DrawInfo *draw_info)
         }
       if (primitive_type == UndefinedPrimitive)
         {
+          if ((q == (char *) NULL) || (p == (char *) NULL))
+            {
+              status = MagickFail;
+              LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+              break;
+            }
           (void) LogMagickEvent(RenderEvent,GetMagickModule(),"  %.*s",
                                 (int) (q-p),p);
           continue;

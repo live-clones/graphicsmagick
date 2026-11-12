@@ -1,3 +1,8 @@
+2026-11-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/render.c (DrawImage): Place an artibrary limit of 200x on
+        MVG expansion due to use of "use" and "class".
+
 2026-11-10  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * coders/wmf.c (ReadWMFImage): Add aspect ratio sanity check after
