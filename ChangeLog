@@ -1,3 +1,8 @@
+2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * doc/format.imdoc: The summary of supported formats was several
+        years out of date. Update it.
+
 2026-11-12  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/render.c (DrawImage): Place an artibrary limit of 200x on

@@ -5,26 +5,33 @@
 <o>8BIM     <|>rw-<|>Photoshop resource format
 <o>8BIMTEXT <|>rw-<|>Photoshop resource text format
 <o>8BIMWTEXT<|>rw-<|>Photoshop resource wide text format
+<o>AAI      <|>rw+<|>AAI Dune image
 <o>APP1     <|>rw-<|>Raw application information
 <o>APP1JPEG <|>rw-<|>Raw JPEG binary data
-<o>ART      <|>r--<|>PF1: 1st Publisher
+<o>ART      <|>rw-<|>PF1: 1st Publisher
 <o>ARW      <|>r--<|>Sony Alpha DSLR RAW
+<o>AVCI     <|>r--<|>Advanced Video Coding Image Format
+<o>AVIF     <|>r--<|>AV1 Image Format
 <o>AVS      <|>rw+<|>AVS X image
+<o>B        <|>rw+<|>Raw blue samples
 <o>BIE      <|>rw-<|>Joint Bi-level Image experts Group
 < >         <|>   <|>interchange format
+<o>BIGTIFF  <|>rw-<|>Tagged Image File Format (64-bit offsets)
 <o>BMP      <|>rw+<|>Microsoft Windows bitmap image
 <o>BMP2     <|>-w-<|>Microsoft Windows bitmap image v2
 <o>BMP3     <|>-w-<|>Microsoft Windows bitmap image v3
+<o>BRF      <|>-w-<|>BRF ASCII Braille format
+<o>C        <|>rw+<|>Raw cyan samples
 <o>CACHE    <|>---<|>Magick Persistent Cache image format
 <o>CALS     <|>rw-<|>Continuous Acquisition and Life-cycle
 < >         <|>   <|>Support Type 1 image
 <o>CAPTION  <|>r--<|>Caption (requires separate size info)
 <o>CIN      <|>rw-<|>Kodak Cineon Format
-<o>CMYK     <|>rw-<|>Raw cyan, magenta, yellow, and black
-< >         <|>   <|>samples (8 or 16 bits, depending on
+<o>CMYK     <|>rw+<|>Raw cyan, magenta, yellow, and black
+< >         <|>   <|>samples (8/16/32 bits, depending on
 < >         <|>   <|>the image depth)
-<o>CMYKA    <|>rw-<|>Raw cyan, magenta, yellow, black, and
-< >         <|>   <|>matte samples (8 or 16 bits, depending
+<o>CMYKA    <|>rw+<|>Raw cyan, magenta, yellow, black, and
+< >         <|>   <|>matte samples (8/16/32 bits, depending
 < >         <|>   <|>on the image depth)
 <o>CR2      <|>r--<|>Canon Photo RAW
 <o>CRW      <|>r--<|>Canon Photo RAW
@@ -53,9 +60,11 @@
 < >         <|>   <|>with MS-DOS TIFF preview
 <o>EXIF     <|>rw-<|>Exif digital camera binary data
 <o>FAX      <|>rw+<|>Group 3 FAX (Not TIFF Group3 FAX!)
+<o>FILE     <|>r--<|>Uniform Resource Locator (file://)
 <o>FITS     <|>rw-<|>Flexible Image Transport System
 <o>FRACTAL  <|>r--<|>Plasma fractal image
 <o>FPX      <|>rw-<|>FlashPix Format
+<o>G        <|>rw+<|>Raw green samples
 <o>GIF      <|>rw+<|>CompuServe graphics interchange format
 <o>GIF87    <|>rw-<|>CompuServe graphics interchange format
 < >         <|>   <|>(version 87a)
@@ -63,6 +72,10 @@
 < >         <|>   <|>another
 <o>GRAY     <|>rw+<|>Raw gray samples (8/16/32 bits,
 < >         <|>   <|>depending on the image depth)
+<o>GRAYA    <|>rw+<|>Raw gray samples + alpha (8/16/32 bits,
+< >         <|>   <|>depending on the image depth)
+<o>HEIC     <|>r--<|>High-Efficiency Image Codec in HEIF
+<o>HEIF     <|>r--<|>High Efficiency Image Format
 <o>HISTOGRAM<|>-w-<|>Histogram of the image
 <o>HRZ      <|>r--<|>HRZ: Slow scan TV
 <o>HTML     <|>-w-<|>Hypertext Markup Language and a
@@ -75,45 +88,59 @@
 <o>IDENTITY <|>r--<|>Hald CLUT identity image
 <o>IMAGE    <|>r--<|>GraphicsMagick Embedded Image
 <o>INFO     <|>-w+<|>Image descriptive information and
-< >         <|>   <|> statistics
+< >         <|>   <|>statistics
 <o>IPTC     <|>rw-<|>IPTC Newsphoto
 <o>IPTCTEXT <|>rw-<|>IPTC Newsphoto text format
 <o>IPTCWTEXT<|>rw-<|>IPTC Newsphoto wide text format
+<o>ISOBRL   <|>-w-<|>ISO/TR 11548-1 format
+<o>ISOBRL6  <|>-w-<|>ISO/TR 11548-1 format 6dot
+<o>J2C      <|>rw-<|>JPEG-2000 Code Stream Syntax
 <o>JBG      <|>rw+<|>Joint Bi-level Image experts Group
 < >         <|>   <|>interchange format
 <o>JBIG     <|>rw+<|>Joint Bi-level Image experts Group
 < >         <|>   <|>interchange format
 <o>JNG      <|>rw-<|>JPEG Network Graphics
+<o>JNX      <|>r--<|>Garmin tile storage format
 <o>JP2      <|>rw-<|>JPEG-2000 JP2 File Format Syntax
 <o>JPC      <|>rw-<|>JPEG-2000 Code Stream Syntax
 <o>JPEG     <|>rw-<|>Joint Photographic Experts Group
 < >         <|>   <|>JFIF format
 <o>JPG      <|>rw-<|>Joint Photographic Experts Group
 < >         <|>   <|>JFIF format
+<o>JXL      <|>rw-<|>JXL Image Format
+<o>K        <|>rw+<|>Raw black samples
 <o>K25      <|>r--<|>Kodak Photo RAW
 <o>KDC      <|>r--<|>Kodak Photo RAW
 <o>LABEL    <|>r--<|>Text image format
+<o>M        <|>rw+<|>Raw magenta samples
 <o>M2V      <|>rw+<|>MPEG-2 Video Stream
+<o>MAC      <|>r--<|>Mac Paint
 <o>MAP      <|>rw-<|>Colormap intensities and indices
-<o>MAT      <|>r--<|>MATLAB image format
-<o>MATTE    <|>-w+<|>MATTE format
+<o>MAT      <|>rw+<|>MATLAB image format
+<o>MATTE    <|>-w+<|>MATTE raw opacity format
+<o>MEF      <|>r--<|>Mamiya Photo RAW
 <o>MIFF     <|>rw+<|>Magick Image File Format
 <o>MNG      <|>rw+<|>Multiple-image Network Graphics
 <o>MONO     <|>rw-<|>Bi-level bitmap in least-significant-
 < >         <|>   <|>-byte-first order
+<o>MP4      <|>r--<|>MPEG-4 Part 14 in HEIF
 <o>MPC      <|>rw+<|>Magick Persistent Cache image format
-<o>MPEG     <|>rw+<|>MPEG-1 Video Stream
-<o>MPG      <|>rw+<|>MPEG-1 Video Stream
+<o>MPEG     <|>-w+<|>MPEG-1 Video Stream
+<o>MPG      <|>-w+<|>MPEG-1 Video Stream
 <o>MRW      <|>r--<|>Minolta Photo Raw
-<o>MSL      <|>r--<|>Magick Scripting Language
+<o>MSL      <|>rw+<|>Magick Scripting Language
 <o>MTV      <|>rw+<|>MTV Raytracing image format
 <o>MVG      <|>rw-<|>Magick Vector Graphics
 <o>NEF      <|>r--<|>Nikon Electronic Format
 <o>NULL     <|>r--<|>Constant image of uniform color
+<o>O        <|>rw+<|>Raw opacity samples
+<o>ORA      <|>r--<|>Open Raster
+<o>ORF      <|>r--<|>Olympus Photo RAW
 <o>OTB      <|>rw-<|>On-the-air bitmap
 <o>P7       <|>rw+<|>Xv thumbnail format
 <o>PAL      <|>rw-<|>16bit/pixel interleaved YUV
-<o>PALM     <|>rw-<|>Palm Pixmap
+<o>PALM     <|>r--<|>Palm Pixmap
+<o>PAM      <|>rw+<|>Portable Arbitrary Map format
 <o>PBM      <|>rw+<|>Portable bitmap format (black and white)
 <o>PCD      <|>rw-<|>Photo CD
 <o>PCDS     <|>rw-<|>Photo CD
@@ -123,10 +150,10 @@
 <o>PDB      <|>rw+<|>Palm Database ImageViewer Format
 <o>PDF      <|>rw+<|>Portable Document Format
 <o>PEF      <|>r--<|>Pentax Electronic File
-<o>PFA      <|>r--<|>TrueType font
-<o>PFB      <|>r--<|>TrueType font
+<o>PFA      <|>r--<|>Postscript Type 1 font (ASCII)
+<o>PFB      <|>r--<|>Postscript Type 1 font (binary)
 <o>PGM      <|>rw+<|>Portable graymap format (gray scale)
-<o>PGX      <|>r--<|>JPEG-2000 VM Format
+<o>PGX      <|>rw-<|>JPEG-2000 VM Format
 <o>PICON    <|>rw-<|>Personal Icon
 <o>PICT     <|>rw-<|>Apple Macintosh QuickDraw/PICT
 <o>PIX      <|>r--<|>Alias/Wavefront RLE image format
@@ -136,6 +163,10 @@
 < >         <|>   <|>opaque only
 <o>PNG32    <|>rw-<|>Portable Network Graphics, 32 bit RGBA
 < >         <|>   <|>semitransparency OK
+<o>PNG48    <|>rw-<|>Portable Network Graphics, 48 bit RGB
+< >         <|>   <|>opaque or binary transparent OK
+<o>PNG64    <|>rw-<|>Portable Network Graphics, 64 bit RGBA
+< >         <|>   <|>opaque or transparent OK
 <o>PNG8     <|>rw-<|>Portable Network Graphics, 8-bit
 < >         <|>   <|>indexed, binary transparency only
 <o>PNM      <|>rw+<|>Portable anymap
@@ -145,9 +176,9 @@
 <o>PS       <|>rw+<|>Adobe PostScript
 <o>PS2      <|>-w+<|>Adobe Level II PostScript
 <o>PS3      <|>-w+<|>Adobe Level III PostScript
-<o>PSD      <|>rw-<|>Adobe Photoshop bitmap
 <o>PTIF     <|>rw-<|>Pyramid encoded TIFF
 <o>PWP      <|>r--<|>Seattle Film Works
+<o>R        <|>rw+<|>Raw red samples
 <o>RAF      <|>r--<|>Fuji Photo RAW
 <o>RAS      <|>rw+<|>SUN Rasterfile
 <o>RGB      <|>rw+<|>Raw red, green, and blue samples
@@ -159,17 +190,23 @@
 <o>SGI      <|>rw+<|>Irix RGB image
 <o>SHTML    <|>-w-<|>Hypertext Markup Language and a
 < >         <|>   <|>client-side image map
+<o>SR2      <|>r--<|>Sony Photo RAW
+<o>SRF      <|>r--<|>Sony Photo RAW
 <o>STEGANO  <|>r--<|>Steganographic image
 <o>SUN      <|>rw+<|>SUN Rasterfile
-<o>SVG      <|>rw+<|>Scalable Vector Gaphics
+<o>SVG      <|>r--<|>Scalable Vector Gaphics
+<o>SVGZ     <|>r--<|>Scalable Vector Gaphics
+< >         <|>   <|>(ZIP compressed)
 <o>TEXT     <|>rw+<|>Raw text
 <o>TGA      <|>rw+<|>Truevision Targa image
 <o>TIFF     <|>rw+<|>Tagged Image File Format
 <o>TILE     <|>r--<|>Tile image with a texture
 <o>TIM      <|>r--<|>PSX TIM
-<o>TOPOL    <|>r--<|>TOPOL X Image
+<o>TOPOL    <|>rw-<|>TOPOL X Image
 <o>TTF      <|>r--<|>TrueType font
-<o>TXT      <|>rw+<|>Raw text
+<o>TXT      <|>rw+<|>ASCII Text
+<o>UBRL     <|>-w-<|>Unicode Text format
+<o>UBRL6    <|>-w-<|>Unicode Text format 6dot
 <o>UIL      <|>-w-<|>X-Motif UIL table
 <o>UYVY     <|>rw-<|>16bit/pixel interleaved YUV
 <o>VDA      <|>rw+<|>Truevision Targa image
@@ -178,8 +215,9 @@
 <o>VIFF     <|>rw+<|>Khoros Visualization image
 <o>VST      <|>rw+<|>Truevision Targa image
 <o>WBMP     <|>rw-<|>Wireless Bitmap (level 0) image
+<o>WEBP     <|>rw-<|>WebP Image Format
 <o>WMF      <|>r--<|>Windows Metafile
-<o>WPG      <|>r--<|>Word Perfect Graphics
+<o>WPG      <|>rw-<|>Word Perfect Graphics
 <o>X        <|>rw-<|>X Image
 <o>X3F      <|>r--<|>Foveon X3 (Sigma/Polaroid) RAW
 <o>XBM      <|>rw-<|>X Windows system bitmap (black
