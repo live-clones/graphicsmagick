@@ -6235,7 +6235,7 @@ sub-command.</pp>
 <!-- ------------ --version ------------------------------------------ -->
 
 <utils apps=animate,batch,compare,composite,conjure,convert,display,gm,identify,import,mogrify,montage>
-<dopt>-version</opt>
+<dopt>--version</opt>
 
 <abs>print compact GNU-style GraphicsMagick version information</abs>
 

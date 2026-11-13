@@ -4375,6 +4375,32 @@ UnregisterMSLImage(void)
 %
 %
 */
+/*
+  Usage example:
+
+  Using the conjure tool:
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <image>
+    <read filename="logo:" />
+    <resize geometry="800x600" />
+    <write filename="output.png" />
+  </image>
+
+  gm conjure msl:script.msl
+
+
+  Using the MSL writer directly???
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <image>
+    <resize geometry="800x600" />
+    <write filename="output.png" />
+  </image>
+
+  gm convert logo: msl:script2.msl
+
+ */
 #if defined(HasXML)
 static unsigned int WriteMSLImage(const ImageInfo *image_info,Image *image)
 {

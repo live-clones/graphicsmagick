@@ -1,5 +1,8 @@
 2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * doc/options.imdoc: Fix typo. Used -version when --version was
+        intended.
+
         * magick/render.c (TraceSquareLinecap): Fixes gleaned from
         ImageMagick's GHSA-m9p2-wqc3-mj22.
 
