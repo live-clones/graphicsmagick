@@ -8319,7 +8319,7 @@ TraceSquareLinecap(PrimitiveInfo *primitive_info,
       break;
   }
   if (i == (long) number_vertices)
-    i=number_vertices-1;
+    return(MagickTrue);
   distance=sqrt(dx*dx+dy*dy+MagickEpsilon);
   primitive_info[0].point.x=primitive_info[i].point.x+
     dx*(distance+offset)/distance;
@@ -8332,6 +8332,8 @@ TraceSquareLinecap(PrimitiveInfo *primitive_info,
     if ((fabs(dx) >= MagickEpsilon) || (fabs(dy) >= MagickEpsilon))
       break;
   }
+  if (j < 0)
+    return(MagickTrue);
   distance=sqrt(dx*dx+dy*dy+MagickEpsilon);
   primitive_info[number_vertices-1].point.x=primitive_info[j].point.x+
     dx*(distance+offset)/distance;

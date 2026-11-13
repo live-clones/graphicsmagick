@@ -1,5 +1,8 @@
 2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/render.c (TraceSquareLinecap): Fixes gleaned from
+        ImageMagick's GHSA-m9p2-wqc3-mj22.
+
         * coders/svg.c: Quote stroke-dasharray argument similar to
         ImageMagick's GHSA-6r6f-x5h8-fw8h to block MVG injection
         opportunity.
