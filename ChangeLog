@@ -1,5 +1,8 @@
 2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/command.c (ConjureImageCommand): Accept a MSL script file
+        name which is already prefixed with "msl:".
+
         * doc/options.imdoc: Fix typo. Used -version when --version was
         intended.
 

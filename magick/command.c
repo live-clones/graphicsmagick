@@ -6700,11 +6700,20 @@ MagickExport MagickPassFail ConjureImageCommand(ImageInfo *image_info,
     /*
       Interpret MSL script.
     */
-    (void) SetImageAttribute(image_info->attributes,"filename",(char *) NULL);
-    status&=SetImageAttribute(image_info->attributes,"filename",argv[i]);
-    if (status == MagickFail)
-      MagickFatalError(ImageFatalError,UnableToPersistKey,argv[i]);
-    MagickFormatString(image_info->filename,sizeof(image_info->filename),"msl:%.1024s",argv[i]);
+    {
+      char filename[MaxTextExtent];
+      size_t offset = 0;
+
+      (void) SetImageAttribute(image_info->attributes,"filename",(char *) NULL);
+      if (LocaleNCompare("msl:",argv[i],4) == 0)
+        offset=4;
+      (void) strlcpy(filename,argv[i]+offset,sizeof(filename));
+      status&=SetImageAttribute(image_info->attributes,"filename",filename);
+      if (status == MagickFail)
+        MagickFatalError(ImageFatalError,UnableToPersistKey,filename);
+      (void) strlcpy(image_info->filename,"msl:",sizeof(image_info->filename));
+      (void) strlcat(image_info->filename,filename,sizeof(image_info->filename));
+    }
     image=ReadImage(image_info,exception);
     if (exception->severity > UndefinedException)
       {
