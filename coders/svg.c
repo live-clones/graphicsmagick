@@ -1856,7 +1856,7 @@ SVGStartElement(void *context,const xmlChar *name,
                 }
               if (LocaleCompare(keyword,"stroke-dasharray") == 0)
                 {
-                  MVGPrintf(svg_info->file,"stroke-dasharray %s\n",value);
+                  MVGPrintf(svg_info->file,"stroke-dasharray '%s'\n",value);
                   break;
                 }
               if (LocaleCompare(keyword,"stroke-dashoffset") == 0)
@@ -2074,7 +2074,7 @@ SVGStartElement(void *context,const xmlChar *name,
                                   }
                                 if (LocaleCompare(keyword,"stroke-dasharray") == 0)
                                   {
-                                    MVGPrintf(svg_info->file,"stroke-dasharray %s\n",value);
+                                    MVGPrintf(svg_info->file,"stroke-dasharray '%s'\n",value);
                                     break;
                                   }
                                 if (LocaleCompare(keyword,"stroke-dashoffset") == 0)
@@ -2861,7 +2861,7 @@ void    ProcessStyleClassDefs (
                   }
                 if (LocaleCompare(keyword,"stroke-dasharray") == 0)
                   {
-                    MVGPrintf(svg_info->file,"stroke-dasharray %s\n",value);
+                    MVGPrintf(svg_info->file,"stroke-dasharray '%s'\n",value);
                     break;
                   }
                 if (LocaleCompare(keyword,"stroke-dashoffset") == 0)

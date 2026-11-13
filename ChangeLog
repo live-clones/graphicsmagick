@@ -1,5 +1,9 @@
 2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * coders/svg.c: Quote stroke-dasharray argument similar to
+        ImageMagick's GHSA-6r6f-x5h8-fw8h to block MVG injection
+        opportunity.
+
         * doc/format.imdoc: The summary of supported formats was several
         years out of date. Update it.
 
