@@ -256,7 +256,7 @@ The \fBGraphicsMagick\fP utilities recognize the following image formats:
  o  MPEG      -w+ MPEG-1 Video Stream
  o  MPG       -w+ MPEG-1 Video Stream
  o  MRW       r-- Minolta Photo Raw
- o  MSL       rw+ Magick Scripting Language
+ o  MSL       r-- Magick Scripting Language
  o  MTV       rw+ MTV Raytracing image format
  o  MVG       rw- Magick Vector Graphics
  o  NEF       r-- Nikon Electronic Format
@@ -6665,14 +6665,18 @@ program, or those that do not have access to a Perl interpreter or a
 compiler.
 
 
-WARNING: MSL scripts can request to read from or write to arbitrary
+WARNING: While not being a Turing-complete programming language, MSL
+is still a scripting language capable of doing arbitrary things. Be
+sure that you know what an existing script does prior to invoking
+it. MSL scripts can request to read from or write to arbitrary
 locations on the server, or trigger specific coders. Without access
 controls, MSL scripts are able to read files which are expected to be
 private, and render into an image which might be viewed by others.
-MSL scripts are able to overwrite files which are important to the
-user.  MSL scripts are able to open URLs, including to internal
-private servers, resulting in possible Server-Side Request Forgery
-(SSRF).
+MSL scripts may be used to produce non-image output such as Unix shell
+scripts or private keys.  MSL scripts are able to overwrite files
+which are important to the user.  MSL scripts are able to open URLs,
+including to internal private servers, resulting in possible
+Server-Side Request Forgery (SSRF).
 
 The interpreter is called conjure and here is an example
 script:

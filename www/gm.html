@@ -302,7 +302,7 @@ The <strong>GraphicsMagick</strong> utilities recognize the following image form
 <tr><td><dd><img SRC="images/ball.png" ALT="*">MPEG     </td><td>-w+</td><td>MPEG-1 Video Stream</td></tr>
 <tr><td><dd><img SRC="images/ball.png" ALT="*">MPG      </td><td>-w+</td><td>MPEG-1 Video Stream</td></tr>
 <tr><td><dd><img SRC="images/ball.png" ALT="*">MRW      </td><td>r--</td><td>Minolta Photo Raw</td></tr>
-<tr><td><dd><img SRC="images/ball.png" ALT="*">MSL      </td><td>rw+</td><td>Magick Scripting Language</td></tr>
+<tr><td><dd><img SRC="images/ball.png" ALT="*">MSL      </td><td>r--</td><td>Magick Scripting Language</td></tr>
 <tr><td><dd><img SRC="images/ball.png" ALT="*">MTV      </td><td>rw+</td><td>MTV Raytracing image format</td></tr>
 <tr><td><dd><img SRC="images/ball.png" ALT="*">MVG      </td><td>rw-</td><td>Magick Vector Graphics</td></tr>
 <tr><td><dd><img SRC="images/ball.png" ALT="*">NEF      </td><td>r--</td><td>Nikon Electronic Format</td></tr>
@@ -9159,14 +9159,18 @@ program, or those that do not have access to a Perl interpreter or a
 compiler.
 <br>&nbsp;<br>
 <p>
-WARNING: MSL scripts can request to read from or write to arbitrary
+WARNING: While not being a Turing-complete programming language, MSL
+is still a scripting language capable of doing arbitrary things. Be
+sure that you know what an existing script does prior to invoking
+it. MSL scripts can request to read from or write to arbitrary
 locations on the server, or trigger specific coders. Without access
 controls, MSL scripts are able to read files which are expected to be
 private, and render into an image which might be viewed by others.
-MSL scripts are able to overwrite files which are important to the
-user.  MSL scripts are able to open URLs, including to internal
-private servers, resulting in possible Server-Side Request Forgery
-(SSRF).
+MSL scripts may be used to produce non-image output such as Unix shell
+scripts or private keys.  MSL scripts are able to overwrite files
+which are important to the user.  MSL scripts are able to open URLs,
+including to internal private servers, resulting in possible
+Server-Side Request Forgery (SSRF).
 <br>&nbsp;<br>
 <p>The interpreter is called conjure and here is an example
 script:

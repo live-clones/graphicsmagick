@@ -128,7 +128,7 @@
 <o>MPEG     <|>-w+<|>MPEG-1 Video Stream
 <o>MPG      <|>-w+<|>MPEG-1 Video Stream
 <o>MRW      <|>r--<|>Minolta Photo Raw
-<o>MSL      <|>rw+<|>Magick Scripting Language
+<o>MSL      <|>r--<|>Magick Scripting Language
 <o>MTV      <|>rw+<|>MTV Raytracing image format
 <o>MVG      <|>rw-<|>Magick Vector Graphics
 <o>NEF      <|>r--<|>Nikon Electronic Format

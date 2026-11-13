@@ -119,8 +119,6 @@ typedef struct _MSLInfo
 /*
   Forward declarations.
 */
-static unsigned int
-  WriteMSLImage(const ImageInfo *,Image *);
 
 static void
 MSLError(void *context,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3);
@@ -139,6 +137,19 @@ MSLError(void *context,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3);
 %  Method ReadMSLImage reads a Magick Scripting Language file and returns it.
 %  It allocates the memory necessary for the new Image structure and returns a
 %  pointer to the new image.
+%
+%  WARNING: While not being a Turing-complete programming language, MSL
+%  is still a scripting language capable of doing arbitrary things. Be
+%  sure that you know what an existing script does prior to invoking
+%  it. MSL scripts can request to read from or write to arbitrary
+%  locations on the server, or trigger specific coders. Without access
+%  controls, MSL scripts are able to read files which are expected to be
+%  private, and render into an image which might be viewed by others.
+%  MSL scripts may be used to produce non-image output such as Unix shell
+%  scripts or private keys.  MSL scripts are able to overwrite files
+%  which are important to the user.  MSL scripts are able to open URLs,
+%  including to internal private servers, resulting in possible
+%  Server-Side Request Forgery (SSRF).
 %
 %  The format of the ReadMSLImage method is:
 %
@@ -3995,7 +4006,7 @@ MSLError(void *context,const char *format,...)
   Note that if an image is passed in, that it is from the writer and
   should never be freed!
  */
-static unsigned int
+static MagickPassFail
 ProcessMSLScript(const ImageInfo *image_info,Image **image,
                  ExceptionInfo *exception)
 {
@@ -4271,11 +4282,16 @@ ReadMSLImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
   image=(Image *) NULL;
   status=ProcessMSLScript(image_info,&image,exception);
+  if ((status == MagickFail) && (image != (Image *) NULL))
+    {
+      DestroyImageList(image);
+      image=(Image *) NULL;
+    }
 
   if (status == MagickFail)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "ProcessMSLScript() returned MagickFail!");
-  return(image);
+  return(GetFirstImageInList(image));
 }
 #endif /* defined(HasXML) */
 
@@ -4311,7 +4327,6 @@ RegisterMSLImage(void)
 
   entry=SetMagickInfo("MSL");
   entry->decoder=(DecoderHandler) ReadMSLImage;
-  entry->encoder=(EncoderHandler) WriteMSLImage;
   entry->description="Magick Scripting Language";
   entry->module="MSL";
   entry->extension_treatment=IgnoreExtensionTreatment;
@@ -4345,81 +4360,3 @@ UnregisterMSLImage(void)
   (void) UnregisterMagickInfo("MSL");
 #endif /* defined(HasXML) */
 }
-
-/*
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%   W r i t e M S L I m a g e                                                 %
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%  Method WriteMSLImage processes the image via a MSL script.
-%
-%  The format of the WriteMSLImage method is:
-%
-%      unsigned int WriteMSLImage(const ImageInfo *image_info,Image *image)
-%
-%  A description of each parameter follows.
-%
-%    o status: Method WriteMSLImage return True if the image is written.
-%      False is returned is there is a memory shortage or if the image file
-%      fails to write.
-%
-%    o image_info: Specifies a pointer to a ImageInfo structure.
-%
-%    o image:  A pointer to an Image structure.
-%
-%
-*/
-/*
-  Usage example:
-
-  Using the conjure tool:
-
-  <?xml version="1.0" encoding="UTF-8"?>
-  <image>
-    <read filename="logo:" />
-    <resize geometry="800x600" />
-    <write filename="output.png" />
-  </image>
-
-  gm conjure msl:script.msl
-
-
-  Using the MSL writer directly???
-
-  <?xml version="1.0" encoding="UTF-8"?>
-  <image>
-    <resize geometry="800x600" />
-    <write filename="output.png" />
-  </image>
-
-  gm convert logo: msl:script2.msl
-
- */
-#if defined(HasXML)
-static unsigned int WriteMSLImage(const ImageInfo *image_info,Image *image)
-{
-  MagickPassFail
-    status;
-
-  assert(image_info != (const ImageInfo *) NULL);
-  assert(image_info->signature == MagickSignature);
-  assert(image != (Image *) NULL);
-  assert(image->signature == MagickSignature);
-  status=OpenBlob(image_info,image,WriteBinaryBlobMode,&image->exception);
-  if (status == False)
-    ThrowWriterException(FileOpenError,UnableToOpenFile,image);
-  /* (void) ReferenceImage(image); what for? */
-  status=ProcessMSLScript(image_info,&image,&image->exception);
-  if (status == MagickFail)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "ProcessMSLScript() returned MagickFail!");
-  status &= CloseBlob(image);
-  return status;
-}
-#endif /* defined(HasXML) */
