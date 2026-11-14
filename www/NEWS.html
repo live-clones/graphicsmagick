@@ -41,7 +41,7 @@
 <!-- -*- mode: rst -*- -->
 <!-- This text is in reStucturedText format, so it may look a bit odd. -->
 <!-- See http://docutils.sourceforge.net/rst.html for details. -->
-<p>This file was last updated to reflect changes up to October 13, 2026.</p>
+<p>This file was last updated to reflect changes up to November 14, 2026.</p>
 <p>Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
 ChangeLog file, and/or the Mercurial changesets, for full details.</p>
@@ -120,9 +120,21 @@ all targets.</p></li>
 </ul>
 <p>Security Fixes:</p>
 <ul class="simple">
+<li><p>Bzip blob reader: Quit after one error report on the stream.</p></li>
+<li><p>MSL: MSL is no longer accessible via a &quot;MSL:&quot; prefix on input file
+names. Since MSL is capable of producing, reading, and writing
+arbitrary files (and is not a graphic file &quot;format&quot;), this was
+decided to be an unnecessary risk.  Use 'conjure' as has always been
+documented.</p></li>
 <li><p>MSL: Address possible arithmetic overflow while calculating memory
 allocation size.</p></li>
+<li><p>MVG: Many fixes related to 'stroke-dasharray' / DrawDashPolygon() to
+prevent seemingly infinite looping.</p></li>
+<li><p>MVG: Place an artibrary limit on MVG &quot;macro&quot; expansion due to use of
+&quot;use&quot; and &quot;class&quot;.</p></li>
 <li><p>PCL: Guard against arithmetic overflow while computing bytes per line.</p></li>
+<li><p>SVG: Quote stroke-dasharray argument to block MVG injection
+opportunity.</p></li>
 </ul>
 <p>Bug fixes:</p>
 <ul class="simple">
@@ -136,6 +148,8 @@ LevelImageChannel() with parameterized arguments.</p></li>
 <li><p>PDF writer: Include the time zone offset from UTC in timestamps
 since ISO 32000-1 specifies it, and popular software such as
 'pdfinfo', Adobe Reader and Mozilla Firefox expect it.</p></li>
+<li><p>Microsoft Windows vcpkg compatibility improvements for the configure
+script, and C pre-processor.</p></li>
 </ul>
 <p>API Updates:</p>
 <ul class="simple">
@@ -158,6 +172,11 @@ also changed its LevelImage() to accept parameterized double
 arguments rather than a text string. Due to internal chaos and that
 there are usage benefits from 'black/white/mid', that is now the
 accepted syntax.</p></li>
+<li><p>conjure/MSL: There is no longer a MSL coder module and files will no
+longer be treated as MSL by adding a &quot;MSL:&quot; prefix to the file
+name. Please use 'conjure' (as has always been documented) to
+execute MSL scripts.  The 'conjure' command will be present if
+libxml2 is included in the build.</p></li>
 </ul>
 <p>Build Changes:</p>
 <ul class="simple">
@@ -165,8 +184,11 @@ accepted syntax.</p></li>
 </ul>
 <p>Windows Delegate Updates/Additions:</p>
 <ul class="simple">
-<li><p>None. Please note that most of the bundled 3rd-party source packages
-have known security issues, even if they represent the latest
+<li><p>Update libwmf to
+libwmf-0.2.17+d66567b90190eb3e326426f5a5113cfe3f40fc37. Libwmf is
+now built as a DLL.</p></li>
+<li><p>Please note that most of the bundled 3rd-party source packages have
+known security issues, even if they represent the latest
 release. Bundling source files in this manner does not make sense in
 today's hostile/aware world.</p></li>
 </ul>

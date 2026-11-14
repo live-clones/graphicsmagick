@@ -1,7 +1,18 @@
-2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+2026-11-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-        * magick/command.c (ConjureImageCommand): Accept a MSL script file
-        name which is already prefixed with "msl:".
+        * NEWS.txt: Update the news.
+
+        * magick/command.c (GMCommandSingle): The 'conjure' sub-command is
+        now only available if libxml is included in the build.  If
+        'conjure' is present, then it should function.
+
+        * magick/msl.c: The MSL implementation is moved into the core
+        library and there is no longer a MSL coder module.  The documented
+        way to use MSL has always been via the 'conjure' utility. It is no
+        longer possible to invoke a file as a MSL script by prepending
+        "MSL:" to the file name.
+
+2026-11-13  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * doc/options.imdoc: Fix typo. Used -version when --version was
         intended.

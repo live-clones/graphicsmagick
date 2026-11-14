@@ -1,6 +1,6 @@
 #!/bin/sh
 # -*- shell-script -*-
-# Copyright (C) 2004-2024 GraphicsMagick Group
+# Copyright (C) 2004-2026 GraphicsMagick Group
 # SPDX-License-Identifier: MIT
 # Test -list option
 . ./common.shi
@@ -9,7 +9,7 @@
 # Number of tests we plan to execute
 test_plan_fn 48
 
-nox_commands='batch benchmark compare composite conjure convert version identify mogrify montage time version'
+base_commands='batch benchmark compare composite convert version identify mogrify montage time version'
 
 test_command_fn "gm version" ${GM} version
 
@@ -17,11 +17,19 @@ test_command_fn "gm -version" ${GM} -version
 
 test_command_fn "gm --version" ${GM} --version
 
-for command in ${nox_commands}
+for command in ${base_commands}
 do
     test_command_fn "gm version ${command}" ${GM} version ${command}
     test_command_fn "gm ${command} -version" ${GM} ${command} -version
     test_command_fn "gm ${command} --version" ${GM} ${command} --version
+done
+
+xml_commands='conjure'
+for command in ${xml_commands}
+do
+    test_command_fn "gm version ${command}" ${GM} version ${command}
+    test_command_fn "gm ${command} -version" -F XML ${GM} ${command} -version
+    test_command_fn "gm ${command} --version" -F XML ${GM} ${command} --version
 done
 
 x_commands='animate display import'

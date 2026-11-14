@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2024 GraphicsMagick Group
+# Copyright (C) 2004-2026 GraphicsMagick Group
 # SPDX-License-Identifier: MIT
 #
 # This program is covered by multiple licenses, which are described in
@@ -128,7 +128,6 @@ MAGICK_CODER_SRCS = \
 	coders/mpc.c \
 	coders/mpeg.c \
 	coders/mpr.c \
-	coders/msl.c \
 	coders/mtv.c \
 	coders/mvg.c \
 	coders/null.c \
@@ -231,7 +230,6 @@ coders_LTLIBRARIES = \
 	coders/mpc.la \
 	coders/mpeg.la \
 	coders/mpr.la \
-	coders/msl.la \
 	coders/mtv.la \
 	coders/mvg.la \
 	coders/null.la \
@@ -576,12 +574,6 @@ coders_mpr_la_SOURCES      = coders/mpr.c
 coders_mpr_la_CPPFLAGS     = $(MAGICK_CODER_CPPFLAGS)
 coders_mpr_la_LDFLAGS      = $(MODULECOMMONFLAGS)
 coders_mpr_la_LIBADD       = $(LIBMAGICK)
-
-# MSL coder module
-coders_msl_la_SOURCES      = coders/msl.c
-coders_msl_la_CPPFLAGS     = $(MAGICK_CODER_CPPFLAGS)
-coders_msl_la_LDFLAGS      = $(MODULECOMMONFLAGS)
-coders_msl_la_LIBADD       = $(LIBMAGICK) $(LIB_XML) $(LIB_XML_DEPS)
 
 # MTV coder module
 coders_mtv_la_SOURCES      = coders/mtv.c

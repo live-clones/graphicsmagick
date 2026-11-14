@@ -1,6 +1,6 @@
 #!/bin/sh
 # -*- shell-script -*-
-# Copyright (C) 2004-2024 GraphicsMagick Group
+# Copyright (C) 2004-2026 GraphicsMagick Group
 # SPDX-License-Identifier: MIT
 # Test -list option
 . ./common.shi
@@ -9,15 +9,21 @@
 # Number of tests we plan to execute
 test_plan_fn 29
 
-# batch is skipped since its help output contains TAP test results!
-nox_commands='benchmark compare composite conjure convert help identify mogrify montage time version'
-
 test_command_fn "gm help" ${GM} help
 
-for command in ${nox_commands}
+# batch is skipped since its help output contains TAP test results!
+base_commands='benchmark compare composite convert help identify mogrify montage time version'
+for command in ${base_commands}
 do
     test_command_fn "gm help ${command}" ${GM} help ${command}
     test_command_fn "gm ${command} -help" ${GM} ${command} -help
+done
+
+xml_commands='conjure'
+for command in ${xml_commands}
+do
+    test_command_fn "gm help ${command}" ${GM} help ${command}
+    test_command_fn "gm ${command} -help" -F XML ${GM} ${command} -help
 done
 
 x_commands='animate display import'

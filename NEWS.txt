@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to October 13, 2026.
+This file was last updated to reflect changes up to November 14, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -34,10 +34,27 @@ Special Issues:
 
 Security Fixes:
 
+* Bzip blob reader: Quit after one error report on the stream.
+
+* MSL: MSL is no longer accessible via a "MSL:" prefix on input file
+  names. Since MSL is capable of producing, reading, and writing
+  arbitrary files (and is not a graphic file "format"), this was
+  decided to be an unnecessary risk.  Use 'conjure' as has always been
+  documented.
+
 * MSL: Address possible arithmetic overflow while calculating memory
   allocation size.
 
+* MVG: Many fixes related to 'stroke-dasharray' / DrawDashPolygon() to
+  prevent seemingly infinite looping.
+
+* MVG: Place an artibrary limit on MVG "macro" expansion due to use of
+  "use" and "class".
+
 * PCL: Guard against arithmetic overflow while computing bytes per line.
+
+* SVG: Quote stroke-dasharray argument to block MVG injection
+  opportunity.
 
 Bug fixes:
 
@@ -54,6 +71,9 @@ Bug fixes:
 * PDF writer: Include the time zone offset from UTC in timestamps
   since ISO 32000-1 specifies it, and popular software such as
   'pdfinfo', Adobe Reader and Mozilla Firefox expect it.
+
+* Microsoft Windows vcpkg compatibility improvements for the configure
+  script, and C pre-processor.
 
 API Updates:
 
@@ -77,14 +97,24 @@ Behavior Changes:
   there are usage benefits from 'black/white/mid', that is now the
   accepted syntax.
 
+* conjure/MSL: There is no longer a MSL coder module and files will no
+  longer be treated as MSL by adding a "MSL:" prefix to the file
+  name. Please use 'conjure' (as has always been documented) to
+  execute MSL scripts.  The 'conjure' command will be present if
+  libxml2 is included in the build.
+
 Build Changes:
 
 * None
 
 Windows Delegate Updates/Additions:
 
-* None. Please note that most of the bundled 3rd-party source packages
-  have known security issues, even if they represent the latest
+* Update libwmf to
+  libwmf-0.2.17+d66567b90190eb3e326426f5a5113cfe3f40fc37. Libwmf is
+  now built as a DLL.
+
+* Please note that most of the bundled 3rd-party source packages have
+  known security issues, even if they represent the latest
   release. Bundling source files in this manner does not make sense in
   today's hostile/aware world.
 

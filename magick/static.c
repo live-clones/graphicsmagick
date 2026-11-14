@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % SPDX-License-Identifier: MIT
 %
@@ -146,7 +146,6 @@ static const struct
 #if !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
   STATICM("MPEG",RegisterMPEGImage,UnregisterMPEGImage),
   STATICM("MPR",RegisterMPRImage,UnregisterMPRImage),
-  STATICM("MSL",RegisterMSLImage,UnregisterMSLImage),
 #endif /* if !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
   STATICM("MTV",RegisterMTVImage,UnregisterMTVImage),
   STATICM("MVG",RegisterMVGImage,UnregisterMVGImage),

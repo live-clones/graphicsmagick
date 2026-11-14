@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2025 GraphicsMagick Group
+# Copyright (C) 2004-2026 GraphicsMagick Group
 # SPDX-License-Identifier: MIT
 
 # This program is covered by multiple licenses, which are described in
@@ -38,7 +38,7 @@ magick_libGraphicsMagick_la_LDFLAGS = \
 	-no-undefined -export-symbols-regex ".*" \
 	$(MAGICK_LT_RELEASE_OPTS) \
 	-version-info $(MAGICK_LIBRARY_CURRENT):$(MAGICK_LIBRARY_REVISION):$(MAGICK_LIBRARY_AGE)
-#magick_libGraphicsMagick_la_DEPENDENCIES = 
+#magick_libGraphicsMagick_la_DEPENDENCIES =
 
 if HasX11
 MAGICK_X11_BASE_SRCS = \
@@ -50,6 +50,12 @@ MAGICK_X11_BASE_SRCS = \
 	magick/widget.h \
 	magick/xwindow.c \
 	magick/xwindow.h
+endif
+
+if HasXML
+MAGICK_LIBXML2_BASE_SRCS = \
+	magick/msl-private.h \
+	magick/msl.c
 endif
 
 # Library base sources
@@ -205,7 +211,8 @@ MAGICK_BASE_SRCS = \
 	magick/utility.h \
 	magick/version.c \
 	magick/version.h \
-	$(MAGICK_X11_BASE_SRCS)
+	$(MAGICK_X11_BASE_SRCS) \
+	$(MAGICK_LIBXML2_BASE_SRCS)
 
 if WIN32_NATIVE_BUILD
 MAGICK_PLATFORM_SRCS = 	\
@@ -351,4 +358,3 @@ magick-install-data-local:
 MAGICK_UNINSTALL_LOCAL_TARGETS = magick-uninstall-local
 magick-uninstall-local:
 	rm -f $(DESTDIR)$(magickincdir)/magick_config.h
-

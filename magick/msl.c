@@ -62,6 +62,7 @@
 #include "magick/texture.h"
 #include "magick/transform.h"
 #include "magick/utility.h"
+#include "magick/msl-private.h"
 #if defined(MSWINDOWS)
 #  if defined(__MINGW32__)
 #    if !defined(_MSC_VER)
@@ -122,52 +123,6 @@ typedef struct _MSLInfo
 
 static void
 MSLError(void *context,const char *format,...) MAGICK_FUNC_PRINTF_FORMAT(2,3);
-
-/*
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%   R e a d M S L I m a g e                                                   %
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%  Method ReadMSLImage reads a Magick Scripting Language file and returns it.
-%  It allocates the memory necessary for the new Image structure and returns a
-%  pointer to the new image.
-%
-%  WARNING: While not being a Turing-complete programming language, MSL
-%  is still a scripting language capable of doing arbitrary things. Be
-%  sure that you know what an existing script does prior to invoking
-%  it. MSL scripts can request to read from or write to arbitrary
-%  locations on the server, or trigger specific coders. Without access
-%  controls, MSL scripts are able to read files which are expected to be
-%  private, and render into an image which might be viewed by others.
-%  MSL scripts may be used to produce non-image output such as Unix shell
-%  scripts or private keys.  MSL scripts are able to overwrite files
-%  which are important to the user.  MSL scripts are able to open URLs,
-%  including to internal private servers, resulting in possible
-%  Server-Side Request Forgery (SSRF).
-%
-%  The format of the ReadMSLImage method is:
-%
-%      Image *ReadMSLImage(const ImageInfo *image_info,
-%                          ExceptionInfo *exception)
-%
-%  A description of each parameter follows:
-%
-%    o image:  Method ReadMSLImage returns a pointer to the image after
-%      reading. A null image is returned if there is a memory shortage or if
-%      the image cannot be read.
-%
-%    o image_info: Specifies a pointer to a ImageInfo structure.
-%
-%    o exception: return any errors or warnings in this structure.
-%
-%
-*/
 
 #if defined(__cplusplus) || defined(c_plusplus)
 /* extern "C" { */
@@ -4006,7 +3961,7 @@ MSLError(void *context,const char *format,...)
   Note that if an image is passed in, that it is from the writer and
   should never be freed!
  */
-static MagickPassFail
+MagickPassFail
 ProcessMSLScript(const ImageInfo *image_info,Image **image,
                  ExceptionInfo *exception)
 {
@@ -4262,101 +4217,4 @@ ProcessMSLScript(const ImageInfo *image_info,Image **image,
   /* FIXME: It is not clear what constitutes "success" for MSL */
   return exception->severity < ErrorException ? MagickPass : MagickFail;
 }
-
-static Image *
-ReadMSLImage(const ImageInfo *image_info,ExceptionInfo *exception)
-{
-  Image *
-    image;
-
-  MagickPassFail
-    status;
-
-  assert(image_info != (const ImageInfo *) NULL);
-  assert(image_info->signature == MagickSignature);
-  assert(exception != (ExceptionInfo *) NULL);
-  assert(exception->signature == MagickSignature);
-
-  /*
-    Open image file.
-  */
-  image=(Image *) NULL;
-  status=ProcessMSLScript(image_info,&image,exception);
-  if ((status == MagickFail) && (image != (Image *) NULL))
-    {
-      DestroyImageList(image);
-      image=(Image *) NULL;
-    }
-
-  if (status == MagickFail)
-    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "ProcessMSLScript() returned MagickFail!");
-  return(GetFirstImageInList(image));
-}
 #endif /* defined(HasXML) */
-
-/*
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%   R e g i s t e r M S L I m a g e                                           %
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%  Method RegisterMSLImage adds attributes for the MSL image format to
-%  the list of supported formats.  The attributes include the image format
-%  tag, a method to read and/or write the format, whether the format
-%  supports the saving of more than one frame to the same file or blob,
-%  whether the format supports native in-memory I/O, and a brief
-%  description of the format.
-%
-%  The format of the RegisterMSLImage method is:
-%
-%      RegisterMSLImage(void)
-%
-*/
-ModuleExport void
-RegisterMSLImage(void)
-{
-#if defined(HasXML)
-  MagickInfo
-    *entry;
-
-  entry=SetMagickInfo("MSL");
-  entry->decoder=(DecoderHandler) ReadMSLImage;
-  entry->description="Magick Scripting Language";
-  entry->module="MSL";
-  entry->extension_treatment=IgnoreExtensionTreatment;
-  (void) RegisterMagickInfo(entry);
-#endif /* defined(HasXML) */
-}
-
-/*
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%   U n r e g i s t e r M S L I m a g e                                       %
-%                                                                             %
-%                                                                             %
-%                                                                             %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%  Method UnregisterMSLImage removes format registrations made by the
-%  MSL module from the list of supported formats.
-%
-%  The format of the UnregisterMSLImage method is:
-%
-%      UnregisterMSLImage(void)
-%
-*/
-ModuleExport void
-UnregisterMSLImage(void)
-{
-#if defined(HasXML)
-  (void) UnregisterMagickInfo("MSL");
-#endif /* defined(HasXML) */
-}

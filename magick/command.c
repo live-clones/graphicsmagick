@@ -82,6 +82,7 @@
 #include "magick/utility.h"
 #include "magick/version.h"
 #include "magick/xwindow.h"
+#include "magick/msl-private.h"
 
 /*
   Typedef declarations.
@@ -164,7 +165,9 @@ static void
   BenchmarkUsage(void),
   CompositeUsage(void),
   CompareUsage(void),
+#if defined(HasXML)
   ConjureUsage(void),
+#endif /* HasXML */
   ConvertUsage(void),
 #if defined(HasX11)
   DisplayUsage(void),
@@ -214,8 +217,10 @@ static const struct
      CompareImageCommand, CompareUsage, 0, SingleMode | BatchMode },
    { "composite", "composite images together",
      CompositeImageCommand, CompositeUsage, 0, SingleMode | BatchMode },
+#if defined(HasXML)
    { "conjure", "execute a Magick Scripting Language (MSL) XML script",
      ConjureImageCommand, ConjureUsage, 0, SingleMode | BatchMode },
+#endif /* HaxXML */
    { "convert", "convert an image or sequence of images",
      ConvertImageCommand, ConvertUsage, 0, SingleMode | BatchMode },
 #if defined(HasX11)
@@ -6575,6 +6580,7 @@ static void ConvertUsage(void)
 %      void ConjureUsage()
 %
 */
+#if defined(HasXML)
 static void ConjureUsage(void)
 {
   PrintUsageHeader();
@@ -6711,10 +6717,26 @@ MagickExport MagickPassFail ConjureImageCommand(ImageInfo *image_info,
       status&=SetImageAttribute(image_info->attributes,"filename",filename);
       if (status == MagickFail)
         MagickFatalError(ImageFatalError,UnableToPersistKey,filename);
-      (void) strlcpy(image_info->filename,"msl:",sizeof(image_info->filename));
+      /* (void) strlcpy(image_info->filename,"msl:",sizeof(image_info->filename)); */
       (void) strlcat(image_info->filename,filename,sizeof(image_info->filename));
     }
+
+#if 1
+    image=(Image *) NULL;
+    status=ProcessMSLScript(image_info,&image,exception);
+    if ((status == MagickFail) && (image != (Image *) NULL))
+    {
+      DestroyImageList(image);
+      image=(Image *) NULL;
+    }
+
+  if (status == MagickFail)
+    (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                          "ProcessMSLScript() returned MagickFail!");
+  image=GetFirstImageInList(image);
+#else
     image=ReadImage(image_info,exception);
+#endif
     if (exception->severity > UndefinedException)
       {
         CatchException(exception);
@@ -6729,6 +6751,7 @@ MagickExport MagickPassFail ConjureImageCommand(ImageInfo *image_info,
   LiberateArgumentList(argc,argv);
   return(status);
 }
+#endif /* #if defined(HasXML) */
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17779,7 +17802,9 @@ static MagickPassFail GMCommandSingle(int argc,char **argv)
         "animate",
         "compare",
         "composite",
+#if defined(HasXML)
         "conjure",
+#endif /* HasXML */
         "convert",
         "display",
         "identify",
