@@ -46,43 +46,53 @@ static int ParseError (int position, char **argv)
   return Usage(argv);
 }
 
-static MagickPassFail
-ConfirmAccess(const ConfirmAccessMode mode,
-              const char *path,
-              Magick::ExceptionInfo *exception)
+
+extern "C"
 {
-  MagickPassFail
-    status = MagickPass;
+  // Clang's UBSAN does not like mixing C/C++ types
+#if defined(__has_attribute)
+#  if __has_attribute(no_sanitize)
+  __attribute__((no_sanitize("function")))
+#  endif
+#endif
+  static MagickPassFail
+  ConfirmAccess(const Magick::ConfirmAccessMode mode,
+                const char *path,
+                Magick::ExceptionInfo *exception)
+  {
+    MagickPassFail
+      status = MagickPass;
 
-  unsigned int
-    i;
+    unsigned int
+      i;
 
-  static const char *
-    banned_files[] =
-    {
-      "/etc/passwd",
-      "/etc/shadow",
-      NULL
-    };
+    static const char * const
+      banned_files[] =
+      {
+        "/etc/passwd",
+        "/etc/shadow",
+        NULL
+      };
 
-  if ((mode == FileReadConfirmAccessMode) ||
-      (mode == FileWriteConfirmAccessMode))
+    if ((mode == FileReadConfirmAccessMode) ||
+        (mode == FileWriteConfirmAccessMode))
 
-    {
-      i=0;
-      while (banned_files[i] != (const char *) NULL)
-        {
-          if (strcmp(banned_files[i],path) == 0)
-            {
-              ThrowException(exception,FileOpenError,"Access denied by policy",path);
-              status = MagickFail;
-              break;
-            }
-          i++;
-        }
-    }
+      {
+        i=0;
+        while (banned_files[i] != (const char *) NULL)
+          {
+            if (strcmp(banned_files[i],path) == 0)
+              {
+                ThrowException(exception,FileOpenError,"Access denied by policy",path);
+                status = MagickFail;
+                break;
+              }
+            i++;
+          }
+      }
 
-  return(status);
+    return(status);
+  }
 }
 
 
