@@ -187,6 +187,11 @@ struct _wmf_magick_t
   /* Push depth */
   long
     push_depth;
+
+  /* Used to validate structure */
+  unsigned long
+    signature;
+
 };
 
 
@@ -267,7 +272,7 @@ static void         util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply br
 static void         util_set_pen(wmfAPI * API, wmfDC * dc);
 
 /* Progress callback */
-static int magick_progress_callback (void* context,float quantum)
+static int magick_progress_callback (void* context,float proportion)
 {
   Image
     *image;
@@ -276,10 +281,13 @@ static int magick_progress_callback (void* context,float quantum)
     status = 0;
 
   image=(Image *) context;
-  if (MagickMonitorFormatted((magick_int64_t)floor((double)quantum*100), (magick_int64_t)100,
-                             &image->exception,(char*)context,
+  assert(image->signature == MagickSignature);
+  if (MagickMonitorFormatted((magick_int64_t)floor((double)proportion*100), /* quantum */
+                             (magick_int64_t)100, /* span */
+                             &image->exception, /* exception */
+                             "[%s] Parsing WMF vectors...", /* format string */
                              image->filename) == False)
-    status = 1;
+    status = 1; /* Return non-zero to quit */
   return status;
 }
 
@@ -442,6 +450,8 @@ static void ipa_bmp_draw(wmfAPI *API, wmfBMP_Draw_t *bmp_draw)
   PixelPacket
     white;
 
+  assert(ddata->image->signature == MagickSignature);
+
   if (bmp_draw->bmp.data == 0)
     return;
 
@@ -451,6 +461,7 @@ static void ipa_bmp_draw(wmfAPI *API, wmfBMP_Draw_t *bmp_draw)
       /* FIXME: Report exception */
       return;
     }
+  assert(image->signature == MagickSignature);
 
   if (bmp_draw->crop.x || bmp_draw->crop.y ||
       (bmp_draw->crop.w != bmp_draw->bmp.width) ||
@@ -536,6 +547,7 @@ static void ipa_bmp_read(wmfAPI * API, wmfBMP_Read_t * bmp_read) {
   MonitorHandler
     handler;
 
+  assert(ddata->image->signature == MagickSignature);
   GetExceptionInfo(&exception);
   bmp_read->bmp.data = 0;
 
@@ -598,6 +610,7 @@ static void ipa_device_open(wmfAPI * API)
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData (API);
 
+  assert(ddata->image->signature == MagickSignature);
   ddata->pattern_id = 0;
   ddata->clipping = False;
   ddata->clip_path_id = 0;
@@ -615,6 +628,7 @@ static void ipa_device_close(wmfAPI * API)
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData(API);
 
+  assert(ddata->image->signature == MagickSignature);
   if (ddata->draw_context != (DrawContext) NULL)
     {
       DrawDestroyContext(ddata->draw_context);
@@ -638,6 +652,8 @@ static void ipa_device_begin(wmfAPI * API)
 
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData(API);
+
+  assert(ddata->image->signature == MagickSignature);
 
   /* Make SVG output happy */
   DrawPushGraphicContext(WmfDrawContext);
@@ -724,6 +740,8 @@ static void ipa_device_end(wmfAPI * API)
 {
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData(API);
+
+  assert(ddata->image->signature == MagickSignature);
 
   /* Reset any existing clip paths by popping context */
   if (ddata->clipping)
@@ -1133,6 +1151,8 @@ static void ipa_region_clip(wmfAPI *API, wmfPolyRectangle_t *poly_rect)
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData (API);
 
+  assert(ddata->image->signature == MagickSignature);
+
   /* Reset any existing clip paths by popping context */
   if (ddata->clipping)
     DrawPopGraphicContext(WmfDrawContext);
@@ -1216,6 +1236,7 @@ static void ipa_functions(wmfAPI *API)
     return;
 
   (void) memset((void *) ddata, 0, sizeof(wmf_magick_t));
+  ddata->signature = MagickSignature;
   API->device_data = (void *) ddata;
 
   /*
@@ -1254,6 +1275,7 @@ static void ipa_draw_text(wmfAPI * API, wmfDrawText_t * draw_text)
   wmf_magick_t
     *ddata = WMF_MAGICK_GetData(API);
 
+  assert(ddata->image->signature == MagickSignature);
   point = draw_text->pt;
 
   /* Choose bounding box and calculate its width and height */
@@ -1559,6 +1581,8 @@ static void util_set_brush(wmfAPI * API, wmfDC * dc, const BrushApply brush_appl
   wmfBrush
     *brush = WMF_DC_BRUSH(dc);
 
+  assert(ddata->image->signature == MagickSignature);
+
   /* Set polygon fill rule */
   switch (WMF_DC_POLYFILL(dc))  /* Is this correct ?? */
     {
@@ -1835,6 +1859,8 @@ static void util_set_pen(wmfAPI * API, wmfDC * dc)
   /*   unsigned int */
   /*     pen_type; */
 
+  assert(ddata->image->signature == MagickSignature);
+
   pen = WMF_DC_PEN(dc);
 
   pen_width = (WMF_PEN_WIDTH(pen) + WMF_PEN_HEIGHT(pen)) / 2;
@@ -1988,6 +2014,8 @@ static double util_pointsize(wmfAPI* API, wmfFont* font, char* str, double font_
   double
     pointsize = 0.0;
 
+  assert(ddata->image->signature == MagickSignature);
+
   draw_info=ddata->draw_info;
   if (draw_info == (const DrawInfo *) NULL)
     return 0;
@@ -2107,6 +2135,8 @@ static float lite_font_stringwidth(wmfAPI* API, wmfFont* font, char* str)
   ResolutionType
     orig_resolution_units;
 
+  assert(ddata->image->signature == MagickSignature);
+
   orig_x_resolution = image->x_resolution;
   orig_y_resolution = image->y_resolution;
   orig_resolution_units = image->units;
@@ -2215,6 +2245,8 @@ static void lite_font_map(wmfAPI* API, wmfFont* font)
 
   if (font == 0)
     return;
+
+  assert(ddata->image->signature == MagickSignature);
 
   font_data = (wmfFontData*)API->font_data;
   font->user_data = font_data->user_data;
@@ -2506,10 +2538,13 @@ static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * excepti
     }
 
   /* Register progress monitor */
-  wmf_status_function(API,(void*)"[%s] Parsing vectors...", magick_progress_callback);
+  wmf_status_function(API,(void*)image, magick_progress_callback);
+  /* Make sure we report 0% */
+  (void) magick_progress_callback((void*)image, 0.0);
 
   ddata = WMF_MAGICK_GetData(API);
   ddata->image = image;
+  assert(ddata->image->signature == MagickSignature);
   ddata->image_info = image_info;
   ddata->draw_info = CloneDrawInfo((const ImageInfo *) NULL, (const DrawInfo *) NULL);
   MagickFreeMemory(ddata->draw_info->font);
@@ -2802,6 +2837,8 @@ static Image *ReadWMFImage(const ImageInfo * image_info, ExceptionInfo * excepti
       (void) wmf_api_destroy(API);
       ThrowReaderException(DelegateError,FailedToRenderFile,image);
     }
+  /* Make sure we report 100% */
+  (void) magick_progress_callback((void*)image, 100.0);
 
   /*
    * Scribble on canvas image

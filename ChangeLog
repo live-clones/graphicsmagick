@@ -1,3 +1,8 @@
+2026-11-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/wmf.c (magick_progress_callback): Fix progress monitor
+        registration and callback implementation.
+
 2026-11-14  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * NEWS.txt: Update the news.
