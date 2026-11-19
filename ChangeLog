@@ -1,5 +1,8 @@
 2026-11-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * Magick++/demo/zoom.cpp: Quench GCC warning: ‘function’ attribute
+        directive ignored.
+
         * magick/transform.c (CoalesceImages): Do not ignore error status from
         CompositeImage(), SetImageColor(), SetImage().
 

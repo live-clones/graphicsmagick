@@ -50,6 +50,11 @@ static int ParseError (int position, char **argv)
 extern "C"
 {
   // Clang's UBSAN does not like mixing C/C++ types
+#if (defined(__GNUC__) && __GNUC__ >= 5)
+#pragma GCC diagnostic push
+  // Quench warning: ‘function’ attribute directive ignored [-Wattributes]
+#pragma GCC diagnostic ignored "-Wattributes"
+#endif
 #if defined(__has_attribute)
 #  if __has_attribute(no_sanitize)
   __attribute__((no_sanitize("function")))

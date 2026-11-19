@@ -38,15 +38,40 @@
 
 <main id="graphicsmagick-changelog">
 <h1 class="title">GraphicsMagick ChangeLog</h1>
-<p>2026-11-18  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
+<p>2026-11-19  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
 <ul class="simple">
+<li><p>Magick++/demo/zoom.cpp: Quench GCC warning: ‘function’ attribute
+directive ignored.</p></li>
+<li><p>magick/transform.c (CoalesceImages): Do not ignore error status from
+CompositeImage(), SetImageColor(), SetImage().</p></li>
+<li><p>magick/shear.c (AffineTransformImage): Do not ignore error status from
+SetImage().</p></li>
+<li><p>magick/render.c (DrawPatternPath): Do not ignore error status from
+SetImage().</p></li>
+<li><p>coders/txt.c (ReadTXTImage): Do not ignore error status from
+SetImage() and SetImageEx().</p></li>
+<li><p>coders/png.c (ReadOnePNGImage): Do not ignore error status from
+SetImage().</p></li>
+<li><p>coders/meta.c (ReadMETAImage): Intentionally ignore error status
+from SetImageEx().</p></li>
+<li><p>coders/locale.c (ReadLOCALEImage): Avoid warning about ignoring
+SetImageEx() error status, and do not ignore error status from
+CloseBlob().</p></li>
+<li><p>coders/label.c (ReadLABELImage): Do not ignore error status from
+SetImage().</p></li>
+<li><p>coders/histogram.c (WriteHISTOGRAMImage): Do not ignore error status from
+SetImageEx().</p></li>
+<li><p>coders/gradient.c (ReadGRADIENTImage): Do not ignore error status from
+SetImageEx().</p></li>
+<li><p>coders/caption.c (ReadCAPTIONImage): Do not ignore error status from
+SetImageEx().</p></li>
 <li><p>coders/pict.c (ReadPICTImage): Do not ignore error status from
 SetImageEx(). Addresses SourceForge issue &quot;#784 SEGV (write) in
 <cite>CopyCompositePixels</cite> when the PICT frame pixel cache cannot be
 allocated (<cite>pict.c:1487</cite>, <cite>composite.c:919</cite>)&quot;.</p></li>
-<li><p>magick/image.h: Do not ignore return status from SetImage() and
-SetImageEx().</p></li>
+<li><p>magick/image.h: Produce compiler warnings if the status from SetImage() or
+SetImageEx() is ignored.</p></li>
 </ul>
 </blockquote>
 <p>2026-11-15  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
