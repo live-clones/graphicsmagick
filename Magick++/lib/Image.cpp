@@ -916,7 +916,8 @@ void Magick::Image::equalize ( void )
 void Magick::Image::erase ( void )
 {
   modifyImage();
-  SetImage( image(), OpaqueOpacity );
+  if (SetImage( image(), OpaqueOpacity ) == MagickFail)
+    {};
   throwImageException();
 }
 

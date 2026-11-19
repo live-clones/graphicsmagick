@@ -350,9 +350,15 @@ static Image *ReadLOCALEImage(const ImageInfo *image_info,
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   image->columns=1;
   image->rows=1;
-  (void) SetImage(image,OpaqueOpacity);
+  if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
+    {
+    }
   status=ReadConfigureFile(image,image->filename,0,exception);
-  (void) CloseBlob(image);
+  if (CloseBlob(image) == MagickFail)
+    {
+      if (image->exception.severity > exception->severity)
+        CopyException(exception, &image->exception);
+    }
   return(image);
 }
 

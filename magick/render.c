@@ -5469,7 +5469,12 @@ DrawPatternPath(Image *image,const DrawInfo *draw_info,const char *name,
   DestroyImageInfo(image_info);
   status &= QueryColorDatabase("none",&(*pattern)->background_color,
                                &image->exception);
-  (void) SetImage(*pattern,OpaqueOpacity);
+  if ((status &= SetImage(*pattern,OpaqueOpacity)) == MagickFail)
+    {
+      /* Copy exception into base image */
+      if ((*pattern)->exception.severity > image->exception.severity)
+        CopyException(&image->exception, &(*pattern)->exception);
+    }
   (void) LogMagickEvent(RenderEvent,GetMagickModule(),
                         "begin pattern-path %.1024s %.1024s",name,geometry->value);
   clone_info=CloneDrawInfo((ImageInfo *) NULL,draw_info);

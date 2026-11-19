@@ -1,3 +1,47 @@
+2026-11-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/transform.c (CoalesceImages): Do not ignore error status from
+        CompositeImage(), SetImageColor(), SetImage().
+
+        * magick/shear.c (AffineTransformImage): Do not ignore error status from
+        SetImage().
+
+        * magick/render.c (DrawPatternPath): Do not ignore error status from
+        SetImage().
+
+        * coders/txt.c (ReadTXTImage): Do not ignore error status from
+        SetImage() and SetImageEx().
+
+        * coders/png.c (ReadOnePNGImage): Do not ignore error status from
+        SetImage().
+
+        * coders/meta.c (ReadMETAImage): Intentionally ignore error status
+        from SetImageEx().
+
+        * coders/locale.c (ReadLOCALEImage): Avoid warning about ignoring
+        SetImageEx() error status, and do not ignore error status from
+        CloseBlob().
+
+        * coders/label.c (ReadLABELImage): Do not ignore error status from
+        SetImage().
+
+        * coders/histogram.c (WriteHISTOGRAMImage): Do not ignore error status from
+        SetImageEx().
+
+        * coders/gradient.c (ReadGRADIENTImage): Do not ignore error status from
+        SetImageEx().
+
+        * coders/caption.c (ReadCAPTIONImage): Do not ignore error status from
+        SetImageEx().
+
+        * coders/pict.c (ReadPICTImage): Do not ignore error status from
+        SetImageEx(). Addresses SourceForge issue "#784 SEGV (write) in
+        `CopyCompositePixels` when the PICT frame pixel cache cannot be
+        allocated (`pict.c:1487`, `composite.c:919`)".
+
+        * magick/image.h: Produce compiler warnings if the status from SetImage() or
+        SetImageEx() is ignored.
+
 2026-11-15  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * Magick++/demo/zoom.cpp (ConfirmAccess): Allow Clan's UBSAN to

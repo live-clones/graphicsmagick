@@ -90,7 +90,7 @@ do { \
   return((Image *) NULL); \
 } while (0);
 static Image *ReadCAPTIONImage(const ImageInfo *image_info,
-  ExceptionInfo *exception)
+                               ExceptionInfo *exception)
 {
   char
     *caption = (char *) NULL,
@@ -100,7 +100,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
     *draw_info = (DrawInfo *) NULL;
 
   Image
-    *image;
+    *image = (Image *) NULL;
 
   register char
     *p,
@@ -116,7 +116,7 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
     metrics;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   /*
     Initialize Image structure.
@@ -145,49 +145,65 @@ static Image *ReadCAPTIONImage(const ImageInfo *image_info,
     Format caption.
   */
   draw_info=CloneDrawInfo(image_info,(DrawInfo *) NULL);
+  if (draw_info == (DrawInfo *) NULL)
+    ThrowCAPTIONException(ResourceLimitError,MemoryAllocationFailed,image);
   draw_info->fill=image_info->pen;
   draw_info->text=AllocateString(caption);
+  if (draw_info->text == (char *) NULL)
+    ThrowCAPTIONException(ResourceLimitError,MemoryAllocationFailed,image);
   p=caption;
   q=draw_info->text;
   for (i=0; *p != '\0'; p++)
-  {
-    *q++=(*p);
-    *q='\0';
-    /*
-      FIXME: The algorithm to get the type metrics is not based on
-      new-line delimited strings.  Instead it seems call
-      GetTypeMetrics() for each character position.  This very slow!.
-    */
-    status=GetTypeMetrics(image,draw_info,&metrics);
-    if (status == MagickFail)
-      {
-        DestroyDrawInfo(draw_info);
-        draw_info=(DrawInfo *) NULL;
-        MagickFreeMemory(caption);
+    {
+      *q++=(*p);
+      *q='\0';
+      /*
+        FIXME: The algorithm to get the type metrics is not based on
+        new-line delimited strings.  Instead it seems to call
+        GetTypeMetrics() for each character position.  This very slow!.
+      */
+      if ((status &= GetTypeMetrics(image,draw_info,&metrics)) == MagickFail)
         ThrowCAPTIONException(TypeError,UnableToGetTypeMetrics,image);
-      }
-    if ((metrics.width+metrics.max_advance/2) < image->columns)
-      continue;
-    for (p--; !isspace((int) *p) && (p > caption); p--);
-    *p++='\n';
-    q=draw_info->text;
-    i++;
-  }
+      if ((metrics.width+metrics.max_advance/2) < image->columns)
+        continue;
+      for (p--; !isspace((int) *p) && (p > caption); p--);
+      *p++='\n';
+      q=draw_info->text;
+      i++;
+    }
   q=(char *) NULL;
   if (image->rows == 0)
     image->rows=(unsigned long) ((i+1)*(metrics.ascent-metrics.descent));
-  (void) SetImage(image,OpaqueOpacity);
+  if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
+    {
+      DestroyImage(image);
+      image=(Image *) NULL;
+      goto read_caption_fail;
+    }
   /*
     Draw caption.
   */
-  (void) CloneString(&draw_info->text,caption);
+  if (CloneString(&draw_info->text,caption) == MagickFail)
+    {
+      ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,image->filename);
+      DestroyImage(image);
+      image=(Image *) NULL;
+      goto read_caption_fail;
+    }
   MagickFormatString(geometry,sizeof(geometry),"+%g+%g",metrics.max_advance/4,metrics.ascent);
   draw_info->geometry=AllocateString(geometry);
-  (void) AnnotateImage(image,draw_info);
+  if (AnnotateImage(image,draw_info) == MagickFail)
+    {
+      CopyException(exception, &image->exception);
+      DestroyImage(image);
+      image=(Image *) NULL;
+    }
+ read_caption_fail:;
   DestroyDrawInfo(draw_info);
   draw_info=(DrawInfo *) NULL;
   MagickFreeMemory(caption);
-  StopTimer(&image->timer);
+  if (image != (Image *) NULL)
+    StopTimer(&image->timer);
   return(image);
 }
 

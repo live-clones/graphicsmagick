@@ -2788,11 +2788,10 @@ static Image *ReadOnePNGImage(MngInfo *mng_info,
       MagickFreeResourceLimitedMemory(Quantum *,mng_info->quantum_scanline);
       MagickFreeResourceLimitedMemory(unsigned char *,mng_info->png_pixels);
       if (ReallocateImageColormap(image,2) == MagickFail)
-        {
-          ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
+        ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);
+      if (SetImage(image,TransparentOpacity) == MagickFail)
+          ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
                                image);
-        }
-      (void) SetImage(image,TransparentOpacity);
 #if defined(GMPNG_SETJMP_NOT_THREAD_SAFE)
       UnlockSemaphoreInfo(png_semaphore);
 #endif
@@ -5746,7 +5745,9 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               image->page.x=0;
               image->page.y=0;
               image->background_color=mng_background_color;
-              (void) SetImage(image,TransparentOpacity);
+              if (SetImage(image,TransparentOpacity) == MagickFail)
+                ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                     image);
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  Inserted transparent background"
@@ -6159,11 +6160,23 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
 #endif
 
               if (image->matte)
-                (void) SetImage(large_image,TransparentOpacity);
+                {
+                  if (SetImage(large_image,TransparentOpacity) == MagickFail)
+                    {
+                      ThrowException(exception,ResourceLimitError,
+                                     UnableToSetImageBackgroundColor,image->filename);
+                      break;
+                    }
+                }
               else
                 {
                   large_image->background_color.opacity=OpaqueOpacity;
-                  (void) SetImage(large_image,OpaqueOpacity);
+                  if (SetImage(large_image,OpaqueOpacity) == MagickFail)
+                    {
+                      ThrowException(exception,ResourceLimitError,
+                                     UnableToSetImageBackgroundColor,image->filename);
+                      break;
+                    }
                   if (magn_methx == 4)
                     magn_methx=2;
                   if (magn_methx == 5)
@@ -6536,7 +6549,11 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
                                        image);
                 }
-              (void) SetImage(image,TransparentOpacity);
+              if (SetImage(image,TransparentOpacity) == MagickFail)
+                {
+                  ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                       image);
+                }
               image->page.width=1;
               image->page.height=1;
               image->page.x=0;
@@ -6606,7 +6623,11 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
       image->background_color=mng_background_color;
       image->matte=MagickFalse;
       if (!image_info->ping)
-        (void) SetImage(image,OpaqueOpacity);
+        if (SetImage(image,OpaqueOpacity) == MagickFail)
+          {
+            ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                 image);
+          }
       mng_info->image_found++;
     }
 #endif

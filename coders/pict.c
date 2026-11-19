@@ -1484,7 +1484,8 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                 image->rows=frame.bottom-frame.top;
                 if (CheckImagePixelLimits(image, exception) != MagickPass)
                   ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
-                (void) SetImageEx(image,OpaqueOpacity,exception);
+                if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
+                  ThrowPICTReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,image);
                 break;
               }
             case 0x12:

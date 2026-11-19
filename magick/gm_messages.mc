@@ -3011,6 +3011,12 @@ unable to select image
 .
 
 MessageId       = +1
+SymbolicName    = LimitErrorUnableToSetImageBackgroundColor
+Language        = English
+unable to set image background color
+.
+
+MessageId       = +1
 SymbolicName    = LimitErrorUnableToSharpenImage
 Language        = English
 unable to sharpen image

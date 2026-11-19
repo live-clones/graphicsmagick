@@ -415,12 +415,24 @@ MagickExport Image *CoalesceImages(const Image *image,ExceptionInfo *exception)
           for (i = 0; i < (long) coalesce_image->colors; i++) {
             if (coalesce_image->colormap[i].opacity == TransparentOpacity) {
               found_transparency = True;
-              (void) SetImageColor(coalesce_image->next,&coalesce_image->colormap[i]);
+              if (SetImageColor(coalesce_image->next,&coalesce_image->colormap[i]) == MagickFail)
+                {
+                  if (coalesce_image->next->exception.severity > exception->severity)
+                    CopyException(exception, &coalesce_image->next->exception);
+                  DestroyImage(coalesce_image->next);
+                  coalesce_image->next = (Image *) NULL;
+                }
               break;
             }
           }
           if (!found_transparency)
-            (void) SetImage(coalesce_image->next,OpaqueOpacity);
+            {
+              if (SetImageEx(coalesce_image->next,OpaqueOpacity,exception) == MagickFail)
+                {
+                  DestroyImage(coalesce_image->next);
+                  coalesce_image->next = (Image *) NULL;
+                }
+            }
         }
         break;
       }
@@ -1431,7 +1443,7 @@ MagickExport Image *MosaicImages(const Image *image,ExceptionInfo *exception)
     matte;
 
   MagickPassFail
-    status;
+    status = MagickPass;
 
   size_t
     image_list_length;
@@ -1453,7 +1465,11 @@ MagickExport Image *MosaicImages(const Image *image,ExceptionInfo *exception)
   */
   mosaic_image=AllocateImage((ImageInfo *) NULL);
   if (mosaic_image == (Image *) NULL)
-    return((Image *) NULL);
+    {
+      ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,
+                     image->filename);
+      return mosaic_image;
+    }
   mosaic_image->columns=page.width;
   mosaic_image->rows=page.height;
 
@@ -1472,21 +1488,31 @@ MagickExport Image *MosaicImages(const Image *image,ExceptionInfo *exception)
     'transparent' is often best for composition.
   */
   mosaic_image->background_color=image->background_color;
-  (void) SetImage(mosaic_image,OpaqueOpacity);
+  if (SetImageEx(mosaic_image,OpaqueOpacity,exception) == MagickFail)
+    {
+      DestroyImage(mosaic_image);
+      mosaic_image=(Image *) NULL;
+      return mosaic_image;
+    }
 
   /*
     Composite mosaic.
   */
   scene=0;
   for (next=image; next != (Image *) NULL; next=next->next)
-  {
-    (void) CompositeImage(mosaic_image,next->compose,next,next->page.x,
-      next->page.y);
-    status=MagickMonitorFormatted(scene++,image_list_length,
-                                  exception,MosaicImageText,image->filename);
-    if (status == MagickFail)
-      break;
-  }
+    {
+      if (CompositeImage(mosaic_image,next->compose,next,next->page.x,
+                         next->page.y) == MagickFail)
+        {
+          status &= MagickFail;
+          CopyException(exception, &mosaic_image->exception);
+        }
+      status &= MagickMonitorFormatted(scene++,image_list_length,
+                                       exception,MosaicImageText,
+                                       image->filename);
+      if (status == MagickFail)
+        break;
+    }
   return(mosaic_image);
 }
 

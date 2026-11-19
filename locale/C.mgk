@@ -1645,6 +1645,9 @@
         <Message name="UnableToSegmentImage">
           unable to segment image
         </Message>
+        <Message name="UnableToSetImageBackgroundColor">
+          unable to set image background color
+        </Message>
       </Error>
       <FatalError>
         <Message name="UnableToAllocateAscii85Info">

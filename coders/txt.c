@@ -650,7 +650,8 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
           }
 
         /* Assure that all image pixels are initialized to black */
-        SetImage(image,OpaqueOpacity);
+        if (SetImage(image,OpaqueOpacity) == MagickFail)
+          ThrowNOTXTReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,image);
 
         BImgBuff = MagickAllocateResourceLimitedClearedArray(unsigned char *,
                                                              ((size_t)x+1),
@@ -965,7 +966,13 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
     /*
       Annotate the text image.
     */
-    (void) SetImageEx(image,OpaqueOpacity,exception);
+    if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
+      {
+        if (texture != (Image *) NULL)
+          DestroyImage(texture);
+        DestroyDrawInfo(draw_info);
+        ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,image);
+      }
     draw_info=CloneDrawInfo(image_info,(DrawInfo *) NULL);
     draw_info->fill=image_info->pen;
     (void) CloneString(&draw_info->text,image_info->filename);
@@ -1064,7 +1071,8 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
         image->next->rows=image->rows;
         image=SyncNextImageInList(image);
         (void) strlcpy(image->filename,filename,MaxTextExtent);
-        (void) SetImage(image,OpaqueOpacity);
+        if (SetImage(image,OpaqueOpacity) == MagickFail)
+          ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,image);
         if (!MagickMonitorFormatted(TellBlob(image),GetBlobSize(image),exception,
                                     LoadImagesText,image->filename))
           break;

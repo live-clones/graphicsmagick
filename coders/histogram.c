@@ -156,6 +156,12 @@ ModuleExport void UnregisterHISTOGRAMImage(void)
 %
 %
 */
+#define WriteHISTOGRAMImageCleanupRGB()                 \
+  {                                                     \
+    MagickFreeResourceLimitedMemory(long *,red);        \
+    MagickFreeResourceLimitedMemory(long *,green);      \
+    MagickFreeResourceLimitedMemory(long *,blue);       \
+  }
 static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
                                           Image *image)
 {
@@ -231,21 +237,16 @@ static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
     Allocate histogram count arrays.
   */
   length=Max(ScaleQuantumToChar(MaxRGB)+1,histogram_image->columns);
-  red=MagickAllocateResourceLimitedArray(long *,length,sizeof(long));
-  green=MagickAllocateResourceLimitedArray(long *,length,sizeof(long));
-  blue=MagickAllocateResourceLimitedArray(long *,length,sizeof(long));
+  red=MagickAllocateResourceLimitedClearedArray(long *,length,sizeof(long));
+  green=MagickAllocateResourceLimitedClearedArray(long *,length,sizeof(long));
+  blue=MagickAllocateResourceLimitedClearedArray(long *,length,sizeof(long));
   if ((red == (long *) NULL) || (green == (long *) NULL) ||
       (blue == (long *) NULL))
     {
-      MagickFreeResourceLimitedMemory(long *,red);
-      MagickFreeResourceLimitedMemory(long *,green);
-      MagickFreeResourceLimitedMemory(long *,blue);
+      WriteHISTOGRAMImageCleanupRGB();
       DestroyImage(histogram_image);
       ThrowWriterException(ResourceLimitError,MemoryAllocationFailed,image);
     }
-  (void) memset(red,0,length*sizeof(long));
-  (void) memset(green,0,length*sizeof(long));
-  (void) memset(blue,0,length*sizeof(long));
   /*
     Initialize histogram count arrays.
   */
@@ -279,9 +280,23 @@ static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
   /*
     Initialize histogram image.
   */
-  (void) QueryColorDatabase("black",&histogram_image->background_color,
-                            &image->exception);
-  (void) SetImage(histogram_image,OpaqueOpacity);
+  if ((status &= QueryColorDatabase("black",
+                                    &histogram_image->background_color,
+                                    &image->exception)) == MagickFail)
+    {
+      WriteHISTOGRAMImageCleanupRGB();
+      DestroyImage(histogram_image);
+      histogram_image = (Image *) NULL;
+      return status;
+    }
+  if ((status &= SetImageEx(histogram_image,OpaqueOpacity,&image->exception))
+      == MagickFail)
+    {
+      WriteHISTOGRAMImageCleanupRGB();
+      DestroyImage(histogram_image);
+      histogram_image = (Image *) NULL;
+      return status;
+    }
   for (x=0; x < (long) histogram_image->columns; x++)
     {
       q=GetImagePixels(histogram_image,x,0,1,histogram_image->rows);
@@ -319,9 +334,7 @@ static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
   /*
     Free memory resources.
   */
-  MagickFreeResourceLimitedMemory(long *,blue);
-  MagickFreeResourceLimitedMemory(long *,green);
-  MagickFreeResourceLimitedMemory(long *,red);
+  WriteHISTOGRAMImageCleanupRGB();
   file=AcquireTemporaryFileStream(filename,BinaryFileIOMode);
   if (file == (FILE *) NULL)
     {
@@ -339,10 +352,14 @@ static MagickPassFail WriteHISTOGRAMImage(const ImageInfo *image_info,
       Add a histogram as an image comment.
     */
     (void) GetNumberColors(image,file,&image->exception);
-    (void) fclose(file);
+    if (fclose(file) != 0)
+      {
+        DestroyImage(histogram_image);
+        ThrowWriterTemporaryFileException(filename);
+      }
     histogram=(char *) FileToBlob(filename,&histogram_length,&histogram_image->exception);
-    (void) StripImage(histogram_image);
-    (void) SetImageAttribute(histogram_image,"comment",NULL);
+    (void) StripImage(histogram_image); /* Remove profiles and text attributes */
+    (void) SetImageAttribute(histogram_image,"comment",NULL); /* Remove comment */
     if (histogram && histogram_length > 0)
       (void) SetImageAttribute(histogram_image,"comment",histogram);
     MagickFreeMemory(histogram);

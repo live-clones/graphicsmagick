@@ -581,7 +581,14 @@ MagickExport Image *MontageImages(const Image *images,
       (void) strlcpy(montage->filename,montage_info->filename,MaxTextExtent);
       montage->columns=bounds.width;
       montage->rows=bounds.height;
-      (void) SetImage(montage,OpaqueOpacity);
+      if (SetImage(montage,OpaqueOpacity) == MagickFail)
+        {
+          MagickFreeMemory(master_list);
+          DestroyDrawInfo(draw_info);
+          if (montage->exception.severity > exception->severity)
+            CopyException(exception, &montage->exception);
+          return((Image *) NULL);
+        }
       /*
         Set montage geometry.
       */

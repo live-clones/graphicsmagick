@@ -160,8 +160,22 @@ static Image *ReadLABELImage(const ImageInfo *image_info,
                          metrics.ascent);
     }
   draw_info->geometry=AllocateString(geometry);
-  (void) SetImage(image,OpaqueOpacity);
-  (void) AnnotateImage(image,draw_info);
+  if (SetImage(image,OpaqueOpacity) == MagickFail)
+    {
+      if (image->exception.severity > exception->severity)
+        CopyException(exception, &image->exception);
+      DestroyDrawInfo(draw_info);
+      StopTimer(&image->timer);
+      return(image);
+    }
+  if (AnnotateImage(image,draw_info) == MagickFail)
+    {
+      if (image->exception.severity > exception->severity)
+        CopyException(exception, &image->exception);
+      DestroyDrawInfo(draw_info);
+      StopTimer(&image->timer);
+      return(image);
+    }
   DestroyDrawInfo(draw_info);
   StopTimer(&image->timer);
   return(image);

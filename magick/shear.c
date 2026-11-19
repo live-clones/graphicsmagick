@@ -149,14 +149,26 @@ AffineTransformImage(const Image *image,const AffineMatrix *affine,
     (unsigned long) ceil(max.y-min.y-0.5),True,exception);
   if (affine_image == (Image *) NULL)
     return((Image *) NULL);
-  (void) SetImage(affine_image,TransparentOpacity);
+  if (SetImageEx(affine_image,TransparentOpacity,exception) == MagickFail)
+    {
+      DestroyImage(affine_image);
+      affine_image=(Image *) NULL;
+      return((Image *) NULL);
+    }
   transform.sx=affine->sx;
   transform.rx=affine->rx;
   transform.ry=affine->ry;
   transform.sy=affine->sy;
   transform.tx=(-min.x);
   transform.ty=(-min.y);
-  (void) DrawAffineImage(affine_image,image,&transform);
+  if (DrawAffineImage(affine_image,image,&transform) == MagickFail)
+    {
+      if (affine_image->exception.severity > exception->severity)
+        CopyException(exception, &affine_image->exception);
+      DestroyImage(affine_image);
+      affine_image=(Image *) NULL;
+      return((Image *) NULL);
+    }
   return(affine_image);
 }
 
