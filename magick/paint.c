@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -50,7 +50,7 @@
 */
 #define FuzzyOpacityMatch(color,target,fuzz) \
   (((color)->opacity == (target)->opacity) && \
-   FuzzyColorMatch(color,target,fuzz))
+   FuzzyColorMatchInlined(color,target,fuzz))
 #define MaxStacksize  (((size_t) 1) << 15)
 #define Push(up,left,right,delta)                                       \
   {                                                                     \
@@ -176,7 +176,7 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
   /*
     Set floodfill color.
   */
-  if (FuzzyColorMatch(&draw_info->fill,&target,image->fuzz))
+  if (FuzzyColorMatchInlined(&draw_info->fill,&target,image->fuzz))
     return(MagickFail);
   /*
     The flood-fill algorithm may lock-up if a clip-mask is present
@@ -239,7 +239,7 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
 
           for (x=x1; x >= 0; x--)
             {
-              if (!FuzzyColorMatch(q,&target,image->fuzz))
+              if (!FuzzyColorMatchInlined(q,&target,image->fuzz))
                 break;
               floodplane[y*image->columns+x]=MagickTrue;
               *q=draw_info->fill;
@@ -264,8 +264,8 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
 
           for (x=x1; x >= 0; x--)
             {
-              if (FuzzyColorMatch(q,&target,image->fuzz) ||
-                  FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+              if (FuzzyColorMatchInlined(q,&target,image->fuzz) ||
+                  FuzzyColorMatchInlined(q,&draw_info->fill,image->fuzz))
                 break;
               floodplane[y*image->columns+x]=MagickTrue;
               *q=draw_info->fill;
@@ -308,7 +308,7 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
 
                       for ( ; x < (long) image->columns; x++)
                         {
-                          if (!FuzzyColorMatch(q,&target,image->fuzz))
+                          if (!FuzzyColorMatchInlined(q,&target,image->fuzz))
                             break;
                           floodplane[y*image->columns+x]=MagickTrue;
                           *q=draw_info->fill;
@@ -332,8 +332,8 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
 
                       for ( ; x < (long) image->columns; x++)
                         {
-                          if (FuzzyColorMatch(q,&target,image->fuzz) ||
-                              FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+                          if (FuzzyColorMatchInlined(q,&target,image->fuzz) ||
+                              FuzzyColorMatchInlined(q,&draw_info->fill,image->fuzz))
                             break;
                           floodplane[y*image->columns+x]=True;
                           *q=draw_info->fill;
@@ -370,7 +370,7 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
 
                   for ( ; x <= x2; x++)
                     {
-                      if (FuzzyColorMatch(q,&target,image->fuzz))
+                      if (FuzzyColorMatchInlined(q,&target,image->fuzz))
                         break;
                       q++;
                     }
@@ -386,8 +386,8 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
 
                   for ( ; x <= x2; x++)
                     {
-                      if (!FuzzyColorMatch(q,&target,image->fuzz) &&
-                          !FuzzyColorMatch(q,&draw_info->fill,image->fuzz))
+                      if (!FuzzyColorMatchInlined(q,&target,image->fuzz) &&
+                          !FuzzyColorMatchInlined(q,&draw_info->fill,image->fuzz))
                         break;
                       q++;
                     }
@@ -620,8 +620,7 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
   (void) segment_stack;
   (void) floodplane;
   (void) method;
-  ThrowException(&image->exception,ResourceLimitError,FuzzingBuildUnsafeForProduction,
-                 image->filename);
+  ThrowException(&image->exception,DrawWarning,FuzzingBuildUnsafeForProductionimage->filename);
   status=MagickFail;
 #else
   /*
@@ -835,7 +834,7 @@ OpaqueImageCallBack(void *mutable_data,         /* User provided mutable data */
     {
       for (i=0; i < npixels; i++)
         {
-          if (FuzzyColorMatch(&pixels[i],&options.target,options.fuzz))
+          if (FuzzyColorMatchInlined(&pixels[i],&options.target,options.fuzz))
             pixels[i]=options.fill;
         }
     }
@@ -975,7 +974,7 @@ TransparentImageCallBack(void *mutable_data,         /* User provided mutable da
     {
       for (i=0; i < npixels; i++)
         {
-          if (FuzzyColorMatch(&pixels[i],&options.target,options.fuzz))
+          if (FuzzyColorMatchInlined(&pixels[i],&options.target,options.fuzz))
             pixels[i].opacity=options.opacity;
           else if (clear_matte)
             pixels[i].opacity=OpaqueOpacity;

@@ -770,6 +770,9 @@
       <Message name="URLNotFound">
         URL not found
       </Message>
+      <Message name="FuzzingBuildUnsafeForProduction">
+        fuzzing build, unsafe for production
+      </Message>
     </Warning>
   </Draw>
   <File>
@@ -1647,9 +1650,6 @@
         </Message>
         <Message name="UnableToSetImageBackgroundColor">
           unable to set image background color
-        </Message>
-        <Message name="FuzzingBuildUnsafeForProduction">
-          fuzzing build, unsafe for production
         </Message>
       </Error>
       <FatalError>

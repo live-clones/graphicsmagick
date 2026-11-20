@@ -3505,7 +3505,7 @@ static unsigned int MagickXColorEditImage(Display *display,
                           break;
                         for (x=0; x < (int) (*image)->columns; x++)
                           {
-                            if (FuzzyColorMatch(q,&target,(*image)->fuzz))
+                            if (FuzzyColorMatchInlined(q,&target,(*image)->fuzz))
                               {
                                 q->red=ScaleShortToQuantum(color.red);
                                 q->green=ScaleShortToQuantum(color.green);
@@ -3520,7 +3520,7 @@ static unsigned int MagickXColorEditImage(Display *display,
                 else
                   {
                     for (i=0; i < (int) (*image)->colors; i++)
-                      if (FuzzyColorMatch((*image)->colormap+i,&target,(*image)->fuzz))
+                      if (FuzzyColorMatchInlined((*image)->colormap+i,&target,(*image)->fuzz))
                         {
                           (*image)->colormap[i].red=ScaleShortToQuantum(color.red);
                           (*image)->colormap[i].green=
@@ -9533,7 +9533,7 @@ static unsigned int MagickXMatteEditImage(Display *display,
                       break;
                     for (x=0; x < (int) (*image)->columns; x++)
                       {
-                        if (FuzzyColorMatch(q,&target,(*image)->fuzz))
+                        if (FuzzyColorMatchInlined(q,&target,(*image)->fuzz))
                           q->opacity=(Quantum) MagickAtoL(matte);
                         q++;
                       }

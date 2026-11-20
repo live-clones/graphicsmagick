@@ -6471,7 +6471,7 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
                     break;
                   for (x=0; x < (long) image->columns; x++)
                     {
-                      if (!FuzzyColorMatch(q,&target,image->fuzz))
+                      if (!FuzzyColorMatchInlined(q,&target,image->fuzz))
                         {
                           q++;
                           continue;

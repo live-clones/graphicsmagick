@@ -1,8 +1,14 @@
 2026-11-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
-        * magick/paint.c (MatteFloodfillImage): Report error if
-        FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is defined because
-        ASAN-instrumented code runs very slowly.
+        * magick/color-private.h (FuzzyColorMatchInlined): New inline
+        function to replace existing FuzzyColorMatch() everywhere. The
+        FuzzyColorMatch() function adds a lot of overhead because it is
+        not inlined and it must be called for each pixel.
+
+        * magick/paint.c (MatteFloodfillImage): Report warning and return
+        immediately if FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is defined
+        because this code runs very slowly when ASAN-instrumented and will
+        require more time than oss-fuzz allows.
 
 2026-11-19  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 

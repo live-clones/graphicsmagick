@@ -1415,6 +1415,12 @@ default error
 .
 
 MessageId       = +1
+SymbolicName    = DrawWarningFuzzingBuildUnsafeForProduction
+Language        = English
+fuzzing build, unsafe for production
+.
+
+MessageId       = +1
 SymbolicName    = DrawWarningNotARelativeURL
 Language        = English
 Not a relative URL
@@ -2588,12 +2594,6 @@ MessageId       = +1
 SymbolicName    = LimitErrorCacheResourcesExhausted
 Language        = English
 Disk space limit exceeded (see -limit Disk)
-.
-
-MessageId       = +1
-SymbolicName    = LimitErrorFuzzingBuildUnsafeForProduction
-Language        = English
-fuzzing build, unsafe for production
 .
 
 MessageId       = +1

@@ -181,16 +181,16 @@ MagickExport RectangleInfo GetImageBoundingBox(const Image *image,
             */
             for (x=0; x < (long) image->columns; x++)
               {
-                if (!FuzzyColorMatch(p,&corners[0],image->fuzz))
+                if (!FuzzyColorMatchInlined(p,&corners[0],image->fuzz))
                   if (x < thread_bounds.x)
                     thread_bounds.x=x;
-                if (!FuzzyColorMatch(p,&corners[1],image->fuzz))
+                if (!FuzzyColorMatchInlined(p,&corners[1],image->fuzz))
                   if (x > (long) thread_bounds.width)
                     thread_bounds.width=x;
-                if (!FuzzyColorMatch(p,&corners[0],image->fuzz))
+                if (!FuzzyColorMatchInlined(p,&corners[0],image->fuzz))
                   if (y < thread_bounds.y)
                     thread_bounds.y=y;
-                if (!FuzzyColorMatch(p,&corners[2],image->fuzz))
+                if (!FuzzyColorMatchInlined(p,&corners[2],image->fuzz))
                   if (y > (long) thread_bounds.height)
                     thread_bounds.height=y;
                 p++;

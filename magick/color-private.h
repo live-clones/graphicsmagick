@@ -37,8 +37,27 @@
    ((p)->green != (q)->green) ||                                \
    ((p)->blue != (q)->blue))
 
+#define QauntumDifference(p,q,element) \
+  ((double)p->element-(double) q->element)
+#define QuantumElementDistance(p,q,element) \
+  (QauntumDifference(p,q,element)*QauntumDifference(p,q,element))
+#define QuantumColorDistance(p,q) (QuantumElementDistance(p,q,red)+ \
+                                   QuantumElementDistance(p,q,green) + \
+                                   QuantumElementDistance(p,q,blue))
+
 extern MagickExport unsigned int
-  FuzzyColorMatch(const PixelPacket *p,const PixelPacket *q,const double fuzz) MAGICK_FUNC_PURE;
+  FuzzyColorMatch(const PixelPacket *p,const PixelPacket *q,const double fuzz) MAGICK_FUNC_PURE MAGICK_FUNC_DEPRECATED;
+
+#if defined(MagickEpsilon)
+static inline MagickBool FuzzyColorMatchInlined(const PixelPacket *p,
+  const PixelPacket *q,const double fuzz) MAGICK_FUNC_PURE;
+static inline MagickBool FuzzyColorMatchInlined(const PixelPacket *p,
+  const PixelPacket *q,const double fuzz)
+{
+  return (fuzz <= MagickEpsilon ? ColorMatch(q,p) :
+          (QuantumColorDistance(p,q) > fuzz*fuzz ? MagickFalse : MagickTrue));
+}
+#endif /* if defined(MagickEpsilon) */
 
 /*
   Compare two pixels (including opacity)

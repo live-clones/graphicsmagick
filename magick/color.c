@@ -373,27 +373,8 @@ static void DestroyColorList(NodeInfo *node_info)
 MagickExport MagickBool FuzzyColorMatch(const PixelPacket *p,
   const PixelPacket *q,const double fuzz)
 {
-  double
-    difference,
-    distance,
-    fuzz_squared;
-
-  if (fuzz <= MagickEpsilon)
-    return (ColorMatch(q,p));
-  fuzz_squared=fuzz*fuzz;
-  difference=p->red-(double) q->red;
-  distance=difference*difference;
-  if (distance > (fuzz_squared))
-    return(MagickFalse);
-  difference=p->green-(double) q->green;
-  distance+=difference*difference;
-  if (distance > (fuzz_squared))
-    return(MagickFalse);
-  difference=p->blue-(double) q->blue;
-  distance+=difference*difference;
-  if (distance > (fuzz_squared))
-    return(MagickFalse);
-  return(MagickTrue);
+  return (fuzz <= MagickEpsilon ? ColorMatch(q,p) :
+          (QuantumColorDistance(p,q) > fuzz*fuzz ? MagickFalse : MagickTrue));
 }
 
 /*
