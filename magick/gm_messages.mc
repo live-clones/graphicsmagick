@@ -2591,6 +2591,12 @@ Disk space limit exceeded (see -limit Disk)
 .
 
 MessageId       = +1
+SymbolicName    = LimitErrorFuzzingBuildUnsafeForProduction
+Language        = English
+fuzzing build, unsafe for production
+.
+
+MessageId       = +1
 SymbolicName    = LimitErrorImagePixelHeightLimitExceeded
 Language        = English
 Image pixel height limit exceeded (see -limit Height)

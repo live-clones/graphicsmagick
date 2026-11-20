@@ -1648,6 +1648,9 @@
         <Message name="UnableToSetImageBackgroundColor">
           unable to set image background color
         </Message>
+        <Message name="FuzzingBuildUnsafeForProduction">
+          fuzzing build, unsafe for production
+        </Message>
       </Error>
       <FatalError>
         <Message name="UnableToAllocateAscii85Info">

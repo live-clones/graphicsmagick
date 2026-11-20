@@ -605,6 +605,25 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
     return(MagickFail);
   if (q->opacity == opacity)
     return(MagickFail);
+#if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+  /*
+    This algorithm can easily exceed oss-fuzz time limits for ASAN builds.
+  */
+  (void) skip;
+  (void) offset;
+  (void) start;
+  (void) x1;
+  (void) x2;
+  (void) y;
+  (void) x;
+  (void) s;
+  (void) segment_stack;
+  (void) floodplane;
+  (void) method;
+  ThrowException(&image->exception,ResourceLimitError,FuzzingBuildUnsafeForProduction,
+                 image->filename);
+  status=MagickFail;
+#else
   /*
     The flood-fill algorithm may lock-up if a clip-mask is present
     because the pixels just written may not be what is read later.
@@ -740,6 +759,7 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
     } while (x <= x2);
   }
   MagickFreeResourceLimitedMemory(SegmentInfo*, segment_stack);
+#endif /* not if defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION) */
   return(status);
 }
 
