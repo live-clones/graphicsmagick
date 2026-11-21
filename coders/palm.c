@@ -1096,7 +1096,7 @@ static Image *ReadPALMImage(const ImageInfo *image_info,
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowPALMReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   alloc_size = Max(palm_header.bytes_per_row,MagickArraySize(2,image->columns));
@@ -1416,7 +1416,7 @@ CreatePALMMapImage(const unsigned int depth)
       break;
     } while(1);
 
-  if ((status != MagickPass) && (map_image != (Image *) NULL))
+  if ((status == MagickFail) && (map_image != (Image *) NULL))
       {
         DestroyImage(map_image);
         map_image = (Image *) NULL;
@@ -1540,7 +1540,7 @@ OptimizePALMImage(const ImageInfo *image_info,
           map_image=(Image *) NULL;
         }
 
-      if ((status != MagickPass) && (palm_image != (Image *) NULL))
+      if ((status == MagickFail) && (palm_image != (Image *) NULL))
         {
           DestroyImage(palm_image);
           palm_image = (Image *) NULL;

@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2019 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -490,7 +490,7 @@ IntegralRotateImage(const Image *image,unsigned int rotations,
     if (rotate_image == (Image *) NULL)
       return((Image *) NULL);
     if (rotations != 0)
-      if (ModifyCache(rotate_image,exception) != MagickPass)
+      if (ModifyCache(rotate_image,exception) == MagickFail)
         {
           DestroyImage(rotate_image);
           return (Image *) NULL;
@@ -1854,22 +1854,22 @@ RotateImage(const Image *image,const double degrees,ExceptionInfo *exception)
   rotate_image->matte|=rotate_image->background_color.opacity != OpaqueOpacity;
 
   if (XShearImage(rotate_image,shear.x,width,height,
-          x_offset,y_offset,exception) != MagickPass)
+          x_offset,y_offset,exception) == MagickFail)
     goto rotate_image_exception;
 
   if (YShearImage(rotate_image,shear.y,shear1_width,height,
                   (long) (rotate_image->columns-shear1_width)/2,y_offset,exception)
-      != MagickPass)
+      == MagickFail)
     goto rotate_image_exception;
 
   if (XShearImage(rotate_image,shear.x,shear1_width,shear2_height,
                   (long) (rotate_image->columns-shear1_width)/2,
                   (long) (rotate_image->rows-shear2_height)/2,exception)
-     != MagickPass)
+     == MagickFail)
     goto rotate_image_exception;
 
   if (CropToFitImage(&rotate_image,shear.x,shear.y,width,height,True,exception)
-      != MagickPass)
+      == MagickFail)
     goto rotate_image_exception;
 
   rotate_image->page.width=0;
@@ -1994,16 +1994,16 @@ ShearImage(const Image *image,const double x_shear,
 
   if (XShearImage(shear_image,shear.x,image->columns,image->rows,x_offset,
                   (long) (shear_image->rows-image->rows)/2,exception)
-      != MagickPass)
+      == MagickFail)
     goto shear_image_exception;
 
   if (YShearImage(shear_image,shear.y,y_width,image->rows,
                   (long) (shear_image->columns-y_width)/2,y_offset,exception)
-      != MagickPass)
+      == MagickFail)
     goto shear_image_exception;
 
   if (CropToFitImage(&shear_image,shear.x,shear.y,image->columns,image->rows,
-                     False,exception) != MagickPass)
+                     False,exception) == MagickFail)
     goto shear_image_exception;
 
   shear_image->page.width=0;

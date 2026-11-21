@@ -466,7 +466,7 @@ ReplaceImageColormap(Image *image,
         }
     }
 
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       /*
         Reassign image colormap indexes
@@ -479,7 +479,7 @@ ReplaceImageColormap(Image *image,
       /*
         Replace existing colormap.
       */
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
           (void) memcpy(new_colormap,colormap,sizeof(PixelPacket)*colors);
           MagickFreeMemory(image->colormap);

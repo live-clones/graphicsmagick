@@ -640,7 +640,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 
             image->orientation=convert_orientation(basic_info.orientation);
 
-            if (CheckImagePixelLimits(image, exception) != MagickPass)
+            if (CheckImagePixelLimits(image, exception) == MagickFail)
               ThrowJXLReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
             pixel_format.endianness=JXL_NATIVE_ENDIAN;
@@ -959,7 +959,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
                 if ((res = ImportImagePixelArea(image,quantum_type,quantum_size,
                                                 p,
                                                 &import_options,&import_area_info))
-                    != MagickPass)
+                    == MagickFail)
                   break;
                 /* Promote linear image to sRGB (2.4 gamma).
                    We could also set image->gamma and return the original image. */
@@ -1682,7 +1682,7 @@ static unsigned int WriteJXLImage(const ImageInfo *image_info,Image *image)
 
         if ((status = ExportImagePixelArea(image,quantum_type,quantum_size,
                                            p,&export_options,&export_info))
-            != MagickPass)
+            == MagickFail)
           break;
 
         p += export_info.bytes_exported;

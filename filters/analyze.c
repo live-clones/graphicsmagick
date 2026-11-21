@@ -217,7 +217,7 @@ ModuleExport MagickPassFail AnalyzeImage(Image **image_ref,
 #endif
         }
     }
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       double
         brightness_mean,

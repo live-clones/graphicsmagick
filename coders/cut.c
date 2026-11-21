@@ -372,7 +372,7 @@ static Image *ReadCUTImage(const ImageInfo *image_info,ExceptionInfo *exception)
   /* If ping is true, then only set image size and colors without reading any image data. */
   if (image_info->ping) goto Finish;
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowCUTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /* ----- Do something with palette ----- */

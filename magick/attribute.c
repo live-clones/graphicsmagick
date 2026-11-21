@@ -2833,7 +2833,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "IPTC:*" with all matching
         key=values and return it.
       */
-      if (GenerateIPTCAttribute((Image *) image,key) == MagickPass)
+      if (GenerateIPTCAttribute((Image *) image,key) != MagickFail)
         return(GetImageAttribute(image,key));
     }
   else if (LocaleNCompare("8BIM:",key,5) == 0)
@@ -2842,7 +2842,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "8BIM:*" with all matching
         key=values and return it.
       */
-      if (Generate8BIMAttribute((Image *) image,key) == MagickPass)
+      if (Generate8BIMAttribute((Image *) image,key) != MagickFail)
         return(GetImageAttribute(image,key));
     }
   else if (LocaleNCompare("EXIF:",key,5) == 0)
@@ -2851,7 +2851,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "EXIF:*" with all matching
         key=values and return it.
       */
-      if (GenerateEXIFAttribute((Image *) image,key) == MagickPass)
+      if (GenerateEXIFAttribute((Image *) image,key) != MagickFail)
         return(GetImageAttribute(image,key));
     }
   else if ((key_length >=2) && (key[key_length-1] == '*'))
@@ -2860,7 +2860,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "foo:*" with all matching
         key=values and return it.
       */
-      if (GenerateWildcardAttribute((Image *) image,key) == MagickPass)
+      if (GenerateWildcardAttribute((Image *) image,key) != MagickFail)
         return(GetImageAttribute(image,key));
     }
   else if ((key_length ==1) && (key[0] == '*'))
@@ -2869,7 +2869,7 @@ GetImageAttribute(const Image *image,const char *key)
         Create an attribute named "*" with all key=values and return
         it.
       */
-      if (GenerateWildcardAttribute((Image *) image,key) == MagickPass)
+      if (GenerateWildcardAttribute((Image *) image,key) != MagickFail)
         return(GetImageAttribute(image,key));
     }
   return(p);
@@ -3650,7 +3650,7 @@ SetImageAttribute(Image *image,const char *key,const char *value)
                 is valid. Don't append new value to existing value,
                 replace it instead.
               */
-              if ((MagickAtoIChk(value, &orientation) == MagickPass) &&
+              if ((MagickAtoIChk(value, &orientation) != MagickFail) &&
                   (orientation > 0 || orientation <= (int)LeftBottomOrientation))
                 {
                   SetEXIFOrientation(image, orientation);

@@ -829,7 +829,7 @@ static Image *ReadPNMImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if (image->scene >= (image_info->subimage+image_info->subrange-1))
           break;
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /*

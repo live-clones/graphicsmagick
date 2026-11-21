@@ -272,7 +272,7 @@ static Image *ReadVICARImage(const ImageInfo *image_info,
       StopTimer(&image->timer);
       return(image);
     }
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   if (!AllocateImageColormap(image,256))
     ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image);

@@ -3686,7 +3686,7 @@ CompositeImageRegion(const CompositeOperator compose,
              columns,rows,canvas_x,canvas_y);
 #endif
 
-      if ((status == MagickPass) &&
+      if ((status != MagickFail) &&
           ((unsigned long) canvas_x < canvas_image->columns) &&
           ((unsigned long) canvas_y < canvas_image->rows) &&
           ((unsigned long) update_x < update_image->columns) &&

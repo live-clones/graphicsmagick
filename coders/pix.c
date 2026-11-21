@@ -151,7 +151,7 @@ static Image *ReadPIXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (image->scene >= (image_info->subimage+image_info->subrange-1))
         break;
 
-    if (CheckImagePixelLimits(image, exception) != MagickPass)
+    if (CheckImagePixelLimits(image, exception) == MagickFail)
       ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
     /*
@@ -224,7 +224,7 @@ static Image *ReadPIXImage(const ImageInfo *image_info,ExceptionInfo *exception)
     bits_per_pixel=ReadBlobMSBShort(image);
     status=(!EOFBlob(image)) && (width != 0U) && (height != 0U) &&
       ((bits_per_pixel == 8) || (bits_per_pixel == 24));
-    if (status == MagickPass)
+    if (status != MagickFail)
       {
         /*
           Allocate next image structure.
@@ -240,7 +240,7 @@ static Image *ReadPIXImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                     LoadImagesText,image->filename))
           break;
       }
-  } while (status == MagickPass);
+  } while (status != MagickFail);
   while (image->previous != (Image *) NULL)
     image=image->previous;
   CloseBlob(image);

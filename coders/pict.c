@@ -1411,14 +1411,14 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                           "Dimensions: %lux%lu",image->columns,image->rows);
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   SetRedSample(&image->background_color,0);
   SetGreenSample(&image->background_color,0);
   SetBlueSample(&image->background_color,0);
   SetOpacitySample(&image->background_color,OpaqueOpacity);
-  if (SetImageEx(image,OpaqueOpacity,exception) != MagickPass)
+  if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
     {
       CloseBlob(image);
       DestroyImage(image);
@@ -1482,7 +1482,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                   break;
                 image->columns=frame.right-frame.left;
                 image->rows=frame.bottom-frame.top;
-                if (CheckImagePixelLimits(image, exception) != MagickPass)
+                if (CheckImagePixelLimits(image, exception) == MagickFail)
                   ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
                 if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
                   ThrowPICTReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,image);
@@ -1736,7 +1736,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                       if (ReadBlobByte(image) == EOF)
                         break;
                   }
-                if (CheckImagePixelLimits(tile_image, exception) != MagickPass)
+                if (CheckImagePixelLimits(tile_image, exception) == MagickFail)
                   ThrowPICTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
                 if ((code != 0x9a) && (code != 0x9b) &&
                     (bytes_per_line & 0x8000) == 0)
@@ -1987,7 +1987,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                                   "Tile Transform %lux%lu ==> %s",
                                   tile_image->columns,tile_image->rows,
                                   geometry);
-          if (TransformImage(&tile_image,(char *) NULL,geometry) != MagickPass)
+          if (TransformImage(&tile_image,(char *) NULL,geometry) == MagickFail)
             {
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1999,7 +1999,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                                   tile_image->columns,tile_image->rows,
                                   image->columns,image->rows,frame.left,frame.right);
           if (CompositeImage(image,CopyCompositeOp,tile_image,frame.left,
-                             frame.right) != MagickPass)
+                             frame.right) == MagickFail)
             {
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),

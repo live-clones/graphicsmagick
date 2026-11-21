@@ -1316,7 +1316,7 @@ static MagickPassFail ReadHEIFImageFrame(heif_image_handle* heif_image_handle,
       return MagickPass;
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     {
       HEIFReadImageFrameCleanup();
       return MagickFail;

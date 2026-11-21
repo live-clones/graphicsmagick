@@ -402,7 +402,7 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       /*
         Tile fill color onto floodplane.
       */
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
 #if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)
@@ -451,7 +451,7 @@ MagickExport MagickPassFail ColorFloodfillImage(Image *image,
       /*
         Tile image onto floodplane.
       */
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
 #if ENABLE_COLORFLOODFILL_OPENMP
 #if defined(HAVE_OPENMP)

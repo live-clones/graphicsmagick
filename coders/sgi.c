@@ -522,7 +522,7 @@ static Image *ReadSGIImage(const ImageInfo *image_info,ExceptionInfo *exception)
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                             "Image columns=%lu rows=%lu", image->columns, image->rows);
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /*

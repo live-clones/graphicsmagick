@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003 - 2018 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2003 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -273,7 +273,7 @@ MagickExport MagickPassFail GetImageStatistics(const Image *image,
   /*
     Compute Variance
   */
-  if (status == MagickPass)
+  if (status != MagickFail)
     status = PixelIterateMonoRead(GetImageStatisticsVariance,
                                   NULL,
                                   "[%s] Compute image variance...",
@@ -282,7 +282,7 @@ MagickExport MagickPassFail GetImageStatistics(const Image *image,
   /*
     Compute Standard Deviation
   */
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       statistics->red.standard_deviation=sqrt(statistics->red.variance);
       statistics->green.standard_deviation=sqrt(statistics->green.variance);

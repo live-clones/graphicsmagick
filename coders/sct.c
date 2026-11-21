@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -212,7 +212,7 @@ static Image *ReadSCTImage(const ImageInfo *image_info,ExceptionInfo *exception)
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*

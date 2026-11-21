@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -107,7 +107,7 @@ static Image *ReadNULLImage(const ImageInfo *image_info,
   if (image->rows == 0)
     image->rows=1;
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   (void) strlcpy(image->filename,image_info->filename,MaxTextExtent);

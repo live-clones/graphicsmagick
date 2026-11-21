@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % SPDX-License-Identifier: MIT
 %
@@ -190,7 +190,7 @@ static Image *ReadMVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
   if ((image->columns == 0) || (image->rows == 0))
     ThrowReaderException(OptionError,MustSpecifyImageSize,image);
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*

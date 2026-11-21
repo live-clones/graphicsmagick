@@ -1505,7 +1505,7 @@ InitializeImageColormap(Image *image, TIFF *tiff)
             break;
           }
         }
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
           register const PixelPacket
             *p;
@@ -2718,7 +2718,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
           goto read_next_frame;
         }
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         {
           ThrowTIFFReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
         }
@@ -2864,7 +2864,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
         if (QuantumTransferMode(image,photometric,compress_tag,sample_format,
                                 samples_per_pixel,planar_config,0,&quantum_type,
                                 &quantum_samples,exception)
-            == MagickPass)
+            != MagickFail)
           {
             method=ScanLineMethod;
             if ((compress_tag == COMPRESSION_JPEG) ||
@@ -2969,7 +2969,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                         PLANARCONFIG_CONTIG,0,
                                         &quantum_type,&quantum_samples,
                                         exception)
-                    != MagickPass)
+                    == MagickFail)
                   ThrowTIFFReaderException(CorruptImageError,
                                            ImproperImageHeader,image);
                 max_sample=quantum_samples;
@@ -3152,7 +3152,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                         samples_per_pixel,PLANARCONFIG_CONTIG,
                                         0,&quantum_type,&quantum_samples,
                                         exception)
-                    != MagickPass)
+                    == MagickFail)
                   ThrowTIFFReaderException(CorruptImageError,
                                            ImproperImageHeader,image);
                 max_sample=quantum_samples;
@@ -3363,7 +3363,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
                                         PLANARCONFIG_CONTIG,0,&quantum_type,
                                         &quantum_samples,
                                         exception)
-                    != MagickPass)
+                    == MagickFail)
                   ThrowTIFFReaderException(CorruptImageError,
                                            ImproperImageHeader,image);
                 max_sample=quantum_samples;
@@ -3767,21 +3767,21 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
               Apply image resource limits to tile width, height, and pixels.
             */
             errno=0;
-            if (AcquireMagickResource(WidthResource,tile_columns) != MagickPass)
+            if (AcquireMagickResource(WidthResource,tile_columns) == MagickFail)
               {
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "TIFF tile width %u exceeds limit!",tile_columns);
                 ThrowTIFFReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,
                                          image);
               }
-            if (AcquireMagickResource(HeightResource,tile_rows) != MagickPass)
+            if (AcquireMagickResource(HeightResource,tile_rows) == MagickFail)
               {
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "TIFF tile width %u exceeds limit!",tile_rows);
                 ThrowTIFFReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,
                                          image);
               }
-            if (AcquireMagickResource(PixelsResource,tile_total_pixels) != MagickPass)
+            if (AcquireMagickResource(PixelsResource,tile_total_pixels) == MagickFail)
               {
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "TIFF tile pixels %" MAGICK_SIZE_T_F "u exceeds limit!",
@@ -4067,7 +4067,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
         }
 
     read_next_frame:
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
           StopTimer(&image->timer);
           if (image->depth > QuantumDepth)
@@ -4115,7 +4115,7 @@ ReadTIFFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (status == MagickFail)
         break;
 
-    } while ((status == MagickPass) && (more_frames));
+    } while ((status != MagickFail) && (more_frames));
   TIFFClose(tiff);
   if (status == MagickFail)
     {
@@ -7255,7 +7255,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                                         sample_format,samples_per_pixel,
                                         PLANARCONFIG_CONTIG,0,&quantum_type,
                                         &quantum_samples,&image->exception)
-                    == MagickPass)
+                    != MagickFail)
                   max_sample=quantum_samples;
               }
 
@@ -7455,7 +7455,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
                                         sample_format,samples_per_pixel,
                                         PLANARCONFIG_CONTIG,0,&quantum_type,
                                         &quantum_samples,&image->exception)
-                    == MagickPass)
+                    != MagickFail)
                   max_sample=quantum_samples;
               }
             /*

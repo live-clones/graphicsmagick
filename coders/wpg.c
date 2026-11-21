@@ -540,7 +540,7 @@ static int UnpackWPGRaster(Image *image,int bpp)
           RunCount = i;
           if (x!=0) {    /* attempt to duplicate row from x position: */
             /* I do not know what to do here */
-            if (InsertRow(BImgBuff,y,image,bpp) == MagickPass)   /* May be line flush can fix a situation. */
+            if (InsertRow(BImgBuff,y,image,bpp) != MagickFail)   /* May be line flush can fix a situation. */
               {
                 x=0;
                 y++;
@@ -2370,7 +2370,7 @@ static MagickPassFail WriteWPGImage(const ImageInfo *image_info, Image *image)
           status = MagickFail;
           break;
         }
-      if (ExportImagePixelArea(image, (StoredPlanes==1)?GrayQuantum:IndexQuantum, StoredPlanes,pixels,0,0) != MagickPass)
+      if (ExportImagePixelArea(image, (StoredPlanes==1)?GrayQuantum:IndexQuantum, StoredPlanes,pixels,0,0) == MagickFail)
         {
           status = MagickFail;
           break;

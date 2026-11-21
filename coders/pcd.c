@@ -675,7 +675,7 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
                           (overview ? "(with overview) " : ""),
                           image->columns,image->rows);
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*
@@ -783,7 +783,7 @@ static Image *ReadPCDImage(const ImageInfo *image_info,ExceptionInfo *exception)
           image->colorspace=sRGBColorspace;
         else
           image->colorspace=YCCColorspace;
-        if (TransformColorspace(image,RGBColorspace) != MagickPass)
+        if (TransformColorspace(image,RGBColorspace) == MagickFail)
           break;
         StopTimer(&image->timer);
         if (j < (long) number_images)

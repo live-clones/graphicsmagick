@@ -671,7 +671,7 @@ static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image,
       image->colors = 1l << image->depth;
       if (image->columns == 0 || image->rows == 0)
         RET_CHECK(image);
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         {
           RET_CHECK(image);
           /* ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image); */
@@ -704,7 +704,7 @@ static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image,
           if (MagickFindRawImageMinMax(image, import_options->endian, HDR.nRows,
                                        HDR.nCols, DoublePixel, (unsigned int)ldblk, BImgBuff,
                                        &import_options->double_minvalue,
-                                       &import_options->double_maxvalue) != MagickPass)
+                                       &import_options->double_maxvalue) == MagickFail)
             goto skip_reading_current;
         }
       if (HDR.Type[1]==1)          /* Find Min and Max Values for floats */
@@ -712,7 +712,7 @@ static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image,
           if (MagickFindRawImageMinMax(image, import_options->endian, HDR.nRows,
                                        HDR.nCols, FloatPixel, (unsigned int)ldblk, BImgBuff,
                                        &import_options->double_minvalue,
-                                       &import_options->double_maxvalue) != MagickPass)
+                                       &import_options->double_maxvalue) == MagickFail)
             goto skip_reading_current;
         }
 
@@ -760,7 +760,7 @@ static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image,
             {
               if (MagickFindRawImageMinMax(image, import_options->endian, HDR.nRows,
                                            HDR.nCols, DoublePixel, (unsigned int)ldblk, BImgBuff,
-                                           &MinVal_c, &MaxVal_c) != MagickPass)
+                                           &MinVal_c, &MaxVal_c) == MagickFail)
                 goto skip_reading_current;
               for (i=0; i<(long)HDR.nCols; i++)
                 {
@@ -777,7 +777,7 @@ static Image *ReadMATImageV4(const ImageInfo *image_info, Image *image,
             {
               if (MagickFindRawImageMinMax(image, import_options->endian, HDR.nRows,
                                            HDR.nCols, FloatPixel, (unsigned int)ldblk, BImgBuff,
-                                           &MinVal_c, &MaxVal_c) != MagickPass)
+                                           &MinVal_c, &MaxVal_c) == MagickFail)
                 goto skip_reading_current;
               for (i=0; i<(long)HDR.nCols; i++)
                 {
@@ -1249,7 +1249,7 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
           MagickArraySize(ldblk,MATLAB_HDR.SizeY) > MATLAB_HDR.ObjectSize)  /* Safety check for forged and or corrupted data. */
         goto MATLAB_KO;
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         {
           ThrowImg2MATReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
         }
@@ -1261,7 +1261,7 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
           if (image->colors>256)
             image->colors = 256;
 
-          if (AllocateImageColormap(image, image->colors) != MagickPass)
+          if (AllocateImageColormap(image, image->colors) == MagickFail)
             {
               if (logging)
                 (void)LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1293,7 +1293,7 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
           if (MagickFindRawImageMinMax(image2, import_options.endian,MATLAB_HDR.SizeX,
                                        MATLAB_HDR.SizeY,DoublePixel, (unsigned int)ldblk, BImgBuff,
                                        &import_options.double_minvalue,
-                                       &import_options.double_maxvalue) != MagickPass)
+                                       &import_options.double_maxvalue) == MagickFail)
             goto skip_reading_current;
           if (logging) (void)LogMagickEvent(CoderEvent,GetMagickModule(),
                                             "Double import options: Min=%g, Max=%g",
@@ -1304,7 +1304,7 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
           if (MagickFindRawImageMinMax(image2, import_options.endian,MATLAB_HDR.SizeX,
                                        MATLAB_HDR.SizeY,FloatPixel, (unsigned int)ldblk, BImgBuff,
                                        &import_options.double_minvalue,
-                                       &import_options.double_maxvalue) != MagickPass)
+                                       &import_options.double_maxvalue) == MagickFail)
             goto skip_reading_current;
           if (logging)
             (void)LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -1394,14 +1394,14 @@ static Image *ReadMATImage(const ImageInfo *image_info, ExceptionInfo *exception
             {
               if (MagickFindRawImageMinMax(image2, import_options.endian, MATLAB_HDR.SizeX,
                                            MATLAB_HDR.SizeY, DoublePixel, (unsigned int)ldblk, BImgBuff,
-                                           &MinVal_c, &MaxVal_c) != MagickPass)
+                                           &MinVal_c, &MaxVal_c) == MagickFail)
                 ThrowImg2MATReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             }
           if (CellType==miSINGLE)
             {
               if (MagickFindRawImageMinMax(image2, import_options.endian, MATLAB_HDR.SizeX,
                                            MATLAB_HDR.SizeY, FloatPixel, (unsigned int)ldblk, BImgBuff,
-                                           &MinVal_c, &MaxVal_c)  != MagickPass)
+                                           &MinVal_c, &MaxVal_c)  == MagickFail)
                 ThrowImg2MATReaderException(CorruptImageError,UnexpectedEndOfFile,image);
             }
 

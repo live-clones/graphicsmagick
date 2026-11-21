@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % SPDX-License-Identifier: MIT
 %
@@ -113,7 +113,7 @@ static Image *ReadARTImage(const ImageInfo *image_info,ExceptionInfo *exception)
   image->rows=height;
   if(GetBlobSize(image)!=(magick_off_t) (8+((size_t)ldblk+Padding)*image->rows))
     ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   image->depth=1;
   image->colors=1l << image->depth;
@@ -230,7 +230,7 @@ static MagickPassFail WriteARTImage(const ImageInfo *image_info,Image *image)
         status=MagickFail;
         break;
       }
-    if (ExportImagePixelArea(image,GrayQuantum,1,pixels,0,0) != MagickPass)
+    if (ExportImagePixelArea(image,GrayQuantum,1,pixels,0,0) == MagickFail)
       {
         status=MagickFail;
         break;

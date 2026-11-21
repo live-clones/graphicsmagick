@@ -1332,7 +1332,7 @@ CheckBitSize:
         if (image->scene >= (image_info->subimage+image_info->subrange-1))
           break;
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowBMPReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /*
@@ -2814,7 +2814,7 @@ static unsigned int WriteBMPImage(const ImageInfo *image_info,Image *image)
       status&=MagickMonitorFormatted(scene++,image_list_length,
                                      &image->exception,SaveImagesText,
                                      image->filename);
-      if (status != MagickPass)
+      if (status == MagickFail)
         break;
       if (logging)
         (void) LogMagickEvent(CoderEvent,GetMagickModule(),

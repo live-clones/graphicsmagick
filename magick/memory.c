@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2025 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -817,7 +817,7 @@ MagickExport void *_MagickReallocateResourceLimitedMemoryLoc(void *p,
         {
           /* Allocate or enlarge memory */
           size_diff = new_size - memory_resource.alloc_size;
-          if (AcquireMagickResource(MemoryResource,size_diff) == MagickPass)
+          if (AcquireMagickResource(MemoryResource,size_diff) != MagickFail)
             {
               if (new_size > memory_resource.alloc_size_real)
                 {
@@ -933,7 +933,7 @@ MagickExport void *_MagickReallocateResourceLimitedMemoryLoc(void *p,
     }
   TraceMagickAccessMemoryResource_T(module,function,line,"AFTER",&memory_resource);
 
-  res = ((status == MagickPass) && memory_resource.memory) ?
+  res = ((status != MagickFail) && memory_resource.memory) ?
     UserLandPointerGivenBaseAlloc(memory_resource.memory) : 0;
 
   return res;

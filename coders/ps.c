@@ -339,13 +339,13 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
     magick_uint64_t
       pixels;
 
-    if (AcquireMagickResource(WidthResource,width) != MagickPass)
+    if (AcquireMagickResource(WidthResource,width) == MagickFail)
       ThrowPsReaderException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
-    if (AcquireMagickResource(HeightResource,height) != MagickPass)
+    if (AcquireMagickResource(HeightResource,height) == MagickFail)
       ThrowPsReaderException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
     pixels=(magick_uint64_t)width*height;
     if ((0 == pixels) || (pixels/width != height) ||
-        (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+        (AcquireMagickResource(PixelsResource,pixels) == MagickFail))
       ThrowPsReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   }
 
@@ -354,7 +354,7 @@ static Image *ReadPSImage(const ImageInfo *image_info,ExceptionInfo *exception)
   ThrowPsReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
   ThrowPsReaderExceptionOnFOpFailure(ferror(file),1);
   ThrowPsReaderExceptionOnFOpFailure(fclose(file),0);
-  ThrowPsReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
+  ThrowPsReaderExceptionOnFOpFailure((CloseBlob(image) == MagickFail),0);
   filesize=GetBlobSize(image);
   DestroyImage(image);
   image=(Image *) NULL;
@@ -850,13 +850,13 @@ static unsigned int WritePSImage(const ImageInfo *image_info,Image *image)
         magick_uint64_t
           pixels;
 
-        if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
+        if (AcquireMagickResource(WidthResource,geometry.width) == MagickFail)
           ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
-        if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
+        if (AcquireMagickResource(HeightResource,geometry.height) == MagickFail)
           ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
         pixels=(magick_uint64_t)geometry.width*geometry.height;
         if ((0 == pixels) || (pixels/geometry.width != geometry.height) ||
-            (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+            (AcquireMagickResource(PixelsResource,pixels) == MagickFail))
           ThrowWriterException(ResourceLimitError,ImagePixelLimitExceeded,image);
       }
 

@@ -870,7 +870,7 @@ static MagickPassFail load_level (Image* image,
                                image->filename);
         }
 
-      if (MagickPass == status)
+      if (status != MagickFail)
         {
           /*
             Composite the tile onto the layer's image, and then
@@ -940,7 +940,7 @@ static MagickPassFail load_level (Image* image,
           destTop++;
         }
 
-      if (MagickPass != status)
+      if (status == MagickFail)
         return status;
 
       /* restore the saved position so we'll be ready to
@@ -1211,7 +1211,7 @@ static MagickPassFail ReadOneLayer( Image* image, XCFDocInfo* inDocInfo, XCFLaye
     return MagickFail;
 
   /* clear the image based on the layer opacity */
-  if (SetImage(outLayer->image,(Quantum)(255-outLayer->opacity)) != MagickPass)
+  if (SetImage(outLayer->image,(Quantum)(255-outLayer->opacity)) == MagickFail)
     return MagickFail;
 
   /* set the compositing mode */
@@ -1450,7 +1450,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       ThrowReaderException(CorruptImageError,ImageTypeNotSupported,image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*
@@ -1463,7 +1463,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
   SetGreenSample(&image->background_color,0);
   SetBlueSample(&image->background_color,0);
   SetOpacitySample(&image->background_color,OpaqueOpacity);
-  if (SetImage(image,OpaqueOpacity) != MagickPass)
+  if (SetImage(image,OpaqueOpacity) == MagickFail)
     ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,image); /* ??? */
 
   image->matte=True;  /* XCF always has a matte! */
@@ -1686,7 +1686,7 @@ static Image *ReadXCFImage(const ImageInfo *image_info,ExceptionInfo *exception)
       unsigned int
         previous_offset;
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /* BIG HACK

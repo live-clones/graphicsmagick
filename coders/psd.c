@@ -640,7 +640,7 @@ static Image *ReadPSDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   image->depth=psd_info.depth <= 8 ? 8 : QuantumDepth;
   image->columns=psd_info.columns;
   image->rows=psd_info.rows;
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowPSDReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   if (SetImageEx(image,OpaqueOpacity,exception) == MagickFail)
     {

@@ -4437,7 +4437,7 @@ MagickExport magick_int64_t MagickSizeStrToInt64(const char *str,
 
   result=-1;
   end=(char *) NULL;
-  if ((status=MagickStrToInt64(str,&end,&result)) == MagickPass)
+  if ((status=MagickStrToInt64(str,&end,&result)) != MagickFail)
     {
       int
         c,

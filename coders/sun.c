@@ -428,7 +428,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (((unsigned long) ((long) image->columns) != image->columns) ||
           ((unsigned long) ((long) image->rows) != image->rows))
         ThrowReaderException(CoderError,ImageColumnOrRowSizeIsNotSupported,image);
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
       image->depth=sun_info.depth <= 8 ? 8 : QuantumDepth;
       if (sun_info.depth < 24)
@@ -644,7 +644,7 @@ static Image *ReadSUNImage(const ImageInfo *image_info,ExceptionInfo *exception)
             }
           status &= DecodeImage(sun_data,sun_data_length,sun_pixels,bytes_per_image);
           MagickFreeResourceLimitedMemory(unsigned char *,sun_data);
-          if (status != MagickPass)
+          if (status == MagickFail)
             {
               MagickFreeResourceLimitedMemory(unsigned char *,sun_pixels);
               ThrowReaderException(CorruptImageError,UnableToRunlengthDecodeImage,image);

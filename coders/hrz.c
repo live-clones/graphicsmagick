@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2009-2025 GraphicsMagick Group
+% Copyright (C) 2009-2026 GraphicsMagick Group
 % SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
@@ -233,7 +233,7 @@ static unsigned int WriteHRZImage(const ImageInfo *image_info,Image *image)
           status=MagickFail;
           break;
         }
-      if (ExportImagePixelArea(image,RGBQuantum,8,pixels,0,0) != MagickPass)
+      if (ExportImagePixelArea(image,RGBQuantum,8,pixels,0,0) == MagickFail)
         {
           status = MagickFail;
           break;

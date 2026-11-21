@@ -1726,7 +1726,7 @@ static Image *ReadOnePNGImage(MngInfo *mng_info,
     if ((chunk_malloc_max_str=AccessDefinition(image_info,"png","chunk-malloc-max")))
       {
         unsigned long chunk_malloc_max;
-        if (MagickAtoULChk(chunk_malloc_max_str, &chunk_malloc_max) == MagickPass)
+        if (MagickAtoULChk(chunk_malloc_max_str, &chunk_malloc_max) != MagickFail)
           {
             png_set_chunk_malloc_max(ping, chunk_malloc_max);
             if (logging)
@@ -5131,7 +5131,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   image->background_color=mng_background_color;
                   image->matte=MagickFalse;
                   image->delay=0;
-                  if (SetImage(image,OpaqueOpacity) != MagickPass)
+                  if (SetImage(image,OpaqueOpacity) == MagickFail)
                     {
                       if (logging)
                         (void) LogMagickEvent(CoderEvent,GetMagickModule(),

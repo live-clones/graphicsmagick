@@ -1660,7 +1660,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
                             (jpeg_info.do_block_smoothing ? "true" : "false"));
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     {
       jpeg_destroy_decompress(&jpeg_info);
       ThrowJPEGReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
@@ -1750,7 +1750,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
       CloseBlob(image);
       return(image);
     }
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     {
       jpeg_destroy_decompress(&jpeg_info);
       ThrowJPEGReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
@@ -2139,7 +2139,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
   /*
     Free jpeg resources.
   */
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       /*
         jpeg_finish_decompress() may throw an exception while it is
@@ -2173,7 +2173,7 @@ static Image *ReadJPEGImage(const ImageInfo *image_info,
     EXIF orientation enumerations match TIFF enumerations, which happen
     to match the enumeration values used by GraphicsMagick.
   */
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       const ImageAttribute
         *attribute;

@@ -1572,7 +1572,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
                           /*
                             Sync the one pixel
                           */
-                          if (SyncImagePixels(image) != MagickPass)
+                          if (SyncImagePixels(image) == MagickFail)
                             status=MagickFail;
                         }
                       else
@@ -1586,7 +1586,7 @@ static MagickPassFail RenderFreetype(Image *image,const DrawInfo *draw_info,
                     Sync the full span
                   */
                   if (active)
-                    if (SyncImagePixels(image) != MagickPass)
+                    if (SyncImagePixels(image) == MagickFail)
                       status=MagickFail;
                   if (status == MagickFail)
                     break;

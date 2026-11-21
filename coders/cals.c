@@ -331,7 +331,7 @@ static Image *ReadCALSImage(const ImageInfo *image_info,ExceptionInfo *exception
       file_write_status=MagickPass;
     } while (0);
   (void) fclose(file);
-  if (file_write_status != MagickPass)
+  if (file_write_status == MagickFail)
     {
       (void) LiberateTemporaryFile(filename);
       ThrowReaderException(CoderError,UnableToWriteTemporaryFile,image);

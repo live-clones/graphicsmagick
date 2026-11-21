@@ -840,7 +840,7 @@ SetNexus(const Image * restrict image,const long x,const long y,
       nexus_info->staging_length=0;
       MagickFreeAlignedMemory(nexus_info->staging);
 
-      if (AcquireMagickResource(MemoryResource,length) == MagickPass)
+      if (AcquireMagickResource(MemoryResource,length) != MagickFail)
         nexus_info->staging=MagickAllocateAlignedMemory(PixelPacket *,
                                                         MAGICK_CACHE_LINE_SIZE,
                                                         length);
@@ -3401,7 +3401,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
   if ((image->columns == 0) ||
       (image->columns > LONG_MAX) ||
       (AcquireMagickResource(WidthResource,image->columns)
-       != MagickPass))
+       == MagickFail))
     {
       char
         message[MaxTextExtent];
@@ -3423,7 +3423,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
   if ((image->rows == 0) ||
       (image->rows > LONG_MAX) ||
       (AcquireMagickResource(HeightResource,image->rows)
-       != MagickPass))
+       == MagickFail))
     {
       char
         message[MaxTextExtent];
@@ -3448,7 +3448,7 @@ CheckImagePixelLimits(const Image *image, ExceptionInfo *exception)
 
     total_pixels=(magick_int64_t) image->columns*image->rows;
     if (AcquireMagickResource(PixelsResource,total_pixels)
-        != MagickPass)
+        == MagickFail)
       {
         char
           message[MaxTextExtent];

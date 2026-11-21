@@ -1878,7 +1878,7 @@ SVGStartElement(void *context,const xmlChar *name,
               if (LocaleCompare(keyword,"stroke-miterlimit") == 0)
                 {
                   double stroke_miterlimit;
-                  if ((MagickAtoFChk(value,&stroke_miterlimit) != MagickPass) ||
+                  if ((MagickAtoFChk(value,&stroke_miterlimit) == MagickFail) ||
                       stroke_miterlimit < 1.0)
                     {
                       errno=0;
@@ -2096,7 +2096,7 @@ SVGStartElement(void *context,const xmlChar *name,
                                 if (LocaleCompare(keyword,"stroke-miterlimit") == 0)
                                   {
                                     double stroke_miterlimit;
-                                    if ((MagickAtoFChk(value,&stroke_miterlimit) != MagickPass) ||
+                                    if ((MagickAtoFChk(value,&stroke_miterlimit) == MagickFail) ||
                                         stroke_miterlimit < 1.0)
                                       {
                                         errno=0;
@@ -2883,7 +2883,7 @@ void    ProcessStyleClassDefs (
                 if (LocaleCompare(keyword,"stroke-miterlimit") == 0)
                   {
                     double stroke_miterlimit;
-                    if ((MagickAtoFChk(value,&stroke_miterlimit) != MagickPass) || stroke_miterlimit < 1.0)
+                    if ((MagickAtoFChk(value,&stroke_miterlimit) == MagickFail) || stroke_miterlimit < 1.0)
                       {
                         errno=0;
                         ThrowException(svg_info->exception,DrawError,InvalidPrimitiveArgument,value);

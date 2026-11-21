@@ -2700,7 +2700,7 @@ PrimitiveInfoRealloc(PrimitiveInfoMgr * p_PIMgr, const size_t Needed)
       status = MagickFail;
     }
 
-  if ((status == MagickPass) && (NeedAllocCount > *p_PIMgr->p_AllocCount))
+  if ((status != MagickFail) && (NeedAllocCount > *p_PIMgr->p_AllocCount))
     {
       PrimitiveInfo *new_primitive_info;
       new_primitive_info=MagickReallocateResourceLimitedClearedArray(PrimitiveInfo *,

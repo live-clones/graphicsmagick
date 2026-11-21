@@ -692,7 +692,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
   /*
     Initialize Jasper
   */
-  if (initialize_jasper(exception) != MagickPass)
+  if (initialize_jasper(exception) == MagickFail)
     {
       return (Image *) NULL;
     }
@@ -1053,7 +1053,7 @@ static Image *ReadJP2Image(const ImageInfo *image_info,
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowJP2ReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*
@@ -1451,7 +1451,7 @@ WriteJP2Image(const ImageInfo *image_info,Image *image)
   /*
     Initialize Jasper
   */
-  if (initialize_jasper(&image->exception) != MagickPass)
+  if (initialize_jasper(&image->exception) == MagickFail)
     {
       return MagickFail;
     }

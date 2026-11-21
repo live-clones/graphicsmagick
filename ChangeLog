@@ -1,5 +1,10 @@
 2026-11-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/*.c coders/*.c filters/*.c: Change all pass/fail logic
+        which is based on MagickPass to be based on MagickFail.
+        MagickFail is defined as 0, so there is built-in CPU support for
+        it, whereas MagickPass is just a reasonable non-zero integer.
+
         * coders/png.c (ReadMNGImage): Properly release resources if
         SetImage() fails.  Addresses oss-fuzz issue 588680057
         "graphicsmagick:coder_MNG_fuzzer: Direct-leak in

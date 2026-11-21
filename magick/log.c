@@ -1102,7 +1102,7 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
                     (void) strlcat(filename,DirectorySeparator,MaxTextExtent);
                   (void) strlcat(filename,token,MaxTextExtent);
                   status &= ReadLogConfigureFile(filename,depth+1,exception);
-                  if (status != MagickPass)
+                  if (status == MagickFail)
                     {
                       MagickFreeMemory(xml);
                       return (status);
@@ -1206,7 +1206,7 @@ static MagickPassFail ReadLogConfigureFile(const char *basename,
 
   MagickFreeMemory(xml);
 
-  if ((depth == 0) && (status == MagickPass))
+  if ((depth == 0) && (status != MagickFail))
     log_info->log_configured=MagickTrue;
 
   return(status);

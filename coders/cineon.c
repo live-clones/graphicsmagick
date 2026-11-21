@@ -750,7 +750,7 @@ static Image *ReadCINEONImage(const ImageInfo *image_info,
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*

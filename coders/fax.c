@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2003-2024 GraphicsMagick Group
+% Copyright (C) 2003-2026 GraphicsMagick Group
 % Copyright (C) 2002 ImageMagick Studio
 % Copyright 1991-1999 E. I. du Pont de Nemours and Company
 % SPDX-License-Identifier: MIT
@@ -167,7 +167,7 @@ static Image *ReadFAXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   status=HuffmanDecodeImage(image);
@@ -319,10 +319,10 @@ static MagickPassFail WriteFAXImage(const ImageInfo *image_info,Image *image)
       Convert MIFF to monochrome.
     */
     status &= TransformColorspace(image,RGBColorspace);
-    if (status != MagickPass)
+    if (status == MagickFail)
       break;
     status &= HuffmanEncodeImage(clone_info,image);
-    if (status != MagickPass)
+    if (status == MagickFail)
       break;
     if (image->next == (Image *) NULL)
       break;
@@ -330,7 +330,7 @@ static MagickPassFail WriteFAXImage(const ImageInfo *image_info,Image *image)
     status &= MagickMonitorFormatted(scene++,image_list_length,
                                      &image->exception,SaveImagesText,
                                      image->filename);
-    if (status != MagickPass)
+    if (status == MagickFail)
       break;
   } while (clone_info->adjoin);
   DestroyImageInfo(clone_info);

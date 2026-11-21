@@ -293,7 +293,7 @@ static Image *ReadXBMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       StopTimer(&image->timer);
       return(image);
     }
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   /*
     Allocate temporary storage for X bitmap image

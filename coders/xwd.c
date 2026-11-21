@@ -564,7 +564,7 @@ static Image *ReadXWDImage(const ImageInfo *image_info,ExceptionInfo *exception)
   image->columns=(unsigned long) ximage->width;
   image->rows=(unsigned long) ximage->height;
   if (!image_info->ping)
-    if (CheckImagePixelLimits(image, exception) != MagickPass)
+    if (CheckImagePixelLimits(image, exception) == MagickFail)
       ThrowXWDReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
   image->depth=8;
 

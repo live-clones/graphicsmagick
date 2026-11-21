@@ -1396,13 +1396,13 @@ static MagickPassFail WritePS3Image(const ImageInfo *image_info,Image *image)
         magick_uint64_t
           pixels;
 
-        if (AcquireMagickResource(WidthResource,geometry.width) != MagickPass)
+        if (AcquireMagickResource(WidthResource,geometry.width) == MagickFail)
           ThrowWriterException(ResourceLimitError,ImagePixelWidthLimitExceeded,image);
-        if (AcquireMagickResource(HeightResource,geometry.height) != MagickPass)
+        if (AcquireMagickResource(HeightResource,geometry.height) == MagickFail)
           ThrowWriterException(ResourceLimitError,ImagePixelHeightLimitExceeded,image);
         pixels=(magick_uint64_t)geometry.width*geometry.height;
         if ((0 == pixels) || (pixels/geometry.width != geometry.height) ||
-            (AcquireMagickResource(PixelsResource,pixels) != MagickPass))
+            (AcquireMagickResource(PixelsResource,pixels) == MagickFail))
           ThrowWriterException(ResourceLimitError,ImagePixelLimitExceeded,image);
       }
 

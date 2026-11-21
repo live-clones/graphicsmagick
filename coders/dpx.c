@@ -2172,7 +2172,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowDPXReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*
@@ -2993,7 +2993,7 @@ STATIC Image *ReadDPXImage(const ImageInfo *image_info,ExceptionInfo *exception)
         }
     }
 
-  if (status != MagickPass)
+  if (status == MagickFail)
     ThrowDPXReaderException(CorruptImageError,CorruptImage,image);
 
   if (EOFBlob(image))

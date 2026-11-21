@@ -3578,7 +3578,7 @@ static unsigned int MagickXColorEditImage(Display *display,
                         q->blue=ScaleShortToQuantum(color.blue);
                         q++;
                       }
-                    if ((status &= SyncImagePixels(*image)) != MagickPass)
+                    if ((status &= SyncImagePixels(*image)) == MagickFail)
                       break;
                   }
                 break;
@@ -5094,7 +5094,7 @@ static unsigned int MagickXCropImage(Display *display,MagickXResourceInfo *resou
           q->opacity=TransparentOpacity;
           q++;
         }
-      if ((status &= SyncImagePixels(image)) != MagickPass)
+      if ((status &= SyncImagePixels(image)) == MagickFail)
         break;
     }
   /*

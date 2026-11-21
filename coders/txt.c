@@ -613,7 +613,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
           (void)LogMagickEvent(CoderEvent,GetMagickModule(),
                                "Image Geometry: %lux%lu", image->columns, image->rows);
 
-        if (CheckImagePixelLimits(image, exception) != MagickPass)
+        if (CheckImagePixelLimits(image, exception) == MagickFail)
           ThrowNOTXTReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
         /*
@@ -947,7 +947,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
     image->rows=(unsigned long)
       ceil(((page.height*image->y_resolution)/dy_resolution)-0.5);
 
-    if (CheckImagePixelLimits(image, exception) != MagickPass)
+    if (CheckImagePixelLimits(image, exception) == MagickFail)
       ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
     texture=(Image *) NULL;

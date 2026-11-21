@@ -427,7 +427,7 @@ static Image *ReadVIFFImage(const ImageInfo *image_info,
       image->columns=viff_info.rows;
       image->rows=viff_info.columns;
       image->depth=viff_info.x_pixel_size <= 8 ? 8 : QuantumDepth;
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
       /*
         Verify that we can read this VIFF image.

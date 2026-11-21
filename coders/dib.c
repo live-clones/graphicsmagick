@@ -682,7 +682,7 @@ static Image *ReadDIBImage(const ImageInfo *image_info,ExceptionInfo *exception)
         image->rows=geometry.height;
     }
 
-   if (CheckImagePixelLimits(image, exception) != MagickPass)
+   if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   if (image->storage_class == PseudoClass)

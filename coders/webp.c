@@ -259,7 +259,7 @@ static Image *ReadWEBPImage(const ImageInfo *image_info,
       StopTimer(&image->timer);
       return(image);
     }
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     {
       MagickFreeResourceLimitedMemory(unsigned char *,stream);
       ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);

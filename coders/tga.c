@@ -689,7 +689,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info, ExceptionInfo *exception
         if (image->scene >= (image_info->subimage+image_info->subrange-1))
           break;
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /*
@@ -1286,11 +1286,11 @@ static unsigned int WriteTGAImage(const ImageInfo *image_info,Image *image)
           switch (tga_info.image_type)
             {
             case TGAMonochrome:
-              if (ExportImagePixelArea(image,GrayQuantum,tga_info.bits_per_pixel,tga_pixels,0,0) != MagickPass)
+              if (ExportImagePixelArea(image,GrayQuantum,tga_info.bits_per_pixel,tga_pixels,0,0) == MagickFail)
                 status=MagickFail;
               break;
             case TGAColormap:
-              if (ExportImagePixelArea(image,IndexQuantum,tga_info.bits_per_pixel,tga_pixels,0,0) != MagickPass)
+              if (ExportImagePixelArea(image,IndexQuantum,tga_info.bits_per_pixel,tga_pixels,0,0) == MagickFail)
                 status=MagickFail;
               break;
             default:                    /* TrueColor RGB (quantum type is BGR, ExportImagePixelArea is useless.)*/

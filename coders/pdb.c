@@ -503,7 +503,7 @@ static Image *ReadPDBImage(const ImageInfo *image_info,ExceptionInfo *exception)
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowPDBReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   packets=MagickArraySize(MagickArraySize(bits_per_pixel,image->columns)/8,

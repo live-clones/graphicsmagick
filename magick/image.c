@@ -477,7 +477,7 @@ MagickExport Image *AllocateImage(const ImageInfo *image_info)
 
   if (image_info->attributes != (Image *) NULL)
     {
-      if (CloneImageAttributes(allocate_image,image_info->attributes) != MagickPass)
+      if (CloneImageAttributes(allocate_image,image_info->attributes) == MagickFail)
         {
           DestroyImage(allocate_image);
           MagickFatalError3(ResourceLimitError,MemoryAllocationFailed,
@@ -1301,7 +1301,7 @@ MagickExport Image *CloneImage(const Image *image,const unsigned long columns,
         }
       return(clone_image);
     }
-  if (CheckImagePixelLimits(clone_image, exception) != MagickPass)
+  if (CheckImagePixelLimits(clone_image, exception) == MagickFail)
     {
       DestroyImage(clone_image);
       ThrowImageException3(ResourceLimitError,ImagePixelLimitExceeded,
@@ -3070,7 +3070,7 @@ ParseSubImageFileSpecification(char *filename,
           ThrowException(exception,OptionError,
                          InvalidSubimageSpecification,spec);
         }
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
           /* Truncate filename */
           *(spec_start-1)='\0';

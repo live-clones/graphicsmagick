@@ -806,7 +806,7 @@ MagickExport MagickPassFail HuffmanEncode2Image(const ImageInfo *image_info,
       MagickFreeMemory(scanline);
       return(MagickFail);
     }
-  if (SetImageType(huffman_image,BilevelType) != MagickPass)
+  if (SetImageType(huffman_image,BilevelType) == MagickFail)
     {
       CopyException(&image->exception,&huffman_image->exception);
       MagickFreeMemory(scanline);
@@ -915,7 +915,7 @@ MagickExport MagickPassFail HuffmanEncode2Image(const ImageInfo *image_info,
               break;
             }
     } /* for (y=... */
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       /*
         End of page.

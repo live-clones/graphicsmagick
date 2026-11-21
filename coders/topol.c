@@ -962,7 +962,7 @@ static MagickPassFail WriteTopoLImage(const ImageInfo *image_info, Image *image)
           status=MagickFail;
           break;
         }
-      if (ExportImagePixelArea(image,qt,bpp,pixels,0,&export_info) != MagickPass)
+      if (ExportImagePixelArea(image,qt,bpp,pixels,0,&export_info) == MagickFail)
         {
           status = MagickFail;
           break;

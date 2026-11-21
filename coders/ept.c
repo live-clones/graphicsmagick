@@ -334,7 +334,7 @@ static Image *ReadEPTImage(const ImageInfo *image_info,
   ThrowReaderExceptionOnFOpFailure((fputs(translate_geometry,file) == EOF),1);
   ThrowReaderExceptionOnFOpFailure(ferror(file),1);
   ThrowReaderExceptionOnFOpFailure(fclose(file),0);
-  ThrowReaderExceptionOnFOpFailure((CloseBlob(image) != MagickPass),0);
+  ThrowReaderExceptionOnFOpFailure((CloseBlob(image) == MagickFail),0);
   filesize=GetBlobSize(image);
   DestroyImage(image);
   image=(Image *) NULL;

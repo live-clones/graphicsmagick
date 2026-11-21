@@ -1,5 +1,5 @@
 /*
-% Copyright (C) 2009-2023 GraphicsMagick Group
+% Copyright (C) 2009-2026 GraphicsMagick Group
 % SPDX-License-Identifier: MIT
 %
 % This program is covered by multiple licenses, which are described in
@@ -88,7 +88,7 @@ static Image *ReadIdentityImage(const ImageInfo *image_info,
   image=AllocateImage(image_info);
   order=8;
   if (image_info->filename[0] != '\0')
-    if ((status &= MagickAtoULChk(image_info->filename, &order)) != MagickPass)
+    if ((status &= MagickAtoULChk(image_info->filename, &order)) == MagickFail)
       ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   if (order > 40)
       ThrowReaderException(FileOpenError,UnableToOpenFile,image);

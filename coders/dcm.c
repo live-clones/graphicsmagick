@@ -7326,10 +7326,10 @@ static MagickPassFail DCM_ReadNonNativeImages(Image **image,const ImageInfo *ima
                     break;
                   }
             }
-        } while (status == MagickPass);
+        } while (status != MagickFail);
 
       (void) fclose(file);
-      if (status == MagickPass)
+      if (status != MagickFail)
         {
           clone_info=CloneImageInfo(image_info);
           clone_info->blob=(void *) NULL;
@@ -7374,7 +7374,7 @@ static MagickPassFail DCM_ReadNonNativeImages(Image **image,const ImageInfo *ima
                     status=DCM_PostRescaleImage(next_image,dcm,True,exception);
                   }
               }
-          if (status == MagickPass)
+          if (status != MagickFail)
             {
               strlcpy(next_image->filename,(*image)->filename,sizeof(next_image->filename));
               next_image->scene=scene;
@@ -7501,7 +7501,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
     Loop to read DCM image header one element at a time
   */
   status=DCM_ReadElement(image,&dcm,exception);
-  while ((status == MagickPass) && ((dcm.group != 0x7FE0) || (dcm.element != 0x0010)))
+  while ((status != MagickFail) && ((dcm.group != 0x7FE0) || (dcm.element != 0x0010)))
     {
       DicomElemParseFunc
         *pfunc;
@@ -7512,7 +7512,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       MagickFreeResourceLimitedMemory(unsigned char *,dcm.data);
       dcm.data = NULL;
       dcm.length = 0;
-      if (status == MagickPass)
+      if (status != MagickFail)
         status=DCM_ReadElement(image,&dcm,exception);
     }
   if (status == MagickFail)
@@ -7641,7 +7641,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (image_info->ping)
         break;
 
-      if (CheckImagePixelLimits(image, exception) != MagickPass)
+      if (CheckImagePixelLimits(image, exception) == MagickFail)
         ThrowDCMReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
       /*
@@ -7661,7 +7661,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
           else
             status=DCM_ReadRGBImage(image,&dcm,exception);
         }
-      if (status != MagickPass)
+      if (status == MagickFail)
         break;
 
       if ((dcm.rescaling == DCM_RS_PRE) &&
@@ -7681,7 +7681,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "Rescaling image channels...");
               status = DCM_PostRescaleImage(image,&dcm,False,exception);
-              if (status != MagickPass)
+              if (status == MagickFail)
                 break;
             }
         }
@@ -7718,7 +7718,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
   */
  dcm_read_failure:
   DCM_DestroyDCM(&dcm);
-  if (status == MagickPass)
+  if (status != MagickFail)
     {
       /* It is possible to have success status yet have no image */
       if (image != (Image *) NULL)

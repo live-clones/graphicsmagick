@@ -219,32 +219,32 @@ QuantumOperatorImageMultivalue(Image *image,
       /*
         Apply operator to individual RGB(A) channels.
       */
-      if ((MagickPass == status) && (options.red_enabled))
+      if ((status != MagickFail) && (options.red_enabled))
         {
-          status=QuantumOperatorImage(image,RedChannel,quantum_operator,
-                                      options.values.red,&image->exception);
+          status &= QuantumOperatorImage(image,RedChannel,quantum_operator,
+                                         options.values.red,&image->exception);
         }
 
-      if ((MagickPass == status) && (options.green_enabled))
+      if ((status != MagickFail) && (options.green_enabled))
         {
-          status=QuantumOperatorImage(image,GreenChannel,quantum_operator,
-                                      options.values.green,&image->exception);
+          status &= QuantumOperatorImage(image,GreenChannel,quantum_operator,
+                                         options.values.green,&image->exception);
         }
 
-      if ((MagickPass == status) && (options.blue_enabled))
+      if ((status != MagickFail) && (options.blue_enabled))
         {
-          status=QuantumOperatorImage(image,BlueChannel,quantum_operator,
-                                      options.values.blue,&image->exception);
+          status &= QuantumOperatorImage(image,BlueChannel,quantum_operator,
+                                         options.values.blue,&image->exception);
         }
 
-      if ((MagickPass == status) && (options.opacity_enabled))
+      if ((status != MagickFail) && (options.opacity_enabled))
         {
-          status=QuantumOperatorImage(image,OpacityChannel,quantum_operator,
-                                      options.values.opacity,&image->exception);
+          status &= QuantumOperatorImage(image,OpacityChannel,quantum_operator,
+                                         options.values.opacity,&image->exception);
         }
     }
 
-  if ((MagickPass == status) && (options.opacity_enabled))
+  if ((status != MagickFail) && (options.opacity_enabled))
     {
       status=QuantumOperatorImage(image,OpacityChannel,quantum_operator,
                                   options.values.opacity,&image->exception);

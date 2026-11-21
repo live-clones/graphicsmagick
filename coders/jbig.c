@@ -263,7 +263,7 @@ static Image *ReadJBIGImage(const ImageInfo *image_info,
       CloseBlob(image);
       return(image);
     }
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     {
       jbg_dec_free(&jbig_info);
       MagickFreeMemory(buffer);

@@ -466,7 +466,7 @@ static Image *ReadRLEImage(const ImageInfo *image_info,ExceptionInfo *exception)
       return(image);
     }
 
-  if (CheckImagePixelLimits(image, exception) != MagickPass)
+  if (CheckImagePixelLimits(image, exception) == MagickFail)
     ThrowRLEReaderException(ResourceLimitError,ImagePixelLimitExceeded,image);
 
   /*
