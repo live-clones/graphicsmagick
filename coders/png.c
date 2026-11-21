@@ -5720,7 +5720,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                     {
                       DestroyImageList(image);
                       MngInfoFreeStruct(mng_info,&have_mng_structure);
-                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  return NULL from ReadMNGImage()");
+                      (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                            "  return NULL from ReadMNGImage()");
                       return((Image *) NULL);
                     }
                   image=SyncNextImageInList(image);
@@ -5746,8 +5747,16 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               image->page.y=0;
               image->background_color=mng_background_color;
               if (SetImage(image,TransparentOpacity) == MagickFail)
-                ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
-                                     image);
+                {
+                  /* Failure path if mng_info width/height are bad, or underlying image is bad */
+                  (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                        "Failed to set image background color for background"
+                                        " rectangle with dimensions %lux%lu",
+                                        image->columns, image->rows);
+                  MngInfoFreeStruct(mng_info,&have_mng_structure);
+                  ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                       image);
+                }
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                       "  Inserted transparent background"

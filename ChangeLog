@@ -1,3 +1,10 @@
+2026-11-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * coders/png.c (ReadMNGImage): Properly release resources if
+        SetImage() fails.  Addresses oss-fuzz issue 588680057
+        "graphicsmagick:coder_MNG_fuzzer: Direct-leak in
+        ___interceptor_malloc".  This problem was recently added.
+
 2026-11-20  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/color-private.h (FuzzyColorMatchInlined): New inline
