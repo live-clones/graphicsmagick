@@ -1,3 +1,8 @@
+2026-11-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/paint.c (MatteFloodfillImage): Restore missing comma
+        which broke the oss-fuzz build.
+
 2026-11-21  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/*.c coders/*.c filters/*.c: Change all pass/fail logic

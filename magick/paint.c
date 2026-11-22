@@ -620,7 +620,7 @@ MagickExport MagickPassFail MatteFloodfillImage(Image *image,
   (void) segment_stack;
   (void) floodplane;
   (void) method;
-  ThrowException(&image->exception,DrawWarning,FuzzingBuildUnsafeForProductionimage->filename);
+  ThrowException(&image->exception,DrawWarning,FuzzingBuildUnsafeForProduction,image->filename);
   status=MagickFail;
 #else
   /*
