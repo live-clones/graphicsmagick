@@ -54,6 +54,12 @@ extern MagickExport void
   MagickMapDeallocateMap(MagickMap map);
 
 /*
+  Return the existing number of entries in the map
+*/
+extern MagickExport size_t
+  MagickMapNumberOfEntries(MagickMap map);
+
+/*
   Deallocate (clear) all objects in the map.
 */
 extern MagickExport void
@@ -69,7 +75,7 @@ extern MagickExport MagickMap
   Add an entry to the Magick Map.
   Argument is copied into the map.
 */
-extern MagickExport unsigned int
+extern MagickExport MagickPassFail
   MagickMapAddEntry(MagickMap map,const char *key, const void *object,
                     const size_t object_size, ExceptionInfo *exception);
 

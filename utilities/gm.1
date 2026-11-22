@@ -1,4 +1,4 @@
-.TH gm 1 "2026/11/13" "GraphicsMagick"
+.TH gm 1 "2026/11/22" "GraphicsMagick"
 .TP
 .in 15
 .in 15
@@ -3400,6 +3400,12 @@ ordinary file (rather than pipe) then any truncated output file is
 removed.  This option may be used to assure that unexpectedly large
 files are not written.  This option may also be used to simulate what
 will happen if the disk is full.
+
+The number of profiles (binary or text blobs) which may be attached to
+an image may be limited by the \fBProfiles\fP limit. This limit may
+be encountered while reading a file format which supports attached
+profiles, or while associating a profile with an image using an
+API.
 
 The value argument is an absolute value, but may have standard binary
 suffix characters applied ('K', 'M', 'G', 'T', 'P', 'E') to apply a

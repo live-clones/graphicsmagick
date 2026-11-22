@@ -3587,6 +3587,12 @@ removed.  This option may be used to assure that unexpectedly large
 files are not written.  This option may also be used to simulate what
 will happen if the disk is full.</font></td></tr></table>
 <table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
+The number of profiles (binary or text blobs) which may be attached to
+an image may be limited by the <strong>Profiles</strong> limit. This limit may
+be encountered while reading a file format which supports attached
+profiles, or while associating a profile with an image using an
+API.</font></td></tr></table>
+<table width="90%" border="0" cellspacing="0"             cellpadding="8">             <tr><td width="6%"><br></td><td><font size="-1">
 The value argument is an absolute value, but may have standard binary
 suffix characters applied ('K', 'M', 'G', 'T', 'P', 'E') to apply a
 scaling to the value (based on a multiplier of 1024). Any additional

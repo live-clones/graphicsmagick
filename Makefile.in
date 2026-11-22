@@ -11216,7 +11216,7 @@ uninstall-man: uninstall-man1 uninstall-man4 uninstall-man5
 .PRECIOUS: Makefile
 
 
-.PHONY: www srpm rpm profile scan-build
+.PHONY: www srpm rpm profile scan-build-21
 magick-install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(magickincdir)
 	$(INSTALL_HEADER) magick/magick_config_api.h $(DESTDIR)$(magickincdir)/magick_config.h

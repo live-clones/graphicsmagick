@@ -47,6 +47,7 @@
 #include "magick/omp_data_view.h"
 #include "magick/pixel_iterator.h"
 #include "magick/profile.h"
+#include "magick/resource.h"
 #include "magick/quantize.h"
 #include "magick/resize.h"
 #include "magick/transform.h"
@@ -1261,8 +1262,22 @@ SetImageProfile(Image *image,const char *name, const unsigned char *profile,
                             (unsigned long) length);
       if ((profile != 0) && (length != 0))
         {
-          status &= MagickMapAddEntry((MagickMap) image->profiles,name,profile,length,
-                                      &image->exception);
+          /*
+            Determine if 'profiles' resource limit will be exceeded. For
+            ease of implementation, assume that an entry will be added
+            rather than replaced.
+          */
+          size_t number_of_profiles = MagickMapNumberOfEntries((MagickMap) image->profiles);
+          if (AcquireMagickResource(ProfilesResource,(size_t)number_of_profiles+1) == MagickFail)
+            {
+              ThrowBinaryException3(ResourceLimitError,ProfilesLimitExceeded,
+                              UnableToAddOrRemoveProfile);
+            }
+          else
+            {
+              status &= MagickMapAddEntry((MagickMap) image->profiles,name,profile,length,
+                                          &image->exception);
+            }
         }
     }
   return (status);

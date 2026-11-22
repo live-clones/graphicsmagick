@@ -50,6 +50,7 @@
 #include "magick/monitor.h"
 #include "magick/pixel_cache.h"
 #include "magick/profile.h"
+#include "magick/resource.h"
 #include "magick/utility.h"
 #include "magick/version.h"
 #include "magick/static.h"
@@ -1304,6 +1305,8 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
 
                     if (MagickAtoL(values) <= 0)
                       ThrowMIFFReaderException(CorruptImageError,ImproperImageHeader,image);
+                    if (AcquireMagickResource(ProfilesResource,(size_t)number_of_profiles+1) == MagickFail)
+                      ThrowReaderException(ResourceLimitError,ProfilesLimitExceeded,image);
                     i=number_of_profiles;
                     new_profiles=MagickReallocateResourceLimitedArray(ProfileInfo *,profiles,
                                                                      (size_t)number_of_profiles+1,sizeof(ProfileInfo));

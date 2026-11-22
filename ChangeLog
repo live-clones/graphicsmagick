@@ -1,5 +1,16 @@
 2026-11-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/resource.c: Add support for a 'profiles' resource limit.
+
+        * magick/map.c: New function MagickMapNumberOfEntries() to return
+        the current number of entries in the map.  Improve documentation.
+
+        * coders/miff.c (ReadMIFFImage): Enforce that the number of
+        attached profiles does not exceed the limit.
+
+        * coders/mpc.c (ReadMPCImage): Enforce that the number of attached
+        profiles does not exceed the limit.
+
         * magick/paint.c (MatteFloodfillImage): Restore missing comma
         which broke the oss-fuzz build.
 

@@ -31,7 +31,8 @@ typedef enum
   HeightResource,      /* Maximum pixel height of an image (Pixels) */
   ReadResource,        /* Maximum uncompressed data read from file */
   WriteResource,       /* Maximum uncompressed data written to file */
-  ImagesResource       /* Maximum number of discrete images */
+  ImagesResource,      /* Maximum number of discrete images */
+  ProfilesResource     /* Maximum number of attached profiles per image */
 } ResourceType;
 
 

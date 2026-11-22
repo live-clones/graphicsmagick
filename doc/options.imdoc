@@ -3482,6 +3482,13 @@ files are not written.  This option may also be used to simulate what
 will happen if the disk is full.</pp>
 
 <pp>
+The number of profiles (binary or text blobs) which may be attached to
+an image may be limited by the <s>Profiles</s> limit. This limit may
+be encountered while reading a file format which supports attached
+profiles, or while associating a profile with an image using an
+API.</pp>
+
+<pp>
 The value argument is an absolute value, but may have standard binary
 suffix characters applied ('K', 'M', 'G', 'T', 'P', 'E') to apply a
 scaling to the value (based on a multiplier of 1024). Any additional

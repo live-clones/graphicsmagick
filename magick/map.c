@@ -294,13 +294,14 @@ MagickMapAccessEntry(MagickMap map,const char *key, size_t *object_size)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  MagickMapAddEntry() adds a new entry to a map, or replaces an existing
-%  matching entry.  True is returned on success.  If False is returned, then
-%  the exception argument describes the reason for failure.
+%  matching entry.  MagickPass is returned on success.  If MagickFail is
+%  returned, then the exception argument describes the reason for failure.
 %
 %  The format of the MagickMapAddEntry method is:
 %
-%      void MagickMapAddEntry(MagickMap map,const char *key,
-%                             const void *object, const size_t object_size)
+%      MagickPassFail MagickMapAddEntry(MagickMap map,const char *key,
+%                                       const void *object,
+%                                       const size_t object_size)
 %
 %  A description of each parameter follows:
 %
@@ -317,7 +318,7 @@ MagickMapAccessEntry(MagickMap map,const char *key, size_t *object_size)
 %                 returned.
 %
 */
-MagickExport unsigned int
+MagickExport MagickPassFail
 MagickMapAddEntry(MagickMap map,const char *key, const void *object,
   const size_t object_size, ExceptionInfo *exception)
 {
@@ -338,7 +339,7 @@ MagickMapAddEntry(MagickMap map,const char *key, const void *object,
       if (exception)
         ThrowException(exception,ResourceLimitError,MemoryAllocationFailed,
           NULL);
-      return (False);
+      return (MagickFail);
     }
 
   (void) LockSemaphoreInfo(map->semaphore);
@@ -406,7 +407,7 @@ MagickMapAddEntry(MagickMap map,const char *key, const void *object,
 
   (void) UnlockSemaphoreInfo(map->semaphore);
 
-  return (True);
+  return (MagickPass);
 }
 
 /*
@@ -700,6 +701,51 @@ MagickMapDeallocateMap(MagickMap map)
 %                                                                             %
 %                                                                             %
 %                                                                             %
++   M a g i c k N u m b e r O f E n t r i e s                                 %
+%                                                                             %
+%                                                                             %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  MagickMapNumberOfEntries returns the current number of entries in the map
+%
+%  The format of the MagickMapNumberOfEntries method is:
+%
+%       size_t MagickMapNumberOfEntries(MagickMap map)
+%
+%  A description of each parameter follows:
+%
+%    o map: map context
+%
+*/
+MagickExport size_t
+MagickMapNumberOfEntries(MagickMap map)
+{
+  size_t count=0;
+  assert(map != 0);
+  assert(map->signature == MagickSignature);
+
+  (void) LockSemaphoreInfo(map->semaphore);
+  if (map->list)
+  {
+    register MagickMapObject
+      *p;
+
+    for (p=map->list; p != 0; )
+      {
+        count++;
+        p=p->next;
+      }
+  }
+  (void) UnlockSemaphoreInfo(map->semaphore);
+  return count;
+}
+
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                                                                             %
+%                                                                             %
 +   M a g i c k M a p D e a l l o c a t e I t e r a t o r                     %
 %                                                                             %
 %                                                                             %
@@ -863,13 +909,13 @@ MagickMapIterateToFront(MagickMapIterator iterator)
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  MagickMapIterateNext() advances the iterator by one element. True is
-%  returned if there are remaining entries in the map. The key argument
+%  MagickMapIterateNext() advances the iterator by one element. MagickTrue
+%  is returned if there are remaining entries in the map. The key argument
 %  is updated to point to the element key.
 %
 %  The format of the MagickMapIterateNext method is:
 %
-%       void MagickMapIterateToFront(MagickMapIterator iterator)
+%       MagickBool MagickMapIterateToFront(MagickMapIterator iterator)
 %
 %  A description of each parameter follows:
 %
@@ -878,7 +924,7 @@ MagickMapIterateToFront(MagickMapIterator iterator)
 %    o key: pointer to location to store a pointer to the key
 %
 */
-MagickExport unsigned int
+MagickExport MagickBool
 MagickMapIterateNext(MagickMapIterator iterator,const char **key)
 {
   assert(iterator != 0);
@@ -910,7 +956,7 @@ MagickMapIterateNext(MagickMapIterator iterator,const char **key)
 
   UnlockSemaphoreInfo(iterator->map->semaphore);
 
-  return (iterator->member != 0);
+  return ((iterator->member != 0) ? MagickTrue : MagickFalse);
 }
 
 /*
@@ -931,7 +977,7 @@ MagickMapIterateNext(MagickMapIterator iterator,const char **key)
 %
 %  The format of the MagickMapIteratePrevious method is:
 %
-%       void MagickMapIterateToPrevious(MagickMapIterator iterator)
+%       MagickMapIteratePrevious(MagickMapIterator iterator,const char **key)
 %
 %  A description of each parameter follows:
 %
@@ -940,7 +986,7 @@ MagickMapIterateNext(MagickMapIterator iterator,const char **key)
 %    o key: pointer to location to store a pointer to the key
 %
 */
-MagickExport unsigned int
+MagickExport MagickBool
 MagickMapIteratePrevious(MagickMapIterator iterator,const char **key)
 {
   assert(iterator != 0);
@@ -975,7 +1021,7 @@ MagickMapIteratePrevious(MagickMapIterator iterator,const char **key)
 
   UnlockSemaphoreInfo(iterator->map->semaphore);
 
-  return (iterator->member != 0);
+  return ((iterator->member != 0) ? MagickTrue : MagickFalse);
 }
 
 /*
@@ -1004,11 +1050,11 @@ MagickMapIteratePrevious(MagickMapIterator iterator,const char **key)
 %    o key: key corresponding to the entry to remove
 %
 */
-MagickExport unsigned int
+MagickExport MagickBool
 MagickMapRemoveEntry(MagickMap map,const char *key)
 {
   unsigned int
-    status = False;
+    status = MagickFalse;
 
   assert(map != 0);
   assert(map->signature == MagickSignature);
@@ -1047,7 +1093,7 @@ MagickMapRemoveEntry(MagickMap map,const char *key)
                 }
 
               MagickMapDestroyObject(p);
-              status=True;
+              status=MagickTrue;
               break;
             }
         }

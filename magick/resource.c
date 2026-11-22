@@ -67,9 +67,9 @@ typedef enum
 typedef struct _ResourceInfo
 {
   const char
-    name[8],
+    name[9],
     units[2],
-    env[20];
+    env[22];
 
   magick_intmax_t
     value;
@@ -97,18 +97,19 @@ typedef struct _ResourceInfo
 #define PIXEL_LIMIT (INT_MAX/(sizeof(PixelPacket)))
 static ResourceInfo resource_info[] =
   {
-   { "",       "",  "",                    0, 0,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
-   { "disk",   "B", "MAGICK_LIMIT_DISK",   0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
-   { "files",  "",  "MAGICK_LIMIT_FILES",  0, 0,    256,                    0, SummationLimit, 0 },
-   { "map",    "B", "MAGICK_LIMIT_MAP",    0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
-   { "memory", "B", "MAGICK_LIMIT_MEMORY", 0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
-   { "pixels", "P", "MAGICK_LIMIT_PIXELS", 0, 1,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
-   { "threads", "", "OMP_NUM_THREADS",     1, 1,    MagickResourceInfinity, 0, AbsoluteLimit, 0  },
-   { "width",  "P", "MAGICK_LIMIT_WIDTH",  0, 1,    PIXEL_LIMIT,            0, AbsoluteLimit, 0  },
-   { "height", "P", "MAGICK_LIMIT_HEIGHT", 0, 1,    PIXEL_LIMIT,            0, AbsoluteLimit, 0  },
-   { "read",   "B", "MAGICK_LIMIT_READ",   0, 4096, MagickResourceInfinity, 0, AbsoluteLimit, 0  },
-   { "write",  "B", "MAGICK_LIMIT_WRITE",  0, 4096, MagickResourceInfinity, 0, AbsoluteLimit, 0  },
-   { "images", "",  "MAGICK_LIMIT_IMAGES",  0, 0,   MagickResourceInfinity, 0, SummationLimit, 0 }
+   { "",         "",  "",                      0, 0,    MagickResourceInfinity, 0, AbsoluteLimit,  0 },
+   { "disk",     "B", "MAGICK_LIMIT_DISK",     0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
+   { "files",    "",  "MAGICK_LIMIT_FILES",    0, 0,    256,                    0, SummationLimit, 0 },
+   { "map",      "B", "MAGICK_LIMIT_MAP",      0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
+   { "memory",   "B", "MAGICK_LIMIT_MEMORY",   0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
+   { "pixels",   "P", "MAGICK_LIMIT_PIXELS",   0, 1,    MagickResourceInfinity, 0, AbsoluteLimit,  0 },
+   { "threads",  "",  "OMP_NUM_THREADS",       1, 1,    MagickResourceInfinity, 0, AbsoluteLimit,  0 },
+   { "width",    "P", "MAGICK_LIMIT_WIDTH",    0, 1,    PIXEL_LIMIT,            0, AbsoluteLimit,  0 },
+   { "height",   "P", "MAGICK_LIMIT_HEIGHT",   0, 1,    PIXEL_LIMIT,            0, AbsoluteLimit,  0 },
+   { "read",     "B", "MAGICK_LIMIT_READ",     0, 4096, MagickResourceInfinity, 0, AbsoluteLimit,  0 },
+   { "write",    "B", "MAGICK_LIMIT_WRITE",    0, 4096, MagickResourceInfinity, 0, AbsoluteLimit,  0 },
+   { "images",   "",  "MAGICK_LIMIT_IMAGES",   0, 0,    MagickResourceInfinity, 0, SummationLimit, 0 },
+   { "profiles", "",  "MAGICK_LIMIT_PROFILES", 0, 1,    256,                    0, AbsoluteLimit,  0 }
   };
 
 /*

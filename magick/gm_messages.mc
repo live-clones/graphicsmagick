@@ -2657,6 +2657,12 @@ Pixel cache allocation failed
 .
 
 MessageId       = +1
+SymbolicName    = LimitErrorProfilesLimitExceeded
+Language        = English
+Attached profiles limit exceeded (see -limit Profiles)
+.
+
+MessageId       = +1
 SymbolicName    = LimitErrorReadLimitExceeded
 Language        = English
 Read limit exceeded (see -limit Read)

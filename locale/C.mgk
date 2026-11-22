@@ -1636,6 +1636,9 @@
         <Message name="UnableToThresholdImage">
           unable to threshold image
         </Message>
+        <Message name="ProfilesLimitExceeded">
+          Attached profiles limit exceeded (see -limit Profiles)
+        </Message>
         <Message name="ReadLimitExceeded">
           Read limit exceeded (see -limit Read)
         </Message>
