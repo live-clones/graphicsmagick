@@ -1,3 +1,8 @@
+2026-11-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
+
+        * magick/symbols.h, wand/wand_symbols.h: Update macros to prefix
+        function names with 'Gm'.
+
 2026-11-22  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
         * magick/resource.c: Add support for a 'profiles' resource limit.

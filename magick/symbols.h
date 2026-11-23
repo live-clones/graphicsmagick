@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2012-2026 GraphicsMagick Group
+  SPDX-License-Identifier: MIT
 
   This program is covered by multiple licenses, which are described in
   Copyright.txt. You should have received a copy of Copyright.txt with this
@@ -590,6 +591,7 @@
 #define MagickMapIteratePrevious GmMagickMapIteratePrevious
 #define MagickMapIterateToBack GmMagickMapIterateToBack
 #define MagickMapIterateToFront GmMagickMapIterateToFront
+#define MagickMapNumberOfEntries GmMagickMapNumberOfEntries
 #define MagickMapRemoveEntry GmMagickMapRemoveEntry
 #define MagickMonitorActive GmMagickMonitorActive
 #define MagickMonitorFormatted GmMagickMonitorFormatted
@@ -757,6 +759,7 @@
 #define PlasmaImage GmPlasmaImage
 #define PopImagePixels GmPopImagePixels
 #define PrependImageToList GmPrependImageToList
+#define ProcessMSLScript GmProcessMSLScript
 #define ProfileImage GmProfileImage
 #define PurgeTemporaryFilesAsyncSafe GmPurgeTemporaryFilesAsyncSafe
 #define PurgeTemporaryFiles GmPurgeTemporaryFiles
@@ -852,7 +855,6 @@
 #define RegisterMPCImage GmRegisterMPCImage
 #define RegisterMPEGImage GmRegisterMPEGImage
 #define RegisterMPRImage GmRegisterMPRImage
-#define RegisterMSLImage GmRegisterMSLImage
 #define RegisterMTVImage GmRegisterMTVImage
 #define RegisterMVGImage GmRegisterMVGImage
 #define RegisterNULLImage GmRegisterNULLImage
@@ -1082,7 +1084,6 @@
 #define UnregisterMPCImage GmUnregisterMPCImage
 #define UnregisterMPEGImage GmUnregisterMPEGImage
 #define UnregisterMPRImage GmUnregisterMPRImage
-#define UnregisterMSLImage GmUnregisterMSLImage
 #define UnregisterMTVImage GmUnregisterMTVImage
 #define UnregisterMVGImage GmUnregisterMVGImage
 #define UnregisterNULLImage GmUnregisterNULLImage

@@ -478,6 +478,7 @@ GMMAGICKSYMBOLS=$(srcdir)/magick/symbols.h
 GMWANDSYMBOLS=$(srcdir)/wand/wand_symbols.h
 
 # Build symbols files to add 'gm' prefix to functions
+# This should only be used for a static build.
 gmsymbols:
 	$(srcdir)/scripts/gmsymbols.sh magick/.libs/libGraphicsMagick.a MAGICK > $(GMMAGICKSYMBOLS)
 	$(srcdir)/scripts/gmsymbols.sh wand/.libs/libGraphicsMagickWand.a MAGICK_WAND > $(GMWANDSYMBOLS)
