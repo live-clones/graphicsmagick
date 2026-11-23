@@ -6,7 +6,7 @@
 GraphicsMagick News
 ===================
 
-This file was last updated to reflect changes up to November 14, 2026.
+This file was last updated to reflect changes up to November 23, 2026.
 
 Please note that this file records news for the associated development
 branch and that each development branch has its own NEWS file. See the
@@ -19,7 +19,7 @@ release and not attempt to patch older releases.
 .. contents::
   :local:
 
-1.3.49 (???? ??, 2026)
+1.3.50 (???? ??, 2026)
 ========================
 
 Special Issues:
@@ -38,9 +38,10 @@ Security Fixes:
 
 * MSL: MSL is no longer accessible via a "MSL:" prefix on input file
   names. Since MSL is capable of producing, reading, and writing
-  arbitrary files (and is not a graphic file "format"), this was
-  decided to be an unnecessary risk.  Use 'conjure' as has always been
-  documented.
+  arbitrary files (and is not a graphic file "format"), allowing any
+  input file to be treated as a script by merely prefixing the file
+  name with "MSL:" is an unnecessary risk.  Use of 'conjure' to
+  execute MSL scripts has always been documented.
 
 * MSL: Address possible arithmetic overflow while calculating memory
   allocation size.
@@ -56,9 +57,13 @@ Security Fixes:
 * SVG: Quote stroke-dasharray argument to block MVG injection
   opportunity.
 
+* SetImage()/SetImageEx(): Do not ignore error status from these
+  functions since segmentation violations may occur if the resulting
+  incomplete image is accessed.
+
 Bug fixes:
 
-* Wand: The MagickLevelImage() function rewritten to use
+* Wand: The MagickLevelImage() function is rewritten to use
   LevelImageChannel() with parameterized arguments.
 
 * PerlMagick: Only use LevelImage() if a text string argument was
@@ -75,13 +80,18 @@ Bug fixes:
 * Microsoft Windows vcpkg compatibility improvements for the configure
   script, and C pre-processor.
 
+* WMF: The WMF progress monitor registration and callback function
+  implementation were completely wrong! Fixed now.
+
 API Updates:
 
 * None
 
 New Features:
 
-* None
+* Resource Limits: Add support for a 'profiles' resource limit, which
+  limits the number of attached profiles which may be associated with
+  one image.  This avoids a denial of service (DOS) opportunity.
 
 Behavior Changes:
 

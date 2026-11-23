@@ -1,5 +1,7 @@
 2026-11-23  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * NEWS.txt: Update the news.
+
         * magick/symbols.h, wand/wand_symbols.h: Update macros to prefix
         function names with 'Gm'.
 
