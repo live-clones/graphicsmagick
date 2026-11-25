@@ -3249,8 +3249,12 @@ double Magick::Image::meanErrorPerPixel ( void ) const
 void Magick::Image::modulusDepth ( const unsigned int depth_ )
 {
   modifyImage();
-  SetImageDepth( image(), depth_ );
+  if (SetImageDepth( image(), depth_ ) == MagickFail)
+    {
+      // throwImageException() below will report via exception
+    }
   options()->depth( depth_ );
+  throwImageException();
 }
 unsigned int Magick::Image::modulusDepth ( void ) const
 {

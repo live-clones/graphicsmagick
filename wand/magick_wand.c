@@ -8599,8 +8599,7 @@ WandExport unsigned int MagickSetImageDepth(MagickWand *wand,
   assert(wand->signature == MagickSignature);
   if (wand->images == (Image *) NULL)
     ThrowWandExceptionBoolean(WandError,WandContainsNoImages,wand->id);
-  (void) SetImageDepth(wand->image,depth);
-  return(True);
+  return SetImageDepth(wand->image,depth);
 }
 
 /*

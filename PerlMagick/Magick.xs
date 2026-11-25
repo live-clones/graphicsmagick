@@ -1396,7 +1396,10 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
             if (info)
               info->image_info->depth=SvIV(sval);
             for ( ; image; image=image->next)
-              SetImageDepth(image,SvIV(sval));
+              if (SetImageDepth(image,SvIV(sval)) == MagickFail)
+                {
+                  /* Error is reported via image */
+                }
             return;
           }
         if (LocaleCompare(attribute,"dispose") == 0)

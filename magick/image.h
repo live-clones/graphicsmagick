@@ -1067,7 +1067,7 @@ extern MagickExport MagickPassFail
                       unsigned long height,const PixelPacket *pixel) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageClipMask(Image *image,const Image *clip_mask) MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageCompositeMask(Image *image,const Image *composite_mask),  /*to support SVG masks*/
-  SetImageDepth(Image *image,const unsigned long) MAGICK_FUNC_NONNULL(),
+  SetImageDepth(Image *image,const unsigned long) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageInfo(ImageInfo *image_info,const unsigned int flags,ExceptionInfo *exception) MAGICK_FUNC_NONNULL(),
   SetImageOpacity(Image *,const unsigned int) MAGICK_FUNC_NONNULL(),
   SetImageType(Image *image,const ImageType) MAGICK_FUNC_NONNULL(),
