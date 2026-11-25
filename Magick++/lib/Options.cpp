@@ -354,7 +354,10 @@ void Magick::Options::magick ( const std::string &magick_ )
 
   ExceptionInfo exception;
   GetExceptionInfo(&exception);
-  SetImageInfo( _imageInfo, 1, &exception);
+  if (SetImageInfo( _imageInfo, 1, &exception) == MagickFail)
+    {
+      // Handled below
+    }
   if ( _imageInfo->magick[0] == '\0' )
     throwExceptionExplicit( OptionWarning,
                             "Unrecognized image format",

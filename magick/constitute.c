@@ -1550,7 +1550,9 @@ MagickExport Image *ReadImage(const ImageInfo *image_info,
   /*
     Obtain file magick from filename
   */
-  (void) SetImageInfo(clone_info,SETMAGICK_READ,exception);
+  if (SetImageInfo(clone_info,SETMAGICK_READ,exception) == MagickFail)
+    {
+    }
   (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                         "Magick=%s, Filename=%s", clone_info->magick,clone_info->filename);
   (void) strlcpy(filename,clone_info->filename,MaxTextExtent);
@@ -1761,7 +1763,9 @@ MagickExport Image *ReadImage(const ImageInfo *image_info,
       DestroyImageList(image);
       image=(Image *) NULL;
       clone_info->temporary=True;
-      (void) SetImageInfo(clone_info,SETMAGICK_READ,exception);
+      if (SetImageInfo(clone_info,SETMAGICK_READ,exception) == MagickFail)
+        {
+        }
       magick_info=GetMagickInfo(clone_info->magick,exception);
       /*
         If there is no magick info entry for this format, or there is
@@ -2227,7 +2231,9 @@ WriteImage(const ImageInfo *image_info,Image *image)
   clone_info=CloneImageInfo(image_info);
   (void) strlcpy(clone_info->filename,image->filename,MaxTextExtent);
   (void) strlcpy(clone_info->magick,image->magick,MaxTextExtent);
-  (void) SetImageInfo(clone_info,SETMAGICK_WRITE,&image->exception);
+  if (SetImageInfo(clone_info,SETMAGICK_WRITE,&image->exception) == MagickFail)
+    {
+    }
   (void) strlcpy(image->filename,clone_info->filename,MaxTextExtent);
   image->dither=image_info->dither;
   DisassociateBlob(image);
@@ -2475,10 +2481,12 @@ WriteImages(const ImageInfo *image_info,Image *image,
               if (strlcpy(p->filename,filename,MaxTextExtent) >= MaxTextExtent)
                 status &= MagickFail;
         }
-      (void) SetImageInfo(clone_info,
-                          (SETMAGICK_WRITE |
-                           (!clone_info->adjoin ? SETMAGICK_RECTIFY : 0U)),
-                          exception);
+      if (SetImageInfo(clone_info,
+                       (SETMAGICK_WRITE |
+                        (!clone_info->adjoin ? SETMAGICK_RECTIFY : 0U)),
+                       exception) == MagickFail)
+        {
+        }
       for (p=image; p != (Image *) NULL; p=p->next)
         {
           status &= WriteImage(clone_info,p);
@@ -2554,10 +2562,12 @@ MagickExport MagickPassFail WriteImagesFile(const ImageInfo *image_info,Image *i
         *p;
 
       clone_info->file=file;
-      (void) SetImageInfo(clone_info,
-                          (SETMAGICK_WRITE |
-                           (!clone_info->adjoin ? SETMAGICK_RECTIFY : 0U)),
-                          exception);
+      if (SetImageInfo(clone_info,
+                       (SETMAGICK_WRITE |
+                        (!clone_info->adjoin ? SETMAGICK_RECTIFY : 0U)),
+                       exception) == MagickFail)
+        {
+        }
       for (p=image; p != (Image *) NULL; p=p->next)
         {
           status &= WriteImage(clone_info,p);

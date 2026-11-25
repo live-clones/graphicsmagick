@@ -1625,7 +1625,9 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
 
                 GetExceptionInfo(&exception);
                 MagickFormatString(info->image_info->filename,sizeof(info->image_info->filename),"%.1024s:",SvPV(sval,na));
-                SetImageInfo(info->image_info,SETMAGICK_WRITE,&exception);
+                if (SetImageInfo(info->image_info,SETMAGICK_WRITE,&exception) == MagickFail)
+                  {
+                  }
                 if (*info->image_info->magick == '\0')
                   MagickError(OptionError,UnrecognizedImageFormat,
                               info->image_info->filename);
@@ -2735,7 +2737,9 @@ Average(ref)
     MagickFormatString(info->image_info->filename,sizeof(info->image_info->filename),"average-%.*s",MaxTextExtent-9,
       ((p=strrchr(image->filename,'/')) ? p+1 : image->filename));
     (void) MagickStrlCpy(image->filename,info->image_info->filename,sizeof(image->filename));
-    SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception);
+    if (SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception) == MagickFail)
+      {
+      }
     SvREFCNT_dec(MY_CXT.error_list);
     MY_CXT.error_jump=NULL;
     XSRETURN(1);
@@ -3345,7 +3349,9 @@ Flatten(ref)
     MagickFormatString(info->image_info->filename,sizeof(info->image_info->filename),"average-%.*s",MaxTextExtent-9,
       ((p=strrchr(image->filename,'/')) ? p+1 : image->filename));
     (void) MagickStrlCpy(image->filename,info->image_info->filename,sizeof(image->filename));
-    SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception);
+    if (SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception) == MagickFail)
+      {
+      }
     SvREFCNT_dec(MY_CXT.error_list);
     MY_CXT.error_jump=NULL;
     XSRETURN(1);
@@ -4518,7 +4524,9 @@ ImageToBlob(ref,...)
       (void) MagickStrlCpy(next->filename,filename,sizeof(next->filename));
       next->scene=scene++;
     }
-    SetImageInfo(package_info->image_info,SETMAGICK_WRITE,&image->exception);
+    if (SetImageInfo(package_info->image_info,SETMAGICK_WRITE,&image->exception) == MagickFail)
+      {
+      }
     EXTEND(sp,(long) GetImageListLength(image));
     GetExceptionInfo(&exception);
     for ( ; image; image=image->next)
@@ -7115,7 +7123,9 @@ Mosaic(ref)
     SvREFCNT_dec(sv);
     info=GetPackageInfo(aTHX_ (void *) av,info);
     (void) MagickStrlCpy(image->filename,info->image_info->filename,sizeof(image->filename));
-    SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception);
+    if (SetImageInfo(info->image_info,SETMAGICK_WRITE,&image->exception) == MagickFail)
+      {
+      }
     if (exception.severity != UndefinedException)
       CatchException(&exception);
     DestroyExceptionInfo(&exception);
@@ -8417,10 +8427,12 @@ Write(ref,...)
       (void) MagickStrlCpy(next->filename,filename,sizeof(next->filename));
       next->scene=scene++;
     }
-    (void) SetImageInfo(package_info->image_info,
-                        (SETMAGICK_WRITE |
-                         (!package_info->image_info->adjoin ? SETMAGICK_RECTIFY: 0U)),
-                        &image->exception);
+    if (SetImageInfo(package_info->image_info,
+                     (SETMAGICK_WRITE |
+                      (!package_info->image_info->adjoin ? SETMAGICK_RECTIFY: 0U)),
+                     &image->exception) == MagickFail)
+      {
+      }
     for (next=image; next; next=next->next)
     {
       (void) WriteImage(package_info->image_info,next);

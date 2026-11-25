@@ -1046,7 +1046,7 @@ extern MagickExport MagickBool
   IsTaintImage(const Image *) MAGICK_FUNC_NONNULL(),
   IsSubimage(const char *,const MagickBool);
 
-/* Functions which return unsigned int to indicate operation pass/fail */
+/* Functions which return MagickPassFail to indicate operation pass/fail */
 extern MagickExport MagickPassFail
   AddDefinition(ImageInfo *image_info,const char *magick, const char *key,
     const char *value, ExceptionInfo *exception) MAGICK_FUNC_NONNULL(),
@@ -1068,8 +1068,8 @@ extern MagickExport MagickPassFail
   SetImageClipMask(Image *image,const Image *clip_mask) MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageCompositeMask(Image *image,const Image *composite_mask),  /*to support SVG masks*/
   SetImageDepth(Image *image,const unsigned long) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
-  SetImageInfo(ImageInfo *image_info,const unsigned int flags,ExceptionInfo *exception) MAGICK_FUNC_NONNULL(),
-  SetImageOpacity(Image *,const unsigned int) MAGICK_FUNC_NONNULL(),
+  SetImageInfo(ImageInfo *image_info,const unsigned int flags,ExceptionInfo *exception) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
+  SetImageOpacity(Image *,const unsigned int) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageType(Image *image,const ImageType) MAGICK_FUNC_NONNULL(),
   StripImage(Image *image) MAGICK_FUNC_NONNULL(),
   SyncImage(Image *image) MAGICK_FUNC_NONNULL();

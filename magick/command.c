@@ -2425,7 +2425,9 @@ CompareImageCommand(ImageInfo *image_info,
   filename=(char *) NULL;
   compare_image=NewImageList();
   (void) strlcpy(image_info->filename,argv[argc-1],MaxTextExtent);
-  (void) SetImageInfo(image_info,SETMAGICK_WRITE,exception);
+  if (SetImageInfo(image_info,SETMAGICK_WRITE,exception) == MagickFail)
+    {
+    }
 
   status=MagickPass;
   /*
@@ -3344,7 +3346,9 @@ MagickExport MagickPassFail CompositeImageCommand(ImageInfo *image_info,
   option_info.geometry=(char *) NULL;
   image=NewImageList();
   (void) strlcpy(image_info->filename,argv[argc-1],MaxTextExtent);
-  (void) SetImageInfo(image_info,SETMAGICK_WRITE,exception);
+  if (SetImageInfo(image_info,SETMAGICK_WRITE,exception) == MagickFail)
+    {
+    }
   mask_image=NewImageList();
   option_info.stegano=0;
   option_info.stereo=MagickFalse;
@@ -4533,7 +4537,9 @@ MagickExport MagickPassFail ConvertImageCommand(ImageInfo *image_info,
   image=NewImageList();
   image_list=(Image *) NULL;
   (void) strlcpy(image_info->filename,argv[argc-1],MaxTextExtent);
-  (void) SetImageInfo(image_info,SETMAGICK_WRITE,exception);
+  if (SetImageInfo(image_info,SETMAGICK_WRITE,exception) == MagickFail)
+    {
+    }
   ping=MagickFalse;
   option=(char *) NULL;
   status=MagickPass;
@@ -7149,7 +7155,9 @@ MagickExport MagickPassFail DisplayImageCommand(ImageInfo *image_info,
                 */
                 (void) strlcpy(image->filename,resource_info.write_filename,
                   MaxTextExtent);
-                (void) SetImageInfo(image_info,SETMAGICK_WRITE,&image->exception);
+                if (SetImageInfo(image_info,SETMAGICK_WRITE,&image->exception) == MagickFail)
+                  {
+                  }
                 status&=WriteImage(image_info,image);
                 (void) CatchImageException(image);
               }
@@ -12919,7 +12927,9 @@ MagickExport MagickPassFail MogrifyImageCommand(ImageInfo *image_info,
                 (void) CloneString(&format,argv[i]);
                 (void) strlcpy(image_info->filename,format,MaxTextExtent);
                 (void) strlcat(image_info->filename,":",sizeof(image_info->filename));
-                (void) SetImageInfo(image_info,SETMAGICK_WRITE,exception);
+                if (SetImageInfo(image_info,SETMAGICK_WRITE,exception) == MagickFail)
+                  {
+                  }
                 if (*image_info->magick == '\0')
                   ThrowMogrifyException(OptionError,UnrecognizedImageFormat,format);
               }
@@ -14404,7 +14414,9 @@ MagickExport MagickPassFail MontageImageCommand(ImageInfo *image_info,
       (char *) NULL);
 
   (void) strlcpy(image_info->filename,argv[argc-1],MaxTextExtent);
-  (void) SetImageInfo(image_info,SETMAGICK_WRITE,exception);
+  if (SetImageInfo(image_info,SETMAGICK_WRITE,exception) == MagickFail)
+    {
+    }
   montage_info=CloneMontageInfo(image_info,(MontageInfo *) NULL);
   GetQuantizeInfo(&quantize_info);
   quantize_info.number_colors=0;

@@ -759,7 +759,14 @@ MagickExport Image *BlobToImage(const ImageInfo *image_info,const void *blob,
     not provided.
   */
   if (clone_info->magick[0] == '\0')
-    (void) SetImageInfo(clone_info,SETMAGICK_READ,exception);
+    if (SetImageInfo(clone_info,SETMAGICK_READ,exception) == MagickFail)
+      {
+        ThrowException(exception,BlobError,UnableToDeduceImageFormat,clone_info->filename);
+        DestroyImageInfo(clone_info);
+        (void) LogMagickEvent(BlobEvent,GetMagickModule(),
+                              "Leaving BlobToImage");
+        return((Image *) NULL);
+      }
   (void) LogMagickEvent(BlobEvent,GetMagickModule(),
                         "Blob magick=\"%s\"", clone_info->magick);
   if (clone_info->magick[0] == '\0')
