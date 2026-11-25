@@ -1,5 +1,9 @@
 2026-11-25  Bob Friesenhahn  <bfriesen@simple.dallas.tx.us>
 
+        * magick/image.h: Warn if return value from SetImageColor() or
+        SetImageColorRegion() is not checked, and address any warnings
+        which result.
+
         * coders/png.c (ReadMNGImage): Perform proper clean-ups when
         SetImage() fails.  Addresses oss-fuzz issue 590193559
         "graphicsmagick:coder_MNG_fuzzer: Direct-leak in

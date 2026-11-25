@@ -1062,9 +1062,9 @@ extern MagickExport MagickPassFail
   ResetImagePage(Image *image,const char *page) MAGICK_FUNC_NONNULL(),
   SetImage(Image *image,const Quantum) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageEx(Image *image,const Quantum opacity,ExceptionInfo *exception) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
-  SetImageColor(Image *image,const PixelPacket *pixel) MAGICK_FUNC_NONNULL(),
+  SetImageColor(Image *image,const PixelPacket *pixel) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageColorRegion(Image *image,long x,long y,unsigned long width,
-                      unsigned long height,const PixelPacket *pixel) MAGICK_FUNC_NONNULL(),
+                      unsigned long height,const PixelPacket *pixel) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageClipMask(Image *image,const Image *clip_mask),
   SetImageCompositeMask(Image *image,const Image *composite_mask),  /*to support SVG masks*/
   SetImageDepth(Image *image,const unsigned long) MAGICK_FUNC_NONNULL(),

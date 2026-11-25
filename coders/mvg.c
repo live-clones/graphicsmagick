@@ -200,7 +200,11 @@ static Image *ReadMVGImage(const ImageInfo *image_info,ExceptionInfo *exception)
     Initialize image canvas with the background color (default white),
     which may be transparent.
   */
-  SetImageColor(image,&image->background_color);
+  if (SetImageColor(image,&image->background_color) == MagickFail)
+    {
+      CloseBlob(image);
+      return (Image *) NULL;
+    }
   draw_info=CloneDrawInfo(image_info,(DrawInfo *) NULL);
   draw_info->fill=image_info->pen;
   draw_info->primitive=NULL;
