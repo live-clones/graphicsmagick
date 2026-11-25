@@ -4302,6 +4302,12 @@ static Image *ReadJNGImage(const ImageInfo *image_info,
 }
 #endif
 
+#define ThrowMNGReaderException(code_,reason_,image_)   \
+  {                                                     \
+    MagickFreeMemory(chunk);                            \
+    MngInfoFreeStruct(mng_info,&have_mng_structure);    \
+    ThrowReaderException(code_,reason_,image_);         \
+  }
 static Image *ReadMNGImage(const ImageInfo *image_info,
                            ExceptionInfo *exception)
 {
@@ -4321,11 +4327,14 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
     term_chunk_found,
     skip_to_iend;
 
-  volatile long
+  volatile size_t
     image_count=0;
 
   MngInfo
     *mng_info;
+
+  unsigned char
+    *chunk = (unsigned char *) NULL;
 
   MngBox
     default_fb,
@@ -4440,10 +4449,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
       */
       if ((ReadBlob(image,8,magic_number) != 8) ||
           (memcmp(magic_number,"\212MNG\r\n\032\n",8) != 0))
-        {
-          MngInfoFreeStruct(mng_info,&have_mng_structure);
-          ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-        }
+        ThrowMNGReaderException(CorruptImageError,ImproperImageHeader,image);
       /*
         Initialize some nonzero members of the MngInfo structure.
       */
@@ -4484,9 +4490,6 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
           register unsigned char
             *p = 0;
 
-          unsigned char
-            *chunk = (unsigned char *) NULL;
-
           /*
             Read a new chunk.
           */
@@ -4501,8 +4504,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                                       "  Reading MNG chunk, count: "
                                       "%" MAGICK_SIZE_T_F  "u",
                                       (MAGICK_SIZE_T) count);
-              MngInfoFreeStruct(mng_info,&have_mng_structure);
-              ThrowReaderException(CorruptImageError,CorruptImage,image);
+              ThrowMNGReaderException(CorruptImageError,CorruptImage,image);
             }
 
           if (logging)
@@ -4513,8 +4515,12 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
 
           if (length > PNG_MAX_UINT)
             {
-              MngInfoFreeStruct(mng_info,&have_mng_structure);
-              ThrowReaderException(CorruptImageError,CorruptImage,image);
+              if (image->logging)
+                (void) LogMagickEvent(CoderEvent,GetMagickModule(),
+                                      "chunk length (%" MAGICK_SIZE_T_F "u)"
+                                      " is greater than PNG_MAX_UINT",
+                                      (MAGICK_SIZE_T) length);
+              ThrowMNGReaderException(CorruptImageError,CorruptImage,image);
             }
           if (length > (size_t) blob_size)
             {
@@ -4525,21 +4531,16 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                                       " (%" MAGICK_OFF_F "d)",
                                       (MAGICK_SIZE_T) length,
                                       blob_size);
-              MngInfoFreeStruct(mng_info,&have_mng_structure);
-              ThrowReaderException(CorruptImageError,CorruptImage,image);
+              ThrowMNGReaderException(CorruptImageError,CorruptImage,image);
             }
           if (length)
             {
               chunk=MagickAllocateMemory(unsigned char *,length);
               if (chunk == (unsigned char *) NULL)
-                ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
-                                     image);
+                ThrowMNGReaderException(ResourceLimitError,MemoryAllocationFailed,
+                                        image);
               if (ReadBlob(image,length,chunk) != length)
-                {
-                  MagickFreeMemory(chunk);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(CorruptImageError,CorruptImage,image);
-                }
+                ThrowMNGReaderException(CorruptImageError,CorruptImage,image);
               p=chunk;
             }
           (void) ReadBlobMSBLong(image);  /* read crc word */
@@ -4581,11 +4582,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
           if (!memcmp(type,mng_MHDR,4))
             {
               if (length < 16)
-                {
-                  MagickFreeMemory(chunk);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(CorruptImageError,CorruptImage,image);
-                }
+                ThrowMNGReaderException(CorruptImageError,CorruptImage,image);
 #if defined(GMPNG_SETJMP_NOT_THREAD_SAFE)
               /* To quiet a Coverity complaint */
               LockSemaphoreInfo(png_semaphore);
@@ -4610,10 +4607,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "   MNG width or height is zero: width %lu, height %lu",
                                         mng_info->mng_width,mng_info->mng_height);
-                  MagickFreeMemory(chunk);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(CorruptImageError,ImproperImageHeader,
-                                       image);
+                  ThrowMNGReaderException(CorruptImageError,ImproperImageHeader,
+                                          image);
                 }
               if ((long) mng_info->mng_width >
                   GetMagickResourceLimit(WidthResource) ||
@@ -4623,10 +4618,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "   MNG width or height too large: width %lu, height %lu",
                                         mng_info->mng_width,mng_info->mng_height);
-                  MagickFreeMemory(chunk);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(CorruptImageError,ImproperImageHeader,
-                                       image);
+                  ThrowMNGReaderException(CorruptImageError,ImproperImageHeader,
+                                          image);
                 }
 
               p+=8;
@@ -4678,10 +4671,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                         "  MNG width or height is too large: %lu, %lu",
                                         mng_info->mng_width,mng_info->mng_height);
-                  MagickFreeMemory(chunk);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(CorruptImageError,
-                                       ImproperImageHeader,image);
+                  ThrowMNGReaderException(CorruptImageError,
+                                          ImproperImageHeader,image);
                 }
 
               MagickFormatString(page_geometry,sizeof(page_geometry),"%lux%lu+0+0",
@@ -4750,9 +4741,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
                                           "  DEFI chunk must be at least"
                                           " 2 bytes long");
-                  MagickFreeMemory(chunk);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(CorruptImageError,CorruptImage,image);
+                  ThrowMNGReaderException(CorruptImageError,CorruptImage,image);
                 }
               object_id=((magick_uint32_t) p[0] << 8) | (magick_uint32_t) p[1];
               if (mng_type == 2 && object_id != 0)
@@ -4871,10 +4860,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   if (mng_info->global_plte == (png_colorp) NULL)
                     {
                       mng_info->global_plte_length=0;
-                      MagickFreeMemory(chunk);
-                      MngInfoFreeStruct(mng_info,&have_mng_structure);
-                      ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
-                                           image);
+                      ThrowMNGReaderException(ResourceLimitError,MemoryAllocationFailed,
+                                              image);
                     }
                   for (i=0; i < (long) (length/3); i++)
                     {
@@ -5686,11 +5673,7 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
         }
 #ifdef MNG_INSERT_LAYERS
       if (length < 8)
-        {
-          MagickFreeMemory(chunk);
-          MngInfoFreeStruct(mng_info,&have_mng_structure);
-          ThrowReaderException(CorruptImageError,ImproperImageHeader,image);
-        }
+        ThrowMNGReaderException(CorruptImageError,ImproperImageHeader,image);
       image_width=mng_get_long(p);
       image_height=mng_get_long(&p[4]);
 #endif
@@ -5753,9 +5736,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                                         "Failed to set image background color for background"
                                         " rectangle with dimensions %lux%lu",
                                         image->columns, image->rows);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
-                                       image);
+                  ThrowMNGReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                          image);
                 }
               if (logging)
                 (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -6213,10 +6195,9 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
                   MagickFreeMemory(next);
                   MagickFreeMemory(prev);
                   DestroyImageList(image);
-                  MngInfoFreeStruct(mng_info,&have_mng_structure);
-                  ThrowReaderException(ResourceLimitError,
-                                       MemoryAllocationFailed,image)
-                    }
+                  ThrowMNGReaderException(ResourceLimitError,
+                                          MemoryAllocationFailed,image);
+                }
               n=GetImagePixels(image,0,0,image->columns,1);
               if(n == (PixelPacket *) NULL)
                 {
@@ -6554,15 +6535,11 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
               image->columns=1;
               image->rows=1;
               if (ReallocateImageColormap(image,2) == MagickFail)
-                {
-                  ThrowReaderException(ResourceLimitError,MemoryAllocationFailed,
-                                       image);
-                }
+                ThrowMNGReaderException(ResourceLimitError,MemoryAllocationFailed,
+                                        image);
               if (SetImage(image,TransparentOpacity) == MagickFail)
-                {
-                  ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
-                                       image);
-                }
+                ThrowMNGReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                        image);
               image->page.width=1;
               image->page.height=1;
               image->page.x=0;
@@ -6633,10 +6610,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
       image->matte=MagickFalse;
       if (!image_info->ping)
         if (SetImage(image,OpaqueOpacity) == MagickFail)
-          {
-            ThrowReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
-                                 image);
-          }
+          ThrowMNGReaderException(ResourceLimitError,UnableToSetImageBackgroundColor,
+                                  image);
       mng_info->image_found++;
     }
 #endif
@@ -6646,20 +6621,19 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
   while (image->previous != (Image *) NULL)
     {
       image_count++;
-#if 0
-      /* This code triggers and fails to release memory in oss-fuzz 8710 */
-      if (image_count > 10*mng_info->image_found)
+#if 1
+      /*
+        This code triggers and fails to release memory in oss-fuzz 8710.
+        Re-written and re-enabled to see what happens.
+      */
+      if (image_count > (size_t)10*mng_info->image_found)
         {
           if (logging)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                                  "  No beginning");
-          MngInfoFreeStruct(mng_info,&have_mng_structure);
-          (void) ThrowException2(exception,(ExceptionType) CoderError,
-                                 "Linked list is corrupted,"
-                                 " beginning of list not found",
-                                 image_info->filename);
-          (void) LogMagickEvent(CoderEvent,GetMagickModule(),"  return NULL from ReadMNGImage()");
-          return((Image *) NULL);
+                                  "Linked list is corrupted,"
+                                  " beginning of list not found");
+          ThrowMNGReaderException(CorruptImageError,CorruptImage,
+                                  image);
         }
 #endif
       image=image->previous;
@@ -6818,7 +6792,8 @@ static Image *ReadMNGImage(const ImageInfo *image_info,
   have_mng_structure=MagickFalse;
   if (logging)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
-                          "exit ReadMNGImage(), image_count=%ld",image_count);
+                          "exit ReadMNGImage(), image_count=%"
+                          MAGICK_SIZE_T_F "u",image_count);
   return(image);
 }
 #else /* PNG_LIBPNG_VER > 10011 */
