@@ -937,7 +937,7 @@ MagickExport MagickPassFail ClipPathImage(Image *image,const char *pathname,
 
   clip_mask->is_grayscale=True;
   clip_mask->is_monochrome=True;
-  (void) SetImageClipMask(image,clip_mask);
+  status &= SetImageClipMask(image,clip_mask);
   DestroyImage(clip_mask);
   return status;
 }

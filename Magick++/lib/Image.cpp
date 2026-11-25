@@ -2493,13 +2493,20 @@ void Magick::Image::clipMask ( const Magick::Image & clipMask_ )
   if( clipMask_.isValid() )
     {
       // Set clip mask
-      SetImageClipMask( image(), clipMask_.constImage() );
+      if (SetImageClipMask( image(), clipMask_.constImage()) == MagickFail)
+        {
+          // throwImageException() below will report via exception
+        }
     }
   else
     {
       // Unset existing clip mask
-      SetImageClipMask( image(), 0 );
+      if (SetImageClipMask( image(), 0 ) == MagickFail)
+        {
+          // throwImageException() will report via exception
+        }
     }
+  throwImageException();
 }
 Magick::Image Magick::Image::clipMask ( void  ) const
 {

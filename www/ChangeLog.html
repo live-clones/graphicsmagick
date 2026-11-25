@@ -40,10 +40,13 @@
 <h1 class="title">GraphicsMagick ChangeLog</h1>
 <p>2026-11-25  Bob Friesenhahn  &lt;<a class="reference external" href="mailto:bfriesen&#37;&#52;&#48;simple&#46;dallas&#46;tx&#46;us">bfriesen<span>&#64;</span>simple<span>&#46;</span>dallas<span>&#46;</span>tx<span>&#46;</span>us</a>&gt;</p>
 <blockquote>
-<ul class="simple">
+<ul>
 <li><p>magick/image.h: Warn if return value from SetImageColor() or
 SetImageColorRegion() is not checked, and address any warnings
-which result.</p></li>
+which result.</p>
+<p>Warn if return value from SetImageClipMask() is not checked, and
+address any warnings which result.</p>
+</li>
 <li><p>coders/png.c (ReadMNGImage): Perform proper clean-ups when
 SetImage() fails.  Addresses oss-fuzz issue 590193559
 &quot;graphicsmagick:coder_MNG_fuzzer: Direct-leak in

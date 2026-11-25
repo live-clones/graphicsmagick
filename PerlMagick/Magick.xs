@@ -1275,7 +1275,9 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
 
             clip_mask=SetupList(aTHX_ SvRV(sval),&info,(SV ***) NULL);
             for ( ; image; image=image->next)
-              SetImageClipMask(image,clip_mask);
+              if (SetImageClipMask(image,clip_mask) == MagickFail)
+                {
+                }
             return;
           }
         if (LocaleNCompare(attribute,"colormap",8) == 0)

@@ -2791,8 +2791,11 @@ MSLStartElement(void *context,const xmlChar *name,
                               if (theAttr &&
                                   LocaleCompare(theAttr->value, value) == 0)
                                 {
-                                  (void) SetImageClipMask(msl_info->image[n],
-                                                          msl_info->image[j]);
+                                  if (SetImageClipMask(msl_info->image[n],
+                                                       msl_info->image[j]) == MagickFail)
+                                    {
+                                      CopyException(msl_info->exception, &msl_info->image[n]->exception);
+                                    }
                                   break;
                                 }
                             }

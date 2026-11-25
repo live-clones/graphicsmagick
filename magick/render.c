@@ -3669,13 +3669,27 @@ DrawImage(Image *image,const DrawInfo *draw_info)
                     if (graphic_context[n]->extra->clip_path != (char *) NULL)
                       if (LocaleCompare(graphic_context[n]->extra->clip_path,
                                         graphic_context[n-1]->extra->clip_path) != 0)
-                        (void) SetImageClipMask(image,(Image *) NULL);
+                        {
+                          status &= SetImageClipMask(image,(Image *) NULL);
+                          if (status == MagickFail)
+                            {
+                              (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                              break;
+                            }
+                        }
                     if (graphic_context[n]->extra->composite_path != (char *) NULL)
                       {
                         /* clean up composite mask if different from parent */
                         if (LocaleCompare(graphic_context[n]->extra->composite_path,
                                           graphic_context[n-1]->extra->composite_path) != 0)
-                          (void) SetImageCompositeMask(image,(Image *) NULL);
+                          {
+                            status &= SetImageCompositeMask(image,(Image *) NULL);
+                            if (status == MagickFail)
+                              {
+                                (void) LogMagickEvent(RenderEvent,GetMagickModule(),"Quit with error");
+                                break;
+                              }
+                          }
                       }
                     DestroyDrawInfo(graphic_context[n]);
                     n--;
