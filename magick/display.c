@@ -3528,7 +3528,7 @@ static unsigned int MagickXColorEditImage(Display *display,
                           (*image)->colormap[i].blue=
                             ScaleShortToQuantum(color.blue);
                         }
-                    (void) SyncImage(*image);
+                    status &= SyncImage(*image);
                   }
                 break;
               }
@@ -4108,7 +4108,7 @@ static unsigned int MagickXCompositeImage(Display *display,
       /*
         Create mattes for blending.
       */
-      SetImageOpacity(composite_image,OpaqueOpacity);
+      status &= SetImageOpacity(composite_image,OpaqueOpacity);
       opacity=(Quantum) (ScaleQuantumToChar(MaxRGB)-
                          ((long) ScaleQuantumToChar(MaxRGB)*blend)/100);
       status &= SetImageType(image,TrueColorMatteType);

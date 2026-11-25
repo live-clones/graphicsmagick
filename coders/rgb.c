@@ -730,10 +730,17 @@ static unsigned int WriteRGBImage(const ImageInfo *image_info,Image *image)
       Convert MIFF to RGB raster pixels.
     */
     if (TransformColorspace(image,RGBColorspace) == MagickFail)
-      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      {
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      }
     if (LocaleCompare(image_info->magick,"RGBA") == 0)
       if (!image->matte)
-        SetImageOpacity(image,OpaqueOpacity);
+        if (SetImageOpacity(image,OpaqueOpacity) == MagickFail)
+          {
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+            ThrowWriterException(CoderError,UnableToSetImageOpacity,image);
+          }
 
     switch (image_info->interlace)
     {

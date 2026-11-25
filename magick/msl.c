@@ -2889,7 +2889,10 @@ MSLStartElement(void *context,const xmlChar *name,
                           if ((opac > 0.0) && (len > 1) && value[len-1] == '%')
                             opac = (MaxRGBDouble * (opac/100.0));
 
-                          SetImageOpacity( msl_info->image[n], (unsigned int) opac );
+                          if (SetImageOpacity(msl_info->image[n], (unsigned int) opac ) == MagickFail)
+                            {
+                              GetImageException(msl_info->image[n],msl_info->exception);
+                            }
                           break;
                         }
 

@@ -1379,7 +1379,11 @@ void Magick::Image::oilPaint ( const double radius_ )
 void Magick::Image::opacity ( const unsigned int opacity_ )
 {
   modifyImage();
-  SetImageOpacity( image(), opacity_ );
+  if (SetImageOpacity( image(), opacity_ ) == MagickFail)
+    {
+      // Handled below
+    }
+  throwImageException();
 }
 
 // Change the color of an opaque pixel to the pen color.
@@ -3203,9 +3207,13 @@ void Magick::Image::matte ( const bool matteFlag_ )
   // desired, then set the matte channel to opaque.
   if ((matteFlag_ && !constImage()->matte) ||
       (constImage()->matte && !matteFlag_))
-    SetImageOpacity(image(),OpaqueOpacity);
+    if (SetImageOpacity(image(),OpaqueOpacity) == MagickFail)
+      {
+        // Handled below
+      }
 
   image()->matte = matteFlag_;
+  throwImageException();
 }
 bool Magick::Image::matte ( void ) const
 {

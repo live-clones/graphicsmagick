@@ -771,11 +771,18 @@ static unsigned int WriteCMYKImage(const ImageInfo *image_info,Image *image)
     /*
       Convert MIFF to CMYK raster pixels.
     */
-    if (TransformColorspace(image,CMYKColorspace) == MagickFail)
-      ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+    if ((status &= TransformColorspace(image,CMYKColorspace)) == MagickFail)
+      {
+        MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+        ThrowWriterException(CoderError,UnableToTransformColorspace,image);
+      }
     if (LocaleCompare(image_info->magick,"CMYKA") == 0)
       if (!image->matte)
-        SetImageOpacity(image,OpaqueOpacity);
+        if ((status &= SetImageOpacity(image,OpaqueOpacity)) == MagickFail)
+          {
+            MagickFreeResourceLimitedMemory(unsigned char *,pixels);
+            ThrowWriterException(CoderError,UnableToSetImageOpacity,image);
+          }
 
     switch (image_info->interlace)
     {

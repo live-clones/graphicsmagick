@@ -13,6 +13,9 @@
         Warn if return value from SetImageInfo() is not checked, and
         quench any warnings which result.
 
+        Warn if return value from SetImageType() is not checked, and
+        address any warnings which result.
+
         * coders/png.c (ReadMNGImage): Perform proper clean-ups when
         SetImage() fails.  Addresses oss-fuzz issue 590193559
         "graphicsmagick:coder_MNG_fuzzer: Direct-leak in

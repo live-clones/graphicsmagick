@@ -518,7 +518,7 @@ ColorMatrixImage(Image *image,const unsigned int order,const double *color_matri
       Add opacity channel if we will be updating opacity.
     */
     if ((!image->matte) && (options.matrix[3] != (double *) NULL))
-      SetImageOpacity(image,OpaqueOpacity);
+      status &= SetImageOpacity(image,OpaqueOpacity);
   }
 
   if (LogMagickEvent(TransformEvent,GetMagickModule(),
@@ -1441,7 +1441,12 @@ MagickExport Image *SteganoImage(const Image * restrict image,const Image * rest
             break;
           }
         }
-        (void) SyncImage(stegano_image);
+        if ((status &= SyncImage(stegano_image)) == MagickFail)
+          {
+            CopyException(exception,&stegano_image->exception);
+            DestroyImage(stegano_image);
+            return (Image *) NULL;
+          }
         c++;
         if (c == 3)
           c=0;
@@ -1458,7 +1463,12 @@ MagickExport Image *SteganoImage(const Image * restrict image,const Image * rest
         break;
   }
   if (stegano_image->storage_class == PseudoClass)
-    (void) SyncImage(stegano_image);
+    if ((status &= SyncImage(stegano_image)) == MagickFail)
+      {
+        CopyException(exception,&stegano_image->exception);
+        DestroyImage(stegano_image);
+        return (Image *) NULL;
+      }
   stegano_image->is_grayscale=is_grayscale;
   return(stegano_image);
 }
@@ -1854,7 +1864,10 @@ MagickExport Image *WaveImage(const Image * restrict image,const double amplitud
   */
   if ((wave_image->background_color.opacity != OpaqueOpacity) &&
       (!wave_image->matte))
-    SetImageOpacity(wave_image,OpaqueOpacity);
+    status &= SetImageOpacity(wave_image,OpaqueOpacity);
+
+  if (status == MagickFail)
+    GetImageException(wave_image,exception);
 
   /*
     Allocate and initialize sine map.

@@ -3142,7 +3142,7 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
           assert(mask_image->signature == MagickSignature);
           status&=SetImageType(composite_image,TrueColorMatteType);
           if (!composite_image->matte)
-            SetImageOpacity(composite_image,OpaqueOpacity);
+            status&=SetImageOpacity(composite_image,OpaqueOpacity);
           status&=CompositeImage(composite_image,CopyOpacityCompositeOp,
                                  mask_image,0,0);
           if (status == MagickFail)
@@ -3157,7 +3157,7 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
             Create mattes for dissolve.
           */
           if (!composite_image->matte)
-            SetImageOpacity(composite_image,OpaqueOpacity);
+            status&=SetImageOpacity(composite_image,OpaqueOpacity);
           for (y=0; y < (long) composite_image->rows; y++)
             {
               q=GetImagePixels(composite_image,0,y,composite_image->columns,1);
@@ -3172,6 +3172,8 @@ static MagickPassFail CompositeImageList(ImageInfo *image_info,Image **image,
               if (!SyncImagePixels(composite_image))
                 break;
             }
+          if (status == MagickFail)
+            GetImageException(composite_image,exception);
         }
       if (option_info->compose == DisplaceCompositeOp)
         (void) CloneString(&composite_image->geometry,

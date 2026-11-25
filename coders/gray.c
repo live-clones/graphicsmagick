@@ -630,19 +630,20 @@ static unsigned int WriteGRAYImage(const ImageInfo *image_info,Image *image)
       case YellowQuantum:
       case BlackQuantum:
         {
-          if (TransformColorspace(image,CMYKColorspace) == MagickFail)
+          if ((status &= TransformColorspace(image,CMYKColorspace)) == MagickFail)
             ThrowWriterException(CoderError,UnableToTransformColorspace,image);
           break;
         }
       default:
         {
-          if (TransformColorspace(image,RGBColorspace) == MagickFail)
+          if ((status &= TransformColorspace(image,RGBColorspace)) == MagickFail)
             ThrowWriterException(CoderError,UnableToTransformColorspace,image);
         }
       }
     if (!(image->matte) &&
         ((quantum_type == GrayAlphaQuantum) || (quantum_type == AlphaQuantum)))
-      (void) SetImageOpacity(image,OpaqueOpacity);
+      if ((status &= SetImageOpacity(image,OpaqueOpacity)) == MagickFail)
+        ThrowWriterException(CoderError,UnableToSetImageOpacity,image);
 
     /*
       Allocate scanline

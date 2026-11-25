@@ -122,13 +122,12 @@ static Image *ReadMONOImage(const ImageInfo *image_info,
   if ((image->columns == 0) || (image->rows == 0))
     ThrowReaderException(OptionError,MustSpecifyImageSize,image);
   status=OpenBlob(image_info,image,ReadBinaryBlobMode,exception);
-  if (status == False)
+  if (status == MagickFail)
     ThrowReaderException(FileOpenError,UnableToOpenFile,image);
   for (i=0; i < image->offset; i++)
     {
       if (EOF == ReadBlobByte(image))
-        ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
-                       image->filename);
+        ThrowReaderException(CorruptImageError,UnexpectedEndOfFile,image);
     }
   /*
     Initialize image colormap.
@@ -162,7 +161,7 @@ static Image *ReadMONOImage(const ImageInfo *image_info,
         bit=0U;
       byte>>=1U;
     }
-    if (!SyncImagePixels(image))
+    if ((status &= SyncImagePixels(image)) == MagickFail)
       break;
     if (QuantumTick(y,image->rows))
       if (!MagickMonitorFormatted(y,image->rows,exception,LoadImageText,
@@ -170,10 +169,12 @@ static Image *ReadMONOImage(const ImageInfo *image_info,
                                   image->columns,image->rows))
         break;
   }
-  (void) SyncImage(image);
+  status &= SyncImage(image);
   if (EOFBlob(image))
     ThrowException(exception,CorruptImageError,UnexpectedEndOfFile,
       image->filename);
+  if (image->exception.severity > exception->severity)
+    CopyException(exception, &image->exception);
   CloseBlob(image);
   StopTimer(&image->timer);
   return(image);

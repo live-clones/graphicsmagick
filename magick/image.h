@@ -1070,7 +1070,7 @@ extern MagickExport MagickPassFail
   SetImageDepth(Image *image,const unsigned long) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageInfo(ImageInfo *image_info,const unsigned int flags,ExceptionInfo *exception) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   SetImageOpacity(Image *,const unsigned int) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
-  SetImageType(Image *image,const ImageType) MAGICK_FUNC_NONNULL(),
+  SetImageType(Image *image,const ImageType) MAGICK_FUNC_NONNULL() MAGICK_FUNC_WARN_UNUSED_RESULT,
   StripImage(Image *image) MAGICK_FUNC_NONNULL(),
   SyncImage(Image *image) MAGICK_FUNC_NONNULL();
 

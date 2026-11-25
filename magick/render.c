@@ -6553,7 +6553,7 @@ DrawPrimitive(Image *image,const DrawInfo *draw_info,
     case MattePrimitive:
       {
         if (!image->matte)
-          SetImageOpacity(image,OpaqueOpacity);
+          status&=SetImageOpacity(image,OpaqueOpacity);
         switch (primitive_info->method)
           {
           case PointMethod:

@@ -5987,7 +5987,9 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           {
             photometric=PHOTOMETRIC_MINISBLACK;
             if (!image->matte)
-              SetImageOpacity(image,OpaqueOpacity);
+              if ((status &= SetImageOpacity(image,OpaqueOpacity)) == MagickFail)
+                ThrowException(&image->exception,CoderError,UnableToSetImageOpacity,
+                               image->filename);
             break;
           }
         case PaletteType:
@@ -5999,7 +6001,9 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           {
             photometric=PHOTOMETRIC_PALETTE;
             if (!image->matte)
-              SetImageOpacity(image,OpaqueOpacity);
+              if ((status &= SetImageOpacity(image,OpaqueOpacity)) == MagickFail)
+                ThrowException(&image->exception,CoderError,UnableToSetImageOpacity,
+                               image->filename);
             break;
           }
         case TrueColorType:
@@ -6011,7 +6015,9 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           {
             photometric=PHOTOMETRIC_RGB;
             if (!image->matte)
-              SetImageOpacity(image,OpaqueOpacity);
+              if ((status &= SetImageOpacity(image,OpaqueOpacity)) == MagickFail)
+                ThrowException(&image->exception,CoderError,UnableToSetImageOpacity,
+                               image->filename);
             break;
           }
         case ColorSeparationType:
@@ -6023,7 +6029,9 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
           {
             photometric=PHOTOMETRIC_SEPARATED;
             if (!image->matte)
-              SetImageOpacity(image,OpaqueOpacity);
+              if ((status &= SetImageOpacity(image,OpaqueOpacity)) == MagickFail)
+                ThrowException(&image->exception,CoderError,UnableToSetImageOpacity,
+                               image->filename);
             break;
           }
         case UndefinedType:
@@ -6039,22 +6047,22 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
       */
       if ((PHOTOMETRIC_MINISWHITE == photometric) ||
           (PHOTOMETRIC_MINISBLACK == photometric))
-      {
-        const char *
-          value;
+        {
+          const char *
+            value;
 
-        /*
-          Photometric
-        */
-        value=AccessDefinition(image_info,"tiff","photometric");
-        if (value)
-          {
-            if (LocaleCompare(value,"miniswhite") == 0)
-              photometric=PHOTOMETRIC_MINISWHITE;
-            else if (LocaleCompare(value,"minisblack") == 0)
-              photometric=PHOTOMETRIC_MINISBLACK;
-          }
-      }
+          /*
+            Photometric
+          */
+          value=AccessDefinition(image_info,"tiff","photometric");
+          if (value)
+            {
+              if (LocaleCompare(value,"miniswhite") == 0)
+                photometric=PHOTOMETRIC_MINISWHITE;
+              else if (LocaleCompare(value,"minisblack") == 0)
+                photometric=PHOTOMETRIC_MINISBLACK;
+            }
+        }
 
       /*
         If the user has selected something other than MINISWHITE,
@@ -6650,7 +6658,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
               using LERC. It specifies the maximum absolute difference
               allowed between the original and compressed pixel
               values.
-             */
+            */
             {
               const char *str_value;
               if ((str_value=AccessDefinition(image_info,"tiff","lerc-maxzerror")) != NULL)
@@ -6788,14 +6796,14 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
       if (rows_per_strip==0 || scanline_size==0)
         rows_per_strip=1;
       else
-      {
-        if (scanline_size < (tsize_t) bytes_per_strip_target)
-          rows_per_strip *= (uint32) ((size_t) bytes_per_strip_target / ((size_t) rows_per_strip*scanline_size));
-        if (rows_per_strip > image->rows)
-          rows_per_strip=image->rows;
-        if (rows_per_strip < 1)
-          rows_per_strip=1;
-      }
+        {
+          if (scanline_size < (tsize_t) bytes_per_strip_target)
+            rows_per_strip *= (uint32) ((size_t) bytes_per_strip_target / ((size_t) rows_per_strip*scanline_size));
+          if (rows_per_strip > image->rows)
+            rows_per_strip=image->rows;
+          if (rows_per_strip < 1)
+            rows_per_strip=1;
+        }
 
       /*
         It seems that some programs fail to handle more than 32K or
@@ -6918,14 +6926,14 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
 
 #if EXPERIMENTAL_EXIF_TAGS
 #if TIFFLIB_VERSION >= 20120922
-        if (status!=MagickFail)
+      if (status!=MagickFail)
         {
           const unsigned char *profile_data;
           size_t profile_length;
           if ((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
-          {
-            AddExifFields(tiff,profile_data,profile_length,logging, 0/* FLAG_BASE */);
-          }
+            {
+              AddExifFields(tiff,profile_data,profile_length,logging, 0/* FLAG_BASE */);
+            }
         }
 #endif /* TIFFLIB_VERSION >= 20120922 */
 #endif /* defined(EXPERIMENTAL_EXIF_TAGS) */
@@ -7176,7 +7184,7 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
       if (photometric == PHOTOMETRIC_MINISWHITE)
         export_options.grayscale_miniswhite=MagickTrue;
       else if (photometric == PHOTOMETRIC_MINISBLACK)
-         export_options.grayscale_miniswhite=MagickFalse;
+        export_options.grayscale_miniswhite=MagickFalse;
       /*
         Set extra export options for floating point.
       */
@@ -7597,80 +7605,80 @@ WriteTIFFImage(const ImageInfo *image_info,Image *image)
 #if EXPERIMENTAL_EXIF_TAGS
 #if TIFFLIB_VERSION >= 20120922
 
-        if (status!=MagickFail)
+      if (status!=MagickFail)
         {
           const unsigned char *profile_data;
           size_t profile_length;
           if ((profile_data=GetImageProfile(image,"Exif",&profile_length)) != 0)
-          {
-            magick_uint64_t dir_EXIF_offset = 0;
-            magick_uint64_t dir_GPS_offset = 0;
-         /*
-          * Unfortunately it depends on the prehistory, what number TIFFCurrentDirectory() will get back.
-          * Therefore, the current main IFD number has to be adapted. However, this is an inconsistency in LibTIFF which should be
-          * corrected. This means that the provided code to determine/handle current directory number here is just a current work around.
-          */
-            tdir_t current_mainifd = TIFFCurrentDirectory(tiff);
-            if (TIFFCurrentDirOffset(tiff) > 0 && current_mainifd > 0) current_mainifd--;
-
-            TIFFFreeDirectory(tiff);
-            if (TIFFCreateEXIFDirectory(tiff) == 0)
             {
-              if (AddExifFields(tiff,profile_data,profile_length,logging, FLAG_EXIF) > 0)
-                {             /* Now write the directory of Exif data */
+              magick_uint64_t dir_EXIF_offset = 0;
+              magick_uint64_t dir_GPS_offset = 0;
+              /*
+               * Unfortunately it depends on the prehistory, what number TIFFCurrentDirectory() will get back.
+               * Therefore, the current main IFD number has to be adapted. However, this is an inconsistency in LibTIFF which should be
+               * corrected. This means that the provided code to determine/handle current directory number here is just a current work around.
+               */
+              tdir_t current_mainifd = TIFFCurrentDirectory(tiff);
+              if (TIFFCurrentDirOffset(tiff) > 0 && current_mainifd > 0) current_mainifd--;
 
-                if (!TIFFWriteCustomDirectory(tiff, &dir_EXIF_offset))
+              TIFFFreeDirectory(tiff);
+              if (TIFFCreateEXIFDirectory(tiff) == 0)
                 {
-                  LogMagickEvent(CoderEvent,GetMagickModule(),"Failed TIFFWriteCustomDirectory() of the Exif data");
+                  if (AddExifFields(tiff,profile_data,profile_length,logging, FLAG_EXIF) > 0)
+                    {             /* Now write the directory of Exif data */
+
+                      if (!TIFFWriteCustomDirectory(tiff, &dir_EXIF_offset))
+                        {
+                          LogMagickEvent(CoderEvent,GetMagickModule(),"Failed TIFFWriteCustomDirectory() of the Exif data");
+                        }
+                    }
                 }
-              }
-            }
 
 #if TIFFLIB_VERSION >= 20230609
-            if (TIFFCreateGPSDirectory(tiff) == 0)
-            {
-              if (AddExifFields(tiff,profile_data,profile_length,logging, FLAG_GPS) > 0)
-                {             /* Now write the directory of Exif data */
-                if (!TIFFWriteCustomDirectory(tiff, &dir_GPS_offset))
+              if (TIFFCreateGPSDirectory(tiff) == 0)
                 {
-                  LogMagickEvent(CoderEvent,GetMagickModule(),"Failed TIFFWriteCustomDirectory() of the ExifGPS data");
+                  if (AddExifFields(tiff,profile_data,profile_length,logging, FLAG_GPS) > 0)
+                    {             /* Now write the directory of Exif data */
+                      if (!TIFFWriteCustomDirectory(tiff, &dir_GPS_offset))
+                        {
+                          LogMagickEvent(CoderEvent,GetMagickModule(),"Failed TIFFWriteCustomDirectory() of the ExifGPS data");
+                        }
+                    }
+                  else
+                    TIFFSetDirectory(tiff, 0);
                 }
-              }
-              else
-                TIFFSetDirectory(tiff, 0);
-            }
 #endif
 
-            if (dir_EXIF_offset>0 || dir_GPS_offset>0)
-              {          /* Go back to the first directory, and add the EXIFIFD pointer. */
-              TIFFSetDirectory(tiff, 0);
-              if (dir_EXIF_offset>0)
-                  TIFFSetField(tiff, TIFFTAG_EXIFIFD, dir_EXIF_offset);
-              if (dir_GPS_offset>0)
-                  TIFFSetField(tiff, TIFFTAG_GPSIFD, dir_GPS_offset);
-            }
+              if (dir_EXIF_offset>0 || dir_GPS_offset>0)
+                {          /* Go back to the first directory, and add the EXIFIFD pointer. */
+                  TIFFSetDirectory(tiff, 0);
+                  if (dir_EXIF_offset>0)
+                    TIFFSetField(tiff, TIFFTAG_EXIFIFD, dir_EXIF_offset);
+                  if (dir_GPS_offset>0)
+                    TIFFSetField(tiff, TIFFTAG_GPSIFD, dir_GPS_offset);
+                }
 
-                /* Save changed tiff-directory to file */
-            if (image->next != (Image *)NULL)
-            {
-              if (!TIFFWriteDirectory(tiff))
-              {
-                (void)LogMagickEvent(CoderEvent, GetMagickModule(), "TIFFWriteDirectory returns failed status!");
-              }
-              /* Re configure directory status for next image. Reset current IFD number. */
-              if (!TIFFSetDirectory(tiff, current_mainifd))
-              {
-                if (logging)
-                  LogMagickEvent(CoderEvent,GetMagickModule(),"TIFFSetDirectory() failed.\n");
-              }
-              TIFFFreeDirectory(tiff);
-              if (!TIFFCreateDirectory(tiff))
-              {
-                if (logging)
-                  LogMagickEvent(CoderEvent,GetMagickModule(),"TIFFCreateDirectory() failed.\n");
-              }
+              /* Save changed tiff-directory to file */
+              if (image->next != (Image *)NULL)
+                {
+                  if (!TIFFWriteDirectory(tiff))
+                    {
+                      (void)LogMagickEvent(CoderEvent, GetMagickModule(), "TIFFWriteDirectory returns failed status!");
+                    }
+                  /* Re configure directory status for next image. Reset current IFD number. */
+                  if (!TIFFSetDirectory(tiff, current_mainifd))
+                    {
+                      if (logging)
+                        LogMagickEvent(CoderEvent,GetMagickModule(),"TIFFSetDirectory() failed.\n");
+                    }
+                  TIFFFreeDirectory(tiff);
+                  if (!TIFFCreateDirectory(tiff))
+                    {
+                      if (logging)
+                        LogMagickEvent(CoderEvent,GetMagickModule(),"TIFFCreateDirectory() failed.\n");
+                    }
+                }
             }
-          }
         }
 #endif /* TIFFLIB_VERSION >= 20120922 */
 #endif /* if EXPERIMENTAL_EXIF_TAGS */

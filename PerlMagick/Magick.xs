@@ -5562,7 +5562,10 @@ Mogrify(ref,...)
                     *q;
 
                   if (!composite_image->matte)
-                    SetImageOpacity(composite_image,OpaqueOpacity);
+                    if (SetImageOpacity(composite_image,OpaqueOpacity) == MagickFail)
+                      {
+                        /* FIXME: Explicitly report error? */
+                      }
                   for (y=0; y < (long) composite_image->rows; y++)
                     {
                       q=GetImagePixels(composite_image,0,y,
@@ -5581,7 +5584,10 @@ Mogrify(ref,...)
               else
                 {
                   if (opacity != OpaqueOpacity)
-                    SetImageOpacity(composite_image,(unsigned int) opacity);
+                    if (SetImageOpacity(composite_image,(unsigned int) opacity) == MagickFail)
+                      {
+                        /* FIXME: Explicitly report error? */
+                      }
                 }
             }
           if (attribute_flag[9])
@@ -5633,7 +5639,10 @@ Mogrify(ref,...)
                   /* FIXME: Explicitly report error? */
                 }
               if (!composite_image->matte)
-                SetImageOpacity(composite_image,OpaqueOpacity);
+                if (SetImageOpacity(composite_image,OpaqueOpacity) == MagickFail)
+                  {
+                    /* FIXME: Explicitly report error? */
+                  }
               (void) CompositeImage(composite_image,CopyOpacityCompositeOp,
                 mask_image,0,0);
             }
@@ -5892,7 +5901,10 @@ Mogrify(ref,...)
           if (attribute_flag[3])
             opacity=argument_list[3].int_reference;
           if (!image->matte)
-            SetImageOpacity(image,OpaqueOpacity);
+            if (SetImageOpacity(image,OpaqueOpacity) == MagickFail)
+              {
+                /* FIXME: Explicitly report error? */
+              }
           (void) AcquireOnePixelByReference(image,&target,(long) (geometry.x % image->columns),
             (long) (geometry.y % image->rows),&exception);
           if (attribute_flag[4])
